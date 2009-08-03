@@ -1,0 +1,7 @@
+LIBRARY     STUMS.SYS
+
+EXPORTS
+                UMSS_GetNextPDO
+                UMSS_RegisterCompletionHandler
+                UMSS_StartRequest
+                UMSS_GetMaxLun

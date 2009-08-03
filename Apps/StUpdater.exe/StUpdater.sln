@@ -1,0 +1,28 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MscDevLib", "..\..\Libs\mscdevlib\mscdevlib.vcproj", "{2EBFE417-A0C7-4D18-8C77-AC36AEEF7390}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StUpdaterApp", "stupdaterapp.vcproj", "{B0789F63-5C55-46AA-A53F-D9C815F16066}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2EBFE417-A0C7-4D18-8C77-AC36AEEF7390} = {2EBFE417-A0C7-4D18-8C77-AC36AEEF7390}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2EBFE417-A0C7-4D18-8C77-AC36AEEF7390}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2EBFE417-A0C7-4D18-8C77-AC36AEEF7390}.Debug|Win32.Build.0 = Debug|Win32
+		{2EBFE417-A0C7-4D18-8C77-AC36AEEF7390}.Release|Win32.ActiveCfg = Release|Win32
+		{2EBFE417-A0C7-4D18-8C77-AC36AEEF7390}.Release|Win32.Build.0 = Release|Win32
+		{B0789F63-5C55-46AA-A53F-D9C815F16066}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B0789F63-5C55-46AA-A53F-D9C815F16066}.Debug|Win32.Build.0 = Debug|Win32
+		{B0789F63-5C55-46AA-A53F-D9C815F16066}.Release|Win32.ActiveCfg = Release|Win32
+		{B0789F63-5C55-46AA-A53F-D9C815F16066}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

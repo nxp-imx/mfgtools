@@ -1,0 +1,132 @@
+1.782.0.000
+01/15/2009
+
+	- Added LBA_Boot tag for drive tables.
+
+1.781.0.000
+11/25/2008
+
+	- Added support for secondary USB PID.
+
+1.780.0.000
+11/20/2008
+
+	- Fixed string lengths in ReadProfileRegData().
+
+1.779.0.000
+11/17/2008
+
+	- Addition of feature to save and load configuration profiles to the registry.
+
+1.778.0.000
+11/11/2008
+
+	- Add "Default" to file system list control
+
+1.777.0.000
+10/31/2008
+
+	- Double data drive fixes
+
+1.776.0.000
+10/27/2008
+
+	- Added data drive label option
+
+1.775.0.000
+10/09/2008
+
+	- Added new option to display message when minimal dialog is formatting the data area.
+
+1.774.0.000
+10/08/2008
+
+	- Fixes for bitmap specification, name retention, and resource update
+	- Fixes to reserve space for fileversion resources
+	- Fix corrupted About by trimming trailing whitespace from strings
+	- Fix to update file version in fixed portion of file version info
+	- Updated several Asian strings from MfgTool/Updater versions
+	- Fix to visvaledit.h to add valid chars for dirpath spec
+	- Truncate version info strings in About splash to width of image
+
+1.773.0.000
+9/29/2008
+
+	- Fixed saving Auto Start/Stop options
+	- Fixed cancellation of extraction when user selects "Cancel" from file save dialog
+	- Fixed file version info saving
+
+1.772.0.000
+9/24/2008
+
+	- Changed _tscanf to _stscanf for reading the USB IDs from the TextBox into the global variable.
+	- Fixes the issue where the USB IDs can not be changed in the Binder app.
+	Apps\StBinder\TargetDeviceIdsDlg.cpp
+
+1.771.0.000
+9/18/2008
+
+	- Fixed modified drive array elements from editing existing drives
+	- Removed upper case 'L' in "Close Automatically" option
+
+1.770.0.000
+9/3/2008
+
+	- Changed registry entry to Freescale from SigmaTel
+
+1.769.0.000
+8/15/08
+
+	- Changed splash screen and About to standard, now moved to WinSupport library
+	- Fixed file version info
+	- Added Auto Start/Stop options to updater configuration
+
+1.768.0.000
+8/8/08
+
+	- Changed splash screen and About to standard
+	- Added Low NAND Solution option
+
+1.766.0.000
+07/25/2008
+
+	- Full configuration of updater application
+
+1.764.5.000
+05/12/2008
+
+	- Added updater configuration options for:
+		Format Data Area
+		Erase Media
+	- Changed version format to periods from commas
+
+1.762.4.000
+11/5/2007
+
+	- Add support for 3700 firmware version information
+
+1.762.3.000
+08/16/2007
+
+	- fix version number
+	- correct PRC strings
+
+1.762.0.002
+08/14/2007
+
+	- Localization fix
+
+1.762.0.001
+08/13/2007
+
+	- Localization fix
+
+1.762.0.000
+08/09/2007
+
+	- Localization fixes
+
+1.761.0.000
+07/03/2007
+
+	- Added "Force Recovery Mode" option to updater configuration

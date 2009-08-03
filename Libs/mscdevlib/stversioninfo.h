@@ -1,0 +1,65 @@
+// StVersionInfo.h: interface for the CStVersionInfo class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#if !defined(AFX_STVERSIONINFO_H__72EA2FE9_CF2B_403B_91DB_A14C9C3F14F7__INCLUDED_)
+#define AFX_STVERSIONINFO_H__72EA2FE9_CF2B_403B_91DB_A14C9C3F14F7__INCLUDED_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
+class CStVersionInfo : CStBase
+{
+public:
+	CStVersionInfo(string name="CStVersionInfo");
+	CStVersionInfo(const CStVersionInfo&);
+	CStVersionInfo& operator=(const CStVersionInfo& ver);
+
+	virtual ~CStVersionInfo();
+
+	BOOL operator != (CStVersionInfo&);
+	BOOL operator == (CStVersionInfo&);
+	BOOL operator > (const CStVersionInfo& rhsVer) const;
+
+	USHORT GetHigh() const;
+	USHORT GetMid() const;
+	USHORT GetLow() const;
+
+	void Reset();
+	void SetHigh(DWORD high, bool _bcd = false);
+	void SetMid(DWORD Mid, bool _bcd = false);
+	void SetLow(DWORD low, bool _bcd = false);
+
+	wstring GetVersionString();
+
+	BOOL m_loaded_from_resource;
+
+private:
+	USHORT	m_high;
+	USHORT	m_mid;	USHORT	m_low;
+
+	////////////////////////////////////////////////////////////////////////////////
+	//! Converts a four digit BCD number to the decimal equivalent.
+	//! Remember that the BCD value is big endian but read as a 16-bit little 
+	//! endian number. So we have to byte swap during this conversion.
+	//!
+	//! \param bcdNumber BCD value in reverse byte order.
+	//! \return A decimal version of \a bcdNumber.
+	////////////////////////////////////////////////////////////////////////////////
+	inline USHORT BCD2D(USHORT bcdNumber) {
+		USHORT resultVersion;
+		resultVersion = ((bcdNumber & 0x000f) * 100);
+		resultVersion += ( ((bcdNumber & 0x00f0) >> 4) * 1000);
+		resultVersion += ( ((bcdNumber & 0x0f00) >> 8) * 1);
+		resultVersion += ( ((bcdNumber & 0xf000) >> 12) * 10);
+		return resultVersion;
+	} 
+};
+
+class CStVersionInfoPtrArray : public CStArray<class CStVersionInfo*> {
+public:
+	CStVersionInfoPtrArray(size_t size, string name="CStVersionInfoPtrArray");
+	~CStVersionInfoPtrArray();
+};
+#endif // !defined(AFX_STVERSIONINFO_H__72EA2FE9_CF2B_403B_91DB_A14C9C3F14F7__INCLUDED_)

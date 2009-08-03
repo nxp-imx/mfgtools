@@ -1,0 +1,10 @@
+*******************************
+RELEASE_DEVICEAPI_v1.0.0.4
+BR_PIANO_MAIN_DEV_0002
+
+br_piano_main_dev_0003
+
+07/12/06
+
+	- Improved HidDevice error handling.
+	- DeviceManager messaging work. Still in development.

@@ -1,0 +1,128 @@
+; Installation inf for the SigmaTel 3410/3500/3600 USB Bulk IO Recovery Device
+;
+; (c) Copyright 1999 Microsoft
+;
+
+[Version]
+Signature="$CHICAGO$"
+Class=Player_Recovery_Device
+ClassGUID={9FFF066D-3ED3-4567-9123-8B82CFE1CDD4}
+Provider=%MfgName%
+DriverVer=01/12/2007,6.0.1.0
+CatalogFile=StMp3Recx64.cat
+
+[SourceDisksNames]
+1=%Disk_Description%,,,
+
+[SourceDisksFiles]
+StMp3Recx64.sys = 1
+
+[Manufacturer]
+%MfgName%=Microsoft, NTamd64
+
+[Microsoft.NTamd64]
+%DeviceDesc%=StMp3Rec.Dev, USB\VID_066F&PID_3410&REV_0083
+%DeviceDesc%=StMp3Rec.Dev, USB\VID_066F&PID_3410
+%DeviceDesc%=StMp3Rec.Dev, USB\VID_066F&PID_3500
+%DeviceDesc%=StMp3Rec.Dev, USB\VID_066F&PID_3600
+
+[ClassInstall32]
+Addreg=Class_AddReg
+
+[Class_AddReg]
+HKR,,,,%DeviceDesc%
+HKR,,Icon,,"-53"
+
+[DestinationDirs]
+StMp3Rec.Files.Ext = 10,System32\Drivers
+
+[StMp3Rec.Dev.NT]
+CopyFiles=StMp3Rec.Files.Ext
+
+[StMp3Rec.Dev.NT.Services]
+Addservice = StMp3Recx64, 0x00000002, StMp3Rec.AddService
+
+[StMp3Rec.AddService]
+DisplayName    = %SvcDesc%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %10%\System32\Drivers\StMp3Recx64.sys
+AddReg         = StMp3Rec.AddReg
+LoadOrderGroup = Base
+
+[StMp3Rec.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,StMp3Recx64.sys
+HKR,"Parameters","MaximumTransferSize",0x10001,4096
+HKR,"Parameters","DebugLevel",0x10001,2
+HKR,"Parameters","BulkUsbEnable",0x10001,1
+
+[StMp3Rec.Files.Ext]
+StMp3Recx64.sys
+
+;---------------------------------------------------------------;
+
+[Strings]
+; English
+Disk_Description="Installation Disk"
+ProviderName="Player"
+MfgName="Generic"
+DeviceDesc="Player Recovery Device Class"
+SvcDesc="Player Recovery Device Control Driver"
+
+[Strings.0404]
+; Chinese (traditional)
+Disk_Description="Installation Disk"
+ProviderName="冀诀"
+MfgName="硄ノ"
+DeviceDesc="冀诀確砞称摸"
+SvcDesc="冀诀確砞称北臱笆祘Α"
+
+[Strings.0804]
+; Chinese (simplified)
+Disk_Description="Installation Disk"
+ProviderName="播放机"
+MfgName="通用"
+DeviceDesc="播放机恢复设备类别"
+SvcDesc="播放机恢复设备控制驱动程序"
+
+[Strings.0412]
+; Korean
+Disk_Description="Installation Disk"
+ProviderName="敲饭捞绢"
+MfgName="裹侩"
+DeviceDesc="敲饭捞绢 汗备 厘摹 努贰胶"
+SvcDesc="敲饭捞绢 汗备 厘摹 力绢 靛扼捞滚"
+
+[Strings.040a]
+; Spanish
+Disk_Description="Installation Disk"
+ProviderName="Reproductor"
+MfgName="Gen閞ico"
+DeviceDesc="Clase de dispositivo de recuperaci髇 del reproductor"
+SvcDesc="Controlador del dispositivo de recuperaci髇 del reproductor"
+
+[Strings.0411]
+; Japanese
+Disk_Description="Installation Disk"
+ProviderName="僾儗乕儎乕"
+MfgName="昗弨"
+DeviceDesc="僾儗乕儎乕 儕僇僶儕 僨僶僀僗 僋儔僗"
+SvcDesc="僾儗乕儎乕 儕僇僶儕 僨僶僀僗 僐儞僩儘乕儖 僪儔僀僶 "
+
+[Strings.040c]
+; French
+Disk_Description="Installation Disk"
+ProviderName="Lecteur"
+MfgName="G閚閞ique"
+DeviceDesc="Classe de p閞iph閞ique de la restauration de lecteur"
+SvcDesc="Pilote de p閞iph閞ique de la restauration de lecteur"
+
+[Strings.0407]
+; German
+Disk_Description="Installation Disk"
+ProviderName="Player"
+MfgName="Allgemein"
+DeviceDesc="Player-Wiederherstellungsger鋞eklasse"
+SvcDesc="Treiber f黵 Player-Wiederherstellungsger鋞"

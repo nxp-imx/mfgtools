@@ -1,0 +1,323 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\DeviceApi.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "..\\..\\Resources\\StCompany.ico"
+IDI_STSCSI_ICON         ICON                    "..\\..\\resources\\StScsi.ico"
+IDI_STHIDBLTC_ICON      ICON                    "..\\..\\resources\\StHidBltc.ico"
+IDI_STHIDPITC_ICON      ICON                    "..\\..\\resources\\StHidPitc.ico"
+IDI_SCSI_ICON           ICON                    "..\\..\\resources\\Scsi.ico"
+IDI_STMTP_ICON          ICON                    "..\\..\\resources\\StMtp.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About DeviceApi"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "DeviceApi Version 1.0.3.2",IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2006",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+END
+
+IDD_DEVICEAPI_DIALOG DIALOGEX 0, 0, 472, 226
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "DeviceApi"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Close",IDCANCEL,330,203,50,16
+    COMBOBOX        IDC_SELECT_DEVICE_COMBO,7,18,152,53,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Refresh",IDC_REFRESH_BUTTON,167,19,37,11
+    CONTROL         "",IDC_API_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,48,119,145
+    EDITTEXT        IDC_COMMAND_EDIT,142,48,102,21,ES_MULTILINE | ES_UPPERCASE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | WS_VSCROLL
+    RTEXT           "16 bytes (max)",IDC_CDB_SIZE_TEXT,183,72,52,8
+    CONTROL         "Read",IDC_READ_RADIO,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP,158,91,33,10
+    CONTROL         "Write",IDC_WRITE_RADIO,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,196,91,30,10
+    EDITTEXT        IDC_XFER_SIZE_EDIT,173,124,40,14,ES_READONLY
+    LTEXT           "OK",IDC_STATUS_TEXT,161,175,77,8
+    DEFPUSHBUTTON   "Send",IDC_SEND_BUTTON,168,148,50,14
+    EDITTEXT        IDC_RESPONSE_EDIT,259,48,206,146,ES_MULTILINE | ES_READONLY | WS_VSCROLL
+    LTEXT           "Select device:",IDC_STATIC,7,7,69,8
+    LTEXT           "Select API:",IDC_STATIC,7,37,69,8
+    LTEXT           "CDB size:",IDC_STATIC,146,72,33,8
+    LTEXT           "Response:",IDC_STATIC,259,37,41,8
+    GROUPBOX        "Command:",IDC_STATIC,137,37,112,174
+    LTEXT           "Command data size:",IDC_STATIC,146,113,82,8
+    GROUPBOX        "",IDC_STATIC,149,82,87,25
+    LTEXT           "bytes",IDC_STATIC,218,127,19,8
+    CONTROL         "Reject AutoPlay",IDC_REJECT_AUTOPLAY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,203,72,10
+    CONTROL         "",IDC_TALKY_LED,"Static",SS_BLACKFRAME,146,174,10,10
+    CONTROL         "",IDC_CMD_PROGRESS,"msctls_progress32",0x0,142,195,102,7
+END
+
+IDD_PARAM_DIALOG DIALOGEX 0, 0, 225, 156
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,57,135,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,117,135,50,14
+    EDITTEXT        IDC_PARAM1_VAL,91,17,127,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Preserve Janus Drive:",IDC_PARAM1_TAG,7,20,80,8,NOT WS_VISIBLE
+    EDITTEXT        IDC_PARAM2_VAL,91,35,127,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Parameter tag:",IDC_PARAM2_TAG,7,38,80,8,NOT WS_VISIBLE
+    EDITTEXT        IDC_PARAM3_VAL,91,53,127,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Parameter tag:",IDC_PARAM3_TAG,7,56,80,8,NOT WS_VISIBLE
+    EDITTEXT        IDC_PARAM4_VAL,91,71,127,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Parameter tag:",IDC_PARAM4_TAG,7,74,80,8,NOT WS_VISIBLE
+    EDITTEXT        IDC_PARAM5_VAL,91,89,127,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Parameter tag:",IDC_PARAM5_TAG,7,92,80,8,NOT WS_VISIBLE
+    EDITTEXT        IDC_PARAM6_VAL,91,107,127,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Parameter tag:",IDC_PARAM6_TAG,7,110,80,8,NOT WS_VISIBLE
+    CTEXT           "Info",IDC_API_INFO,7,65,211,8,NOT WS_VISIBLE
+    COMBOBOX        IDC_PARAM1_VAL_LIST,91,18,127,30,CBS_DROPDOWNLIST | CBS_SORT | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_PARAM2_VAL_LIST,91,36,127,30,CBS_DROPDOWNLIST | CBS_SORT | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_PARAM3_VAL_LIST,91,54,127,30,CBS_DROPDOWNLIST | CBS_SORT | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_PARAM4_VAL_LIST,91,72,127,30,CBS_DROPDOWNLIST | CBS_SORT | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_PARAM5_VAL_LIST,91,90,127,30,CBS_DROPDOWNLIST | CBS_SORT | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_PARAM6_VAL_LIST,91,108,127,30,CBS_DROPDOWNLIST | CBS_SORT | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_DATA_DIALOG DIALOGEX 0, 0, 220, 186
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,56,165,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,113,165,50,14
+    EDITTEXT        IDC_CMD_DATA_EDIT,7,7,206,146,ES_MULTILINE | WS_VSCROLL
+END
+
+IDD_ATTACH_DATA_DIALOG DIALOGEX 0, 0, 404, 311
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_ACCEPTFILES
+CAPTION "Attach Data"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Firmware file/resource selection",IDC_SELECT_FIRMWARE_RADIO,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,16,22,118,10
+    CONTROL         "Hex input",IDC_SELECT_HEX_RADIO,"Button",BS_AUTORADIOBUTTON,140,22,47,10
+    CONTROL         "Version input",IDC_SELECT_VERSION_RADIO,"Button",BS_AUTORADIOBUTTON,194,22,58,10
+    CONTROL         "File",IDC_FIRMWARE_FILE_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,16,62,25,10
+    CONTROL         "Resource",IDC_FIRMWARE_RESOURCE_RADIO,"Button",BS_AUTORADIOBUTTON,16,81,44,10
+    COMBOBOX        IDC_FIRMWARE_FILE_COMBO,66,61,259,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,WS_EX_ACCEPTFILES
+    COMBOBOX        IDC_FIRMWARE_RESOURCE_COMBO,66,80,259,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_FIRMWARE_FILE_BROWSE_BUTTON,332,60,16,14
+    LTEXT           "Empty list",IDC_FIRMWARE_FILE_EMPTY_LINK,360,63,34,8
+    EDITTEXT        IDC_HEX_INPUT_EDIT,16,190,371,58,ES_MULTILINE | WS_VSCROLL
+    EDITTEXT        IDC_VERSION_INPUT_EDIT,16,277,72,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,290,290,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,347,290,50,14
+    GROUPBOX        "Firmware",IDC_STATIC,7,46,390,122
+    LTEXT           "Component Version:",IDC_FW_COMP_VER_LABEL,16,138,68,8
+    LTEXT           "Product Version:",IDC_PROD_VER_LABEL,16,152,56,8
+    LTEXT           "Type/Id:",IDC_FW_TYPE_LABEL,16,124,30,8
+    LTEXT           "000.000.000",IDC_FIRMWARE_COMPONENT_VERSION_TEXT,89,138,58,8
+    LTEXT           "000.000.000",IDC_FIRMWARE_PRODUCT_VERSION_TEXT,89,152,58,8
+    LTEXT           "36xx-RSRC",IDC_FIRMWARE_TYPE_ID_TEXT,51,124,58,8
+    LTEXT           "Size:",IDC_STATIC,304,271,19,8
+    LTEXT           "1,024 bytes",IDC_DATA_SIZE_TEXT,330,271,67,8
+    LTEXT           "Tag:",IDC_FW_TAG_LABEL,165,152,18,8
+    LTEXT           "DRIVE_TAG_BOOTMANAGER_S (0x50)",IDC_FIRMWARE_TAG_TEXT,206,152,133,8
+    LTEXT           "Language:",IDC_FW_LANG_LABEL,165,138,36,8
+    LTEXT           "English (US)",IDC_FIRMWARE_LANGUAGE_TEXT,206,138,104,8
+    EDITTEXT        IDC_FIRMWARE_FILE_PATH_EDIT,16,102,371,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    GROUPBOX        "Hex",IDC_STATIC,7,175,390,81
+    GROUPBOX        "Version",IDC_STATIC,7,263,90,36
+    GROUPBOX        "Select Data Source",IDC_STATIC,7,7,390,33
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,3,2
+ PRODUCTVERSION 1,0,3,2
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "SigmaTel, Inc."
+            VALUE "FileDescription", "Sends API commands to SigmaTel devices."
+            VALUE "FileVersion", "1.0.3.2"
+            VALUE "InternalName", "DeviceApi.exe"
+            VALUE "LegalCopyright", "Copyright (C) 2008. SigmaTel, Inc.  All rights reserved."
+            VALUE "OriginalFilename", "DeviceApi.exe"
+            VALUE "ProductName", "DeviceApi"
+            VALUE "ProductVersion", "1.0.3.2"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_DEVICEAPI_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 465
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 219
+    END
+
+    IDD_PARAM_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 218
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 149
+    END
+
+    IDD_DATA_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 213
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 179
+    END
+
+    IDD_ATTACH_DATA_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 397
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 304
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About DeviceApi..."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\DeviceApi.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

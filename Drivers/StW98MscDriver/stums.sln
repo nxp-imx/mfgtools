@@ -1,0 +1,45 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stums_sys", "sys\stums_sys.vcproj", "{E9AD09F4-FBC3-46BA-8E80-9174846E259C}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stums_pdr", "pdr\stums_pdr.vcproj", "{FF3539DF-828B-4FD2-A118-96BB35399869}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 3
+		SccProjectName0 = stums
+		SccLocalPath0 = .
+		SccProvider0 = MSSCCI:ClearCase
+		CanCheckoutShared = false
+		SolutionUniqueID = {2335DE45-1C3A-4260-9E06-7F0E7FCB429D}
+		SccProjectUniqueName1 = pdr\\stums_pdr.vcproj
+		SccLocalPath1 = .
+		CanCheckoutShared = false
+		SccProjectFilePathRelativizedFromConnection1 = pdr\\
+		SccProjectUniqueName2 = sys\\stums_sys.vcproj
+		SccLocalPath2 = .
+		CanCheckoutShared = false
+		SccProjectFilePathRelativizedFromConnection2 = sys\\
+	EndGlobalSection
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{E9AD09F4-FBC3-46BA-8E80-9174846E259C}.Debug.ActiveCfg = Debug|Win32
+		{E9AD09F4-FBC3-46BA-8E80-9174846E259C}.Debug.Build.0 = Debug|Win32
+		{E9AD09F4-FBC3-46BA-8E80-9174846E259C}.Release.ActiveCfg = Release|Win32
+		{E9AD09F4-FBC3-46BA-8E80-9174846E259C}.Release.Build.0 = Release|Win32
+		{FF3539DF-828B-4FD2-A118-96BB35399869}.Debug.ActiveCfg = Debug|Win32
+		{FF3539DF-828B-4FD2-A118-96BB35399869}.Debug.Build.0 = Debug|Win32
+		{FF3539DF-828B-4FD2-A118-96BB35399869}.Release.ActiveCfg = Release|Win32
+		{FF3539DF-828B-4FD2-A118-96BB35399869}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

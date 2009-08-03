@@ -1,0 +1,229 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\StFwLoader.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "..\\..\\Resources\\StCompany.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_CONNECTED           BITMAP                  "res\\connected.bmp"
+IDB_UNCONNECTED         BITMAP                  "res\\unconnected.bmp"
+IDB_ERROR               BITMAP                  "res\\error.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 143
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About StFwLoader"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "StFwLoader Version 1.0.9.0",IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2005; SigmaTel, Inc. All rights reserved.",IDC_STATIC,40,25,181,10
+    DEFPUSHBUTTON   "OK",IDOK,92,120,50,16,WS_GROUP
+    EDITTEXT        IDC_DESC_EDIT,19,44,198,34,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Intelligent Applications -\n\t        Committed to making life simpler.",IDC_STATIC,19,89,198,20
+END
+
+IDD_STFWLOADER_DIALOG DIALOGEX 0, 0, 272, 201
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_ACCEPTFILES | WS_EX_APPWINDOW
+CAPTION "StFwLoader"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_FILE_COMBO,14,23,225,84,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_BROWSE_BUTTON,243,23,15,12
+    PUSHBUTTON      "Load",IDC_LOAD_BUTTON,111,136,50,14
+    CONTROL         "Reject AutoPlay",IDC_REJECT_AUTOPLAY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,171,75,10
+    CONTROL         "Always on top",IDC_ON_TOP_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,184,61,10
+    CONTROL         "Automatically start download",IDC_AUTO_DOWNLOAD_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,87,171,113,10
+    DEFPUSHBUTTON   "Close",IDCANCEL,215,178,50,16
+    CTEXT           "Empty list",IDC_EMPTY_LIST_LINK,228,94,35,8
+    CONTROL         "",IDC_PROGRESS1,"msctls_progress32",WS_BORDER,7,156,258,8
+    LTEXT           "Size:",IDC_STATIC,14,56,16,8
+    LTEXT           "Date modified:",IDC_STATIC,14,67,48,8
+    LTEXT           "0 bytes",IDC_FILE_SIZE,90,56,92,8
+    LTEXT           "8/29/2005",IDC_FILE_DATE,90,67,50,8
+    LTEXT           "Product version:",IDC_STATIC,14,78,56,8
+    LTEXT           "Component version:",IDC_STATIC,14,89,67,8
+    GROUPBOX        "File details",IDC_STATIC,7,5,258,100
+    LTEXT           "C:\\this\\is\\a\\very\\long\\path\\plus\\the\\filename.sb",IDC_FILE_NAME,14,44,244,8,SS_PATHELLIPSIS
+    LTEXT           "2.521.103",IDC_PRODUCT_VERSION,90,78,65,8
+    LTEXT           "2.521.103",IDC_COMPONENT_VERSION,90,89,65,8
+    EDITTEXT        IDC_STATUS_EDIT,67,115,138,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    CONTROL         132,IDC_CONNECTED_PICT,"Static",SS_BITMAP | SS_CENTERIMAGE,13,112,46,37
+    LTEXT           "Type:",IDC_STATIC,160,78,20,8
+    LTEXT           "????",IDC_TAG,184,78,80,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,9,0
+ PRODUCTVERSION 1,0,9,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "SigmaTel, inc."
+            VALUE "FileDescription", "STMP Firmware Loader"
+            VALUE "FileVersion", "1.0.9.0"
+            VALUE "InternalName", "StFwLoader.exe"
+            VALUE "LegalCopyright", "SigmaTel, Inc.  All rights reserved."
+            VALUE "OriginalFilename", "StFwLoader.exe"
+            VALUE "ProductName", "STMP Firmware Loader"
+            VALUE "ProductVersion", "1.0.9.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 10
+        BOTTOMMARGIN, 136
+    END
+
+    IDD_STFWLOADER_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 265
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 194
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About StFwLoader..."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\StFwLoader.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

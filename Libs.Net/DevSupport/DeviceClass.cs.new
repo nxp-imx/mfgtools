@@ -1,0 +1,399 @@
+// UsbEject version 1.0 March 2006
+// written by Simon Mourier <email: simon [underscore] mourier [at] hotmail [dot] com>
+
+using System;
+using System.ComponentModel;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
+
+namespace DevSupport.DeviceManager
+{
+    /// <summary>
+    /// A generic base class for physical device classes.
+    /// </summary>
+    public abstract class DeviceClass : IDisposable, IEnumerable
+    {
+//        private IntPtr _deviceInfoSet;
+        private Guid _ClassGuid;
+        private Guid _InterfaceGuid;
+        private int _ClassIconIndex;
+        private String _Description;
+        private String _Enumerator;
+        private Collection<Device> _Devices;
+
+        #region IEnumerable Implementation
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return Devices.GetEnumerator();
+        }
+        
+        #endregion
+
+        protected DeviceClass(Guid iFaceGuid, Guid classGuid, String enumerator)
+            : this(iFaceGuid, classGuid, enumerator, IntPtr.Zero)
+        {
+        }
+
+        internal virtual Device CreateDevice(Win32.SP_DEVINFO_DATA deviceInfoData, String path)
+        {
+            return new Device(deviceInfoData.devInst, path);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the DeviceClass class.
+        /// </summary>
+        /// <param name="classGuid">A device class Guid.</param>
+        /// <param name="hwndParent">The handle of the top-level window to be used for any user interface or IntPtr.Zero for no handle.</param>
+        protected DeviceClass(Guid iFaceGuid, Guid classGuid, String enumerator, IntPtr hwndParent)
+        {
+            _InterfaceGuid = iFaceGuid;
+            _ClassGuid = classGuid;
+            _Enumerator = enumerator;
+
+//            _deviceInfoSet = GetDevInfoSet(InterfaceGuid, ClassGuid, Enumerator);
+            //            _deviceInfoSet = Win32.SetupDiGetClassDevs(ref _InterfaceGuid, 0, hwndParent, Win32.DIGCF_DEVICEINTERFACE | Win32.DIGCF_PRESENT);
+//            if (_deviceInfoSet.ToInt32() == Win32.INVALID_HANDLE_VALUE)
+//                throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+//            if (_deviceInfoSet != IntPtr.Zero)
+//            {
+//                Win32.SetupDiDestroyDeviceInfoList(_deviceInfoSet);
+//                _deviceInfoSet = IntPtr.Zero;
+//            }
+        }
+
+        /// <summary>
+        /// Gets the device's class guid.
+        /// </summary>
+        public Guid ClassGuid
+        {
+            get
+            {
+                return _ClassGuid;
+            }
+        }
+
+        /// <summary>
+        /// Gets the device's interface guid.
+        /// </summary>
+        public Guid InterfaceGuid
+        {
+            get
+            {
+                return _InterfaceGuid;
+            }
+        }
+
+        /// <summary>
+        /// Gets the DeviceClass icon index.
+        /// </summary>
+        public int ClassIconIndex
+        {
+            get
+            {
+                _ClassIconIndex = -1;
+
+                if (!Win32.SetupDiGetClassImageIndex(DeviceManager.ClassImageList, ref _ClassGuid, out _ClassIconIndex))
+                {
+                    int error = Marshal.GetLastWin32Error();
+                }
+                return _ClassIconIndex;
+            }
+        }
+
+        /// <summary>
+        /// Gets the DeviceClass description.
+        /// </summary>
+        public String Description
+        {
+            get
+            {
+                if (_Description == null)
+                {
+                    int requiredSize;
+                    StringBuilder desc = new StringBuilder(1024);
+                    Guid classGuid = ClassGuid;
+                    if (Win32.SetupDiGetClassDescription(ref classGuid, desc, desc.Capacity, out requiredSize))
+                    {
+                        _Description = desc.ToString();
+                    }
+                    else
+                    {
+                        int error = Marshal.GetLastWin32Error();
+                    }
+                }
+                return _Description;
+            }
+        }
+
+        /// <summary>
+        /// Gets the DeviceClass enumerator. ex. USB, PCI, USBSTOR
+        /// </summary>
+        public String Enumerator
+        {
+            get
+            {
+                return _Enumerator;
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of devices contained in the DeviceClass
+        /// </summary>
+        public int Count
+        { 
+            get
+            {
+                return Devices.Count;
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of devices of this device class.
+        /// </summary>
+        public Collection<Device> Devices
+        {
+            get
+            {
+                if (_Devices == null)
+                {
+                    _Devices = new Collection<Device>();
+
+                    Collection<DeviceInfoData> devInfoDataSet = GetDevInfoDataSet();
+
+                    foreach (DeviceInfoData devDataInfo in devInfoDataSet)
+                    {
+//                    IntPtr infoSet = GetDevInfoSet(InterfaceGuid, ClassGuid, Enumerator);
+//
+//                    Win32.SP_DEVINFO_DATA devData = new Win32.SP_DEVINFO_DATA();
+//                    String devPath = String.Empty;
+//                    int error = Win32.ERROR_SUCCESS;
+//
+//                    for (int index = 0; /*no check*/; ++index)
+//                    {
+//
+//                        if (InterfaceGuid != Guid.Empty /*&& gWinVersionInfo().IsWinNT()*/ )
+//                        {
+//                            error = EnumDeviceInterfaceDetails(index, infoSet, InterfaceGuid, out devPath, devData);
+//                            if (error == Win32.ERROR_NO_MORE_ITEMS)
+//                            {
+//                                break;
+//                            }
+//                        }
+//                        else
+//                        {
+//                            if (!Win32.SetupDiEnumDeviceInfo(infoSet, index, devData))
+//                            {
+//                                error = Marshal.GetLastWin32Error();
+//                                if (error != Win32.ERROR_NO_MORE_ITEMS)
+//                                {
+//                                    throw new Win32Exception(error);
+//                                }
+//                                break;
+//                            }
+//                        }
+//
+//                        Device device = CreateDevice(devData, devPath);
+//                        //                        int tempIndex = device.HubIndex;
+
+                        Device device = CreateDevice(devDataInfo.Data, devDataInfo.Path);
+                        if ( device != null )
+                            _Devices.Add(device);
+                    }
+//                    _Devices.Sort();
+//                    Win32.SetupDiDestroyDeviceInfoList(infoSet);
+                }
+                return _Devices;
+            }
+        }
+
+        internal protected class DeviceInfoData
+        {
+            internal Win32.SP_DEVINFO_DATA Data = new Win32.SP_DEVINFO_DATA();
+            internal String Path = String.Empty;
+        }
+
+        protected Collection<DeviceInfoData> GetDevInfoDataSet()
+        {
+            int error = Win32.S_OK;
+
+            IntPtr infoSet = GetDevInfoSet(InterfaceGuid, ClassGuid, Enumerator);
+
+            DeviceInfoData devInfoData = new DeviceInfoData();
+            Collection<DeviceInfoData> devInfoDataSet = new Collection<DeviceInfoData>();
+
+            for (int index = 0; /*no check*/; ++index)
+            {
+
+                if (InterfaceGuid != Guid.Empty /*&& gWinVersionInfo().IsWinNT()*/ )
+                {
+                    error = EnumDeviceInterfaceDetails(index, infoSet, InterfaceGuid, out devInfoData.Path, devInfoData.Data);
+                    if (error == Win32.ERROR_NO_MORE_ITEMS)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!Win32.SetupDiEnumDeviceInfo(infoSet, index, devInfoData.Data))
+                    {
+                        error = Marshal.GetLastWin32Error();
+                        if (error != Win32.ERROR_NO_MORE_ITEMS)
+                        {
+                            throw new Win32Exception(error);
+                        }
+                        break;
+                    }
+                }
+
+                devInfoDataSet.Add(devInfoData);
+            }
+            Win32.SetupDiDestroyDeviceInfoList(infoSet);
+
+            return devInfoDataSet;
+        }
+
+        protected IntPtr GetDevInfoSet(Guid interfaceGuid, Guid classGuid, String enumerator)
+        {
+            IntPtr infoSet = new IntPtr();
+
+            // decide the criteria for the devices
+            if (interfaceGuid != Guid.Empty) //&& gWinVersionInfo().IsWinNT()
+            {
+                infoSet = Win32.SetupDiGetClassDevs(ref interfaceGuid, 0, IntPtr.Zero,
+                    Win32.DIGCF_DEVICEINTERFACE | Win32.DIGCF_PRESENT);
+            }
+            else
+            {
+                if (String.IsNullOrEmpty(enumerator))
+                {
+                    infoSet = Win32.SetupDiGetClassDevs(ref classGuid, 0, IntPtr.Zero,
+                        Win32.DIGCF_PRESENT);
+                }
+                else
+                {
+                    infoSet = Win32.SetupDiGetClassDevs(0, enumerator, IntPtr.Zero,
+                        Win32.DIGCF_PRESENT | Win32.DIGCF_ALLCLASSES);
+                }
+            }
+
+            return infoSet;
+        }
+
+        int EnumDeviceInterfaceDetails(int index, IntPtr devInfoSet, Guid iFaceGuid, out String devPath, Win32.SP_DEVINFO_DATA devInfoData)
+        {
+            Win32.SP_DEVICE_INTERFACE_DATA interfaceData = new Win32.SP_DEVICE_INTERFACE_DATA();
+
+            if (!Win32.SetupDiEnumDeviceInterfaces(devInfoSet, null, ref iFaceGuid, index, interfaceData))
+            {
+                int error = Marshal.GetLastWin32Error();
+                if (error == Win32.ERROR_NO_MORE_ITEMS)
+                {
+                    devPath = String.Empty;
+                    devInfoData = null;
+                    return error;
+                }
+                else
+                    throw new Win32Exception(error);
+            }
+
+            int requiredSize = 0;
+            if (!Win32.SetupDiGetDeviceInterfaceDetail(devInfoSet, interfaceData, IntPtr.Zero, 0, ref requiredSize, devInfoData))
+            {
+                int error = Marshal.GetLastWin32Error();
+                if (error != Win32.ERROR_INSUFFICIENT_BUFFER)
+                    throw new Win32Exception(error);
+            }
+
+            IntPtr buffer = Marshal.AllocHGlobal(requiredSize);
+            Win32.SP_DEVICE_INTERFACE_DETAIL_DATA detailData = new Win32.SP_DEVICE_INTERFACE_DETAIL_DATA();
+            Marshal.StructureToPtr(detailData, buffer, false);
+
+            if (!Win32.SetupDiGetDeviceInterfaceDetail(devInfoSet, interfaceData, buffer, requiredSize, ref requiredSize, devInfoData))
+            {
+                Marshal.FreeHGlobal(buffer);
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
+
+            IntPtr pDevicePath = (IntPtr)((int)buffer + (int)Marshal.OffsetOf(typeof(Win32.SP_DEVICE_INTERFACE_DETAIL_DATA), "devicePath"));
+            devPath = Marshal.PtrToStringAuto(pDevicePath);
+            Marshal.FreeHGlobal(buffer);
+
+            return Win32.ERROR_SUCCESS;
+        }
+        
+        public Device FindDeviceByPath(String devPath)
+        {
+
+            if (String.IsNullOrEmpty(devPath))
+            {
+                return null;
+            }
+
+            // Find the Device in our list of devices.
+            foreach (Device dev in Devices)
+            {
+                if (dev != null)
+                {
+                    if (String.Compare(dev.Path, devPath, true) == 0)
+                    {
+                        return dev;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public Device FindDeviceByDriver(String driverName)
+        {
+            if (String.IsNullOrEmpty(driverName))
+            {
+                return null;
+            }
+
+            // Find the Device in our list of devices.
+            foreach (Device dev in Devices)
+            {
+                if (dev != null)
+                {
+                    if (String.Compare(dev.Driver, driverName, true) == 0)
+                    {
+                        return dev;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public override string ToString()
+        {
+            return Description;
+        }
+    }
+
+    /// <summary>
+    /// The device class for the Computer device.
+    /// </summary>
+    public sealed class ComputerDeviceClass : DeviceClass
+    {
+        /// <summary>
+        /// Initializes a new instance of the ComputerDeviceClass class.
+        /// </summary>
+        public ComputerDeviceClass()
+            : base(Guid.Empty, Win32.GUID_DEVCLASS_COMPUTER, String.Empty)
+        { }
+    }
+}

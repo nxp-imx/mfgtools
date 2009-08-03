@@ -1,0 +1,12 @@
+05/24/2007
+
+If you do not have the Sigmatel certificate in the Personal certificate store on your
+system you must import it using pvkimprt.exe from this folder.
+
+pvkimprt -IMPORT mycredentials.spc myprivatekey.pvk
+
+password is "sigmatel"
+
+Once in the "Personal" store you can sign an application with:
+
+signcode /s my /cn "Sigmatel, Inc." <app name>

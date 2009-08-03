@@ -1,0 +1,38 @@
+;****************************************************************************
+;                                                                           *
+; THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY     *
+; KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE       *
+; IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR     *
+; PURPOSE.                                                                  *
+;                                                                           *
+; Copyright 1993-99  Microsoft Corporation.  All Rights Reserved.           *
+;                                                                           *
+;****************************************************************************
+
+VXD STUMSPDR DYNAMIC
+
+DESCRIPTION 'Generic USB Mass Storage Port Driver'
+
+SEGMENTS
+	_LPTEXT         CLASS 'LCODE'   PRELOAD NONDISCARDABLE
+	_LTEXT          CLASS 'LCODE'   PRELOAD NONDISCARDABLE
+	_LDATA          CLASS 'LCODE'   PRELOAD NONDISCARDABLE
+	_TEXT           CLASS 'LCODE'   PRELOAD NONDISCARDABLE
+	_DATA           CLASS 'LCODE'   PRELOAD NONDISCARDABLE
+	CONST           CLASS 'LCODE'   PRELOAD NONDISCARDABLE
+	_TLS            CLASS 'LCODE'   PRELOAD NONDISCARDABLE
+	_BSS            CLASS 'LCODE'   PRELOAD NONDISCARDABLE
+	_ITEXT          CLASS 'ICODE'   DISCARDABLE
+	_IDATA          CLASS 'ICODE'   DISCARDABLE
+	_PTEXT          CLASS 'PCODE'   NONDISCARDABLE
+	_PDATA          CLASS 'PDATA'   NONDISCARDABLE SHARED
+	_STEXT          CLASS 'SCODE'   RESIDENT
+	_SDATA          CLASS 'SCODE'   RESIDENT
+        _DBOSTART       CLASS 'DBOCODE' PRELOAD NONDISCARDABLE CONFORMING
+	_DBOCODE        CLASS 'DBOCODE' PRELOAD NONDISCARDABLE CONFORMING
+	_DBODATA        CLASS 'DBOCODE' PRELOAD NONDISCARDABLE CONFORMING
+	_16ICODE        CLASS '16ICODE' PRELOAD DISCARDABLE
+	_RCODE          CLASS 'RCODE'
+EXPORTS
+        STUMSPDR_DDB @1
+

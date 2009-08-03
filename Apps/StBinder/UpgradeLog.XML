@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="StBinder">
+</Property><Property Name="Solution File" Value="C:\views\Binder\Apps\StBinder\StBinder.sln">
+</Property><Property Name="Date" Value="Monday, June 16, 2008">
+</Property><Property Name="Time" Value="16:36:25 PM">
+</Property></Properties><Event ErrorLevel="1" Project="WinSupport" Source="..\..\Libs\WinSupport\WinSupport.vcproj" Description="This application has been updated to include settings related to the User Account Control (UAC) feature of Windows Vista. By default, when run on Windows Vista with UAC enabled, this application is marked to run with the same privileges as the process that launched it. This marking also disables the application from running with virtualization. You can change UAC related settings from the Property Pages of the project.">
+</Event><Event ErrorLevel="0" Project="WinSupport" Source="..\..\Libs\WinSupport\WinSupport.vcproj" Description="Project file successfully backed up as 'C:\views\Binder\Libs\WinSupport\WinSupport.vcproj.8.00.old'.">
+</Event><Event ErrorLevel="0" Project="WinSupport" Source="..\..\Libs\WinSupport\WinSupport.vcproj" Description="Project upgraded successfully.">
+</Event><Event ErrorLevel="3" Project="WinSupport" Source="..\..\Libs\WinSupport\WinSupport.vcproj" Description="Converted">
+</Event></UpgradeLog>

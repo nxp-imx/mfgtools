@@ -1,0 +1,135 @@
+*******************************
+RELEASE_BITBURNER_v1.0.4.5
+*******************************
+BRANCH: MAIN/LATEST
+7/16/09
+
+ - Fix definition of USB_VID and USB_PID in HW_OCOTP_ROM2.
+ - Change Title bar to distiguish i.MX23 device from STMP3780 based on SW_CAP_IMX23.
+ - Make SAFE_USB_REPORT_SIZE and DISABLE_SECONDARY_BOOT reserved in public release.
+ - Created i.MX23 OTP Register set.
+   - Register HW_OCOTP_SWCAP changes:
+     - Added SW_CAP_RMVB_E (11) field.
+     - Added SW_CAP_SMV_D (12) field.
+     - Added SW_CAP_IND_TEMP (13) field.
+     - Added SW_CAP_IMX23 (19) field.
+   - Register HW_OCOTP_CUSTCAP changes:
+     - Added INTERNAL_BOARD_ID (29:28) field.
+     - Added CUST_DISABLE_JANUSDRM10 (30) field.
+     - Added CUST_DISABLE_WMADRM9 (31) field.
+   
+*******************************
+RELEASE_BITBURNER_v1.0.4.4
+*******************************
+BRANCH: MAIN/LATEST
+4/6/09
+
+ - Added SAFE_USB_REPORT_SIZE definition as bit 10 in ROM7 for 3780 TA4
+ - Added DISABLE_SECONDARY_BOOT definition as bit 30 in ROM1 for 3780 TA4
+
+*******************************
+RELEASE_BITBURNER_v1.0.4.3
+*******************************
+BRANCH: MAIN/LATEST
+6/19/08
+
+ - Use OtpAccessPitc.37700.sb for 3770 as well.
+ - OtpAccessPitc.3770.sb is no longer used.
+ 
+*******************************
+RELEASE_BITBURNER_v1.0.4.2
+*******************************
+BRANCH: MAIN/LATEST
+5/16/08
+
+ - Move StOtpRegs37xx from DevSupport into BitBurner project.
+ - Create Libs/OtpAccessPitc project for PITC functionality and resources.
+ 
+*******************************
+RELEASE_BITBURNER_v1.0.4.1
+*******************************
+BRANCH: MAIN/LATEST
+5/11/08
+
+ - Fixed SD_POWER_GATE_GPIO field definitions in HW_OCOTP_ROM0 for STMP3780.
+ 
+*******************************
+RELEASE_BITBURNER_v1.0.4.0
+*******************************
+BRANCH: MAIN/LATEST
+4/8/08
+
+ - Added OtpAccessPitc.3780.sb for Huashan parts.
+ - Added STMP3780 OT bit definitions.
+ 
+*******************************
+RELEASE_BITBURNER_v1.0.3.0
+*******************************
+BRANCH: br_host_main_dev_0089
+10/26/07
+
+ - Added OtpAccessPitc.37B0.sb for BigRAM parts.
+ - Renamed OtpAccessPitc.sb to OtpAccessPitc.3700.sb for Piano parts.
+ - GetChipId to determine which PITC to use.
+ - Don't lock the fields in the UI if the register is shadowed.
+
+*******************************
+RELEASE_BITBURNER_v1.0.2.5
+*******************************
+BRANCH: br_host_main_dev_0089
+09/10/07
+
+ - Removed USE_SERIAL_JTAG from HW_OCOTP_HWCAP2 : Bit 14.
+ - Added USE_PARALLEL_JTAG to HW_OCOTP_ROM0 : Bit 22.
+ - Added ENABLE_PJTAG_12MA_DRIVE to HW_OCOTP_ROM0 : Bit 23.
+
+*******************************
+RELEASE_BITBURNER_v1.0.2.4
+*******************************
+BRANCH: main/LATEST
+08/23/07
+
+ - Updated otp pitc to pitc_otp_rw_ek012.sb
+ - Fix for writing all HW_OCOTP_CRYPTOX registers.
+
+*******************************
+RELEASE_BITBURNER_v1.0.2.3
+*******************************
+BRANCH: main/LATEST
+08/22/07
+
+ - Add HW_OCOTP_HWCAP2:PACKAGE_TYPE: 011 - 128 pin TQFP.
+
+*******************************
+RELEASE_BITBURNER_v1.0.2.2
+*******************************
+BRANCH: br_host_main_dev_0078
+07/16/07
+ - Add Internal registers
+ - Change HW_OCOTP_ROM0:SD_POWER_UP_DELAY: 0x00 - 0ms to 0x00 - 20ms
+
+*******************************
+RELEASE_BITBURNER_v1.0.2.1
+*******************************
+BRANCH: br_host_main_dev_0068
+06/22/07
+
+ - Reverse the order of the displayed bit fields from 
+   "Register X (0:31)" to "Register X (31:0)"
+
+*******************************
+RELEASE_BITBURNER_v1.0.2.0
+*******************************
+BRANCH: br_host_main_dev_0068
+06/14/07
+
+ - Change the endian-ness of the register value before writing and after reading.
+
+*******************************
+RELEASE_BITBURNER_v1.0.1.0
+*******************************
+BRANCH: br_host_main_dev_0068
+06/1/07
+
+ - Initial Release.
+

@@ -1,0 +1,33 @@
+//
+// Vendor.h
+//
+// Vendor specific definitions returned on SCSIOP_INQUIRY.
+//
+
+#pragma pack (push, 1)
+
+typedef struct _INQUIRY_VENDOR_SPECIFIC_DATA {
+	UCHAR  NumberDataStructs;
+	UCHAR  Type;
+	UCHAR  DeviceNumberAndLUN;
+	UCHAR  Flags;
+	UCHAR  MEDIA_TYPE;
+	USHORT Size;
+} INQUIRY_VENDOR_SPECIFIC_DATA, *PINQUIRY_VENDOR_SPECIFIC_DATA;
+
+#pragma pack (pop)
+
+#define SCSI_INQUIRY_VENDOR_SPECIFIC_STRUCT_MDS		1
+
+#define SCSI_INQUIRY_VENDOR_FLAG_SYSTEMMEDIA        0x01
+
+#define SCSI_MDS_MEDIA_TYPE_NAND					0x00
+#define SCSI_MDS_MEDIA_TYPE_SMARTMEDIA				0x01
+#define SCSI_MDS_MEDIA_TYPE_MMC						0x10
+#define SCSI_MDS_MEDIA_TYPE_MMC_1_4					0x10
+#define SCSI_MDS_MEDIA_TYPE_MMC_2_1_1				0x11
+#define SCSI_MDS_MEDIA_TYPE_MMC_3_1					0x12
+#define SCSI_MDS_MEDIA_TYPE_MMC_UNKNOWN_VERSION		0x13
+#define SCSI_MDS_MEDIA_TYPE_SD						0x20
+#define SCSI_MDS_MEDIA_TYPE_SD_1_0					0x20
+#define SCSI_MDS_MEDIA_TYPE_SD_UNKNOWN_VERSION		0x21

@@ -1,0 +1,36 @@
+
+STUMS - Sigmatel USB Mass Storage Drivers For Windows 98 SE
+
+This driver was derived from a USBMSC sample template provided by Microsoft.
+It is intended to provide USB Mass Storage support on Windows 98 SE.  Other
+Micorsoft platforms provide native USBMSC support.
+
+The driver has been modified to provide support for Sigmatel based devices.
+Those changes will be listed here. In the event that Microsoft updates the
+template, these changes will need to retained.
+
+History
+=======
+08/05/2003	- Original
+
+===============================================================================
+
+
+08/05/2003
+
+Change of driver names
+
+	Changes sprinkled throughout.  UMSS changed to STUMS in both USB and
+	SCSI drivers.
+
+Version/Manufacturer information in .INF file made to be generic (non-Sigmatel).
+
+Removal of additional VID/PIDs in .INF file.  Only Sigmatel VID/PIDs supported.
+
+Added internal request in USB driver to check for a valid chip ID before
+enumerating the device. Only Sigmatel devices are supported.
+
+	Affected files: sys\umss.c
+			sys\umss.h
+			sys\ios.c
+			

@@ -1,0 +1,57 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Updater.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="UpdaterFilename" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">updater.sb</Value>
+    </Setting>
+    <Setting Name="MscUsbVid" Type="System.UInt16" Scope="Application">
+      <Value Profile="(Default)">1647</Value>
+    </Setting>
+    <Setting Name="MscUsbPid" Type="System.UInt16" Scope="Application">
+      <Value Profile="(Default)">40976</Value>
+    </Setting>
+    <Setting Name="MtpUsbVid" Type="System.UInt16" Scope="Application">
+      <Value Profile="(Default)">1647</Value>
+    </Setting>
+    <Setting Name="MtpUsbPid" Type="System.UInt16" Scope="Application">
+      <Value Profile="(Default)">40976</Value>
+    </Setting>
+    <Setting Name="UpdaterUsbVid" Type="System.UInt16" Scope="Application">
+      <Value Profile="(Default)">1647</Value>
+    </Setting>
+    <Setting Name="UpdaterUsbPid" Type="System.UInt16" Scope="Application">
+      <Value Profile="(Default)">14335</Value>
+    </Setting>
+    <Setting Name="RecoveryUsbVid" Type="System.UInt16" Scope="Application">
+      <Value Profile="(Default)">1647</Value>
+    </Setting>
+    <Setting Name="RecoveryUsbPid" Type="System.UInt16" Scope="Application">
+      <Value Profile="(Default)">14080</Value>
+    </Setting>
+    <Setting Name="EraseMedia" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PreserveJanus" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="VolumeLabel" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">FSL MMC</Value>
+    </Setting>
+    <Setting Name="ShowLog" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DriveArray" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">
+                 <ArrayOfLogicalDrive xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                    <LogicalDrive filename="firmware.sb" desc="Firmware Image 1" type="System" tag="FirmwareImg" requestedSize="0" flags="ImageData" />
+                    <LogicalDrive desc="Data Drive" type="Data" tag="tData" requestedSize="0" flags="Format" />
+                    <LogicalDrive desc="Janus Drive" type="HiddenData" tag="tJanus" requestedSize="0" flags="JanusInit" />
+                    <LogicalDrive desc="Settings Drive" type="HiddenData" tag="tSettings" requestedSize="0" flags="None" />
+                    <LogicalDrive filename="firmware.sb" desc="Firmware Image 2" type="System" tag="FirmwareImg2" requestedSize="0" flags="ImageData" />
+                    <LogicalDrive filename="firmware.sb" desc="Firmware Image 3" type="System" tag="FirmwareImg3" requestedSize="0" flags="ImageData" />
+                 </ArrayOfLogicalDrive>
+              </Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

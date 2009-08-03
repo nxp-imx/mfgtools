@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="7.10"
+	Name="stums_pdr"
+	ProjectGUID="{FF3539DF-828B-4FD2-A118-96BB35399869}"
+	SccProjectName="stums"
+	SccAuxPath=""
+	SccLocalPath=".."
+	SccProvider="MSSCCI:ClearCase"
+	Keyword="MakeFileProj">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory=".\Debug"
+			IntermediateDirectory=".\Debug"
+			ConfigurationType="0"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_pdr.mak CFG=&quot;Stums_pdr - Win32 Debug&quot;"
+				ReBuildCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_pdr.mak CFG=&quot;Stums_pdr - Win32 Debug&quot; /a"
+				CleanCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_pdr.mak CFG=&quot;Stums_pdr - Win32 Debug&quot; CLEAN"
+				Output="stumspdr.pdr"/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory=".\Release"
+			IntermediateDirectory=".\Release"
+			ConfigurationType="0"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_pdr.mak CFG=&quot;Stums_pdr - Win32 Release&quot;"
+				ReBuildCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_pdr.mak CFG=&quot;Stums_pdr - Win32 Release&quot; /a"
+				CleanCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_pdr.mak CFG=&quot;Stums_pdr - Win32 Release&quot; CLEAN"
+				Output="stums_pdr.exe"/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+			<File
+				RelativePath=".\umssaer.c">
+			</File>
+			<File
+				RelativePath=".\umssctl.asm">
+			</File>
+			<File
+				RelativePath=".\umssdbg.c">
+			</File>
+			<File
+				RelativePath=".\umssio.c">
+			</File>
+			<File
+				RelativePath=".\umsslist.c">
+			</File>
+			<File
+				RelativePath=".\umsspdr.c">
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl">
+			<File
+				RelativePath="..\iopacket.h">
+			</File>
+			<File
+				RelativePath=".\umssaer.h">
+			</File>
+			<File
+				RelativePath=".\umssdbg.h">
+			</File>
+			<File
+				RelativePath=".\umsspdr.h">
+			</File>
+			<File
+				RelativePath=".\vendor.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+		</Filter>
+		<File
+			RelativePath=".\stums_pdr.mak">
+		</File>
+		<File
+			RelativePath=".\stums_pdr.vcproj">
+		</File>
+		<File
+			RelativePath=".\umsspdr.def">
+		</File>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

@@ -1,0 +1,33 @@
+﻿<Window x:Class="MfgTool.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:MfgTool;assembly="
+    xmlns:usb="clr-namespace:DevSupport.USB;assembly=DevSupport"
+    xmlns:ui="clr-namespace:DevSupport.UI;assembly=DevSupport"
+    Title="MfgTool" SizeToContent="WidthAndHeight" Icon="/MfgTool;component/Application.ico" 
+        Loaded="Window_Loaded" Closing="Window_Closing" ResizeMode="CanMinimize">
+    <DockPanel Name="MainDockPanel" LastChildFill="True">
+        <Menu Height="22" Name="MainMenu" DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="E_xit" InputGestureText="Alt-F4" Click="OnFileExit" />
+            </MenuItem>
+            <MenuItem Header="Options">
+                <MenuItem Header="Configuration..." Click="OnOptionsConfiguration"/>
+                <MenuItem Header="Clean Registry..."/>
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="About MfgTool..."/>
+            </MenuItem>
+        </Menu>
+        <StatusBar Name="StatusBar" Height="23" DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="#FFD4D0C8"></StatusBar>
+        <Canvas Name="ControlPanel" Height="64" Background="#FFECE9D8" DockPanel.Dock="Bottom">
+            <Border BorderThickness="1" BorderBrush="#FFD4D0C8"/>
+        </Canvas>
+        <DockPanel Name="PortPanelHolder">
+            <ui:PortPanel Name="PanelA" Index="0"/>
+            <ui:PortPanel Name="PanelB" Index="1"/>
+            <ui:PortPanel Name="PanelC" Index="2"/>
+            <ui:PortPanel Name="PanelD" Index="3"/>
+        </DockPanel>
+    </DockPanel>
+</Window>

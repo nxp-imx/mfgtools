@@ -1,0 +1,16 @@
+*******************************
+RELEASE_BITBURNER_v1.0.3.2
+*******************************
+BRANCH: main/LATEST
+03/06/08
+
+ - Fixed ResponseString() for the GetLogicalTable api.
+ 
+*******************************
+RELEASE_BITBURNER_v1.0.3.1
+*******************************
+BRANCH: main/LATEST
+11/27/07
+
+ - Added MtpSwitchToMsc (0x97F7) command.
+

@@ -1,0 +1,65 @@
+; Sample2.INF
+;
+; MSDN Autoplay Sample 2
+;
+; Copyright (c) 2001 Microsoft Corporation
+;
+
+[Version]
+Signature = "$Windows NT$"
+
+[DefaultInstall]
+AddReg = Sample2.addreg
+;CopyFiles = Sample.Files.Sys
+
+;
+; Autoplay stuff
+;
+[Sample2.addreg]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MSDN Autoplay Sample 2 Handler
+HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\DeviceEnum","DefaultIcon",,"C:\Temp\Apps\DeviceEnum\obj\Debug\DeviceEnum.exe,0"
+HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\DeviceEnum","Action",,"Reject AutoPlay"
+HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\DeviceEnum","Provider",,"Device Enum"
+HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\DeviceEnum","ProgID",,"SGTL.DeviceEnum"
+HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\DeviceEnum","InitCmdLine",,"Sample unused command line"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Add the MSDN Autoplay Sample 2  Handler to an EventHandler
+; Here we picked "VideoCameraArrival", could be any Non-Volume EventHandler under the EventHandlers key
+; This is the EventHandler to put in the dialog (VideoCameraArrival)
+HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\MTPMediaPlayerArrival","SGTLDeviceEnum"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MSDN Autoplay Sample 2 ProgID/CLSID mapping
+HKCR,"SGTL.DeviceEnum",,,"SGTL Device Enum"
+HKCR,"SGTL.DeviceEnum\CLSID",,,"{C474001A-E005-4a8d-8EE5-D45224ED4DF3}"
+
+; CLSID itself
+HKCR,"CLSID\{C474001A-E005-4a8d-8EE5-D45224ED4DF3}",,,"SGTL Device Enum"
+
+HKCR,"CLSID\{C474001A-E005-4a8d-8EE5-D45224ED4DF3}\LocalServer32",,,"DeviceEnum.exe"
+HKCR,"CLSID\{C474001A-E005-4a8d-8EE5-D45224ED4DF3}\ProgID",,,"SGTL.DeviceEnum"
+HKCR,"CLSID\{C474001A-E005-4a8d-8EE5-D45224ED4DF3}\VersionIndependentProgID",,,"SGTL.DeviceEnum"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MSDN Autoplay Sample 2 AppID
+HKCR,"CLSID\{C474001A-E005-4a8d-8EE5-D45224ED4DF3}","AppID",,"{B2FE8EA6-5008-40b0-A30F-0A51511C9FB0}"
+
+; Required to be invoked from a service process.
+HKCR,"AppID\{B2FE8EA6-5008-40b0-A30F-0A51511C9FB0}","RunAs",,"Interactive User"
+
+; Required to be able to register in the Running Object Table with the ROTFLAGS_ALLOWANYCLIENT flag
+HKCR,"AppID\DeviceEnum.exe","AppID",,"{B2FE8EA6-5008-40b0-A30F-0A51511C9FB0}"
+
+;
+; File copying stuff
+;
+;[DestinationDirs]
+;Sample.Files.Sys = 11
+
+;[SourcesDiskFiles]
+;Sample2.exe
+
+;[Sample.Files.Sys]
+;Sample2.exe

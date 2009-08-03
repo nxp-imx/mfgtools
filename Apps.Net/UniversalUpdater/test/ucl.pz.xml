@@ -1,0 +1,51 @@
+<!--
+* The CFG element contains a list of recognized usb devices.
+*  DEV elements provide a name, class, vid and pid for each device.
+*
+* Each LIST element contains a list of update instructions.
+*  "Install" - Erase media and install firmware.
+*  "Update" - Update firmware only.
+*
+* Each CMD element contains one update instruction of attribute type.
+*  "pull" - Does UtpRead(body, file) transaction.
+*  "push" - Does UtpWrite(body, file) transaction.
+*  "drop" - Does UtpCommand(body) then waits for device to disconnect.
+*  "boot" - Finds configured device, forces it to "body" device and downloads "file".
+*  "find" - Waits for the "body" device to connect.
+*  "show" - Parse and show device info in "file".
+-->
+
+<UCL>
+  <CFG>
+    <VER file="firmware.sb" label="Upgrade Firmware Version: " />
+    <DEV mode="UserMtp" vid="066F" pid="A010" />
+    <DEV mode="UserMsc" vid="066F" pid="8000" />
+    <DEV mode="Updater" vid="066F" pid="37FF" />
+    <DEV mode="Recovery" vid="066F" pid="3700" />
+  </CFG>
+  <LIST name="Install" desc="Full installation.">
+    <CMD type="boot" body="Recovery" file="updater.sb">Booting update firmware.</CMD>
+    <CMD type="find" body="Updater" />
+    <CMD type="pull" body="?" file="device.xml">Getting device info.</CMD>
+    <CMD type="show" file="device.xml" />
+    <CMD type="push" body="p" file="firmware.sb">Preparing media.</CMD>
+    <CMD type="push" body="w 50" file="firmware.sb">Writing new firmware.</CMD>
+    <CMD type="push" body="w 60" file="firmware.sb" />
+    <CMD type="push" body="w 70" file="firmware.sb" />
+    <CMD type="drop" body="!3">Performing initialization.</CMD>
+    <CMD type="find" body="Updater" />
+    <CMD type="push" body="s" />
+    <CMD type="drop" body="!1">Done.</CMD>
+  </LIST>
+  <LIST name="Update" desc="Firmware update.">
+    <CMD type="boot" body="Recovery" file="updater.sb">Booting update firmware.</CMD>
+    <CMD type="find" body="Updater" />
+    <CMD type="pull" body="?" file="device.xml">Getting device info.</CMD>
+    <CMD type="show" file="device.xml" />
+    <CMD type="push" body="c" file="firmware.sb">Checking compatibility.</CMD>
+    <CMD type="push" body="w 50" file="firmware.sb">Writing new firmware.</CMD>
+    <CMD type="push" body="w 60" file="firmware.sb" />
+    <CMD type="push" body="w 70" file="firmware.sb" />
+    <CMD type="drop" body="!1">Done.</CMD>
+  </LIST>
+</UCL>

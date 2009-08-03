@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitInit", "BitInit.csproj", "{CCF602FF-4F3F-47F8-93DC-7FA5F219521B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevSupport", "..\..\Libs.Net\DevSupport\DevSupport.csproj", "{02EBCAA5-8233-4B75-86E7-5B61787530FF}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{DF582516-C36A-4E6E-8D83-AC81D2FDA617}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CCF602FF-4F3F-47F8-93DC-7FA5F219521B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCF602FF-4F3F-47F8-93DC-7FA5F219521B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCF602FF-4F3F-47F8-93DC-7FA5F219521B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCF602FF-4F3F-47F8-93DC-7FA5F219521B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02EBCAA5-8233-4B75-86E7-5B61787530FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02EBCAA5-8233-4B75-86E7-5B61787530FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02EBCAA5-8233-4B75-86E7-5B61787530FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02EBCAA5-8233-4B75-86E7-5B61787530FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF582516-C36A-4E6E-8D83-AC81D2FDA617}.Debug|Any CPU.ActiveCfg = Debug
+		{DF582516-C36A-4E6E-8D83-AC81D2FDA617}.Debug|Any CPU.Build.0 = Debug
+		{DF582516-C36A-4E6E-8D83-AC81D2FDA617}.Release|Any CPU.ActiveCfg = Release
+		{DF582516-C36A-4E6E-8D83-AC81D2FDA617}.Release|Any CPU.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

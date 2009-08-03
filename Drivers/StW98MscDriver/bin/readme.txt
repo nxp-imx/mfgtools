@@ -1,0 +1,1 @@
+Refer to the directions in the stums.inf file in the [Microsoft] section to add Win98SE MSC support for your player.

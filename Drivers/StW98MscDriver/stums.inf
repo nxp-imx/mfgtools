@@ -1,0 +1,133 @@
+[Version]
+Signature="$CHICAGO$"
+Class=HDC
+provider=%MSFT%
+
+[Manufacturer]
+%MfgName%=Microsoft
+
+[PreCopySection]
+HKR,,NoSetupUI,,1
+
+[DestinationDirs]
+; \<WINDIR>\SYSTEM32\DRIVERS
+stums.files = 10,System32\Drivers
+
+; \<WINDIR>\SYSTEM\IOSUBSYS
+stumspdr.files = 12
+
+[Generic.install]
+CopyFiles=stums.files, stumspdr.files
+AddReg=stums.addreg
+
+[Generic.install.HW]
+AddReg=bulkonly.addreg.HW
+
+[stums.addreg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,STUMS.SYS
+
+; If the device does not correctly indicate which protocol it uses,
+; one of the following sections should be added to indicate which protocol
+; the driver should use.
+
+; Indicate that the device uses the C/B/I protocol
+[cbi.addreg.HW]
+HKR,,DeviceProtocol,0x10001,00
+
+; Indicate that the device uses the C/B protocol
+[cb.addreg.HW]
+HKR,,DeviceProtocol,0x10001,01
+
+; Indicate that the device uses the BULK ONLY protocol
+[bulkonly.addreg.HW]
+HKR,,DeviceProtocol,0x10001,0x50
+HKR,,DeviceType,0x10001,0x00
+
+; Install the port driver
+[stumspdr.install]
+AddReg=stumspdr.addreg
+
+[stumspdr.addreg]
+HKR,,DevLoader,,*ios
+HKR,,PortDriver,,stumspdr.pdr
+
+[stums.files]
+stums.sys
+
+[stumspdr.files]
+stumspdr.pdr
+
+[SourceDisksNames]
+1000 = %DiskName%,"",,
+
+[SourceDisksFiles]
+STUMS.SYS = 1000
+STUMSPDR.PDR = 1000
+
+
+[Strings]
+; English
+MSFT="Microsoft"
+MfgName="Microsoft"
+USB\Generic.DeviceDesc="USB Audio Player"
+DiskName="USB Mass Storage Driver"
+STUMS\Generic.DeviceDesc="USB Mass Storage Driver"
+
+[Strings.0404]
+; Chinese (traditional)
+MSFT="Microsoft"
+MfgName="Microsoft"
+USB\Generic.DeviceDesc="USB Audio Player"
+DiskName="USB §j∂q¿x¶s≥]≥∆≈X∞ µ{¶°"
+STUMS\Generic.DeviceDesc="USB §j∂q¿x¶s≥]≥∆≈X∞ µ{¶°"
+
+[Strings.0804]
+; Chinese (simplified)
+MSFT="Microsoft"
+MfgName="Microsoft"
+USB\Generic.DeviceDesc="USB Audio Player"
+DiskName="USB ¥Û¡ø¥¢¥Ê…Ë±∏«˝∂Ø≥Ã–Ú"
+STUMS\Generic.DeviceDesc="USB ¥Û¡ø¥¢¥Ê…Ë±∏«˝∂Ø≥Ã–Ú"
+
+[Strings.0412]
+; Korean
+MSFT="Microsoft"
+MfgName="Microsoft"
+USB\Generic.DeviceDesc="USB Audio Player"
+DiskName="USB ¥ÎøÎ∑Æ ¿˙¿Â¿Âƒ° µÂ∂Û¿Ãπˆ"
+STUMS\Generic.DeviceDesc="USB ¥ÎøÎ∑Æ ¿˙¿Â¿Âƒ° µÂ∂Û¿Ãπˆ"
+
+[Strings.040a]
+; Spanish
+MSFT="Microsoft"
+MfgName="Microsoft"
+USB\Generic.DeviceDesc="USB Audio Player"
+DiskName="Controlador de almacenamiento masivo USB"
+STUMS\Generic.DeviceDesc="Controlador de almacenamiento masivo USB"
+
+[Strings.0411]
+; Japanese
+MSFT="Microsoft"
+MfgName="Microsoft"
+USB\Generic.DeviceDesc="USB Audio Player"
+DiskName="USB ëÂó ÉXÉgÉåÅ[ÉW ÉhÉâÉCÉo"
+STUMS\Generic.DeviceDesc="USB ëÂó ÉXÉgÉåÅ[ÉW ÉhÉâÉCÉo"
+
+[Strings.040c]
+; French
+MSFT="Microsoft"
+MfgName="Microsoft"
+USB\Generic.DeviceDesc="USB Pour Lecteur" 
+DiskName="Pilote du pÈriphÈrique de stockage USB"  
+STUMS\Generic.DeviceDesc="Pilote du pÈriphÈrique de stockage USB" 
+
+[Strings.0407]
+; German
+MSFT="Microsoft"
+MfgName="Microsoft"
+USB\Generic.DeviceDesc="USB Audio Player"
+DiskName="Treiber f¸r den USB-Massenspeicher"
+STUMS\Generic.DeviceDesc="Treiber f¸r den USB-Massenspeicher"
+
+[Microsoft]

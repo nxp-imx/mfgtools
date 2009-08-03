@@ -1,0 +1,219 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\BitBurner.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "..\\..\\Resources\\StCompany.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About BitBurner"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "BitBurner Version 1.0.4.5",IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2007. SigmaTel, Inc. All Rights Reserved.",IDC_STATIC,40,25,188,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+END
+
+IDD_BITBURNER_DIALOG DIALOGEX 0, 0, 657, 377
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "BitBurner"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Close",IDCANCEL,600,354,50,16
+    COMBOBOX        IDC_SELECT_DEVICE_COMBO,7,19,163,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Select device:",IDC_STATIC,7,7,69,8
+    CONTROL         "",IDC_REGISTER_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,50,95,312
+    LTEXT           "Select OTP register:",IDC_STATIC,7,38,69,8
+    CONTROL         "",IDC_PROPERTY_FRAME,"Static",SS_BLACKFRAME,126,150,348,148
+    EDITTEXT        IDC_PITC_INFO_EDIT,513,31,125,90,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Info:",IDC_STATIC,513,22,52,8
+    GROUPBOX        "PITC",IDC_STATIC,499,7,151,165
+    PUSHBUTTON      "Download",IDC_LOAD_PITC_BUTTON,565,134,50,14
+    CONTROL         "",IDC_PITC_PROGRESS,"msctls_progress32",NOT WS_VISIBLE | WS_BORDER,513,156,125,6
+    CONTROL         "",IDC_PITC_LED,"Static",SS_BLACKFRAME,545,135,11,10
+    EDITTEXT        IDC_STATUS_EDIT,193,18,293,14,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
+    CONTROL         "",IDC_TALKY_LED,"Static",SS_BLACKFRAME,176,20,11,10
+    GROUPBOX        "OTP Register",IDC_STATIC,113,50,375,312
+    EDITTEXT        IDC_OTP_REG_INFO,123,74,212,63,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Info:",IDC_STATIC,122,63,52,8
+    EDITTEXT        IDC_CURRENT_EDIT,301,304,57,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Current value:",IDC_STATIC,247,307,49,8
+    EDITTEXT        IDC_NEW_EDIT,301,321,57,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "New value:",IDC_STATIC,258,324,38,8
+    PUSHBUTTON      "Lock",IDC_LOCK_BUTTON,201,343,57,14,WS_DISABLED
+    PUSHBUTTON      "Write",IDC_WRITE_BUTTON,271,343,57,14,WS_DISABLED
+    PUSHBUTTON      "Write && Lock",IDC_WRITE_N_LOCK_BUTTON,342,343,57,14,WS_DISABLED
+    LTEXT           "Fields:",IDC_STATIC,125,141,52,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,4,5
+ PRODUCTVERSION 1,0,4,5
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Freescale, Inc."
+            VALUE "FileDescription", "Burn STMP37xx OTP bits"
+            VALUE "FileVersion", "1.0.4.5"
+            VALUE "InternalName", "BitBurner.exe"
+            VALUE "LegalCopyright", "Copyright (C) 2009. Freescale, Inc.  All rights reserved."
+            VALUE "OriginalFilename", "BitBurner.exe"
+            VALUE "ProductName", "BitBurner"
+            VALUE "ProductVersion", "1.0.4.5"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_BITBURNER_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 650
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 370
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About BitBurner..."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\BitBurner.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"     // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

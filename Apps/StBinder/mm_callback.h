@@ -1,0 +1,13 @@
+//
+// mm_callback.h
+//
+#pragma once
+
+
+typedef HRESULT (CALLBACK FAR * LPFN_MOUSEMOVE_CALLBACK)(PVOID pCallerClass, UINT);
+
+typedef struct _MOUSEMOVECALLBACK {
+	UINT	id;
+	PVOID	pCallerClass;
+	LPFN_MOUSEMOVE_CALLBACK pfnCallback;
+} MOUSEMOVECALLBACK, *PMOUSEMOVECALLBACK;

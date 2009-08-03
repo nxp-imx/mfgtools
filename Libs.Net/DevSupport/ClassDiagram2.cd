@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DevSupport.DeviceManager.UTP.UpdateTransportProtocol">
+    <Position X="1.5" Y="0.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="DevSupport.DeviceManager.UTP.UpdateTransportProtocol.Transaction" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>UpdateTransportProtocol.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="DevSupport.DeviceManager.UTP.UpdateTransportProtocol.StartState" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>UpdateTransportProtocol.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Enum Name="DevSupport.DeviceManager.UTP.UpdateTransportProtocol.TransactionStateType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>UpdateTransportProtocol.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Class Name="DevSupport.DeviceManager.UTP.UpdateTransportProtocol.State" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>UpdateTransportProtocol.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="DevSupport.DeviceManager.UTP.UpdateTransportProtocol.Command" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>UpdateTransportProtocol.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAEAEgAAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>UpdateTransportProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

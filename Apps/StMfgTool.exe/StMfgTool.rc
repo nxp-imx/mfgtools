@@ -1,0 +1,2829 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+#include "../../common/updater_res.h"
+#include "defaultprofile.h"
+
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Japanese resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_IDLEMESSAGE     "弨旛偑偱偒傑偟偨"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "僾儘僌儔儉忣曬丄僶乕僕儑儞斣崋丄挊嶌尃傪昞帵偟傑偡\n僶乕僕儑儞忣曬"
+    ID_APP_EXIT             "傾僾儕働乕僔儑儞傪廔椆偟傑偡\n廔椆"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "僂傿儞僪僂僒僀僘傪曄峏"
+    AFX_IDS_SCMOVE          "僂傿儞僪僂偺埵抲傪曄峏"
+    AFX_IDS_SCMINIMIZE      "僂傿儞僪僂傪嵟彫壔"
+    AFX_IDS_SCMAXIMIZE      "僂傿儞僪僂偺嵟戝壔"
+    AFX_IDS_SCNEXTWINDOW    "師偺僪僉儏儊儞僩偵愗傝懼偊"
+    AFX_IDS_SCPREVWINDOW    "慜偺僪僉儏儊儞僩偵愗傝懼偊"
+    AFX_IDS_SCCLOSE         "傾僋僥傿僽側僂傿儞僪僂傪暵偠偰僪僉儏儊儞僩傪曐懚"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "乽僂傿儞僪僂傪捠忢僒僀僘偵栠偡乿"
+    AFX_IDS_SCTASKLIST      "乽僞僗僋儕僗僩傪桳岠壔乿"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPINFO_ERR_NOT_INITIALIZED "憖嶌僄儔乕丗憖嶌偑弶婜壔偝傟偰偄傑偣傫丅"
+    IDS_OPINFO_ERR_MISSING_DIRECTORY "憖嶌僄儔乕丗僨傿儗僋僩儕%s偑懚嵼偟傑偣傫丅"
+    IDS_OPINFO_ERR_EMPTY_DIRECTORY "憖嶌僄儔乕丗僨傿儗僋僩儕%s偵僼傽僀儖偑偁傝傑偣傫丅"
+    IDS_OPINFO_ERR_MISSING_INI_SECTION 
+                            "憖嶌僄儔乕丗""player.ini""僼傽僀儖偵%s僙僋僔儑儞偑偁傝傑偣傫丅"
+    IDS_OPINFO_ERR_MISSING_FILE "憖嶌僄儔乕丗%s僼傽僀儖偑尒偮偐傝傑偣傫丅"
+    IDS_OPINFO_ERR_INVALID_OPERATION "憖嶌僄儔乕丗憖嶌偑僒億乕僩偝傟偰偄傑偣傫丅"
+    IDS_OPINFO_ERR_SYSTEM_ERROR "憖嶌僄儔乕丗僔僗僥儉僄儔乕"
+    IDS_OPINFO_ERR_NO_CMD_LINE "憖嶌僄儔乕丗""%s""偑%s僙僋僔儑儞乮""%s""僼傽僀儖撪乯偵偁傝傑偣傫丅"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPINFO_OK           "憖嶌僗僥乕僞僗丗OK"
+    IDS_OPINFO_ERR_NO_FILE_DESC "憖嶌僄儔乕丗%s偺愢柧偑偁傝傑偣傫丅"
+    IDS_OPINFO_ERR_INVALID_DRV_TYPE "憖嶌僄儔乕丗僪儔僀僽僞僀僾偑柍岠偱偡丅"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_OPTIONS_CONFIGURATION "Configuration Manager偺婲摦"
+    ID_START_STOP_TOGGLE    "Player憖嶌偺奐巒乛掆巭"
+    ID_VIEW_LOG             "Log Manager偺婲摦"
+    ID_OPTIONS_CLEAN_REGISTRY "Clean Registry Manager偺婲摦"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_EXIT                "傾僾儕働乕僔儑儞偺廔椆"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_PORT_GROUP_BOX       "弨旛偑偱偒傑偟偨"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OK                  "OK"
+    IDS_CANCEL              "僉儍儞僙儖"
+    IDS_CLOSE               "暵偠傞"
+    IDS_ERROR               "僄儔乕"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_NEW                 "怴婯嶌惉"
+    IDS_EDIT                "曇廤"
+    IDS_DELETE              "嶍彍"
+    IDS_SAVE                "曐懚"
+    IDS_WAITING_FOR_DEVICE  "僨僶僀僗偺懸婡拞..."
+    IDS_WAITING_FOR_DRIVE   "僪儔僀僽偺懸婡拞..."
+    IDS_STOPPED_BY_USER     "儐乕僓乕偵傛傝掆巭偝傟傑偟偨"
+    IDS_NO_DEVICE_CONNECTED "僨僶僀僗偑愙懕偝傟偰偄傑偣傫丅"
+    IDS_RESETTING_DEVICE    "僨僶僀僗偺儕僙僢僩拞..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STOP                "掆巭"
+    IDS_STOPPING            "掆巭拞..."
+    IDS_START               "奐巒"
+    IDS_VALID_PROFILE_TO_SCRUB "儗僕僗僩儕傪僋儕乕儞偡傞偵偼桳岠側僾儘僼傽僀儖偑昁梫偱偡丅"
+    IDS_INVALID_PLAYER_PROFILE "柍岠側Player僾儘僼傽僀儖"
+    IDS_STOP_REQUIRED       "<掆巭>傪墴偟偰丄僾儘僌儔儉傪廔椆偡傞慜偵偡傋偰偺憖嶌傪廔椆偟偰偔偩偝偄丅"
+    IDS_UNSAFE_DEVICE_REMOVAL "埨慡偱偼側偄僨僶僀僗偺庢傝奜偟"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_FNAME_TEXT      "僼傽僀儖柤丗"
+    IDS_CFG_DESC_TEXT       "愢柧丗"
+    IDS_CFG_DRIVE_TYPE_TEXT "僪儔僀僽僞僀僾丗"
+    IDS_CFG_DRIVE_TAG_TEXT  "僪儔僀僽僞僌乮16恑乯丗"
+    IDS_CFG_DRIVE_SIZE_TEXT "昁梫側僪儔僀僽梕検乮KB乯丗"
+    IDS_CFG_DRIVE_DATA_GRP_TEXT "僪儔僀僽僨乕僞"
+    IDS_CFG_ADD_DRIVE_TEXT  "僪儔僀僽偺捛壛"
+    IDS_CFG_DRIVES_GRP_TEXT "僪儔僀僽"
+    IDS_CFG_SDK_BASE_TEXT   "SDK儀乕僗"
+    IDS_OPLOADER_LOADING    "Loading..."
+    IDS_OPLOADER_LOAD_STARTED "Load HID started..."
+    IDS_OPLOADER_COMPLETE   "Load HID Complete."
+    IDS_OPLOADER_INVALID_DEVICE "Loader Error: Invalid device to load."
+    IDS_OPLOADER_INVALID_STATE "Loader Error: Invalid State (%s)."
+    IDS_OPLOADER_INVALID_MSG "Loader Error: Invalid Msg State (%s)."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_CHANGES_LOST_WARNING "僨僼僅儖僩傪慖戰偡傞偲慡偰偺曄峏揰偑幐傢傟傑偡丅懕偗傑偡偐丠"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_GENERAL_TITLE   "慡斒"
+    IDS_CFG_GENERAL_RESTRICT_DEVICE "僨僶僀僗偺僾儘僼傽僀儖拞偼憖嶌傪惂尷偡傞丅"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_GENERAL_SUPRESS_AUTOPLAY "帺摦嵞惗婡擻偺嫅斲偺桳岠壔"
+    IDS_CFG_GENERAL_AUTOPLAY_ALL_DRVS "偡傋偰偺僪儔僀僽"
+    IDS_CFG_GENERAL_AUTOPLAY_SELECT_DRIVE "僪儔僀僽偺慖戰"
+    IDS_CFG_GENERAL_LANGUAGE_GROUP "尵岅"
+    IDS_CFG_GENERAL_OPTIONS_GROUP "僆僾僔儑儞"
+    IDS_CFG_GENERAL_DEFAULT_LANGUAGE "僨僼僅儖僩偺尵岅丗"
+    IDS_CFG_GENERAL_AUTOPLAY_GROUP "帺摦嵞惗婡擻"
+    IDS_CFG_GENERAL_ENABLE_LOGGING "僀儀儞僩偺儘僌偺桳岠壔丅"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_EDIT_TITLE       "憖嶌僄僨傿僞"
+    IDS_OP_EDIT_ADD_FILE    "僼傽僀儖偺捛壛"
+    IDS_OP_EDIT_ADD_DIR     "僨傿儗僋僩儕偺捛壛"
+    IDS_OP_EDIT_FILE_REMOVE "嶍彍"
+    IDS_OP_EDIT_TYPE        "憖嶌僞僀僾丗"
+    IDS_OP_EDIT_STEP1       "憖嶌僞僀僾傪慖戰偟偰偔偩偝偄丅"
+    IDS_OP_EDIT_NAME_OPERATION "憖嶌偵柤慜傪晅偗偰偔偩偝偄丅"
+    IDS_OP_EDIT_NAME        "憖嶌僼僅儖僟丗"
+    IDS_OP_EDIT_SELECT_FILES "憖嶌偵昁梫側僼傽僀儖傪慖戰偟偰偔偩偝偄丅"
+    IDS_OP_EDIT_SELECT_OPTIONS "憖嶌偺僆僾僔儑儞傪慖戰偟偰偔偩偝偄丅"
+    IDS_OP_EDIT_STEP1_GRP   "僗僥僢僾1"
+    IDS_OP_EDIT_STEP2_GRP   "僗僥僢僾2"
+    IDS_OP_EDIT_STEP3_GRP   "僗僥僢僾3"
+    IDS_OP_EDIT_STEP4_GRP   "僗僥僢僾4"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_EDIT_ADVANCED    "徻嵶"
+    IDS_OP_EDIT_DRIVE_NUM   "僪儔僀僽斣崋丗"
+    IDS_DIRECTORY_DETECTED_PROMPT "峏怴憖嶌偼僨傿儗僋僩儕偵懳墳偟偰偄傑偣傫\r\n慖戰偟偨僨傿儗僋僩儕傪嶍彍偟傑偡偐丠"
+    IDS_DIRECTORY_DETECTED_TITLE "僨傿儗僋僩儕偑専弌偝傟傑偟偨"
+    IDS_FILE_BROWSE_TYPES   "僼傽乕儉僂僃傾僼傽僀儖乮*.s;*.sb;*.bin;*.rsc乯||"
+    IDS_NOTHING_TO_REMOVE   "嶍彍懳徾偑偁傝傑偣傫丅\n\n1. 嵍懁偺儃僢僋僗偐傜嶍彍偡傞僼傽僀儖傪慖戰偟偰偔偩偝偄丅\n2. [嶍彍]傪僋儕僢僋偟偰偔偩偝偄丅"
+    IDS_INVALID_OP_FOLDER   "憖嶌僼僅儖僟偑柍岠偱偡丅\n\n憖嶌傪曐懚偡傞偵偼丄[憖嶌僼僅儖僟]僼傿乕儖僪偵桳岠側Windows僼僅儖僟柤傪巜掕偟偰偔偩偝偄丅"
+    IDS_OP_ALREADY_EXISTS   "偙偺柤慜偺憖嶌偼婛偵懚嵼偟傑偡丅\n\n[OK]傪墴偡偲丄婛懚偺'%s'憖嶌\n\\<%s>\n偑怴偟偄憖嶌偱忋彂偒偝傟傑偡丅\n\n[僉儍儞僙儖]傪墴偡偲丄曐懚懳徾偺憖嶌柤傪曄峏偱偒傑偡丅"
+    IDS_CONFIRM_OVERWRITE   "忋彂偒偺妋擣"
+    IDS_SELECT_DIRECTORY    "僨傿儗僋僩儕偺慖戰"
+    IDS_OPTIONS             "僆僾僔儑儞"
+    IDS_NO_OPTIONS          "偙偺憖嶌偵桳岠側僆僾僔儑儞偼偁傝傑偣傫丅"
+    IDS_NO_ITEMS_IN_VIEW    "偙偺價儏乕偵偼傾僀僥儉偼偁傝傑偣傫丅"
+    IDS_OP_EDIT_TIMEOUT     "Operation Timeout:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_MENU_ENABLE         "桳岠壔"
+    IDS_MENU_NEW            "怴婯嶌惉..."
+    IDS_MENU_EDIT           "曇廤..."
+    IDS_MENU_DELETE         "嶍彍"
+    IDS_MENU_MOVE_UP        "忋偵堏摦"
+    IDS_MENU_MOVE_DOWN      "壓偵堏摦"
+    IDS_ERASE_MEDIA         "Erase Media"
+    IDS_CFG_PROFILE_TITLE   "僾儘僼傽僀儖"
+    IDS_CFG_PROFILE_LABEL   "儃儕儏乕儉儔儀儖丗"
+    IDS_CFG_PROFILE_DESC    "僾儘僼傽僀儖偺愢柧丗"
+    IDS_CFG_PROFILE_USB_VENDOR "USB儀儞僟乕ID丗"
+    IDS_CFG_PROFILE_USB_PRODUCT "USB惢昳ID丗"
+    IDS_CFG_PROFILE_SCSI_VENDOR "SCSI儀儞僟乕ID丗"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PROFILE_SCSI_PRODUCT "SCSI惢昳ID丗"
+    IDS_CFG_PROFILE_OPERATIONS "憖嶌丗"
+    IDS_CFG_PROFILE_GRP     "僾儘僼傽僀儖"
+    IDS_CFG_PROFILE_INVALID_DESC 
+                            "僾儘僼傽僀儖僄儔乕丗[僾儘僼傽僀儖偺愢柧]僼傿乕儖僪偵偼丄桳岠側Windows僼僅儖僟柤傪巜掕偟偰偔偩偝偄丅"
+    IDS_DELETE_CONFIRM_MSG  "%s僾儘僼傽僀儖傪嶍彍偟傑偡偐丠\n\n[OK]傪墴偡偲僾儘僼傽僀儖偑嶍彍偝傟丄\n\n娭楢偡傞偡傋偰偺僼傽僀儖偑嶍彍偝傟傑偡丅\n[僉儍儞僙儖]傪墴偡偲丄嶍彍偑拞抐偝傟傑偡丅"
+    IDS_DELETE_CONFIRM_TITLE "嶍彍偺妋擣"
+    IDS_TOOLTIP_NO_PATH     "僷僗偑偁傝傑偣傫"
+    IDS_TOOLTIP_PROFILE_LOCATION "応強丗 .\\Profiles\\%s\\%s"
+    IDS_TOOLTIP_NO_FILES    "僼傽僀儖偑偁傝傑偣傫"
+    IDS_CFG_PROFILE_INVALID_DESC_MSG 
+                            "僾儘僼傽僀儖偺愢柧偑柍岠偱偡丅\n\n僾儘僼傽僀儖傪曐懚偡傞偵偼丄[僾儘僼傽僀儖偺愢柧]僼傿乕儖僪偵桳岠側Windows僼僅儖僟柤傪巜掕偟偰偔偩偝偄丅"
+    IDS_CFG_PROFILE_EXISTS_MSG 
+                            "偙偺柤慜偺僾儘僼傽僀儖偼婛偵懚嵼偟傑偡丅\n\n[OK]傪墴偡偲婛懚偺'%s'僾儘僼傽僀儖\n<%s>\n偑怴偟偄僾儘僼傽僀儖忣曬偱忋彂偒偝傟傑偡丅\n\n[僉儍儞僙儖]傪墴偡偲丄曐懚懳徾偺僾儘僼傽僀儖柤傪曄峏偱偒傑偡丅"
+    IDS_CFG_PROFILE_COL_OP  "憖嶌"
+    IDS_CFG_PROFILE_COL_FOLDER "僼僅儖僟"
+    IDS_CFG_PROFILE_COL_FILES "僼傽僀儖"
+    IDS_CFG_PROFILE_COL_OPTIONS "僆僾僔儑儞"
+    IDS_CFG_PROFILE_DELETE_CONFIRM 
+                            "%s憖嶌%s傪嶍彍偟傑偡偐丠\n\n[OK]傪墴偡偲丄憖嶌偲\n娭楢偡傞偡傋偰偺僼傽僀儖偑嶍彍偝傟傑偡丅\n\n[僉儍儞僙儖]傪墴偡偲丄嶍彍偑拞抐偝傟傑偡丅"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PROFILE_DELETE_TITLE "嶍彍偺妋擣"
+    IDS_CFG_USBPORT_UNASSIGNED "乮枹妱傝摉偰乯"
+    IDS_CFG_USBPORT_PANEL   "乮僷僱儖%c乯"
+    IDS_CFG_USBPORT_PORT    "億乕僩 %d %s %s"
+    IDS_CFG_USBPORT_HUB     "僴僽%d"
+    IDS_CFG_USBPORT_HUB_PORT "億乕僩%d - 僴僽%d"
+    IDS_CFG_USBPORT_MYCOMPUTER "儅僀僐儞僺儏乕僞"
+    IDS_CFG_USBPORT_CONTROLLER "僐儞僩儘乕儔"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STATUS_NO_OPS_SELECTED "僾儘僼傽僀儖偑慖戰偝傟偰偄傑偣傫"
+    IDS_STATUS_STATUS_TEXT  "僗僥乕僞僗"
+    IDS_CFG_USBPORT_MAX_PORTS "嵟戝USB億乕僩悢"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPCOPY_COPYING      "僐僺乕拞..."
+    IDS_OPCOPY_STARTED      "僐僺乕傪奐巒偟傑偟偨..."
+    IDS_OPCOPY_COMPLETE     "僐僺乕偑姰椆偟傑偟偨"
+    IDS_OPCOPY_STOPPED_BY_USER "僐僺乕偑儐乕僓乕偵傛偭偰掆巭偝傟傑偟偨 - 偍懸偪偔偩偝偄..."
+    IDS_OPCOPY_FINALIZING_COPY "僐僺乕憖嶌傪姰椆拞..."
+    IDS_OPCOPY_CREATING_DIR "僨傿儗僋僩儕傪嶌惉拞丗%s..."
+    IDS_OPCOPY_CREATE_DIR_ERR "僨傿儗僋僩儕傪嶌惉 拞- 僄儔乕乮%d)"
+    IDS_OPCOPY_COPY_ERR     "僼傽僀儖偺僐僺乕 - 僄儔乕乮%d乯"
+    IDS_OPCOPY_COPYING_FILE "%s偺僐僺乕拞..."
+    IDS_ERASEOP_ERASING_MEDIA "儊僨傿傾偺徚嫀拞..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERASEOP_WAITING_VOLUME_REMOVAL "儃儕儏乕儉嶍彍傪懸婡偟偰偄傑偡丅"
+    IDS_ERASEOP_ERROR_ERASING "儊僨傿傾徚嫀僄儔乕丅"
+    IDS_ERASEOP_CANT_STOP   "徚嫀憖嶌傪掆巭偱偒傑偣傫丅"
+    IDS_ERASEOP_COMPLETE    "徚嫀偑姰椆偟傑偟偨丅"
+    IDS_ERASEOP_ERASED_RESETTING "儊僨傿傾偼徚嫀偝傟傑偟偨丅僨僶僀僗偺儕僙僢僩拞..."
+    IDS_OPERATION_UPDATE    "峏怴"
+    IDS_OPERATION_COPY      "僐僺乕"
+    IDS_OPERATION_LOAD      "LOAD"
+    IDS_OPERATION_INVALID_OP "柍岠側憖嶌"
+    IDS_OPERATION_ERASE     "徚嫀"
+    IDS_OPERATION_REG_SCRUB "儗僕僗僩儕偺僗僋儔僽"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPFLAGS_OPTIONSTRINGS_STATICID "僗僞僥傿僢僋ID夞暅儌乕僪僼傽乕儉僂僃傾傪巊梡"
+    IDS_OPFLAGS_OPTIONSTRINGS_MULTI_STATICID 
+                            "暋悢偺僗僞僥傿僢僋ID僼傽乕儉僂僃傾僼傽僀儖傪巊梡乮暋悢僨乕僞僪儔僀僽偺傒乯"
+    IDS_OPFLAGS_OPTIONSTRINGS_FAT32 "FAT32"
+    IDS_OPFLAGS_OPTIONSTRINGS_WINCE "Windows CE"
+    IDS_OPFLAGS_OPTIONSTRINGS_ERASE "Erase Media"
+    IDS_OPMONITOR_MONITORING "娔帇拞..."
+    IDS_OPREGISTRY_SCRUBBING "儗僕僗僩儕偺僗僋儔僽拞..."
+    IDS_OPREGISTRY_SCRUB_COMPLETE "儗僕僗僩儕偺僗僋儔僽偑姰椆偟傑偟偨"
+    IDS_OPREGISTRY_SCRUB_ERROR "儗僕僗僩儕偺僗僋儔僽丗僗僋儔僽拞偵僄儔乕偑敪惗偟傑偟偨丅"
+    IDS_OPREGISTRY_SCRUB_NOTHING_TO_DO "儗僕僗僩儕僗僋儔僽丗憖嶌晄梫丅"
+    IDS_OPUPDATER_UPDATING  "峏怴拞..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPUPDATER_SEARCHING_TO_RECOVER "暅媽偡傞僨僶僀僗傪専嶕拞..."
+    IDS_OPUPDATER_REQUIRES_RESET_RECOVERY "僨僶僀僗偼夞暅儌乕僪偵儕僙僢僩偡傞昁梫偑偁傝傑偡..."
+    IDS_OPUPDATER_SEARCHING_TO_UPDATE "峏怴偡傞僨僶僀僗偺専嶕拞..."
+    IDS_OPUPDATER_INVALID_DEVICE "Updater僄儔乕丗峏怴偡傞僨僶僀僗偑柍岠偱偡丅"
+    IDS_OPUPDATER_INVALID_STATE "Updater僄儔乕丗柍岠側忬懺乮%s乯丅"
+    IDS_OPUPDATER_INVALID_MSG "Updater僄儔乕丗柍岠側儊僢僙乕僕忬懺乮%s乯丅"
+    IDS_OPUPDATER_LOADING_USBMSC "USBMSC傪RAM偵撉傒崬傒拞..."
+    IDS_OPUPDATER_LOADING_FIRMWARE "僼傽乕儉僂僃傾傪僼儔僢僔儏偵撉傒崬傒拞..."
+    IDS_OPUPDATER_COMPLETE  "峏怴偑姰椆偟傑偟偨丅"
+    IDS_OPUPDATER_UPDATE_ERROR "Updater僄儔乕丗 0x%x (%d) - %s"
+    IDS_OPUPDATER_ALLOCATING "儊僨傿傾傾儘働乕僔儑儞拞"
+    IDS_OPUPDATER_GET_DRIVE_SIZES "僷乕僥傿僔儑儞僒僀僘庢摼拞"
+    IDS_OPUPDATER_WRITING_FILE "彂偒崬傒拞 %s"
+    IDS_PROFILE_OK          "僾儘僼傽僀儖僗僥乕僞僗丗OK"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PROFILE_ERR_FILE_NO_EXIST "僼傽僀儖%s偑懚嵼偟傑偣傫丅"
+    IDS_OPUPDATER_VERIFYING_FILE "儀儕僼傽僀拞 %s"
+    IDS_PORTMGRDLG_DRIVES_TEXT "僪儔僀僽丗"
+    IDS_PORTMGRDLG_PORT_GRP_TEXT "枹妱傝摉偰"
+    IDS_OPUPDATER_LOADING_FILE "儘乕僪拞 %s"
+    IDS_PORTMGRDLG_PANEL_TEXT "%c - 枹妱傝摉偰"
+    IDS_PORTMGRDLG_HUB_PORT_TEXT "%c - 僴僽%d丄億乕僩%d"
+    IDS_PORTMGRDLG_MONITORING "娔帇拞..."
+    IDS_PORTMGRDLG_COMPLETE "憖嶌偑姰椆偟傑偟偨丅"
+    IDS_OPUPDATER_INITIALIZING_DRM "DRM傪弶婜壔偟偰偄傑偡"
+    IDS_OPUPDATER_INITIALIZING_DATABASE "僨乕僞儀乕僗傪弶婜壔偟偰偄傑偡"
+    IDS_PORTMGRDLG_FORMATTING "僼僅乕儅僢僩拞乧"
+    IDS_REGSCRUB_CLEAN_TEXT "僋儕乕儞"
+    IDS_REGSCRUB_REMOVE_STATIC_TEXT "僗僞僥傿僢僋ID僄儞僩儕偺嶍彍"
+    IDS_REGSCRUB_PROFILE_DESC_TEXT "僾儘僼傽僀儖偺愢柧丗"
+    IDS_REGSCRUB_USB_VID_TEXT "USB儀儞僟乕ID丗"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PROFILE_WRN_INVALID_OPERATION "僾儘僼傽僀儖寈崘丗柍岠側憖嶌偼幚峴偝傟傑偣傫丅"
+    IDS_PROFILE_ERR_NOT_INITIALIZED "僾儘僼傽僀儖寈崘丗僾儘僼傽僀儖偑弶婜壔偝傟偰偄傑偣傫丅"
+    IDS_PROFILE_ERR_NO_VALID_OPERATION "僾儘僼傽僀儖僄儔乕丗桳岠側憖嶌偑偁傝傑偣傫丅"
+    IDS_PROFILE_ERR_NO_SELECTION "僾儘僼傽僀儖僄儔乕丗僾儗乕儎乕僾儘僼傽僀儖傪嶌惉傑偨偼慖戰偟偰偔偩偝偄丅"
+    IDS_PROFILE_ERR_MISSING_DIRECTORY "僾儘僼傽僀儖僄儔乕丗僨傿儗僋僩儕%s偼懚嵼偟傑偣傫丅"
+    IDS_PROFILE_ERR_MISSING_INI_FILE "僾儘僼傽僀儖僄儔乕丗%s僼傽僀儖偑偁傝傑偣傫丅"
+    IDS_PROFILE_ERR_INVALID_CHARS "僾儘僼傽僀儖僄儔乕丗僾儘僼傽僀儖偺愢柧偵師偺暥帤偼巊梡偱偒傑偣傫丗%s"
+    IDS_PROFILE_ERR_INVALID_DESCRIPTION "僾儘僼傽僀儖僄儔乕丗僾儘僼傽僀儖愢柧偑柍岠偱偡丅"
+    IDS_PROFILE_ERR_INVALID_USB_VENDOR_ID "僾儘僼傽僀儖僄儔乕丗USB儀儞僟乕ID偑柍岠偱偡丅"
+    IDS_PROFILE_ERR_INVALID_USB_PROD_ID "僾儘僼傽僀儖僄儔乕丗USB惢昳ID偑柍岠偱偡丅"
+    IDS_PROFILE_ERR_INVALID_SCSI_VENDOR_ID "僾儘僼傽僀儖僄儔乕丗SCSI儀儞僟乕ID偑柍岠偱偡丅"
+    IDS_PROFILE_ERR_INVALID_SCSI_PROD_ID "僾儘僼傽僀儖僄儔乕丗SCSI惢昳ID偑柍岠偱偡丅"
+    IDS_PROFILE_WRN_INVALID_VOLUME_LABLE "僾儘僼傽僀儖寈崘丗儃儕儏乕儉儔儀儖偑柍岠偱偡丅"
+    IDS_PROFILE_MSG_OVERWRITE_PROMPT "%s偼彂偒崬傒曐岇偝傟偰偄傑偡丅\n忋彂偒偟偰憖嶌忬懺傪曄峏偟傑偡偐丠"
+    IDS_PROFILE_ERR_WRITE_FAILURE "僼傽僀儖%s偵彂偒崬傔傑偣傫丅"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_REGSCRUB_USB_PID_TEXT "USB惢昳ID丗"
+    IDS_REGSCRUB_SCSI_VID_TEXT "SCSI儀儞僟乕ID丗"
+    IDS_REGSCRUB_SCSI_PID_TEXT "SCSI惢昳ID丗"
+    IDS_REGSCRUB_SCANNING_STATUS_TEXT "儗僕僗僩儕僄儞僩儕偺僗僉儍儞拞丗"
+    IDS_REGSCRUB_DELETING_STATUS_TEXT "儗僕僗僩儕僄儞僩儕偺嶍彍拞丗"
+    IDS_REGSCRUB_ENTRIES_REM_STATUS_TEXT "嶍彍偝傟偨僨僶僀僗僄儞僩儕丗"
+    IDS_REGSCRUB_INVALID_PROFILE "柍岠側僾儘僼傽僀儖 - 桳岠側僾儘僼傽僀儖傪慖戰偟偰偔偩偝偄丅"
+    IDS_REGSCRUB_CONFIRM_PROMPT 
+                            "偙偺僆僾僔儑儞偼崅搙側僩儔僽儖僔儏乕僥傿儞僌梡側偺偱丄\n捠忢偺儗僕僗僩儕儊儞僥僫儞僗張棟偱偼僆儞偵偟側偄偱偔偩偝偄丅\n\n偙偺儃僢僋僗傪僆儞偵偡傞偲丄儐乕僓乕偼亀儐乕僓乕儅僯儏傾儖亁偵婰嵹偝傟偨\n傾僾儕働乕僔儑儞偺僙僢僩傾僢僾丒峔惉張棟傪姰慡偵幚峴偡傞昁梫偑偁傝傑偡丅\n偙偺儃僢僋僗偼丄僗僞僥傿僢僋ID僼傽乕儉僂僃傾偵栤戣偑敪惗偟偨偲偒偺傒丄僆儞偵偟偰偔偩偝偄丅\n\n僗僞僥傿僢僋ID僄儞僩儕傪杮摉偵嶍彍偟傑偡偐丠"
+    IDS_REGSCRUB_WRONG_OS   "偙偺憖嶌偼僆儁儗乕僥傿儞僌僔僗僥儉偱僒億乕僩偝傟偰偄傑偣傫丅"
+    IDS_REGSCRUB_FINISHED   "姰椆偟傑偟偨"
+    IDS_REGSCRUB_REMOVE_RECOVERY "Remove Recovery Entries"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STATUS_GRP_TEXT     "僗僥乕僞僗忣曬"
+    IDS_STATUS_PROFILE_TEXT "僾儘僼傽僀儖"
+    IDS_STATUS_FW_VER_TEXT  "僶乕僕儑儞"
+    IDS_STATUS_START_TEXT   "奐巒擔帪"
+    IDS_STATUS_ELAPSED_TEXT "宱夁帪娫"
+    IDS_STATUS_AVG_DURATION_TEXT "暯嬒傾僢僾僨乕僩帪娫"
+    IDS_STATUS_OK_UPDATES_TEXT "傾僢僾僨乕僩姰椆悢"
+    IDS_STATUS_FAILED_UPDATES_TEXT "傾僢僾僨乕僩幐攕悢"
+    IDS_STATUS_FAILURE_RATE_TEXT "幐攕棪"
+    IDS_STATUS_NO_PORTS_SELECTED "USB偑慖戰偝傟偰偄傑偣傫"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERROR_INVALID_DEVICE "僄儔乕丗僨僶僀僗偑柍岠偱偡"
+    IDS_ERROR_DEVICE_REMOVED_DURING_OP "僄儔乕丗憖嶌拞偵僨僶僀僗偑庢傝奜偝傟傑偟偨"
+    IDS_ERROR_VOLUME_REMOVED_DURING_OP "僄儔乕丗憖嶌拞偵儃儕儏乕儉偑庢傝奜偝傟傑偟偨"
+    IDS_DEFINE_TABLE_TEXT   "憖嶌偵昁梫側僼傽僀儖偺僪儔僀僽傾儘働乕僔儑儞僥乕僽儖傪掕媊"
+    IDS_OPUPDATE_HEADER_DESC "愢柧"
+    IDS_OPUPDATE_HEADER_TYPE "僞僀僾"
+    IDS_OPUPDATE_HEADER_TAG "僞僌"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_NAME_FOLDER      "[憖嶌僼僅儖僟柤]"
+    IDS_COLUMN_FILENAME     "僼傽僀儖柤"
+    IDS_COLUMN_SIZE         "僒僀僘"
+    IDS_COLUMN_TIMESTAMP    "擔晅"
+    IDS_NUM_OBJECTS         "%d 僆僽僕僃僋僩"
+    IDS_NEW_FOLDER          "怴僼僅儖僟"
+    IDS_ADD_FOLDER          "僼僅儖僟捛壛"
+    IDS_OP_COPY_STEP2       "儊僨傿傾偵僐僺乕偡傞僐儞僥儞僣傪掕媊"
+    IDS_HUB_REQUIRED        "奜晅偗USB僴僽梫"
+    IDS_UPDATE_STEP3_TEXT   "傾僢僾僨乕僩僽乕僩僼傽乕儉僂僃傾傪掕媊(35xx/36xx:stmfgmsc.sb 37xx: updater.sb)"
+    IDS_MENU_COPY_DRIVE     "僐僺乕"
+    IDS_UNAUTHORIZED_SYSTEM "偙偺僔僗僥儉偼偙偺傾僾儕働乕僔儑儞傪巊梡偱偒傑偣傫"
+    IDS_WAITING_TO_COMPLETE "Waiting to complete..."
+    IDS_OTPOP_TEXT          "Enter an 8-bit hexidecimal value to be written to the first available OTP register. "
+    IDS_OPERATION_OTP_REGISTER "OTP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPOTP_OP_FAILED     "OTP operation failed."
+    IDS_OPOTP_WRITING_REG   "Writing OTP register..."
+    IDS_REGCHK_INFO_TEXT    "Checking registry devices..."
+    IDS_REGCHK_ENTRIES_TEXT "Matching Device Entries:"
+    IDS_REGCHK_OTHER_TEXT   "Other Device Entries:"
+	IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
+	IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
+END
+
+#endif    // Japanese resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (P.R.C.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_MAINFRAME           "StMfgTool"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "StMfgTool"
+    AFX_IDS_IDLEMESSAGE     "准备就绪"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "显示程序的信息、版本和版权\n关于"
+    ID_APP_EXIT             "退出应用程序\n退出"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "更改窗口大小"
+    AFX_IDS_SCMOVE          "更改窗口位置"
+    AFX_IDS_SCMINIMIZE      "窗口最小化"
+    AFX_IDS_SCMAXIMIZE      "窗口最大化"
+    AFX_IDS_SCNEXTWINDOW    "切换至下一个文档窗口"
+    AFX_IDS_SCPREVWINDOW    "切换至上一个文档窗口"
+    AFX_IDS_SCCLOSE         "关闭活动窗口，并提示保存文档"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "还原窗口至正常大小"
+    AFX_IDS_SCTASKLIST      "启动任务列表"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPINFO_ERR_NOT_INITIALIZED "操作错误：操作未初始化。"
+    IDS_OPINFO_ERR_MISSING_DIRECTORY "操作错误：目录 %s 不存在。"
+    IDS_OPINFO_ERR_EMPTY_DIRECTORY "操作错误：目录 %s 中不包含任何文件。"
+    IDS_OPINFO_ERR_MISSING_INI_SECTION "操作错误：文件""“player.ini”""的 %s 部分不存在。"
+    IDS_OPINFO_ERR_MISSING_FILE "操作错误：无法找到 %s 文件。"
+    IDS_OPINFO_ERR_INVALID_OPERATION "操作错误：不支持该操作。"
+    IDS_OPINFO_ERR_SYSTEM_ERROR "操作错误：系统错误。"
+    IDS_OPINFO_ERR_NO_CMD_LINE "操作错误：""“%s”""不存在于 %s 文件的 ""“%s”""部分中。"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPINFO_OK           "操作状态：正确"
+    IDS_OPINFO_ERR_NO_FILE_DESC "操作错误：没有对 %s 的描述。"
+    IDS_OPINFO_ERR_INVALID_DRV_TYPE "操作错误：驱动器类型无效。"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_OPTIONS_CONFIGURATION "启动配置管理器"
+    ID_START_STOP_TOGGLE    "开始／停止播放器操作"
+    ID_VIEW_LOG             "启动日志管理器"
+    ID_OPTIONS_CLEAN_REGISTRY "启动清理注册表管理器"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_EXIT                "退出应用程序"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_PORT_GROUP_BOX       "准备就绪"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OK                  "确定"
+    IDS_CANCEL              "取消"
+    IDS_CLOSE               "关闭"
+    IDS_ERROR               "错误"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_NEW                 "新建"
+    IDS_EDIT                "编辑"
+    IDS_DELETE              "删除"
+    IDS_SAVE                "保存"
+    IDS_WAITING_FOR_DEVICE  "正在等候设备…"
+    IDS_WAITING_FOR_DRIVE   "正在等候驱动器..."
+    IDS_STOPPED_BY_USER     "用户停止"
+    IDS_NO_DEVICE_CONNECTED "未连接任何设备。"
+    IDS_RESETTING_DEVICE    "正在重设设备..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STOP                "停止"
+    IDS_STOPPING            "正在停止…"
+    IDS_START               "开始"
+    IDS_VALID_PROFILE_TO_SCRUB "必须拥有有效简档才能清理注册表。"
+    IDS_INVALID_PLAYER_PROFILE "无效的播放器简档"
+    IDS_STOP_REQUIRED       "请按<停止>按钮，并在退出程序前允许所有操作运行完毕。"
+    IDS_UNSAFE_DEVICE_REMOVAL "设备移除不安全"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_FNAME_TEXT      "文件名："
+    IDS_CFG_DESC_TEXT       "描述："
+    IDS_CFG_DRIVE_TYPE_TEXT "驱动器类型："
+    IDS_CFG_DRIVE_TAG_TEXT  "驱动器标记（十六进制）："
+    IDS_CFG_DRIVE_SIZE_TEXT "需要的驱动器大小 (KB)："
+    IDS_CFG_DRIVE_DATA_GRP_TEXT "驱动器数据"
+    IDS_CFG_ADD_DRIVE_TEXT  "添加驱动器"
+    IDS_CFG_DRIVES_GRP_TEXT "驱动器"
+    IDS_CFG_SDK_BASE_TEXT   "SDK 基准"
+    IDS_OPLOADER_LOADING    "载入…"
+    IDS_OPLOADER_LOAD_STARTED "HID模式载入开始…"
+    IDS_OPLOADER_COMPLETE   "载入HID模式结束"
+    IDS_OPLOADER_INVALID_DEVICE "载入失败：无效设备"
+    IDS_OPLOADER_INVALID_STATE "载入失败：无效状态（%s）"
+    IDS_OPLOADER_INVALID_MSG "载入失败：无效消息状态(%s）"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_CHANGES_LOST_WARNING "当缺省值载入后，所有变化将被复位，您仍旧需要继续吗？"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_GENERAL_TITLE   "常规"
+    IDS_CFG_GENERAL_RESTRICT_DEVICE "限制设置设备简档的操作。"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_GENERAL_SUPRESS_AUTOPLAY "启用自动运行拒绝功能"
+    IDS_CFG_GENERAL_AUTOPLAY_ALL_DRVS "所有驱动器"
+    IDS_CFG_GENERAL_AUTOPLAY_SELECT_DRIVE "选择驱动器"
+    IDS_CFG_GENERAL_LANGUAGE_GROUP "语言"
+    IDS_CFG_GENERAL_OPTIONS_GROUP "选项"
+    IDS_CFG_GENERAL_DEFAULT_LANGUAGE "默认语言："
+    IDS_CFG_GENERAL_AUTOPLAY_GROUP "自动运行"
+    IDS_CFG_GENERAL_ENABLE_LOGGING "启用事件日志记录功能。"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_EDIT_TITLE       "操作编辑器"
+    IDS_OP_EDIT_ADD_FILE    "添加文件"
+    IDS_OP_EDIT_ADD_DIR     "添加目录"
+    IDS_OP_EDIT_FILE_REMOVE "移除"
+    IDS_OP_EDIT_TYPE        "操作类型："
+    IDS_OP_EDIT_STEP1       "选择操作类型。"
+    IDS_OP_EDIT_NAME_OPERATION "命名操作名称。"
+    IDS_OP_EDIT_NAME        "操作文件夹："
+    IDS_OP_EDIT_SELECT_FILES "选择操作所需文件夹。"
+    IDS_OP_EDIT_SELECT_OPTIONS "选择操作选项。"
+    IDS_OP_EDIT_STEP1_GRP   "步骤 1"
+    IDS_OP_EDIT_STEP2_GRP   "步骤 2"
+    IDS_OP_EDIT_STEP3_GRP   "步骤 3"
+    IDS_OP_EDIT_STEP4_GRP   "步骤 4"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_EDIT_ADVANCED    "高级"
+    IDS_OP_EDIT_DRIVE_NUM   "驱动器编号："
+    IDS_DIRECTORY_DETECTED_PROMPT "更新操作不支持目录 \r\n。您是否要删除所选目录？"
+    IDS_DIRECTORY_DETECTED_TITLE "已检测到的目录"
+    IDS_FILE_BROWSE_TYPES   "固件文件 (*.s;*.sb;*.bin;*.rsc)||"
+    IDS_NOTHING_TO_REMOVE   "无任何可移除的文件。\n\n1.请在左边的方框中选择要移除的文件。\n2.按“移除”按钮。"
+    IDS_INVALID_OP_FOLDER   "操作文件夹无效\n\n操作文件夹中必须包含有效的 Windows 文件夹名称才能保存操作。"
+    IDS_OP_ALREADY_EXISTS   "该操作名称已存在。\n\n 如需以新的操作信息覆写现有的“%s”操作 \n<%s>\n，请按“确定”按钮。\n\n 如需更改您要保存的操作名称，请按“取消”按钮。"
+    IDS_CONFIRM_OVERWRITE   "确认覆写"
+    IDS_SELECT_DIRECTORY    "选择目录"
+    IDS_OPTIONS             "选项"
+    IDS_NO_OPTIONS          "无可供此操作选择的选项。"
+    IDS_NO_ITEMS_IN_VIEW    "此视图上无任何项目。"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_MENU_ENABLE         "启用"
+    IDS_MENU_NEW            "新建…"
+    IDS_MENU_EDIT           "编辑…"
+    IDS_MENU_DELETE         "删除"
+    IDS_MENU_MOVE_UP        "上移"
+    IDS_MENU_MOVE_DOWN      "下移"
+    IDS_CFG_PROFILE_TITLE   "简档"
+    IDS_CFG_PROFILE_LABEL   "卷标："
+    IDS_CFG_PROFILE_DESC    "简档描述："
+    IDS_CFG_PROFILE_USB_VENDOR "USB 厂商 ID："
+    IDS_CFG_PROFILE_USB_PRODUCT "USB 产品 ID："
+    IDS_CFG_PROFILE_SCSI_VENDOR "SCSI 厂商 ID："
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PROFILE_SCSI_PRODUCT "SCSI 产品 ID："
+    IDS_CFG_PROFILE_OPERATIONS "操作："
+    IDS_CFG_PROFILE_GRP     "简档"
+    IDS_CFG_PROFILE_INVALID_DESC "简档错误:简档描述字段必须包含一个有效的 Windows 文件夹名称。"
+    IDS_DELETE_CONFIRM_MSG  "是否删除 %s 简档？\n\n 如需清除简档 \n若要删除简档和\n所有相关的文件，请按“确定”。\n\n如需放弃删除，请按“取消”。"
+    IDS_DELETE_CONFIRM_TITLE "确认删除"
+    IDS_TOOLTIP_NO_PATH     "没有路径"
+    IDS_TOOLTIP_PROFILE_LOCATION "位置：.\\Profiles\\%s\\%s"
+    IDS_TOOLTIP_NO_FILES    "没有文件"
+    IDS_CFG_PROFILE_INVALID_DESC_MSG 
+                            "简档描述无效！\n\n简档描述字段必须包含一个有效的 Windows 文件夹名称才能保存简档。"
+    IDS_CFG_PROFILE_EXISTS_MSG 
+                            "这个名称的简档已经存在。\n\n若要以新的简档信息覆写现有“%s”简档\n<%s>\n，请按“确定”按钮。\n\n若要更改您要保存的简档名称，请按“取消”按钮。"
+    IDS_CFG_PROFILE_COL_OP  "操作"
+    IDS_CFG_PROFILE_COL_FOLDER "文件夹"
+    IDS_CFG_PROFILE_COL_FILES "文件"
+    IDS_CFG_PROFILE_COL_OPTIONS "选项"
+    IDS_CFG_PROFILE_DELETE_CONFIRM 
+                            "是否删除 %s 操作 %s？\n\n若要移除操作\n并删除所有相关的文件，请按“确定”按钮。\n\n若要放弃删除，请按“取消”按钮。"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PROFILE_DELETE_TITLE "确认删除"
+    IDS_CFG_USBPORT_UNASSIGNED "（未分配）"
+    IDS_CFG_USBPORT_PANEL   "（面板 %c）"
+    IDS_CFG_USBPORT_PORT    "端口 %d %s %s"
+    IDS_CFG_USBPORT_HUB     "集线器 %d"
+    IDS_CFG_USBPORT_HUB_PORT "端口 %d - 集线器 %d"
+    IDS_CFG_USBPORT_MYCOMPUTER "我的电脑"
+    IDS_CFG_USBPORT_CONTROLLER "控制器"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STATUS_NO_OPS_SELECTED "没有选择profile"
+    IDS_STATUS_STATUS_TEXT  "状态"
+    IDS_CFG_USBPORT_MAX_PORTS "最多可支持USB端口的个数"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPCOPY_COPYING      "正在复制…"
+    IDS_OPCOPY_STARTED      "开始复制…"
+    IDS_OPCOPY_COMPLETE     "复制完成"
+    IDS_OPCOPY_STOPPED_BY_USER "用户停止复制 - 请稍候…"
+    IDS_OPCOPY_FINALIZING_COPY "正在结束复制操作…"
+    IDS_OPCOPY_CREATING_DIR "正在创建目录：%s…"
+    IDS_OPCOPY_CREATE_DIR_ERR "创建目录 - 错误 (%d)"
+    IDS_OPCOPY_COPY_ERR     "复制文件 - 错误 (%d)"
+    IDS_OPCOPY_COPYING_FILE "正在复制 %s…"
+    IDS_ERASEOP_ERASING_MEDIA "正在擦除介质…"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERASEOP_WAITING_VOLUME_REMOVAL "正在等候卷移除。"
+    IDS_ERASEOP_ERROR_ERASING "擦除介质错误。"
+    IDS_ERASEOP_CANT_STOP   "无法停止擦除操作。"
+    IDS_ERASEOP_COMPLETE    "擦除完成。"
+    IDS_ERASEOP_ERASED_RESETTING "已擦除介质，正在重设设备…"
+    IDS_OPERATION_UPDATE    "更新"
+    IDS_OPERATION_COPY      "复制"
+    IDS_OPERATION_LOAD      "载入"
+    IDS_OPERATION_INVALID_OP "操作无效"
+    IDS_OPERATION_ERASE     "擦除"
+    IDS_OPERATION_REG_SCRUB "注册表清除"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPFLAGS_OPTIONSTRINGS_STATICID "使用静态 ID 恢复模式固件"
+    IDS_OPFLAGS_OPTIONSTRINGS_MULTI_STATICID "使用多静态 ID 固件文件（仅限多数据驱动器）"
+    IDS_OPFLAGS_OPTIONSTRINGS_FAT32 "FAT32"
+    IDS_OPFLAGS_OPTIONSTRINGS_WINCE "Windows CE"
+    IDS_OPFLAGS_OPTIONSTRINGS_ERASE "Erase Media"
+    IDS_OPMONITOR_MONITORING "正在监测…"
+    IDS_OPREGISTRY_SCRUBBING "正在清除注册表…"
+    IDS_OPREGISTRY_SCRUB_COMPLETE "注册表清除完毕"
+    IDS_OPREGISTRY_SCRUB_ERROR "注册表清除：清除时发生错误。"
+    IDS_OPREGISTRY_SCRUB_NOTHING_TO_DO "注册表清除：无可清除项目。"
+    IDS_OPUPDATER_UPDATING  "正在更新…"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPUPDATER_SEARCHING_TO_RECOVER "正在搜索设备以恢复…"
+    IDS_OPUPDATER_REQUIRES_RESET_RECOVERY "必须将设备重设为恢复模式…"
+    IDS_OPUPDATER_SEARCHING_TO_UPDATE "正在搜索要更新的设备…"
+    IDS_OPUPDATER_INVALID_DEVICE "更新错误：要更新的设备无效。"
+    IDS_OPUPDATER_INVALID_STATE "更新错误：状态 (%s) 无效。"
+    IDS_OPUPDATER_INVALID_MSG "更新错误：消息状态 (%s) 无效。"
+    IDS_OPUPDATER_LOADING_USBMSC "正在向 RAM 中加载 USBMSC…"
+    IDS_OPUPDATER_LOADING_FIRMWARE "正在向 FLASH 中加载固件…"
+    IDS_OPUPDATER_COMPLETE  "更新完成。"
+    IDS_OPUPDATER_UPDATE_ERROR "更新错误： 0x%x (%d) - %s"
+    IDS_OPUPDATER_ALLOCATING "正在分配媒体"
+    IDS_OPUPDATER_GET_DRIVE_SIZES "正在获得分区大小"
+    IDS_OPUPDATER_WRITING_FILE "写入 %S"
+    IDS_PROFILE_OK          "简档状态：正确"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PROFILE_ERR_FILE_NO_EXIST "文件不存在：%s。"
+    IDS_OPUPDATER_VERIFYING_FILE "正在校验 %S"
+    IDS_PORTMGRDLG_DRIVES_TEXT "驱动器："
+    IDS_PORTMGRDLG_PORT_GRP_TEXT "未分配"
+    IDS_OPUPDATER_LOADING_FILE "载入 %S"
+    IDS_PORTMGRDLG_PANEL_TEXT "%c - 未分配"
+    IDS_PORTMGRDLG_HUB_PORT_TEXT "%c - 集线器 %d，端口 %d"
+    IDS_PORTMGRDLG_MONITORING "正在监控…"
+    IDS_PORTMGRDLG_COMPLETE "操作完成"
+    IDS_OPUPDATER_INITIALIZING_DRM "正在初始化DRM"
+    IDS_OPUPDATER_INITIALIZING_DATABASE "正在初始化数据库"
+    IDS_PORTMGRDLG_FORMATTING "格式化…"
+    IDS_REGSCRUB_CLEAN_TEXT "清理"
+    IDS_REGSCRUB_REMOVE_STATIC_TEXT "清除静入态 ID 条目"
+    IDS_REGSCRUB_PROFILE_DESC_TEXT "简档描述："
+    IDS_REGSCRUB_USB_VID_TEXT "USB 厂商 ID："
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PROFILE_WRN_INVALID_OPERATION "简档警告：将不执行无效操作。"
+    IDS_PROFILE_ERR_NOT_INITIALIZED "简档错误：简档尚未初始化。"
+    IDS_PROFILE_ERR_NO_VALID_OPERATION "简档错误：无有效操作。"
+    IDS_PROFILE_ERR_NO_SELECTION "简档错误：请创建或选择一个播放器简档。"
+    IDS_PROFILE_ERR_MISSING_DIRECTORY "简档错误：目录 %s 不存在。"
+    IDS_PROFILE_ERR_MISSING_INI_FILE "简档错误： %s 文件不存在。"
+    IDS_PROFILE_ERR_INVALID_CHARS "简档错误：简档描述无法包含：%s。"
+    IDS_PROFILE_ERR_INVALID_DESCRIPTION "简档错误：简档描述无效。"
+    IDS_PROFILE_ERR_INVALID_USB_VENDOR_ID "简档错误：USB 厂商 ID 无效。"
+    IDS_PROFILE_ERR_INVALID_USB_PROD_ID "简档错误：USB 产品 ID 无效。"
+    IDS_PROFILE_ERR_INVALID_SCSI_VENDOR_ID "简档错误：SCSI 厂商 ID 无效。"
+    IDS_PROFILE_ERR_INVALID_SCSI_PROD_ID "简档错误：SCSI 产品 ID 无效。"
+    IDS_PROFILE_WRN_INVALID_VOLUME_LABLE "简档错误：卷标无效。"
+    IDS_PROFILE_MSG_OVERWRITE_PROMPT "%s 有写保护。\n 是否覆写以更改操作状态？"
+    IDS_PROFILE_ERR_WRITE_FAILURE "无法写入文件：%s。"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_REGSCRUB_USB_PID_TEXT "USB 产品 ID："
+    IDS_REGSCRUB_SCSI_VID_TEXT "SCSI 厂商 ID："
+    IDS_REGSCRUB_SCSI_PID_TEXT "SCSI 产品 ID："
+    IDS_REGSCRUB_SCANNING_STATUS_TEXT "正在扫描注册表条目："
+    IDS_REGSCRUB_DELETING_STATUS_TEXT "正在删除注册表条目："
+    IDS_REGSCRUB_ENTRIES_REM_STATUS_TEXT "已移除的设备条目："
+    IDS_REGSCRUB_INVALID_PROFILE "无效简档 - 请选择一个有效简档。"
+    IDS_REGSCRUB_CONFIRM_PROMPT 
+                            "此选项系解决故障的一项高级选项，并且不\n得在正常的注册表维护过程中勾选该选项。\n\n 用户必须在认真阅读《用户手册》中有关\n该应用程序安装和配置程序的全部内容后方可勾选此选项。\n仅限当您遇到静态 ID 固件方面的问题时方可勾选此选项。\n\n您是否确定要清除该静态 ID 条目？"
+    IDS_REGSCRUB_WRONG_OS   "该操作系统不支持此项操作。"
+    IDS_REGSCRUB_FINISHED   "完成"
+    IDS_REGSCRUB_REMOVE_RECOVERY "Remove Recovery Entries"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STATUS_GRP_TEXT     "状态信息"
+    IDS_STATUS_PROFILE_TEXT "Profile"
+    IDS_STATUS_FW_VER_TEXT  "版本"
+    IDS_STATUS_START_TEXT   "开始时间"
+    IDS_STATUS_ELAPSED_TEXT "持续时间"
+    IDS_STATUS_AVG_DURATION_TEXT "平均持续时间"
+    IDS_STATUS_OK_UPDATES_TEXT "成功次数"
+    IDS_STATUS_FAILED_UPDATES_TEXT "失败次数"
+    IDS_STATUS_FAILURE_RATE_TEXT "失败比率"
+    IDS_STATUS_NO_PORTS_SELECTED "没有选择USB端口"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERROR_INVALID_DEVICE "错误：无效设备"
+    IDS_ERROR_DEVICE_REMOVED_DURING_OP "错误：设备在操作期间已被移除"
+    IDS_ERROR_VOLUME_REMOVED_DURING_OP "错误：卷在操作期间已被移除"
+    IDS_DEFINE_TABLE_TEXT   "下载软件所在驱动器位置表"
+    IDS_OPUPDATE_HEADER_DESC "描述"
+    IDS_OPUPDATE_HEADER_TYPE "类型"
+    IDS_OPUPDATE_HEADER_TAG "起始标签"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_NAME_FOLDER      "[工作文件夹]"
+    IDS_COLUMN_FILENAME     "文件名称"
+    IDS_COLUMN_SIZE         "尺寸"
+    IDS_COLUMN_TIMESTAMP    "日期"
+    IDS_NUM_OBJECTS         "%d 目标文件"
+    IDS_NEW_FOLDER          "新文件夹"
+    IDS_ADD_FOLDER          "增加文件夹"
+    IDS_OP_COPY_STEP2       "定义需要拷贝到播放器的内容"
+    IDS_HUB_REQUIRED        "需要一个外置的USB集线器"
+    IDS_UPDATE_STEP3_TEXT   "指定升级启动程序(35xx/36xx:stmfgmsc.sb 37xx:updater.sb)"
+    IDS_MENU_COPY_DRIVE     "拷贝"
+    IDS_UNAUTHORIZED_SYSTEM "本系统没有授权使用该应用程序"
+    IDS_WAITING_TO_COMPLETE "请稍候…"
+    IDS_OTPOP_TEXT          "输入写入OTP的8-bit的16进制的数值"
+    IDS_OPERATION_OTP_REGISTER "OTP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPOTP_OP_FAILED     "OTP操作失败"
+    IDS_OPOTP_WRITING_REG   "写入OTP寄存器"
+    IDS_REGCHK_INFO_TEXT    "检查注册表设备信息…"
+    IDS_REGCHK_ENTRIES_TEXT "符合的设备信息："
+    IDS_REGCHK_OTHER_TEXT   "其他的设备信息："
+	IDS_REGCHK_WARNING      "注册表内存在太多USB设备的信息。性能和稳定性可以通过运行注册表USB设备清除工具来提高。"
+	IDS_CFG_COM_PORT_MSGS   "使COM端口输出信息"
+END
+
+#endif    // Chinese (P.R.C.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Korean resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+#ifdef _WIN32
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_MAINFRAME           "StMfgTool"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "StMfgTool"
+    AFX_IDS_IDLEMESSAGE     "霖厚 肯丰"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "橇肺弊伐 沥焊, 滚傈 锅龋 棺 历累鼻 沥焊甫 钎矫钦聪促\nAbout"
+    ID_APP_EXIT             "览侩 橇肺弊伐阑 辆丰钦聪促\nExit"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "累诀芒 农扁甫 函版钦聪促"
+    AFX_IDS_SCMOVE          "累诀芒 困摹甫 函版钦聪促"
+    AFX_IDS_SCMINIMIZE      "累诀芒阑 酒捞能栏肺 绵家钦聪促"
+    AFX_IDS_SCMAXIMIZE      "累诀芒阑 傈眉 拳搁 钎矫钦聪促"
+    AFX_IDS_SCNEXTWINDOW    "促澜 巩辑芒栏肺 傈券钦聪促"
+    AFX_IDS_SCPREVWINDOW    "捞傈 巩辑芒栏肺 傈券钦聪促"
+    AFX_IDS_SCCLOSE         "劝己芒阑 摧绊 巩辑 历厘 犬牢鄂阑 钎矫钦聪促"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "累诀芒阑 沥惑 农扁肺 汗盔钦聪促"
+    AFX_IDS_SCTASKLIST      "累诀 格废阑 劝己拳钦聪促"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPINFO_ERR_NOT_INITIALIZED "累诀 坷幅: 累诀捞 檬扁拳登瘤 臼疽嚼聪促."
+    IDS_OPINFO_ERR_MISSING_DIRECTORY "累诀 坷幅: 叼泛磐府 %s啊 粮犁窍瘤 臼嚼聪促."
+    IDS_OPINFO_ERR_EMPTY_DIRECTORY "累诀 坷幅: 叼泛磐府 %s俊 颇老捞 绝嚼聪促."
+    IDS_OPINFO_ERR_MISSING_INI_SECTION 
+                            "累诀 坷幅: ""player.ini"" 颇老俊 %s 冀记捞 绝嚼聪促."
+    IDS_OPINFO_ERR_MISSING_FILE "累诀 坷幅: %s 颇老阑 茫阑 荐 绝嚼聪促."
+    IDS_OPINFO_ERR_INVALID_OPERATION "累诀 坷幅: 累诀捞 瘤盔登瘤 臼嚼聪促."
+    IDS_OPINFO_ERR_SYSTEM_ERROR "累诀 坷幅: 矫胶袍 坷幅."
+    IDS_OPINFO_ERR_NO_CMD_LINE "累诀 坷幅: ""%s"" 颇老狼 %s 冀记俊 ""%s""啊 粮犁窍瘤 臼嚼聪促 ."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPINFO_OK           "累诀 惑怕: OK"
+    IDS_OPINFO_ERR_NO_FILE_DESC "累诀 坷幅: %s俊 措茄 汲疙捞 绝嚼聪促."
+    IDS_OPINFO_ERR_INVALID_DRV_TYPE "累诀 坷幅: 靛扼捞宏 辆幅啊 肋给登菌嚼聪促."
+END
+
+STRINGTABLE 
+BEGIN
+    ID_OPTIONS_CONFIGURATION "汲沥 包府磊甫 矫累钦聪促"
+    ID_START_STOP_TOGGLE    "敲饭捞绢 累诀阑 矫累/辆丰钦聪促"
+    ID_VIEW_LOG             "肺弊 包府磊甫 矫累钦聪促"
+    ID_OPTIONS_CLEAN_REGISTRY "努赴 饭瘤胶飘府 包府磊甫 矫累钦聪促"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_EXIT                "览侩 橇肺弊伐阑 辆丰钦聪促"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_PORT_GROUP_BOX       "霖厚 肯丰"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OK                  "犬牢"
+    IDS_CANCEL              "秒家"
+    IDS_CLOSE               "摧扁"
+    IDS_ERROR               "坷幅"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_NEW                 "货 累诀"
+    IDS_EDIT                "祈笼"
+    IDS_DELETE              "昏力"
+    IDS_SAVE                "历厘"
+    IDS_WAITING_FOR_DEVICE  "厘摹 措扁 吝..."
+    IDS_WAITING_FOR_DRIVE   "靛扼捞宏 措扁 吝..."
+    IDS_STOPPED_BY_USER     "荤侩磊 吝瘤"
+    IDS_NO_DEVICE_CONNECTED "楷搬等 厘摹啊 绝嚼聪促."
+    IDS_RESETTING_DEVICE    "厘摹甫 犁汲沥窍绰 吝..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STOP                "吝瘤"
+    IDS_STOPPING            "吝瘤窍绰 吝..."
+    IDS_START               "矫累"
+    IDS_VALID_PROFILE_TO_SCRUB "饭瘤胶飘府甫 沥府窍妨搁 馆靛矫 蜡瓤茄 橇肺鞘捞 乐绢具 钦聪促."
+    IDS_INVALID_PLAYER_PROFILE "肋给等 敲饭捞绢 橇肺鞘"
+    IDS_STOP_REQUIRED       "<吝瘤> 甫 穿弗 促澜 葛电 累诀捞 场朝 锭鳖瘤 扁促啡促啊 橇肺弊伐阑 辆丰窍绞矫坷."
+    IDS_UNSAFE_DEVICE_REMOVAL "救傈窍瘤 臼篮 厘摹 力芭"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_FNAME_TEXT      "颇老 捞抚:"
+    IDS_CFG_DESC_TEXT       "汲疙:"
+    IDS_CFG_DRIVE_TYPE_TEXT "靛扼捞宏 辆幅:"
+    IDS_CFG_DRIVE_TAG_TEXT  "靛扼捞宏 怕弊 (16柳荐):"
+    IDS_CFG_DRIVE_SIZE_TEXT "夸没等 靛扼捞宏 农扁 (KB):"
+    IDS_CFG_DRIVE_DATA_GRP_TEXT "靛扼捞宏 单捞磐"
+    IDS_CFG_ADD_DRIVE_TEXT  "靛扼捞宏 眠啊"
+    IDS_CFG_DRIVES_GRP_TEXT "靛扼捞宏"
+    IDS_CFG_SDK_BASE_TEXT   "SDK 海捞胶"
+    IDS_OPLOADER_LOADING    "Loading..."
+    IDS_OPLOADER_LOAD_STARTED "Load HID started..."
+    IDS_OPLOADER_COMPLETE   "Load HID Complete."
+    IDS_OPLOADER_INVALID_DEVICE "Loader Error: Invalid device to load."
+    IDS_OPLOADER_INVALID_STATE "Loader Error: Invalid State (%s)."
+    IDS_OPLOADER_INVALID_MSG "Loader Error: Invalid Msg State (%s)."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_CHANGES_LOST_WARNING "叼弃飘蔼 急琶矫 急沥等 葛电 急琶捞 秒家邓聪促, 拌加 角青 钦聪鳖?"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_GENERAL_TITLE   "老馆"
+    IDS_CFG_GENERAL_RESTRICT_DEVICE "厘摹 橇肺鞘 累己 累诀阑 陛瘤钦聪促."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_GENERAL_SUPRESS_AUTOPLAY "AutoPlay 芭何 扁瓷阑 倾侩钦聪促"
+    IDS_CFG_GENERAL_AUTOPLAY_ALL_DRVS "葛电 靛扼捞宏"
+    IDS_CFG_GENERAL_AUTOPLAY_SELECT_DRIVE "靛扼捞宏甫 急琶钦聪促"
+    IDS_CFG_GENERAL_LANGUAGE_GROUP "攫绢"
+    IDS_CFG_GENERAL_OPTIONS_GROUP "急琶荤亲"
+    IDS_CFG_GENERAL_DEFAULT_LANGUAGE "扁夯 汲沥 攫绢:"
+    IDS_CFG_GENERAL_AUTOPLAY_GROUP "AutoPlay"
+    IDS_CFG_GENERAL_ENABLE_LOGGING "捞亥飘 扁废 累己阑 倾侩钦聪促."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_EDIT_TITLE       "累诀 俊叼磐"
+    IDS_OP_EDIT_ADD_FILE    "颇老 眠啊"
+    IDS_OP_EDIT_ADD_DIR     "叼泛磐府 眠啊"
+    IDS_OP_EDIT_FILE_REMOVE "力芭"
+    IDS_OP_EDIT_TYPE        "累诀 辆幅:"
+    IDS_OP_EDIT_STEP1       "累诀 辆幅甫 急琶窍绞矫坷."
+    IDS_OP_EDIT_NAME_OPERATION "累诀 捞抚阑 瘤沥窍绞矫坷."
+    IDS_OP_EDIT_NAME        "累诀 弃歹:"
+    IDS_OP_EDIT_SELECT_FILES "累诀俊 鞘夸茄 颇老阑 急琶窍绞矫坷."
+    IDS_OP_EDIT_SELECT_OPTIONS "累诀俊 鞘夸茄 可记阑 急琶窍绞矫坷."
+    IDS_OP_EDIT_STEP1_GRP   "窜拌 1"
+    IDS_OP_EDIT_STEP2_GRP   "窜拌 2"
+    IDS_OP_EDIT_STEP3_GRP   "窜拌 3"
+    IDS_OP_EDIT_STEP4_GRP   "窜拌 4"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_EDIT_ADVANCED    "绊鞭"
+    IDS_OP_EDIT_DRIVE_NUM   "靛扼捞宏 锅龋:"
+    IDS_DIRECTORY_DETECTED_PROMPT 
+                            "诀单捞飘 累诀篮 叼泛磐府甫 瘤盔窍瘤 臼嚼聪促.\r\n急琶等 叼泛磐府(甸)甫 昏力窍矫摆嚼聪鳖?"
+    IDS_DIRECTORY_DETECTED_TITLE "叼泛磐府啊 昏力登菌嚼聪促"
+    IDS_FILE_BROWSE_TYPES   "七傀绢 颇老 (*.s;*.sb;*.bin;*.rsc||)"
+    IDS_NOTHING_TO_REMOVE   "力芭且 措惑捞 绝嚼聪促.\n\n1. 哭率 惑磊俊辑 力芭且 颇老阑 急琶窍绞矫坷.\n2. ""力芭""甫 穿福绞矫坷."
+    IDS_INVALID_OP_FOLDER   "肋给等 累诀 弃歹涝聪促\n\n累诀 弃歹亲格俊绰 馆靛矫 蜡瓤茄 Windows 弃歹疙阑 器窃矫挪 促澜俊 累诀阑 历厘且 荐 乐嚼聪促."
+    IDS_OP_ALREADY_EXISTS   "鞍篮 捞抚狼 累诀捞 捞固 粮犁钦聪促.\n\n'犬牢'阑 穿福搁 扁粮 '%s' 累诀\n<%s>\n俊 货肺款 累诀 沥焊甫 丹绢静扁 钦聪促.\n\n'秒家'甫 穿福搁 历厘窍妨绰 累诀狼 捞抚阑 函版且 荐 乐嚼聪促."
+    IDS_CONFIRM_OVERWRITE   "丹绢静扁 且 巴牢瘤 犬牢窍绞矫坷"
+    IDS_SELECT_DIRECTORY    "叼泛磐府甫 急琶窍绞矫坷"
+    IDS_OPTIONS             "急琶荤亲"
+    IDS_NO_OPTIONS          "捞 累诀俊绰 急琶荤亲捞 绝嚼聪促."
+    IDS_NO_ITEMS_IN_VIEW    "捞 拳搁俊绰 亲格捞 绝嚼聪促."
+    IDS_OP_EDIT_TIMEOUT     "Operation Timeout:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_MENU_ENABLE         "啊瓷"
+    IDS_MENU_NEW            "脚痹..."
+    IDS_MENU_EDIT           "祈笼..."
+    IDS_MENU_DELETE         "昏力"
+    IDS_MENU_MOVE_UP        "困肺 捞悼"
+    IDS_MENU_MOVE_DOWN      "酒贰肺 捞悼"
+    IDS_CFG_PROFILE_TITLE   "橇肺鞘"
+    IDS_CFG_PROFILE_LABEL   "杭俘 饭捞喉:"
+    IDS_CFG_PROFILE_DESC    "橇肺鞘 汲疙:"
+    IDS_CFG_PROFILE_USB_VENDOR "USB 亥歹 ID:"
+    IDS_CFG_PROFILE_USB_PRODUCT "USB 力前 ID:"
+    IDS_CFG_PROFILE_SCSI_VENDOR "SCSI 亥歹 ID:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PROFILE_SCSI_PRODUCT "SCSI 力前 ID:"
+    IDS_CFG_PROFILE_OPERATIONS "累诀:"
+    IDS_CFG_PROFILE_GRP     "橇肺鞘"
+    IDS_CFG_PROFILE_INVALID_DESC 
+                            "橇肺鞘 坷幅: 橇肺鞘 汲疙 亲格俊绰 馆靛矫 蜡瓤茄 Windows 弃歹 捞抚阑 涝仿秦具 钦聪促."
+    IDS_DELETE_CONFIRM_MSG  "%s 橇肺鞘阑 昏力窍矫摆嚼聪鳖?\n\n'犬牢'阑 穿福搁 橇肺鞘\n棺 包访 颇老捞 傈何 昏力邓聪促.\n\n'秒家'甫 穿福搁 昏力啊 吝瘤邓聪促."
+    IDS_DELETE_CONFIRM_TITLE "昏力甫 犬牢钦聪促"
+    IDS_TOOLTIP_NO_PATH     "版肺啊 绝嚼聪促"
+    IDS_TOOLTIP_PROFILE_LOCATION "困摹: .\\Profiles\\%s\\%s"
+    IDS_TOOLTIP_NO_FILES    "颇老捞 绝嚼聪促"
+    IDS_CFG_PROFILE_INVALID_DESC_MSG 
+                            "橇肺鞘 汲疙捞 肋给登菌嚼聪促!\n\n橇肺鞘 汲疙 亲格俊绰 馆靛矫 蜡瓤茄 Windows 弃歹 捞抚阑 涝仿窍寂具 颇老阑 历厘且 荐 乐嚼聪促."
+    IDS_CFG_PROFILE_EXISTS_MSG 
+                            "捞 捞抚狼 橇肺鞘捞 捞固 乐嚼聪促.\n\n'犬牢'阑 穿福搁 扁粮 '%s' 橇肺鞘\n<%s>\n俊 货肺款 橇肺鞘 沥焊甫 丹绢静扁 钦聪促.\n\n'秒家'甫 穿福搁 历厘窍妨绰 橇肺鞘 捞抚阑 函版且 荐 乐嚼聪促."
+    IDS_CFG_PROFILE_COL_OP  "累诀"
+    IDS_CFG_PROFILE_COL_FOLDER "弃歹"
+    IDS_CFG_PROFILE_COL_FILES "颇老"
+    IDS_CFG_PROFILE_COL_OPTIONS "急琶荤亲"
+    IDS_CFG_PROFILE_DELETE_CONFIRM 
+                            "%s 累诀 %s阑 昏力窍摆嚼聪鳖?\n\n'犬牢'阑 穿福搁 累诀\n 棺 包访颇老阑 傈何 昏力钦聪促.\n\n'秒家'甫 穿福搁 昏力甫 吝瘤钦聪促."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PROFILE_DELETE_TITLE "昏力甫 犬牢钦聪促"
+    IDS_CFG_USBPORT_UNASSIGNED "(固瘤沥)"
+    IDS_CFG_USBPORT_PANEL   "(菩澄 %c)"
+    IDS_CFG_USBPORT_PORT    "器飘 %d %s %s"
+    IDS_CFG_USBPORT_HUB     "倾宏 %d"
+    IDS_CFG_USBPORT_HUB_PORT "器飘 %d - 倾宏 %d"
+    IDS_CFG_USBPORT_MYCOMPUTER "郴 哪腔磐"
+    IDS_CFG_USBPORT_CONTROLLER "牧飘费矾"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STATUS_NO_OPS_SELECTED "橇肺鞘 累诀阑 急琶秦 林技夸"
+    IDS_STATUS_STATUS_TEXT  "惑怕"
+    IDS_CFG_USBPORT_MAX_PORTS "弥措 USB 器飘 荤侩 侩捞"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPCOPY_COPYING      "汗荤 吝..."
+    IDS_OPCOPY_STARTED      "汗荤啊 矫累登菌嚼聪促..."
+    IDS_OPCOPY_COMPLETE     "汗荤 肯丰"
+    IDS_OPCOPY_STOPPED_BY_USER "荤侩磊啊 汗荤甫 吝瘤沁嚼聪促 - 扁促妨 林绞矫坷..."
+    IDS_OPCOPY_FINALIZING_COPY "汗荤 累诀阑 肯丰窍绊 乐嚼聪促..."
+    IDS_OPCOPY_CREATING_DIR "叼泛磐府 累己 吝: %s..."
+    IDS_OPCOPY_CREATE_DIR_ERR "叼泛磐府 累己 吝 - 坷幅(%d)"
+    IDS_OPCOPY_COPY_ERR     "颇老阑 汗荤钦聪促 - 坷幅(%d)"
+    IDS_OPCOPY_COPYING_FILE "汗荤 吝 %sˇ"
+    IDS_ERASEOP_ERASING_MEDIA "概眉 家芭 吝..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERASEOP_WAITING_VOLUME_REMOVAL "杭俘 力芭甫 困秦 措扁 吝涝聪促."
+    IDS_ERASEOP_ERROR_ERASING "概眉 家芭 坷幅."
+    IDS_ERASEOP_CANT_STOP   "家芭 累诀阑 吝瘤且 荐 绝嚼聪促."
+    IDS_ERASEOP_COMPLETE    "家芭 肯丰."
+    IDS_ERASEOP_ERASED_RESETTING "概眉甫 家芭窍绊, 厘摹甫 犁汲沥窍绰 吝..."
+    IDS_OPERATION_UPDATE    "诀单捞飘"
+    IDS_OPERATION_COPY      "汗荤"
+    IDS_OPERATION_LOAD      "货 累诀"
+    IDS_OPERATION_INVALID_OP "肋给等 累诀"
+    IDS_OPERATION_ERASE     "家芭"
+    IDS_OPERATION_REG_SCRUB "饭瘤胶飘府 沥府(REGISTRY SCRUB)"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPFLAGS_OPTIONSTRINGS_STATICID "沥利 ID 汗盔 葛靛 七傀绢甫 荤侩钦聪促"
+    IDS_OPFLAGS_OPTIONSTRINGS_MULTI_STATICID 
+                            "钢萍敲 沥利 ID 七傀绢 颇老阑 荤侩钦聪促 (钢萍敲 单捞磐 靛扼捞宏俊父 茄窃)"
+    IDS_OPFLAGS_OPTIONSTRINGS_FAT32 "FAT32"
+    IDS_OPFLAGS_OPTIONSTRINGS_WINCE "Windows CE"
+    IDS_OPFLAGS_OPTIONSTRINGS_ERASE "Erase Media"
+    IDS_OPMONITOR_MONITORING "葛聪磐 吝ˇ"
+    IDS_OPREGISTRY_SCRUBBING "饭瘤胶飘府 沥府 吝..."
+    IDS_OPREGISTRY_SCRUB_COMPLETE "饭瘤胶飘府 沥府 肯丰"
+    IDS_OPREGISTRY_SCRUB_ERROR "饭瘤胶飘府 沥府: 沥府 吝 坷幅 惯积."
+    IDS_OPREGISTRY_SCRUB_NOTHING_TO_DO "饭瘤胶飘府 沥府: 沥府且 郴侩 绝澜."
+    IDS_OPUPDATER_UPDATING  "诀单捞飘 吝..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPUPDATER_SEARCHING_TO_RECOVER "汗盔且 厘摹 八祸 吝..."
+    IDS_OPUPDATER_REQUIRES_RESET_RECOVERY "厘摹甫 汗盔 葛靛肺 犁汲沥秦具 钦聪促..."
+    IDS_OPUPDATER_SEARCHING_TO_UPDATE "诀单捞飘且 厘摹甫 八祸 吝..."
+    IDS_OPUPDATER_INVALID_DEVICE "诀单捞飘 坷幅: 诀单捞飘且 厘摹啊 肋给登菌嚼聪促."
+    IDS_OPUPDATER_INVALID_STATE "诀单捞飘 坷幅: 惑怕啊 肋给登菌嚼聪促(%s)."
+    IDS_OPUPDATER_INVALID_MSG "诀单捞飘 坷幅: 肋给等 皋矫瘤 惑怕(%s)."
+    IDS_OPUPDATER_LOADING_USBMSC "USBMSC甫 RAM栏肺 佬绢甸捞绰 吝..."
+    IDS_OPUPDATER_LOADING_FIRMWARE "七傀绢甫 FLASH肺 佬绢甸捞绰 吝..."
+    IDS_OPUPDATER_COMPLETE  "诀单捞飘 肯丰."
+    IDS_OPUPDATER_UPDATE_ERROR "诀单捞飘 坷幅:  0x%x (%d) - %s"
+    IDS_OPUPDATER_ALLOCATING "固叼酒 且寸吝"
+    IDS_OPUPDATER_GET_DRIVE_SIZES "颇萍记 侩樊 犬焊吝."
+    IDS_OPUPDATER_WRITING_FILE "颇老 静扁 %s"
+    IDS_PROFILE_OK          "橇肺鞘 惑怕: OK"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PROFILE_ERR_FILE_NO_EXIST "颇老捞 粮犁窍瘤 臼嚼聪促: %s."
+    IDS_OPUPDATER_VERIFYING_FILE "八刘 %s"
+    IDS_PORTMGRDLG_DRIVES_TEXT "靛扼捞宏(甸):"
+    IDS_PORTMGRDLG_PORT_GRP_TEXT "固瘤沥"
+    IDS_OPUPDATER_LOADING_FILE "肺爹 %s"
+    IDS_PORTMGRDLG_PANEL_TEXT "%c - 固瘤沥"
+    IDS_PORTMGRDLG_HUB_PORT_TEXT "%c - 倾宏 %d, 器飘 %d"
+    IDS_PORTMGRDLG_MONITORING "葛聪磐 吝..."
+    IDS_PORTMGRDLG_COMPLETE "累诀 肯丰"
+    IDS_OPUPDATER_INITIALIZING_DRM "DRM 沥焊 檬扁拳吝"
+    IDS_OPUPDATER_INITIALIZING_DATABASE "单捞鸥 海捞胶 檬扁拳 吝"
+    IDS_PORTMGRDLG_FORMATTING "器杆泼 吝涝聪促ˇ"
+    IDS_REGSCRUB_CLEAN_TEXT "沥府"
+    IDS_REGSCRUB_REMOVE_STATIC_TEXT "沥利 ID 涝仿 郴侩 力芭"
+    IDS_REGSCRUB_PROFILE_DESC_TEXT "橇肺鞘 汲疙:"
+    IDS_REGSCRUB_USB_VID_TEXT "USB 亥歹 ID:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PROFILE_WRN_INVALID_OPERATION "橇肺鞘 版绊: 肋给等 累诀(甸)篮 角青登瘤 臼嚼聪促."
+    IDS_PROFILE_ERR_NOT_INITIALIZED "橇肺鞘 坷幅: 橇肺鞘捞 檬扁拳登瘤 臼疽嚼聪促."
+    IDS_PROFILE_ERR_NO_VALID_OPERATION "橇肺鞘 坷幅:  蜡瓤茄 累诀捞 绝嚼聪促."
+    IDS_PROFILE_ERR_NO_SELECTION "橇肺鞘 坷幅: 敲饭捞绢 橇肺鞘阑 累己 肚绰 急琶窍绞矫坷."
+    IDS_PROFILE_ERR_MISSING_DIRECTORY "橇肺鞘 坷幅: 叼泛磐府 %s啊 绝嚼聪促."
+    IDS_PROFILE_ERR_MISSING_INI_FILE "橇肺鞘 坷幅: %s 颇老捞 绝嚼聪促."
+    IDS_PROFILE_ERR_INVALID_CHARS "橇肺鞘 坷幅: 橇肺鞘 汲疙俊绰 促澜阑 器窃矫懦 荐 绝嚼聪促: %s"
+    IDS_PROFILE_ERR_INVALID_DESCRIPTION "橇肺鞘 坷幅: 肋给等 橇肺鞘 汲疙."
+    IDS_PROFILE_ERR_INVALID_USB_VENDOR_ID "橇肺鞘 坷幅: 肋给等 USB 亥歹 ID"
+    IDS_PROFILE_ERR_INVALID_USB_PROD_ID "橇肺鞘 坷幅: 肋给等 USB 力前 ID"
+    IDS_PROFILE_ERR_INVALID_SCSI_VENDOR_ID "橇肺鞘 坷幅: 肋给等 SCSI 亥歹 ID"
+    IDS_PROFILE_ERR_INVALID_SCSI_PROD_ID "橇肺鞘 坷幅: 肋给等 SCSI 力前 ID"
+    IDS_PROFILE_WRN_INVALID_VOLUME_LABLE "橇肺鞘 版绊: 肋给等 杭俘 饭捞喉"
+    IDS_PROFILE_MSG_OVERWRITE_PROMPT 
+                            "%s 绰 静扁 陛瘤登绢 乐嚼聪促.\n丹绢静扁 窍咯 累诀 惑怕甫 函版窍摆嚼聪鳖?"
+    IDS_PROFILE_ERR_WRITE_FAILURE "颇老俊 静扁 且 荐 绝嚼聪促: %s."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_REGSCRUB_USB_PID_TEXT "USB 力前 ID:"
+    IDS_REGSCRUB_SCSI_VID_TEXT "SCSI 亥歹 ID:"
+    IDS_REGSCRUB_SCSI_PID_TEXT "SCSI 力前 ID:"
+    IDS_REGSCRUB_SCANNING_STATUS_TEXT "饭瘤胶飘府 殿废 沥焊 八祸窍扁:"
+    IDS_REGSCRUB_DELETING_STATUS_TEXT "饭瘤胶飘府 殿废 沥焊 昏力窍扁:"
+    IDS_REGSCRUB_ENTRIES_REM_STATUS_TEXT "厘摹 殿废沥焊啊 力芭凳:"
+    IDS_REGSCRUB_INVALID_PROFILE "肋给等 橇肺鞘 - 蜡瓤茄 橇肺鞘阑 急琶窍绞矫坷."
+    IDS_REGSCRUB_CONFIRM_PROMPT 
+                            "捞 可记篮 绊鞭 巩力 秦搬 累诀 傈侩捞骨肺, 老馆利 饭瘤胶飘府 蜡瘤包府 累诀 吝俊绰 痢八窍瘤 \n付绞矫坷.\n\n捞 惑磊俊 眉农钎矫甫 沁阑 版快 荤侩磊 概春倔俊 乐绰 览侩 橇肺弊伐 汲摹/汲沥 例瞒甫 荤侩磊啊 肯丰秦 林绢具\n 钦聪促.\n沥利 ID 锭巩俊 巩力啊 积辨 版快俊父 捞 惑磊俊 眉农窍绞矫坷.\n\n沥富肺 沥利 ID 涝仿 郴侩阑 昏力窍摆嚼聪鳖?"
+    IDS_REGSCRUB_WRONG_OS   "泅犁 款康 眉力俊辑绰 捞 累诀阑 瘤盔窍瘤 臼嚼聪促."
+    IDS_REGSCRUB_FINISHED   "肯丰凳"
+    IDS_REGSCRUB_REMOVE_RECOVERY "Remove Recovery Entries"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STATUS_GRP_TEXT     "惑炔 沥焊"
+    IDS_STATUS_PROFILE_TEXT "橇肺鞘"
+    IDS_STATUS_FW_VER_TEXT  "滚傈"
+    IDS_STATUS_START_TEXT   "矫累矫埃"
+    IDS_STATUS_ELAPSED_TEXT "家夸矫埃"
+    IDS_STATUS_AVG_DURATION_TEXT "乞闭家夸 矫埃"
+    IDS_STATUS_OK_UPDATES_TEXT "肯丰等 累诀"
+    IDS_STATUS_FAILED_UPDATES_TEXT "角菩茄 累诀"
+    IDS_STATUS_FAILURE_RATE_TEXT "角菩 厚啦"
+    IDS_STATUS_NO_PORTS_SELECTED "USB 器飘甫 急琶秦 林技夸."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERROR_INVALID_DEVICE "坷幅: 肋给等 厘摹"
+    IDS_ERROR_DEVICE_REMOVED_DURING_OP "坷幅: 厘摹甫 累悼 吝俊 力芭登菌嚼聪促"
+    IDS_ERROR_VOLUME_REMOVED_DURING_OP "坷幅: 杭俘捞 累悼 吝俊 力芭登菌嚼聪促"
+    IDS_DEFINE_TABLE_TEXT   "累诀俊 鞘夸茄 靛扼捞宏俊 且寸瞪 颇老 格瞒"
+    IDS_OPUPDATE_HEADER_DESC "郴侩"
+    IDS_OPUPDATE_HEADER_TYPE "鸥涝"
+    IDS_OPUPDATE_HEADER_TAG "钎"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_NAME_FOLDER      "[累诀 弃歹]"
+    IDS_COLUMN_FILENAME     "颇老 捞抚"
+    IDS_COLUMN_SIZE         "农扁"
+    IDS_COLUMN_TIMESTAMP    "朝楼"
+    IDS_NUM_OBJECTS         "%d 措惑"
+    IDS_NEW_FOLDER          "货 弃歹"
+    IDS_ADD_FOLDER          "弃歹 歹窍扁"
+    IDS_OP_COPY_STEP2       "固叼绢俊 汗荤瞪 郴侩 犬牢"
+    IDS_HUB_REQUIRED        "寇厘 USB 倾宏啊 鞘夸钦聪促"
+    IDS_UPDATE_STEP3_TEXT   "诀单捞飘 瞪 Boot 七 寇绢 甫 疙扁 窍技夸."
+    IDS_MENU_COPY_DRIVE     "汗荤"
+    IDS_UNAUTHORIZED_SYSTEM "夯 矫胶牌篮 捞 累诀阑 角青且 鼻府啊 绝谰聪促."
+    IDS_WAITING_TO_COMPLETE "Waiting to complete..."
+    IDS_OTPOP_TEXT          "Enter an 8-bit hexidecimal value to be written to the first available OTP register. "
+    IDS_OPERATION_OTP_REGISTER "OTP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPOTP_OP_FAILED     "OTP operation failed."
+    IDS_OPOTP_WRITING_REG   "Writing OTP register..."
+    IDS_REGCHK_INFO_TEXT    "Checking registry devices..."
+    IDS_REGCHK_ENTRIES_TEXT "Matching Device Entries:"
+    IDS_REGCHK_OTHER_TEXT   "Other Device Entries:"
+	IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
+	IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
+END
+
+#endif    // Korean resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (Taiwan) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
+#pragma code_page(950)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_MAINFRAME           "StMfgTool"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "StMfgTool"
+    AFX_IDS_IDLEMESSAGE     "非称碞狐"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "陪ボ祘Α戈癟セ㎝舦\n闽"
+    ID_APP_EXIT             "癶莱ノ祘Α\n癶"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "跑跌怠"
+    AFX_IDS_SCMOVE          "跑跌怠竚"
+    AFX_IDS_SCMINIMIZE      "跌怠程て"
+    AFX_IDS_SCMAXIMIZE      "跌怠程て"
+    AFX_IDS_SCNEXTWINDOW    "ち传ゅン跌怠"
+    AFX_IDS_SCPREVWINDOW    "ち传ゅン跌怠"
+    AFX_IDS_SCCLOSE         "闽超ノい跌怠矗ボ纗ゅン"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "临跌怠タ盽"
+    AFX_IDS_SCTASKLIST      "币笆睲虫"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPINFO_ERR_NOT_INITIALIZED "巨岿粇巨ゼ﹍て"
+    IDS_OPINFO_ERR_MISSING_DIRECTORY "巨岿粇ヘ魁 %s ぃ"
+    IDS_OPINFO_ERR_EMPTY_DIRECTORY "巨岿粇ヘ魁 %s いぃヴ郎"
+    IDS_OPINFO_ERR_MISSING_INI_SECTION "巨岿粇ゅン ""player.ini""  %s 场だぃ"
+    IDS_OPINFO_ERR_MISSING_FILE "巨岿粇礚猭т %s ゅン"
+    IDS_OPINFO_ERR_INVALID_OPERATION "巨岿粇ぃや赣巨"
+    IDS_OPINFO_ERR_SYSTEM_ERROR "巨岿粇╰参岿粇"
+    IDS_OPINFO_ERR_NO_CMD_LINE "巨岿粇郎 ""%s""  %s 场だい⊿Τ ""%s"" "
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPINFO_OK           "巨篈タ絋"
+    IDS_OPINFO_ERR_NO_FILE_DESC "巨岿粇⊿Τ癸 %s 磞瓃"
+    IDS_OPINFO_ERR_INVALID_DRV_TYPE "巨岿粇合盒诀摸礚"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_OPTIONS_CONFIGURATION "币笆舱篈恨瞶"
+    ID_START_STOP_TOGGLE    "秨﹍/氨ゎ冀竟巨"
+    ID_VIEW_LOG             "币笆ら粁恨瞶"
+    ID_OPTIONS_CLEAN_REGISTRY "币笆睲瞶祅魁郎恨瞶"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_EXIT                "癶莱ノ祘Α"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_PORT_GROUP_BOX       "非称碞狐"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OK                  "絋﹚"
+    IDS_CANCEL              ""
+    IDS_CLOSE               "闽超"
+    IDS_ERROR               "岿粇"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_NEW                 "穝糤"
+    IDS_EDIT                "絪胯"
+    IDS_DELETE              "埃"
+    IDS_SAVE                "纗"
+    IDS_WAITING_FOR_DEVICE  "叫祔杆竚"
+    IDS_WAITING_FOR_DRIVE   "叫祔合盒诀"
+    IDS_STOPPED_BY_USER     "ㄏノ氨ゎ"
+    IDS_NO_DEVICE_CONNECTED "ゼ硈钡ヴ杆竚"
+    IDS_RESETTING_DEVICE    "タ穝砞﹚杆竚"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STOP                "氨ゎ"
+    IDS_STOPPING            "タ氨ゎ"
+    IDS_START               "秨﹍"
+    IDS_VALID_PROFILE_TO_SCRUB "ゲ斗砞﹚Τ砞﹚郎よ睲瞶祅魁郎"
+    IDS_INVALID_PLAYER_PROFILE "礚冀竟砞﹚郎"
+    IDS_STOP_REQUIRED       "叫<氨ゎ>秙癶祘Α玡ㄏ┮Τ巨磅︽Ч拨"
+    IDS_UNSAFE_DEVICE_REMOVAL "ぃ簿埃杆竚"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_FNAME_TEXT      "郎嘿"
+    IDS_CFG_DESC_TEXT       "磞瓃"
+    IDS_CFG_DRIVE_TYPE_TEXT "合盒诀摸"
+    IDS_CFG_DRIVE_TAG_TEXT  "合盒诀夹癘せ秈"
+    IDS_CFG_DRIVE_SIZE_TEXT "惠璶合盒诀 (KB)"
+    IDS_CFG_DRIVE_DATA_GRP_TEXT "合盒诀戈"
+    IDS_CFG_ADD_DRIVE_TEXT  "穝糤合盒诀"
+    IDS_CFG_DRIVES_GRP_TEXT "合盒诀"
+    IDS_CFG_SDK_BASE_TEXT   "SDK 膀非"
+    IDS_OPLOADER_LOADING    "Loading..."
+    IDS_OPLOADER_LOAD_STARTED "Load HID started..."
+    IDS_OPLOADER_COMPLETE   "Load HID Complete."
+    IDS_OPLOADER_INVALID_DEVICE "Loader Error: Invalid device to load."
+    IDS_OPLOADER_INVALID_STATE "Loader Error: Invalid State (%s)."
+    IDS_OPLOADER_INVALID_MSG "Loader Error: Invalid Msg State (%s)."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_CHANGES_LOST_WARNING "更箇砞,┮Τэ跑穦框ア?  腀種盾?"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_GENERAL_TITLE   ""
+    IDS_CFG_GENERAL_RESTRICT_DEVICE "癸杆竚砞﹚郎巨"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_GENERAL_SUPRESS_AUTOPLAY "氨ノ笆冀"
+    IDS_CFG_GENERAL_AUTOPLAY_ALL_DRVS "┮Τ合盒诀"
+    IDS_CFG_GENERAL_AUTOPLAY_SELECT_DRIVE "匡拒合盒诀"
+    IDS_CFG_GENERAL_LANGUAGE_GROUP "粂ē"
+    IDS_CFG_GENERAL_OPTIONS_GROUP "匡兜"
+    IDS_CFG_GENERAL_DEFAULT_LANGUAGE "箇砞粂ē"
+    IDS_CFG_GENERAL_AUTOPLAY_GROUP "笆磅︽"
+    IDS_CFG_GENERAL_ENABLE_LOGGING "币ノㄆン癘魁"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_EDIT_TITLE       "巨絪胯竟"
+    IDS_OP_EDIT_ADD_FILE    "穝糤郎"
+    IDS_OP_EDIT_ADD_DIR     "穝糤ヘ魁"
+    IDS_OP_EDIT_FILE_REMOVE "睲埃"
+    IDS_OP_EDIT_TYPE        "巨摸"
+    IDS_OP_EDIT_STEP1       "匡拒巨摸"
+    IDS_OP_EDIT_NAME_OPERATION "巨㏑"
+    IDS_OP_EDIT_NAME        "巨戈Ж"
+    IDS_OP_EDIT_SELECT_FILES "匡拒巨┮惠郎Ж"
+    IDS_OP_EDIT_SELECT_OPTIONS "匡拒巨匡兜"
+    IDS_OP_EDIT_STEP1_GRP   "˙艼 1"
+    IDS_OP_EDIT_STEP2_GRP   "˙艼 2"
+    IDS_OP_EDIT_STEP3_GRP   "˙艼 3"
+    IDS_OP_EDIT_STEP4_GRP   "˙艼 4"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_EDIT_ADVANCED    "秈顶"
+    IDS_OP_EDIT_DRIVE_NUM   "合盒诀絪腹"
+    IDS_DIRECTORY_DETECTED_PROMPT "穝巨ぃやヘ魁\r\n眤稱埃匡いヘ魁"
+    IDS_DIRECTORY_DETECTED_TITLE "埃ヘ魁"
+    IDS_FILE_BROWSE_TYPES   "硁砰郎 (*.s;*.sb;*.bin;*.rsc||)"
+    IDS_NOTHING_TO_REMOVE   "礚ヴ睲埃ゅン\n\n1.叫オ娩よ遏い匡拒璶睲埃郎\n2.睲埃秙"
+    IDS_INVALID_OP_FOLDER   "巨戈Ж\n\n礚巨戈Жいゲ斗Τ Windows 戈Ж纗巨"
+    IDS_OP_ALREADY_EXISTS   "赣巨嘿\n\n惠穝巨戈癟籠糶瞷Τ '%s' 巨 \n<%s>\n叫絋﹚秙\n\n 惠跑眤璶纗巨嘿叫秙"
+    IDS_CONFIRM_OVERWRITE   "絋粄滦糶"
+    IDS_SELECT_DIRECTORY    "匡拒ヘ魁"
+    IDS_OPTIONS             "匡兜"
+    IDS_NO_OPTIONS          "礚ㄑ巨匡拒匡兜"
+    IDS_NO_ITEMS_IN_VIEW    "浪跌礚ヴ兜ヘ"
+    IDS_OP_EDIT_TIMEOUT     "Operation Timeout:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_MENU_ENABLE         "す砛"
+    IDS_MENU_NEW            "穝"
+    IDS_MENU_EDIT           "絪胯"
+    IDS_MENU_DELETE         "埃"
+    IDS_MENU_MOVE_UP        "簿"
+    IDS_MENU_MOVE_DOWN      "簿"
+    IDS_CFG_PROFILE_TITLE   "砞﹚郎"
+    IDS_CFG_PROFILE_LABEL   "合夹乓"
+    IDS_CFG_PROFILE_DESC    "砞﹚郎磞瓃"
+    IDS_CFG_PROFILE_USB_VENDOR "USB ㄑ莱坝 ID"
+    IDS_CFG_PROFILE_USB_PRODUCT "USB 玻珇 ID"
+    IDS_CFG_PROFILE_SCSI_VENDOR "SCSI 矗ㄑ坝 ID"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PROFILE_SCSI_PRODUCT "SCSI 玻珇 ID"
+    IDS_CFG_PROFILE_OPERATIONS "巨"
+    IDS_CFG_PROFILE_GRP     "砞﹚郎"
+    IDS_CFG_PROFILE_INVALID_DESC "ゲ斗Τ Windows 戈Ж嘿"
+    IDS_DELETE_CONFIRM_MSG  "埃 %s 砞﹚郎\n\n惠睲埃砞﹚郎\n埃┮Τ闽郎叫絋﹚秙\n\n惠斌埃叫秙"
+    IDS_DELETE_CONFIRM_TITLE "絋粄埃"
+    IDS_TOOLTIP_NO_PATH     "⊿Τ隔畖"
+    IDS_TOOLTIP_PROFILE_LOCATION "竚 .\\Profiles\\%s\\%s"
+    IDS_TOOLTIP_NO_FILES    "⊿Τ郎"
+    IDS_CFG_PROFILE_INVALID_DESC_MSG 
+                            "砞﹚郎磞瓃礚\n\n 砞﹚郎磞瓃逆ゲ斗Τ Windows 戈Ж嘿纗赣砞﹚郎"
+    IDS_CFG_PROFILE_EXISTS_MSG 
+                            "硂嘿砞﹚郎竒\n\n惠穝砞﹚郎戈癟籠糶瞷Τ '%s' 砞﹚郎 \n<%s>\n叫絋﹚秙\n\n惠跑眤璶纗砞﹚郎嘿叫秙"
+    IDS_CFG_PROFILE_COL_OP  "巨"
+    IDS_CFG_PROFILE_COL_FOLDER "戈Ж"
+    IDS_CFG_PROFILE_COL_FILES "郎"
+    IDS_CFG_PROFILE_COL_OPTIONS "匡兜"
+    IDS_CFG_PROFILE_DELETE_CONFIRM 
+                            "埃 %s 巨\n\n惠睲埃巨 \n埃┮Τ闽郎叫絋﹚秙\n\n惠斌埃叫秙"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PROFILE_DELETE_TITLE "絋粄埃"
+    IDS_CFG_USBPORT_UNASSIGNED "ゼ"
+    IDS_CFG_USBPORT_PANEL   "北狾 %c"
+    IDS_CFG_USBPORT_PORT    "梆 %d %s %s"
+    IDS_CFG_USBPORT_HUB     "栋絬竟 %d"
+    IDS_CFG_USBPORT_HUB_PORT "梆 %d - 栋絬竟 %d"
+    IDS_CFG_USBPORT_MYCOMPUTER "и筿福"
+    IDS_CFG_USBPORT_CONTROLLER "北竟"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STATUS_NO_OPS_SELECTED "⊿Τ匡拒Profile"
+    IDS_STATUS_STATUS_TEXT  "Profile 篈:"
+    IDS_CFG_USBPORT_MAX_PORTS "程菏代USB Port计"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPCOPY_COPYING      "タ狡籹"
+    IDS_OPCOPY_STARTED      "秨﹍狡籹"
+    IDS_OPCOPY_COMPLETE     "狡籹ЧΘ"
+    IDS_OPCOPY_STOPPED_BY_USER "ㄏノ氨ゎ狡籹 - 叫祔"
+    IDS_OPCOPY_FINALIZING_COPY "タ挡狡籹巨"
+    IDS_OPCOPY_CREATING_DIR "タミヘ魁%s"
+    IDS_OPCOPY_CREATE_DIR_ERR "ミヘ魁 - 岿粇 (%d)"
+    IDS_OPCOPY_COPY_ERR     "狡籹郎 - 岿粇 (%d)"
+    IDS_OPCOPY_COPYING_FILE "タ狡籹 %s"
+    IDS_ERASEOP_ERASING_MEDIA "タ睲埃癘拘砰"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERASEOP_WAITING_VOLUME_REMOVAL "タ单合簿埃"
+    IDS_ERASEOP_ERROR_ERASING "睲埃癘拘砰岿粇"
+    IDS_ERASEOP_CANT_STOP   "礚猭氨ゎ睲埃巨"
+    IDS_ERASEOP_COMPLETE    "睲埃ЧΘ"
+    IDS_ERASEOP_ERASED_RESETTING "睲埃碈砰タ穝砞﹚杆竚"
+    IDS_OPERATION_UPDATE    "穝"
+    IDS_OPERATION_COPY      "狡籹"
+    IDS_OPERATION_LOAD      "LOAD"
+    IDS_OPERATION_INVALID_OP "巨礚"
+    IDS_OPERATION_ERASE     "睲埃"
+    IDS_OPERATION_REG_SCRUB "睲埃祅魁郎"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPFLAGS_OPTIONSTRINGS_STATICID "ㄏノStatic_ID Recovery家Α洞砰"
+    IDS_OPFLAGS_OPTIONSTRINGS_MULTI_STATICID "ㄏノStatic ID 洞砰郎度戈合盒诀"
+    IDS_OPFLAGS_OPTIONSTRINGS_FAT32 "FAT32"
+    IDS_OPFLAGS_OPTIONSTRINGS_WINCE "Windows CE"
+    IDS_OPFLAGS_OPTIONSTRINGS_ERASE "Erase Media"
+    IDS_OPMONITOR_MONITORING "タ菏代"
+    IDS_OPREGISTRY_SCRUBBING "タ睲埃祅魁郎"
+    IDS_OPREGISTRY_SCRUB_COMPLETE "睲埃祅魁郎ЧΘ"
+    IDS_OPREGISTRY_SCRUB_ERROR "睲埃祅魁郎睲埃祇ネ岿粇"
+    IDS_OPREGISTRY_SCRUB_NOTHING_TO_DO "睲埃祅魁郎礚睲埃兜ヘ"
+    IDS_OPUPDATER_UPDATING  "タ穝"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPUPDATER_SEARCHING_TO_RECOVER "タ穓碝杆竚临"
+    IDS_OPUPDATER_REQUIRES_RESET_RECOVERY "ゲ斗盢杆竚穝砞﹚临家Α"
+    IDS_OPUPDATER_SEARCHING_TO_UPDATE "タ穓碝杆竚穝"
+    IDS_OPUPDATER_INVALID_DEVICE "穝岿粇饼穝杆竚礚"
+    IDS_OPUPDATER_INVALID_STATE "穝岿粇篈 (%s) 礚"
+    IDS_OPUPDATER_INVALID_MSG "穝岿粇戈癟篈 (%s) 礚"
+    IDS_OPUPDATER_LOADING_USBMSC "タ RAM い更 USBMSC"
+    IDS_OPUPDATER_LOADING_FIRMWARE "タ FLASH い更洞砰"
+    IDS_OPUPDATER_COMPLETE  "穝ЧΘ "
+    IDS_OPUPDATER_UPDATE_ERROR "穝岿粇 0x%x (%d) - %s"
+    IDS_OPUPDATER_ALLOCATING "タ眔癘拘砰"
+    IDS_OPUPDATER_GET_DRIVE_SIZES "タ眔跋"
+    IDS_OPUPDATER_WRITING_FILE "糶 %s"
+    IDS_PROFILE_OK          "砞﹚郎篈タ絋"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PROFILE_ERR_FILE_NO_EXIST "郎ぃ %s"
+    IDS_OPUPDATER_VERIFYING_FILE "タ絋粄 %s"
+    IDS_PORTMGRDLG_DRIVES_TEXT "合盒诀"
+    IDS_PORTMGRDLG_PORT_GRP_TEXT "ゼ"
+    IDS_OPUPDATER_LOADING_FILE "更 %s"
+    IDS_PORTMGRDLG_PANEL_TEXT "%c - ゼ"
+    IDS_PORTMGRDLG_HUB_PORT_TEXT "%c - 栋絬竟 %d梆 %d"
+    IDS_PORTMGRDLG_MONITORING "タ菏跌"
+    IDS_PORTMGRDLG_COMPLETE "巨ЧΘ"
+    IDS_OPUPDATER_INITIALIZING_DRM "タㄏてDRM"
+    IDS_OPUPDATER_INITIALIZING_DATABASE "タㄏて戈畐"
+    IDS_PORTMGRDLG_FORMATTING "Αて"
+    IDS_REGSCRUB_CLEAN_TEXT "睲瞶"
+    IDS_REGSCRUB_REMOVE_STATIC_TEXT "睲埃繰ゎ ID 兜ヘ"
+    IDS_REGSCRUB_PROFILE_DESC_TEXT "砞﹚郎磞瓃"
+    IDS_REGSCRUB_USB_VID_TEXT "USB ㄑ莱坝 ID"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PROFILE_WRN_INVALID_OPERATION "砞﹚郎牡盢ぃ磅︽礚巨"
+    IDS_PROFILE_ERR_NOT_INITIALIZED "砞﹚郎岿粇砞﹚郎﹟ゼ﹍て"
+    IDS_PROFILE_ERR_NO_VALID_OPERATION "砞﹚郎岿粇礚Τ巨"
+    IDS_PROFILE_ERR_NO_SELECTION "砞﹚郎岿粇叫ミ┪匡拒冀竟砞﹚郎"
+    IDS_PROFILE_ERR_MISSING_DIRECTORY "砞﹚郎岿粇ヘ魁 %s ぃ"
+    IDS_PROFILE_ERR_MISSING_INI_FILE "砞﹚郎岿粇 %s ゅンぃ"
+    IDS_PROFILE_ERR_INVALID_CHARS "砞﹚郎岿粇砞﹚郎磞瓃礚猭 %s"
+    IDS_PROFILE_ERR_INVALID_DESCRIPTION "砞﹚郎岿粇砞﹚郎磞瓃礚"
+    IDS_PROFILE_ERR_INVALID_USB_VENDOR_ID "砞﹚郎岿粇USB ㄑ莱坝 ID 礚"
+    IDS_PROFILE_ERR_INVALID_USB_PROD_ID "砞﹚郎岿粇USB 玻珇 ID 礚"
+    IDS_PROFILE_ERR_INVALID_SCSI_VENDOR_ID "砞﹚郎岿粇SCSI ㄑ莱坝 ID 礚"
+    IDS_PROFILE_ERR_INVALID_SCSI_PROD_ID "砞﹚郎岿粇SCSI 玻珇 ID 礚"
+    IDS_PROFILE_WRN_INVALID_VOLUME_LABLE "砞﹚郎岿粇夹乓腹礚"
+    IDS_PROFILE_MSG_OVERWRITE_PROMPT "%s Τň糶\n琌滦糶跑巨篈"
+    IDS_PROFILE_ERR_WRITE_FAILURE "礚猭糶郎 %s"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_REGSCRUB_USB_PID_TEXT "USB 玻珇 ID"
+    IDS_REGSCRUB_SCSI_VID_TEXT "SCSI ㄑ莱坝 ID"
+    IDS_REGSCRUB_SCSI_PID_TEXT "SCSI 玻珇 ID"
+    IDS_REGSCRUB_SCANNING_STATUS_TEXT "タ苯磞祅魁郎兜ヘ"
+    IDS_REGSCRUB_DELETING_STATUS_TEXT "タ埃祅魁郎兜ヘ"
+    IDS_REGSCRUB_ENTRIES_REM_STATUS_TEXT "睲埃杆竚兜ヘ"
+    IDS_REGSCRUB_INVALID_PROFILE "礚砞﹚郎  叫匡拒Τ砞﹚郎"
+    IDS_REGSCRUB_CONFIRM_PROMPT 
+                            "匡兜琌秈︽岿粇逼埃秈顶匡兜ぃ莱\nタ盽祅魁郎蝴臔筁祘いつ匡赣匡兜\n\nㄏノゲ斗冈綷筁ㄏノもいΤ闽\n 赣莱ノ祘Α杆㎝舱篈祘Α场ず甧よつ匡匡兜\n度讽眤笿繰ゎ ID 洞砰よ拜肈つ匡匡兜\n\n眤琌絋﹚璶睲埃赣繰ゎ ID 兜ヘ"
+    IDS_REGSCRUB_WRONG_OS   "赣穨╰参ぃや兜巨"
+    IDS_REGSCRUB_FINISHED   "ЧΘ"
+    IDS_REGSCRUB_REMOVE_RECOVERY "Remove Recovery Entries"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STATUS_GRP_TEXT     "篈戈"
+    IDS_STATUS_PROFILE_TEXT "Profile"
+    IDS_STATUS_FW_VER_TEXT  "セ"
+    IDS_STATUS_START_TEXT   "秨﹍丁"
+    IDS_STATUS_ELAPSED_TEXT "尿丁"
+    IDS_STATUS_AVG_DURATION_TEXT "キА尿丁"
+    IDS_STATUS_OK_UPDATES_TEXT "ΘΩ计"
+    IDS_STATUS_FAILED_UPDATES_TEXT "ア毖Ω计"
+    IDS_STATUS_FAILURE_RATE_TEXT "ア毖ゑ瞯"
+    IDS_STATUS_NO_PORTS_SELECTED "⊿Τ匡拒USB PORT"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERROR_INVALID_DEVICE "岿粇礚杆竚"
+    IDS_ERROR_DEVICE_REMOVED_DURING_OP "岿粇巨筁祘い簿埃杆竚"
+    IDS_ERROR_VOLUME_REMOVED_DURING_OP "岿粇巨筁祘い睲埃夹乓"
+    IDS_DEFINE_TABLE_TEXT   "Define the drive allocation table with files required for the operation."
+    IDS_OPUPDATE_HEADER_DESC "Description"
+    IDS_OPUPDATE_HEADER_TYPE "Type"
+    IDS_OPUPDATE_HEADER_TAG "Tag"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_NAME_FOLDER      "[Operation Folder]"
+    IDS_COLUMN_FILENAME     "Filename"
+    IDS_COLUMN_SIZE         "Size"
+    IDS_COLUMN_TIMESTAMP    "Date"
+    IDS_NUM_OBJECTS         "%d object(s)"
+    IDS_NEW_FOLDER          "New Folder"
+    IDS_ADD_FOLDER          "Add Folder"
+    IDS_OP_COPY_STEP2       "Define the content to be copied to the media"
+    IDS_HUB_REQUIRED        "An external USB hub is required"
+    IDS_UPDATE_STEP3_TEXT   "Specify update boot firmware (35xx/36xx:stmfgmsc.sb 37xx:updater.sb)."
+    IDS_MENU_COPY_DRIVE     "Copy"
+    IDS_UNAUTHORIZED_SYSTEM "This system is not authorized to use this application."
+    IDS_WAITING_TO_COMPLETE "Waiting to complete..."
+    IDS_OTPOP_TEXT          "Enter an 8-bit hexidecimal value to be written to the first available OTP register. "
+    IDS_OPERATION_OTP_REGISTER "OTP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPOTP_OP_FAILED     "OTP operation failed."
+    IDS_OPOTP_WRITING_REG   "Writing OTP register..."
+    IDS_REGCHK_INFO_TEXT    "Checking registry devices..."
+    IDS_REGCHK_ENTRIES_TEXT "Matching Device Entries:"
+    IDS_REGCHK_OTHER_TEXT   "Other Device Entries:"
+	IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
+	IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
+END
+
+#endif    // Chinese (Taiwan) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// STMPRECVRESTYPE
+//
+
+IDR_STMP3REC_SYS        STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3rec.sys"
+IDR_STMP3REC_INF        STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3rec.inf"
+IDR_STMP3REC_CAT        STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3rec.cat"
+IDR_STMP3RECX64_SYS     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3recx64.sys"
+IDR_STMP3RECX64_INF     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3recx64.inf"
+IDR_STMP3RECX64_CAT     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3recx64.cat"
+
+IDB_COMPANY_BMP	 BITMAP "..\\..\Resources\\freescale_logo.bmp"
+
+#endif    // Neutral resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\StMfgTool.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef LOCKED_DEFAULT_PROFILE
+IDR_DEFAULT_PROFILE_RESID_0	STMPFWRESTYPE "res/updater.sb"
+IDR_DEFAULT_PROFILE_RESID_1	STMPFWRESTYPE "res/firmware.sb"
+IDR_DEFAULT_PROFILE_RESID_3	STMPFWRESTYPE "res/OtpInit.sb"
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\StMfgToolx.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_USB_STATE           BITMAP                  "res\\checks.bmp"
+IDB_OP_STATE            BITMAP                  "res\\tree_sta.bmp"
+IDB_CLOSED_FOLDER       BITMAP                  "..\\..\\resources\\closedfolder.BMP"
+IDB_FIRMWARE_FILE       BITMAP                  "..\\..\\resources\\resourcefile.bmp"
+IDB_OPEN_FOLDER         BITMAP                  "..\\..\\resources\\openfolder.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Options"
+    BEGIN
+        MENUITEM "&Configuration...",           ID_OPTIONS_CONFIGURATION
+        MENUITEM "Clean &Registry...",          ID_OPTIONS_CLEAN_REGISTRY
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About StMfgTool...",         ID_APP_ABOUT
+    END
+END
+
+IDR_UPDATELIST_MENU MENU 
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "n",                           IDM_ST_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "e",                           IDM_ST_EDIT
+        MENUITEM SEPARATOR
+        MENUITEM "d",                           IDM_ST_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "c",                           IDM_ST_COPY
+        MENUITEM SEPARATOR
+        MENUITEM "u",                           IDM_ST_MOVE_UP
+        MENUITEM "d",                           IDM_ST_MOVE_DOWN
+    END
+END
+
+IDR_FILEOPLIST_MENU MENU 
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "n",                           IDM_ST_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "d",                           IDM_ST_DELETE
+    END
+END
+
+IDR_FOLDEROPLIST_MENU MENU 
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "n",                           IDM_ST_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "e",                           IDM_ST_ADD_DIR
+        MENUITEM SEPARATOR
+        MENUITEM "d",                           IDM_ST_DELETE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS 
+BEGIN
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 80
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About StMfgTool"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,15,20,20
+    LTEXT           "StMfgTool Version 1.0",IDC_ABOUT_VERSION_TEXT,40,14,188,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2008",IDC_ABOUT_COPYRIGHT_TEXT,40,26,188,8
+    LTEXT           "All Rights Reserved",IDC_ABOUT_ALLRIGHTS_TEXT,40,38,188,8
+    DEFPUSHBUTTON   "OK",IDOK,93,58,50,16,WS_GROUP
+END
+
+IDD_BUTTON_DLG DIALOGEX 0, 0, 660, 65
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Status Information",IDC_STATUS_GRP_TEXT,7,7,578,52
+    LTEXT           "Profile:",IDC_STATUS_PROFILE_TEXT,15,19,42,8
+    LTEXT           "Version:",IDC_STATUS_FW_VER_TEXT,15,45,57,8
+    LTEXT           "version",IDC_STATUS_FW_VER,108,45,76,8,0,WS_EX_RIGHT
+    LTEXT           "Start Time:",IDC_STATUS_START_TEXT,223,19,67,8
+    LTEXT           "start time",IDC_STATUS_START,299,19,95,8,0,WS_EX_RIGHT
+    LTEXT           "Elapsed Time:",IDC_STATUS_ELAPSED_TEXT,223,33,81,8
+    LTEXT           "elapsed time",IDC_STATUS_ELAPSED,337,33,57,8,0,WS_EX_RIGHT
+    LTEXT           "Average Duration:",IDC_STATUS_AVG_DURATION_TEXT,223,45,113,8
+    LTEXT           "avg duration",IDC_STATUS_AVG_DURATION,351,45,43,8,0,WS_EX_RIGHT
+    LTEXT           "Successful Operations:",IDC_STATUS_OK_UPDATES_TEXT,441,19,95,8
+    LTEXT           "OK Ops",IDC_STATUS_OK_UPDATES,550,19,26,8,0,WS_EX_RIGHT
+    LTEXT           "Failed Operations:",IDC_STATUS_FAILED_UPDATES_TEXT,441,33,95,8
+    LTEXT           "failed ops",IDC_STATUS_FAILED_UPDATES,550,33,26,8,0,WS_EX_RIGHT
+    LTEXT           "Failure Rate:",IDC_STATUS_FAILURE_RATE_TEXT,441,45,100,8
+    LTEXT           "fail %",IDC_STATUS_FAILURE_RATE,550,45,26,8,0,WS_EX_RIGHT
+    DEFPUSHBUTTON   "Start",ID_START_STOP_TOGGLE,593,9,60,50,BS_FLAT | WS_DISABLED,WS_EX_DLGMODALFRAME
+    COMBOBOX        IDC_STATUS_PROFILE_COMBO,63,16,122,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_STATUS_MULTI_COMBO_PROFILE,63,16,75,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_STATUS_MULTI_COMBO_SETTINGS,138,16,47,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Status:",IDC_STATUS_STATUS_TEXT,15,33,40,8
+    LTEXT           "status",IDC_STATUS_STATUS,62,33,122,8,0,WS_EX_RIGHT
+END
+
+IDD_PORT_DLG DIALOGEX 0, 0, 163, 101
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+EXSTYLE WS_EX_TOOLWINDOW
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Unassigned",ID_PORT_GROUP_BOX,7,7,149,87,WS_DISABLED
+    CONTROL         "",IDC_PORT_PROGRESS,"msctls_progress32",WS_DISABLED,15,74,133,14
+    CONTROL         "",IDC_PORT_TASK_PROGRESS,"msctls_progress32",0x0,15,55,133,6
+    EDITTEXT        IDC_PORT_DRIVE,122,17,26,14,ES_AUTOHSCROLL | ES_READONLY | WS_DISABLED
+    EDITTEXT        IDC_PORT_STATUS_EDIT,15,36,133,14,ES_AUTOHSCROLL | ES_READONLY | WS_DISABLED | NOT WS_TABSTOP
+    LTEXT           "Drive(s):",IDC_PORT_DRIVE_TEXT,89,20,28,8,WS_DISABLED
+    LTEXT           "",IDC_PORT_OPERATION_TEXT,18,23,63,8
+END
+
+IDD_CONF_PROFILE_DLG DIALOGEX 0, 0, 334, 236
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Profiles"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_PLAYER_PROFILE_COMBO,17,17,181,50,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_PLAYER_PROFILE_EDIT,142,41,186,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_USB_VID_TEXT,142,60,28,12,ES_UPPERCASE | ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_USB_PID_TEXT,142,80,28,12,ES_UPPERCASE | ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_SCSI_MFG_TEXT,259,60,68,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_SCSI_PRODUCT_TEXT,259,80,68,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_VOLUME_LABEL_TEXT,271,97,56,12,ES_AUTOHSCROLL | ES_READONLY
+    CONTROL         "Volume Label:",IDC_VOLUME_LABEL_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,164,99,99,10,WS_EX_RIGHT
+    PUSHBUTTON      "New",IDC_NEW,214,16,50,14
+    PUSHBUTTON      "Delete",IDC_DELETE,273,16,50,14
+    CONTROL         "",IDC_OPERATIONS_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,113,320,90
+    RTEXT           "Profile Description:",IDC_PLAYER_PROFILE_TEXT,22,43,114,8,NOT WS_GROUP
+    RTEXT           "USB Vendor ID:",IDC_USB_VID_DESC_TEXT,71,62,66,8,NOT WS_GROUP
+    RTEXT           "USB Product ID:",IDC_USB_PID_DESC_TEXT,70,81,68,8,NOT WS_GROUP
+    RTEXT           "SCSI Vendor ID:",IDC_SCSI_MFG_DESC_TEXT,179,62,75,8
+    RTEXT           "SCSI Product ID:",IDC_SCSI_PRODUCT_DESC_TEXT,179,81,76,8
+    LTEXT           "Operations:",IDC_OPERATION_DESC_TEXT,7,102,75,8
+    ICON            IDR_MAINFRAME,IDC_STATUS_ICON,10,209,21,20
+    EDITTEXT        IDC_STATUS_TEXT,37,212,290,15,ES_MULTILINE | ES_READONLY | NOT WS_TABSTOP
+    GROUPBOX        "Profile",IDC_PROFILE_GRP,7,7,320,30
+END
+
+IDD_CONF_GENERAL_DLG DIALOGEX 0, 0, 334, 222
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "General"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Restrict operations to profile devices",IDC_RESTRICT_DEVICE_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,24,176,10
+    CONTROL         "Enable AutoPlay rejection",IDC_SUPRESS_AUTOPLAY,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,13,96,183,10
+    CONTROL         "All drives",IDC_AUTOPLAY_ALL_DRVS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,24,125,105,10
+    CONTROL         "Select drives",IDC_AUTOPLAY_SEL_DRVS_RADIO,"Button",BS_AUTORADIOBUTTON,24,138,110,10
+    CONTROL         "",IDC_IDC_AUTOPLAY_DRV_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,141,108,44,50
+    GROUPBOX        "Options",IDC_CFG_GENERAL_OPTIONS_GROUP_TEXT,7,7,320,69
+    GROUPBOX        "AutoPlay",IDC_CFG_GENERAL_AUTOPLAY_GROUP_TEXT,7,82,320,80
+    CONTROL         "Enable event logging",IDC_EVENT_LOG_ENABLE_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,40,175,10
+    CONTROL         "Enable COM port status messages",IDC_CFG_COM_PORT_MSGS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,56,175,10
+
+END
+
+IDD_CONF_USB_PORT_DLG DIALOGEX 0, 0, 334, 222
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "USB Ports"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_USB_TREE,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_DISABLEDRAGDROP | TVS_CHECKBOXES | TVS_TRACKSELECT | WS_BORDER | WS_TABSTOP | 0x800,7,7,320,189,WS_EX_RIGHT
+    COMBOBOX        IDC_USBPORTS_ENABLED_PORTS,7,201,31,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Maximum USB ports enabled",IDC_USBPORTS_PORTS_ENABLED_TEXT,50,203,119,8
+    CTEXT           "",IDC_HUB_REQUIRED,37,216,260,16,SS_CENTERIMAGE | NOT WS_VISIBLE
+END
+
+IDD_LOGMGR_DIALOG DIALOGEX 0, 0, 307, 222
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Log Manager"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Cancel",IDCANCEL,123,199,59,16
+    EDITTEXT        IDC_LOG_DATA,12,7,283,184,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL | NOT WS_TABSTOP
+END
+
+IDD_REGSCRUB_DLG DIALOGEX 0, 0, 280, 209
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Registry Scrub"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Close",IDCANCEL,148,187,50,14
+    PUSHBUTTON      "Clean",IDC_SCRUB,82,187,50,14
+    COMBOBOX        IDC_PROFILE_COMBO,102,8,171,55,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Remove Static-ID Entries",IDC_REMOVE_STATIC_IDS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,63,98,10
+    CONTROL         "Remove Recovery Entries",IDC_REMOVE_RECOVERY_ENTRIES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,78,109,10
+    RTEXT           "Profile Description:",IDC_PLAYER_PROFILE_TEXT,7,9,91,8,NOT WS_GROUP
+    RTEXT           "USB Vendor ID:",IDC_USB_VID_DESC_TEXT,7,28,72,8,NOT WS_GROUP
+    RTEXT           "USB Product ID:",IDC_USB_PID_DESC_TEXT,7,47,72,8,NOT WS_GROUP
+    RTEXT           "SCSI Vendor ID:",IDC_SCSI_MFG_DESC_TEXT,118,28,77,8
+    RTEXT           "SCSI Product ID:",IDC_SCSI_PRODUCT_DESC_TEXT,118,47,77,8
+    EDITTEXT        IDC_USB_VID_TEXT,84,26,28,12,ES_UPPERCASE | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    EDITTEXT        IDC_USB_PID_TEXT,84,45,28,12,ES_UPPERCASE | ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    EDITTEXT        IDC_SCSI_MFG_TEXT,200,26,64,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    EDITTEXT        IDC_SCSI_PRODUCT_TEXT,200,45,63,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    EDITTEXT        IDC_REG_PROCESSING,7,107,266,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    LTEXT           "Scanning Registry Entries:",IDC_SCANNING_TEXT,8,95,160,8
+    LTEXT           "Deleting Registry Entries:",IDC_DELETING_TEXT,8,127,158,8
+    EDITTEXT        IDC_REG_DELETING,7,138,266,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    EDITTEXT        IDC_REG_DEVICE_COUNT,245,161,24,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    RTEXT           "Device Entries Removed:",IDC_REMOVED_TEXT,114,164,126,8
+END
+
+IDD_EDIT_DRIVE DIALOGEX 0, 0, 232, 193
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,61,164,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,128,164,50,14
+    LTEXT           "File name:",IDC_CFG_FNAME_TEXT,14,52,178,8
+    EDITTEXT        IDC_EDIT_FILE_NAME,14,65,186,14,ES_LOWERCASE | ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BROWSE_FILE,204,65,15,14
+    LTEXT           "Description:",IDC_CFG_DESC_TEXT,14,90,186,8
+    EDITTEXT        IDC_EDIT_DESCRIPTION,14,102,185,14,ES_AUTOHSCROLL
+    LTEXT           "Drive type:",IDC_CFG_DRIVE_TYPE_TEXT,14,15,88,8
+    COMBOBOX        IDC_COMBO_DRIVE_TYPE,14,27,87,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Drive tag:",IDC_CFG_DRIVE_TAG_TEXT,123,15,92,8
+    LTEXT           "Requested Drive Size (KB):",IDC_CFG_DRIVE_SIZE_TEXT,14,127,188,8
+    EDITTEXT        IDC_EDIT_REQUESTED_DRIVE_SIZE,14,140,61,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_DRIVE_TAG,123,27,93,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_UPDATEOPDLG DIALOGEX 0, 0, 378, 305
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "UpdateOp"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,321,231,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,321,255,50,14
+    GROUPBOX        "Step 1",IDC_STEP1_GROUP,7,7,364,45
+    LTEXT           "Name the operation.",IDC_UPDATE_STEP1_TEXT,16,18,355,8
+    EDITTEXT        IDC_OP_NAME_EDIT,16,30,127,14,ES_AUTOHSCROLL
+    LTEXT           "Define the drive allocation table with files required for the operation.",IDC_UPDATE_STEP2_TEXT,16,65,355,8
+    CONTROL         "",IDC_OP_OPTIONS_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,17,235,253,40
+    CONTROL         "",IDC_DRIVE_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,16,78,355,71
+    GROUPBOX        "Step 2",IDC_STEP2_GROUP,7,55,364,107
+    LTEXT           "Specify update boot firmware (35xx/36xx:stmfgmsc.sb 37xx:updater.sb).",IDC_UPDATE_STEP3_TEXT,16,175,270,8
+    EDITTEXT        IDC_UPDATE_BOOT_FW_EDIT,17,186,326,14,ES_LOWERCASE | ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_UPDATE_BOOT_FW_BROWSE_BTN,348,185,22,14
+    GROUPBOX        "Step 3",IDC_STEP3_GROUP,7,163,364,42
+    GROUPBOX        "Step 4",IDC_STEP4_GROUP,7,212,296,68
+    LTEXT           "Select options for the operation",IDC_UPDATE_STEP4_TEXT,17,222,280,8
+END
+
+IDD_COPYOPDLG DIALOGEX 0, 0, 429, 239
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "CopyOp"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,340,176,50,18
+    PUSHBUTTON      "Cancel",IDCANCEL,340,204,50,18
+    GROUPBOX        "Step 1",IDC_STEP1_GROUP,7,7,413,45
+    LTEXT           "Name the operation.",IDC_STEP1_TEXT,17,20,149,8
+    EDITTEXT        IDC_OP_NAME_EDIT,17,32,127,14,ES_AUTOHSCROLL
+    LTEXT           "Specify files required for the operation.",IDC_STEP2_TEXT,17,71,193,8
+    GROUPBOX        "Step 3",IDC_STEP3_GROUP,7,167,296,61
+    LTEXT           "Select options for the operation.",IDC_STEP3_TEXT,17,177,212,8
+    RTEXT           "Operation Timeout:",IDC_OP_TIMEOUT_TEXT,139,209,119,8
+    EDITTEXT        IDC_OP_TIMEOUT_EDIT,264,207,34,14,ES_AUTOHSCROLL | ES_NUMBER
+    RTEXT           "Drive Number:",IDC_STATIC_DRIVE_NUM_EDIT_LABEL,139,189,119,8
+    CONTROL         "",IDC_OP_FILE_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,156,83,258,62,WS_EX_ACCEPTFILES
+    CONTROL         "",IDC_OP_FOLDERTREE,"SysTreeView32",TVS_HASLINES | TVS_EDITLABELS | TVS_NOTOOLTIPS | TVS_TRACKSELECT | WS_BORDER | WS_TABSTOP,17,83,138,63,WS_EX_ACCEPTFILES
+    COMBOBOX        IDC_OP_COPY_DRV_NUM_COMBO,264,187,34,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Static",IDC_OP_COPY_NUMOBJECTS,"Static",SS_SIMPLE | WS_GROUP,17,147,398,11
+    GROUPBOX        "Step 2",IDC_STEP2_GROUP,7,56,413,108,0x10
+END
+
+IDD_LOADOPDLG DIALOGEX 0, 0, 239, 190
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Load"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,51,169,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,127,169,50,14
+    GROUPBOX        "Step 1",IDC_STEP1_GROUP,7,7,225,45
+    LTEXT           "Name the operation.",IDC_STEP1_TEXT,17,20,149,8
+    EDITTEXT        IDC_OP_NAME_EDIT,17,32,127,14,ES_AUTOHSCROLL
+    LTEXT           "Specify files required for the operation.",IDC_STEP2_TEXT,17,71,193,8
+    EDITTEXT        IDC_OP_LOAD_FNAME_EDIT,18,86,196,14,ES_LOWERCASE | ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BROWSE_FILE,214,86,15,14
+    GROUPBOX        "Step 2",IDC_STEP2_GROUP,7,56,225,54
+    GROUPBOX        "Step 3",IDC_STEP3_GROUP,7,116,225,45
+    LTEXT           "Select options for the operation.",IDC_STEP3_TEXT,17,130,207,8
+    RTEXT           "Operation Timeout:",IDC_OP_TIMEOUT_TEXT,98,147,90,8
+    EDITTEXT        IDC_OP_TIMEOUT_EDIT,195,144,34,14,ES_AUTOHSCROLL | ES_NUMBER
+END
+
+IDD_OTPOPDLG DIALOGEX 0, 0, 221, 142
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "OTP Register Operation"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,43,120,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,127,120,50,14
+    LTEXT           "Specify value",IDC_OTPOP_TEXT,17,70,157,18
+    EDITTEXT        IDC_OTPOP_VALUE,17,92,40,14,ES_AUTOHSCROLL
+    GROUPBOX        "Step 1",IDC_STEP1_GROUP,7,7,207,45
+    LTEXT           "Name the operation.",IDC_STEP1_TEXT,17,20,149,8
+    EDITTEXT        IDC_OP_NAME_EDIT,17,32,127,14,ES_AUTOHSCROLL
+    GROUPBOX        "Step 2",IDC_STEP2_GROUP,7,57,207,57
+END
+
+IDD_REGCHECK_DLG DIALOGEX 0, 0, 210, 86
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Registry Check"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Checking registry devices...",IDC_REGCHK_INFO_TEXT,16,15,171,8
+    CONTROL         "",IDC_REGCHK_PROGRESS,"msctls_progress32",WS_BORDER,16,32,177,10
+    LTEXT           "Matching Device Entries:",IDC_REGCHK_ENTRIES_TEXT,57,49,100,8,0,WS_EX_RIGHT
+    LTEXT           "Static",IDC_REGCHK_ENTRIES,162,49,29,8,0,WS_EX_RIGHT
+    RTEXT           "Other Device  Entries:",IDC_REGCHK_OTHER_DEVICES_TEXT,57,65,100,8
+    RTEXT           "Static",IDC_REGCHK_OTHER_ENTRIES,162,65,29,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 63
+    END
+
+    IDD_BUTTON_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 653
+        TOPMARGIN, 7
+    END
+
+    IDD_PORT_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 156
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 94
+    END
+
+    IDD_CONF_PROFILE_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 327
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 222
+    END
+
+    IDD_CONF_GENERAL_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 327
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 215
+    END
+
+    IDD_CONF_USB_PORT_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 327
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 215
+    END
+
+    IDD_LOGMGR_DIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 296
+        BOTTOMMARGIN, 210
+    END
+
+    IDD_REGSCRUB_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 273
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
+    END
+
+    IDD_EDIT_DRIVE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 225
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 187
+    END
+
+    IDD_UPDATEOPDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 371
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 290
+    END
+
+    IDD_COPYOPDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 422
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 232
+    END
+
+    IDD_LOADOPDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 232
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 183
+    END
+
+    IDD_OTPOPDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 214
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 135
+    END
+
+    IDD_REGCHECK_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 203
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 79
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_CONF_GENERAL_DLG DLGINIT
+BEGIN
+    1008, 0x403, 8, 0
+0x6e45, 0x6c67, 0x7369, 0x0068, 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_MAINFRAME           "StMfgTool"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "StMfgTool"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application\nExit"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PLAYER_INI          "[PROFILE]\r\nPLAYER=\r\nUSB_VID=\r\nUSB_PID=\r\nSCSI_MFG=\r\nSCSI_PRODUCT=\r\nVOLUME_LABEL=\r\n\r\n[OPERATIONS]\r\n"
+    IDS_OPINFO_ERR_NOT_INITIALIZED 
+                            "Operation error: Operation has not been initialized."
+    IDS_OPINFO_ERR_MISSING_DIRECTORY 
+                            "Operation error: Directory %s does not exist."
+    IDS_OPINFO_ERR_EMPTY_DIRECTORY 
+                            "Operation error: Directory %s does not contain any files."
+    IDS_OPINFO_ERR_MISSING_INI_SECTION 
+                            "Operation error: The %s section of the ""player.ini"" file is not present."
+    IDS_OPINFO_ERR_MISSING_FILE "Operation error: Cannot find the %s file."
+    IDS_OPINFO_ERR_INVALID_OPERATION 
+                            "Operation error: Operation is not supported."
+    IDS_OPINFO_ERR_SYSTEM_ERROR "Operation error: System error."
+    IDS_OPINFO_ERR_NO_CMD_LINE 
+                            "Operation error: ""%s"" does not exist in the %s section of the ""%s"" file."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPINFO_OK           "Operation status: OK"
+    IDS_OPINFO_ERR_NO_FILE_DESC "Operation error: No description for %s."
+    IDS_OPINFO_ERR_INVALID_DRV_TYPE "Operation error: Invalid drive type."
+END
+
+STRINGTABLE 
+BEGIN
+    ID_OPTIONS_CONFIGURATION "Launch Configuration Manager"
+    ID_START_STOP_TOGGLE    "Start/Stop the Player operations"
+    ID_VIEW_LOG             "Launch Log Manager"
+    ID_OPTIONS_CLEAN_REGISTRY "Launch Clean Registry Manager"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_EXIT                "Quit the application"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_PORT_GROUP_BOX       "Ready"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OK                  "OK"
+    IDS_CANCEL              "Cancel"
+    IDS_CLOSE               "Close"
+    IDS_ERROR               "Error"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_NEW                 "New"
+    IDS_EDIT                "Edit"
+    IDS_DELETE              "Delete"
+    IDS_SAVE                "Save"
+    IDS_WAITING_FOR_DEVICE  "Waiting for device..."
+    IDS_WAITING_FOR_DRIVE   "Waiting for drive..."
+    IDS_STOPPED_BY_USER     "Operation stopped by user."
+    IDS_NO_DEVICE_CONNECTED "No device connected."
+    IDS_RESETTING_DEVICE    "Resetting device..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STOP                "Stop"
+    IDS_STOPPING            "Stopping..."
+    IDS_START               "Start"
+    IDS_VALID_PROFILE_TO_SCRUB "Must have a valid profile to clean registry."
+    IDS_INVALID_PLAYER_PROFILE "Invalid Player Profile"
+    IDS_STOP_REQUIRED       "Please press <Stop> and allow all operations to finish before exiting the program."
+    IDS_UNSAFE_DEVICE_REMOVAL "Unsafe Removal of Device"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_GENERAL_TITLE   "General"
+    IDS_CFG_GENERAL_RESTRICT_DEVICE "Restrict operations to profile devices."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_GENERAL_SUPRESS_AUTOPLAY "Enable AutoPlay rejection"
+    IDS_CFG_GENERAL_AUTOPLAY_ALL_DRVS "All drives"
+    IDS_CFG_GENERAL_AUTOPLAY_SELECT_DRIVE "Select drives"
+    IDS_CFG_GENERAL_LANGUAGE_GROUP "Language"
+    IDS_CFG_GENERAL_OPTIONS_GROUP "Options"
+    IDS_CFG_GENERAL_DEFAULT_LANGUAGE "Default Language:"
+    IDS_CFG_GENERAL_AUTOPLAY_GROUP "AutoPlay"
+    IDS_CFG_GENERAL_ENABLE_LOGGING "Enable event logging."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_EDIT_TITLE       "Operation Editor"
+    IDS_OP_EDIT_ADD_FILE    "Add File"
+    IDS_OP_EDIT_ADD_DIR     "Add Folder"
+    IDS_OP_EDIT_FILE_REMOVE "Remove"
+    IDS_OP_EDIT_TYPE        "Operation Type:"
+    IDS_OP_EDIT_STEP1       "Select the operation type."
+    IDS_OP_EDIT_NAME_OPERATION "Name the operation."
+    IDS_OP_EDIT_NAME        "Operation Folder:"
+    IDS_OP_EDIT_SELECT_FILES "Select files required for the operation."
+    IDS_OP_EDIT_SELECT_OPTIONS "Select options for the operation."
+    IDS_OP_EDIT_STEP1_GRP   "Step 1"
+    IDS_OP_EDIT_STEP2_GRP   "Step 2"
+    IDS_OP_EDIT_STEP3_GRP   "Step 3"
+    IDS_OP_EDIT_STEP4_GRP   "Step 4"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_EDIT_ADVANCED    "Advanced"
+    IDS_OP_EDIT_DRIVE_NUM   "Drive Number:"
+    IDS_DIRECTORY_DETECTED_PROMPT 
+                            "    Update operations do not support directories.\r\nWould you like the selected directory(s) to be deleted?"
+    IDS_DIRECTORY_DETECTED_TITLE "Directory Detected"
+    IDS_FILE_BROWSE_TYPES   "Firmware Files (*.s;*.sb;*.bin;*.rsc||)"
+    IDS_NOTHING_TO_REMOVE   "Nothing to remove.\n\n1. Select files to remove in the box on the left.\n2. Press Remove."
+    IDS_INVALID_OP_FOLDER   "Invalid Operation Folder\n\nThe Operation Folder field must contain a valid Windows folder name before the operation can be saved."
+    IDS_OP_ALREADY_EXISTS   "An operation of this name already exists.\n\nPressing 'OK' will overwrite the existing '%s' operation\n<%s>\nwith the new operation information.\n\nPressing 'Cancel' will allow you to change the name of the operation you are trying to save. "
+    IDS_CONFIRM_OVERWRITE   "Confirm Overwrite"
+    IDS_SELECT_DIRECTORY    "Select Directory"
+    IDS_OPTIONS             "Options"
+    IDS_NO_OPTIONS          "No options available for this operation."
+    IDS_NO_ITEMS_IN_VIEW    "No items in this view."
+    IDS_OP_EDIT_TIMEOUT     "Operation Timeout:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_MENU_ENABLE         "Enable"
+    IDS_MENU_NEW            "New..."
+    IDS_MENU_EDIT           "Edit..."
+    IDS_MENU_DELETE         "Delete"
+    IDS_MENU_MOVE_UP        "Move Up"
+    IDS_MENU_MOVE_DOWN      "Move Down"
+    IDS_CFG_PROFILE_TITLE   "Profiles"
+    IDS_CFG_PROFILE_LABEL   "Volume Label:"
+    IDS_CFG_PROFILE_DESC    "Profile Description:"
+    IDS_CFG_PROFILE_USB_VENDOR "USB Vendor ID:"
+    IDS_CFG_PROFILE_USB_PRODUCT "USB Product ID:"
+    IDS_CFG_PROFILE_SCSI_VENDOR "SCSI Vendor ID:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PROFILE_SCSI_PRODUCT "SCSI Product ID:"
+    IDS_CFG_PROFILE_OPERATIONS "Operations:"
+    IDS_CFG_PROFILE_GRP     "Profile"
+    IDS_CFG_PROFILE_INVALID_DESC 
+                            "Profile error: The Profile Description field must contain a valid Windows folder name."
+    IDS_DELETE_CONFIRM_MSG  "Delete the %s profile?\n\nPressing 'OK' will remove the profile\nand delete all related files.\n\nPressing 'Cancel' will abort the delete. "
+    IDS_DELETE_CONFIRM_TITLE "Confirm delete"
+    IDS_TOOLTIP_NO_PATH     "No path"
+    IDS_TOOLTIP_PROFILE_LOCATION "Location: .\\Profiles\\%s\\%s"
+    IDS_TOOLTIP_NO_FILES    "No files"
+    IDS_CFG_PROFILE_INVALID_DESC_MSG 
+                            "Invalid Profile Description!\n\nThe Profile Description field must contain a valid Windows folder name before the profile can be saved."
+    IDS_CFG_PROFILE_EXISTS_MSG 
+                            "A profile of this name already exists.\n\nPressing 'OK' will overwrite the existing '%s' profile\n<%s>\nwith the new profile information.\n\nPressing 'Cancel' will allow you to change the name of the profile you are trying to save. "
+    IDS_CFG_PROFILE_COL_OP  "Operation"
+    IDS_CFG_PROFILE_COL_FOLDER "Folder"
+    IDS_CFG_PROFILE_COL_FILES "Files"
+    IDS_CFG_PROFILE_COL_OPTIONS "Options"
+    IDS_CFG_PROFILE_DELETE_CONFIRM 
+                            "Delete the %s operation %s?\n\nPressing 'OK' will remove the operation\nand delete all related files.\n\nPressing 'Cancel' will abort the delete. "
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PROFILE_DELETE_TITLE "Confirm delete"
+    IDS_CFG_USBPORT_UNASSIGNED "(Unassigned)"
+    IDS_CFG_USBPORT_PANEL   "(Panel %c)"
+    IDS_CFG_USBPORT_PORT    "Port %d %s %s"
+    IDS_CFG_USBPORT_HUB     "Hub %d"
+    IDS_CFG_USBPORT_HUB_PORT "Port %d - Hub %d"
+    IDS_CFG_USBPORT_MYCOMPUTER "My Computer"
+    IDS_CFG_USBPORT_CONTROLLER "Controller"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STATUS_NO_OPS_SELECTED "No profile operations selected"
+    IDS_STATUS_STATUS_TEXT  "Status:"
+    IDS_CFG_USBPORT_MAX_PORTS "Maximum USB ports enabled"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPCOPY_COPYING      "Copying..."
+    IDS_OPCOPY_STARTED      "Copy started..."
+    IDS_OPCOPY_COMPLETE     "Copy complete"
+    IDS_OPCOPY_STOPPED_BY_USER "Copy stopped by user - Please Wait..."
+    IDS_OPCOPY_FINALIZING_COPY "Finalizing copy operation..."
+    IDS_OPCOPY_CREATING_DIR "Creating Directory: %s..."
+    IDS_OPCOPY_CREATE_DIR_ERR "Creating Directory - error(%d)"
+    IDS_OPCOPY_COPY_ERR     "Copy File - error(%d)"
+    IDS_OPCOPY_COPYING_FILE "Copying %s..."
+    IDS_ERASEOP_ERASING_MEDIA "Erasing media..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERASEOP_WAITING_VOLUME_REMOVAL "Waiting for volume removal."
+    IDS_ERASEOP_ERROR_ERASING "Error erasing media."
+    IDS_ERASEOP_CANT_STOP   "Unable to stop erase operation."
+    IDS_ERASEOP_COMPLETE    "Erase complete."
+    IDS_ERASEOP_ERASED_RESETTING "Media erased, resetting device..."
+    IDS_OPERATION_UPDATE    "UPDATE"
+    IDS_OPERATION_COPY      "COPY"
+    IDS_OPERATION_LOAD      "LOAD"
+    IDS_OPERATION_INVALID_OP "INVALID OPERATION"
+    IDS_OPERATION_ERASE     "ERASE"
+    IDS_OPERATION_REG_SCRUB "REGISTRY SCRUB"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPFLAGS_OPTIONSTRINGS_STATICID "Use static-id recovery mode firmware"
+    IDS_OPFLAGS_OPTIONSTRINGS_MULTI_STATICID 
+                            "Use multiple static-id firmware files (multiple data drives only)"
+    IDS_OPFLAGS_OPTIONSTRINGS_FAT32 "FAT32"
+    IDS_OPFLAGS_OPTIONSTRINGS_WINCE "Windows CE"
+    IDS_OPFLAGS_OPTIONSTRINGS_ERASE "Erase Media"
+    IDS_OPMONITOR_MONITORING "Monitoring..."
+    IDS_OPREGISTRY_SCRUBBING "Scrubbing Registry..."
+    IDS_OPREGISTRY_SCRUB_COMPLETE "Registry Scrub Complete"
+    IDS_OPREGISTRY_SCRUB_ERROR "Registry Scrub: ERROR while scrubbing."
+    IDS_OPREGISTRY_SCRUB_NOTHING_TO_DO "Registry Scrub: Nothing to do."
+    IDS_OPUPDATER_UPDATING  "Updating..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPUPDATER_SEARCHING_TO_RECOVER "Searching for device to recover..."
+    IDS_OPUPDATER_REQUIRES_RESET_RECOVERY 
+                            "Device requires reset to recovery mode..."
+    IDS_OPUPDATER_SEARCHING_TO_UPDATE "Searching for device to update..."
+    IDS_OPUPDATER_INVALID_DEVICE "Updater Error: Invalid device to update."
+    IDS_OPUPDATER_INVALID_STATE "Updater Error: Invalid State (%s)."
+    IDS_OPUPDATER_INVALID_MSG "Updater Error: Invalid Msg State (%s)."
+    IDS_OPUPDATER_RESETTING_DEVICE "Resetting device..."
+    IDS_OPUPDATER_LOADING_USBMSC "Loading USBMSC into RAM..."
+    IDS_OPUPDATER_LOADING_FIRMWARE "Loading firmware into FLASH..."
+    IDS_OPUPDATER_COMPLETE  "Update Complete."
+    IDS_OPUPDATER_UPDATE_ERROR "Updater Error 0x%x (%d) - %s"
+    IDS_OPUPDATER_ALLOCATING "Allocating media..."
+    IDS_OPUPDATER_GET_DRIVE_SIZES "Getting partition sizes..."
+    IDS_OPUPDATER_WRITING_FILE "Writing %s..."
+    IDS_PROFILE_OK          "Profile status: OK"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PROFILE_ERR_FILE_NO_EXIST "File does not exist: %s."
+    IDS_OPUPDATER_VERIFYING_FILE "Verifying %s..."
+    IDS_PORTMGRDLG_DRIVES_TEXT "Drive(s):"
+    IDS_PORTMGRDLG_PORT_GRP_TEXT "Unassigned"
+    IDS_OPUPDATER_LOADING_FILE "Loading %s..."
+    IDS_PORTMGRDLG_PANEL_TEXT "%c - Unassigned"
+    IDS_PORTMGRDLG_HUB_PORT_TEXT "%c - Hub %d, Port %d"
+    IDS_PORTMGRDLG_MONITORING "Monitoring..."
+    IDS_PORTMGRDLG_COMPLETE "Operations Complete"
+    IDS_OPUPDATER_INITIALIZING_DRM "Initializing DRM..."
+    IDS_OPUPDATER_INITIALIZING_DATABASE "Initializing database..."
+    IDS_PORTMGRDLG_FORMATTING "Formatting..."
+    IDS_REGSCRUB_CLEAN_TEXT "Clean"
+    IDS_REGSCRUB_REMOVE_STATIC_TEXT "Remove Static-ID Entries"
+    IDS_REGSCRUB_PROFILE_DESC_TEXT "Profile Description:"
+    IDS_REGSCRUB_USB_VID_TEXT "USB Vendor ID:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PROFILE_WRN_INVALID_OPERATION 
+                            "Profile warning: Invalid operation(s) will not be executed."
+    IDS_PROFILE_ERR_NOT_INITIALIZED 
+                            "Profile error: Profile has not been initialized."
+    IDS_PROFILE_ERR_NO_VALID_OPERATION "Profile error:  No valid operation."
+    IDS_PROFILE_ERR_NO_SELECTION 
+                            "Profile error: Please create or select a player profile."
+    IDS_PROFILE_ERR_MISSING_DIRECTORY 
+                            "Profile error: Directory %s does not exist."
+    IDS_PROFILE_ERR_MISSING_INI_FILE 
+                            "Profile error: The %s file is not present."
+    IDS_PROFILE_ERR_INVALID_CHARS 
+                            "Profile error: Profile Description can not contain: %s"
+    IDS_PROFILE_ERR_INVALID_DESCRIPTION 
+                            "Profile error: Invalid Profile Description."
+    IDS_PROFILE_ERR_INVALID_USB_VENDOR_ID 
+                            "Profile error: Invalid USB Vendor ID"
+    IDS_PROFILE_ERR_INVALID_USB_PROD_ID 
+                            "Profile error: Invalid USB Product ID"
+    IDS_PROFILE_ERR_INVALID_SCSI_VENDOR_ID 
+                            "Profile error: Invalid SCSI Vendor ID"
+    IDS_PROFILE_ERR_INVALID_SCSI_PROD_ID 
+                            "Profile error: Invalid SCSI Product ID"
+    IDS_PROFILE_WRN_INVALID_VOLUME_LABLE 
+                            "Profile warning: Invalid Volume Label"
+    IDS_PROFILE_MSG_OVERWRITE_PROMPT 
+                            "%s is write protected.\nOverwrite to change the operation state?"
+    IDS_PROFILE_ERR_WRITE_FAILURE "Can not write to file: %s."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_REGSCRUB_USB_PID_TEXT "USB Product ID:"
+    IDS_REGSCRUB_SCSI_VID_TEXT "SCSI Vendor ID:"
+    IDS_REGSCRUB_SCSI_PID_TEXT "SCSI Product ID:"
+    IDS_REGSCRUB_SCANNING_STATUS_TEXT "Scanning Registry Entries:"
+    IDS_REGSCRUB_DELETING_STATUS_TEXT "Deleting Registry Entries:"
+    IDS_REGSCRUB_ENTRIES_REM_STATUS_TEXT "Device Entries Removed:"
+    IDS_REGSCRUB_INVALID_PROFILE 
+                            "Invalid profile - please select a valid profile."
+    IDS_REGSCRUB_CONFIRM_PROMPT 
+                            "This option is for advanced troubleshooting, and should\nnot be checked during normal registry maintenance.\n\nChecking this box will require the user to completely go through\nthe application's setup/configuration process in the User's Manual.\nOnly check this box if experiencing problems with static-id firmware.\n\nAre you sure you want to remove the static-id entries?"
+    IDS_REGSCRUB_WRONG_OS   "This operation is not supported on this operating system."
+    IDS_REGSCRUB_FINISHED   "Finished"
+    IDS_REGSCRUB_REMOVE_RECOVERY "Remove Recovery Entries"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_FNAME_TEXT      "File name:"
+    IDS_CFG_DESC_TEXT       "Description:"
+    IDS_CFG_DRIVE_TYPE_TEXT "Drive type:"
+    IDS_CFG_DRIVE_TAG_TEXT  "Drive tag (hexadecimal):"
+    IDS_CFG_DRIVE_SIZE_TEXT "Requested Drive Size (KB):"
+    IDS_CFG_DRIVE_DATA_GRP_TEXT "Drive Data"
+    IDS_CFG_ADD_DRIVE_TEXT  "Add Drive"
+    IDS_CFG_DRIVES_GRP_TEXT "Drives"
+    IDS_CFG_SDK_BASE_TEXT   "SDK base"
+    IDS_OPLOADER_LOADING    "Loading..."
+    IDS_OPLOADER_LOAD_STARTED "Load HID started..."
+    IDS_OPLOADER_COMPLETE   "Load HID Complete."
+    IDS_OPLOADER_INVALID_DEVICE "Loader Error: Invalid device to load."
+    IDS_OPLOADER_INVALID_STATE "Loader Error: Invalid State (%s)."
+    IDS_OPLOADER_INVALID_MSG "Loader Error: Invalid Msg State (%s)."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_CHANGES_LOST_WARNING 
+                            "All changes will be lost when the\ndefault values are loaded.\n\nDo you wish to continue?"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPLOADER_LOADING_FIRMWARE "Loading firmware into HID..."
+    IDS_OPLOADER_LOAD_ERROR "Loader Error: # %d"
+    IDS_STATUS_GRP_TEXT     "Status Information"
+    IDS_STATUS_PROFILE_TEXT "Profile:"
+    IDS_STATUS_FW_VER_TEXT  "Version:"
+    IDS_STATUS_START_TEXT   "Started:"
+    IDS_STATUS_ELAPSED_TEXT "Elapsed:"
+    IDS_STATUS_AVG_DURATION_TEXT "Average Duration:"
+    IDS_STATUS_OK_UPDATES_TEXT "Successful Operations:"
+    IDS_STATUS_FAILED_UPDATES_TEXT "Failed Operations:"
+    IDS_STATUS_FAILURE_RATE_TEXT "Failure Rate:"
+    IDS_STATUS_NO_PORTS_SELECTED "No USB ports selected"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERROR_INVALID_DEVICE "Error: Invalid device"
+    IDS_ERROR_DEVICE_REMOVED_DURING_OP 
+                            "Error: Device removed during operation"
+    IDS_ERROR_VOLUME_REMOVED_DURING_OP 
+                            "Error: Volume removal during operation"
+    IDS_DEFINE_TABLE_TEXT   "Define the drive allocation table with files required for the operation."
+    IDS_OPUPDATE_HEADER_DESC "Description"
+    IDS_OPUPDATE_HEADER_TYPE "Type"
+    IDS_OPUPDATE_HEADER_TAG "Tag"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OP_NAME_FOLDER      "[Operation Folder]"
+    IDS_COLUMN_FILENAME     "File Name"
+    IDS_COLUMN_SIZE         "Size"
+    IDS_COLUMN_TIMESTAMP    "Date"
+    IDS_NUM_OBJECTS         "%d Object(s)"
+    IDS_NEW_FOLDER          "New Folder"
+    IDS_ADD_FOLDER          "Add Folder"
+    IDS_OP_COPY_STEP2       "Define the content to be copied to the media"
+    IDS_HUB_REQUIRED        "An external USB hub is required"
+    IDS_UPDATE_STEP3_TEXT   "Specify update boot firmware (35xx/36xx:stmfgmsc.sb 37xx:updater.sb)."
+    IDS_MENU_COPY_DRIVE     "Copy"
+    IDS_UNAUTHORIZED_SYSTEM "This system is not authorized to use this application."
+    IDS_WAITING_TO_COMPLETE "Waiting to complete..."
+    IDS_OTPOP_TEXT          "Enter an 8-bit hexidecimal value to be written to the first available OTP register. "
+    IDS_OPERATION_OTP_REGISTER "OTP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_OPOTP_OP_FAILED     "OTP operation failed."
+    IDS_OPOTP_WRITING_REG   "Writing OTP register..."
+    IDS_REGCHK_INFO_TEXT    "Checking registry devices..."
+    IDS_REGCHK_ENTRIES_TEXT "Matching Device Entries:"
+    IDS_REGCHK_OTHER_TEXT   "Other Device Entries:"
+	IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
+	IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\StMfgTool.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

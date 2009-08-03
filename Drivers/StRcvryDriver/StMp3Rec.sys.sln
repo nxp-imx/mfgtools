@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StMp3Rec.sys", "StMp3Rec.sys.vcproj", "{612F7A60-C14A-4DD4-8532-78935E8E105A}"
+EndProject
+Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 2
+		SccProjectName0 = StMp3Rec.sys
+		SccLocalPath0 = ..\\..
+		SccProvider0 = MSSCCI:ClearCase
+		CanCheckoutShared = true
+		SccProjectFilePathRelativizedFromConnection0 = Drivers\\StRcvryDriver.Vista\\
+		SccProjectUniqueName1 = StMp3Rec.sys.vcproj
+		SccLocalPath1 = ..\\..
+		CanCheckoutShared = true
+		SccProjectFilePathRelativizedFromConnection1 = Drivers\\StRcvryDriver.Vista\\
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{612F7A60-C14A-4DD4-8532-78935E8E105A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{612F7A60-C14A-4DD4-8532-78935E8E105A}.Debug|Win32.Build.0 = Debug|Win32
+		{612F7A60-C14A-4DD4-8532-78935E8E105A}.Release|Win32.ActiveCfg = Release|Win32
+		{612F7A60-C14A-4DD4-8532-78935E8E105A}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

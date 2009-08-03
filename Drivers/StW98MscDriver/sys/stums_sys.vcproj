@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="7.10"
+	Name="stums_sys"
+	ProjectGUID="{E9AD09F4-FBC3-46BA-8E80-9174846E259C}"
+	SccProjectName="stums"
+	SccAuxPath=""
+	SccLocalPath=".."
+	SccProvider="MSSCCI:ClearCase"
+	Keyword="MakeFileProj">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="Debug"
+			IntermediateDirectory="Debug"
+			ConfigurationType="0">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_sys.mak CFG=&quot;Stums_sys - Win32 Debug&quot;"
+				ReBuildCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_sys.mak CFG=&quot;Stums_sys - Win32 Debug&quot; /a"
+				CleanCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_sys.mak CFG=&quot;Stums_sys - Win32 Debug&quot; CLEAN"
+				Output="$(OUTDIR)stums.sys"/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="Release"
+			IntermediateDirectory="Release"
+			ConfigurationType="0">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_sys.mak CFG=&quot;Stums_sys - Win32 Release&quot;"
+				ReBuildCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_sys.mak CFG=&quot;Stums_sys - Win32 Release&quot; /a"
+				CleanCommandLine="&quot;$(MSVC60)&quot;\VC98\Bin\NMAKE /f stums_sys.mak CFG=&quot;Stums_sys - Win32 Release&quot; CLEAN"/>
+		</Configuration>
+		<Configuration
+			Name="Clean|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0">
+			<Tool
+				Name="VCNMakeTool"/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			<File
+				RelativePath=".\bulkonly.c">
+			</File>
+			<File
+				RelativePath=".\cbi.c">
+			</File>
+			<File
+				RelativePath=".\globals.c">
+			</File>
+			<File
+				RelativePath=".\ios.c">
+			</File>
+			<File
+				RelativePath=".\umss.c">
+			</File>
+			<File
+				RelativePath=".\umssdbg.c">
+			</File>
+			<File
+				RelativePath=".\umsspnp.c">
+			</File>
+			<File
+				RelativePath=".\umsspwr.c">
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath="..\iopacket.h">
+			</File>
+			<File
+				RelativePath=".\resource.h">
+			</File>
+			<File
+				RelativePath=".\umss.h">
+			</File>
+			<File
+				RelativePath=".\umssdbg.h">
+			</File>
+			<File
+				RelativePath=".\umssguid.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+			<File
+				RelativePath=".\umss.rc">
+			</File>
+		</Filter>
+		<File
+			RelativePath=".\stums_sys.mak">
+		</File>
+		<File
+			RelativePath=".\stums_sys.vcproj">
+		</File>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

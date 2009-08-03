@@ -1,0 +1,1332 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Japanese resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "StBinder偵偮偄偰"
+    IDS_GRP_RECV_DRIVER     "儕僇僶儕儌乕僪僪儔僀僶乕"
+    IDS_DLG_ABOUT_COPYRIGHT "Copyright (C) 2008 Freescale Semiconductor Inc.\nAll Rights Reserved"
+    IDS_GRP_FIRMWARE        "僼傽乕儉僂僃傾"
+    IDS_GRP_FIRMWARE_OTHER  "僼傽乕儉僂僃傾亅偦偺懠"
+    IDS_COLUMN_PATHNAME     "僷僗柤"
+    IDS_COLUMN_VERSION      "僶乕僕儑儞"
+    IDS_COLUMN_SIZE         "僒僀僘"
+    IDS_COLUMN_TIMESTAMP    "僞僀儉僗僞儞僾"
+    IDS_FILTER_FIRMWARE_UPDATER "僼傽乕儉僂僃傾峏怴僜僼僩"
+    IDS_STATUS_UPDATING_TARGET_INFO "僞乕僎僢僩忣曬峏怴拞"
+    IDS_ERR_ORIG_NAME       "僞乕僎僢僩幚峴壜擻僼傽僀儖偺尦僼傽僀儖柤偼丄StupdaterApp.exe偱側偗傟偽側傝傑偣傫丅"
+    IDS_ERR_EARLIER_UPD_VERSION 
+                            "僼傽乕儉僂僃傾峏怴僜僼僩偺僶乕僕儑儞偼v1.750.0.0偐偦傟埲屻偱側偗傟偽側傝傑偣傫丅"
+    IDS_FILTER_RECV_DRIVER  "儕僇僶儕儌乕僪僪儔僀僶"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FILTER_FIRMWARE     "僼傽乕儉僂僃傾僼傽僀儖"
+    IDS_RES_DELETE          "嶍彍"
+    IDS_RES_REPLACE         "抲偒姺偊"
+    IDS_RES_UNKNOWN         "晄柧"
+    IDS_RES_DELETE_REPLACE_PROMPT "埲壓偺儕僜乕僗偑抲偒姺偊傜傟傞偐丄嶍彍偝傟傑偡"
+    IDS_CONTINUE_PROMPT     "懕偗傑偡偐"
+    IDS_STAT_UPDATING_RESOURCES "儕僜乕僗峏怴拞乧"
+    IDS_ERR_TARGET_OPEN_FAILED "僞乕僎僢僩峏怴僜僼僩傪婲摦偡傞偙偲偑偱偒傑偣傫"
+    IDS_ERR_FAILED_TO_READ_DATA "僨乕僞乕撉傒庢傝幐攕"
+    IDS_ERR_FAILED_TO_OPEN_FILE "僼傽僀儖僆乕僾儞幐攕"
+    IDS_ERR_FAILED_RES_WRITE "儕僜乕僗彂偒崬傒幐攕"
+    IDS_ERR_MEM_ALLOC_FAILED "儊儌儕妱傝摉偰幐攕"
+    IDS_ERR_EXTRACT_FAILED  "僼傽僀儖拪弌幐攕"
+    IDS_DLG_SPECIFY_TARGET  "儕僜乕僗傪寢崌偡傞僼傽乕儉僂僃傾峏怴僜僼僩傪巜掕偟偰壓偝偄"
+    IDS_DLG_SPECIFY_RES_GRP "慖戰偟偨儕僜乕僗僞僀僾偵懳墳偟偰偄傞僼傽僀儖傪壓婰偺儕僗僩偵愝掕偟偰壓偝偄"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_DLG_TARGET_VERSION  "僶乕僕儑儞:"
+    IDS_DLG_TARGET_DATE     "擔晅:"
+    IDS_DLG_TARGET_SIZE     "僒僀僘:"
+    IDS_DLG_TARGET_RESOURCES "寢崌偡傞儕僜乕僗:"
+    IDS_DLG_FILE_COUNT      "僼傽僀儖悢:"
+    IDS_DLG_ABOUT_VERSION   "Firmware Update Resource Binder"
+    IDS_DLG_APPLY_TEXT      "揔梡"
+    IDS_DLG_CLOSE_TEXT      "暵偠傞"
+    IDS_GRP_UPDATER_INFORMATION "僞乕僎僢僩峏怴僜僼僩忣曬"
+    IDS_OK                  "妋掕"
+    IDS_CANCEL              "庢徚"
+    IDS_DELETE              "嶍彍"
+    IDS_EXTRACT             "拪弌"
+    IDS_BROWSE              "墈棗..."
+    IDS_RESLIST_DESC        "捛壛儕僜乕僗傪僪儔僢僌仌僪儘僢僾偐僽儔僂僘(塃僋儕僢僋)"
+    IDS_RESTREE_DESC        "儕僜乕僗僌儖乕僾偺慖戰"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FIND_TARGET_DESC    "懳徾傾僾儕働乕僔儑儞偺墈棗"
+    IDS_APPLY_DESC          "儕僜乕僗曄峏傪懳徾傾僾儕働乕僔儑儞傊斀塮"
+    IDS_CLOSE_DESC          "StBinder廔椆"
+    IDS_STATUS_WRITING_RESOURCE "彂偒崬傒拞"
+    IDS_STATUS_UPDATING_RESOURCE_CFG "儕僜乕僗峔惉偺峏怴拞"
+    IDS_STATUS_CLOSING_TARGET "懳徾傾僾儕働乕僔儑儞偺廔椆"
+    IDS_STAT_INITIALIZING   "弶婜壔拞乧"
+    IDS_RESOURCES           "帒尮"
+    IDS_TARGET_CUST_COMPANY_TEXT "Company Name:"
+    IDS_TARGET_CUST_PRODDESC_TEXT "Product Description:"
+    IDS_TARGET_CUST_APPTITLE_TEXT "Application Title:"
+    IDS_TARGET_CUST_COPYRIGHT_TEXT "Copyright:"
+    IDS_TARGET_CUST_COMMENT_TEXT "Comment:"
+    IDS_TARGET_CUST_COMPANYIMAGE_TEXT "Company Image:"
+    IDS_TARGET_CUST_UPDATERICON_TEXT "Updater Icon:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_OPTIONS_USELOCALFILES_TEXT "僨僼僅儖僩偱儘乕僇儖僼傽僀儖帒尮傪巊梡"
+    IDS_TARGET_OPTIONS_FORCERECV_TEXT "儕僇僶儕儌乕僪偱嫮惂揑偵愙懕"
+    IDS_TARGET_OPTIONS_ERASEMEDIA_TEXT "儊僨傿傾慡懱徚嫀"
+    IDS_TARGET_OPTIONS_FORMATDATAAREA_TEXT "僨乕僞椞堟偺僼僅乕儅僢僩(&F)"
+    IDS_TARGET_OPTIONS_DIALOG_TEXT "僟僀傾儘僌:"
+    IDS_TARGET_OPTIONS_DEFAULT_TEXT "僨僼僅儖僩"
+    IDS_TARGET_OPTIONS_DEFAULTLABEL_TEXT "儃儕儏乕儉儔儀儖丗:"
+    IDS_TARGET_OPTIONS_AUTORECV_TEXT "Allow Auto Recovery"
+    IDS_TARGET_OPTIONS_REBOOT2PLAYER_TEXT "Reboot To Player Msg"
+    IDS_TARGET_OPTIONS_LOWNAND_TEXT "Low NAND Solution"
+    IDS_TARGET_OPTIONS_DEFAULT_FS_TEXT "僼傽僀儖僔僗僥儉:"
+    IDS_TARGET_OPTIONS_AUTOSTART_TEXT "Start Automatically"
+    IDS_TARGET_OPTIONS_AUTOCLOSE_TEXT "Close Automatically"
+    IDS_TARGET_IDS_SCSI_MFG_TEXT "SCSI儀儞僟乕ID丗:"
+    IDS_TARGET_IDS_SCSI_PROD_TEXT "SCSI惢昳ID丗:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_IDS_MTP_MFG_TEXT "MTP儀儞僟乕ID丗:"
+    IDS_TARGET_IDS_MTP_PROD_TEXT "MTP惢昳ID丗:"
+    IDS_TARGET_IDS_USB_VENDOR_TEXT "USB儀儞僟乕ID丗:"
+    IDS_TARGET_IDS_USB_PROD_TEXT "USB惢昳ID丗:"
+    IDS_USE_LOCAL_DESC      "僠僃僢僋儅乕僋傪僋儕傾偡傞偙偲偱丄懳徾傾僾儕働乕僔儑儞偑儘乕僇儖儕僜乕僗傪巊梡偟傑偣傫"
+    IDS_FORCE_RECV_DESC     "僨僶僀僗傪儕僇僶儕儌乕僪偵嫮惂揑偵愙懕偟傾僢僾僨乕僩"
+    IDS_ERASE_MEDIA_DESC    "Set option to erase the media by default"
+    IDS_CFG_UPDATER_DESC    "Configure the firmware update application"
+    IDS_MINDLG_DESC         "嵟彫僟僀傾儘僌儃僢僋僗傪巊梡"
+    IDS_STDDLG_DESC         "昗弨僟僀傾儘僌儃僢僋僗傪巊梡"
+    IDS_ADVDLG_DESC         "徻嵶僟僀傾儘僌儃僢僋僗傪巊梡"
+    IDS_DEFDLG_DESC         "僟僀傾儘僌儃僢僋僗巜掕傪嶍彍"
+    IDS_COLUMN_FILE_NAME    "僼傽僀儖柤"
+    IDS_COLUMN_FILE_DESC    "愢柧"
+    IDS_COLUMN_FILE_TYPE    "僞僀僾"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_FILE_TAG     "僞僌"
+    IDS_COLUMN_FILE_RESERVE "僒僀僘"
+    IDS_DRIVE_ARRAY_TEXT    "Drive Array Specification"
+    IDS_DRIVE_EDIT_FNAME_TEXT "僼傽僀儖柤丗:"
+    IDS_DRIVE_EDIT_DESC_TEXT "愢柧丗:"
+    IDS_DRIVE_EDIT_DRIVE_TYPE_TEXT "僪儔僀僽僞僀僾丗:"
+    IDS_DRIVE_EDIT_DRIVE_TAG_TEXT "僪儔僀僽僞僌乮16恑乯丗:"
+    IDS_DRIVE_EDIT_DRIVE_SIZE_TEXT "昁梫側僪儔僀僽梕検乮KB乯丗:"
+    IDS_DRIVE_EDIT_DIALOG_TITLE "曇廤"
+    IDS_DRIVE_MENU_NEW      "怴婯嶌惉..."
+    IDS_DRIVE_MENU_EDIT     "曇廤..."
+    IDS_DRIVE_MENU_DELETE   "嶍彍"
+    IDS_DRIVE_MENU_MOVE_UP  "忋偵堏摦"
+    IDS_DRIVE_MENU_MOVE_DOWN "壓偵堏摦"
+    IDS_DRIVE_MENU_COPY_DRIVE "僐僺乕"
+    IDS_DLG_TARGET_BASESDK_TEXT "SDK儀乕僗"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_OPTIONS_FMT_WARN "Data Area Format Warning"
+    IDS_TARGET_OPTIONS_LABEL_TEXT "Default Label"
+    IDS_PROFILE_LOAD_TEXT   "Select configuration profile"
+    IDS_PROFILE_SAVE_TEXT   "Save profile as:"
+    IDS_DLG_LOAD_BTN_TEXT   "Load Profile"
+    IDS_DLG_SAVE_BTN_TEXT   "Save Profile"
+    IDS_CFG_LOADPROFILE_DESC "Load an updater settings profile"
+    IDS_CFG_SAVEPROFILE_DESC "Save current updater settings to a profile"
+    IDS_TARGET_OPTIONS_FS_DEFAULT "Default"
+    IDS_PROFILE_MISSING_FILE "File not found:\n\n  %s"
+	IDS_TARGET_IDS_SECOND_USB_PROD_TEXT "Secondary USB Product ID (optional):"
+END
+
+#endif    // Japanese resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (P.R.C.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "关于StBinder"
+    IDS_GRP_RECV_DRIVER     "恢复模式驱动"
+    IDS_DLG_ABOUT_COPYRIGHT "版权所有(C) 2008 Freescale Semiconductor, Inc 保留所有权力"
+    IDS_GRP_FIRMWARE        "固件"
+    IDS_GRP_FIRMWARE_OTHER  "硁砰 - ㄤ(...)"
+    IDS_COLUMN_PATHNAME     "路径名"
+    IDS_COLUMN_VERSION      "版本"
+    IDS_COLUMN_SIZE         "尺寸"
+    IDS_COLUMN_TIMESTAMP    "时间标识"
+    IDS_FILTER_FIRMWARE_UPDATER "硁砰穝祘Α"
+    IDS_STATUS_UPDATING_TARGET_INFO "タ穝ヘ夹戈癟"
+    IDS_ERR_ORIG_NAME       "目标可执行文件的原有文件名必须是StupdaterApp.exe"
+    IDS_ERR_EARLIER_UPD_VERSION "硁砰穝祘Α穝硁蔨セ莱 v1.750.0.0 ┪セ"
+    IDS_FILTER_RECV_DRIVER  "Recovery家Α臱笆硁蔨"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FILTER_FIRMWARE     "硁砰郎"
+    IDS_RES_DELETE          "删除"
+    IDS_RES_REPLACE         "替换"
+    IDS_RES_UNKNOWN         "不明"
+    IDS_RES_DELETE_REPLACE_PROMPT "以下资源将被替换或删除"
+    IDS_CONTINUE_PROMPT     "继续?"
+    IDS_STAT_UPDATING_RESOURCES "更新资源…"
+    IDS_ERR_TARGET_OPEN_FAILED "无法打开用于绑定的目标更新软件"
+    IDS_ERR_FAILED_TO_READ_DATA "弄戈ア毖"
+    IDS_ERR_FAILED_TO_OPEN_FILE "礚猭ゴ秨郎"
+    IDS_ERR_FAILED_RES_WRITE "写入资源失败"
+    IDS_ERR_MEM_ALLOC_FAILED "礚猭ㄏノ纗丁"
+    IDS_ERR_EXTRACT_FAILED  "提取文件失败"
+    IDS_DLG_SPECIFY_TARGET  "指定被绑定资源的目标更新软件"
+    IDS_DLG_SPECIFY_RES_GRP "对于选定的资源类型, 通过拖放或浏览将对应的文件放到下列列表中"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_DLG_TARGET_VERSION  "版本:"
+    IDS_DLG_TARGET_DATE     "日期:"
+    IDS_DLG_TARGET_SIZE     "尺寸:"
+    IDS_DLG_TARGET_RESOURCES "绑定资源:"
+    IDS_DLG_FILE_COUNT      "文件计数:"
+    IDS_DLG_ABOUT_VERSION   "Firmware Update Resource Binder"
+    IDS_DLG_APPLY_TEXT      "申请"
+    IDS_DLG_CLOSE_TEXT      "关闭"
+    IDS_GRP_UPDATER_INFORMATION "目标更新软件情报"
+    IDS_OK                  "确定"
+    IDS_CANCEL              "取消"
+    IDS_DELETE              "删除"
+    IDS_EXTRACT             "提取"
+    IDS_BROWSE              "浏览..."
+    IDS_RESLIST_DESC        "拖放或浏览要添加的资源"
+    IDS_RESTREE_DESC        "选择资源组"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FIND_TARGET_DESC    "浏览目标应用程序"
+    IDS_APPLY_DESC          "将资源变更写入目标应用程序"
+    IDS_CLOSE_DESC          "关闭状态显示"
+    IDS_STATUS_WRITING_RESOURCE "写入"
+    IDS_STATUS_UPDATING_RESOURCE_CFG "更新资源构成"
+    IDS_STATUS_CLOSING_TARGET "关闭目标应用程序"
+    IDS_STAT_INITIALIZING   "初始化…"
+    IDS_RESOURCES           "資源"
+    IDS_TARGET_CUST_COMPANY_TEXT "Company Name:"
+    IDS_TARGET_CUST_PRODDESC_TEXT "Product Description:"
+    IDS_TARGET_CUST_APPTITLE_TEXT "Application Title:"
+    IDS_TARGET_CUST_COPYRIGHT_TEXT "Copyright:"
+    IDS_TARGET_CUST_COMMENT_TEXT "Comment:"
+    IDS_TARGET_CUST_COMPANYIMAGE_TEXT "Company Image:"
+    IDS_TARGET_CUST_UPDATERICON_TEXT "Updater Icon:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_OPTIONS_USELOCALFILES_TEXT "缺省使用本地文件资源"
+    IDS_TARGET_OPTIONS_FORCERECV_TEXT "强制恢复模式"
+    IDS_TARGET_OPTIONS_ERASEMEDIA_TEXT "全媒体删除"
+    IDS_TARGET_OPTIONS_FORMATDATAAREA_TEXT "格式数据区(&F)"
+    IDS_TARGET_OPTIONS_DIALOG_TEXT "对话框名称"
+    IDS_TARGET_OPTIONS_DEFAULT_TEXT "默认值"
+    IDS_TARGET_OPTIONS_DEFAULTLABEL_TEXT "卷标："
+    IDS_TARGET_OPTIONS_AUTORECV_TEXT "Allow Auto Recovery"
+    IDS_TARGET_OPTIONS_REBOOT2PLAYER_TEXT "Reboot To Player Msg"
+    IDS_TARGET_OPTIONS_LOWNAND_TEXT "Low NAND Solution"
+    IDS_TARGET_OPTIONS_DEFAULT_FS_TEXT "文件系统"
+    IDS_TARGET_OPTIONS_AUTOSTART_TEXT "Start Automatically"
+    IDS_TARGET_OPTIONS_AUTOCLOSE_TEXT "Close Automatically"
+    IDS_TARGET_IDS_SCSI_MFG_TEXT "SCSI 厂商 ID："
+    IDS_TARGET_IDS_SCSI_PROD_TEXT "SCSI 产品 ID："
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_IDS_MTP_MFG_TEXT "MTP 厂商 ID："
+    IDS_TARGET_IDS_MTP_PROD_TEXT "MTP 产品 ID："
+    IDS_TARGET_IDS_USB_VENDOR_TEXT "USB 厂商 ID："
+    IDS_TARGET_IDS_USB_PROD_TEXT "USB 产品 ID："
+    IDS_USE_LOCAL_DESC      "清除复选框以防止目标应用程序使用本地资源"
+    IDS_FORCE_RECV_DESC     "强制设备进入恢复模式以便进行更新"
+    IDS_ERASE_MEDIA_DESC    "Set option to erase the media by default"
+    IDS_CFG_UPDATER_DESC    "Configure the firmware update application"
+    IDS_MINDLG_DESC         "最小化用户接口对话框"
+    IDS_STDDLG_DESC         "标准用户接口对话框"
+    IDS_ADVDLG_DESC         "蔼顶ノめざ癸杠よ遏"
+    IDS_DEFDLG_DESC         "清除对话框"
+    IDS_COLUMN_FILE_NAME    "文件名称"
+    IDS_COLUMN_FILE_DESC    "描述"
+    IDS_COLUMN_FILE_TYPE    "类型"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_FILE_TAG     "起始标签"
+    IDS_COLUMN_FILE_RESERVE "尺寸"
+    IDS_DRIVE_ARRAY_TEXT    "Drive Array Specification"
+    IDS_DRIVE_EDIT_FNAME_TEXT "文件名："
+    IDS_DRIVE_EDIT_DESC_TEXT "描述："
+    IDS_DRIVE_EDIT_DRIVE_TYPE_TEXT "驱动器类型："
+    IDS_DRIVE_EDIT_DRIVE_TAG_TEXT "驱动器标记（十六进制）："
+    IDS_DRIVE_EDIT_DRIVE_SIZE_TEXT "需要的驱动器大小 (KB)："
+    IDS_DRIVE_EDIT_DIALOG_TITLE "编辑…"
+    IDS_DRIVE_MENU_NEW      "新建…"
+    IDS_DRIVE_MENU_EDIT     "编辑…"
+    IDS_DRIVE_MENU_DELETE   "删除"
+    IDS_DRIVE_MENU_MOVE_UP  "上移"
+    IDS_DRIVE_MENU_MOVE_DOWN "下移"
+    IDS_DRIVE_MENU_COPY_DRIVE "拷贝"
+    IDS_DLG_TARGET_BASESDK_TEXT "SDK 基准"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_OPTIONS_FMT_WARN "Data Area Format Warning"
+    IDS_TARGET_OPTIONS_LABEL_TEXT "Default Label"
+    IDS_PROFILE_LOAD_TEXT   "Select configuration profile"
+    IDS_PROFILE_SAVE_TEXT   "Save profile as:"
+    IDS_DLG_LOAD_BTN_TEXT   "Load Profile"
+    IDS_DLG_SAVE_BTN_TEXT   "Save Profile"
+    IDS_CFG_LOADPROFILE_DESC "Load an updater settings profile"
+    IDS_CFG_SAVEPROFILE_DESC "Save current updater settings to a profile"
+    IDS_TARGET_OPTIONS_FS_DEFAULT "Default"
+    IDS_PROFILE_MISSING_FILE "File not found:\n\n  %s"
+	IDS_TARGET_IDS_SECOND_USB_PROD_TEXT "Secondary USB Product ID (optional):"
+END
+
+#endif    // Chinese (P.R.C.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Korean resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+#ifdef _WIN32
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "StBinder 沥焊"
+    IDS_GRP_RECV_DRIVER     "葛靛 靛扼捞滚"
+    IDS_DLG_ABOUT_COPYRIGHT "Copyright (C) 2008 Freescale Semiconductor Inc.\nAll Rights Reserved"
+    IDS_GRP_FIRMWARE        "七傀绢"
+    IDS_GRP_FIRMWARE_OTHER  "七傀绢-other(...)"
+    IDS_COLUMN_PATHNAME     "颇老 版肺"
+    IDS_COLUMN_VERSION      "滚傈"
+    IDS_COLUMN_SIZE         "农扁"
+    IDS_COLUMN_TIMESTAMP    "鸥烙 胶牌橇"
+    IDS_FILTER_FIRMWARE_UPDATER "七傀绢 诀抛捞磐"
+    IDS_STATUS_UPDATING_TARGET_INFO "盎脚 措惑 沥焊"
+    IDS_ERR_ORIG_NAME       "措惑 角青 颇老俊 檬扁 颇老疙篮 Stupdater.exe 咯具 钦聪促"
+    IDS_ERR_EARLIER_UPD_VERSION "七傀绢 诀单捞磐 滚傈篮 1.750.0.0 趣篮 弊捞惑捞咯具 邓聪促"
+    IDS_FILTER_RECV_DRIVER  "葛靛 靛扼捞滚"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FILTER_FIRMWARE     "七傀绢 颇老"
+    IDS_RES_DELETE          "昏力"
+    IDS_RES_REPLACE         "背券"
+    IDS_RES_UNKNOWN         "固犬牢"
+    IDS_RES_DELETE_REPLACE_PROMPT "促澜俊 府家胶甸篮 背券 肚绰 昏力 邓聪促."
+    IDS_CONTINUE_PROMPT     "拌加 角青?"
+    IDS_STAT_UPDATING_RESOURCES "诀单勒 府家胶.."
+    IDS_ERR_TARGET_OPEN_FAILED "官牢爹且 措惑 诀单捞磐 甫 凯荐 绝谰聪促 "
+    IDS_ERR_FAILED_TO_READ_DATA "单捞鸥甫 佬阑荐啊 绝谰聪促"
+    IDS_ERR_FAILED_TO_OPEN_FILE "颇老阑 凯荐绝谰聪促"
+    IDS_ERR_FAILED_RES_WRITE "府家胶 盎脚 俊矾 "
+    IDS_ERR_MEM_ALLOC_FAILED "皋葛府且寸阑 且荐 绝谰聪促"
+    IDS_ERR_EXTRACT_FAILED  "颇老 眠免俊 角菩沁谰聪促."
+    IDS_DLG_SPECIFY_TARGET  "府家胶甫 官款爹且 措惑 七傀绢 诀单捞磐甫 汲沥窍绞矫夸."
+    IDS_DLG_SPECIFY_RES_GRP "急琶等 府家胶 鸥涝俊 楷包等 颇老甸阑 格废 酒贰肺 靛贰弊 趣篮 Browse 秦辑 急琶窍绞矫夸."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_DLG_TARGET_VERSION  "滚傈"
+    IDS_DLG_TARGET_DATE     "朝楼"
+    IDS_DLG_TARGET_SIZE     "农扁"
+    IDS_DLG_TARGET_RESOURCES "包访 府家胶"
+    IDS_DLG_FILE_COUNT      "颇老 俺荐"
+    IDS_DLG_ABOUT_VERSION   "Firmware Update Resource Binder"
+    IDS_DLG_APPLY_TEXT      "利侩"
+    IDS_DLG_CLOSE_TEXT      "摧扁"
+    IDS_GRP_UPDATER_INFORMATION "措惑 诀单捞磐 沥焊"
+    IDS_OK                  "犬牢"
+    IDS_CANCEL              "秒家"
+    IDS_DELETE              "昏力"
+    IDS_EXTRACT             "眠免"
+    IDS_BROWSE              "茫酒焊扁ˇ..."
+    IDS_RESLIST_DESC        "眠啊 府家胶 Drag-Drop 趣篮 茫酒焊扁"
+    IDS_RESTREE_DESC        "府家胶 弊缝 急琶"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FIND_TARGET_DESC    "秦寸 橇肺弊伐 茫酒焊扁"
+    IDS_APPLY_DESC          "秦寸 橇肺弊伐 俊 函屈等 府家胶甫 利侩窍扁"
+    IDS_CLOSE_DESC          "StBinder 摧扁"
+    IDS_STATUS_WRITING_RESOURCE "静扁吝"
+    IDS_STATUS_UPDATING_RESOURCE_CFG "府家胶 券版阑 诀单勒 吝涝聪促"
+    IDS_STATUS_CLOSING_TARGET "秦寸橇肺弊伐 摧扁"
+    IDS_STAT_INITIALIZING   "檬扁拳 柳青 吝涝聪促ˇ"
+    IDS_RESOURCES           "府家胶"
+    IDS_TARGET_CUST_COMPANY_TEXT "Company Name:"
+    IDS_TARGET_CUST_PRODDESC_TEXT "Product Description:"
+    IDS_TARGET_CUST_APPTITLE_TEXT "Application Title:"
+    IDS_TARGET_CUST_COPYRIGHT_TEXT "Copyright:"
+    IDS_TARGET_CUST_COMMENT_TEXT "Comment:"
+    IDS_TARGET_CUST_COMPANYIMAGE_TEXT "Company Image:"
+    IDS_TARGET_CUST_UPDATERICON_TEXT "Updater Icon:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_OPTIONS_USELOCALFILES_TEXT "叼弃飘 蔼栏肺 肺拿 颇老 府家胶 荤侩"
+    IDS_TARGET_OPTIONS_FORCERECV_TEXT "汗盔 葛靛肺 碍夸矫糯"
+    IDS_TARGET_OPTIONS_ERASEMEDIA_TEXT "傈眉 固叼绢 昏力"
+    IDS_TARGET_OPTIONS_FORMATDATAAREA_TEXT "单捞磐 康开 器杆泼(&F)"
+    IDS_TARGET_OPTIONS_DIALOG_TEXT "券版"
+    IDS_TARGET_OPTIONS_DEFAULT_TEXT "叼弃飘蔼"
+    IDS_TARGET_OPTIONS_DEFAULTLABEL_TEXT "杭俘 饭捞喉"
+    IDS_TARGET_OPTIONS_AUTORECV_TEXT "Allow Auto Recovery"
+    IDS_TARGET_OPTIONS_REBOOT2PLAYER_TEXT "Reboot To Player Msg"
+    IDS_TARGET_OPTIONS_LOWNAND_TEXT "Low NAND Solution"
+    IDS_TARGET_OPTIONS_DEFAULT_FS_TEXT "颇老 矫胶袍"
+    IDS_TARGET_OPTIONS_AUTOSTART_TEXT "Start Automatically"
+    IDS_TARGET_OPTIONS_AUTOCLOSE_TEXT "Close Automatically"
+    IDS_TARGET_IDS_SCSI_MFG_TEXT "SCSI 亥歹 ID:"
+    IDS_TARGET_IDS_SCSI_PROD_TEXT "SCSI 力前 ID:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_IDS_MTP_MFG_TEXT "MTP 亥歹 ID:"
+    IDS_TARGET_IDS_MTP_PROD_TEXT "MTP 力前 ID:"
+    IDS_TARGET_IDS_USB_VENDOR_TEXT "USB 亥歹 ID:"
+    IDS_TARGET_IDS_USB_PROD_TEXT "USB 力前 ID:"
+    IDS_USE_LOCAL_DESC      "秦寸 橇肺弊伐捞 肺拿 府家胶甫 荤侩窍瘤 臼档废 氓冠胶 急琶阑 秦力 窍绞矫夸."
+    IDS_FORCE_RECV_DESC     "诀单勒阑 困秦 厘摹甫 汗盔 葛靛肺 碍夸 矫淖谰聪促"
+    IDS_ERASE_MEDIA_DESC    "Set option to erase the media by default"
+    IDS_CFG_UPDATER_DESC    "Configure the firmware update application"
+    IDS_MINDLG_DESC         "弥家 荤侩磊 券版 荤侩"
+    IDS_STDDLG_DESC         "钎霖 荤侩磊 券版 荤侩"
+    IDS_ADVDLG_DESC         "绢靛龟胶靛 荤侩磊券版 荤侩"
+    IDS_DEFDLG_DESC         "券版 汲沥芒 摧扁"
+    IDS_COLUMN_FILE_NAME    "颇老 捞抚"
+    IDS_COLUMN_FILE_DESC    "郴侩"
+    IDS_COLUMN_FILE_TYPE    "鸥涝"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_FILE_TAG     "钎"
+    IDS_COLUMN_FILE_RESERVE "Requested KB"
+    IDS_DRIVE_ARRAY_TEXT    "Drive Array Specification"
+    IDS_DRIVE_EDIT_FNAME_TEXT "颇老 捞抚:"
+    IDS_DRIVE_EDIT_DESC_TEXT "汲疙:"
+    IDS_DRIVE_EDIT_DRIVE_TYPE_TEXT "靛扼捞宏 辆幅:"
+    IDS_DRIVE_EDIT_DRIVE_TAG_TEXT "靛扼捞宏 怕弊 (16柳荐):"
+    IDS_DRIVE_EDIT_DRIVE_SIZE_TEXT "夸没等 靛扼捞宏 农扁 (KB):"
+    IDS_DRIVE_EDIT_DIALOG_TITLE "祈笼"
+    IDS_DRIVE_MENU_NEW      "脚痹..."
+    IDS_DRIVE_MENU_EDIT     "祈笼..."
+    IDS_DRIVE_MENU_DELETE   "昏力"
+    IDS_DRIVE_MENU_MOVE_UP  "困肺 捞悼"
+    IDS_DRIVE_MENU_MOVE_DOWN "酒贰肺 捞悼"
+    IDS_DRIVE_MENU_COPY_DRIVE "汗荤"
+    IDS_DLG_TARGET_BASESDK_TEXT "Base SDK:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_OPTIONS_FMT_WARN "Data Area Format Warning"
+    IDS_TARGET_OPTIONS_LABEL_TEXT "Default Label"
+    IDS_PROFILE_LOAD_TEXT   "Select configuration profile"
+    IDS_PROFILE_SAVE_TEXT   "Save profile as:"
+    IDS_DLG_LOAD_BTN_TEXT   "Load Profile"
+    IDS_DLG_SAVE_BTN_TEXT   "Save Profile"
+    IDS_CFG_LOADPROFILE_DESC "Load an updater settings profile"
+    IDS_CFG_SAVEPROFILE_DESC "Save current updater settings to a profile"
+    IDS_TARGET_OPTIONS_FS_DEFAULT "Default"
+    IDS_PROFILE_MISSING_FILE "File not found:\n\n  %s"
+	IDS_TARGET_IDS_SECOND_USB_PROD_TEXT "Secondary USB Product ID (optional):"
+END
+
+#endif    // Korean resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (Taiwan) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
+#pragma code_page(950)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "闽 StBinder"
+    IDS_GRP_RECV_DRIVER     "確家Α臱笆"
+    IDS_DLG_ABOUT_COPYRIGHT "舦┮Τ(C) 2008 Freescale Semiconductor, Inc 玂痙┮Τ舦"
+    IDS_GRP_FIRMWARE        "硁砰"
+    IDS_GRP_FIRMWARE_OTHER  "硁砰 - ㄤ"
+    IDS_COLUMN_PATHNAME     "隔畖"
+    IDS_COLUMN_VERSION      "セ"
+    IDS_COLUMN_SIZE         "へ"
+    IDS_COLUMN_TIMESTAMP    "丁夹醚"
+    IDS_FILTER_FIRMWARE_UPDATER "硁砰穝祘Α"
+    IDS_STATUS_UPDATING_TARGET_INFO "穝ヘ夹戈癟"
+    IDS_ERR_ORIG_NAME       "ヘ夹磅︽ゅンΤゅンゲ斗琌StupdaterApp.exe"
+    IDS_ERR_EARLIER_UPD_VERSION "硁砰穝祘Α穝硁蔨セ莱 v1.750.0.0 ┪セ"
+    IDS_FILTER_RECV_DRIVER  "確家Α臱笆硁蔨"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FILTER_FIRMWARE     "硁砰郎"
+    IDS_RES_DELETE          "埃"
+    IDS_RES_REPLACE         "蠢传"
+    IDS_RES_UNKNOWN         "ぃ"
+    IDS_RES_DELETE_REPLACE_PROMPT "戈方盢砆蠢传┪埃"
+    IDS_CONTINUE_PROMPT     "膥尿?"
+    IDS_STAT_UPDATING_RESOURCES "穝戈方"
+    IDS_ERR_TARGET_OPEN_FAILED "礚猭ゴ秨ノ竕﹚ヘ夹穝硁蔨"
+    IDS_ERR_FAILED_TO_READ_DATA "弄计沮ア毖"
+    IDS_ERR_FAILED_TO_OPEN_FILE "ゴ秨ゅンア毖"
+    IDS_ERR_FAILED_RES_WRITE "糶戈方ア毖"
+    IDS_ERR_MEM_ALLOC_FAILED "礚猭だ皌纗丁"
+    IDS_ERR_EXTRACT_FAILED  "矗ゅンア毖"
+    IDS_DLG_SPECIFY_TARGET  "﹚砆竕﹚戈方ヘ夹穝硁蔨"
+    IDS_DLG_SPECIFY_RES_GRP "癸匡﹚戈方摸,硄筁╈┪聅凝盢癸莱ゅンい"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_DLG_TARGET_VERSION  "セ:"
+    IDS_DLG_TARGET_DATE     "ら戳:"
+    IDS_DLG_TARGET_SIZE     "へ:"
+    IDS_DLG_TARGET_RESOURCES "竕﹚郎计:"
+    IDS_DLG_FILE_COUNT      "郎计:"
+    IDS_DLG_ABOUT_VERSION   "Firmware Update Resource Binder"
+    IDS_DLG_APPLY_TEXT      "甅ノ"
+    IDS_DLG_CLOSE_TEXT      "闽超"
+    IDS_GRP_UPDATER_INFORMATION "ヘ夹穝硁蔨戈癟"
+    IDS_OK                  "絋﹚"
+    IDS_CANCEL              ""
+    IDS_DELETE              "埃"
+    IDS_EXTRACT             "矗"
+    IDS_BROWSE              "聅凝"
+    IDS_RESLIST_DESC        "╈┪聅凝菲公龄璶穝糤戈方"
+    IDS_RESTREE_DESC        "匡拒戈方舱"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FIND_TARGET_DESC    "聅凝ヘ夹莱ノ祘Α"
+    IDS_APPLY_DESC          "盢戈方跑糶ヘ夹莱ノ祘Α"
+    IDS_CLOSE_DESC          "闽超 StBinder"
+    IDS_STATUS_WRITING_RESOURCE "タ糶"
+    IDS_STATUS_UPDATING_RESOURCE_CFG "タ穝戈方皌竚"
+    IDS_STATUS_CLOSING_TARGET "タ闽超ヘ夹莱ノ祘Α"
+    IDS_STAT_INITIALIZING   "﹍て"
+    IDS_RESOURCES           "戈方"
+    IDS_TARGET_CUST_COMPANY_TEXT "Company Name:"
+    IDS_TARGET_CUST_PRODDESC_TEXT "Product Description:"
+    IDS_TARGET_CUST_APPTITLE_TEXT "Application Title:"
+    IDS_TARGET_CUST_COPYRIGHT_TEXT "Copyright:"
+    IDS_TARGET_CUST_COMMENT_TEXT "Comment:"
+    IDS_TARGET_CUST_COMPANYIMAGE_TEXT "Company Image:"
+    IDS_TARGET_CUST_UPDATERICON_TEXT "Updater Icon:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_OPTIONS_USELOCALFILES_TEXT "箇砞ㄏノセ诀郎戈方"
+    IDS_TARGET_OPTIONS_FORCERECV_TEXT "眏秈Recovery家Α"
+    IDS_TARGET_OPTIONS_ERASEMEDIA_TEXT "Ч睲埃ず癘拘砰"
+    IDS_TARGET_OPTIONS_FORMATDATAAREA_TEXT "Α戈跋(&F)"
+    IDS_TARGET_OPTIONS_DIALOG_TEXT "癸杠よ遏嘿"
+    IDS_TARGET_OPTIONS_DEFAULTLABEL_TEXT "Default Volume Label"
+    IDS_TARGET_OPTIONS_AUTORECV_TEXT "Allow Auto Recovery"
+    IDS_TARGET_OPTIONS_REBOOT2PLAYER_TEXT "Reboot To Player Msg"
+    IDS_TARGET_OPTIONS_LOWNAND_TEXT "Low NAND Solution"
+    IDS_TARGET_OPTIONS_DEFAULT_FS_TEXT "File System"
+    IDS_TARGET_OPTIONS_AUTOSTART_TEXT "Start Automatically"
+    IDS_TARGET_OPTIONS_AUTOCLOSE_TEXT "Close Automatically"
+    IDS_TARGET_IDS_SCSI_MFG_TEXT "SCSI Manufacturer:"
+    IDS_TARGET_IDS_SCSI_PROD_TEXT "SCSI Product:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_IDS_MTP_MFG_TEXT "MTP Manufacturer:"
+    IDS_TARGET_IDS_MTP_PROD_TEXT "MTP Product:"
+    IDS_TARGET_IDS_USB_VENDOR_TEXT "USB Vendor ID:"
+    IDS_TARGET_IDS_USB_PROD_TEXT "USB Product ID:"
+    IDS_USE_LOCAL_DESC      "つ匡磷ヘ夹莱ノ祘Αㄏノセ诀戈方"
+    IDS_FORCE_RECV_DESC     "眏Device秈Recovery家Α獽ど"
+    IDS_ERASE_MEDIA_DESC    "Set option to erase the media by default"
+    IDS_CFG_UPDATER_DESC    "Configure the firmware update application"
+    IDS_MINDLG_DESC         "程てノめざ癸杠よ遏"
+    IDS_STDDLG_DESC         "夹非ノめざ癸杠よ遏"
+    IDS_ADVDLG_DESC         "蔼顶ノめざ癸杠よ遏"
+    IDS_DEFDLG_DESC         "睲埃癸杠よ遏"
+    IDS_COLUMN_FILE_NAME    "Filename"
+    IDS_COLUMN_FILE_DESC    "Description"
+    IDS_COLUMN_FILE_TYPE    "Type"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_FILE_TAG     "Tag"
+    IDS_COLUMN_FILE_RESERVE "Requested KB"
+    IDS_DRIVE_ARRAY_TEXT    "Drive Array Specification"
+    IDS_DRIVE_EDIT_FNAME_TEXT "File name:"
+    IDS_DRIVE_EDIT_DESC_TEXT "Description:"
+    IDS_DRIVE_EDIT_DRIVE_TYPE_TEXT "Drive type:"
+    IDS_DRIVE_EDIT_DRIVE_TAG_TEXT "Drive tag (hexadecimal):"
+    IDS_DRIVE_EDIT_DRIVE_SIZE_TEXT "Requested Drive Size (KB):"
+    IDS_DRIVE_EDIT_DIALOG_TITLE "Edit Drive"
+    IDS_DRIVE_MENU_NEW      "穝"
+    IDS_DRIVE_MENU_EDIT     "絪胯"
+    IDS_DRIVE_MENU_DELETE   "埃"
+    IDS_DRIVE_MENU_MOVE_UP  "簿"
+    IDS_DRIVE_MENU_MOVE_DOWN "簿"
+    IDS_DRIVE_MENU_COPY_DRIVE "Copy"
+    IDS_DLG_TARGET_BASESDK_TEXT "Base SDK:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_OPTIONS_FMT_WARN "Data Area Format Warning"
+    IDS_TARGET_OPTIONS_LABEL_TEXT "Default Label"
+    IDS_PROFILE_LOAD_TEXT   "Select configuration profile"
+    IDS_PROFILE_SAVE_TEXT   "Save profile as:"
+    IDS_DLG_LOAD_BTN_TEXT   "Load Profile"
+    IDS_DLG_SAVE_BTN_TEXT   "Save Profile"
+    IDS_CFG_LOADPROFILE_DESC "Load an updater settings profile"
+    IDS_CFG_SAVEPROFILE_DESC "Save current updater settings to a profile"
+    IDS_TARGET_OPTIONS_FS_DEFAULT "Default"
+    IDS_PROFILE_MISSING_FILE "File not found:\n\n  %s"
+	IDS_TARGET_IDS_SECOND_USB_PROD_TEXT "Secondary USB Product ID (optional):"
+END
+
+#endif    // Chinese (Taiwan) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,775,0,0
+ PRODUCTVERSION 1,775,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Freescale Semiconductor, Inc."
+            VALUE "FileDescription", "Firmware Update Resource Binder"
+            VALUE "FileVersion", "1.775.0.000"
+            VALUE "InternalName", "StBinder.exe"
+            VALUE "LegalCopyright", "Copyright Freescale Semiconductor, Inc. 2008 All rights reserved."
+            VALUE "OriginalFilename", "StBinder.exe"
+            VALUE "ProductName", "Firmware Update Resource Binder"
+            VALUE "ProductVersion", "1.775.0.000"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+#endif    // Neutral resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\StBinder.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_SIGMATEL_ICON       ICON                    "StBinder.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_CLOSEDFOLDER        BITMAP                  ".\\res\\closedfolder.BMP"
+IDB_RESOURCEFILE        BITMAP                  ".\\res\\resourcefile.bmp"
+IDB_OPENFOLDER          BITMAP                  ".\\res\\openfolder.bmp"
+IDB_SPLASH              BITMAP                  "..\\..\\resources\\freescale_logo.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 245, 54
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About StBinder"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_SIGMATEL_ICON,IDC_STATIC,11,20,21,20
+    LTEXT           "StBinder Version 1.764.5.000",IDC_BINDER_VERSION,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2006 Sigmatel Inc.\nAll Rights Reserved",IDC_BINDER_COPYRIGHT,40,24,133,21
+    DEFPUSHBUTTON   "OK",IDOK,188,7,50,16,WS_GROUP
+END
+
+IDD_STBINDER_DIALOG DIALOGEX 0, 0, 561, 249
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "StBinder"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Apply",IDOK,446,232,51,16,0,WS_EX_DLGMODALFRAME
+    PUSHBUTTON      "Close",IDCANCEL,497,232,51,16,0,WS_EX_DLGMODALFRAME
+    PUSHBUTTON      "...",IDC_FIND_TARGET,237,32,12,14,BS_NOTIFY
+    LTEXT           "File Count:",IDC_DLG_FILE_COUNT_TEXT,439,119,76,8,0,WS_EX_RIGHT
+    LTEXT           "Count",IDC_TOTAL_FILE_COUNT,524,119,20,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_TARGET,11,32,225,14,ES_AUTOHSCROLL | WS_DISABLED
+    CONTROL         "",IDC_BINARIES_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,179,130,369,97,WS_EX_ACCEPTFILES
+    LTEXT           "For the selected resource type, drag+drop or browse to the corresponding files into the list below.",IDC_DLG_SPECIFY_RESOURCE_GRP,11,88,260,36
+    LTEXT           "Specify the target firmware updater to which the resources will be bound.",IDC_DLG_SPECIFY_TARGET,11,17,268,12
+    LTEXT           "Bound Resources:",IDC_DLG_TARGET_RESOURCES_TEXT,310,80,92,8
+    LTEXT           "Static",IDC_BOUND_RESOURCE_COUNT,465,80,65,8,0,WS_EX_RIGHT
+    LTEXT           "Version:",IDC_DLG_TARGET_VERSION_TEXT,310,28,92,8
+    LTEXT           "Static",IDC_UPDATER_VERSION,465,28,65,8,0,WS_EX_RIGHT
+    LTEXT           "Date:",IDC_DLG_TARGET_DATE_TEXT,310,55,92,8
+    LTEXT           "Static",IDC_UPDATER_DATE,465,55,65,8,0,WS_EX_RIGHT
+    GROUPBOX        "Updater Information",IDC_GRP_UPDATER_INFORMATION,295,16,253,97
+    LTEXT           "File size:",IDC_DLG_TARGET_SIZE_TEXT,310,68,92,8
+    LTEXT           "Static",IDC_UPDATER_FILESIZE,465,68,65,8,0,WS_EX_RIGHT
+    CONTROL         "Status text",IDC_STATUS_TEXT,"Static",SS_LEFTNOWORDWRAP | SS_SUNKEN | SS_ENDELLIPSIS | WS_GROUP,11,232,304,16,WS_EX_DLGMODALFRAME
+    CONTROL         "",IDC_RESOURCETREE,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_NOTOOLTIPS | TVS_TRACKSELECT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,11,130,171,97,WS_EX_ACCEPTFILES
+    CONTROL         "",IDC_PROGRESS1,"msctls_progress32",WS_BORDER,315,232,130,16,WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE
+    PUSHBUTTON      "Configure",IDC_DLG_TARGET_CONFIGURE,310,93,73,15
+    LTEXT           "Base SDK:",IDC_DLG_TARGET_BASESDK_TEXT,310,41,81,8
+    LTEXT           "Static",IDC_DLG_TARGET_BASESDK,466,41,65,8,0,WS_EX_RIGHT
+    PUSHBUTTON      "Load Profile",IDC_CFG_LOAD_PROFILE,395,92,67,15
+    PUSHBUTTON      "Save Profile",IDC_CFG_SAVE_PROFILE,464,92,67,15
+END
+
+IDD_OTHER_LANGID DIALOGEX 0, 0, 291, 106
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "StBinder"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,230,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,230,24,50,14
+    LISTBOX         IDC_LOCALE_LIST,21,7,198,91,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE
+END
+
+IDD_USERCONFIRM DIALOGEX 0, 0, 226, 134
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "StBinder"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,128,109,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,53,109,50,14
+    CONTROL         "",IDC_CONFIRM_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,4,25,216,53
+    LTEXT           "Static",IDC_CONFIRM_TEXT,8,7,212,11
+    LTEXT           "Static",IDC_CONTINUE,8,90,73,9
+END
+
+IDD_TARGET_CUSTOMER DIALOGEX 0, 0, 344, 217
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Customer Data"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Company Name:",IDC_TARGET_CUST_COMPANY_TEXT,18,16,95,8,0,WS_EX_RIGHT
+    LTEXT           "Application Title:",IDC_TARGET_CUST_TITLE_TEXT,18,90,95,8,0,WS_EX_RIGHT
+    LTEXT           "Copyright String:",IDC_TARGET_CUST_COPYRIGHT_TEXT,18,111,95,8,0,WS_EX_RIGHT
+    LTEXT           "Comment:",IDC_TARGET_CUST_COMMENT_TEXT,18,192,95,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_TARGET_CUST_TITLE,127,87,169,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TARGET_CUST_COMPANY,127,14,169,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TARGET_CUST_COPYRIGHT,127,109,169,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TARGET_CUST_COMMENT,126,189,169,14,ES_MULTILINE | ES_AUTOHSCROLL
+    LTEXT           "Company Image:",IDC_TARGET_CUST_COMPANYIMAGE_TEXT,18,147,95,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_TARGET_CUST_COMPANYIMAGE,158,144,138,14,ES_AUTOHSCROLL
+    LTEXT           "Updater Icon:",IDC_TARGET_CUST_UPDATERICON_TEXT,18,170,95,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_TARGET_CUST_UPDATERICON,157,169,138,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_TARGET_CUST_BROWSE_COMPANYIMAGE,297,144,14,14
+    PUSHBUTTON      "...",IDC_TARGET_CUST_BROWSE_UPDATERICON,297,169,14,14
+    ICON            123,IDC_COMPANY_ICON,127,141,20,20
+    ICON            124,IDC_UPDATER_ICON,127,165,20,20
+    CONTROL         "",IDC_COMPANY_BITMAP,"Static",SS_BITMAP | SS_CENTERIMAGE,125,139,20,20
+    LTEXT           "Product Description:",IDC_TARGET_CUST_PROD_DESC_TEXT,18,35,95,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_TARGET_CUST_PROD_DESC,127,32,169,14,ES_AUTOHSCROLL
+    LTEXT           "Product Name:",IDC_TARGET_CUST_PROD_NAME_TEXT,18,52,95,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_TARGET_CUST_PROD_NAME,127,50,169,14,ES_AUTOHSCROLL
+    LTEXT           "Version:",IDC_TARGET_CUST_VERSION_TEXT,18,72,95,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_UPD_MINOR_VERSION,164,68,20,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PROD_MAJOR_VERSION,202,68,20,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PROD_MINOR_VERSION,242,68,20,14,ES_AUTOHSCROLL
+    LTEXT           ".",IDC_STATIC,152,72,8,8
+    LTEXT           ".",IDC_STATIC,189,72,8,8
+    LTEXT           ".",IDC_STATIC,228,72,8,8
+    EDITTEXT        IDC_UPD_MAJOR_VERSION,127,69,20,14,ES_AUTOHSCROLL
+END
+
+IDD_TARGET_IDS DIALOGEX 0, 0, 344, 217
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Device Identifiers"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "SCSI Manufacturer:",IDC_TARGET_IDS_SCSI_MFG_TEXT,65,18,100,8,0,WS_EX_RIGHT
+    LTEXT           "SCSI Product:",IDC_TARGET_IDS_SCSI_PROD_TEXT,65,36,100,8,0,WS_EX_RIGHT
+    LTEXT           "MTP Manufacturer:",IDC_TARGET_IDS_MTP_MFG_TEXT,65,62,100,8,0,WS_EX_RIGHT
+    LTEXT           "MTP Product:",IDC_TARGET_IDS_MTP_PROD_TEXT,65,79,100,8,0,WS_EX_RIGHT
+    LTEXT           "USB Vendor ID:",IDC_TARGET_IDS_USB_VENDOR_TEXT,65,103,100,8,0,WS_EX_RIGHT
+    LTEXT           "USB Product ID:",IDC_TARGET_IDS_USB_PROD_TEXT,65,123,100,8,0,WS_EX_RIGHT
+    LTEXT           "Secondary USB Product ID (optional):",IDC_TARGET_IDS_USB_PROD2_TEXT,7,141,158,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_TARGET_IDS_SCSIMFG,177,15,80,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TARGET_IDS_SCSIPROD,176,33,80,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TARGET_IDS_MTPMFG,176,59,80,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TARGET_IDS_MTPPROD,176,76,80,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TARGET_IDS_USBVENDOR,176,100,80,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TARGET_IDS_USBPROD,176,118,80,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TARGET_IDS_USBPROD2,176,137,80,14,ES_AUTOHSCROLL
+END
+
+IDD_TARGET_OPTIONS DIALOGEX 0, 0, 344, 217
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Options"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Allow Auto Recovery",IDC_TARGET_OPTIONS_AUTORECV,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,20,139,10
+    CONTROL         "Force Recovery",IDC_TARGET_OPTIONS_FORCERECV,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,42,140,10
+    CONTROL         "Format Data Area",IDC_TARGET_OPTIONS_FORMATDATA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,175,20,120,10
+    CONTROL         "Erase Media",IDC_TARGET_OPTIONS_ERASEMEDIA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,175,42,120,10
+    COMBOBOX        IDC_TARGET_OPTIONS_FILESYSTEM,175,62,43,65,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Default File System",IDC_TARGET_OPTIONS_FILESYSTEM_TEXT,225,64,87,8
+    CONTROL         "Default to local firmware files",IDC_TARGET_OPTIONS_USELOCALFILES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,65,141,10
+    LTEXT           "Dialog:",IDC_TARGET_OPTIONS_DIALOG_TEXT,21,107,38,8
+    CONTROL         "Min",IDC_TARGET_OPTIONS_MINDLG,"Button",BS_AUTORADIOBUTTON,68,107,24,10
+    CONTROL         "Std",IDC_TARGET_OPTIONS_STDDLG,"Button",BS_AUTORADIOBUTTON,99,107,24,10
+    CONTROL         "Adv",IDC_TARGET_OPTIONS_ADVDLG,"Button",BS_AUTORADIOBUTTON,128,107,24,10
+    CONTROL         "Windows CE download",IDC_TARGET_OPTIONS_WINCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,86,143,10
+    CONTROL         "Start Automatically",IDC_TARGET_OPTIONS_AUTOSTART,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,124,143,10
+    CONTROL         "Close Automatically",IDC_TARGET_OPTIONS_AUTOCLOSE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,144,144,10
+    EDITTEXT        IDC_TARGET_OPTIONS_LABEL,175,86,63,14,ES_AUTOHSCROLL
+    LTEXT           "Default Label",IDC_TARGET_OPTIONS_LABEL_TEXT,246,89,82,8
+END
+
+IDD_TARGET_DRIVE_ARRAY DIALOGEX 0, 0, 344, 217
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Drive Array"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Drive Array Specification",IDC_TARGET_DRIVEARRAY_TEXT,14,17,200,8
+    CONTROL         "",IDC_TARGET_DRIVEARRAY,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,14,41,316,93
+END
+
+IDD_TARGET_DRIVE_EDIT DIALOGEX 0, 0, 232, 193
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,61,164,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,128,164,50,14
+    LTEXT           "File name:",IDC_DRIVE_EDIT_FNAME_TEXT,14,52,178,8
+    EDITTEXT        IDC_DRIVE_EDIT_FILE_NAME,14,65,186,14,ES_LOWERCASE | ES_AUTOHSCROLL
+    LTEXT           "Description:",IDC_DRIVE_EDIT_DESC_TEXT,14,90,186,8
+    EDITTEXT        IDC_DRIVE_EDIT_DESCRIPTION,14,102,185,14,ES_AUTOHSCROLL
+    LTEXT           "Drive type:",IDC_DRIVE_EDIT_DRIVE_TYPE_TEXT,14,15,88,8
+    COMBOBOX        IDC_DRIVE_EDIT_COMBO_DRIVE_TYPE,14,27,87,48,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Drive tag:",IDC_DRIVE_EDIT_DRIVE_TAG_TEXT,123,15,92,8
+    LTEXT           "Requested Drive Size (KB):",IDC_DRIVE_EDIT_DRIVE_SIZE_TEXT,14,127,188,8
+    EDITTEXT        IDC_DRIVE_EDIT_REQUESTED_DRIVE_SIZE,14,140,61,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_DRIVE_EDIT_COMBO_DRIVE_TAG,123,27,93,48,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_TARGET_MISC DIALOGEX 0, 0, 344, 217
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Misc"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         """Reboot to player"" message",IDC_TARGET_OPTIONS_REBOOT2PLAYER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,41,140,10
+    CONTROL         "Low Nand solution",IDC_TARGET_OPTIONS_LOWNAND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,63,118,10
+    CONTROL         "Data Area Format Warning",IDC_TARGET_OPTIONS_FMT_WARN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,85,118,10
+END
+
+IDD_CFG_LOAD_PROFILE DIALOGEX 0, 0, 191, 140
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "StBinder"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,30,119,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,111,119,50,14
+    LISTBOX         IDC_CFG_LOAD_PROFILES,7,32,170,73,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Select a configuration profile",IDC_CFG_LOAD_TEXT,9,15,160,8
+END
+
+IDD_CFG_SAVE_PROFILE DIALOGEX 0, 0, 204, 86
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "StBinder"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,27,64,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,123,64,50,14
+    LTEXT           "Save profile as:",IDC_CFG_SAVE_PROFILE_TEXT,7,18,180,8
+    EDITTEXT        IDC_CFG_SAVE_PROFILE_AS,12,35,175,14,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 238
+        TOPMARGIN, 7
+    END
+
+    IDD_STBINDER_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 548
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 236
+    END
+
+    IDD_TARGET_CUSTOMER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 337
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+    END
+
+    IDD_TARGET_IDS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 337
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+    END
+
+    IDD_TARGET_OPTIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 337
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+    END
+
+    IDD_TARGET_DRIVE_ARRAY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 337
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+    END
+
+    IDD_TARGET_DRIVE_EDIT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 225
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 187
+    END
+
+    IDD_TARGET_MISC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 337
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+    END
+
+    IDD_CFG_LOAD_PROFILE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 184
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 133
+    END
+
+    IDD_CFG_SAVE_PROFILE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 197
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 79
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_LISTMENU MENU 
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "d",                           IDM_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "e",                           IDM_EXTRACT
+        MENUITEM SEPARATOR
+        MENUITEM "f...",                        IDM_BROWSE
+    END
+END
+
+IDR_GROUPMENU MENU 
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "d",                           IDM_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "e...",                        IDM_BROWSE
+    END
+END
+
+IDR_DRIVE_MENU MENU 
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "n",                           IDM_DRIVE_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "e",                           IDM_DRIVE_EDIT
+        MENUITEM SEPARATOR
+        MENUITEM "d",                           IDM_DRIVE_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "c",                           IDM_DRIVE_COPY
+        MENUITEM SEPARATOR
+        MENUITEM "u",                           IDM_DRIVE_MOVE_UP
+        MENUITEM "d",                           IDM_DRIVE_MOVE_DOWN
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About StBinder..."
+    IDS_GRP_RECV_DRIVER     "Recovery Mode Driver"
+    IDS_DLG_ABOUT_COPYRIGHT "Copyright (C) 2008 Freescale Semiconductor Inc.\nAll Rights Reserved"
+    IDS_GRP_FIRMWARE        "Firmware"
+    IDS_GRP_FIRMWARE_OTHER  "Firmware - Other(...)"
+    IDS_COLUMN_PATHNAME     "Pathname"
+    IDS_COLUMN_VERSION      "Version"
+    IDS_COLUMN_SIZE         "Size"
+    IDS_COLUMN_TIMESTAMP    "Time Stamp"
+    IDS_FILTER_FIRMWARE_UPDATER "Firmware Updater"
+    IDS_STATUS_UPDATING_TARGET_INFO "Updating target information..."
+    IDS_ERR_ORIG_NAME       "The original filename of the target executable must be StupdaterApp.exe."
+    IDS_ERR_EARLIER_UPD_VERSION 
+                            "The firmware updater must be v1.750.0.0 or later"
+    IDS_FILTER_RECV_DRIVER  "Recovery Mode Driver"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FILTER_FIRMWARE     "Firmware Files"
+    IDS_RES_DELETE          "Delete"
+    IDS_RES_REPLACE         "Replace"
+    IDS_RES_UNKNOWN         "Unknown"
+    IDS_RES_DELETE_REPLACE_PROMPT 
+                            "The following resources will be replaced or deleted:"
+    IDS_CONTINUE_PROMPT     "Continue?"
+    IDS_RESOURCE_CHANGES_TITLE "Resource Changes"
+    IDS_STAT_UPDATING_RESOURCES "Updating Resources..."
+    IDS_ERR_TARGET_OPEN_FAILED "Could not open target updater for binding."
+    IDS_ERR_FAILED_TO_READ_DATA "Failed to read data."
+    IDS_ERR_FAILED_TO_OPEN_FILE "Failed to open file."
+    IDS_ERR_FAILED_RES_WRITE "Failed to write resource."
+    IDS_ERR_MEM_ALLOC_FAILED "Unable to allocate memory."
+    IDS_ERR_EXTRACT_FAILED  "Failed to extract file"
+    IDS_DLG_SPECIFY_TARGET  "Specify the target firmware updater to which the resources will be bound."
+    IDS_DLG_SPECIFY_RES_GRP "For the selected resource type, drag+drop or browse to the corresponding files into the list below."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_DLG_TARGET_VERSION  "Version:"
+    IDS_DLG_TARGET_DATE     "Date:"
+    IDS_DLG_TARGET_SIZE     "File Size:"
+    IDS_DLG_TARGET_RESOURCES "Bound Resources:"
+    IDS_DLG_FILE_COUNT      "File Count:"
+    IDS_DLG_ABOUT_VERSION   "Firmware Update Resource Binder"
+    IDS_DLG_APPLY_TEXT      "Apply"
+    IDS_DLG_CLOSE_TEXT      "Close"
+    IDS_GRP_UPDATER_INFORMATION "Updater Information"
+    IDS_OK                  "OK"
+    IDS_CANCEL              "Cancel"
+    IDS_DELETE              "Delete"
+    IDS_EXTRACT             "Extract"
+    IDS_BROWSE              "Browse..."
+    IDS_RESLIST_DESC        "Drag+Drop or browse(rclick) for resources to add"
+    IDS_RESTREE_DESC        "Select a resource group"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FIND_TARGET_DESC    "Browse for a target application"
+    IDS_APPLY_DESC          "Write resource changes to the target application"
+    IDS_CLOSE_DESC          "Close StBinder"
+    IDS_STATUS_WRITING_RESOURCE "Writing"
+    IDS_STATUS_UPDATING_RESOURCE_CFG "Updating resource configuration"
+    IDS_STATUS_CLOSING_TARGET "Closing target application"
+    IDS_STAT_INITIALIZING   "Initializing..."
+    IDS_RESOURCES           "Resources"
+    IDS_TARGET_CUST_COMPANY_TEXT "Company Name:"
+    IDS_TARGET_CUST_PRODDESC_TEXT "Product Description:"
+    IDS_TARGET_CUST_APPTITLE_TEXT "Application Title:"
+    IDS_TARGET_CUST_COPYRIGHT_TEXT "Copyright:"
+    IDS_TARGET_CUST_COMMENT_TEXT "Comment:"
+    IDS_TARGET_CUST_COMPANYIMAGE_TEXT "Company Image:"
+    IDS_TARGET_CUST_UPDATERICON_TEXT "Updater Icon:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_OPTIONS_USELOCALFILES_TEXT 
+                            "Uses local file resources by default"
+    IDS_TARGET_OPTIONS_FORCERECV_TEXT "Force Recovery Mode"
+    IDS_TARGET_OPTIONS_ERASEMEDIA_TEXT "Full Media Erase"
+    IDS_TARGET_OPTIONS_FORMATDATAAREA_TEXT "Format Data Area"
+    IDS_TARGET_OPTIONS_DIALOG_TEXT "Dialog:"
+    IDS_TARGET_OPTIONS_DEFAULTLABEL_TEXT "Default Volume Label"
+    IDS_TARGET_OPTIONS_AUTORECV_TEXT "Allow Auto Recovery"
+    IDS_TARGET_OPTIONS_REBOOT2PLAYER_TEXT "Reboot To Player Msg"
+    IDS_TARGET_OPTIONS_LOWNAND_TEXT "Low NAND Solution"
+    IDS_TARGET_OPTIONS_DEFAULT_FS_TEXT "File System"
+    IDS_TARGET_OPTIONS_AUTOSTART_TEXT "Start Automatically"
+    IDS_TARGET_OPTIONS_AUTOCLOSE_TEXT "Close Automatically"
+    IDS_TARGET_IDS_SCSI_MFG_TEXT "SCSI Manufacturer:"
+    IDS_TARGET_IDS_SCSI_PROD_TEXT "SCSI Product:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_IDS_MTP_MFG_TEXT "MTP Manufacturer:"
+    IDS_TARGET_IDS_MTP_PROD_TEXT "MTP Product:"
+    IDS_TARGET_IDS_USB_VENDOR_TEXT "USB Vendor ID:"
+    IDS_TARGET_IDS_USB_PROD_TEXT "USB Product ID:"
+    IDS_USE_LOCAL_DESC      "Remove check to prevent target application from using local resources"
+    IDS_FORCE_RECV_DESC     "Forces the device into recovery mode for the update"
+    IDS_ERASE_MEDIA_DESC    "Set option to erase the media by default"
+    IDS_CFG_UPDATER_DESC    "Configure the firmware update application"
+    IDS_MINDLG_DESC         "Uses the minimal user interface dialog"
+    IDS_STDDLG_DESC         "Uses the standard user interface dialog"
+    IDS_ADVDLG_DESC         "Uses the advanced user interface dialog"
+    IDS_DEFDLG_DESC         "Removes dialog specification"
+    IDS_COLUMN_FILE_NAME    "Filename"
+    IDS_COLUMN_FILE_DESC    "Description"
+    IDS_COLUMN_FILE_TYPE    "Type"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_FILE_TAG     "Tag"
+    IDS_COLUMN_FILE_RESERVE "Requested KB"
+    IDS_DRIVE_ARRAY_TEXT    "Drive Array Specification"
+    IDS_DRIVE_EDIT_FNAME_TEXT "File name:"
+    IDS_DRIVE_EDIT_DESC_TEXT "Description:"
+    IDS_DRIVE_EDIT_DRIVE_TYPE_TEXT "Drive type:"
+    IDS_DRIVE_EDIT_DRIVE_TAG_TEXT "Drive tag (hexadecimal):"
+    IDS_DRIVE_EDIT_DRIVE_SIZE_TEXT "Requested Drive Size (KB):"
+    IDS_DRIVE_EDIT_DIALOG_TITLE "Edit Drive"
+    IDS_DRIVE_MENU_NEW      "New..."
+    IDS_DRIVE_MENU_EDIT     "Edit..."
+    IDS_DRIVE_MENU_DELETE   "Delete"
+    IDS_DRIVE_MENU_MOVE_UP  "Move Up"
+    IDS_DRIVE_MENU_MOVE_DOWN "Move Down"
+    IDS_DRIVE_MENU_COPY_DRIVE "Copy"
+    IDS_DLG_TARGET_BASESDK_TEXT "Base SDK:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TARGET_OPTIONS_FMT_WARN "Data Area Format Warning"
+    IDS_TARGET_OPTIONS_LABEL_TEXT "Default Label"
+    IDS_PROFILE_LOAD_TEXT   "Select configuration profile"
+    IDS_PROFILE_SAVE_TEXT   "Save profile as:"
+    IDS_DLG_LOAD_BTN_TEXT   "Load Profile"
+    IDS_DLG_SAVE_BTN_TEXT   "Save Profile"
+    IDS_CFG_LOADPROFILE_DESC "Load an updater settings profile"
+    IDS_CFG_SAVEPROFILE_DESC "Save current updater settings to a profile"
+    IDS_TARGET_OPTIONS_FS_DEFAULT "Default"
+    IDS_PROFILE_MISSING_FILE "File not found:\n\n  %s"
+	IDS_TARGET_IDS_SECOND_USB_PROD_TEXT "Secondary USB Product ID (optional):"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\StBinder.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

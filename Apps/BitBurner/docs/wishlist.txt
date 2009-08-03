@@ -1,0 +1,25 @@
+Possible enhancements: 
+ 
+ Add tool tips to describe fields and registers. 
+ 
+ Move manual PITC download to a menu item. 
+ 
+ Make register field control bigger. 
+ 
+ Make INTERNAL version with all the registers. 
+ 
+ Make command-line version that writes registers from an ini file. 
+ 
+ Save registers to file for use in mfg tool. 
+
+
+
+keygen generates key files for use by elftosb. (We need to get the OTP burner application to 
+accept the key file format for burning the crypto key.)
+
+	The key file format is very simple. It just has the hex version of a 128-bit key (so 32 hex characters),
+	one key per line. The idea would be to load the key file and have a drop down menu to select which key
+	to program. Most customers will probably only use a single key, though.
+
+	The main thing is that it would be really nice for the customer if they could generate a set of keys 
+	with keygen and use the same file for burning and elftosb. (creed)

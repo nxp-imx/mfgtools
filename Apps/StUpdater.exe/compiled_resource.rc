@@ -1,0 +1,743 @@
+// Microsoft Visual C++ generated resource script.
+//
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "resource.h"
+#include "afxres.h"
+
+#undef INCLUDE_DRIVE_ARRAY
+#include "product.h"
+
+#include "../../Customization/version.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Japanese resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_NEUTRAL
+#pragma code_page(932)
+#endif //_WIN32
+
+#include "lang_jpn.h"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ PRODUCTVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "CompanyName", CFG_JPN_VENDOR_NAME_L
+			VALUE "FileDescription", CFG_JPN_UPDATER_DESC_L
+            VALUE "FileVersion", UPGRADE_STRING_VERSION
+            VALUE "InternalName", CFG_JPN_UPDATER_DLG_TITLE_L
+            VALUE "LegalCopyright", CFG_JPN_COPYRIGHT_L
+            VALUE "OriginalFilename", L"StUpdaterApp.exe"
+            VALUE "ProductName", CFG_JPN_PRODUCT_NAME_L
+            VALUE "ProductVersion", PRODUCT_STRING_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PRODUCT_NAME					CFG_JPN_PRODUCT_NAME_L
+    IDS_CFG_VENDOR_NAME						CFG_JPN_VENDOR_NAME_L
+	IDS_CFG_COPYRIGHT						CFG_JPN_COPYRIGHT_L
+	IDS_CFG_UPDATER_DLG_TITLE				CFG_JPN_UPDATER_DLG_TITLE_L
+	IDS_CFG_ABOUT_DLG_TITLE					CFG_JPN_ABOUT_DLG_TITLE_L
+	IDS_CFG_UPDATER_DESC					CFG_JPN_UPDATER_DESC_L
+	IDS_CFG_UNINST_DESC						CFG_JPN_UNINST_DESC_L
+	IDS_CFG_REGDLL_DESC						CFG_JPN_REGDLL_DESC_L
+	IDS_CFG_RESDLL_DESC						CFG_JPN_RESDLL_DESC_L
+	IDS_CFG_USBMSC_DESC						CFG_JPN_USBMSC_DESC_L
+	IDS_CFG_RECOVERY_DESC					CFG_JPN_RECOVERY_DESC_L
+END  
+
+
+#endif    // Japanese resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (P.R.C.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#include "lang_chs.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ PRODUCTVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404b0"
+        BEGIN
+            VALUE "CompanyName", CFG_CHS_VENDOR_NAME_L
+			VALUE "FileDescription", CFG_CHS_UPDATER_DESC_L
+            VALUE "FileVersion", UPGRADE_STRING_VERSION
+            VALUE "InternalName", CFG_CHS_UPDATER_DLG_TITLE_L
+            VALUE "LegalCopyright", CFG_CHS_COPYRIGHT_L
+            VALUE "OriginalFilename", L"StUpdaterApp.exe"
+            VALUE "ProductName", CFG_CHS_PRODUCT_NAME_L
+            VALUE "ProductVersion", PRODUCT_STRING_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PRODUCT_NAME					CFG_CHS_PRODUCT_NAME_L
+    IDS_CFG_VENDOR_NAME						CFG_CHS_VENDOR_NAME_L
+	IDS_CFG_COPYRIGHT						CFG_CHS_COPYRIGHT_L
+	IDS_CFG_UPDATER_DLG_TITLE				CFG_CHS_UPDATER_DLG_TITLE_L
+	IDS_CFG_ABOUT_DLG_TITLE					CFG_CHS_ABOUT_DLG_TITLE_L
+	IDS_CFG_UPDATER_DESC					CFG_CHS_UPDATER_DESC_L
+	IDS_CFG_UNINST_DESC						CFG_CHS_UNINST_DESC_L
+	IDS_CFG_REGDLL_DESC						CFG_CHS_REGDLL_DESC_L
+	IDS_CFG_RESDLL_DESC						CFG_CHS_RESDLL_DESC_L
+	IDS_CFG_USBMSC_DESC						CFG_CHS_USBMSC_DESC_L
+	IDS_CFG_RECOVERY_DESC					CFG_CHS_RECOVERY_DESC_L
+END  
+
+
+#endif    // Chinese (P.R.C.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Korean resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+#ifdef _WIN32
+LANGUAGE LANG_KOREAN, SUBLANG_NEUTRAL
+#pragma code_page(949)
+#endif //_WIN32
+
+#include "lang_kor.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ PRODUCTVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041204b0"
+        BEGIN
+            VALUE "CompanyName", CFG_KOR_VENDOR_NAME_L
+			VALUE "FileDescription", CFG_KOR_UPDATER_DESC_L
+            VALUE "FileVersion", UPGRADE_STRING_VERSION
+            VALUE "InternalName", CFG_KOR_UPDATER_DLG_TITLE_L
+            VALUE "LegalCopyright", CFG_KOR_COPYRIGHT_L
+            VALUE "OriginalFilename", L"StUpdaterApp.exe"
+            VALUE "ProductName", CFG_KOR_PRODUCT_NAME_L
+            VALUE "ProductVersion", PRODUCT_STRING_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x412, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PRODUCT_NAME					CFG_KOR_PRODUCT_NAME_L
+    IDS_CFG_VENDOR_NAME						CFG_KOR_VENDOR_NAME_L
+	IDS_CFG_COPYRIGHT						CFG_KOR_COPYRIGHT_L
+	IDS_CFG_UPDATER_DLG_TITLE				CFG_KOR_UPDATER_DLG_TITLE_L
+	IDS_CFG_ABOUT_DLG_TITLE					CFG_KOR_ABOUT_DLG_TITLE_L
+	IDS_CFG_UPDATER_DESC					CFG_KOR_UPDATER_DESC_L
+	IDS_CFG_UNINST_DESC						CFG_KOR_UNINST_DESC_L
+	IDS_CFG_REGDLL_DESC						CFG_KOR_REGDLL_DESC_L
+	IDS_CFG_RESDLL_DESC						CFG_KOR_RESDLL_DESC_L
+	IDS_CFG_USBMSC_DESC						CFG_KOR_USBMSC_DESC_L
+	IDS_CFG_RECOVERY_DESC					CFG_KOR_RECOVERY_DESC_L
+END  
+
+
+#endif    // Korean resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (Taiwan) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
+#pragma code_page(950)
+#endif //_WIN32
+
+#include "lang_cht.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ PRODUCTVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040404b0"
+        BEGIN
+            VALUE "CompanyName", CFG_CHT_VENDOR_NAME_L
+			VALUE "FileDescription", CFG_CHT_UPDATER_DESC_L
+            VALUE "FileVersion", UPGRADE_STRING_VERSION
+            VALUE "InternalName", CFG_CHT_UPDATER_DLG_TITLE_L
+            VALUE "LegalCopyright", CFG_CHT_COPYRIGHT_L
+            VALUE "OriginalFilename", L"StUpdaterApp.exe"
+            VALUE "ProductName", CFG_CHT_PRODUCT_NAME_L
+            VALUE "ProductVersion", PRODUCT_STRING_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x404, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PRODUCT_NAME					CFG_CHT_PRODUCT_NAME_L
+    IDS_CFG_VENDOR_NAME						CFG_CHT_VENDOR_NAME_L
+	IDS_CFG_COPYRIGHT						CFG_CHT_COPYRIGHT_L
+	IDS_CFG_UPDATER_DLG_TITLE				CFG_CHT_UPDATER_DLG_TITLE_L
+	IDS_CFG_ABOUT_DLG_TITLE					CFG_CHT_ABOUT_DLG_TITLE_L
+	IDS_CFG_UPDATER_DESC					CFG_CHT_UPDATER_DESC_L
+	IDS_CFG_UNINST_DESC						CFG_CHT_UNINST_DESC_L
+	IDS_CFG_REGDLL_DESC						CFG_CHT_REGDLL_DESC_L
+	IDS_CFG_RESDLL_DESC						CFG_CHT_RESDLL_DESC_L
+	IDS_CFG_USBMSC_DESC						CFG_CHT_USBMSC_DESC_L
+	IDS_CFG_RECOVERY_DESC					CFG_CHT_RECOVERY_DESC_L
+END 
+
+ 
+#endif    // Chinese (Taiwan) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+#endif //_WIN32
+
+#include "lang_deu.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ PRODUCTVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040704b0"
+        BEGIN
+            VALUE "CompanyName", CFG_DEU_VENDOR_NAME_L
+			VALUE "FileDescription", CFG_DEU_UPDATER_DESC_L
+            VALUE "FileVersion", UPGRADE_STRING_VERSION
+            VALUE "InternalName", CFG_DEU_UPDATER_DLG_TITLE_L
+            VALUE "LegalCopyright", CFG_DEU_COPYRIGHT_L
+            VALUE "OriginalFilename", L"StUpdaterApp.exe"
+            VALUE "ProductName", CFG_DEU_PRODUCT_NAME_L
+            VALUE "ProductVersion", PRODUCT_STRING_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x407, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PRODUCT_NAME					CFG_DEU_PRODUCT_NAME_L
+    IDS_CFG_VENDOR_NAME						CFG_DEU_VENDOR_NAME_L
+	IDS_CFG_COPYRIGHT						CFG_DEU_COPYRIGHT_L
+	IDS_CFG_UPDATER_DLG_TITLE				CFG_DEU_UPDATER_DLG_TITLE_L
+	IDS_CFG_ABOUT_DLG_TITLE					CFG_DEU_ABOUT_DLG_TITLE_L
+	IDS_CFG_UPDATER_DESC					CFG_DEU_UPDATER_DESC_L
+	IDS_CFG_UNINST_DESC						CFG_DEU_UNINST_DESC_L
+	IDS_CFG_REGDLL_DESC						CFG_DEU_REGDLL_DESC_L
+	IDS_CFG_RESDLL_DESC						CFG_DEU_RESDLL_DESC_L
+	IDS_CFG_USBMSC_DESC						CFG_DEU_USBMSC_DESC_L
+	IDS_CFG_RECOVERY_DESC					CFG_DEU_RECOVERY_DESC_L
+END  
+
+
+#endif    // German (Germany) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+#endif //_WIN32
+
+#include "lang_enu.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ PRODUCTVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", CFG_ENU_VENDOR_NAME_L
+			VALUE "FileDescription", CFG_ENU_UPDATER_DESC_L
+            VALUE "FileVersion", UPGRADE_STRING_VERSION
+            VALUE "InternalName", CFG_ENU_UPDATER_DLG_TITLE_L
+            VALUE "LegalCopyright", CFG_ENU_COPYRIGHT_L
+            VALUE "OriginalFilename", L"StUpdaterApp.exe"
+            VALUE "ProductName", CFG_ENU_PRODUCT_NAME_L
+            VALUE "ProductVersion", PRODUCT_STRING_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PRODUCT_NAME					CFG_ENU_PRODUCT_NAME_L
+    IDS_CFG_VENDOR_NAME						CFG_ENU_VENDOR_NAME_L
+	IDS_CFG_COPYRIGHT						CFG_ENU_COPYRIGHT_L
+	IDS_CFG_UPDATER_DLG_TITLE				CFG_ENU_UPDATER_DLG_TITLE_L
+	IDS_CFG_ABOUT_DLG_TITLE					CFG_ENU_ABOUT_DLG_TITLE_L
+	IDS_CFG_UPDATER_DESC					CFG_ENU_UPDATER_DESC_L
+	IDS_CFG_UNINST_DESC						CFG_ENU_UNINST_DESC_L
+	IDS_CFG_REGDLL_DESC						CFG_ENU_REGDLL_DESC_L
+	IDS_CFG_RESDLL_DESC						CFG_ENU_RESDLL_DESC_L
+	IDS_CFG_USBMSC_DESC						CFG_ENU_USBMSC_DESC_L
+	IDS_CFG_RECOVERY_DESC					CFG_ENU_RECOVERY_DESC_L
+END
+
+  
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resrc1.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""resource.h""\r\n"
+    "#include ""afxres.h""\r\n"
+    "#include ""..\\..\\product.h""\r\n"
+    "#include ""..\\..\\version.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Spanish resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
+#ifdef _WIN32
+LANGUAGE LANG_SPANISH, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+#endif //_WIN32
+
+#include "lang_esp.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ PRODUCTVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040a04b0"
+        BEGIN
+            VALUE "CompanyName", CFG_ESP_VENDOR_NAME_L
+			VALUE "FileDescription", CFG_ESP_UPDATER_DESC_L
+            VALUE "FileVersion", UPGRADE_STRING_VERSION
+            VALUE "InternalName", CFG_ESP_UPDATER_DLG_TITLE_L
+            VALUE "LegalCopyright", CFG_ESP_COPYRIGHT_L
+            VALUE "OriginalFilename", L"StUpdaterApp.exe"
+            VALUE "ProductName", CFG_ESP_PRODUCT_NAME_L
+            VALUE "ProductVersion", PRODUCT_STRING_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x40A, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PRODUCT_NAME					CFG_ESP_PRODUCT_NAME_L
+    IDS_CFG_VENDOR_NAME						CFG_ESP_VENDOR_NAME_L
+	IDS_CFG_COPYRIGHT						CFG_ESP_COPYRIGHT_L
+	IDS_CFG_UPDATER_DLG_TITLE				CFG_ESP_UPDATER_DLG_TITLE_L
+	IDS_CFG_ABOUT_DLG_TITLE					CFG_ESP_ABOUT_DLG_TITLE_L
+	IDS_CFG_UPDATER_DESC					CFG_ESP_UPDATER_DESC_L
+	IDS_CFG_UNINST_DESC						CFG_ESP_UNINST_DESC_L
+	IDS_CFG_REGDLL_DESC						CFG_ESP_REGDLL_DESC_L
+	IDS_CFG_RESDLL_DESC						CFG_ESP_RESDLL_DESC_L
+	IDS_CFG_USBMSC_DESC						CFG_ESP_USBMSC_DESC_L
+	IDS_CFG_RECOVERY_DESC					CFG_ESP_RECOVERY_DESC_L
+END  
+
+
+#endif    // Spanish resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// French (France) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
+#ifdef _WIN32
+LANGUAGE LANG_FRENCH, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+#endif //_WIN32
+
+#include "lang_fra.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ PRODUCTVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040c04b0"
+        BEGIN
+            VALUE "CompanyName", CFG_FRA_VENDOR_NAME_L
+			VALUE "FileDescription", CFG_FRA_UPDATER_DESC_L
+            VALUE "FileVersion", UPGRADE_STRING_VERSION
+            VALUE "InternalName", CFG_FRA_UPDATER_DLG_TITLE_L
+            VALUE "LegalCopyright", CFG_FRA_COPYRIGHT_L
+            VALUE "OriginalFilename", L"StUpdaterApp.exe"
+            VALUE "ProductName", CFG_FRA_PRODUCT_NAME_L
+            VALUE "ProductVersion", PRODUCT_STRING_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x40C, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PRODUCT_NAME					CFG_FRA_PRODUCT_NAME_L
+    IDS_CFG_VENDOR_NAME						CFG_FRA_VENDOR_NAME_L
+	IDS_CFG_COPYRIGHT						CFG_FRA_COPYRIGHT_L
+	IDS_CFG_UPDATER_DLG_TITLE				CFG_FRA_UPDATER_DLG_TITLE_L
+	IDS_CFG_ABOUT_DLG_TITLE					CFG_FRA_ABOUT_DLG_TITLE_L
+	IDS_CFG_UPDATER_DESC					CFG_FRA_UPDATER_DESC_L
+	IDS_CFG_UNINST_DESC						CFG_FRA_UNINST_DESC_L
+	IDS_CFG_REGDLL_DESC						CFG_FRA_REGDLL_DESC_L
+	IDS_CFG_RESDLL_DESC						CFG_FRA_RESDLL_DESC_L
+	IDS_CFG_USBMSC_DESC						CFG_FRA_USBMSC_DESC_L
+	IDS_CFG_RECOVERY_DESC					CFG_FRA_RECOVERY_DESC_L
+END  
+
+
+#endif    // French (France) resources
+/////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////
+// Italian (Italy) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ITA)
+#ifdef _WIN32
+LANGUAGE LANG_ITALIAN, SUBLANG_ITALIAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#include "lang_ita.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ PRODUCTVERSION 1,UPGRADE_MAJOR_VERSION,UPGRADE_MINOR_VERSION,PRODUCT_VERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041004b0"
+        BEGIN
+            VALUE "CompanyName", CFG_ITA_VENDOR_NAME_L
+			VALUE "FileDescription", CFG_ITA_UPDATER_DESC_L
+            VALUE "FileVersion", UPGRADE_STRING_VERSION
+            VALUE "InternalName", CFG_ITA_UPDATER_DLG_TITLE_L
+            VALUE "LegalCopyright", CFG_ITA_COPYRIGHT_L
+            VALUE "OriginalFilename", L"StUpdaterApp.exe"
+            VALUE "ProductName", CFG_ITA_PRODUCT_NAME_L
+            VALUE "ProductVersion", PRODUCT_STRING_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x410, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_CFG_PRODUCT_NAME					CFG_ITA_PRODUCT_NAME_L
+    IDS_CFG_VENDOR_NAME						CFG_ITA_VENDOR_NAME_L
+	IDS_CFG_COPYRIGHT						CFG_ITA_COPYRIGHT_L
+	IDS_CFG_UPDATER_DLG_TITLE				CFG_ITA_UPDATER_DLG_TITLE_L
+	IDS_CFG_ABOUT_DLG_TITLE					CFG_ITA_ABOUT_DLG_TITLE_L
+	IDS_CFG_UPDATER_DESC					CFG_ITA_UPDATER_DESC_L
+	IDS_CFG_UNINST_DESC						CFG_ITA_UNINST_DESC_L
+	IDS_CFG_REGDLL_DESC						CFG_ITA_REGDLL_DESC_L
+	IDS_CFG_RESDLL_DESC						CFG_ITA_RESDLL_DESC_L
+	IDS_CFG_USBMSC_DESC						CFG_ITA_USBMSC_DESC_L
+	IDS_CFG_RECOVERY_DESC					CFG_ITA_RECOVERY_DESC_L
+END  
+
+#endif    // Italian (Italy) resources
+/////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_UPDATER_ICON        ICON                    CFG_UPDATER_ICON
+IDI_COMPANY_ICON        ICON                    CFG_COMPANY_ICON
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AVI
+//
+
+//IDR_AVI_STSEARCH        AVI                     CFG_SEARCH_AVI
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,1466 @@
+!********************************
+RELEASE_1.824.0.000
+4/29/2009 CLW
+
+	- Save and Restore the Janus drive when erasing the media. Previously the Janus Drive was preserved for field
+	  updates by setting a flag to preserve Janus when calling EraseLogicalMedia. The firmware would try to reallocate the 
+	  media without moving the Janus drive. Since the allocation mechanism has become more flexible, and the contents
+	  of the Janus drive is no longer "classified", the updater app saves the Janus drive to a file, janus.bin, before
+	  erasing the media and restores the janus.bin file to the Janus drive after the media is allocated. Save/Restore is
+	  only implemented for Protocol Version 7.x and above.
+
+	Libs\mscdevlib\stupdater.cpp
+	Libs\mscdevlib\stupdater.h
+
+!********************************
+RELEASE_1.823.0.000
+4/24/2009 CLW
+
+	- Fix up Cylinder/Head/Track calculations for large media. Fixes SDK-5857 : Unable to calculate disk geometry.
+
+	Libs\mscdevlib\stdisk.cpp
+	Libs\mscdevlib\stdisk.h
+
+!********************************
+RELEASE_1.822.0.000
+4/16/2009 CLW
+
+	- Add Windows 7 to supported OS list.
+
+	Apps\StUpdater.exe\stupdaterapp.cpp
+	Apps\StUpdater.exe\stupdaterdlg.cpp
+	Libs\mscdevlib\stglobals.h
+	Libs\mscdevlib\stglobals.cpp
+	Libs\mscdevlib\stglobals.h
+	Libs\mscdevlib\stusbmscdev.cpp
+	Libs\mscdevlib\strecoverydev.cpp
+
+!********************************
+RELEASE_1.821.0.000
+4/13/2009 CLW
+
+	- Save the Settings drive to a file only if there is no settings.bin file shipped with the updater.exe.
+
+	Libs\mscdevlib\stformatter.cpp
+	Libs\mscdevlib\stusbmscdev.cpp
+	Libs\mscdevlib\stusbmscdev.h
+
+!********************************
+RELEASE_1.820.0.000
+2/19/2009 CLW
+
+	- Added support for Settings Drive size changes during update. Settings Drive will be saved to a file
+          on the PC before the media is erased. If the saved file is less than or equal to the new Settings
+          Drive size, the file will be written to the new drive. If the file is bigger than the new Settings
+          Drive size, the file will not be written to the media, but no error will be returned.
+
+	Libs\mscdevlib\stupdater.cpp
+
+!********************************
+RELEASE_1.819.0.000
+01/29/2009 SP
+
+	- SR#: 1-532856351 - Change updater to use same method to calculate sector count both before and after update.
+	- Memory leak fixes in Save/Restore SettingsDrive
+	
+!********************************
+RELEASE_1.818.0.000
+12/10/2008 SP/CLW
+
+	- SNYFLX-261 - Updater tool can not be run in Vista system.
+	- Updated User admin rights check code
+	- Moved admin rights check after cmdline_processor and logger initialization to avoid exception
+	- Specify requireAdministrator in manifest to make Vista elevate the permissions of the updater app.
+
+!********************************
+RELEASE_1.817.0.000
+12/04/2008 CLW
+
+	- SDK-5113, SDK-5188 - Fix for finding MSC devices on Vista.
+	  Instead of using CM_Parent(volume) to get the USBSTOR device, enumerate all of the disks
+	  and compare the device path with the SCSI IDs to find the USBSTOR device. Then use CM_Parent(usbstor)
+          to get the USB device and see if the USB VID/PID are in the USB device path.
+
+	Libs\mscdevlib\stscsi_nt.cpp
+	Libs\mscdevlib\stscsi_nt.h
+
+!********************************
+RELEASE_1.816.0.000
+11/25/2008
+
+	- Added support for secondary USB PID.
+
+!********************************
+RELEASE_1.815.0.000
+11/07/2008
+
+	- Double data drive fixes
+	- Fix default data drive label
+	- Replace default custom bmp with smaller image
+
+!********************************
+RELEASE_1.814.0.000
+10/27/2008
+
+	- Remove default drive label for SDK3.XXX configuration
+
+!********************************
+RELEASE_1.813.0.000
+10/24/2008
+
+	- Correct number of drives in 3.12 resource definitions.  Updater would crash on launch.  Binder would fail to load.
+
+!********************************
+RELEASE_1.812.0.000
+10/13/2008
+
+	- Pick up ROM workaround from trunk version.  Solves ROM failure to reset to HID on clean system.
+	- Pick up USB ID matching changes from Sony branch.
+
+!********************************
+RELEASE_1.811.0.000
+10/09/2008
+
+	- Added new option to display message when minimal dialog is formatting the data area.
+	- Fixed format and erase media options for minimla dialog
+
+!********************************
+RELEASE_1.810.0.000
+10/08/2008
+
+	- Reserve space for product version in fileversion info
+	- Changes to bitmap resource selection
+
+!********************************
+RELEASE_1.809.0.000
+10/02/2008
+
+	- Added check for USB IDs in normal MSC mode to work around customer issue without unique SCSI product IDs.
+	- Added workaround for ROM issue starting on a clean host system
+
+!********************************
+RELEASE_1.808.0.000
+09/29/2008
+
+	- Changed default file version info to work with binder app
+
+!********************************
+RELEASE_1.807.0.000
+09/22/08 - CLW
+
+Ported from HGS.RELEASE_1.785.4.000
+	
+	- Add blinking warning during update to minimal dialog.
+
+	Apps\StUpdater.exe\stupdaterapp.rc
+	Apps\StUpdater.exe\stupdaterdlg.cpp
+
+!********************************
+RELEASE_1.806.0.000
+09/19/2008 - SP
+
+	- Fix default USB vid+pid Ids.
+
+!********************************
+RELEASE_1.805.0.000
+09/08/08 - CLW
+	- Fix RestoreSettingsFile error on blank nands.
+
+	Libs\mscdevlib\stupdater.cpp
+
+!********************************
+RELEASE_1.804.0.000
+08/25/08 - SP
+
+	- Disable FS selection combobox after format required messages
+	- Another attempt to fix the NULL drive letter after updating causing problems with updating the data drive info
+
+!********************************
+RELEASE_1.803.0.000
+08/15/08 - SP
+
+	- Added auto start/stop resource options
+	- converted to use about splash screen from Winsupport
+
+!********************************
+RELEASE_1.802.0.000
+08/08/08 - SP
+
+	- Standard bitmap About added
+	- Added Low NAND Solution option
+	- Fix for no drive letter showing c: drive info
+
+!********************************
+RELEASE_1.801.0.000
+08/01/08 - SP
+
+	- More fixes to resources
+
+!********************************
+RELEASE_1.800.0.000
+08/01/08 - SP
+
+	- Lots of fixes to resources
+
+!********************************
+RELEASE_1.800.0.000
+07/25/08 - SP
+
+	- initial resource config version
+
+!********************************
+RELEASE_1.785.1.000
+08/06/08 - CLW
+	- Fix Save/Restore Settings Drive. Update would fail during "Writing Janus drive" for all updaters
+          that do not have a Settings drive. Only do save/restore if the player has a Settings Drive.
+	- Check for zero sector size and count in CStSystemDrive::ReadDrive(); coming from save settings file.
+          This was causing a divide-by-zero crash when the drive was not enumerated properly.
+	- Make sure we don't send back an incorrect drive in CStUpdater::GetDataDriveInfo(). This prevents
+          the C: drive info being displayed.
+	- Don't stop writing hidden drives if DRM is not enabled. Go on to write the second hidden drive.
+          Fixes issue where the Settings Drive was not getting written if firmware was not DRM enabled.
+
+	Apps/StUpdater.exe/bin/src_extract.bat
+	Customization/Templates/version.h
+	Libs/mscdevlib/stsystemdrive.cpp
+	Libs/mscdevlib/stupdater.cpp
+	Libs/mscdevlib/stusbmscdev.cpp
+
+!********************************
+RELEASE_1.785.0.000
+07/18/08 - CLW
+	- Save/Restore Settings Drive on re-allocation of the media.
+	  Libs/mscdevlib/stbytearray.cpp
+	  Libs/mscdevlib/stbytearray.h
+	  Libs/mscdevlib/stformatter.cpp
+	  Libs/mscdevlib/stscsi_nt.cpp
+	  Libs/mscdevlib/stsystemdrive.cpp
+  	  Libs/mscdevlib/stsystemdrive.h
+	  Libs/mscdevlib/stupdater.cpp
+	  Libs/mscdevlib/stupdater.h
+	  Libs/mscdevlib/stusbmscdev.cpp
+ 	  Libs/mscdevlib/stusbmscdev.h
+
+!********************************
+RELEASE_1.784.0.000
+07/09/08 - SP
+
+	- Increased again control size for version description text strings in Minimum dialog.
+
+!********************************
+RELEASE_1.783.0.000
+07/07/08 - SP
+
+	- Increased control size for version description text strings in Minimum dialog.
+	  Text was being truncated for Japanese, German, and French.
+
+07/07/08 - CLW
+	- Add 15% to system drive size if no Requested Size is specified to allocate extra room
+          for firmware growth necessary for Live Updates.
+	  Libs/mscdevlib/stconfiginfo.cpp
+	  Libs/mscdevlib/stconfiginfo.h
+	  Libs/mscdevlib/stsystemdrive.cpp
+
+
+! *******************************
+RELEASE_1.782.0.000
+07/02/08 - CLW
+	- A better USB VID/PID check during MTP enumeration. 
+          Should distinguish between VID/PID of connected devices.
+  	  Libs/mscdevlib/stmtpdevice.cpp
+
+! *******************************
+RELEASE_1.781.0.000
+07/01/08 - CLW
+	- Allow MTP serial number check to fail if USB VID/PID pass during MTP enumeration.
+  	  Libs/mscdevlib/stmtpdevice.cpp
+
+	- Update libraries used by BitBurner.exe for STMP3770.
+	  Libs/OtpAccessPitc/bin/Debug/OtpAccess.lib
+	  Libs/OtpAccessPitc/bin/OtpAccess.lib
+
+
+! *******************************
+RELEASE_1.780.0.000
+05/13/08 - CLW
+
+	- Added STMP3770 and STMP3780 ROM support.
+  	  Libs\mscdevlib\sthiddevice.cpp
+
+	- Added CStConfigInfo::IsWinCESolution(). Updater will call ResetToUpdater
+	  and bail after writing firmware to the NAND if this flag is true. Default is FALSE.
+  	  Libs\mscdevlib\stconfiginfo.cpp
+  	  Libs\mscdevlib\stconfiginfo.h
+  	  Libs\mscdevlib\stupdater.cpp
+
+05/12/08 - SP
+
+	- Added resource configurations options for:
+		Format Data Area
+		Erase Media
+	- Changed version format to periods from commas
+	- Corrections to button shortcuts in French and German
+
+! *******************************
+RELEASE_1.779.0.000
+MAIN/LATEST
+4/2/08 - CLW
+  
+- Allow writing a file to a hidden data drive
+  Libs\mscdevlib\stusbmscdev.cpp
+
+! *******************************
+RELEASE_1.778.0.006
+br_main_host_dev_0111
+1/28/08
+
+- Increase HID I/O timeout to 5 seconds from 1.
+
+! *******************************
+RELEASE_1.777.0.000
+MAIN/LATEST
+1/10/2008
+
+- Fix for SDK-1905: Updater hangs on initializing for 4 & 8GB NAND after 'Format Data Area" or "Full Media Erase" update in Vista; 2nd try updates ok.
+- Possible fix for SDK-1903: Unable to download firmware when other USB peripherals are connected.
+- Stay in the "looking for devices" loop when waiting on a recovery/hid device.
+- Don't try to ResetToRecovery if the device is in HID mode.
+- over-write instead of append the log file.
+- logging enhancements.
+
+  Apps\StUpdater.exe\stlogger.cpp
+  Apps\StUpdater.exe\stupdaterapp.cpp
+  Apps\StUpdater.exe\stupdaterdlg.cpp
+  Libs\mscdevlib\stconfiginfo.cpp
+  Libs\mscdevlib\stconfiginfo.h
+  Libs\mscdevlib\stupdater.cpp
+
+
+! *******************************
+RELEASE_1.776.0.000
+MAIN/LATEST
+1/7/2008
+
+- Fix for Vista "Access denied" error during full update from MTP mode.
+- Don't format the Wasted sectors at the end of the data drive since no one should be using them anyways.
+
+  Libs\mscdevlib\stformatter.cpp
+
+! *******************************
+RELEASE_1.775.0.000
+BR_HOST_MAIN_DEV_0105
+12/12/2007
+
+- Fix firmware.rsc format recognition for version
+- Remove FAT16 as file system option for  data drives > 2GB
+- Fix for not saving+restoring HDS when formatting
+
+! *******************************
+RELEASE_1.774.0.000
+11/30/2007
+
+- Fixed uninitialized memory crash
+  Libs\mscdevlib\stfwcomponent.cpp
+
+
+! *******************************
+RELEASE_1.773.0.000
+11/06/2007
+
+- Changed firmware version dialog to list control format from static text controls. SDK-1035
+- Added Protocol Version to Advanced dialog information.
+- Corrected formatting progress task count (total progress bar recycling). SDK-1039
+
+
+! *******************************
+RELEASE_1.772.0.000
+10/29/2007
+
+- Do not format hidden drive for non-DRM SDK5 firmware updates.  This removes the Janus drive message from the task display.
+
+! *******************************
+RELEASE_1.771.0.000
+10/16/2007
+
+- Fix for f/w not bound to host system language, nor Invariant, preventing download
+ of firmware resources other than host system language or Invariant.
+
+! *******************************
+RELEASE_1.770.0.000
+10/16/2007
+
+- Fix for invalid version for .rsc files
+
+! *******************************
+RELEASE_1.769.0.000
+10/03/2007
+
+- Modified Janus/Store Init to be done after update and device booted to updater mode.
+- More memory leak fixes
+- SDK5 firmware version retieval
+
+! *******************************
+RELEASE_1.768.8.000
+BRANCH: main/LATEST
+11/26/2007
+
+- Streamline updater verification. Don't verify more than firmware file size.
+
+  Libs\mscdevlib\stsystemdrive.cpp
+
+! *******************************
+RELEASE_1.768.7.000
+BRANCH: br_hgs_std_cst_installerless_main_0000
+10/31/2007
+- Fix for ResetToRecovery on MSC devices for SDK4.42
+
+  Libs\mscdevlib\stusbmscdev.cpp
+
+! *******************************
+RELEASE_1.768.6.000
+BRANCH: br_hgs_std_cst_installerless_main_0000
+10/25/2007
+
+- Fix for Japanese "Show details" string.
+- Use IDS_UPDLG_DETAILS_BTN instead of IDS_SHOW_DETAILS.
+
+  Apps\StUpdater.exe\stupdaterdlg.cpp
+  Apps\StUpdater.exe\stupdaterapp.rc
+  Apps\StUpdater.exe\resource.h
+
+! *******************************
+RELEASE_1.768.5.000
+BRANCH: main/LATEST
+10/18/2007
+
+- Empirical fix for Vista failed to write PBS problem.
+
+  Libs\mscdevlib\stformatter.cpp
+
+! *******************************
+RELEASE_1.768.4.000
+BRANCH: main/LATEST
+09/20/2007
+
+- Fix Application crash on close when not logging. Check Open() before  Flush() and Close().
+- Change logging statement for when the START button is pressed.
+- Fix memory leaks.
+- Add logging to SendScsiCommand.
+- Add fix for NO_FILE_SPECIFIED for second hidden data drive.
+
+  Apps\StUpdater.exe\stlogger.cpp
+  Apps\StUpdater.exe\stupdaterdlg.cpp
+  Libs\mscdevlib\stfwcomponent.cpp
+  Libs\mscdevlib\stscsi_nt.cpp
+  Libs\mscdevlib\stupdater.cpp
+  Libs\mscdevlib\stsystemdrive.cpp
+
+! *******************************
+RELEASE_1.768.3.000
+BRANCH: br_host_main_dev_0092
+08/23/2007
+
+- Fix for bound 64-bit recovery-mode drivers. The inf and cat files are now getting bound instead of 3 copies of the sys file.
+- Add Italian
+- Add bin\src_extract.bat for Installer-less Host Software package.
+- Embellished logging output.
+
+ Customization\Templates\version.h
+ Apps\StUpdater.exe\stupdaterapp.rc
+ Apps\StUpdater.exe\compiled_resource.rc
+ Apps\StUpdater.exe\bin\src_extract.bat
+
+! *******************************
+RELEASE_1.768.2.000
+08/16/2007
+
+- Fix for no firmware resources in language resources of host system.  Should be able to put all f/w resources under Invariant resources.
+
+ Customization\Templates\version.h
+ Libs\mscdevlib\stfwcomponent.cpp 
+ Libs\mscdevlib\stfwcomponent.h
+ Apps\StUpdater.exe\stupdaterdlg.cpp
+ Apps\StUpdater.exe\stupdaterapp.rc
+
+! *******************************
+RELEASE_1.768.1.000
+08/14/2007
+
+- More localization fixes
+
+! *******************************
+RELEASE_1.768.0.000
+08/13/2007
+
+- More localization fixes
+
+! *******************************
+RELEASE_1.767.0.000
+08/09/2007
+
+- Localization fixes
+
+08/1/2007
+
+- Add Customization\readme.txt to the deliverable.
+- Fix the default "Format data area" checkbox for the STD_DLG.
+- Move localization of "Format options" to !minimal_dlg logic because it was not getting localized on the STD_DLG.
+- Add embedded manifest for Microsoft.Windows.Common-Controls' version='6.0.0.0
+
+Files:
+ Customization\Templates\package.mak
+ stupdaterdlg.cpp
+ stupdaterapp.rc
+ stdafx.h
+
+! *******************************
+RELEASE_1.766.0.000
+
+BRANCH: br_host_main_dev_0086
+07/27/2007
+
+- Allow FAT32 selection for blank NANDs with capacity > 256MB
+
+! *******************************
+RELEASE_1.765.0.000
+
+BRANCH: br_host_main_dev_0085
+07/26/2007
+
+- Added ExitInstance() to return status on application exit.  Test apps can now check the return code.
+
+! *******************************
+RELEASE_1.764.0.000
+
+BRANCH: br_host_main_dev_0082
+07/06/2007
+
+- Correct "Please connect device" usage
+- Force recovery for MSC devices
+
+! *******************************
+RELEASE_1.763.0.000
+
+BRANCH: br_host_main_dev_0080
+07/05/2007
+
+- Match for langid when getting f/w resource ID
+
+
+! *******************************
+RELEASE_1.762.0.000
+
+BRANCH: br_host_main_dev_0079
+07/03/2007
+
+- Override CFG_AUTO_RECOVERY when forcing recovery mode
+
+! *******************************
+RELEASE_1.761.0.000
+
+BRANCH: br_host_main_dev_0077
+07/03/2007
+
+- Added "Force Recovery Mode" option support for StBinder
+- Check for  m_current_task != TASK_TYPE_DETECTING_DEVICE before setting the task to none.  This was causing a task
+ status of "Please connect device" to be displayed after resetting the device into recovery mode and recovery mode
+ detection.
+! *******************************
+
+! *******************************
+RELEASE_1.760.0.000
+! *******************************
+BRANCH: br_host_main_dev_0073
+06/22/07
+
+- Removed StDecrypt library
+
+
+! *******************************
+BRANCH br_host_main_dev_0070
+06/13/2007
+
+- StUpdaterApp 1.759.0.00
+	- Fixed default dialog resource when resource is default
+
+! *******************************
+BRANCH br_host_main_dev_0064
+BRANCH br_host_main_dev_0066
+06/12/2007
+
+- StUpdaterApp 1.758.0.000
+	- Do not display media group details if no media
+	- Localization complete
+		English
+		Chinese (Simplified)
+		Chinese (Traditional)
+		French
+		German
+		Japanese
+		Korean
+		Spanish
+
+! *******************************
+BRANCH: br_host_main_dev_0062
+05/23/07
+
+- Added new packaging for HGS
+	Moved some drivers around to make them easier to copy since we are not building them any more.
+	Removed some Customization\Template files that were no longer needed.
+	Restructured the Release directory
+
+! *******************************
+RELEASE_1.757.0.000
+! *******************************
+BRANCH: br_host_main_dev_0061
+05/22/07
+
+- Updater
+	Fixes for Standard dialog
+
+
+! *******************************
+RELEASE_1.756.0.000
+! *******************************
+BRANCH: br_host_main_dev_0057
+05/17/07
+
+- Updater
+	- Added recovery mode drivers built into resource file
+	- Added checks for app closing event at various places in threads
+	- Digitaly signed updater application
+
+- StBinder v.07
+
+	- Added updater dialog selection
+
+BRANCH: br_host_main_dev_0060
+5/17/07
+- Set CStAllocateLogicalMedia and CStEraseLogicalMedia timeouts to ST_SCSI_EXTENDED_TIMEOUT (10 minutes).
+	\SOC_Host\Libs\mscdevlib\stddiapi.cpp
+- Got rid of "initialized but not used variable" compiler warning
+	\SOC_Host\Libs\mscdevlib\stfwcomponent.cpp
+
+- Add  TASK_TYPE_ERASE_MEDIA, IDS_STAT_ERASE_MEDIA 
+	\SOC_Host\Libs\mscdevlib\stprogress.h
+	\SOC_Host\Apps\StUpdater.exe\stupdaterapp.rc
+	\SOC_Host\Apps\StUpdater.exe\resource.h
+	\SOC_Host\Apps\StUpdater.exe\stresource.cpp
+	
+- Call GetProgress()->SetCurrentTask(TASK_TYPE_ERASE_MEDIA, 10) before erasing logical media.	
+	\SOC_Host\Libs\mscdevlib\stupdater.cpp
+	
+- Hard code CFG_DEFAULT_UPDATER_DLG to STANDARD(2)
+	\SOC_Host\Customization\Templates\product.h
+
+*********************************
+01/02/2007
+  1.718.0.000
+
+        Changes to support Vista
+
+*********************************
+10/18/2006
+  1.717.0.000
+
+	Migrated to VC8, .NET 2005
+	Updated HGSystem.dll
+
+! *******************************
+RELEASE_1.716.11.000
+3/28/07
+- add new commands to support ResetToUpdater on 35xx.
+	\SOC_Host\Libs\mscdevlib\stddiapi.cpp
+	\SOC_Host\Libs\mscdevlib\ddildl_defs.h
+	\SOC_Host\Libs\mscdevlib\mtpextensions.h
+	\SOC_Host\Libs\mscdevlib\stmtpdevice.cpp
+	\SOC_Host\Libs\mscdevlib\stmtpdevice.h
+	\SOC_Host\Libs\mscdevlib\stusbmscdev.cpp
+	\SOC_Host\Libs\mscdevlib\stusbmscdev.h
+	\SOC_Host\Libs\mscdevlib\stconfiginfo.cpp
+	\SOC_Host\Libs\mscdevlib\stconfiginfo.h
+
+
+- allow either DRIVE_TAG_UPDATER_S or DRIVE_TAG_UPDATER_NAND_S to be used in recovery-mode.
+	\SOC_Host\Libs\mscdevlib\strecoverydev.cpp
+
+- add operator >
+	\SOC_Host\Libs\mscdevlib\stversioninfo.cpp, stversioninfo.h
+
+- On 35xx, compare updater versions before deciding ResetToUpdater or ResetToRecovery
+- Find updater index with either DRIVE_TAG_UPDATER_S(0xFF) or DRIVE_TAG_UPDATER_NAND_S(0xFE)
+	\SOC_Host\Libs\mscdevlib\stupdater.cpp
+
+- Enlarge updater dialog to fit entire Spanish warning string
+	\SOC_Host\Apps\StUpdater.exe\stupdaterapp.rc
+	
+
+- Add support for initializing a non-Janus HiddenDataDrive with binary data from a file
+  specified as a part of the drive array.
+- Only write the number of sectors for the fw file, not the entire allocation.
+
+	\SOC_Host\Libs\mscdevlib\stfwcomponent.cpp
+	\SOC_Host\Libs\mscdevlib\stfwcomponent.h
+	\SOC_Host\Libs\mscdevlib\sterror.h
+	\SOC_Host\Libs\mscdevlib\stsystemdrive.cpp
+	\SOC_Host\Libs\mscdevlib\sthiddendatadrive.cpp
+
+! *******************************
+RELEASE_1.716.10.000
+3/14/07
+- Format FAT16 for less than 256 MB media.
+- !!!!! Put back in IOCTL_SET_DRIVE_LAYOUT for all formats. This fixes a NAND
+  corruption issue on 2K and XP and a Access Denied problem in Vista.
+
+	\SOC_Host\Libs\mscdevlib\stformatter.cpp
+	\SOC_Host\Libs\mscdevlib\stsdisk.cpp
+
+! *******************************
+RELEASE_1.716.9.000
+2/28/07
+- Add back in the IOCTL_DISK_SET_DRIVE_LAYOUT for blank NANDs to solve a WriteFile 
+  error in Win2K when writing the PBS. This call was removed in 716.7 to try and stablize Formatting in Vista. 
+  It is now conditional on blank NANDs.
+
+\SOC_Host\Libs\mscdevlib\stformatter.cpp
+
+! *******************************
+RELEASE_1.716.8.000
+2/27/07
+Installer changes:
+    Remove Win98 support
+    Replace recovery-mode drivers with new signed drivers
+    Streamline install for recovery-mode drivers
+    Build changes to ship signed binaries instead of building recovery-mode drivers every time.
+ResetToUpdater changes:
+    Add ResetToUpdater SCSI command for MSC devices
+    Add ResetToUpdater MTP command for MTP devices
+    Updater logic to try ResetToUpdater before ResetToRecovery.
+
+! *******************************
+RELEASE_1.716.7.000
+2/15/07
+AutoPlay reject fixes for Visat 32/64
+Formatter changes to try and fix drive locking problems in Vista.
+
+\SOC_Host\Libs\mscdevlib\stformatter.cpp
+\SOC_Host\Libs\WinSupport\AutoPlayReject.cpp
+\SOC_Host\Libs\WinSupport\AutoPlayReject.h
+
+! *******************************
+RELEASE_1.716.6.000
+2/13/07
+Added Show_Reboot_To_Player_Msg flag to override the User Message. 
+Set this flag to FALSE to suppress the Message Dialog displayed at the 
+end of the update process instructing the user to “initialize the 
+internal database before transferring protected content.”
+
+\SOC_Host\Libs\mscdevlib\stupdater.cpp
+\SOC_Host\Apps\StUpdater.exe\stupdaterdlg.cpp
+\SOC_Host\Customization\Templates\product.h
+\SOC_Host\Libs\mscdevlib\stconfiginfo.cpp
+\SOC_Host\Libs\mscdevlib\stconfiginfo.h
+
+! *******************************
+RELEASE_1.716.5.000
+1/29/07
+Added delay after resetting to recovery; needed if using a clean machine so that host has enough time to enumerate recovery device
+\SOC_Host\Libs\mscdevlib\stupdater.cpp
+
+! *******************************
+RELEASE_1.716.4.000
+1/8/07
+Adding 066f/A010 as a default to be added to stums.inf
+\SOC_Host\Installer\script files\setup.rul
+\SOC_Host\Installer\script files\ComponentEvents.rul
+\SOC_Host\Apps\StRegistry.dll\regdll.cpp
+
+1/4/07
+Add Vista platforms.
+\SOC_Host\Libs\mscdevlib\stglobals.h
+\SOC_Host\Libs\mscdevlib\stglobals.cpp
+
+Use physical handle to format PBS in Vista.
+\SOC_Host\Libs\mscdevlib\stformatter.cpp
+
+Monitor for un-formatted media pop-up message in Vista while enumerating updater.sb.  Pop-up asks user if they want to format (launches Windows formatter).  Kill the pop-up window so users do not get confused.
+\SOC_Host\Apps\StUpdater.exe\stupdaterdlg.h
+\SOC_Host\Apps\StUpdater.exe\stupdaterdlg.cpp
+
+Auto start fix.
+\SOC_Host\Apps\StUpdater.exe\stupdaterdlg.h
+\SOC_Host\Apps\StUpdater.exe\stupdaterdlg.cpp
+\SOC_Host\Apps\StUpdater.exe\stupdaterapp.cpp
+
+
+! *******************************
+  RELEASE_1.716.2.000
+!12/1/2006
+!	- Fix problem with moving from SDK 2.611 to SDK 2.612/ 2.62	
+!	- Fix problem with updater getting stuck at "Initialize" if it cannot find the current firmware version
+!	- Fix problem with CFG_FORCE_GET_CURR_VERSIONS flag
+!	- Update FAT logic to use large cluster sizes
+
+! *******************************
+  RELEASE_1.716.1.000
+  Development branch: br_hgs_std_cst_main_0003
+! 10/5/2006
+!	- Created HGS ONLINE PARALLEL MAIN
+!
+! *******************************
+  RELEASE_1.716.0.000
+  Development branch: br_hgs_std_cst_main_0002
+  BR_HGS_STD_CST_MAIN_0002_0000
+! 10/5/2006
+    
+!	- add CFG_FORCE_GET_CURR_VERSIONS flag (default is FALSE)
+!     Setting flag to TRUE will make the updater attempt to get the versions of the firmware on the Media
+!     even if the Protocol Version indicates that the firmware does not support the command. For SDK2.XXX,
+!     this should work ok and will display the Current Version information in the Updater Dialog before the
+!     user clicks Start. For SDK3.XXX, this will not work. The hostlink.sb file does not support the SCSI
+!     command needed to get the current firmware versions. Setting CFG_FORCE_GET_CURR_VERSIONS for SDK3.XXX
+!     devices will make the updater appear to hang. The app is not hung, it is just waiting for the unsupported
+!     SCSI commands to timeout.
+	(files) Apps\StUpdater.exe\StUpdaterDlg.cpp
+        	Customization\Templates\product.h, readme.txt
+        	Libs\MscDevLib\StUsbMscDev.cpp, StConfigInfo.cpp/h
+!
+!	- Fix auto recovery when erase media is required. In the previous version, if the number of system drives
+!     on the media did not match the number of system drives held by the updater, and the "Format data area"
+!     control was not checked, the updater would not find the device in updater mode(Disk drives\_Generic MSC Recovery USB device).
+	(files) Apps\StUpdater.exe\StUpdaterDlg.cpp
+!
+!	- Fix the initial state of the "Format data area" checkbox. The app now correctly initializes the
+!     checkbox to the CFG_DEF_FORMAT_DATA_AREA value.
+	(files) Apps\StUpdater.exe\StUpdaterDlg.cpp
+!
+!	- Added "Boot to Player mode" message for 35xx after update when the "Formatdata area" control is checked.
+!	  Booting to Player mode after formatting the data area will allow the player firmware to create needed
+!     directories and database files.
+	(files) Apps\StUpdater.exe\StUpdaterDlg.cpp
+!
+!	- Fix "Can't find recovery-mode device" problem in Win98 on 2nd iteration by closing the handle to the
+!     Recovery mode device after uploading the MSC firmware.
+	(files) Libs\MscDevLib\StRecoveryDev.cpp
+!
+*******************************
+09/1/2006
+  1.715.2.000
+	Portuguese language support
+	Stupdaterdlg.cpp - fix DefaultFormatCheckBox state.
+
+*******************************
+09/1/2006
+  1.715.1.000
+	Fix  /autoall crash issue with the updater
+
+*******************************
+09/1/2006
+  1.715.0.000
+	Don't format hidden drive if protocol version < UPDATER_JANUS and format not selected
+	Don't close recovery driver handle (dead usb port issue)
+	Get upgrade version info for limited hostlink mode
+	Create SDK2.6xx build from main branch
+
+*******************************
+08/25/2006
+  1.714.1.000
+	Fat logic port from mfgtool
+
+*******************************
+08/18/2006
+
+  1.714.0.000
+
+  SDK3.1xx
+  SDK4.3xx
+
+	Format the hidden drive for Protocol Versions < ST_UPDATER_JANUS
+
+*******************************
+08/08/2006
+
+  1.713.0.000
+
+  SDK4.210
+  SDK3.120
+
+	Save return code from ResetMSCDeviceForRecovery() to catch 35xx failure
+	Don't get component versions when in LIMITED_MSC_MODE
+
+*******************************
+06/27/2006
+
+  1.712.0.006
+
+  SDK4.210
+  SDK3.120
+
+	Defects fixed: Stmp00011319 - bebop - Selecting Details while the device is initializing causes the updater to crash
+
+		This is a re-close.  Disabled details button in button handler to prevent user from dbl-clicking it.
+
+
+*******************************
+06/19/2006
+
+  1.711.0.006
+
+  SDK4.210
+  SDK3.120
+
+	Defects fixed: Stmp00011750 - Win98: must click restart twice after installing the installer 
+
+	- Added supprt for MS Vista.  32 bit Vista seems OK, but the 64 bit version is not recommended.
+	- Removed launch of Music Match installer from Mp3 host installer
+	- Removed unnecessary reboot dialog (win98)
+
+*******************************
+06/08/2006
+
+  1.710.0.006
+
+  SDK4.210
+  SDK3.120
+
+	Stale last_system_error from un-initialized nand returned after successful JanusInit.
+	No longer checking last_system_error if the JanusINit return value is good.  This was
+	introduced in 1.708.0.006.
+
+*******************************
+  06/02/2006
+
+  1.709.0.006
+
+  SDK4.210
+  SDK3.120
+
+	Defects fixed:
+
+	Stmp00011551 - Dirty NANDS will not allow player to install firmware in Windows 98.
+
+		Actually, if the format option is selected in w98, the update would fail
+		with a lock error.  Now fixed.
+
+*******************************
+  05/23/2006
+
+  1.708.0.006
+
+  SDK4.210
+  SDK3.120
+
+	- Removed debug messagebox
+	- Abort update and return error on InitJanus or InitStor failure
+
+*******************************
+  05/19/2006
+
+  1.707.0.006
+
+  SDK4.210
+  SDK3.120
+
+	Defects fixed
+
+	Stmp11319 -  Selecting Details while the device is initializing causes the updater to crash
+
+	- Disabled "Details" button until available
+	- Threaded connection monitor replacing timer version
+	- Corrected potential exception when failing to create temporary HDS dir for saving HDS
+	- Smoothed device connection and ResetToRecovery initialization progress updating
+	- Added "Searching" task for time when updater has not yet opened a device, but is still searching
+	- Corrected German text for 8 strings
+	- Extended dialog a bit to accomodate corrected German text for one of the task status strings
+	
+       
+*******************************
+  05/09/2006
+
+  SDK4.210
+  SDK3.120
+
+	- Back to FAT16 for default FS
+
+*******************************
+  05/09/2006
+  Development branch: br_host_main_dev_0034
+
+  SDK4.210
+  SDK3.120
+
+	- Check AutoStart option before starting init timer
+	- Change menu and others to "Firmware Download"
+	- Move restore of HDS to before InitStore
+
+*******************************
+  05/08/2006
+
+  SDK4.210
+
+	- Made FAT32 the default filesystem for 256MB and above media for P4S problem
+
+*******************************
+  05/03/2006
+  Development branch: br_host_main_dev_0034
+
+  SDK4.210
+  SDK3.120
+
+	- Removed search dialog (CStStatusDlg)
+	- Recovery mode device initialized to MSC (updater.sb) at updater dialog startup
+	- ResetToRecovery from MTP to MSC (updater.sb) moved to update process
+	- Added device add/remove notification
+	- Added “Ready”/”Please connect device” status to updater dialog
+	- Added AutoPlay rejection for MSC devices.
+	- Added device independent version retrieval for upgrade binaries.  Previously, the updater had to have an active session with a MSC device to get the version of the upgrade binaries.
+
+	
+*******************************
+  04/10/2006
+  Development branch: br_host_main_dev_0032
+
+  SDK4.210 Changes
+
+        - Enabled InitializeDataStore
+        - Changed wgetcwd() to GetCurrentDirectoryW()
+        - Changed Janus status to UCHAR
+  
+*******************************
+  04/05/2006
+  Development branch: br_host_main_dev_0025
+
+  SDK 4.210 changes
+
+	- Janus initialization now done in updater.sb mode
+	  Added new vendor commands:
+		GetJanusStatus
+		InitializeJanus
+		InitializeDataStore
+	- No longer erase bootmanger and reset to force recovery mode boot from MTP mode
+	  Added new MTP vendor command ResetToRecovery
+	- Restore HDS files after formatting data drive
+	- Preserve hidden drive when formatting data drive
+	- Added command specific timeout capability
+  
+! *******************************
+  INTEGRATION CHANGE - CLW
+! 3/27/06
+    File : Apps\StResource.dll\stmpres.rc
+!     Changed French string for IDS_DISCONNECT_WARNING and IDS_UPDLG_FORMAT_DATA_AREA
+    File : env.bat
+      Fixed environment variable W2003DDK
+
+  ********************************
+  3/20/2006
+  Development branch: br_host_main_dev_0026
+
+  File: stupdaterapp.cpp
+	Moved OleInitialize() down in InitInstance() to avoid returning without calling
+	OleUninitialize().
+	Moved OleUnintialize() to end of InitInstance() from the destructor.
+  File: stupdaterdlg.cpp
+	Added SetFocus()
+
+  *******************************
+  3/13/2006
+  Development branch: br_host_main_dev_0026
+
+
+  File    : stsdisk.cpp
+      Use default table value for sectors/cluster without modification for sector size.
+
+  *******************************
+  3/01/2006
+  Development branch: br_host_main_dev_0026
+
+
+  File    : setup.ipr
+      Set "Potentially Locked" setting for Win98 file group files to "No".  We handle locked files ourselves.
+  File    : componentevents.rul 
+      Added back the logfile feature from Mp3Host.
+  File    : setup.rul
+      Uncomment the SDFinishReboot() when we need to reboot after install (w98).
+      Logfile writing.
+
+  Defects fixed: 10507
+  
+  *******************************
+  2/23/2006
+  Development branch: br_host_main_dev_0024
+
+
+  File    : stusbmscdev.cpp
+      Always invalidate scsi handle after resetting chip.  Possible hang on application exit.
+  File    : componentevents.rul 
+      Corrected vid+pid lookup for w98.
+  
+
+  *******************************
+  2/20/06
+  Development branch: br_host_main_dev_0022
+  BR_HOST_MAIN_0017
+    File : Libs\MscDevLib\stscsi_nt.cpp, stscsi_9x.cpp
+	- Fix problem with failure of IsSystemMedia() for Low Nand host
+    File : Apps\StUpdater.exe\stupdaterapp.cpp
+	- Fix problem with repeatedly forcing entry into recovery mode
+
+  *******************************
+  INTEGRATION CHANGE - MS
+  2/14/06
+    File : Libs\mscdevlib\ddildl_defs.h
+	   - Increase the value of MAX_MEDIA_TABLE_ENTRIES
+
+! *******************************
+  Development branch: br_host_main_dev_0019
+  BR_HOST_MAIN_0016
+! 2/8/2006
+
+    File  : Apps\StUpdater.exe\stupdaterdlg.cpp
+            Customization\Templats\product.h, readme.txt
+            Libs\MscDevLib\Stconfiginfo.cpp/h
+            - Add Hide Details Button logic 
+    File  : Customization\Templats\product.h, readme.txt
+            Libs\MscDevLib\Stconfiginfo.cpp/h, stscsi_9x.cpp, stscsi_nt.cpp, stusbmscdev.cpp
+            - Add LowNAND logic 
+!
+! *******************************
+  INTEGRATION CHANGE - CLW
+! 2/8/06
+    File  : Apps\StUpdater.exe\stupdaterdlg.cpp
+!     Fixed the "Do not disconnect during update" warning to repair
+!       invalid characters on Japanese OSes.
+!
+! *******************************
+! RELEASE_1.676.0.000
+! *******************************
+  Development branch: br_host_main_dev_0020
+  BR_HOST_MAIN_0015
+! 2/3/2006
+
+  File    : Libs\MscDevLib\stfwcomponent.h, strecoverydev.cpp, stsystemdrive.cpp
+!     Added check for valid firmware files. Updater was trying to use placeholder
+!       firmware files without reporting an error.
+  File    : stusbmscdev.cpp stupdaterdlg.cpp
+      Removed WaitForMtpINit after download and removed corresponding task increment.
+  File    : componentevents.rul setup.rul
+      Added x8000 PID to stums.inf.
+!
+! *******************************
+! RELEASE_1.675.0.000
+! *******************************
+  Development branch: br_host_main_dev_0015
+! 01/27/2006
+
+!     Added SDK 2.610 support.
+!
+!     HGS now ships with placeholder firmware files in the Binary folder of the Installation Disk.
+!      These files must be replaced with your retail firmare before the running setup.exe.
+
+  File    : Customization\Templates\setup.ipr
+            Change firmware file list from *.* to <FW_Files_Semicolon> which will get "customized" 
+              by the hgs database with the specific files from the drive array for each customized host.
+
+  File    : bldall.bat
+            Fix /f and /fo option so they build customized firmware.
+            Add building of fake firmware. This is the default if no firmware option is specified 
+              or if the desired sdk is not available for building customized firmware. The fake 
+              firmware files are independent of sdk. The firmware filenames (separated by spaces) 
+              are specified by the FW_FILES environment variable set by Customization\env.bat. This 
+              fixes the issue where the Release\Binary files need to be present when the installer 
+              is built so the correct firmware files get copied to the target system.
+
+  File    : Customization\Templates\env.bat
+            Added environment variable FW_FILES so the commandline fake firmware builder will know 
+              which files to generate for a given customization.
+
+  File    : Firmware\makefile
+            New make file for building sdk-independent, customization-dependent fake firmware files.
+
+  File    : Firmware\dummy.txt
+            Dummy file copied to all firmware filenames.
+
+! *******************************
+! RELEASE_1.674.0.000
+! *******************************
+  Development branch: br_host_main_dev_0017
+! 01/18/2006
+
+  File    : Libs\MscDevLib\stscsi_nt.cpp
+!     Change SetFilePointer() to SetFilePointerEx() to address media sizes > 2GB.
+
+  File    : Libs\MscDevLib\stusbmscdev.cpp
+            Check that there are > 1 data drives before setting the second data drive at the
+            end of the allocation table.  Also fixed in a add-on version of 1.673.0.000.
+
+  File    : Drivers\StW98MscDriver\sys\stums_sys.mak
+            Fix the debug build for the Win98 MSC driver.
+!
+! *******************************
+! RELEASE_1.673.0.000
+! *******************************
+  *******************************
+  Development branch: br_host_main_dev_0015
+! 1/4/06
+    File  : Libs\MscDevLib\stusbmscdev.cpp
+    Change: Don't put data drive at the end of the array if there is only 1 data drive.
+
+    File  : Apps\StResource.dll\stmpres.rc
+            Apps\StUpdater.exe\stupdaterapp.cpp,stupdaterdlg.cpp
+            Libs\MscDevLib\stconfiginfo.cpp,stglobals.cpp,stmtpdevice.cpp,stupdater.cpp,stusbmscdev.cpp
+    Change: 
+!     Remove pop-up dialog informing user of MTP initialization. (MTP PC and FW)
+!     Add Initializing task to overall progress bar and wait for MTP initialization
+!       before telling user that update is complete. (MTP PC and FW) 
+!
+    File  : Libs\MscDevLib\*
+    Change: - Reworked the Additional Memory to reserve logic. The global drive 
+              array description now uses ulRequestedKB instead of 
+              AdditionalMemory(bytes). ulRequestedKB stipulates the total requested 
+              drive size in KB instead of the additional bytes on top of the file size.
+              Also, only the firmware file size will be compared with the current allocation
+              when determining if realloaction is necessary. So, when an allocation is 
+              being done, the requested size in KB will be used if it is greater than the
+              file size. Subsequently, if the file size is less than the allocation, no
+              allocation will be performed.
+
+    File  : Installer\script files\setup.rul
+    Change: 
+!     Do not ask user for install folder and start menu location
+!       for (woUpdater) installations. 
+!
+    File  : Apps\StUpdater.exe\stupdaterapp.cpp
+    Change: 
+!     Do not display the "Media state is not initialized." pop-up dialog
+!       for for blank media. 
+!
+!     Localize the "Unsafe Removal of Device" window title so we can close it
+!       automatically in Win2000.
+!
+    File  : Apps\StUpdater.exe\stupdaterdlg.cpp
+    Change: 
+!     Flush cached writes to the device before resetting it after updating.
+!
+!     Fix "Unavailable location" pop-up window in WinXP.
+!
+! *******************************
+! RELEASE_1.672.2.000
+! *******************************
+  *******************************
+  INTEGRATION CHANGE - CLW
+! 12/14/05
+    File  : Drivers\StRcvryDriver\stmp3rec.inf, stmp3rec.cpy.inf
+    Change: Made 3600 section descriptor match the section header.
+    Public:
+!     Repaired the recovery-mode driver inf so that the
+!       recovery-mode driver correctly loads on the STMP3600.     
+!
+  *******************************
+  RELEASE_1.672.1.000
+  *******************************
+  *******************************
+  BR_HOST_MAIN_0012
+  Development branch: br_host_main_dev_0012
+  12/09/05
+    File  : Installer\script files\setup.rul,
+            Customization\Templates\product.h
+    Change: Added Over Installer feature.
+            Added CFG_OVERINSTALL to product.h
+
+! *******************************
+! RELEASE_1.672.0.000
+! *******************************
+  *******************************
+  BR_HOST_MAIN_0011
+! 12/06/05
+    File  : Apps\StUpdater.exe\stupdaterapp.rc, stupdaterdlg.cpp
+    Change: 
+!     Change blinking "Do not disconnect" warning to blinking red text
+!       with no blinking background.
+!     Always reset the device after updating.
+!     Do not allow more than one update per session.
+
+    File  : Apps\StUpdater.exe\*
+            Libs\MscDevLib\*
+    Change: Double Data Drive support related changes.
+
+    File  : Drivers\StW98MscDriver\sys\umss.c
+    Change: 
+!     Added STMP3660 and STMP3650 support to Win98 MSC driver.
+!
+! *******************************
+  BR_HOST_MAIN_0010
+  Development branch: br_host_main_dev_0013
+! 12/05/05
+    File  : Installer\script files\setup.rul, componentevents.rul
+            Customization\Templates\setup.ipr
+    Change: Add post install routine for Win98 to add the changes to the MSC driver .inf file.
+    Reason: The Win98 driver only installer would not modify the msc driver inf file, thus
+            Windows 98 would not load the MSC driver for the device.
+    Public:
+!     The (woUpdater) build now correctly installs the MSC driver in Windows 98 SE.
+!
+  *******************************
+  BR_HOST_MAIN_0009
+  Development branch: br_host_main_dev_0010
+  12/02/05
+    File  : Customization\Templates\*.ips
+    Change: Added "OS not supported string"
+
+    File  : Apps\StUpdater.exe\*
+            Libs\MscDevLib\*
+    Change: Added Double Data Drive support to main code base.
+            Still requires custom drive array definition in product.h
+
+! *******************************
+! RELEASE_1.671.1.000
+! *******************************
+  *******************************
+  INTEGRATION CHANGE - CLW
+! 11/29/05
+    File  : Installer\script files\setup.rul
+    Change: Allow user to change Start menu folder.
+    Public:
+!     Allow user to change Start menu folder.     
+!
+! *******************************
+! RELEASE_1.671.0.000
+! *******************************
+  *******************************
+  BR_HOST_MAIN_0008
+  Development branch: br_host_main_dev_0004
+! 11/17/05
+    Change: 
+!     Installer
+!      - Check for x64 platform
+!      - Compare existing driver for timestamp
+!      - Copy drivers to windows system drivers folder
+!      - Find and update existing stums.inf (Win98)
+!      - Remove automatic copy for recovery mode and stums drivers
+!      - Remove modify/remove dialog
+!      - Remove full screen on uninstall
+       Build
+       - Port bumpver.pl to SOC_Host
+       - Add dependencies to stmp3rec.mak and stums_sys.mak to copy the respective .inf files to the release folder
+       Stmpres.dll
+       - Add module definition file
+!      Win98 quick disconnect
+!      - Add delay after successful update and eject before indicating to user that operations are complete
+!
+*******************************
+RELEASE_SDK_BASE_1.670.0.000
+*******************************
+*******************************
+INTEGRATION CHANGE - CLW
+11/15/05
+    File  : Apps\StResource.dll\stmpres.rc 
+    Change: localize "do not disconnect during update" message.
+
+*******************************
+BR_HOST_MAIN_0007
+Development branch: br_host_main_dev_0007
+11/14/05
+    File  : Apps/StUpdater.exe/stupdaterapp.cpp, stupdaterdlg.cpp, 
+            Customization/Templates/product.h, 
+            Libs/MScDevLib/StConfigInfo.cpp(h)
+    Change: Added logic to always force recovery operation. (CFG_ALWAYS_FORCE_RECOVERY)
+    Reason: Useful for field migration from SDk2.521 to SDK3.x. SCSI Mfg/Product strings MUST be
+            the same for both sdks.
+
+*******************************
+INTEGRATION CHANGE - CLW
+11/09/05
+    File  : Apps/StUpdater.exe/stupdaterdlg.cpp, 
+            Libs/MScDevLib/StMscDev.cpp
+    Change: Format hidden data drive on STMP3600.
+            NOTE! - Makes updater compatible with SDK4.2 and incompatible with SDK4.1x
+
+*******************************
+BR_HOST_MAIN_0006
+Development branch: br_host_main_dev_0006
+11/08/05
+    File  : Apps/StUpdater.exe/stupdaterapp.cpp, stupdaterdlg.cpp, 
+            Customization/Templates/product.h, 
+            Libs/MScDevLib/StConfigInfo.cpp(h)
+    Change: Added logic to allow for non-forced recovery operation. (CFG_ALLOW_AUTO_RECOVERY)
+
+*******************************
+BR_HOST_MAIN_0005
+Development branch: br_host_main_dev_0005
+11/08/05
+    File  : Apps/StUpdater.exe/stupdaterapp.cpp(h)
+    Change: Added automatic window closing for "Unsafe device removal" warning in 
+              Win2K during forced recovery update.
+    Change: Condition ResetForRecovery() on CFG_AUTO_RECOVERY==TRUE.
+
+*******************************
+BR_HOST_MAIN_0004
+Development branch: br_host_main_dev_0003
+11/04/05
+    File  : Apps/StUpdater.exe, Libs/MscDevLib, Drivers/*, Customization/Templates/setup.ipr
+    Change: Picking up 3600 support and 64-bit Recovery-mode driver from Mp3Host VOB
+            Removed Drivers/StRcvryDriver.mfg since Drivers/StRcvryDriver now supports 
+              multiple instances for the mfg app.
+    Reason: Want to build 3600 customizations on HGS.
+
+    File  : Apps/StUpdater.exe, Apps/StResource.dll
+    Change: Added flashing "Do NOT disconnect device during update." warning.
+
+    File  : Libs/MscDevLib/StConfigInfo.cpp/.h, Customization/Templates/product.h
+    Change: Added dynamic drive array functionality. <DriveArrayData>, <DriveArraySize>
+    Reason: HGS can now support custom drive array configurations and a single
+              source view can support multiple sdk drive configurations.
+ 
+    File:   Customization\Templates\version.h
+    Change: Changed version=1.625.1.xxx to 1.670.0.xxx
+    Reason: bump version for above changes.
+
+*******************************
+RELEASE_SDK_BASE_1.625.1.000
+*******************************
+*******************************
+BR_HOST_MAIN_0003
+Development branch: br_host_main_dev_0002
+11/01/05
+    File  : Apps/StFwLoader.exe, Libs/DevSupport->Libs/DefInterface, new Libs/DevSupport
+    Change: Picking up StFwLoader and new DevSupport from parallel main br_host_main_0001
+    Reason: Renamed PDW DevSupport library to DevInterface
+
+*******************************
+BR_HOST_MAIN_0002
+Development branch: br_host_main_dev_0001
+10/28/05
+    File  : Apps/PDW, Libs/DevSupport, Libs/WinSupport
+    Change: Picking up PDW from parallel main br_host_main_0000
+    Reason: Can integrate PDW as sdk3.1 deliverable.
+
+*******************************
+BR_HOST_MAIN_0001
+Development branch: br_host_main_dev_0000
+10/28/05
+    File  : All updater support files
+    Change: Create new base for updater support files.
+    Reason: Merging SDK3.1 support back to main. This will create a new base for both past
+            and future SDKs.
+
+*******************************
+RELEASE_1.625.1.000
+*******************************
+Integration branch: br_host_main_0004
+10/14/05
+    File:   Customization\Templates\setup.ipr
+    Change: Changed CheckMD5=YES to CheckMD5=NO
+    Reason: Installer would complain if the firmware files were changed 
+            from the test firmware shipped with the host.
+
+    File:   Customization\Templates\version.h
+    Change: Changed version=1.625.0.xxx to 1.625.1.xxx
+    Reason: bump version for above change.
+
+*******************************
+RELEASE_1.625.0.000
+*******************************
+Integration branch: br_host_main_0004
+10/13/05
+    Initial SoC_Host code base for HGS deployment
+

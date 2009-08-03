@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Register" targetNamespace="http://tempuri.org/Register.xsd" elementFormDefault="qualified" xmlns="http://tempuri.org/Register.xsd" xmlns:mstns="http://tempuri.org/Register.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="OtpRegisterType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OtpRegType_Control" />
+      <xs:enumeration value="OtpRegType_Crypto" />
+      <xs:enumeration value="OtpRegType_Customer" />
+      <xs:enumeration value="OtpRegType_HwCaps" />
+      <xs:enumeration value="OtpRegType_SwCaps" />
+      <xs:enumeration value="OtpRegType_SgtlOperations" />
+      <xs:enumeration value="OtpRegType_Unassigned" />
+      <xs:enumeration value="OtpRegType_Rom" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="OtpRegisters37xx">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="HW_OCOTP_CTRL" />
+      <xs:enumeration value="HW_OCOTP_DATA" />
+      <xs:enumeration value="HW_OCOTP_CUST0" />
+      <xs:enumeration value="HW_OCOTP_CUST1" />
+      <xs:enumeration value="HW_OCOTP_CUST2" />
+      <xs:enumeration value="HW_OCOTP_CUST3" />
+      <xs:enumeration value="HW_OCOTP_CRYPTO0" />
+      <xs:enumeration value="HW_OCOTP_CRYPTO1" />
+      <xs:enumeration value="HW_OCOTP_CRYPTO2" />
+      <xs:enumeration value="HW_OCOTP_CRYPTO3" />
+      <xs:enumeration value="HW_OCOTP_HWCAP0" />
+      <xs:enumeration value="HW_OCOTP_HWCAP1" />
+      <xs:enumeration value="HW_OCOTP_HWCAP2" />
+      <xs:enumeration value="HW_OCOTP_HWCAP3" />
+      <xs:enumeration value="HW_OCOTP_HWCAP4" />
+      <xs:enumeration value="HW_OCOTP_HWCAP5" />
+      <xs:enumeration value="HW_OCOTP_SWCAP" />
+      <xs:enumeration value="HW_OCOTP_CUSTCAP" />
+      <xs:enumeration value="HW_OCOTP_LOCK" />
+      <xs:enumeration value="HW_OCOTP_OPS0" />
+      <xs:enumeration value="HW_OCOTP_OPS1" />
+      <xs:enumeration value="HW_OCOTP_OPS2" />
+      <xs:enumeration value="HW_OCOTP_OPS3" />
+      <xs:enumeration value="HW_OCOTP_UN0" />
+      <xs:enumeration value="HW_OCOTP_UN1" />
+      <xs:enumeration value="HW_OCOTP_UN2" />
+      <xs:enumeration value="HW_OCOTP_ROM0" />
+      <xs:enumeration value="HW_OCOTP_ROM1" />
+      <xs:enumeration value="HW_OCOTP_ROM2" />
+      <xs:enumeration value="HW_OCOTP_ROM3" />
+      <xs:enumeration value="HW_OCOTP_ROM4" />
+      <xs:enumeration value="HW_OCOTP_ROM5" />
+      <xs:enumeration value="HW_OCOTP_ROM6" />
+      <xs:enumeration value="HW_OCOTP_ROM7" />
+      <xs:enumeration value="HW_OCOTP_VERSION" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="Field">
+    <xs:sequence>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" />
+    <xs:attribute name="description" type="xs:string" />
+    <xs:attribute name="offset" type="xs:unsignedByte" />
+    <xs:attribute name="length" type="xs:unsignedByte" />
+  </xs:complexType>
+  <xs:simpleType name="OtpRegisterPermissions">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="External" />
+      <xs:enumeration value="Internal" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="OtpRegister">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="OtpRegisters37xx" default="HW_OCOTP_CTRL" fixed="true" />
+      </xs:sequence>
+      <xs:attribute name="description" type="xs:string" />
+      <xs:attribute name="offset" type="xs:unsignedLong" default="0" fixed="true" />
+      <xs:attribute name="type" type="OtpRegisterType" default="OtpRegType_Control" fixed="true" />
+      <xs:attribute name="permissions" type="OtpRegisterPermissions" />
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="OtpRegister">
+    <xs:sequence>
+    </xs:sequence>
+    <xs:attribute name="name" type="OtpRegisters37xx" />
+    <xs:attribute name="description" type="xs:string" />
+    <xs:attribute name="offset" type="xs:unsignedLong" default="0" />
+    <xs:attribute name="type" type="OtpRegisterType" />
+    <xs:attribute name="permissions" type="OtpRegisterPermissions" />
+  </xs:complexType>
+</xs:schema>

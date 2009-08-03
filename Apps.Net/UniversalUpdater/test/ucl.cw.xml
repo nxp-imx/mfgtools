@@ -1,0 +1,72 @@
+<!--
+Possible UCL format.
+
+Each <LIST> contains a list of update instructions.
+  "Load" - Runs when the program loads.
+  "Exit" - Runs when the program exits.
+  "Update" - Firmware only update (default)
+  "Recover" - Full update, saves and restores janus, settings.
+  "Install" - Full installation.
+
+Update Commands:
+  call  -> UtpCommand(body)
+  read  -> UtpRead(body, file)
+  write -> UtpWrite(body, file)
+  reset -> UtpReset(off, on, load, setup)
+
+  download(vid, image) - download image file to indicated vid
+  find(class, vid, pid) - find the usb device
+  parse(file) - parse the xml file
+  format - format device drive
+  copy - copy file to device
+  unpack - unpack archive to device
+-->
+
+<UCL>
+  <CFG>
+    <VER file="firmware.sb" label="Upgrade Firmware Version: "/>
+    <DEV mode="UserMtp"  vid="066F" pid="A010"/>
+    <DEV mode="UserMsc"  vid="066F" pid="8000"/>
+    <DEV mode="Updater"  vid="066F" pid="37FF"/>
+    <DEV mode="Recovery" vid="066F" pid="3700"/>
+  </CFG>
+  <LIST name="Load" desc="Preparing device for update.">
+    <CMD type="boot" body="Recovery" file="updater.sb">Reset device and load file.</CMD>
+    <CMD type="find" body="Updater">Waiting for device.</CMD>
+    <CMD type="pull" body="?" file="device.xml">Getting device info.</CMD>
+    <CMD type="show" file="device.xml">Ready.</CMD>/>
+  </LIST>
+  <LIST name="Exit" desc="Program shutdown actions.">
+    <CMD type="delete" file="device.xml"/>
+    <CMD type="delete" file="drv2.bin"/>
+    <CMD type="delete" file="drv3.bin"/>
+  </LIST>
+  <LIST name="Update" desc="Firmware only update (default).">
+    <CMD type="push" body="c" file="firmware.sb">Checking allocation.</CMD>
+    <CMD type="push" body="w 50" file="firmware.sb">Writing Firmware 1.</CMD>
+    <CMD type="push" body="w 60" file="firmware.sb"></CMD>
+    <CMD type="push" body="w 70" file="firmware.sb"></CMD>
+    <CMD type="drop" body="!1">Done.</CMD>
+  </LIST>
+  <LIST name="Recover" desc="Full update, saves and restores janus, settings.">
+    <CMD type="pull" body="r 2" file="drv2.bin" onError="ignore">Saving Settings.</CMD>
+    <CMD type="pull" body="r 3" file="drv3.bin" onError="ignore"/>
+    <CMD type="push" body="p" file="firmware.sb">Preparing Media.</CMD>
+    <CMD type="push" body="w 50" file="firmware.sb">Writing Firmware.</CMD>
+    <CMD type="push" body="w 60" file="firmware.sb"/>
+    <CMD type="push" body="w 70" file="firmware.sb"/>
+    <CMD type="push" body="w 2" file="drv2.bin" onError="ignore">Restoring Settings.</CMD>
+    <CMD type="push" body="w 3" file="drv3.bin" onError="ignore"/>
+    <CMD type="drop" body="!1">Done.</CMD>
+  </LIST>
+  <LIST name="Install" desc="Full installation.">
+    <CMD type="push" body="p" file="firmware.sb">Preparing Media.</CMD>
+    <CMD type="push" body="w 50" file="firmware.sb">Writing Firmware.</CMD>
+    <CMD type="push" body="w 60" file="firmware.sb"/>
+    <CMD type="push" body="w 70" file="firmware.sb"/>
+    <CMD type="drop" body="!3">Performing Initialization.</CMD>
+    <CMD type="find" body="Updater"/>
+    <CMD type="push" body="s"/>
+    <CMD type="drop" body="!1">Done.</CMD>
+  </LIST>
+</UCL>

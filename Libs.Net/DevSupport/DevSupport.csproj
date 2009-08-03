@@ -1,0 +1,177 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{02EBCAA5-8233-4B75-86E7-5B61787530FF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DevSupport</RootNamespace>
+    <AssemblyName>DevSupport</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <AssemblyOriginatorKeyFile>DevSupport.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>bin\Release\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Release\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Interop.PortableDeviceApiLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc84353abeda5dd1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\WPD\Interop.PortableDeviceApiLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.PortableDeviceTypesLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc84353abeda5dd1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\WPD\Interop.PortableDeviceTypesLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Imported Features\EnumHelpers.cs">
+      <Link>Utils\EnumHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\Imported Features\Singleton.cs">
+      <Link>Utils\Singleton.cs</Link>
+    </Compile>
+    <Compile Include="..\Utils\BinaryEditorEx.cs">
+      <Link>Utils\BinaryEditorEx.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\Utils\BinaryEditorEx.designer.cs">
+      <Link>Utils\BinaryEditorEx.designer.cs</Link>
+      <DependentUpon>BinaryEditorEx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\WPD\PortableDeviceConstants.cs">
+      <Link>WPD\PortableDeviceConstants.cs</Link>
+    </Compile>
+    <Compile Include="..\WPD\Utils.cs">
+      <Link>WPD\Utils.cs</Link>
+    </Compile>
+    <Compile Include="..\WPD\WpdMtpExtensions.cs">
+      <Link>WPD\WpdMtpExtensions.cs</Link>
+    </Compile>
+    <Compile Include="BulkOnlyTransport.cs" />
+    <Compile Include="Device.cs" />
+    <Compile Include="DeviceChangeMessageWindow.cs" />
+    <Compile Include="DeviceClass.cs" />
+    <Compile Include="DeviceManager.Api.cs" />
+    <Compile Include="DeviceManager.Api.Hid.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DeviceManager.Api.Recovery.cs" />
+    <Compile Include="DeviceManager.Api.Scsi.cs" />
+    <Compile Include="DeviceManager.Api.Utp.cs" />
+    <Compile Include="DeviceManager.Api.Wpd.cs" />
+    <Compile Include="DeviceManager.cs">
+    </Compile>
+    <Compile Include="DiskDeviceClass.cs" />
+    <Compile Include="HidDevice.cs" />
+    <Compile Include="HidDeviceClass.cs" />
+    <Compile Include="Media.cs" />
+    <Compile Include="FormatBuilder.cs" />
+    <Compile Include="MtpDevice.cs" />
+    <Compile Include="MtpDeviceClass.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="UpdateTransportProtocol.cs" />
+    <Compile Include="UsbController.cs" />
+    <Compile Include="UsbControllerMgr.cs" />
+    <Compile Include="UsbHub.cs" />
+    <Compile Include="UsbHubMgr.cs" />
+    <Compile Include="UsbPort.cs" />
+    <Compile Include="WinUsbDevice.cs" />
+    <Compile Include="WinUsbDeviceApi.cs" />
+    <Compile Include="WinUsbDeviceClass.cs" />
+    <Compile Include="WpdDevice.cs" />
+    <Compile Include="WpdDeviceClass.cs" />
+    <Compile Include="Native.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="RecoveryDevice.cs" />
+    <Compile Include="RecoveryDeviceClass.cs" />
+    <Compile Include="Volume.cs">
+    </Compile>
+    <Compile Include="VolumeDeviceClass.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Utils\BinaryEditorEx.resx">
+      <Link>Utils\BinaryEditorEx.resx</Link>
+      <DependentUpon>BinaryEditorEx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StHidBltc.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StHidPitc.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StMtp.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DevSupport.snk" />
+    <None Include="Resources\Scsi.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UtpScsiApi.ico" />
+    <None Include="Resources\UtpScsiMsg.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
