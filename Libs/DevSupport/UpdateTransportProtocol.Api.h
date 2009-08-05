@@ -13,19 +13,17 @@ using DevSupport.DeviceManager.UTP;
 */
 namespace api
 {
-    class ScsiUtpMsg : ScsiApi
+	typedef CStringT<char,StrTraitMFC<char> > CAnsiString;
+
+	class ScsiUtpMsg : public StApiT<_ST_SCSI_CDB::_CDBUTP16> // ScsiApi
     {
 	public:
-		/// <summary>
-        /// The StUtp Command. Byte[0] of the CDB.
-        /// </summary>
-        const UCHAR CommandOp = 0xF0;
 
         /// <summary>
         /// Utp Command Set. 
         /// Byte[1] of the CDB for Vendor-specific SCSI commands.
         /// </summary>
-        enum _CommandSet
+        typedef enum _CommandSet
         {
             Poll  = 0x00,
             Exec  = 0x01,
@@ -34,319 +32,291 @@ namespace api
             Reset = 0xAA
         } CommandSet;
 
-        /// <summary>
+		static CString MsgToString(CommandSet msg )
+		{
+			CString str;
+			switch (msg)
+			{
+			case Poll:
+				str = _T("Poll(0x00)");
+				break;
+			case Exec:
+				str = _T("Exec(0x01)");
+				break;
+			case Get:
+				str = _T("Get(0x02)");
+				break;
+			case Put:
+				str = _T("Put(0x03)");
+				break;
+			case Reset:
+				str = _T("Reset(0xAA)");
+				break;
+			default:
+				str.Format(_T("UNKNOWN(%#02x)"), msg);
+				break;
+			}
+
+			return str;
+		}
+
+		/// <summary>
         /// Utp Response Code Set. 
         /// Byte[12-13] of the SENSE_DATA structure for Vendor-specific SCSI commands.
         /// </summary>
-        public enum ResponseCodeType : short
+        typedef enum 
         {
-            PASS = unchecked((short)0x8000),
-            EXIT = unchecked((short)0x8001),
-            BUSY = unchecked((short)0x8002),
-            SIZE = unchecked((short)0x8003)
+            PASS = 0x8000,
+            EXIT = 0x8001,
+            BUSY = 0x8002,
+            SIZE = 0x8003
+        }ResponseCodeType;
+
+	protected:
+		ScsiUtpMsg(ScsiUtpMsg::_CommandSet cmd, uint8_t dir, int64_t length, uint32_t tag, int64_t lparam)
+            : StApiT<_ST_SCSI_CDB::_CDBUTP16>(API_TYPE_UTP, dir, _T("UtpCmd"))
+        {
+			_cdb.OperationCode = ST_SCSIOP_UTP;
+			_cdb.Command = cmd;
+			_cdb.Tag = Swap4((uint8_t*)&tag);
+			_cdb.LParam = Swap8((uint8_t*)&lparam);
+
+            _xferLength = length;
         }
 
-        protected ScsiUtpMsg(ScsiUtpMsg.CommandSet cmd, Api.CommandDirection dir, Int64 length, UInt32 tag, Int64 lparam)
-            : base(Api.CommandType.UtpScsiMsg, dir, 5/*timeout*/)
+	public:
+		virtual CString ToString() { CString str; str.Format(_T("Unknown(tag:%d, lParam:%#08x, cmd:%#01x)"), _cdb.Tag, _cdb.LParam, _cdb.Command); return str;};
+
+		ResponseCodeType GetResponseCode()
         {
-            _CDB.Add("Operation", CommandOp);
-            _CDB.Add("Command", cmd);
-            _CDB.Add("Tag", tag);
-            _CDB.Add("LParam", lparam);
-
-            TransferSize = length;
-        }
-
-        [Description("The Operation byte for the api."), Category("General")]
-        [TypeConverter(typeof(Utils.DecimalConverterEx))]
-        virtual public Byte Operation
-        {
-            get { return (Byte)_CDB.FromField("Operation"); }
-            private set { _CDB.ToField("Operation", value); }
-        }
-
-        [Description("The Command byte for the api."), Category("General")]
-        [TypeConverter(typeof(Utils.EnumConverterEx))]
-        public ScsiUtpMsg.CommandSet Command
-        {
-            get { return (ScsiUtpMsg.CommandSet)_CDB.FromField("Command"); }
-            private set { _CDB.ToField("Command", value); }
-        }
-
-        [Description("The tag for the entire UTP transaction."), Category("General")]
-        [TypeConverter(typeof(Utils.DecimalConverterEx))]
-        public UInt32 Tag
-        {
-            get { return (UInt32)_CDB.FromField("Tag"); }
-            /*private*/ set { _CDB.ToField("Tag", value); }
-        }
-
-        [Description("Meaning varies per UTP message."), Category("General")]
-        [TypeConverter(typeof(Utils.DecimalConverterEx))]
-        public Int64 LParam
-        {
-            get { return (Int64)_CDB.FromField("LParam"); }
-            /*private*/ set { _CDB.ToField("LParam", value); }
-        }
-
-        #region Response Properties
-
-        [Category("Response")]
-        [TypeConverter(typeof(Utils.EnumConverterEx))]
-        public ResponseCodeType ResponseCode
-        {
-            get 
+            if (ScsiSenseStatus == SCSISTAT_GOOD)
+				return PASS;
+            else
             {
-                if (SenseStatus == Win32.ScsiSenseStatus.GOOD)
-                    return ResponseCodeType.PASS;
+                if (ScsiSenseData.SenseKey == SCSI_SENSE_UNIQUE)
+                    return (ResponseCodeType)((ScsiSenseData.AdditionalSenseCode << 8) + ScsiSenseData.AdditionalSenseCodeQualifier);
                 else
-                {
-                    if (SenseData.SenseKey == Win32.ScsiSenseKey.SCSI_SENSE_UNIQUE)
-                        return (ResponseCodeType)((SenseData.AdditionalSenseCode << 8) + SenseData.AdditionalSenseCodeQualifier);
-                    else
-                        return ResponseCodeType.EXIT;
-                }
+					return EXIT;
             }
+        };
+
+		static CString CodeToString(ResponseCodeType code )
+		{
+			CString str;
+			switch (code)
+			{
+			case PASS:
+				str = _T("PASS(0x8000)");
+				break;
+			case EXIT:
+				str = _T("EXIT(0x8001)");
+				break;
+			case BUSY:
+				str = _T("BUSY(0x8002)");
+				break;
+			case SIZE:
+				str = _T("SIZE(0x8003)");
+				break;
+			default:
+				str.Format(_T("UNKNOWN(%#x)"), code);
+				break;
+			}
+
+			return str;
+		}
+
+		int32_t GetResponseInfo()
+        {
+            uint8_t tempData[4] = { ScsiSenseData.Information[0], ScsiSenseData.Information[1], ScsiSenseData.Information[2], ScsiSenseData.Information[3] };
+            return (int32_t)Swap4(tempData);
         }
 
-        [Category("Response")]
-        [TypeConverter(typeof(Utils.DecimalConverterEx))]
-        public Int32 ResponseInfo
+        int64_t GetResponseSize()
         {
-            get 
+			if (GetResponseCode() == SIZE)
             {
-                Byte[] tempData = new Byte[4] { SenseData.Information[0], SenseData.Information[1], SenseData.Information[2], SenseData.Information[3] };
-                Array.Reverse(tempData);
-                return BitConverter.ToInt32(tempData, 0);
+                uint8_t tempData[8] =
+                { 
+                    ScsiSenseData.CommandSpecificInformation[0], ScsiSenseData.CommandSpecificInformation[1], ScsiSenseData.CommandSpecificInformation[2], ScsiSenseData.CommandSpecificInformation[3], 
+                    ScsiSenseData.Information[0], ScsiSenseData.Information[1], ScsiSenseData.Information[2], ScsiSenseData.Information[3]
+                };
+                return (int64_t)Swap8(tempData);
             }
-        }
-
-        [Category("Response")]
-        [TypeConverter(typeof(Utils.ByteFormatConverter))]
-        public Int64 ResponseSize
-        {
-            get
+            else
             {
-                if (ResponseCode == ResponseCodeType.SIZE)
-                {
-                    Byte[] tempData = new Byte[8] 
-                    { 
-                        SenseData.CommandSpecificInformation[0], SenseData.CommandSpecificInformation[1], SenseData.CommandSpecificInformation[2], SenseData.CommandSpecificInformation[3], 
-                        SenseData.Information[0], SenseData.Information[1], SenseData.Information[2], SenseData.Information[3]
-                    };
-                    Array.Reverse(tempData);
-                    return BitConverter.ToInt64(tempData, 0);
-                }
+                return 0;
+            }
+        };
+
+        CString GetResponseString()
+        {
+			if (GetResponseCode() == PASS)
+                _responseStr = _T("PASS(0x8000)");
+            else if (ScsiSenseData.SenseKey == SCSI_SENSE_UNIQUE)
+            {
+				if (GetResponseCode() == SIZE)
+					_responseStr.Format(_T("SIZE(0x8003), Response Size: %#x"), GetResponseSize());
+				else if ( GetResponseCode() == BUSY)
+                    _responseStr.Format(_T("BUSY(0x8002), TicksRemaining: %d"), GetResponseInfo());
                 else
-                {
-                    return 0;
-                }
+					_responseStr.Format(_T("EXIT(0x8001), Response Info: %#x"), GetResponseInfo());
+            }
+				
+			return CString(StApi::ResponseString());
+        };
+    }; // ScsiUtpMsg
+
+    /// <summary>
+    /// ////////////////////////////////////////////////////////////////////////////////////
+    /// Poll
+    /// ////////////////////////////////////////////////////////////////////////////////////
+    /// </summary>
+    class Poll : public ScsiUtpMsg
+    {
+	public:
+		typedef enum _LParams { None, GetUtpVersion }LParams;
+
+        // Constructor
+        Poll(uint32_t tag, int64_t lParam)
+			: ScsiUtpMsg(ScsiUtpMsg::Poll, ST_WRITE_CMD, 0, tag, lParam)
+        {
+        }
+
+        CString ToString()
+        {
+			CString retStr, lparam;
+            
+            switch(_cdb.LParam)
+			{
+				case None:
+					lparam = _T("None(0)");
+					break;
+				case GetUtpVersion:
+					lparam = _T("GetUtpVersion(1)");
+					break;
+				default:
+					lparam.Format(_T("Unknown(%d)"), _cdb.LParam);
+					break;
+			}
+
+			retStr.Format(_T("Poll(tag:%d, lParam:%s)"), _cdb.Tag, lparam);
+
+			return retStr;
+        }
+
+   }; // class Poll
+
+    /// <summary>
+    /// ////////////////////////////////////////////////////////////////////////////////////
+    /// Exec
+    /// ////////////////////////////////////////////////////////////////////////////////////
+    /// </summary>
+    class Exec : public ScsiUtpMsg
+    {
+	private:
+		CAnsiString m_UtpCommand;
+
+	public:
+        // Constructor
+        Exec(uint32_t tag, int64_t lParam, CString utpCommand)
+			: ScsiUtpMsg(ScsiUtpMsg::Exec, ST_WRITE_CMD_PLUS_DATA, 0, tag, lParam)
+        {
+            USES_CONVERSION;
+
+			m_UtpCommand = T2A(utpCommand);
+
+			if (m_UtpCommand.IsEmpty())
+            {
+                _xferLength = 0;
+                if ( _sendDataPtr )
+				{
+					free(_sendDataPtr);
+					_sendDataPtr = NULL;
+				}
+            }
+            else
+            {
+                _xferLength = (uint32_t)m_UtpCommand.GetLength();
+                _sendDataPtr = (uint8_t*)malloc(_xferLength);
+
+				memcpy_s(_sendDataPtr, _xferLength, m_UtpCommand.GetBuffer(), _xferLength);
             }
         }
 
-        [Category("Response")]
-        public override string ResponseString
-        {
-            get
-            {
-                Utils.DecimalConverterEx decCnvrt = new Utils.DecimalConverterEx();
-                Utils.EnumConverterEx enumCnvrt = new Utils.EnumConverterEx(typeof(ResponseCodeType));
-                Utils.ByteFormatConverter byteCnvrt = new Utils.ByteFormatConverter();
+//		CString GetUtpCommand() { USES_CONVERSION; return CString(A2T(m_UtpCommand)); };
 
-                if (ResponseCode == ResponseCodeType.PASS)
-                    return enumCnvrt.ConvertToString(ResponseCode);
-                else if (SenseData.SenseKey == Win32.ScsiSenseKey.SCSI_SENSE_UNIQUE)
-                {
-                    if (ResponseCode == ResponseCodeType.SIZE)
-                        return enumCnvrt.ConvertToString(ResponseCode) + ", Response Size: " + byteCnvrt.ConvertToString(ResponseSize);
-                    else if ( ResponseCode == ResponseCodeType.BUSY)
-                        return enumCnvrt.ConvertToString(ResponseCode) + ", TicksRemaining: " + ResponseInfo.ToString("#,#0");
-                    else
-                        return enumCnvrt.ConvertToString(ResponseCode) + ", Response Info: " + decCnvrt.ConvertToString(ResponseInfo);
-                }
-                else
-                    return base.ResponseString;
-            }
+		CString ToString()
+        {
+            USES_CONVERSION;
+
+			CString str;
+			str.Format(_T("Exec(tag:%d, lParam:%#08x, cmd:"), _cdb.Tag, _cdb.LParam);
+			str += CString(A2T(m_UtpCommand)) + _T(")");
+
+			return str;
         }
-
-        #endregion
-
-        /// <summary>
-        /// ////////////////////////////////////////////////////////////////////////////////////
-        /// Poll
-        /// ////////////////////////////////////////////////////////////////////////////////////
-        /// </summary>
-        public class Poll : ScsiUtpMsg
-        {
-            public enum LParams : ulong { None, GetUtpVersion }
-            // Constructor
-            public Poll(UInt32 tag, Int64 lParam)
-                : base(ScsiUtpMsg.CommandSet.Poll, Api.CommandDirection.NoData, 0, tag, lParam)
-            {
-            }
-
-            public override string ToString()
-            {
-                String lparam = String.Empty;
-                
-                try { lparam = Enum.GetName(typeof(LParams), LParam); }
-                catch {}
-                
-                if ( String.IsNullOrEmpty(lparam) )
-                    lparam = LParam.ToString("#,#0");
-                else
-                    lparam += "(" + LParam.ToString("#,#0") + ")";
-
-                return String.Format("Poll(tag:{0}, lParam:{1})", Tag, lparam);
-            }
-
-       } // class Poll
-
-        /// <summary>
-        /// ////////////////////////////////////////////////////////////////////////////////////
-        /// Exec
-        /// ////////////////////////////////////////////////////////////////////////////////////
-        /// </summary>
-        public class Exec : ScsiUtpMsg
-        {
-            // Constructor
-            public Exec(UInt32 tag, Int64 lParam, String utpCommand)
-                : base(ScsiUtpMsg.CommandSet.Exec, Api.CommandDirection.WriteWithData, 0, tag, lParam)
-            {
-                UtpCommand = utpCommand;
-            }
-
-            #region Parameter Properties
-
-            // Parameters
-            [Category("Parameters"), Description("The UTP command.")]
-            public String UtpCommand
-            {
-                get { return _UtpCommand; }
-                set
-                {
-                    _UtpCommand = value;
-                    if (_UtpCommand == null)
-                    {
-                        TransferSize = 0;
-                        Data = null;
-                    }
-                    else
-                    {
-                        TransferSize = (UInt32)_UtpCommand.Length;
-                        Data = new Byte[TransferSize];
-
-                        ASCIIEncoding ascii = new ASCIIEncoding();
-                        ascii.GetBytes(_UtpCommand, 0, (Int32)TransferSize, Data, 0);
-                    }
-                }
-            }
-            private String _UtpCommand;
-
-            #endregion
-
-            public override string ToString()
-            {
-                return String.Format("Exec(tag:{0}, lParam:0x{1:X}, cmd:{2})", Tag, LParam, UtpCommand);
-            }
-        
-        } // class Exec
-
-        /// <summary>
-        /// ////////////////////////////////////////////////////////////////////////////////////
-        /// Get
-        /// ////////////////////////////////////////////////////////////////////////////////////
-        /// </summary>
-        public class Get : ScsiUtpMsg
-        {
-            // Constructor
-            public Get(UInt32 tag, Int64 lParam, Int64 length)
-                : base(ScsiUtpMsg.CommandSet.Get, Api.CommandDirection.ReadWithData, length, tag, lParam)
-            {
-            }
-
-            // Base class override implementations
-            public override Int32 ProcessResponse(Byte[] data, Int64 start, Int64 count)
-            {
-                Debug.Assert(count >= TransferSize);
-
-                Data = new Byte[TransferSize];
-
-                data.CopyTo(Data, 0);
-
-                return Win32.ERROR_SUCCESS;
-            }
-
-            #region Response Properties
-
-            [Category("Response")]
-            [Browsable(true)]
-            public override byte[] Data
-            {
-                get { return base.Data; }
-                set { base.Data = value; }
-            }
-/*
-            [Browsable(false)]
-            override public String ResponseString
-            {
-                get
-                {
-                    return FormatReadResponse(Data, 16, 1);
-                }
-            }
-*/
-            #endregion // Response
-
-            public override string ToString()
-            {
-                return String.Format("Get(tag:{0}, pkt{1}, len:0x{2:X})", Tag, LParam, TransferSize);
-            }
-        
-        } // class Get
-
-        /// <summary>
-        /// ////////////////////////////////////////////////////////////////////////////////////
-        /// Put
-        /// ////////////////////////////////////////////////////////////////////////////////////
-        /// </summary>
-        public class Put : ScsiUtpMsg
-        {
-            // Constructor
-            public Put(UInt32 tag, Int64 lParam, Byte[] data)
-                : base(ScsiUtpMsg.CommandSet.Put, Api.CommandDirection.WriteWithData, data != null ? data.Length : 0, tag, lParam)
-            {
-                Data = data;
-            }
-
-            [Category("Parameters"), Description("Data to write.")]
-            [Browsable(true)]
-            [Editor(typeof(Utils.BinaryEditorEx), typeof(System.Drawing.Design.UITypeEditor))]
-            public override byte[] Data
-            {
-                get
-                {
-                    if (base.Data == null)
-                        base.Data = new Byte[TransferSize];
-
-                    return base.Data;
-                }
-                set { base.Data = value; }
-            }
-
-            public override string ToString()
-            {
-                return String.Format("Put(tag:{0}, pkt:{1}, len:0x{2:X})", Tag, LParam, TransferSize);
-            }
-        
-        } // class Put
     
-    } // ScsiUtpMsg
+    }; // class Exec
 
+    /// <summary>
+    /// ////////////////////////////////////////////////////////////////////////////////////
+    /// Get
+    /// ////////////////////////////////////////////////////////////////////////////////////
+    /// </summary>
+    class Get : public ScsiUtpMsg
+    {
+	public:
+        // Constructor
+        Get(uint32_t tag, int64_t lParam, int64_t length)
+			: ScsiUtpMsg(ScsiUtpMsg::Get, ST_READ_CMD, length, tag, lParam)
+        {
+        }
+
+        CString ToString()
+        {
+            CString str;
+			str.Format(_T("Get(tag:%d, pkt:%d, len:%#04x)"), _cdb.Tag, _cdb.LParam, _xferLength);
+
+			return str;
+        }
+    
+    }; // class Get
+
+    /// <summary>
+    /// ////////////////////////////////////////////////////////////////////////////////////
+    /// Put
+    /// ////////////////////////////////////////////////////////////////////////////////////
+    /// </summary>
+    class Put : public ScsiUtpMsg
+    {
+	public:
+        // Constructor
+		Put(uint32_t tag, int64_t lParam, std::vector<uint8_t> data)
+			: ScsiUtpMsg(ScsiUtpMsg::Put, ST_WRITE_CMD_PLUS_DATA, data.size(), tag, lParam)
+        {
+			if ( data.size() )
+			{
+				_sendDataPtr = (uint8_t*)malloc(data.size());
+				for ( unsigned int i = 0; i < data.size(); ++i )
+					*(_sendDataPtr + i) = data[i];
+			}
+        }
+
+        CString ToString()
+        {
+            CString str;
+			str.Format(_T("Put(tag:%d, pkt:%d, len:%#04x)"), _cdb.Tag, _cdb.LParam, _xferLength);
+
+			return str;
+        }
+    
+    }; // class Put
+    
+/*
     public class ScsiUtpApi : ScsiApi
     {
         protected ScsiUtpApi(Api.CommandDirection dir)
-            : base(Api.CommandType.UtpScsiApi, dir, 5/*timeout*/)
+            : base(Api.CommandType.UtpScsiApi, dir, 5) // timeout
         {
         }
 
@@ -487,5 +457,6 @@ namespace api
             private String _Filename;
 
         } // class UtpWrite
-    }
+    };
+*/
 } // namespace DevSupport.Api

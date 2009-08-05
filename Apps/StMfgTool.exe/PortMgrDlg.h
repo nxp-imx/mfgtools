@@ -32,6 +32,28 @@ public:
 
 	static const PTCHAR PortEventStrings[];
 	typedef enum OP_MGR_MODE{ OPMODE_INVALID = 0, OPMODE_MONITOR, OPMODE_RUNNING, OPMODE_ALL_OPS_COMPLETE };
+	static CString OpModeToString(OP_MGR_MODE mode)
+	{
+		CString str;
+		switch(mode)
+		{
+			case OPMODE_MONITOR:
+				str = _T("MONITOR");
+				break;
+			case OPMODE_RUNNING:
+				str = _T("RUNNING");
+				break;
+			case OPMODE_ALL_OPS_COMPLETE:
+				str = _T("ALL_OPS_COMPLETE");
+				break;
+			case OPMODE_INVALID:
+			default:
+				str = _T("INVALID");
+				break;
+		}
+		return str;
+	}
+
 	enum _tag_e_DLG_ID{ IDD = IDD_PORT_DLG };
 	void OpCompleteTick(DWORD _dwElapsedTime);
 /*

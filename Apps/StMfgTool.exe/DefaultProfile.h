@@ -6,7 +6,7 @@
 // profiles in the Profiles folder.
 //
 // Firmware files are attached resources.
-#include "Libs/DevSupport/StMedia.h"
+//#include "Libs/DevSupport/StMedia.h"
 
 //#define RESTRICTED_PC_IDS TRUE
 //#define LOCKED_DEFAULT_PROFILE TRUE

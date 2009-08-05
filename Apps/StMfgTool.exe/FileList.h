@@ -2,7 +2,6 @@
 
 #define NO_INDEX        -1
 
-
 class CFileList
 {
 public:
@@ -12,19 +11,20 @@ public:
 	
 	typedef enum FileListAction {EXISTS_IN_TARGET=0, COPY_TO_TARGET, DELETE_FROM_TARGET, CREATE_DIR, IN_EDIT_ADD, IN_EDIT_DELETE, IN_EDIT_CREATE_DIR, RESOURCE_FILE, IGNORE_FILEITEM};
 
-typedef struct _fileListItem
+	struct FILEITEM
 	{
 		int			m_action;
 		int			m_currentAction;
 		CString		m_csFilePathName;
 		CString		m_csFileName;
-		PVOID		m_pNext;
+		FILEITEM*	m_pNext;
 		DWORD		m_dwAttr;
 		FILETIME	m_timestamp;
 		DWORD		m_dwFileSize;
 		CFileList	*m_pSubFolderList;
 		int			m_resId;
-	} FILEITEM, *PFILEITEM;
+	};
+	typedef FILEITEM* PFILEITEM;
 
 protected:
 

@@ -42,15 +42,17 @@ public:
 	typedef struct NotifyStruct
 	{
         enum dataDir { dataDir_Off, dataDir_FromDevice, dataDir_ToDevice };
-        NotifyStruct(LPCTSTR name)
+        NotifyStruct(LPCTSTR name, dataDir dir, uint32_t max)
             : inProgress(true)
-            , direction(dataDir_Off)
+            , direction(dir)
             , position(0)
+			, maximum(max)
             , error(ERROR_SUCCESS)
             , status(name){};
         bool inProgress;
         dataDir direction;
         uint32_t position;
+		uint32_t maximum;
         int32_t error;
 		CStdString status;
 	};
@@ -70,7 +72,7 @@ public:
 	virtual void RegisterProperties();
 	virtual bool SelfTest(bool eject = false);
 	virtual uint32_t SendCommand(StApi& api, uint8_t* additionalInfo = NULL) { return ERROR_CALL_NOT_IMPLEMENTED; };
-	virtual CStdString GetSendCommandErrorStr() { return CStdString(); };
+//	virtual CStdString GetSendCommandErrorStr() { return CStdString(); };
 	virtual uint32_t ResetChip() { return ERROR_CALL_NOT_IMPLEMENTED; };
 	virtual uint32_t ResetToRecovery() { return ERROR_CALL_NOT_IMPLEMENTED; };
 	virtual uint32_t OldResetToRecovery() { return ERROR_CALL_NOT_IMPLEMENTED; };

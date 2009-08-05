@@ -573,7 +573,6 @@ void CCopyOpDlg::OnFolderListContextMenu(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CCopyOpDlg::OnMenuClickedAdd()
 {
-    CString copy_buffer;
 	CString resStr;
     CFileDialog *dlg;
 	HTREEITEM hParent;

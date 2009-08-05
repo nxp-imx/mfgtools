@@ -58,7 +58,7 @@ public:
 //clw	CUSBPortMgr* GetUSBPortMgr(void) {return m_p_usb_port_mgr;};
 	CConfigMgrSheet* GetConfigMgr(void) {return m_p_config_mgr;};
 	CLogMgrDlg* GetLogMgrDlg(void) {return m_pLogMgrDlg;};
-	CPortMgrDlg* GetPortDlg(INT_PTR _idx) { if( m_p_main_frame->GetSafeHwnd() ) { if(_idx <= m_p_config_mgr->GetNumEnabledPorts() ) return m_p_main_frame->GetPortDlg(_idx); else return NULL; } else return NULL; };
+	CPortMgrDlg* GetPortDlg(INT_PTR _idx) { if( m_p_main_frame->GetSafeHwnd() ) { if(_idx < m_p_config_mgr->GetNumEnabledPorts() ) return m_p_main_frame->GetPortDlg(_idx); else return NULL; } else return NULL; };
 	CVersionInfo * GetVersionInfo(void) { return &m_version_info; };
 protected:
     BOOL FirstInstance(void);

@@ -15,385 +15,509 @@ using DevSupport.Api;
 */
 #include "Volume.h"
 #include "UpdateTransportProtocol.Api.h"
+//#include <ios>
+//#include <iostream>
 
-public class UpdateTransportProtocol
+
+class UpdateTransportProtocol
 {
 private:
-	Volume UtpDevice = null;
-    HANDLE hDevice = null;
-    static UInt32 TransactionTag = 0;
+	Volume* m_pUtpDevice;
+    HANDLE m_hDevice;
+    /// The maximum consecutive Poll messages returning the same BusyState.ResponseInfo before Transaction times out.
+    uint32_t m_MaxPollBusy;
+    /// The maximum packet size that can be transfered by the UTP Device.
+    int64_t m_MaxPacketSize;
+	bool m_Disposed;
+    ///     The version of the device implemented UTP Protocol.
+    int32_t m_UtpVersion;
+    ///     The time in miliseconds to delay between utpBusy messages.
+    int32_t m_BusyDelay;
 
 public:
+    static uint32_t g_TransactionTag;
+	uint32_t GetBusyDelay() { return m_BusyDelay; };
+	uint32_t GetMaxPollBusy() { return m_MaxPollBusy; };
+	int64_t GetMaxPacketSize() { return m_MaxPacketSize; };
+    typedef enum { PowerDown, ChipReset, ResetToRecovery, ResetToUpdater } ResetType;
+
+	class State;
+
 	class Transaction
     {
 	public:
-		Transaction(UpdateTransportProtocol* pUtpInstance, CString command);
-        {
-            m_pUpdateProtocol = pUtpInstance;
-            m_Command = command;
-            m_Tag = ++UpdateTransportProtocol.TransactionTag;
+		Transaction(UpdateTransportProtocol* pUtpInstance, CString command)
+			: m_pCurrentState(NULL)
+			, m_pUpdateProtocol(pUtpInstance)
+			, m_Command(command)
+            , m_BusyCount(0)
+			, m_Tag(0)
+			, m_TotalSize(0)
+			, m_CurrentSize(0)
+			, m_LParam(0)
+		{
+			m_Tag = ++UpdateTransportProtocol::g_TransactionTag;
         }
+
+		virtual ~Transaction()
+		{
+			if ( m_pCurrentState )
+			{
+				delete m_pCurrentState;
+				m_pCurrentState = NULL;
+			}
+		}
         
 		bool KeepPolling()
         {
-            return m_BusyCount < m_pUpdateProtocol->MaxPollBusy;
-        }
-
-        virtual Int64 LParam = 0;
+            return m_BusyCount < m_pUpdateProtocol->GetMaxPollBusy();
+        };
 
 		virtual void Next() = 0;
+		State* GetCurrentState() { return m_pCurrentState; };
+		uint32_t GetTag() { return m_Tag; };
+		CString GetCommand() { return m_Command; };
+		UpdateTransportProtocol* GetProtocol() { return m_pUpdateProtocol; };
+		int64_t GetLParam() { return m_LParam; };
+		int64_t GetMaxPacketSize() { return m_pUpdateProtocol->GetMaxPacketSize(); };
+		int64_t GetTotalSize() { return m_TotalSize; };
+		int64_t GetCurrentSize() { return m_CurrentSize; };
+		void SetCurrentSize(int64_t size) { m_CurrentSize = size; };
+		void IncrementBusyCount() { ++m_BusyCount; };
+		void ClearBusyCount() { m_BusyCount = 0; };
+		uint32_t GetBusyCount() { return m_BusyCount; };
 
 	protected:
 		State* m_pCurrentState;
-        UpdateTransportProtocol m_pUpdateProtocol;
-        UInt32 m_BusyCount;
-        
-	private:
-		UInt32 m_Tag;
+        UpdateTransportProtocol* m_pUpdateProtocol;
+        uint32_t m_BusyCount;
+		uint32_t m_Tag;
         CString m_Command;
-        Int64 m_TotalSize;
-        Int64 m_CurrentSize;
-    }
+        int64_t m_TotalSize;
+        int64_t m_CurrentSize;
+		int64_t m_LParam;
+    };
 
-    class CommandTransaction : Transaction
+    class CommandTransaction : public Transaction
     {
 	public:
 		CommandTransaction(UpdateTransportProtocol* pUtpInstance, CString command)
-            : base(utpInstance, command)
+            : Transaction(pUtpInstance, command)
         {
             m_pCurrentState = new StartState(this);
         }
 
+		int64_t PacketCount()
+        {
+            return m_CurrentSize / m_pUpdateProtocol->GetMaxPacketSize();
+        }
+
         void Next()
         {
-            switch (m_pCurrentState->m_Msg->ResponseCode)
+			State* pNextState = NULL;
+
+			switch (m_pCurrentState->GetUtpMsg()->GetResponseCode())
             {
-				case ScsiUtpMsg::ResponseCodeType::BUSY:
-                    if (CurrentState is StartState)
+				case ScsiUtpMsg::BUSY:
+					if (m_pCurrentState->GetStateType() == State::StartState)
                     {
-                        TotalSize = CurrentState.Msg.ResponseInfo;
-                        CurrentSize = 0;
+                        m_TotalSize = m_pCurrentState->GetUtpMsg()->GetResponseInfo();
+                        m_CurrentSize = 0;
 
                     }
                     else
                     {
-                        CurrentSize = Math.Min(TotalSize, TotalSize - CurrentState.Msg.ResponseInfo);
+                        m_CurrentSize = min(m_TotalSize, m_TotalSize - m_pCurrentState->GetUtpMsg()->GetResponseInfo());
                     }
                     
-                    CurrentState = new BusyState(this, CurrentState.Msg.ResponseInfo);
-                    if (KeepPolling)
-                        Thread.Sleep(UpdateProtocol.BusyDelay);
+                    pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
+                    if (KeepPolling())
+                        Sleep(m_pUpdateProtocol->GetBusyDelay());
                     else
-                        CurrentState = new DoneState(this, -65535, "ERROR: Polling stalled. (-65535)");
+					{
+						delete pNextState; pNextState = NULL;
+                        pNextState = new DoneState(this, -65535, _T("ERROR: Polling stalled. (-65535)"));
+					}
                     break;
-                case ScsiUtpMsg.ResponseCodeType.EXIT:
-                    CurrentState = new DoneState(this, CurrentState.Msg.ResponseInfo, CurrentState.Msg.ResponseString);
+				case ScsiUtpMsg::EXIT:
+                    pNextState = new DoneState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo(), m_pCurrentState->GetUtpMsg()->GetResponseString());
                     break;
-                case ScsiUtpMsg.ResponseCodeType.PASS:
-                    CurrentState = new DoneState(this, 0, CurrentState.Msg.ResponseString);
+				case ScsiUtpMsg::PASS:
+                    pNextState = new DoneState(this, 0, m_pCurrentState->GetUtpMsg()->GetResponseString());
                     break;
                 default:
 //                        String msg = String.Format("In: {0}, Sent: {1}\r\n Response: {2}\r\n Moving to: {3}");
-                    String msg = String.Format("Illegal ResponseCode({0}) for {1}->{2} message.",CurrentState.Msg.ResponseCode, CurrentState.GetType().Name, CurrentState.Msg); 
+                    CString msg;
+					msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
+						ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()),
+						State::StateToString(m_pCurrentState->GetStateType()),
+						m_pCurrentState->GetUtpMsg()->ToString()); 
 //                        InvalidTransactionStateException e = new InvalidTransactionStateException(msg2);
 //                        throw e;
-                    CurrentState = new DoneState(this, -65536, msg + " (-65536)");
+                    pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
                     break;
             }
+
+			delete m_pCurrentState;
+			m_pCurrentState = pNextState;
         }
+    };
 
-    }
-
-    public class ReadTransaction : Transaction
+    class ReadTransaction : public Transaction
     {
-        public Int64 PacketCount
-        {
-            get { return CurrentSize / UpdateProtocol.MaxPacketSize; }
+	private:
+		std::vector<uint8_t> m_Data;
+
+	public:
+        std::vector<uint8_t> GetData()
+		{
+            return m_Data;
         }
 
-        public Byte[] Data
+        ReadTransaction(UpdateTransportProtocol* pUtpInstance, CString command)
+            : Transaction(pUtpInstance, command)
         {
-            get { return _Data; }
-            private set { _Data = value; }
-        }
-        private Byte[] _Data = null;
-
-        public ReadTransaction(UpdateTransportProtocol utpInstance, String command)
-            : base(utpInstance, command)
-        {
-            CurrentState = new StartState(this);
+            m_pCurrentState = new StartState(this);
         }
 
-        public override void Next()
+        int64_t GetPacketCount() { return m_CurrentSize/m_pUpdateProtocol->GetMaxPacketSize(); };
+
+		void Next()
         {
-            if (CurrentState is StartState)
+			State* pNextState = NULL;
+
+			if (m_pCurrentState->GetStateType() == State::StartState)
             {
-                switch (CurrentState.Msg.ResponseCode)
+				switch (m_pCurrentState->GetUtpMsg()->GetResponseCode())
                 {
-                    case ScsiUtpMsg.ResponseCodeType.SIZE:
-                        TotalSize = CurrentState.Msg.ResponseSize;
-                        CurrentSize = 0;
-                        Data = new Byte[TotalSize];
-                        CurrentState = new GetDataState(this);
+					case ScsiUtpMsg::SIZE:
+                        m_TotalSize = m_pCurrentState->GetUtpMsg()->GetResponseSize();
+                        m_CurrentSize = 0;
+                        m_Data.resize(m_TotalSize);
+						// Data = new Byte[TotalSize];
+                        pNextState = new GetDataState(this);
                         break;
-                    case ScsiUtpMsg.ResponseCodeType.EXIT:
-                        CurrentState = new DoneState(this, CurrentState.Msg.ResponseInfo, CurrentState.Msg.ResponseString);
+					case ScsiUtpMsg::EXIT:
+                        pNextState = new DoneState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo(), m_pCurrentState->GetUtpMsg()->GetResponseString());
                         break;
                     default:
 //                            throw new Exception("Illegal Response Code for this transaction.");
-                        String msg = String.Format("Illegal ResponseCode({0}) for {1}->{2} message.", CurrentState.Msg.ResponseCode, CurrentState.GetType().Name, CurrentState.Msg);
-                        CurrentState = new DoneState(this, -65536, msg + " (-65536)");
+                        CString msg;
+						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
+							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()),
+							State::StateToString(m_pCurrentState->GetStateType()),
+							m_pCurrentState->GetUtpMsg()->ToString());
+                        pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
                         break;
                 }
             }
             else
             {
-                switch (CurrentState.Msg.ResponseCode)
+                switch (m_pCurrentState->GetUtpMsg()->GetResponseCode())
                 {
-                    case ScsiUtpMsg.ResponseCodeType.BUSY:
-                        CurrentState = new BusyState(this, CurrentState.Msg.ResponseInfo);
-                        if (KeepPolling)
-                            Thread.Sleep(UpdateProtocol.BusyDelay);
+					case ScsiUtpMsg::BUSY:
+                        pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
+                        if (KeepPolling())
+                            Sleep(m_pUpdateProtocol->GetBusyDelay());
                         else
-                            CurrentState = new DoneState(this, -65535, "ERROR: Polling stalled. (-65535)");
+						{
+							delete pNextState;
+                            pNextState = new DoneState(this, -65535, _T("ERROR: Polling stalled. (-65535)"));
+						}
                         break;
-                    case ScsiUtpMsg.ResponseCodeType.PASS:
-                        if (CurrentSize < TotalSize)
-                            CurrentState = new GetDataState(this);
+					case ScsiUtpMsg::PASS:
+                        if (m_CurrentSize < m_TotalSize)
+                            pNextState = new GetDataState(this);
                         else
-                            CurrentState = new DoneState(this, 0, CurrentState.Msg.ResponseString);
+                            pNextState = new DoneState(this, 0, m_pCurrentState->GetUtpMsg()->GetResponseString());
                         break;
-                    case ScsiUtpMsg.ResponseCodeType.EXIT:
-                        CurrentState = new DoneState(this, CurrentState.Msg.ResponseInfo, CurrentState.Msg.ResponseString);
+					case ScsiUtpMsg::EXIT:
+                        pNextState = new DoneState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo(), m_pCurrentState->GetUtpMsg()->GetResponseString());
                         break;
                     default:
-//                            throw new Exception("Illegal Response Code for this transaction.");
-                        String msg = String.Format("Illegal ResponseCode({0}) for {1}->{2} message.", CurrentState.Msg.ResponseCode, CurrentState.GetType().Name, CurrentState.Msg);
-                        CurrentState = new DoneState(this, -65536, msg + " (-65536)");
+						CString msg;
+						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
+							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()),
+							State::StateToString(m_pCurrentState->GetStateType()),
+							m_pCurrentState->GetUtpMsg()->ToString());
+                        pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
                         break;
                 }
             }
+
+			delete m_pCurrentState;
+			m_pCurrentState = pNextState;
         }
 
-        public void CopyData()
+        void CopyData()
         {
-            Array.Copy(CurrentState.Msg.Data, 0, Data, CurrentSize, CurrentState.Msg.Data.Length);
-            CurrentSize += CurrentState.Msg.Data.Length;
+			const uint8_t* pSrc = m_pCurrentState->GetUtpMsg()->GetDataPtr();
+//			std::vector<uint8_t>::iterator dest = m_Data.begin() + m_CurrentSize;
+			for ( uint32_t i = 0; i < m_pCurrentState->GetUtpMsg()->GetTransferSize(); ++i )
+			{
+				m_Data[i] = pSrc[i];
+			}
+            m_CurrentSize += m_pCurrentState->GetUtpMsg()->GetTransferSize();
         }
 
-    }
+    };
 
-    public class WriteTransaction : Transaction
+    class WriteTransaction : public Transaction
     {
-        public override Int64 LParam
-        {
-            get { return _LParam; }
-        }
-        private Int64 _LParam;
+	private:
+		std::vector<uint8_t> m_Data;
 
-        public Int64 PacketCount
-        {
-            get { return CurrentSize/UpdateProtocol.MaxPacketSize; }
+	public:
+        std::vector<uint8_t> GetData()
+		{
+            return m_Data;
         }
 
-        public Byte[] Data
+        WriteTransaction(UpdateTransportProtocol* pUtpInstance, CString command, std::vector<uint8_t> data)
+            : Transaction(pUtpInstance, command)
         {
-            get { return _Data; }
-            private set { _Data = value; }
-        }
-        private Byte[] _Data = null;
+            m_LParam = m_TotalSize = data.size();
+			m_Data.assign(data.begin(), data.end());
 
-        public WriteTransaction(UpdateTransportProtocol utpInstance, String command, Byte[] data)
-            : base(utpInstance, command)
-        {
-            _LParam = TotalSize = data.Length;
-            Data = new Byte[TotalSize];
-            Array.Copy(data, Data, data.Length);
-
-            CurrentState = new StartState(this);
+            m_pCurrentState = new StartState(this);
         }
 
-        public override void Next()
+        int64_t GetPacketCount() { return m_CurrentSize/m_pUpdateProtocol->GetMaxPacketSize(); };
+
+        void Next()
         {
-            if (CurrentState is StartState)
+			State* pNextState = NULL;
+
+			if (m_pCurrentState->GetStateType() == State::StartState)
             {
-                switch (CurrentState.Msg.ResponseCode)
+				switch (m_pCurrentState->GetUtpMsg()->GetResponseCode())
                 {
-                    case ScsiUtpMsg.ResponseCodeType.BUSY:
+					case ScsiUtpMsg::BUSY:
                         
-                        TotalSize = CurrentState.Msg.ResponseInfo;
-                        CurrentSize = 0;
+                        m_TotalSize = m_pCurrentState->GetUtpMsg()->GetResponseInfo();
+                        m_CurrentSize = 0;
 
-                        CurrentState = new BusyState(this, CurrentState.Msg.ResponseInfo);
-                        Thread.Sleep(UpdateProtocol.BusyDelay);
+                        pNextState = new BusyState(this, m_TotalSize);
+                        Sleep(m_pUpdateProtocol->GetBusyDelay());
                         
                         break;
                     
-                    case ScsiUtpMsg.ResponseCodeType.EXIT:
-                        CurrentState = new DoneState(this, CurrentState.Msg.ResponseInfo, CurrentState.Msg.ResponseString);
+					case ScsiUtpMsg::EXIT:
+                        pNextState = new DoneState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo(), m_pCurrentState->GetUtpMsg()->GetResponseString());
                         break;
-                    case ScsiUtpMsg.ResponseCodeType.PASS:
-                        CurrentState = new PutDataState(this);
+					case ScsiUtpMsg::PASS:
+                        pNextState = new PutDataState(this);
                         break;
                     default:
-//                            throw new Exception("Illegal Response Code for this transaction.");
-                        String msg = String.Format("Illegal ResponseCode({0}) for {1}->{2} message.", CurrentState.Msg.ResponseCode, CurrentState.GetType().Name, CurrentState.Msg);
-                        CurrentState = new DoneState(this, -65536, msg + " (-65536)");
+						CString msg;
+						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
+							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()),
+							State::StateToString(m_pCurrentState->GetStateType()),
+							m_pCurrentState->GetUtpMsg()->ToString());
+                        pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
                         break;
                 }
             }
             else
             {
-                switch (CurrentState.Msg.ResponseCode)
+                switch (m_pCurrentState->GetUtpMsg()->GetResponseCode())
                 {
-                    case ScsiUtpMsg.ResponseCodeType.BUSY:
+					case ScsiUtpMsg::BUSY:
 
-                        CurrentSize = Math.Min(TotalSize, TotalSize - CurrentState.Msg.ResponseInfo);
+                        m_CurrentSize = min(m_TotalSize, m_TotalSize - m_pCurrentState->GetUtpMsg()->GetResponseInfo());
 
-                        CurrentState = new BusyState(this, CurrentState.Msg.ResponseInfo);
-                        if (KeepPolling)
-                            Thread.Sleep(UpdateProtocol.BusyDelay);
+                        pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
+                        if (KeepPolling())
+                            Sleep(m_pUpdateProtocol->GetBusyDelay());
                         else
-                            CurrentState = new DoneState(this, -65535, "ERROR: Polling stalled. (-65535)");
-                        
+						{
+							delete pNextState;
+                            pNextState = new DoneState(this, -65535, _T("ERROR: Polling stalled. (-65535)"));
+						}
                         break;
 
-                    case ScsiUtpMsg.ResponseCodeType.PASS:
-                        if (CurrentSize < TotalSize)
-                            CurrentState = new PutDataState(this);
+					case ScsiUtpMsg::PASS:
+                        if (m_CurrentSize < m_TotalSize)
+                            pNextState = new PutDataState(this);
                         else
-                            CurrentState = new DoneState(this, 0, CurrentState.Msg.ResponseString);
+                            pNextState = new DoneState(this, 0, m_pCurrentState->GetUtpMsg()->GetResponseString());
                         break;
-                    case ScsiUtpMsg.ResponseCodeType.EXIT:
-                        CurrentState = new DoneState(this, CurrentState.Msg.ResponseInfo, CurrentState.Msg.ResponseString);
+					case ScsiUtpMsg::EXIT:
+                        pNextState = new DoneState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo(), m_pCurrentState->GetUtpMsg()->GetResponseString());
                         break;
                     default:
-//                            throw new Exception("Illegal Response Code for this transaction.");
-                        String msg = String.Format("Illegal ResponseCode({0}) for {1}->{2} message.", CurrentState.Msg.ResponseCode, CurrentState.GetType().Name, CurrentState.Msg);
-                        CurrentState = new DoneState(this, -65536, msg + " (-65536)");
+						CString msg;
+						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
+							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()),
+							State::StateToString(m_pCurrentState->GetStateType()),
+							m_pCurrentState->GetUtpMsg()->ToString());
+                        pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
                         break;
                 }
             }
+			delete m_pCurrentState;
+			m_pCurrentState = pNextState;
         }
 
-    }
+    };
 
-    public class State
+    class State
     {
-        public State(Transaction* pTransaction)
+	public:
+		typedef enum { StartState = 0, DoneState, BusyState, GetDataState, PutDataState } StateType;
+		
+		static CString StateToString(StateType stateType)
+		{
+			CString str;
+
+			switch (stateType)
+			{
+			case StartState:
+				str = _T("StartState");
+				break;
+			case DoneState:
+				str = _T("DoneState");
+				break;
+			case GetDataState:
+				str = _T("GetDataState");
+				break;
+			case PutDataState:
+				str = _T("PutDataState");
+				break;
+			default:
+				str = _T("UnknownState");
+				break;
+			}
+
+			return str;
+		};
+
+		State(Transaction* pTransaction, StateType stateType)
+			: m_pTransaction(pTransaction)
+			, m_StateType(stateType)
+			, m_pMsg(NULL)
         {
-            _pTransaction = pTransaction;
-        }
+		}
 
-        protected Transaction* m_pTransaction;
-        protected ScsiUtpMsg* m_pMsg;
-    }
+		virtual ~State()
+		{
+			if ( m_pMsg )
+			{
+				delete m_pMsg;
+				m_pMsg = NULL;
+			}
+		}
 
-    public class StartState : State
+		ScsiUtpMsg* GetUtpMsg() { return m_pMsg; };
+		StateType GetStateType() { return m_StateType; };
+		virtual CString ToString() = 0;
+
+	protected:
+		Transaction* m_pTransaction;
+		ScsiUtpMsg* m_pMsg;
+		StateType m_StateType;
+    };
+
+    class StartState : public State
     {
-        public StartState(Transaction* pTransaction)
-            : base(pTransaction)
+	public:
+		StartState(Transaction* pTransaction)
+			: State(pTransaction, State::StartState)
         {
-            _pMsg = new ScsiUtpMsg.Exec(pTransaction->m_Tag, pTransaction->m_LParam, pTransaction->m_Command);
+			m_pMsg = new api::Exec(pTransaction->GetTag(), pTransaction->GetLParam(), pTransaction->GetCommand());
         }
 
-        public override string ToString()
+        CString ToString()
         {
             CString str;
-			return str.Format("   StartState - {0} // {1}", m_Msg->ToString(), m_Msg->ResponseString);
+			str.Format(_T("   StartState - %s // %s"), m_pMsg->ToString(), m_pMsg->GetResponseString());
+			return str;
         }
+    };
 
-    }
-
-    public class BusyState : State
+    class BusyState : public State
     {
-        public BusyState(Transaction transaction, Int32 ticksRemaining)
-            : base(transaction)
-        {
-            TicksRemaining = ticksRemaining;
-            _Msg = new ScsiUtpMsg.Poll(transaction.Tag, 0);
+	private:
+		int32_t m_TicksRemaining;
 
-            if (transaction.CurrentState is BusyState)
+	public:
+		BusyState(Transaction* pTransaction, int32_t ticksRemaining)
+			: State(pTransaction, State::BusyState)
+        {
+			m_TicksRemaining = ticksRemaining;
+			m_pMsg = new api::Poll(pTransaction->GetTag(), 0);
+
+			if (pTransaction->GetCurrentState()->GetStateType() == State::BusyState)
             {
-                if (((BusyState)transaction.CurrentState).TicksRemaining == TicksRemaining)
-                    ++transaction.BusyCount;
+                if (((BusyState*)(pTransaction->GetCurrentState()))->m_TicksRemaining == ticksRemaining)
+					pTransaction->IncrementBusyCount();
                 else
-                    transaction.BusyCount = 0;
+					pTransaction->ClearBusyCount();
             }
             else
-                transaction.BusyCount = 0;
-
-            BusyCount = transaction.BusyCount;
+				pTransaction->ClearBusyCount();
         }
 
-        public Int32 TicksRemaining
+        CString ToString()
         {
-            get { return _TicksRemaining; }
-            private set { _TicksRemaining = value; }
+            CString str;
+			str.Format(_T("   BusyState - %s busyCount:%d // %s"), m_pMsg->ToString(), m_pTransaction->GetBusyCount(), m_pMsg->GetResponseString());
+			return str;
         }
-        private Int32 _TicksRemaining;
+    };
 
-        private readonly UInt32 BusyCount;
-
-        public override string ToString()
-        {
-            return String.Format("   BusyState - {0} busyCount:{1} // {2}", Msg.ToString(), BusyCount, Msg.ResponseString);
-        }
-    }
-
-    public class DoneState : State
+    class DoneState : public State
     {
-        public DoneState(Transaction transaction, Int32 info, String msg)
-            : base(transaction)
+	private:
+		uint32_t m_Tag;
+	
+	public:
+        int32_t m_ResponseInfo;
+		CString m_ResponseString;
+
+		DoneState(Transaction* pTransaction, int32_t info, CString msg)
+			: State(pTransaction, State::DoneState)
         {
-            ResponseInfo = info;
-            ResponseString = msg;
-            Tag = transaction.Tag;
+            m_ResponseInfo = info;
+            m_ResponseString = msg;
+            m_Tag = pTransaction->GetTag();
         }
 
-        private readonly UInt32 Tag;
+		int32_t GetResponseInfo() { return m_ResponseInfo; };
 
-        public Int32 ResponseInfo
+        CString ToString()
         {
-            get { return _ResponseInfo; }
-            private set { _ResponseInfo = value; }
+            CString str;
+			str.Format(_T("   DoneState - tag:%d // %s"), m_Tag, m_ResponseString);
+			return str;
         }
-        private Int32 _ResponseInfo;
+    };
 
-        public String ResponseString
-        {
-            get { return _ResponseString; }
-            private set { _ResponseString = value; }
-        }
-        private String _ResponseString;
-
-        public override string ToString()
-        {
-            return String.Format("   DoneState - tag:{0} // {1}", Tag, ResponseString);
-        }
-    }
-
-    public class GetDataState : State
+    class GetDataState : public State
     {
-        public GetDataState(ReadTransaction transaction)
-            : base(transaction)
+	public:
+		GetDataState(ReadTransaction* pTransaction)
+			: State(pTransaction, State::GetDataState)
         {
             // How much data to get?
-            Int64 numBytesToRead = Math.Min(transaction.UpdateProtocol.MaxPacketSize, transaction.TotalSize - transaction.CurrentSize);
+            int64_t numBytesToRead = min(pTransaction->GetProtocol()->GetMaxPacketSize(), pTransaction->GetTotalSize() - pTransaction->GetCurrentSize());
 
-            _Msg = new ScsiUtpMsg.Get(transaction.Tag, transaction.PacketCount, numBytesToRead);
+			m_pMsg = new api::Get(pTransaction->GetTag(), pTransaction->GetPacketCount(), numBytesToRead);
         }
 
-        public override string ToString()
+        CString ToString()
         {
-            return String.Format("   GetDataState - {0} // {1}", Msg.ToString(), Msg.ResponseString);
+			CString str;
+			str.Format(_T("   GetDataState - %s // %s"), m_pMsg->ToString(), m_pMsg->GetResponseString());
+			return str;
         }
-    }
+    };
 
-    public class PutDataState : State
+    class PutDataState : public State
     {
-        public PutDataState(WriteTransaction transaction)
-            : base(transaction)
+	public:
+		PutDataState(WriteTransaction* pTransaction)
+			: State(pTransaction, State::PutDataState)
         {
 // TODO: CLW - USE THIS WHEN PAUL FIXES FW TO NOT DEPEND ON SECTOR SIZES 
 //                Int64 numBytesToWrite = Math.Min(transaction.UpdateProtocol.MaxPacketSize, transaction.TotalSize - transaction.CurrentSize);
@@ -401,94 +525,50 @@ public:
 //                Array.Copy(transaction.Data, transaction.CurrentSize, buffer, 0, buffer.LongLength);
 
             // Get some data to put.
-            Byte[] buffer = new Byte[transaction.UpdateProtocol.MaxPacketSize];
-            Int64 numBytesToWrite = Math.Min(buffer.Length, transaction.TotalSize - transaction.CurrentSize);
-            Array.Copy(transaction.Data, transaction.CurrentSize, buffer, 0, numBytesToWrite);
+            int64_t numBytesToWrite = min(pTransaction->GetProtocol()->GetMaxPacketSize(), pTransaction->GetTotalSize() - pTransaction->GetCurrentSize());
+
+			std::vector<uint8_t> data(numBytesToWrite);
+			std::vector<uint8_t> source = pTransaction->GetData();
+			int64_t sourceStart = pTransaction->GetCurrentSize();
+			for ( int64_t count = 0; count < numBytesToWrite; ++count )
+			{
+				data[count] = source[sourceStart + count];
+			}
+//            Array.Copy(pTransaction->Data, transaction.CurrentSize, buffer, 0, numBytesToWrite);
             // Send it.
-            _Msg = new ScsiUtpMsg.Put(transaction.Tag, transaction.PacketCount, buffer);
-            transaction.CurrentSize += numBytesToWrite;
+			m_pMsg = new api::Put(pTransaction->GetTag(), pTransaction->GetPacketCount(), data);
+            pTransaction->SetCurrentSize(pTransaction->GetCurrentSize() + numBytesToWrite);
         }
     
-        public override string ToString()
+        CString ToString()
         {
-            return String.Format("   PutDataState - {0} // {1}", Msg.ToString(), Msg.ResponseString);
+			CString str;
+            str.Format(_T("   PutDataState - %s // %s"), m_pMsg->ToString(), m_pMsg->GetResponseString());
+			return str;
         }
-    }
+    };
 
-    private Volume UtpDevice = null;
-    private SafeFileHandle hDevice = null;
-    private static UInt32 TransactionTag = 0;
-    private bool _Disposed = false;
-    public enum ResetType : uint { PowerDown, ChipReset, ResetToRecovery, ResetToUpdater }
 
-    /// <summary>
-    ///     The version of the device implemented UTP Protocol.
-    /// </summary>
-    [Category("General"), Description("The version of the device implemented UTP Protocol.")]
-    public Int32 UtpVersion
+
+    UpdateTransportProtocol(Volume* pDevice)
     {
-        get { return _UtpVersion; }
-        private set { _UtpVersion = value; }
-    }
-    private Int32 _UtpVersion;
+        m_pUtpDevice = pDevice;
+		m_MaxPacketSize = Volume::MaxTransferSizeInBytes;
+		m_MaxPollBusy = 3;
+		m_Disposed = false;
+		m_BusyDelay = 250;
 
-    /// <summary>
-    ///     The time in miliseconds to delay between utpBusy messages.
-    /// </summary>
-    [Category("General"), Description("The time in miliseconds to delay between utpBusy messages.")]
-    public Int32 BusyDelay
-    {
-        get { return _BusyDelay; }
-        set { _BusyDelay = value; }
-    }
-    private Int32 _BusyDelay = 250;
+		// Dummy info
+		Device::NotifyStruct dummyInfo(_T("Not used"), Device::NotifyStruct::dataDir_Off, 0);
 
-    /// <summary>
-    ///     The maximum consecutive Poll messages returning the same BusyState.ResponseInfo before Transaction times out.
-    /// </summary>
-    [Category("General"), Description("The maximum consecutive Poll messages returning the same BusyState.ResponseInfo before Transaction times out.")]
-    public UInt32 MaxPollBusy
-    {
-        get { return _MaxPollBusy; }
-        set { _MaxPollBusy = value; }
-    }
-    private UInt32 _MaxPollBusy = 3;
-
-    /// <summary>
-    ///     The maximum packet size that can be transfered by the UTP Device.
-    /// </summary>
-    [Category("General"), Description("The maximum packet size that can be transfered by the UTP Device.")]
-    public Int64 MaxPacketSize
-    {
-        get { return _MaxPacketSize; }
-        private set { _MaxPacketSize = value; }
-    }
-    private Int64 _MaxPacketSize;
-
-    public UpdateTransportProtocol(Volume device)
-    {
-        UtpDevice = device;
-        MaxPacketSize = Volume.MaxTransferSize;
-
-        // Open the device.
-        hDevice = UtpDevice.Lock(Volume.LockType.Logical);
+		// Open the device.
+		m_hDevice = m_pUtpDevice->Lock(Volume::LockType_Logical);
 
         // Get the UTP Protocol version.
-        ScsiUtpMsg.Poll pollMsg = new ScsiUtpMsg.Poll(UTP.UpdateTransportProtocol.TransactionTag, (UInt32)ScsiUtpMsg.Poll.LParams.GetUtpVersion);
-        UtpDevice.SendCommand(hDevice, pollMsg);
-        if (pollMsg.ResponseCode == ScsiUtpMsg.ResponseCodeType.EXIT)
-            UtpVersion = pollMsg.ResponseInfo;
-    }
-
-
-    private void Dispose(bool isDisposing)
-    {
-        if (!_Disposed)
-        {
-            UtpDevice.Unlock(hDevice, false);
-        }
-        hDevice.Close();
-        _Disposed = true;
+		Poll pollMsg(UpdateTransportProtocol::g_TransactionTag, Poll::GetUtpVersion);
+        m_pUtpDevice->SendCommand(m_hDevice, pollMsg, NULL, dummyInfo);
+		if (pollMsg.GetResponseCode() == ScsiUtpMsg::EXIT)
+            m_UtpVersion = pollMsg.GetResponseInfo();
     }
 
     ~UpdateTransportProtocol()
@@ -496,114 +576,138 @@ public:
         Dispose(false);
     }
 
-    #region IDisposable Members
-
-    public void Dispose()
+    void Dispose()
     {
         Dispose(true);
-        GC.SuppressFinalize(this);
     }
 
-    #endregion
-
-    public Int32 UtpDrop(String cmd)
+private:
+    void Dispose(bool isDisposing)
     {
-        // tell the UI we are beginning a command.
-        Device.SendCommandProgressArgs cmdProgress =
-            new Device.SendCommandProgressArgs("UtpDrop", Api.Api.CommandDirection.WriteWithData, 0);
-        cmdProgress.Status = String.Format("UtpDrop({0})", cmd);
-        ((Volume)UtpDevice).DoSendProgress(cmdProgress);
+        if (!m_Disposed)
+        {
+            m_pUtpDevice->Unlock(m_hDevice, false);
+        }
+        CloseHandle(m_hDevice);
+        m_Disposed = true;
+    }
+
+public:
+	int32_t UtpDrop(CString cmd)
+    {
+        CString msg;
+
+		// tell the UI we are beginning a command.
+		Device::NotifyStruct cmdProgress(_T("UtpDrop"), Device::NotifyStruct::dataDir_ToDevice, 0);
+		msg.Format(_T("UtpDrop(%s)"), cmd);
+		cmdProgress.status = msg;
+        ((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
         // Unlock the device, but don't close it.
-        ((Volume)UtpDevice).Unlock(hDevice, false);
+		((Volume*)m_pUtpDevice)->Unlock(m_hDevice, false);
 
         // Send the ModeChange message.
-        ScsiUtpMsg.Exec modeMsg = new ScsiUtpMsg.Exec(++UTP.UpdateTransportProtocol.TransactionTag, 0, cmd);
-        UtpDevice.SendCommand(hDevice, modeMsg);
-        if (modeMsg.ResponseCode == ScsiUtpMsg.ResponseCodeType.PASS)
+		Exec modeMsg(++UpdateTransportProtocol::g_TransactionTag, 0, cmd);
+        m_pUtpDevice->SendCommand(m_hDevice, modeMsg, NULL, cmdProgress);
+		if (modeMsg.GetResponseCode() == ScsiUtpMsg::PASS)
         {
             // Set _Disposed to true so we don't try to unlock the device 
             // since it should be disconnecting from the bus and Windows will take care of it.
-            _Disposed = true;
+            m_Disposed = true;
         }
 
         // tell the UI we are done
-        cmdProgress.Status = String.Format("   DoneState - tag:{0} // {1}", modeMsg.Tag, modeMsg.ResponseString);
-        cmdProgress.Error = modeMsg.ResponseInfo;
-        cmdProgress.InProgress = false;
-        ((Volume)UtpDevice).DoSendProgress(cmdProgress);
+		msg.Format(_T("   DoneState - tag:%d // %s"), modeMsg.GetTag(), modeMsg.GetResponseString());
+		cmdProgress.status = msg;
+		cmdProgress.error = modeMsg.GetResponseInfo();
+		cmdProgress.inProgress = false;
+		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
-        return Convert.ToInt32(modeMsg.ResponseInfo);
+        return modeMsg.GetResponseInfo();
     }
 
-    public Int32 UtpCommand(String cmd)
+    int32_t UtpCommand(CString cmd)
     {
-        CommandTransaction transaction = new CommandTransaction(this, cmd);
+		CommandTransaction transaction(this, cmd);
 
         // tell the UI we are beginning a command.
-        Device.SendCommandProgressArgs cmdProgress =
-            new Device.SendCommandProgressArgs("UtpCommand", Api.Api.CommandDirection.WriteWithData, 0);
-        cmdProgress.Status = String.Format("UtpCommand({0}) tag:{1}", cmd, transaction.Tag);
-        ((Volume)UtpDevice).DoSendProgress(cmdProgress);
+		Device::NotifyStruct cmdProgress(_T("UtpCommand"), Device::NotifyStruct::dataDir_ToDevice, 0);
+		cmdProgress.status.Format(_T("UtpCommand(%s) tag:%d"), cmd, transaction.GetTag());
+		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
-        while (!(transaction.CurrentState is DoneState))
+		while (transaction.GetCurrentState()->GetStateType() != State::DoneState)
         {
-            UtpDevice.SendCommand(hDevice, transaction.CurrentState.Msg);
+			m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
 
             // Update the UI
-            cmdProgress.Maximum = transaction.TotalSize;
-            cmdProgress.Position = transaction.CurrentSize;
-            cmdProgress.Status = transaction.CurrentState.ToString() + " // pos:" + transaction.CurrentSize.ToString("#,#0");
-            ((Volume)UtpDevice).DoSendProgress(cmdProgress);
+			cmdProgress.maximum = transaction.GetTotalSize();
+            cmdProgress.position = transaction.GetCurrentSize();
+//            cmdProgress.status = transaction.GetCurrentState()->ToString() + _T(" // pos:") + transaction.GetCurrentSize().ToString("#,#0");
+			cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
+			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
             transaction.Next();
         }
 
         // tell the UI we are done
 //            cmdProgress.Position = (Int32)totalTransferSize;
-        cmdProgress.Status = transaction.CurrentState.ToString();
-        cmdProgress.Error = ((DoneState)transaction.CurrentState).ResponseInfo;
-        cmdProgress.InProgress = false;
-        ((Volume)UtpDevice).DoSendProgress(cmdProgress);
+        cmdProgress.status = transaction.GetCurrentState()->ToString();
+		cmdProgress.error = ((DoneState*)transaction.GetCurrentState())->GetResponseInfo();
+        cmdProgress.inProgress = false;
+		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
-        return ((DoneState)transaction.CurrentState).ResponseInfo;
+        return cmdProgress.error; // ((DoneState)transaction.CurrentState).ResponseInfo;
     }
 
-    public Int32 UtpRead(String cmd, String filename)
+    int32_t UtpRead(CString cmd, CString filename, Device::UI_Callback callback)
     {
-        ReadTransaction transaction = new ReadTransaction(this, cmd);
+        ReadTransaction transaction(this, cmd);
 
         // tell the UI we are beginning a command.
-        Device.SendCommandProgressArgs cmdProgress =
-            new Device.SendCommandProgressArgs("UtpRead", Api.Api.CommandDirection.ReadWithData, 0);
-        cmdProgress.Status = String.Format("UtpRead({0}, {1}) tag:{2}", cmd, filename, transaction.Tag);
-        ((Volume)UtpDevice).DoSendProgress(cmdProgress);
+		HANDLE hCallback = m_pUtpDevice->RegisterCallback(callback);
+		Device::NotifyStruct cmdProgress(_T("UtpRead"), Device::NotifyStruct::dataDir_FromDevice, 0);
+        cmdProgress.status.Format(_T("UtpRead(%s, %s) tag:%d"), cmd, filename, transaction.GetTag());
+		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
 
-        while (!(transaction.CurrentState is DoneState))
+		while (transaction.GetCurrentState()->GetStateType() != State::DoneState)
         {
-            UtpDevice.SendCommand(hDevice, transaction.CurrentState.Msg);
-            if (transaction.CurrentState is GetDataState)
+			m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
+			if (transaction.GetCurrentState()->GetStateType() == State::GetDataState)
                 transaction.CopyData();
 
             // Update the UI
-            cmdProgress.Maximum = transaction.TotalSize;
-            cmdProgress.Position = (Int32)transaction.CurrentSize;
-            cmdProgress.Status = transaction.CurrentState.ToString() + " // pos:" + transaction.CurrentSize.ToString("#,#0");
-            ((Volume)UtpDevice).DoSendProgress(cmdProgress);
+            cmdProgress.maximum = transaction.GetTotalSize();
+            cmdProgress.position = (int32_t)transaction.GetCurrentSize();
+            cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
+			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
             transaction.Next();
         }
 
         // tell the UI we are done
 //            cmdProgress.Position = (Int32)totalTransferSize;
-        cmdProgress.Status = transaction.CurrentState.ToString();
-        cmdProgress.Error = ((DoneState)transaction.CurrentState).ResponseInfo;
-        cmdProgress.InProgress = false;
-        ((Volume)UtpDevice).DoSendProgress(cmdProgress);
+        cmdProgress.status = transaction.GetCurrentState()->ToString();
+		cmdProgress.error = ((DoneState*)transaction.GetCurrentState())->GetResponseInfo();
+        cmdProgress.inProgress = false;
+		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
-        // Create the file 
-        try
+		m_pUtpDevice->UnregisterCallback(hCallback);
+
+		// Create the file 
+        CFile myFile;
+		CFileException fileException;
+
+		if ( !myFile.Open( filename, CFile::modeCreate | CFile::modeWrite | CFile::typeBinary, &fileException ) )
+		{
+			CString msg;
+			msg.Format(_T("!ERROR(%d): UpdateTransportProtocol.UtpRead(%s, %s), tag:%d"), fileException.m_cause, cmd, filename, g_TransactionTag);
+			TRACE(msg);
+			return fileException.m_cause;
+		}
+		myFile.Write( &transaction.GetData()[0], transaction.GetData().size() );
+/*
+		try
         {
             File.WriteAllBytes(filename, transaction.Data);
         }
@@ -613,13 +717,35 @@ public:
             Debug.WriteLine(String.Format("!ERROR: UpdateTransportProtocol.UtpRead({0}, {1}), tag:{2} - {3}", cmd, filename, TransactionTag, e.Message));
             return retVal;
         }
-
-        return ((DoneState)transaction.CurrentState).ResponseInfo;
-
+*/
+        return ((DoneState*)transaction.GetCurrentState())->GetResponseInfo();
     }
 
-    public Int32 UtpWrite(String cmd, String filename)
+    int32_t UtpWrite(CString cmd, CString filename, Device::UI_Callback callback)
     {
+		// open the file for binary reading
+		std::ifstream file;
+		file.open(filename, std::ios_base::binary);
+		if(!file.is_open())
+		{
+			CString msg; msg.Format(_T("!ERROR(%d): UpdateTransportProtocol.UtpWrite(%s, %s), tag:%d"), ERROR_OPEN_FAILED, cmd, filename, g_TransactionTag);
+            TRACE(msg);
+            return ERROR_OPEN_FAILED;
+		}
+		// get the length of the file
+		file.seekg(0, std::ios::end);
+		size_t fileSize = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		// create a vector to hold all the bytes in the file
+		std::vector<uint8_t> data(fileSize, 0);
+
+		// read the file
+		file.read(reinterpret_cast<char*>(&data[0]), fileSize);
+
+		// close the file
+		file.close();
+/*
         // Get the data to send
         Byte[] data = null;
         try
@@ -632,38 +758,41 @@ public:
             Debug.WriteLine(String.Format("!ERROR: UpdateTransportProtocol.UtpWrite({0}, {1}), tag:{2} - {3}", cmd, filename, TransactionTag, e.Message));
             return retVal;
         }
-
-        WriteTransaction transaction = new WriteTransaction(this, cmd, data);
+*/
+        WriteTransaction transaction(this, cmd, data);
 
         // tell the UI we are beginning a command.
-        Utils.ByteFormatConverter byteConverter = new Utils.ByteFormatConverter();
-        Device.SendCommandProgressArgs cmdProgress =
-            new Device.SendCommandProgressArgs("UtpWrite", Api.Api.CommandDirection.WriteWithData, transaction.TotalSize);
-        cmdProgress.Status = String.Format(" UtpWrite({0}, {1}) tag:{2} totalSize:{3}", cmd, filename, transaction.Tag, byteConverter.ConvertToString(transaction.TotalSize));
-        ((Volume)UtpDevice).DoSendProgress(cmdProgress);
+		HANDLE hCallback = m_pUtpDevice->RegisterCallback(callback);
+//        Utils.ByteFormatConverter byteConverter = new Utils.ByteFormatConverter();
+//	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, (int)myNewFwCommandSupport.GetFwComponent().size(), 0);       // STAGE 2 of the Load Operation
+		Device::NotifyStruct cmdProgress(_T("UtpWrite"), Device::NotifyStruct::dataDir_ToDevice, transaction.GetTotalSize());
+        cmdProgress.status.Format(_T(" UtpWrite(%s, %s) tag:%d totalSize:%d"), cmd, filename, transaction.GetTag(), transaction.GetTotalSize());
+		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
-        while (!(transaction.CurrentState is DoneState))
+		while (transaction.GetCurrentState()->GetStateType() != State::DoneState)
         {
-            UtpDevice.SendCommand(hDevice, transaction.CurrentState.Msg);
+			m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
             
             // Update the UI
-            cmdProgress.Maximum = transaction.TotalSize;
-            cmdProgress.Position = (Int32)transaction.CurrentSize;
-            cmdProgress.Status = transaction.CurrentState.ToString() + " // pos:" + transaction.CurrentSize.ToString("#,#0");
-            ((Volume)UtpDevice).DoSendProgress(cmdProgress);
+            cmdProgress.maximum = transaction.GetTotalSize();
+            cmdProgress.position = (int32_t)transaction.GetCurrentSize();
+			cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
+			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
             transaction.Next();
         }
 
         // tell the UI we are done
 //            cmdProgress.Position = (Int32)totalTransferSize;
-        cmdProgress.Status = transaction.CurrentState.ToString();
-        cmdProgress.Error = ((DoneState)transaction.CurrentState).ResponseInfo;
-        cmdProgress.InProgress = false;
-        ((Volume)UtpDevice).DoSendProgress(cmdProgress);
+        cmdProgress.status = transaction.GetCurrentState()->ToString();
+		cmdProgress.error = ((DoneState*)transaction.GetCurrentState())->GetResponseInfo();
+        cmdProgress.inProgress = false;
+		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
-        return ((DoneState)transaction.CurrentState).ResponseInfo;
+		m_pUtpDevice->UnregisterCallback(hCallback);
+
+		return cmdProgress.error;
 
     } // UtpWrite()
 
-} // class UpdateTransportProtocol
+}; // class UpdateTransportProtocol

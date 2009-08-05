@@ -8,6 +8,7 @@
 #include "CopyOpDlg.h"
 #include "LoadFileOpDlg.h"
 #include "OpOTPDlg.h"
+#include "OpUtpUpdateDlg.h"
 #include "ConfigUSBPortPage.h"
 #include "StMfgTool.h"
 #include "DefaultProfile.h"
@@ -77,8 +78,8 @@ BEGIN_MESSAGE_MAP(CConfigPlayerProfilePage, CPropertyPage)
     ON_NOTIFY(NM_CLICK, IDC_OPERATIONS_LIST, OnNMClickOperationsList)
     ON_NOTIFY(LVN_KEYDOWN, IDC_OPERATIONS_LIST, OnLvnKeydownOperationsList)
     ON_NOTIFY(NM_DBLCLK, IDC_OPERATIONS_LIST, OnNMDblclkOperationsList)
-    ON_COMMAND_RANGE(IDM_ENABLED, IDM_NEW_LOAD_OP, OnListCtrlContextMenu)
-    ON_COMMAND_RANGE(IDM_ENABLED, IDM_NEW_OTP_OP, OnListCtrlContextMenu)
+    ON_COMMAND_RANGE(IDM_ENABLED, IDM_NEW_UTP_UPDATE_OP, OnListCtrlContextMenu)
+//    ON_COMMAND_RANGE(IDM_ENABLED, IDM_NEW_OTP_OP, OnListCtrlContextMenu)
 END_MESSAGE_MAP()
 
 
@@ -931,6 +932,10 @@ DWORD CConfigPlayerProfilePage::InsertOpsList(CPlayerProfile * _pProfile)
 				{
 					csText.Append(pOpInfo->m_csOTPValue);
 				}
+				else if ( pOpInfo->m_e_type == COperation::UTP_UPDATE_OP )
+				{
+					csText.Append(pOpInfo->m_UclInstallSection);
+				}
 				else
 				{
 	                for ( int i=0; 1<<i<UL_PARAM_NO_MORE_OPTIONS; ++i ) {
@@ -1605,6 +1610,12 @@ DWORD CConfigPlayerProfilePage::OpWorkerNew(COperation::OpTypes _opType)
 	    ret = pOpEditor->DoModal();
 	    delete pOpEditor;
 	}
+	else if (_opType == COperation::UTP_UPDATE_OP)
+	{
+		COpUtpUpdateDlg *pOpEditor = new COpUtpUpdateDlg(this, pInfo);
+	    ret = pOpEditor->DoModal();
+	    delete pOpEditor;
+	}
 
     if (ret == IDOK)
 	{
@@ -1655,6 +1666,12 @@ DWORD CConfigPlayerProfilePage::OpWorkerEdit()
 	else if (pOpInfo->GetType() == COperation::OTP_OP)
 	{
 		COpOTPDlg *pOpEditor = new COpOTPDlg(this, pOpInfo);
+	    ret = pOpEditor->DoModal();
+	    delete pOpEditor;
+	}
+	else if (pOpInfo->GetType() == COperation::UTP_UPDATE_OP)
+	{
+		COpUtpUpdateDlg *pOpEditor = new COpUtpUpdateDlg(this, pOpInfo);
 	    ret = pOpEditor->DoModal();
 	    delete pOpEditor;
 	}
@@ -1818,6 +1835,9 @@ void CConfigPlayerProfilePage::OnListCtrlContextMenu(UINT nID)
 		break;
 	case IDM_NEW_OTP_OP:
 	    OpWorkerNew(COperation::OTP_OP);
+		break;
+	case IDM_NEW_UTP_UPDATE_OP:
+		OpWorkerNew(COperation::UTP_UPDATE_OP);
 		break;
 	case IDM_ST_EDIT:
         OpWorkerEdit();

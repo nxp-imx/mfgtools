@@ -1,9 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
-#include "../../common/updater_res.h"
-#include "defaultprofile.h"
-
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -434,8 +431,8 @@ BEGIN
     IDS_REGCHK_INFO_TEXT    "Checking registry devices..."
     IDS_REGCHK_ENTRIES_TEXT "Matching Device Entries:"
     IDS_REGCHK_OTHER_TEXT   "Other Device Entries:"
-	IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
-	IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
+    IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
+    IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
 END
 
 #endif    // Japanese resources
@@ -625,7 +622,7 @@ BEGIN
     IDS_OP_EDIT_DRIVE_NUM   "驱动器编号："
     IDS_DIRECTORY_DETECTED_PROMPT "更新操作不支持目录 \r\n。您是否要删除所选目录？"
     IDS_DIRECTORY_DETECTED_TITLE "已检测到的目录"
-    IDS_FILE_BROWSE_TYPES   "固件文件 (*.s;*.sb;*.bin;*.rsc)||"
+    IDS_FILE_BROWSE_TYPES   "固件文件 (*.s;*.sb;*.bin;*.rsc)|*.s;*.sb;*.bin;*.rsc|"
     IDS_NOTHING_TO_REMOVE   "无任何可移除的文件。\n\n1.请在左边的方框中选择要移除的文件。\n2.按“移除”按钮。"
     IDS_INVALID_OP_FOLDER   "操作文件夹无效\n\n操作文件夹中必须包含有效的 Windows 文件夹名称才能保存操作。"
     IDS_OP_ALREADY_EXISTS   "该操作名称已存在。\n\n 如需以新的操作信息覆写现有的“%s”操作 \n<%s>\n，请按“确定”按钮。\n\n 如需更改您要保存的操作名称，请按“取消”按钮。"
@@ -862,8 +859,8 @@ BEGIN
     IDS_REGCHK_INFO_TEXT    "检查注册表设备信息…"
     IDS_REGCHK_ENTRIES_TEXT "符合的设备信息："
     IDS_REGCHK_OTHER_TEXT   "其他的设备信息："
-	IDS_REGCHK_WARNING      "注册表内存在太多USB设备的信息。性能和稳定性可以通过运行注册表USB设备清除工具来提高。"
-	IDS_CFG_COM_PORT_MSGS   "使COM端口输出信息"
+    IDS_REGCHK_WARNING      "注册表内存在太多USB设备的信息。性能和稳定性可以通过运行注册表USB设备清除工具来提高。"
+    IDS_CFG_COM_PORT_MSGS   "使COM端口输出信息"
 END
 
 #endif    // Chinese (P.R.C.) resources
@@ -1055,7 +1052,7 @@ BEGIN
     IDS_DIRECTORY_DETECTED_PROMPT 
                             "诀单捞飘 累诀篮 叼泛磐府甫 瘤盔窍瘤 臼嚼聪促.\r\n急琶等 叼泛磐府(甸)甫 昏力窍矫摆嚼聪鳖?"
     IDS_DIRECTORY_DETECTED_TITLE "叼泛磐府啊 昏力登菌嚼聪促"
-    IDS_FILE_BROWSE_TYPES   "七傀绢 颇老 (*.s;*.sb;*.bin;*.rsc||)"
+    IDS_FILE_BROWSE_TYPES   "七傀绢 颇老 (*.s;*.sb;*.bin;*.rsc)|*.s;*.sb;*.bin;*.rsc|"
     IDS_NOTHING_TO_REMOVE   "力芭且 措惑捞 绝嚼聪促.\n\n1. 哭率 惑磊俊辑 力芭且 颇老阑 急琶窍绞矫坷.\n2. ""力芭""甫 穿福绞矫坷."
     IDS_INVALID_OP_FOLDER   "肋给等 累诀 弃歹涝聪促\n\n累诀 弃歹亲格俊绰 馆靛矫 蜡瓤茄 Windows 弃歹疙阑 器窃矫挪 促澜俊 累诀阑 历厘且 荐 乐嚼聪促."
     IDS_OP_ALREADY_EXISTS   "鞍篮 捞抚狼 累诀捞 捞固 粮犁钦聪促.\n\n'犬牢'阑 穿福搁 扁粮 '%s' 累诀\n<%s>\n俊 货肺款 累诀 沥焊甫 丹绢静扁 钦聪促.\n\n'秒家'甫 穿福搁 历厘窍妨绰 累诀狼 捞抚阑 函版且 荐 乐嚼聪促."
@@ -1296,8 +1293,8 @@ BEGIN
     IDS_REGCHK_INFO_TEXT    "Checking registry devices..."
     IDS_REGCHK_ENTRIES_TEXT "Matching Device Entries:"
     IDS_REGCHK_OTHER_TEXT   "Other Device Entries:"
-	IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
-	IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
+    IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
+    IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
 END
 
 #endif    // Korean resources
@@ -1487,7 +1484,7 @@ BEGIN
     IDS_OP_EDIT_DRIVE_NUM   "合盒诀絪腹"
     IDS_DIRECTORY_DETECTED_PROMPT "穝巨ぃやヘ魁\r\n眤稱埃匡いヘ魁"
     IDS_DIRECTORY_DETECTED_TITLE "埃ヘ魁"
-    IDS_FILE_BROWSE_TYPES   "硁砰郎 (*.s;*.sb;*.bin;*.rsc||)"
+    IDS_FILE_BROWSE_TYPES   "硁砰郎 (*.s;*.sb;*.bin;*.rsc)|*.s;*.sb;*.bin;*.rsc|"
     IDS_NOTHING_TO_REMOVE   "礚ヴ睲埃ゅン\n\n1.叫オ娩よ遏い匡拒璶睲埃郎\n2.睲埃秙"
     IDS_INVALID_OP_FOLDER   "巨戈Ж\n\n礚巨戈Жいゲ斗Τ Windows 戈Ж纗巨"
     IDS_OP_ALREADY_EXISTS   "赣巨嘿\n\n惠穝巨戈癟籠糶瞷Τ '%s' 巨 \n<%s>\n叫絋﹚秙\n\n 惠跑眤璶纗巨嘿叫秙"
@@ -1725,8 +1722,8 @@ BEGIN
     IDS_REGCHK_INFO_TEXT    "Checking registry devices..."
     IDS_REGCHK_ENTRIES_TEXT "Matching Device Entries:"
     IDS_REGCHK_OTHER_TEXT   "Other Device Entries:"
-	IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
-	IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
+    IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
+    IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
 END
 
 #endif    // Chinese (Taiwan) resources
@@ -1754,8 +1751,12 @@ IDR_STMP3RECX64_SYS     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\
 IDR_STMP3RECX64_INF     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3recx64.inf"
 IDR_STMP3RECX64_CAT     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3recx64.cat"
 
-IDB_COMPANY_BMP	 BITMAP "..\\..\Resources\\freescale_logo.bmp"
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
 
+IDB_COMPANY_BMP         BITMAP                  "..\\..\\Resources\\freescale_logo.bmp"
 #endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1768,6 +1769,17 @@ IDB_COMPANY_BMP	 BITMAP "..\\..\Resources\\freescale_logo.bmp"
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_USB_STATE           BITMAP                  "res\\checks.bmp"
+IDB_OP_STATE            BITMAP                  "res\\tree_sta.bmp"
+IDB_CLOSED_FOLDER       BITMAP                  "..\\..\\resources\\closedfolder.BMP"
+IDB_FIRMWARE_FILE       BITMAP                  "..\\..\\resources\\resourcefile.bmp"
+IDB_OPEN_FOLDER         BITMAP                  "..\\..\\resources\\openfolder.bmp"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -1805,12 +1817,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-#ifdef LOCKED_DEFAULT_PROFILE
-IDR_DEFAULT_PROFILE_RESID_0	STMPFWRESTYPE "res/updater.sb"
-IDR_DEFAULT_PROFILE_RESID_1	STMPFWRESTYPE "res/firmware.sb"
-IDR_DEFAULT_PROFILE_RESID_3	STMPFWRESTYPE "res/OtpInit.sb"
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Icon
@@ -1819,17 +1825,6 @@ IDR_DEFAULT_PROFILE_RESID_3	STMPFWRESTYPE "res/OtpInit.sb"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\StMfgToolx.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_USB_STATE           BITMAP                  "res\\checks.bmp"
-IDB_OP_STATE            BITMAP                  "res\\tree_sta.bmp"
-IDB_CLOSED_FOLDER       BITMAP                  "..\\..\\resources\\closedfolder.BMP"
-IDB_FIRMWARE_FILE       BITMAP                  "..\\..\\resources\\resourcefile.bmp"
-IDB_OPEN_FOLDER         BITMAP                  "..\\..\\resources\\openfolder.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -2012,11 +2007,9 @@ BEGIN
     CONTROL         "",IDC_IDC_AUTOPLAY_DRV_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,141,108,44,50
     GROUPBOX        "Options",IDC_CFG_GENERAL_OPTIONS_GROUP_TEXT,7,7,320,69
     GROUPBOX        "AutoPlay",IDC_CFG_GENERAL_AUTOPLAY_GROUP_TEXT,7,82,320,80
-    CONTROL         "Enable event logging",IDC_EVENT_LOG_ENABLE_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,40,175,10
+    CONTROL         "Enable event logging",IDC_EVENT_LOG_ENABLE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,40,175,10
     CONTROL         "Enable COM port status messages",IDC_CFG_COM_PORT_MSGS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,56,175,10
-
 END
 
 IDD_CONF_USB_PORT_DLG DIALOGEX 0, 0, 334, 222
@@ -2024,7 +2017,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "USB Ports"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_USB_TREE,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_DISABLEDRAGDROP | TVS_CHECKBOXES | TVS_TRACKSELECT | WS_BORDER | WS_TABSTOP | 0x800,7,7,320,189,WS_EX_RIGHT
+    CONTROL         "",IDC_USB_TREE,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_DISABLEDRAGDROP | TVS_CHECKBOXES | TVS_TRACKSELECT | TVS_INFOTIP | WS_BORDER | WS_TABSTOP,7,7,320,189,WS_EX_RIGHT
     COMBOBOX        IDC_USBPORTS_ENABLED_PORTS,7,201,31,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Maximum USB ports enabled",IDC_USBPORTS_PORTS_ENABLED_TEXT,50,203,119,8
     CTEXT           "",IDC_HUB_REQUIRED,37,216,260,16,SS_CENTERIMAGE | NOT WS_VISIBLE
@@ -2152,6 +2145,29 @@ BEGIN
     EDITTEXT        IDC_OP_TIMEOUT_EDIT,195,144,34,14,ES_AUTOHSCROLL | ES_NUMBER
 END
 
+IDD_UTPUPDATEOPDLG DIALOGEX 0, 0, 326, 289
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "UTP Update Operation"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,95,266,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,179,266,50,14
+    LTEXT           "Select the UCL List from the file.",IDC_OP_UTP_UPDATE_UCL_LIST_TEXT,17,118,149,8
+    COMBOBOX        IDC_OP_UTP_UPDATE_UCL_LIST_COMBO,17,129,127,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Step 1",IDC_STEP1_GROUP,7,7,312,45
+    LTEXT           "Name the operation.",IDC_STEP1_TEXT,17,20,149,8
+    EDITTEXT        IDC_OP_NAME_EDIT,17,32,127,14,ES_AUTOHSCROLL
+    GROUPBOX        "Step 3",IDC_STEP2_GROUP,7,105,312,57
+    LTEXT           "Specify the command list file ucl.xml",IDC_UPDATE_STEP3_TEXT,17,69,270,8
+    EDITTEXT        IDC_UCL_FNAME_EDIT,17,80,259,14,ES_LOWERCASE | ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_UCL_BROWSE_BTN,288,79,22,14
+    GROUPBOX        "Step 2",IDC_STEP3_GROUP,7,57,312,42
+    LTEXT           "Specify other required file(s).",IDC_OP_UTP_UPDATE_UCL_LIST_TEXT2,17,183,149,8
+    GROUPBOX        "Step 4",IDC_STEP2_GROUP2,7,170,312,85
+    PUSHBUTTON      "...",IDC_REQUIRED_FILES_BROWSE_BTN,288,233,22,14
+    LISTBOX         IDC_LIST1,17,194,259,52,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+END
+
 IDD_OTPOPDLG DIALOGEX 0, 0, 221, 142
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "OTP Register Operation"
@@ -2179,126 +2195,6 @@ BEGIN
     RTEXT           "Other Device  Entries:",IDC_REGCHK_OTHER_DEVICES_TEXT,57,65,100,8
     RTEXT           "Static",IDC_REGCHK_OTHER_ENTRIES,162,65,29,8
 END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_ABOUTBOX, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 228
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 63
-    END
-
-    IDD_BUTTON_DLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 653
-        TOPMARGIN, 7
-    END
-
-    IDD_PORT_DLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 156
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 94
-    END
-
-    IDD_CONF_PROFILE_DLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 327
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 222
-    END
-
-    IDD_CONF_GENERAL_DLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 327
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 215
-    END
-
-    IDD_CONF_USB_PORT_DLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 327
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 215
-    END
-
-    IDD_LOGMGR_DIALOG, DIALOG
-    BEGIN
-        RIGHTMARGIN, 296
-        BOTTOMMARGIN, 210
-    END
-
-    IDD_REGSCRUB_DLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 273
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
-    END
-
-    IDD_EDIT_DRIVE, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 225
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 187
-    END
-
-    IDD_UPDATEOPDLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 371
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 290
-    END
-
-    IDD_COPYOPDLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 422
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 232
-    END
-
-    IDD_LOADOPDLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 232
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 183
-    END
-
-    IDD_OTPOPDLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 214
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 135
-    END
-
-    IDD_REGCHECK_DLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 203
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 79
-    END
-END
-#endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2513,7 +2409,7 @@ BEGIN
     IDS_DIRECTORY_DETECTED_PROMPT 
                             "    Update operations do not support directories.\r\nWould you like the selected directory(s) to be deleted?"
     IDS_DIRECTORY_DETECTED_TITLE "Directory Detected"
-    IDS_FILE_BROWSE_TYPES   "Firmware Files (*.s;*.sb;*.bin;*.rsc||)"
+    IDS_FILE_BROWSE_TYPES   "Firmware Files (*.s;*.sb;*.bin;*.rsc)|*.s;*.sb;*.bin;*.rsc|"
     IDS_NOTHING_TO_REMOVE   "Nothing to remove.\n\n1. Select files to remove in the box on the left.\n2. Press Remove."
     IDS_INVALID_OP_FOLDER   "Invalid Operation Folder\n\nThe Operation Folder field must contain a valid Windows folder name before the operation can be saved."
     IDS_OP_ALREADY_EXISTS   "An operation of this name already exists.\n\nPressing 'OK' will overwrite the existing '%s' operation\n<%s>\nwith the new operation information.\n\nPressing 'Cancel' will allow you to change the name of the operation you are trying to save. "
@@ -2798,8 +2694,8 @@ BEGIN
     IDS_REGCHK_INFO_TEXT    "Checking registry devices..."
     IDS_REGCHK_ENTRIES_TEXT "Matching Device Entries:"
     IDS_REGCHK_OTHER_TEXT   "Other Device Entries:"
-	IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
-	IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
+    IDS_REGCHK_WARNING      "The registry contains a large number of USB entries.  Performance and reliability can be improved by running the registry scrubbing tool."
+    IDS_CFG_COM_PORT_MSGS   "Enable COM port status messages"
 END
 
 #endif    // English (U.S.) resources

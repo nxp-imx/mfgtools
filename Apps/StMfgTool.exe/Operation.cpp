@@ -18,6 +18,7 @@ const PTCHAR COperation::OperationStrings[]     = { _T("UPDATE"),
 											    	_T("COPY"), 
 												    _T("LOAD"),
 													_T("OTP"),
+													_T("UTP_UPDATE"),
 													_T("INVALID OPERATION"),
 												    _T("ERASE"), 
 												    _T("REGISTRY SCRUB") };

@@ -334,7 +334,7 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
 	NotifyStruct nsInfo = {0};
     Device * pDevice = NULL;
 
-	ATLTRACE2(_T("%s::AddUsbDevice()  %s\r\n"), this->ToString().c_str(), path);
+//t	ATLTRACE2(_T("%s::AddUsbDevice()  %s\r\n"), this->ToString().c_str(), path);
 
 	CStdString pathToFind = path + 4;
 
@@ -347,7 +347,7 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
 			if ( pathToFind.CompareNoCase( (*device)->_usbPath.get() ) == 0 )
 			{
 				pDevice = (*device);
-				ATLTRACE2(_T("%s::AddUsbDevice()  Found existing(%d): %s\r\n"), this->ToString().c_str(), _devices.size(), pDevice->_usbPath.get().c_str());
+//t				ATLTRACE2(_T("%s::AddUsbDevice()  Found existing(%d): %s\r\n"), this->ToString().c_str(), _devices.size(), pDevice->_usbPath.get().c_str());
 				break;
 			}
 		}
@@ -402,7 +402,7 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
 					WaitForSingleObject(devicesMutex, INFINITE);
 					_devices.push_back(pDevice);
 					ReleaseMutex(devicesMutex);
-					ATLTRACE2(_T("%s::AddUsbDevice()  Created new(%d):%s\r\n"), this->ToString().c_str(), _devices.size(), pDevice->_usbPath.get().c_str());
+//t					ATLTRACE2(_T("%s::AddUsbDevice()  Created new(%d):%s\r\n"), this->ToString().c_str(), _devices.size(), pDevice->_usbPath.get().c_str());
 					break;
 				}
 			}
@@ -429,7 +429,7 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
 			{
 				if ( pathToFind.CompareNoCase( (*device)->_usbPath.get() ) == 0 )
 				{
-					ATLTRACE2(_T("%s::AddUsbDevice()  Found previous device(%d): %s\r\n"), this->ToString().c_str(), _oldDevices.size(), (*device)->_usbPath.get().c_str());
+//t					ATLTRACE2(_T("%s::AddUsbDevice()  Found previous device(%d): %s\r\n"), this->ToString().c_str(), _oldDevices.size(), (*device)->_usbPath.get().c_str());
 					delete (*device);
 					_oldDevices.erase(device);
 					break;
@@ -474,7 +474,7 @@ DeviceClass::NotifyStruct DeviceClass::RemoveUsbDevice(LPCTSTR path)
 		_devices.erase(device);
 		ReleaseMutex(devicesMutex);
 
-		ATLTRACE2(_T("%s::RemoveUsbDevice() - %s\r\n"), this->ToString().c_str(), path);
+//t		ATLTRACE2(_T("%s::RemoveUsbDevice() - %s\r\n"), this->ToString().c_str(), path);
 	}
 
 	return nsInfo;

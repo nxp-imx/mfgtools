@@ -491,7 +491,7 @@ BOOL DeviceManager::DevChangeWnd::OnDeviceChange(UINT nEventType,DWORD_PTR dwDat
 				{
 					MsgStr = DrivesFromMask( ((PDEV_BROADCAST_VOLUME)lpdb)->dbcv_unitmask );
 					event = VOLUME_ARRIVAL_EVT;
-					ATLTRACE(_T("DeviceManager::DevChangeWnd::OnDeviceChange() - VOLUME_ARRIVAL_EVT(%s)\n"), MsgStr.c_str());
+//t					ATLTRACE(_T("DeviceManager::DevChangeWnd::OnDeviceChange() - VOLUME_ARRIVAL_EVT(%s)\n"), MsgStr.c_str());
 				}
 				break;
 			case DBT_DEVICEREMOVECOMPLETE:
@@ -512,7 +512,7 @@ BOOL DeviceManager::DevChangeWnd::OnDeviceChange(UINT nEventType,DWORD_PTR dwDat
 				{
 					MsgStr = DrivesFromMask( ((PDEV_BROADCAST_VOLUME)lpdb)->dbcv_unitmask );
 					event = VOLUME_REMOVAL_EVT;
-					ATLTRACE(_T("DeviceManager::DevChangeWnd::OnDeviceChange() - VOLUME_REMOVAL_EVT(%s)\n"), MsgStr.c_str());
+//t					ATLTRACE(_T("DeviceManager::DevChangeWnd::OnDeviceChange() - VOLUME_REMOVAL_EVT(%s)\n"), MsgStr.c_str());
 				}
 				break;
 			default:
@@ -586,7 +586,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 		}
 		case VOLUME_ARRIVAL_EVT:
 		{
-			ATLTRACE(_T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT(%s)\n"), msg.c_str());
+//t			ATLTRACE(_T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT(%s)\n"), msg.c_str());
 			int msgLetterIndex;
 			CStdString driveLetterStr;
 			for ( msgLetterIndex = 0; msgLetterIndex < msg.GetLength(); ++msgLetterIndex )
@@ -604,7 +604,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 		}
 		case VOLUME_REMOVAL_EVT:
 		{
-			ATLTRACE(_T("DeviceManager::OnMsgDeviceEvent() - VOLUME_REMOVAL_EVT(%s)\n"), msg.c_str());
+//t			ATLTRACE(_T("DeviceManager::OnMsgDeviceEvent() - VOLUME_REMOVAL_EVT(%s)\n"), msg.c_str());
 			int msgLetterIndex;
 			CStdString driveLetterStr;
 			for ( msgLetterIndex = 0; msgLetterIndex < msg.GetLength(); ++msgLetterIndex )

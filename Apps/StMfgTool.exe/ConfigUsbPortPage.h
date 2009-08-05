@@ -3,7 +3,7 @@
 #include "../../Libs/DevSupport/UsbController.h"
 #include "../../Libs\Winsupport\ColorStaticST.h"
 
-#define DEFAULT_PORTS	8
+#define DEFAULT_PORTS	4
 #define MAX_PORTS		16
 
 // CConfigUSBPortPage dialog

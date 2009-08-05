@@ -797,7 +797,6 @@ void COpUpdateDlg::OnMenuClickedMoveDown(void)
 
 void COpUpdateDlg::OnBnClickedBrowseFile()
 {
-    CString copy_buffer;
     CFileDialog *dlg;
 	CString resStr;
 

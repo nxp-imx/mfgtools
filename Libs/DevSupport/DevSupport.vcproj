@@ -254,6 +254,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UpdateTransportProtocol.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\UsbController.cpp"
 				>
 			</File>
@@ -389,6 +393,14 @@
 			</File>
 			<File
 				RelativePath=".\StVersionInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UpdateTransportProtocol.Api.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UpdateTransportProtocol.h"
 				>
 			</File>
 			<File

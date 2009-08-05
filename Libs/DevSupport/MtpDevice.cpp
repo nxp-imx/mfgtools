@@ -215,8 +215,8 @@ uint32_t MtpDevice::SendCommand(StApi& api, uint8_t* additionalInfo)
 		return ERROR_INVALID_PARAMETER;
 */
     // tell the UI we are beginning a command.
-    NotifyStruct nsInfo(api.GetName());
-    nsInfo.direction = api.IsWriteCmd() ? Device::NotifyStruct::dataDir_ToDevice : Device::NotifyStruct::dataDir_FromDevice;
+    NotifyStruct nsInfo(api.GetName(), api.IsWriteCmd() ? Device::NotifyStruct::dataDir_ToDevice : Device::NotifyStruct::dataDir_FromDevice, 0);
+//    nsInfo.direction = api.IsWriteCmd() ? Device::NotifyStruct::dataDir_ToDevice : Device::NotifyStruct::dataDir_FromDevice;
     Notify(nsInfo);
 
 	// init parameter if it is used

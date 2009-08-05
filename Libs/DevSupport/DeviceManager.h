@@ -86,6 +86,53 @@ public:
                          WMDM_DEVICE_ARRIVAL_EVT, WMDM_DEVICE_REMOVAL_EVT,
                          WMDM_MEDIA_ARRIVAL_EVT, WMDM_MEDIA_REMOVAL_EVT};
 	
+	static CString EventToString(int evnt)
+	{
+		CString str;
+
+		switch(evnt)
+		{
+			case EVENT_KILL:
+				str = _T("EVENT_KILL");
+				break;
+			case HUB_ARRIVAL_EVT:
+				str = _T("HUB_ARRIVAL_EVT");
+				break;
+			case HUB_REMOVAL_EVT:
+				str = _T("HUB_REMOVAL_EVT");
+				break;
+			case DEVICE_ARRIVAL_EVT:
+				str = _T("DEVICE_ARRIVAL_EVT");
+				break;
+			case DEVICE_REMOVAL_EVT:
+				str = _T("DEVICE_REMOVAL_EVT");
+				break;
+			case VOLUME_ARRIVAL_EVT:
+				str = _T("VOLUME_ARRIVAL_EVT");
+				break;
+			case VOLUME_REMOVAL_EVT:
+				str = _T("VOLUME_REMOVAL_EVT");
+				break;
+			case WMDM_DEVICE_ARRIVAL_EVT:
+				str = _T("WMDM_DEVICE_ARRIVAL_EVT");
+				break;
+			case WMDM_DEVICE_REMOVAL_EVT:
+				str = _T("WMDM_DEVICE_REMOVAL_EVT");
+				break;
+			case WMDM_MEDIA_ARRIVAL_EVT:
+				str = _T("WMDM_MEDIA_ARRIVAL_EVT");
+				break;
+			case WMDM_MEDIA_REMOVAL_EVT:
+				str = _T("WMDM_MEDIA_REMOVAL_EVT");
+				break;
+			case UNKNOWN_EVT:
+			default:
+				str = _T("UNKNOWN_EVT");
+		}
+		
+		return str;
+	}
+	
 	typedef enum DeviceChangeNotifyType {
 		AnyChange = 0,
 		ByDevice,

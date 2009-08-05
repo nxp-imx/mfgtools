@@ -92,7 +92,7 @@ usb::Hub * usb::Controller::GetRootHub()
 	{
 		if ( pathToFind.CompareNoCase( (*hub)->_usbPath.get() ) == 0 )
 		{
-//			ATLTRACE2(_T("DeviceClass::AddUsbDevice()  Found existing(%d): %s\r\n"), _devices.size(), pDevice->_usbPath.get().c_str());
+//t			ATLTRACE2(_T("DeviceClass::AddUsbDevice()  Found existing(%d): %s\r\n"), _devices.size(), pDevice->_usbPath.get().c_str());
 			pHub = dynamic_cast<usb::Hub*>(*hub);
 			break;
 		}

@@ -27,6 +27,37 @@ public:
 //		DeviceTypeUsbDevice
 	};
 
+	static CStdString DeviceTypeToString(DeviceType type)
+	{
+		CStdString str;
+		switch(type)
+		{
+			case DeviceTypeRecovery:
+				str = _T("Recovery");
+				break;
+			case DeviceTypeMsc:
+				str = _T("Msc");
+				break;
+			case DeviceTypeMtp:
+				str = _T("Mtp");
+				break;
+			case DeviceTypeHid:
+				str = _T("Hid");
+				break;
+			case DeviceTypeUsbController:
+				str = _T("UsbController");
+				break;
+			case DeviceTypeUsbHub:
+				str = _T("UsbHub");
+				break;
+			case DeviceTypeNone:
+			default:
+				str = _T("None");
+				break;
+		}
+		return str;
+	}
+
 	typedef struct NotifyStruct
 	{
 		Device* Device;

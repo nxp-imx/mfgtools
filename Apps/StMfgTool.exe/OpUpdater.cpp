@@ -995,7 +995,7 @@ DWORD COpUpdater::UpdateMscDevice(CString& _logText)
 	CString taskMsg;
 	Device::UI_Callback callback(this, &COpUpdater::OnDownloadProgress);
 	BSTR bstr_log_text;
-	Device::NotifyStruct nsInfo(_T("COpUpdater::UpdateMscDevice"));
+	Device::NotifyStruct nsInfo(_T("COpUpdater::UpdateMscDevice"), Device::NotifyStruct::dataDir_Off, 0);
 
 	Volume* pMscDevice = dynamic_cast<Volume*>(m_pUSBPort->_device);
 	if ( pMscDevice == NULL )
@@ -1527,16 +1527,16 @@ DWORD COpUpdater::EraseLogicalMedia(Volume* pMscDevice, HANDLE hVolume, Device::
 		}
 		else if ( moreInfo == SCSISTAT_CHECK_CONDITION )
 		{
-			if ( pMscDevice->_scsiSenseData.SenseKey == SCSI_SENSE_ILLEGAL_REQUEST )
+			if ( apiEraseMediaAsync.ScsiSenseData.SenseKey == SCSI_SENSE_ILLEGAL_REQUEST )
 			{
 				// new Async command is not supported, try the old way.
 				newCmdNotSupported = true;
 				break;
 			}
-			else if ( pMscDevice->_scsiSenseData.SenseKey == SCSI_SENSE_UNIQUE )
+			else if ( apiEraseMediaAsync.ScsiSenseData.SenseKey == SCSI_SENSE_UNIQUE )
 			{
-				if ( pMscDevice->_scsiSenseData.AdditionalSenseCode == SCSI_ADSENSE_LUN_NOT_READY &&
-					 pMscDevice->_scsiSenseData.AdditionalSenseCodeQualifier == SCSI_SENSEQ_OPERATION_IN_PROGRESS )
+				if ( apiEraseMediaAsync.ScsiSenseData.AdditionalSenseCode == SCSI_ADSENSE_LUN_NOT_READY &&
+					 apiEraseMediaAsync.ScsiSenseData.AdditionalSenseCodeQualifier == SCSI_SENSEQ_OPERATION_IN_PROGRESS )
 				{
 					// Async Erase is working so sleep a bit and try again to see if it is finished.
 					ATLTRACE(_T("%s - Waiting for EraseLogicalMedia() to finish. (%d)\r\n"), m_pPortMgrDlg->GetPanel(), count++);
@@ -1557,9 +1557,9 @@ DWORD COpUpdater::EraseLogicalMedia(Volume* pMscDevice, HANDLE hVolume, Device::
 		rc = pMscDevice->SendCommand(hVolume, apiEraseMedia, &moreInfo, nsInfo);
 		if ( rc != ERROR_SUCCESS  || moreInfo )
 		{
-			uint32_t numFactoryBadBlocks = (DWORD)pMscDevice->_scsiSenseData.CommandSpecificInformation[0];
-			uint8_t numFailedSdkBadBlocks = pMscDevice->_scsiSenseData.SenseKeySpecific[2];
-			uint8_t totalLostSdkBadBlocks = pMscDevice->_scsiSenseData.SenseKeySpecific[1];
+			uint32_t numFactoryBadBlocks = (DWORD)apiEraseMedia.ScsiSenseData.CommandSpecificInformation[0];
+			uint8_t numFailedSdkBadBlocks = apiEraseMedia.ScsiSenseData.SenseKeySpecific[2];
+			uint8_t totalLostSdkBadBlocks = apiEraseMedia.ScsiSenseData.SenseKeySpecific[1];
 			
 			_logText.Format(_T("  ERASE MEDIA ERROR (%d): numFactoryBadBlocks = %d, numFailedSdkBadBlocks = %d, totalLostSdkBadBlocks = %d\r\n"), rc, numFactoryBadBlocks, numFailedSdkBadBlocks, totalLostSdkBadBlocks);
 			bstr_log_text = _logText.AllocSysString();
@@ -1805,7 +1805,7 @@ DWORD COpUpdater::PerformMscDeviceUpdate(CString& _logText)
 DWORD COpUpdater::VerifyNand(Volume* pMscDevice)
 {
 	DWORD rc = ERROR_SUCCESS;
-	Device::NotifyStruct nsInfo(_T("COpUpdater::VerifyNand"));
+	Device::NotifyStruct nsInfo(_T("COpUpdater::VerifyNand"), Device::NotifyStruct::dataDir_FromDevice, 0);
 	Device::UI_Callback callback(this, &COpUpdater::OnDownloadProgress);
 
 	HANDLE hVolume = pMscDevice->Lock( Volume::LockType_Logical );

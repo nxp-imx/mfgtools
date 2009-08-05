@@ -1,4 +1,7 @@
-﻿using System;
+﻿#include "StdAfx.h"
+#include "UpdateTransportProtocol.h"
+/*
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -11,9 +14,11 @@ using Microsoft.Win32.SafeHandles;
 
 using DevSupport.DeviceManager;
 using DevSupport.Api;
+*/
 
-namespace DevSupport.DeviceManager.UTP
-{
+uint32_t UpdateTransportProtocol::g_TransactionTag = 0;
+
+/*
     public class UpdateTransportProtocol : IDisposable
     {
         public abstract class Transaction
@@ -699,3 +704,4 @@ namespace DevSupport.DeviceManager.UTP
     } // class UpdateTransportProtocol
 
 }
+*/

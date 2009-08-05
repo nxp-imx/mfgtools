@@ -42,6 +42,7 @@ friend class CCopyOpDlg;
 friend class CLoadFileOpDlg;
 friend class COpUpdateDlg;
 friend class COpOTPDlg;
+friend class COpUtpUpdateDlg;
 private:
 	static const PTCHAR OptionsCmdStrings[];
 	static const PTCHAR UpdateFwString;
@@ -71,6 +72,8 @@ private:
 	CString m_cs_new_ini_section;
 //	CString m_cs_original_name;
 	int m_update_boot_fname_list_index;
+	int m_ucl_fname_list_index;
+	CString m_UclInstallSection;
 
     // DriveArray s_usbmsc_drive_array;
     // DriveArray s_mtp_drive_array;
@@ -112,8 +115,14 @@ public:
 	CString GetUpdaterBootPathname(void);
 	void SetUpdaterBootFilename(CString _fName, CFileList::FileListAction _action);
 	void RemoveUpdaterBootFilename(void);
+	CString GetUclFilename(void);
+	CString GetUclPathname(void);
+	void SetUclFilename(CString _fName, CFileList::FileListAction _action);
+	void RemoveUclFilename(void);
 	int GetUpdaterBootFilenameIndex(void) { return m_update_boot_fname_list_index; };
+	int GetUclFilenameIndex(void) { return m_ucl_fname_list_index; };
 	CString GetOTPRegisterValue(void) { return m_csOTPValue; };
+	CString GetUclInstallSection() { return m_UclInstallSection; };
 
 protected:
     INT_PTR ReplaceIniLine(LPCTSTR _section, LPCTSTR _string, INT_PTR _line);

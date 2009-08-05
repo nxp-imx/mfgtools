@@ -9,6 +9,7 @@
 #include "OpRegistry.h"
 #include "OpMonitor.h"
 #include "OpUpdater.h"
+#include "OpUtpUpdate.h"
 #include "OpErase.h"
 #include "OpLoader.h"
 #include "OpOTP.h"
@@ -306,6 +307,16 @@ INT_PTR CPortMgrDlg::CreateOps(void)
 					m_duration += pOp->GetDuration();
 					ATLTRACE("Panel %c - CreateOps() - created an OTP operation(%#x, %d).\n", _T('A')+m_port_display_index, pOp->m_nThreadID, pOp->m_nThreadID);
 					break;
+				case COperation::UTP_UPDATE_OP:
+					m_op_list.AddTail( pOp = new COpUtpUpdate(this, m_p_usb_port, pOpInfo) );
+					if (!pOp->CreateThread(/*CREATE_SUSPENDED*/)) {
+						delete pOp;
+						ATLTRACE("Error: Panel %c - CreateOps() - failed to create a UTP_UPDATE operation.\n", _T('A')+m_port_display_index);
+						return false;
+					}
+					m_duration += pOp->GetDuration();
+					ATLTRACE("Panel %c - CreateOps() - created a UTP_UPDATE operation(%#x, %d).\n", _T('A')+m_port_display_index, pOp->m_nThreadID, pOp->m_nThreadID);
+					break;
 				case COperation::INVALID_OP:
 					ATLTRACE("Warning: Panel %c - CreateOps() - INVALID operation, operation ignored.\n", _T('A')+m_port_display_index);
 					break;
@@ -351,16 +362,16 @@ void CPortMgrDlg::UpdateUI(LPCTSTR _status, int _opDelta/*=0*/, int _taskRange/*
 	//
 	// Manage Task Progress Bar
 	//
-	if ( _taskRange == 0 )
-	{
-		// set the task progress position
-		m_port_task_progress_ctrl.SetPos(_taskPosition);
-	}
-	else if ( _taskRange > 0 )
+///	if ( _taskRange == 0 )
+///	{
+///		// set the task progress position
+///		m_port_task_progress_ctrl.SetPos(_taskPosition);
+///	}
+	if ( _taskRange > 0 )
 	{
 		// turn on the task progress bar, set the range and set pos=0
 		m_port_task_progress_ctrl.SetRange32(0, _taskRange);
-		m_port_task_progress_ctrl.SetPos(0);
+		m_port_task_progress_ctrl.SetPos(_taskPosition);
 		m_port_task_progress_ctrl.ShowWindow(SW_SHOW);
 	}
 	else if ( _taskRange == -1 )
@@ -631,6 +642,7 @@ LRESULT CPortMgrDlg::OnMsgStateChange(WPARAM _event_type, LPARAM _msg_string)
 
 bool CPortMgrDlg::OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo)
 {
+	ATLTRACE(_T("%s PortMgr DevChange Event: %s DevType: %s OpMgr Mode: %s\r\n"),GetPanel(), DeviceManager::EventToString(nsInfo.Event), DeviceClass::DeviceTypeToString(nsInfo.Type).c_str(), OpModeToString(m_mode));
 	bool ret = ERROR_SUCCESS;
 
 	switch(nsInfo.Event)

@@ -171,7 +171,7 @@ int32_t usb::Port::Refresh()
 	// Close the hub
 	CloseHandle(hHub);
 
-	ATLTRACE2(_T("usb::Port::Refresh() - Hub %d, %s\r\n"), _parentHub->_index.get(), _name.c_str());
+//t	ATLTRACE2(_T("usb::Port::Refresh() - Hub %d, %s\r\n"), _parentHub->_index.get(), _name.c_str());
 
 	return error;
 }

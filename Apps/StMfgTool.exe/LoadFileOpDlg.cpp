@@ -152,7 +152,6 @@ void CLoadFileOpDlg::OnBnClickedCancel()
 
 void CLoadFileOpDlg::OnBnClickedBrowseFile()
 {
-    CString copy_buffer;
     CFileDialog *dlg;
 	CString resStr;
 

@@ -34,7 +34,7 @@ Volume::~Volume(void)
 
 void Volume::Trash()
 {
-	memset(&_scsiSenseData, 0, sizeof(_scsiSenseData));
+//	memset(&_scsiSenseData, 0, sizeof(_scsiSenseData));
 //	_diskNumbers.erase(_diskNumbers.begin(), _diskNumbers.end());
 //	_disks.erase(_disks.begin(), _disks.end());
 //	_removableDevices.erase(_removableDevices.begin(), _removableDevices.end());
@@ -456,7 +456,7 @@ uint32_t Volume::SendCommand(HANDLE hDrive, StApi& api, uint8_t* additionalInfo,
 
     // reset our sense data holder in case we need to 
 	// save off fresh data
-	memset(&_scsiSenseData, 0, sizeof(_scsiSenseData));
+//	memset(&_scsiSenseData, 0, sizeof(_scsiSenseData));
 	
 	// init parameter if it is used
 	if (additionalInfo)
@@ -532,15 +532,11 @@ uint32_t Volume::SendCommand(HANDLE hDrive, StApi& api, uint8_t* additionalInfo,
     nsInfo.position = api.GetTransferSize();
     Notify(nsInfo);
 
-    _scsiSenseStatus = pRequest->PassThrough.ScsiStatus;
-	_scsiSenseData = pRequest->SenseData;
+    api.ScsiSenseStatus = pRequest->PassThrough.ScsiStatus;
+	api.ScsiSenseData = pRequest->SenseData;
 
-	if (pRequest->PassThrough.ScsiStatus != SCSISTAT_GOOD)
-	{
-		if (additionalInfo)
-            *additionalInfo = _scsiSenseStatus = pRequest->PassThrough.ScsiStatus;
-		_scsiSenseData = pRequest->SenseData;
-	}
+	if (additionalInfo)
+        *additionalInfo = api.ScsiSenseStatus;
 
 	if ( pRequest != NULL )
 		free(pRequest); 
@@ -556,8 +552,8 @@ uint32_t Volume::SendCommand(StApi& api, uint8_t* additionalInfo)
 		return ERROR_INVALID_PARAMETER;
 */
     // tell the UI we are beginning a command.
-    NotifyStruct nsInfo(api.GetName());
-    nsInfo.direction = api.IsWriteCmd() ? Device::NotifyStruct::dataDir_ToDevice : Device::NotifyStruct::dataDir_FromDevice;
+    NotifyStruct nsInfo(api.GetName(), api.IsWriteCmd() ? Device::NotifyStruct::dataDir_ToDevice : Device::NotifyStruct::dataDir_FromDevice, 0);
+//    nsInfo.direction = api.IsWriteCmd() ? Device::NotifyStruct::dataDir_ToDevice : Device::NotifyStruct::dataDir_FromDevice;
     Notify(nsInfo);
 
     HANDLE hDrive = ::CreateFile (
@@ -583,7 +579,7 @@ uint32_t Volume::SendCommand(StApi& api, uint8_t* additionalInfo)
     return ret;
 
 }
-
+/*
 CStdString Volume::GetSendCommandErrorStr()
 {
 	CStdString msg;
@@ -639,7 +635,7 @@ CStdString Volume::GetSendCommandErrorStr()
 
 	return msg;
 }
-
+*/
 uint32_t Volume::ResetChip()
 {
 	api::StChipReset api;
@@ -686,11 +682,11 @@ int32_t Volume::WriteDrive(const HANDLE hVolume, const uint8_t driveNumber, cons
 {
 	int32_t error = ERROR_SUCCESS;
 	// For Notifying the UI
-	NotifyStruct nsInfo(_T("Volume::WriteDrive()"));
-    nsInfo.direction = Device::NotifyStruct::dataDir_ToDevice;
+	NotifyStruct nsInfo(_T("Volume::WriteDrive()"), Device::NotifyStruct::dataDir_ToDevice, 0);
+//    nsInfo.direction = Device::NotifyStruct::dataDir_ToDevice;
 
 	// Dummy info
-	NotifyStruct dummyInfo(_T("Not used"));
+	NotifyStruct dummyInfo(_T("Not used"), Device::NotifyStruct::dataDir_Off, 0);
 
 	// Get the sector size
 	StGetLogicalDriveInfo apiInfo(driveNumber, DriveInfoSectorSizeInBytes);
@@ -741,11 +737,11 @@ int32_t Volume::ReadDrive(const HANDLE hVolume, const uint8_t driveNumber, std::
 {
 	int32_t error = ERROR_SUCCESS;
 	// For Notifying the UI
-	NotifyStruct nsInfo(_T("Volume::ReadDrive()"));
-    nsInfo.direction = Device::NotifyStruct::dataDir_FromDevice;
+	NotifyStruct nsInfo(_T("Volume::ReadDrive()"), Device::NotifyStruct::dataDir_FromDevice, 0);
+//    nsInfo.direction = Device::NotifyStruct::dataDir_FromDevice;
 
 	// Dummy info
-	NotifyStruct dummyInfo(_T("Not used"));
+	NotifyStruct dummyInfo(_T("Not used"), Device::NotifyStruct::dataDir_Off, 0);
 
 	data.clear();
 
@@ -863,7 +859,7 @@ HANDLE Volume::Lock(LockType lockType)
 }
 
 // Unlocks a volume.
-int32_t Volume::Unlock(HANDLE hDrive)
+int32_t Volume::Unlock(HANDLE hDrive, bool close)
 {
 	DWORD dwBytesReturned;
 	DWORD dwSleepAmount;
@@ -883,13 +879,15 @@ int32_t Volume::Unlock(HANDLE hDrive)
 				NULL 
 			) )
 		{		
-	        CloseHandle(hDrive);
+	        if (close)
+				CloseHandle(hDrive);
 			return ERROR_SUCCESS;
 		}
 		Sleep( dwSleepAmount );
 	}
 
-    CloseHandle(hDrive);
+    if (close)
+		CloseHandle(hDrive);
 	TRACE(_T("*** Volume::Unlock - FAILED\n")); 
 	return GetLastError();
 }

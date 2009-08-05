@@ -33,13 +33,16 @@ namespace api
 
 	#define ST_SCSIOP_READ						0xC0
 	#define ST_SCSIOP_WRITE						0xC1
+    /// The StUtp Command. Byte[0] of the CDB.
+	#define ST_SCSIOP_UTP						0xF0
 
 	enum _API_TYPE {
 		API_TYPE_ST_SCSI =0, 
 		API_TYPE_SCSI    =1, 
 		API_TYPE_BLTC    =2, 
 		API_TYPE_PITC    =3,
-		API_TYPE_ST_MTP  =4
+		API_TYPE_ST_MTP  =4,
+		API_TYPE_UTP     =5
 	};
 
 	const uint8_t ST_READ_CMD=0, ST_WRITE_CMD=1, ST_WRITE_CMD_PLUS_DATA=2;
@@ -189,6 +192,17 @@ namespace api
 			uint8_t Reserved;
 		};
 
+		// API_TYPE_UTP
+		// 
+		//
+		struct _CDBUTP16 {
+			uint8_t OperationCode;		// 0xF0 - ST_SCSIOP_UTP
+			uint8_t Command;			// 
+			uint32_t Tag;
+			int64_t LParam;
+			uint8_t Reserved[2];
+		};
+
 	};
 
 	struct _ALLOCATE_MEDIA_CMD_ENTRY
@@ -331,6 +345,128 @@ namespace api
 				}
 			}
 		}
+		
+		class SenseKey
+		{
+		public:
+			SenseKey(uint8_t key)
+			{
+				switch (key)
+				{
+					case SCSI_SENSE_NO_SENSE:
+						_str = _T("NO_SENSE");
+						break;
+					case SCSI_SENSE_RECOVERED_ERROR:
+						_str = _T("RECOVERED_ERROR");
+						break;
+					case SCSI_SENSE_NOT_READY:
+						_str = _T("NOT_READY");
+						break;
+					case SCSI_SENSE_MEDIUM_ERROR:
+						_str = _T("MEDIUM_ERROR");
+						break;
+					case SCSI_SENSE_HARDWARE_ERROR:
+						_str = _T("HARDWARE_ERROR");
+						break;
+					case SCSI_SENSE_ILLEGAL_REQUEST:
+						_str = _T("ILLEGAL_REQUEST");
+						break;
+					case SCSI_SENSE_UNIT_ATTENTION:
+						_str = _T("UNIT_ATTENTION");
+						break;
+					case SCSI_SENSE_DATA_PROTECT:
+						_str = _T("DATA_PROTECT");
+						break;
+					case SCSI_SENSE_BLANK_CHECK:
+						_str = _T("BLANK_CHECK");
+						break;
+					case SCSI_SENSE_UNIQUE:
+						_str = _T("VENDOR_SPECIFIC");
+						break;
+					case SCSI_SENSE_COPY_ABORTED:
+						_str = _T("COPY_ABORTED");
+						break;
+					case SCSI_SENSE_ABORTED_COMMAND:
+						_str = _T("ABORTED_COMMAND");
+						break;
+					case SCSI_SENSE_EQUAL:
+						_str = _T("EQUAL");
+						break;
+					case SCSI_SENSE_VOL_OVERFLOW:
+						_str = _T("OVERFLOW");
+						break;
+					case SCSI_SENSE_MISCOMPARE:
+						_str = _T("MISCOMPARE");
+						break;
+					case SCSI_SENSE_RESERVED:
+						_str = _T("RESERVED");
+						break;
+					default:
+						_str = _T("UNKNOWN");
+				}
+				_str.AppendFormat(_T("(%02X)"), key);
+			}
+			CStdString& ToString() { return _str; };
+		private:
+			CStdString _str;
+		};
+
+		virtual CStdString GetSendCommandErrorStr()
+		{
+			CStdString msg;
+			switch ( ScsiSenseStatus )
+			{
+			case SCSISTAT_GOOD:
+				msg.Format(_T("SCSI Status: GOOD(0x%02X)\r\n"), ScsiSenseStatus);
+				break;
+			case SCSISTAT_CHECK_CONDITION:
+				msg.Format(_T("SCSI Status: CHECK_CONDITION(0x%02X)\r\n"), ScsiSenseStatus);
+				break;
+			case SCSISTAT_CONDITION_MET:
+				msg.Format(_T("SCSI Status: CONDITION_MET(0x%02X)\r\n"), ScsiSenseStatus);
+				break;
+			case SCSISTAT_BUSY:
+				msg.Format(_T("SCSI Status: BUSY(0x%02X)\r\n"), ScsiSenseStatus);
+				break;
+			case SCSISTAT_INTERMEDIATE:
+				msg.Format(_T("SCSI Status: INTERMEDIATE(0x%02X)\r\n"), ScsiSenseStatus);
+				break;
+			case SCSISTAT_INTERMEDIATE_COND_MET:
+				msg.Format(_T("SCSI Status: INTERMEDIATE_COND_MET(0x%02X)\r\n"), ScsiSenseStatus);
+				break;
+			case SCSISTAT_RESERVATION_CONFLICT:
+				msg.Format(_T("SCSI Status: RESERVATION_CONFLICT(0x%02X)\r\n"), ScsiSenseStatus);
+				break;
+			case SCSISTAT_COMMAND_TERMINATED:
+				msg.Format(_T("SCSI Status: COMMAND_TERMINATED(0x%02X)\r\n"), ScsiSenseStatus);
+				break;
+			case SCSISTAT_QUEUE_FULL:
+				msg.Format(_T("SCSI Status: QUEUE_FULL(0x%02X)\r\n"), ScsiSenseStatus);
+				break;
+			default:
+				msg.Format(_T("SCSI Status: UNKNOWN(0x%02X)\r\n"), ScsiSenseStatus);
+			}
+
+			msg += _T("Sense data:\r\n");
+			msg.AppendFormat(_T("   ErrorCode: 0x%02X\r\n"), ScsiSenseData.ErrorCode);
+			msg.AppendFormat(_T("   Valid: %s\r\n"), ScsiSenseData.Valid ? _T("true") : _T("false"));
+			msg.AppendFormat(_T("   SegmentNumber: 0x%02X\r\n"), ScsiSenseData.SegmentNumber);
+			SenseKey key(ScsiSenseData.SenseKey);
+			msg.AppendFormat(_T("   SenseKey: %s\r\n"), key.ToString().c_str());
+			msg.AppendFormat(_T("   IncorrectLength: %s\r\n"), ScsiSenseData.IncorrectLength ? _T("true") : _T("false"));
+			msg.AppendFormat(_T("   EndOfMedia: %s\r\n"), ScsiSenseData.EndOfMedia ? _T("true") : _T("false"));
+			msg.AppendFormat(_T("   FileMark: %s\r\n"), ScsiSenseData.FileMark ? _T("true") : _T("false"));
+			msg.AppendFormat(_T("   Information[0-3]: %02X %02X %02X %02X \r\n"), ScsiSenseData.Information[0], ScsiSenseData.Information[1], ScsiSenseData.Information[2], ScsiSenseData.Information[3]);
+			msg.AppendFormat(_T("   AdditionalSenseLength: 0x%02X\r\n"), ScsiSenseData.AdditionalSenseLength);
+			msg.AppendFormat(_T("   CommandSpecificInformation[0-3]: %02X %02X %02X %02X\r\n"), ScsiSenseData.CommandSpecificInformation[0], ScsiSenseData.CommandSpecificInformation[1], ScsiSenseData.CommandSpecificInformation[2], ScsiSenseData.CommandSpecificInformation[3]);
+			msg.AppendFormat(_T("   AdditionalSenseCode: 0x%02X\r\n"), ScsiSenseData.AdditionalSenseCode);
+			msg.AppendFormat(_T("   AdditionalSenseCodeQualifier: 0x%02X\r\n"), ScsiSenseData.AdditionalSenseCodeQualifier);
+			msg.AppendFormat(_T("   FieldReplaceableUnitCode: 0x%02X\r\n"), ScsiSenseData.FieldReplaceableUnitCode);
+			msg.AppendFormat(_T("   SenseKeySpecific[0-2]: %02X %02X %02X\r\n"), ScsiSenseData.SenseKeySpecific[0], ScsiSenseData.SenseKeySpecific[1], ScsiSenseData.SenseKeySpecific[2]);
+
+			return msg;
+		}
+
 
 		// Use ONLY for creating runtime commands
 		// This info should be calculated/set as required for each StApi class definition
@@ -352,6 +488,9 @@ namespace api
 		CStdString _responseStr;
 		uint8_t* _responseDataPtr;
 		Parameter::ParamMap _params;
+	public:
+		SENSE_DATA ScsiSenseData;
+		uint8_t ScsiSenseStatus;
 	};
 
 	//////////////////////////////////////////////////////////////////////

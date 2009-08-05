@@ -49,7 +49,7 @@ uint32_t StPitc::SendPitcCommand(StApi& api)
 	
 	if ( moreInfo )
 	{
-        _strResponse = _pDevice->GetSendCommandErrorStr();
+        _strResponse = api.GetSendCommandErrorStr();
 
         HidPitcRequestSense senseApi;
         err = _pDevice->SendCommand(senseApi, &moreInfo);

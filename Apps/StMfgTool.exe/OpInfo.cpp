@@ -33,6 +33,8 @@ COpInfo::COpInfo(CPlayerProfile * _profile, LPCTSTR _cmd_line, INT_PTR _index)
 	, m_cs_new_ini_section(_T(""))
 	, m_csOTPValue(_T(""))
 	, m_update_boot_fname_list_index(-1)
+	, m_ucl_fname_list_index(-1)
+	, m_UclInstallSection(_T(""))
 {
 	ASSERT(m_p_profile);
 	if ( m_cs_cmd_line.Find(_T('=')) != -1 ) {
@@ -82,6 +84,8 @@ COpInfo::COpInfo(CPlayerProfile * _profile)
     , m_drv_mask(0)
     , m_data_drive_num(0)
 	, m_update_boot_fname_list_index(-1)
+	, m_ucl_fname_list_index(-1)
+	, m_UclInstallSection(_T(""))
 {
 	m_FileList.RemoveAll();
 
@@ -436,6 +440,41 @@ validate:
 			break;
 		case COperation::REGISTRY_OP:
 			break;
+
+		case COperation::UTP_UPDATE_OP:
+		{
+			// see if <AppDir>\Profiles\<Player Description>\<Operation Description> exists
+			if ( !m_b_new_op && _taccess(m_cs_path, 0) == -1 ) {
+				csTemp.LoadString(IDS_OPINFO_ERR_MISSING_DIRECTORY);
+				m_error_msg.Format(csTemp, m_cs_path);
+				return (  m_status = OPINFO_ERROR );
+			}
+
+			if ( !m_b_new_op )
+			{
+				GetPrivateProfileString(m_cs_ini_section, _T("UCL_INSTALL_SECTION"), _T(""), csTemp.GetBufferSetLength(_MAX_PATH), _MAX_PATH, m_p_profile->m_cs_ini_file);
+				csTemp.ReleaseBuffer();
+				if ( csTemp.IsEmpty() )
+				{
+					m_error_msg = _T("Operation error: UCL_INSTALL_SECTION= value was not found in player.ini file.");
+					return ( m_status = OPINFO_ERROR );
+				}
+				m_UclInstallSection = csTemp;
+
+				if ( EnumerateFolderFiles(&m_FileList) != OPINFO_OK )
+					return m_status;
+				
+				CString csUclFilename;
+				csUclFilename.Format(_T("%s\\%s"), m_cs_path, _T("ucl.xml"));
+				SetUclFilename( csUclFilename, CFileList::EXISTS_IN_TARGET );
+				if ( m_ucl_fname_list_index == -1 )
+				{
+					m_error_msg.Format(_T("Operation error: Can not find ucl.xml in %s."), m_cs_path);
+					return ( m_status = OPINFO_ERROR );
+				}
+			}
+			break;
+		}
 		default:
 			m_error_msg.LoadString(IDS_OPINFO_ERR_INVALID_OPERATION);
 			return m_status = OPINFO_ERROR;
@@ -466,6 +505,7 @@ DWORD COpInfo::Validate(void)
 		case COperation::UPDATE_OP:
 		case COperation::COPY_OP:
 		case COperation::LOADER_OP:
+		case COperation::UTP_UPDATE_OP:
 		{
 			// if an existing op, check that the folder and file(s) exist
 			if ( !m_b_new_op )
@@ -599,6 +639,10 @@ DWORD COpInfo::WriteIniSection(LPCTSTR _section, LPCTSTR _old_section)
 			break; // we don't write the COPY_OP file list; all files under the operation folder are copied.
 		case COperation::OTP_OP:
 			csSection.AppendFormat(_T("VALUE=%s"), m_csOTPValue);
+			csSection.AppendChar(_T('\0'));
+			break;
+		case COperation::UTP_UPDATE_OP:
+			csSection.AppendFormat(_T("UCL_INSTALL_SECTION=%s\r\n"), m_UclInstallSection);
 			csSection.AppendChar(_T('\0'));
 			break;
 		case COperation::ERASE_OP:
@@ -825,5 +869,44 @@ void COpInfo::RemoveUpdaterBootFilename(void)
 	{
 		m_FileList.RemoveFile(m_update_boot_fname_list_index);
 		m_update_boot_fname_list_index = -1;
+	}
+}
+
+CString COpInfo::GetUclFilename(void)
+{
+	if (m_ucl_fname_list_index != -1)
+		return m_FileList.GetFileNameAt(m_ucl_fname_list_index);
+	else return NULL;
+}
+
+CString COpInfo::GetUclPathname(void)
+{
+	if (m_ucl_fname_list_index != -1)
+		return m_FileList.GetPathNameAt(m_ucl_fname_list_index);
+	else return NULL;
+}
+
+void COpInfo::SetUclFilename(CString _fName, CFileList::FileListAction _action)
+{
+	int index = -1;
+	if ( m_FileList.FindFile(_fName, index) != NULL )
+	{
+		m_ucl_fname_list_index = index;
+	}
+	else
+	{
+		if (m_ucl_fname_list_index != -1)
+			RemoveUclFilename();
+
+		m_ucl_fname_list_index = m_FileList.AddFile(_fName, _action);
+	}
+}
+
+void COpInfo::RemoveUclFilename(void)
+{
+	if (m_ucl_fname_list_index != -1)
+	{
+		m_FileList.RemoveFile(m_ucl_fname_list_index);
+		m_ucl_fname_list_index = -1;
 	}
 }

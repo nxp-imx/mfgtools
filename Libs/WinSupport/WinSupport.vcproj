@@ -220,6 +220,10 @@
 				RelativePath=".\VisValEdit.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\XMLite.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -288,6 +292,10 @@
 			</File>
 			<File
 				RelativePath=".\VisValEdit.h"
+				>
+			</File>
+			<File
+				RelativePath=".\XMLite.h"
 				>
 			</File>
 		</Filter>

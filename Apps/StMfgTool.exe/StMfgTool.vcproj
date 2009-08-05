@@ -299,6 +299,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OpUtpUpdate.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OpUtpUpdateDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PlayerProfile.cpp"
 				>
 			</File>
@@ -469,6 +477,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OpUtpUpdate.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OpUtpUpdateDlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PlayerProfile.h"
 				>
 			</File>
@@ -516,6 +532,10 @@
 				RelativePath=".\TreeDroptarget.h"
 				>
 			</File>
+			<File
+				RelativePath=".\UpdateCommandList.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -528,6 +548,10 @@
 			</File>
 			<File
 				RelativePath="..\..\Resources\closedfolder.BMP"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Resources\freescale_logo.bmp"
 				>
 			</File>
 			<File
@@ -548,6 +572,10 @@
 			</File>
 			<File
 				RelativePath=".\res\StMfgTool.rc2"
+				>
+			</File>
+			<File
+				RelativePath=".\res\StMfgToolx.ico"
 				>
 			</File>
 			<File

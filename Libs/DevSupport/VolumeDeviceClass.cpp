@@ -85,7 +85,7 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 	Device * pDevice = NULL;
 	NotifyStruct nsInfo = {0};
     
-	ATLTRACE2(_T("VolumeDeviceClass::AddUsbDevice()  %s\r\n"), path);
+//t	ATLTRACE2(_T("VolumeDeviceClass::AddUsbDevice()  %s\r\n"), path);
 
 	// if it is not a Drive letter, then return
 	if ( path[0] == _T('\\') )
@@ -151,7 +151,7 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 						WaitForSingleObject(devicesMutex, INFINITE);
 						_devices.push_back(pDevice);
 						ReleaseMutex(devicesMutex);
-						ATLTRACE2(_T("VolumeDeviceClass::AddUsbDevice()  Created new(%d) - %s:\r\n"), _devices.size(), msgLetter.c_str());
+//t						ATLTRACE2(_T("VolumeDeviceClass::AddUsbDevice()  Created new(%d) - %s:\r\n"), _devices.size(), msgLetter.c_str());
 						break;
 					}
 				} // end if(UsbDevice)
@@ -183,7 +183,7 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 
 			if ( drvLetter.Find(msgLetter) != -1 )
 			{
-				ATLTRACE2(_T("VolumeDeviceClass::AddUsbDevice()  Found previous volume(%d): %s\r\n"), _oldDevices.size(), msgLetter.c_str());
+//t				ATLTRACE2(_T("VolumeDeviceClass::AddUsbDevice()  Found previous volume(%d): %s\r\n"), _oldDevices.size(), msgLetter.c_str());
 				delete (*device);
 				_oldDevices.erase(device);
 				break;
@@ -226,7 +226,7 @@ DeviceClass::NotifyStruct VolumeDeviceClass::RemoveUsbDevice(LPCTSTR path)
 				nsInfo.HubIndex = (*device)->_hubIndex.get();
 				nsInfo.Hub = (*device)->_hub.get();
 
-				ATLTRACE2(_T("VolumeDeviceClass::RemoveUsbDevice() -REMOVED- %s:\r\n"), msgLetter.c_str());
+//t				ATLTRACE2(_T("VolumeDeviceClass::RemoveUsbDevice() -REMOVED- %s:\r\n"), msgLetter.c_str());
 
 				break;
 			}

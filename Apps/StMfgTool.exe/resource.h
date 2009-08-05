@@ -7,7 +7,11 @@
 #define ID_SAVE_BUTTON                  4
 #define IDB_COMPANY_BMP                 100
 #define IDP_OLE_INIT_FAILED             101
+#define IDI_UPDATER_ICON                102
 #define IDD_LOGMGR_DIALOG               103
+#define IDI_COMPANY_ICON                104
+#define IDI_COMPANY_BMP                 109
+#define IDI_CUSTOM_COMPANY_BMP          110
 #define IDR_MAINFRAME                   128
 #define IDR_StMfgToolTYPE               129
 #define IDD_BUTTON_DLG                  130
@@ -29,8 +33,76 @@
 #define IDR_UPDATELIST_MENU             148
 #define IDD_LOADOPDLG                   149
 #define IDD_OTPOPDLG                    150
+#define IDR_BOUND_LANG_IDS              150
+#define IDR_BOUND_RESOURCE_COUNT        151
 #define IDB_OPEN_FOLDER                 152
+#define IDR_BOUND_LANG_RESOURCE_COUNT   152
 #define IDD_REGCHECK_DLG                153
+#define IDR_BOUND_RESOURCE_TABLE        153
+#define IDD_UTPUPDATEOPDLG              154
+#define IDR_BOUND_RESOURCE_TABLE_LEN    154
+#define IDR_USE_LOCAL_RESOURCES         155
+#define IDR_DEFAULT_DIALOG              156
+#define IDR_STMP3REC_SYS                160
+#define IDR_STMP3REC_INF                161
+#define IDR_STMP3REC_CAT                162
+#define IDR_STMP3RECX64_SYS             163
+#define IDR_STMP3RECX64_INF             164
+#define IDR_STMP3RECX64_CAT             165
+#define IDR_CFG_ALWAYS_FORCE_RECOVERY   170
+#define IDR_CFG_ERASE_MEDIA             171
+#define IDR_CFG_FORMAT_DATA             172
+#define IDR_CFG_VERSION                 173
+#define IDR_CFG_COMPANYNAME             174
+#define IDR_CFG_PRODUCTDESC             175
+#define IDR_CFG_PRODUCTNAME             176
+#define IDR_CFG_APPTITLE                177
+#define IDR_CFG_COPYRIGHT               178
+#define IDR_CFG_COMMENTS                179
+#define IDR_CFG_SCSIMFG                 180
+#define IDR_CFG_SCSIPROD                181
+#define IDR_CFG_MTPMFG                  182
+#define IDR_CFG_MTPPROD                 183
+#define IDR_CFG_USBVENDOR               184
+#define IDR_CFG_USBPROD                 185
+#define IDR_CFG_AUTORECOVERY            186
+#define IDR_CFG_FORCERECOVERY           187
+#define IDR_CFG_USELOCALRES             188
+#define IDR_CFG_WINCE                   189
+#define IDR_CFG_DLGTYPE                 190
+#define IDR_CFG_FORMATDATA              191
+#define IDR_CFG_ERASEMEDIA              192
+#define IDR_CFG_DEFAULTFAT              193
+#define IDR_CFG_DEFAULTLABEL            194
+#define IDR_CFG_REBOOTMSG               195
+#define IDR_CFG_ABOUT_BMP               196
+#define IDR_CFG_BASE_SDK                197
+#define IDR_CFG_LOW_NAND_SOLUTION       198
+#define IDR_CFG_AUTOSTART               199
+#define IDR_CFG_AUTOCLOSE               200
+#define IDR_CFG_BITMAP_ID               201
+#define IDR_CFG_MINDLG_FMT_MSG          202
+#define IDR_CFG_USBPROD_SECONDARY       203
+#define IDR_CFG_UPD_MAJOR_VERSION       250
+#define IDR_CFG_UPD_MINOR_VERSION       251
+#define IDR_CFG_PROD_MAJOR_VERSION      252
+#define IDR_CFG_PROD_MINOR_VERSION      253
+#define IDR_CFG_DRVARRAY_NUM_DRIVES     300
+#define IDR_CFG_DRVARRAY_ONE            301
+#define IDR_CFG_DRVARRAY_TWO            302
+#define IDR_CFG_DRVARRAY_THREE          303
+#define IDR_CFG_DRVARRAY_FOUR           304
+#define IDR_CFG_DRVARRAY_FIVE           305
+#define IDR_CFG_DRVARRAY_SIX            306
+#define IDR_CFG_DRVARRAY_SEVEN          307
+#define IDR_CFG_DRVARRAY_EIGHT          308
+#define IDR_CFG_DRVARRAY_NINE           309
+#define IDR_CFG_DRVARRAY_TEN            310
+#define IDR_CFG_DRVARRAY_ELEVEN         311
+#define IDR_CFG_DRVARRAY_TWELVE         312
+#define IDR_CFG_DRVARRAY_THIRTEEN       313
+#define IDR_CFG_DRVARRAY_FOURTEEN       314
+#define IDR_CFG_DRVARRAY_FIFTEEN        315
 #define ID_PORT_GROUP_BOX               1001
 #define IDC_PORT_PROGRESS               1002
 #define IDC_LOG_DATA                    1003
@@ -123,6 +195,7 @@
 #define IDC_STEP2_GROUP                 1087
 #define IDC_STEP3_GROUP                 1088
 #define IDC_SRC_DIR_TEXT                1089
+#define IDC_STEP2_GROUP2                1089
 #define IDC_FILE_TYPE_TEXT              1090
 #define IDC_STEP4_GROUP                 1091
 #define IDC_STEP1_TEXT                  1092
@@ -189,7 +262,9 @@
 #define IDC_REGCHK_ENTRIES_TEXT         1144
 #define IDC_REGCHK_ENTRIES              1145
 #define IDC_REGCHK_OTHER_DEVICES_TEXT   1146
-#define IDC_REGCHK_OTHER_ENTRIES		1147
+#define IDC_REGCHK_OTHER_ENTRIES        1147
+#define IDC_UCL_FNAME_EDIT              1148
+#define IDC_UCL_BROWSE_BTN              1149
 #define IDC_STATUS_GRP_TEXT             1150
 #define IDC_STATUS_PROFILE_TEXT         1151
 #define IDC_STATUS_PROFILE              1152
@@ -215,11 +290,14 @@
 #define IDC_UPDATE_BOOT_FW_BROWSE_BTN   1172
 #define IDC_UPDATE_BOOT_FW_EDIT         1173
 #define IDC_UPDATE_STEP4_TEXT           1174
+#define IDC_REQUIRED_FILES_BROWSE_BTN   1174
 #define IDC_STATUS_MULTI_COMBO_PROFILE  1175
 #define IDC_STATUS_MULTI_COMBO_SETTINGS 1176
 #define IDC_ABOUT_ALLRIGHTS_TEXT        1177
-#define IDC_CFG_COM_PORT_MSGS			1178
-
+#define IDC_CFG_COM_PORT_MSGS           1178
+#define IDC_OP_UTP_UPDATE_UCL_LIST_COMBO 1179
+#define IDC_OP_UTP_UPDATE_UCL_LIST_TEXT 1180
+#define IDC_OP_UTP_UPDATE_UCL_LIST_TEXT2 1181
 #define IDS_PLAYER_INI                  2999
 #define IDS_OPINFO_ERR_NOT_INITIALIZED  3000
 #define IDS_OPINFO_ERR_MISSING_DIRECTORY 3001
@@ -506,10 +584,16 @@
 #define IDS_OPOTP_WRITING_REG           5025
 #define IDS_REGCHK_INFO_TEXT            5026
 #define IDS_REGCHK_ENTRIES_TEXT         5027
-#define IDS_REGCHK_OTHER_TEXT			5028
+#define IDS_REGCHK_OTHER_TEXT           5028
 #define IDS_REGCHK_WARNING              5029
-#define IDS_CFG_COM_PORT_MSGS			5030
-
+#define IDS_CFG_COM_PORT_MSGS           5030
+#define IDR_DEFAULT_PROFILE_RESID_0     6000
+#define IDR_DEFAULT_PROFILE_RESID_1     6001
+#define IDR_DEFAULT_PROFILE_RESID_2     6002
+#define IDR_DEFAULT_PROFILE_RESID_3     6003
+#define IDR_OTPACCESS3700_RESID         6010
+#define IDR_OTPACCESS3770_RESID         6011
+#define IDR_OTPACCESS3780_RESID         6012
 #define ID_OPTIONS_CONFIGURATION        32771
 #define ID_START_STOP_TOGGLE            32772
 #define ID_VIEW_LOG                     32773
@@ -527,6 +611,7 @@
 #define IDR_FILEOPLIST_MENU             32788
 #define IDR_FOLDEROPLIST_MENU           32789
 #define IDM_ST_COPY                     32790
+#define IDR_RESID_UNKNOWN               -1
 
 // Next default values for new objects
 // 
@@ -534,7 +619,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        154
 #define _APS_NEXT_COMMAND_VALUE         32790
-#define _APS_NEXT_CONTROL_VALUE         1148
+#define _APS_NEXT_CONTROL_VALUE         1150
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

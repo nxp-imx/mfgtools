@@ -54,8 +54,8 @@ uint32_t RecoveryDevice::Download(const StFwComponent& fwComponent, Device::UI_C
     }
 
 	// For Notifying the UI
-	NotifyStruct nsInfo(_T("RecoveryDevice::Download()"));
-    nsInfo.direction = Device::NotifyStruct::dataDir_ToDevice;
+	NotifyStruct nsInfo(_T("RecoveryDevice::Download()"), Device::NotifyStruct::dataDir_ToDevice, 0);
+//    nsInfo.direction = Device::NotifyStruct::dataDir_ToDevice;
 
 	// For IO completion
 //	FileIO_CompletionRoutine callback(this, &RecoveryDevice::IoCompletion);

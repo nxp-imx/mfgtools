@@ -43,7 +43,7 @@ int32_t HidDevice::AllocateIoBuffers()
     if( hHidDevice == INVALID_HANDLE_VALUE )
     {
 		int32_t error = GetLastError();
-        ATLTRACE2(_T(" HidDevice::AllocateIoBuffers().CreateFile ERROR:(%d)\r\n"), error);
+//t        ATLTRACE2(_T(" HidDevice::AllocateIoBuffers().CreateFile ERROR:(%d)\r\n"), error);
         return error;
     }
 
@@ -159,8 +159,8 @@ uint32_t HidDevice::SendCommand(StApi& api, uint8_t* additionalInfo)
 //	}
 
 	// tell the UI we are beginning a command.
-    NotifyStruct nsInfo(api.GetName());
-    nsInfo.direction = api.IsWriteCmd() ? Device::NotifyStruct::dataDir_ToDevice : Device::NotifyStruct::dataDir_FromDevice;
+    NotifyStruct nsInfo(api.GetName(), api.IsWriteCmd() ? Device::NotifyStruct::dataDir_ToDevice : Device::NotifyStruct::dataDir_FromDevice, api.GetTransferSize());
+//    nsInfo.direction = api.IsWriteCmd() ? Device::NotifyStruct::dataDir_ToDevice : Device::NotifyStruct::dataDir_FromDevice;
     Notify(nsInfo);
 /*
     // If it is not a HID Api, return error.

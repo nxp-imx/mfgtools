@@ -16,10 +16,11 @@
 #define IDM_MOVE_DOWN	(WM_APP + 16)
 */
 
-#define IDM_NEW_UPDATE_OP	(WM_APP + 17)
-#define IDM_NEW_COPY_OP		(WM_APP + 18)
-#define IDM_NEW_LOAD_OP		(WM_APP + 19)
-#define IDM_NEW_OTP_OP		(WM_APP + 20)
+#define IDM_NEW_UPDATE_OP	  (WM_APP + 17)
+#define IDM_NEW_COPY_OP		  (WM_APP + 18)
+#define IDM_NEW_LOAD_OP		  (WM_APP + 19)
+#define IDM_NEW_OTP_OP		  (WM_APP + 20)
+#define IDM_NEW_UTP_UPDATE_OP (WM_APP + 21)
 
 
 ///////////////////////////////////////////////////////////////////////////////
