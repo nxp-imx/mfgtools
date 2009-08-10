@@ -1,0 +1,54 @@
+//
+// StMfgTool.RC2 - resources Microsoft Visual C++ does not edit directly
+//
+
+#ifdef APSTUDIO_INVOKED
+#error this file is not editable by Microsoft Visual C++
+#endif //APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Add manually edited resources here...
+
+/////////////////////////////////////////////////////////////////////////////
+
+#include "version.h"
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,STMFGTOOL_MAJOR_VERSION,STMFGTOOL_MINOR_VERSION,STMFGTOOL_REVISION
+ PRODUCTVERSION 1,STMFGTOOL_MAJOR_VERSION,STMFGTOOL_MINOR_VERSION,STMFGTOOL_REVISION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Freescale Semiconductor, Inc."
+            VALUE "FileDescription", "i.MX Manufacturing Tool"
+            VALUE "FileVersion", STMFGTOOL_STRING_VERSION
+            VALUE "InternalName", "MfgTool.exe"
+            VALUE "LegalCopyright", "Copyright (c) 2009, Freescale Semiconductor, Inc. \nAll Rights Reserved"
+            VALUE "OriginalFilename", "MfgTool.exe"
+            VALUE "ProductName", "i.MX Manufacturing Tool"
+            VALUE "ProductVersion", STMFGTOOL_STRING_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
