@@ -1,6 +1,13 @@
 ****************************************
 RELEASE_STMFGTOOL_1.6.0.001
 ****************************************
+08/19/2009
+
+	- Fix for application crash when command <LIST/> specified in player.ini is not found in ucl.xml file.
+
+****************************************
+RELEASE_STMFGTOOL_1.6.0.001
+****************************************
 08/5/2009
 
 	- Initial release of UTP_UPDATE Operation.

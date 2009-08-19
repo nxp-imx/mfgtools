@@ -920,6 +920,13 @@ UINT DoListThreadProc( LPVOID pParam )
 ///    OverallProgressBar.Maximum = list.Commands.Length * 2;
 ///    OverallProgressBar.Value = 0;
 
+	if ( pOperation->m_pCmdList == NULL )
+	{
+		CString msg; msg.Format(_T("No <CMD/>s. Can not find \"%s\" <LIST/> in ucl.xml file."), pOperation->m_pOpInfo->GetUclInstallSection());
+		pOperation->HandleError(-65535, msg, COpUtpUpdate::OP_INVALID);
+		return -65535;
+	}
+
 	for ( size_t i = 0; i < pOperation->m_pCmdList->GetChildCount(); ++i )
 	{
 		pOperation->m_pPortMgrDlg->UpdateUI(NULL, pOperation->ProgressDelta(i*2+1));
