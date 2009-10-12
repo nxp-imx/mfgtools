@@ -1201,12 +1201,12 @@ DWORD COpUtpUpdate::DoFind(UCL::Command* pCmd)
 		}
     }
 	ATLTRACE(_T("%s DONE WAITING FOR DEV_CHANGE: NewMode: %s CurrMode: %s \r\n"),m_pPortMgrDlg->GetPanel(), UCL::DeviceDesc::DeviceModeToString(newDevMode), UCL::DeviceDesc::DeviceModeToString(m_CurrentDeviceMode));
-
+/*
     if (m_CurrentDeviceMode == newDevMode)
         retValue = 0;
     else
         retValue = -65536;
-
+*/
     return retValue;
 
 } // DoFind()
