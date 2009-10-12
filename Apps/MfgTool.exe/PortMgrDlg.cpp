@@ -643,20 +643,23 @@ LRESULT CPortMgrDlg::OnMsgStateChange(WPARAM _event_type, LPARAM _msg_string)
 bool CPortMgrDlg::OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo)
 {
 	ATLTRACE(_T("%s PortMgr DevChange Event: %s DevType: %s OpMgr Mode: %s\r\n"),GetPanel(), DeviceManager::EventToString(nsInfo.Event), DeviceClass::DeviceTypeToString(nsInfo.Type).c_str(), OpModeToString(m_mode));
-	bool ret = ERROR_SUCCESS;
+	bool ret = TRUE;
 
 	switch(nsInfo.Event)
 	{
 		case DeviceManager::DEVICE_ARRIVAL_EVT:
 			if ( m_mode != OPMODE_ALL_OPS_COMPLETE )
-				m_p_curr_op->PostThreadMessage(WM_MSG_OPEVENT, COperation::OPEVENT_DEVICE_ARRIVAL, 0);
+				ret = m_p_curr_op->PostThreadMessage(WM_MSG_OPEVENT, COperation::OPEVENT_DEVICE_ARRIVAL, 0);
 			else
 				m_mode = ProcessOps();
 			break;
 
 		case DeviceManager::VOLUME_ARRIVAL_EVT:
 			if ( m_mode != OPMODE_ALL_OPS_COMPLETE )
-				m_p_curr_op->PostThreadMessage(WM_MSG_OPEVENT, COperation::OPEVENT_VOLUME_ARRIVAL, 0);
+			{
+				ret = m_p_curr_op->PostThreadMessage(WM_MSG_OPEVENT, COperation::OPEVENT_VOLUME_ARRIVAL, 0);
+				ret = m_p_curr_op->PumpMessage();
+			}
 			else
 				m_port_drive_ctrl.SetWindowText(m_p_usb_port->GetDriveLetters());
 			break;
@@ -664,7 +667,7 @@ bool CPortMgrDlg::OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo)
 		case DeviceManager::DEVICE_REMOVAL_EVT:
 			if ( m_mode != OPMODE_ALL_OPS_COMPLETE )
 			{
-				m_p_curr_op->PostThreadMessage(WM_MSG_OPEVENT, COperation::OPEVENT_DEVICE_REMOVAL, 0);
+				ret = m_p_curr_op->PostThreadMessage(WM_MSG_OPEVENT, COperation::OPEVENT_DEVICE_REMOVAL, 0);
 				m_p_curr_op->PumpMessage();
 			}
 			else if (!m_op_error)
@@ -674,7 +677,7 @@ bool CPortMgrDlg::OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo)
 		case DeviceManager::VOLUME_REMOVAL_EVT:
 			if ( m_mode != OPMODE_ALL_OPS_COMPLETE )
 			{
-				m_p_curr_op->PostThreadMessage(WM_MSG_OPEVENT, COperation::OPEVENT_VOLUME_REMOVAL, 0);
+				ret = m_p_curr_op->PostThreadMessage(WM_MSG_OPEVENT, COperation::OPEVENT_VOLUME_REMOVAL, 0);
 				m_p_curr_op->PumpMessage();
 			}
 			else
@@ -694,7 +697,8 @@ bool CPortMgrDlg::OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo)
 			// if this changed we better tell the ops
 			if ( FindDlgPort() == NULL )
 			{
-				ret = DeviceManager::retUnregisterCallback; 
+				// ret = DeviceManager::retUnregisterCallback;
+				ret = 0; // will be !'d at return
 				SetUsbPort( NULL );
 			}
 			break;
@@ -703,7 +707,7 @@ bool CPortMgrDlg::OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo)
 			;// Process other WM_DEVICECHANGE notifications for other 
 			;// devices or reasons.
 	}
-	return ret;
+	return !ret; // 0 means success
 }
 
 BOOL CPortMgrDlg::FitsProfile(CString dev_path)

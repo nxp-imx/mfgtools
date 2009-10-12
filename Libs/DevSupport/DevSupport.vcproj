@@ -72,9 +72,10 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="mssachlp.lib hid.lib"
+				LinkLibraryDependencies="true"
+				AdditionalDependencies="mssachlp.lib hid.lib MXLib.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="&quot;$(WMSDK)\lib&quot;;&quot;$(WMSDK)\WMDM\lib&quot;;&quot;$(XPDDK)\lib\wxp\i386&quot;"
+				AdditionalLibraryDirectories="&quot;$(WMSDK)\lib&quot;;&quot;$(WMSDK)\WMDM\lib&quot;;&quot;$(XPDDK)\lib\wxp\i386&quot;;&quot;../MXLib/$(OutDir)&quot;"
 				IgnoreAllDefaultLibraries="false"
 			/>
 			<Tool
@@ -140,9 +141,9 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="mssachlp.lib hid.lib"
+				AdditionalDependencies="mssachlp.lib hid.lib MXLib.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;$(XPDDK)\lib\wxp\i386"
+				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;&quot;$(XPDDK)\lib\wxp\i386&quot;;&quot;../MXLib/$(OutDir)&quot;"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -199,6 +200,14 @@
 			</File>
 			<File
 				RelativePath=".\MtpDeviceClass.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MxRomDevice.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MxRomDeviceClass.cpp"
 				>
 			</File>
 			<File
@@ -325,6 +334,14 @@
 			</File>
 			<File
 				RelativePath=".\MtpDeviceClass.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MxRomDevice.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MxRomDeviceClass.h"
 				>
 			</File>
 			<File

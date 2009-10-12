@@ -5,6 +5,7 @@
 #include "MtpDeviceClass.h"
 #include "UsbControllerMgr.h"
 #include "UsbHubMgr.h"
+#include "MxRomDeviceClass.h"
 //#include "UsbDeviceMgr.h"
 
 #include <mswmdm_i.c>
@@ -38,6 +39,7 @@ DeviceManager::DeviceManager()
 	_devClasses[DeviceClass::DeviceTypeHid]		      = new HidDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeUsbController] = new usb::ControllerMgr;
 	_devClasses[DeviceClass::DeviceTypeUsbHub]        = new usb::HubMgr;
+	_devClasses[DeviceClass::DeviceTypeMxRom]         = new MxRomDeviceClass;
 //	_devClasses[DeviceClass::DeviceTypeUsbDevice]     = new usb::DeviceMgr;
 	if ( _devClasses.size() != 6/*7*/ )
 	{

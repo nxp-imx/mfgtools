@@ -404,10 +404,31 @@ BOOL COpUtpUpdate::WaitForDeviceChange(int seconds)
         // Timeout
         retValue = FALSE;
     }
+    else if ( waitResult == WAIT_OBJECT_0 + 2 )
+    {
+        // got a message that we need to handle while we are waiting.
+        MSG msg ; 
+        // Read all of the messages in this next loop, 
+        // removing each message as we read it.
+        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) 
+        { 
+        ATLTRACE2(_T("   COpUtpUpdate::WaitForDeviceChange() - Got a message(%0x).\r\n"), msg.message);
+            // If it is a quit message, exit.
+///            if (msg.message == WM_QUIT)  
+///            {
+///                done = true;
+/////                            break;
+///            }
+            // Otherwise, dispatch the message.
+            DispatchMessage(&msg); 
+        } // End of PeekMessage while loop.
+        retValue = FALSE;
+    }
     else
     {
         // unreachable, but catch it just in case.
         retValue = FALSE;
+		ATLTRACE2(_T("   COpUtpUpdate::WaitForDeviceChange() Invalid waitReturn: %d.\r\n"), waitResult);
     }
 
 	// clean up
@@ -906,6 +927,10 @@ UINT DoListThreadProc( LPVOID pParam )
 	COpUtpUpdate* pOperation = (COpUtpUpdate*)pParam;
 	pOperation->m_bProcessingList = TRUE;
 	UCL::Command* pCmd = NULL;
+	pOperation->m_dwStartTime = GetTickCount();
+
+	CString logText;
+	BSTR bstr_log_text;
 
 ///    if (String.IsNullOrEmpty(list.Description))
 ///        StatusTextBox.Text = String.Empty;
@@ -926,6 +951,10 @@ UINT DoListThreadProc( LPVOID pParam )
 		pOperation->HandleError(-65535, msg, COpUtpUpdate::OP_INVALID);
 		return -65535;
 	}
+
+	logText.Format(_T("%s Start processing %s <LIST/>.\r\n"), pOperation->m_pPortMgrDlg->GetPanel(), pOperation->m_pOpInfo->GetUclInstallSection());
+	bstr_log_text = logText.AllocSysString();
+	((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
 
 	for ( size_t i = 0; i < pOperation->m_pCmdList->GetChildCount(); ++i )
 	{
@@ -967,7 +996,7 @@ UINT DoListThreadProc( LPVOID pParam )
 			{
 				pOperation->m_bProcessingList = FALSE;
 				UCL::Command cmd;
-				cmd.Load(_T("<CMD type=\"drop\" body=\"!2\" timeout=\"0\">"));
+				cmd.Load(_T("<CMD type=\"drop\" body=\"!3\" timeout=\"0\">"));
 				pOperation->DoDrop(&cmd);
 
 				ATLTRACE(_T("%s Update complete reset to recovery ( TestLoop)\r\n"), pOperation->m_pPortMgrDlg->GetPanel());
@@ -976,6 +1005,10 @@ UINT DoListThreadProc( LPVOID pParam )
 	}
 	else
 		pOperation->HandleError(retValue, NULL, COpUtpUpdate::OP_INVALID);
+
+	logText.Format(_T("%s Finished processing %s <LIST/> : %s code=%d.\r\n"), pOperation->m_pPortMgrDlg->GetPanel(), pOperation->m_pOpInfo->GetUclInstallSection(), retValue == ERROR_SUCCESS ? _T("SUCCESS") : _T("FAIL"), retValue);
+	bstr_log_text = logText.AllocSysString();
+	((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
 
 	pOperation->m_bProcessingList = FALSE;
 	return retValue;
@@ -986,6 +1019,9 @@ DWORD COpUtpUpdate::DoCommand(UCL::Command* pCmd)
 	DWORD retValue = ERROR_SUCCESS;
 	Device::UI_Callback callback(this, &COpUtpUpdate::OnDownloadProgress);
 
+	CString logText;
+	BSTR bstr_log_text;
+
 //    if (!String.IsNullOrEmpty(cmd.Description))
 //    {
 //        TaskTextBox.Text = cmd.Description;
@@ -994,6 +1030,10 @@ DWORD COpUtpUpdate::DoCommand(UCL::Command* pCmd)
 //    OutputWindow.Text += " CMD: " + cmd.ToString() + "\r\n";
 	LPCTSTR pStatus = pCmd->value.IsEmpty() ? NULL : (LPCTSTR)pCmd->value;
 	m_pPortMgrDlg->UpdateUI(pStatus, ProgressDelta(m_iPercentComplete));
+
+	logText.Format(_T("%s Start <CMD/> %s.\r\n"), m_pPortMgrDlg->GetPanel(), pCmd->ToString());
+	bstr_log_text = logText.AllocSysString();
+	((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
 
     if ( pCmd->GetType() == _T("boot") )
 	{
@@ -1085,6 +1125,10 @@ DWORD COpUtpUpdate::DoCommand(UCL::Command* pCmd)
 /////            if ( CurrentDevice != null )
 /////                CurrentDevice.SendCommandProgress -= CurrentDevice_SendCommandProgress;
 
+	logText.Format(_T("%s Finished <CMD/> %s %s code=%d.\r\n"), m_pPortMgrDlg->GetPanel(), pCmd->ToString(), retValue == ERROR_SUCCESS ? _T("SUCCESS") : _T("FAIL"), retValue);
+	bstr_log_text = logText.AllocSysString();
+	((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+
 	return retValue;
 }
 
@@ -1146,6 +1190,15 @@ DWORD COpUtpUpdate::DoFind(UCL::Command* pCmd)
             retValue = -65536;
             break;
         }
+		else if ( m_CurrentDeviceMode != UCL::DeviceDesc::Disconnected && m_CurrentDeviceMode != newDevMode )
+		{
+			// If the device is connected and it is not in the expected mode, then don't wait any longer.
+			TRACE(_T(" ERROR: Device is connected in an unexpected mode.\r\n"));
+			TRACE(_T("  Current device mode: ") + UCL::DeviceDesc::DeviceModeToString(m_CurrentDeviceMode)); TRACE(_T("\r\n"));
+			TRACE(_T("  Expected device mode: ") + UCL::DeviceDesc::DeviceModeToString(newDevMode)); TRACE(_T("\r\n"));
+            retValue = -65534;
+			break;
+		}
     }
 	ATLTRACE(_T("%s DONE WAITING FOR DEV_CHANGE: NewMode: %s CurrMode: %s \r\n"),m_pPortMgrDlg->GetPanel(), UCL::DeviceDesc::DeviceModeToString(newDevMode), UCL::DeviceDesc::DeviceModeToString(m_CurrentDeviceMode));
 
@@ -1162,6 +1215,9 @@ DWORD COpUtpUpdate::DoBoot(UCL::Command* pCmd)
 {
     DWORD retValue = 0;
 
+	CString logText;
+	BSTR bstr_log_text;
+
 ///    if (String.IsNullOrEmpty(Thread.CurrentThread.Name))
 ///        Thread.CurrentThread.Name = "DoBoot";
 
@@ -1169,20 +1225,32 @@ DWORD COpUtpUpdate::DoBoot(UCL::Command* pCmd)
     retValue = DoResetToRecovery();
     if (retValue != 0)
     {
-        // error
+		logText.Format(_T("%s DoBoot() - Failed to reset device to Recovery mode. (err=%d)\r\n"), m_pPortMgrDlg->GetPanel(), retValue);
+		bstr_log_text = logText.AllocSysString();
+		((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+		return retValue;
     }
 
     // Look for device in Recovery-mode
     retValue = DoFind(pCmd);
     if (retValue != 0)
     {
-        // error
+		logText.Format(_T("%s DoBoot() - Failed to find device in Recovery mode. (err=%d)\r\n"), m_pPortMgrDlg->GetPanel(), retValue);
+		bstr_log_text = logText.AllocSysString();
+		((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+		return retValue;
     }
 
 	CString fullFileName = m_pOpInfo->GetPath() + _T("\\") + pCmd->GetFile();
 	retValue = DoLoad(fullFileName);
+    if (retValue != 0)
+    {
+		logText.Format(_T("%s DoBoot() - Failed to load %s to Recovery mode device. (err=%d)\r\n"), m_pPortMgrDlg->GetPanel(), fullFileName,retValue);
+		bstr_log_text = logText.AllocSysString();
+		((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+    }
 
-    return retValue;
+	return retValue;
 
 } // DoBoot()
 
@@ -1207,10 +1275,10 @@ DWORD COpUtpUpdate::DoResetToRecovery()
 ///            {
 ///                SetText(OutputWindow, "Sending ResetToRecovery command.\r\n", "add");
 			if (m_pUSBPort->_device->ResetToRecovery() != ERROR_SUCCESS)
-                {
+            {
 ///                    SetText(OutputWindow, CurrentDevice.ErrorString + "\r\n", "add");
-                    retValue = -65536;
-                }
+                retValue = -65536;
+            }
 ///            }
             break;
         case UCL::DeviceDesc::Disconnected:

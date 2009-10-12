@@ -1,5 +1,38 @@
 ****************************************
-RELEASE_STMFGTOOL_1.6.0.001
+RELEASE_STMFGTOOL_1.6.0.003b
+****************************************
+10/12/2009
+	- ENGR00117200: Suggest stop wait if HID device appare at monitor usb port.
+	  Add code to COpUtpUpdate::DoFind() to check if a device connected to the USB port that was
+	  not the device we were expecting, quit waiting and report an error.
+	  
+	Apps\MfgTool.exe\OpUtpUpdate.cpp
+
+****************************************
+RELEASE_STMFGTOOL_1.6.0.003a
+****************************************
+10/5/2009
+
+	- Do not unregister DeviceChange callbacks from PortMgr after UtpUpdate error. This was causing the PortMgr to
+	  stop working after an error happened during the update instead of "auto-recovering" from the error condition.
+	  Additionally, closing the app after the error occured and the callback was unregistered caused an exception
+	  during the app shutdown because it was trying to delete something that was already deleted. This may account
+	  for an application crash that was seen when the device is disconnected abnormally during update.* *Note that 
+	  I have not been able to reproduce this exact failure. Disconnecting the device prematurely results in an error, 
+	  but not an application crash so far in my testing.
+
+****************************************
+RELEASE_STMFGTOOL_1.6.0.003
+****************************************
+10/1/2009
+
+	- Return error when fail to find Recovery device before trying to load firmware file. Probably prevents some
+	  bad behavior when starting update from mode other than recovery. ENGR116387
+	- Add logging statements to begin/end of <LIST/> processing as well as begin/end of <CMD/> processing. ENGR116916
+	- Fix Average Time display.
+
+****************************************
+RELEASE_STMFGTOOL_1.6.0.002
 ****************************************
 08/19/2009
 

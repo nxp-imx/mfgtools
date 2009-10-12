@@ -23,7 +23,8 @@ public:
 		DeviceTypeMtp,
 		DeviceTypeHid,
 		DeviceTypeUsbController,
-		DeviceTypeUsbHub//,
+		DeviceTypeUsbHub,
+		DeviceTypeMxRom//,
 //		DeviceTypeUsbDevice
 	};
 

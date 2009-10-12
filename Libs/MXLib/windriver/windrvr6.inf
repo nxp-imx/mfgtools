@@ -1,0 +1,102 @@
+;
+; Copyright (c) 2003 - 2007 Jungo Ltd.  http://www.jungo.com 
+;
+; Installs windrvr6.sys as a driver for a pseudo-device
+;
+
+[Version]
+Signature=$CHICAGO$
+Class=Jungo
+ClassGuid={c671678c-82c1-43f3-d700-0049433e9a4b}
+Provider=%MFGNAME%
+; The catalog file below is digitally signed by Jungo.
+; For WHQL, you should obtain a catalog signed by Microsoft Hardware Compatibility Labs
+CatalogFile=wd900.cat
+DriverVer=03/27/2007, 9.0.0
+
+[Manufacturer]
+%MFGNAME%=DeviceList,NTamd64
+
+[DestinationDirs]
+DefaultDestDir=10,System32\Drivers
+
+[SourceDisksFiles]
+windrvr6.sys=1
+
+[SourceDisksNames]
+1=%INSTDISK%,,,.
+;Delete the above line and uncomment the next line for WHQL
+;1 = %INSTDISK%,windrvr6.cat,,
+
+; x86 platform, Win9x, Windows 2000 and later
+[DeviceList]
+%DESCRIPTION%=DriverInstall,*WINDRVR6
+
+; x64 platform, Windows XP x64 edition and later
+[DeviceList.NTamd64]
+%DESCRIPTION%=DriverInstall,*WINDRVR6
+
+[ClassInstall]  ; Register a new class in Windows 98/Me
+AddReg=UpDateRegistry
+
+[ClassInstall32]  ; Register a new class in Windows 2000 and later
+AddReg=UpDateRegistry
+
+[UpDateRegistry]
+HKR,,,,Jungo
+HKR,,Icon,,-5
+
+;------------------------------------------------------------------------------
+;  Windows 2000 and later Sections (x86 and x64 platforms)
+;------------------------------------------------------------------------------
+
+[DriverInstall.NT]
+CopyFiles=DriverCopyFiles
+
+[DriverCopyFiles]
+windrvr6.sys,,,0x22  ; COPYFLG_NOSKIP | COPYFLG_NO_VERSION_DIALOG
+
+[DriverInstall.NT.Services]
+AddService=WinDriver6,2,DriverService
+
+[DriverService]
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary=%10%\system32\drivers\windrvr6.sys
+
+[DriverInstall.NT.hw]
+AddReg=DriverHwAddReg
+
+[DriverHwAddReg]
+HKR,,SampleInfo,,""
+
+;------------------------------------------------------------------------------
+;  Windows 98 Sections
+;------------------------------------------------------------------------------
+
+[DriverInstall]
+AddReg=DriverAddReg
+CopyFiles=DriverCopyFiles
+LogConfig=DriverConfig98
+
+[DriverAddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,windrvr6.sys
+
+[DriverConfig98]
+ConfigPriority=NORMAL
+IOConfig=1@100-3ff%ffff(3ff::)
+
+[DriverInstall.hw]
+AddReg=DriverHwAddReg
+
+;------------------------------------------------------------------------------
+;  String Definitions
+;------------------------------------------------------------------------------
+
+[Strings]
+MFGNAME="Jungo"
+INSTDISK="Jungo Installation Disc"
+DESCRIPTION="WinDriver"
+

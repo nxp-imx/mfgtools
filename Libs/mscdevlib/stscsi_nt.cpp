@@ -831,13 +831,14 @@ ST_ERROR CStScsi_Nt::OpenPhysicalDrive(USHORT driveToFind, USHORT UpgradeOrNorma
 	BOOL			drive_opened = FALSE;
 	USHORT			driveFound = 0;
 
+	CString str;
+	USES_CONVERSION;
 
     if (UpgradeOrNormal == NORMAL_MSC)
     {
 	    GetUpdater()->GetConfigInfo()->GetSCSIMfgString(w_strSCSIMfgString);
 	    GetUpdater()->GetConfigInfo()->GetSCSIProductString(w_strSCSIProductString);
 
-		USES_CONVERSION;
 		strSCSIMfgString = W2A(w_strSCSIMfgString.c_str());
 		strSCSIProductString = W2A(w_strSCSIProductString.c_str());
     }
@@ -872,6 +873,8 @@ ST_ERROR CStScsi_Nt::OpenPhysicalDrive(USHORT driveToFind, USHORT UpgradeOrNorma
 		if( m_handle == INVALID_HANDLE_VALUE ) 
 		{
 			//CStTrace::trace( "CreateFile failed with error: %d\n", GetLastError() );
+			str.Format(_T("    CStScsi_Nt::OpenPhysicalDrive() - CreateFile(%s) failed with error: %d"), DriveToOpen, GetLastError());
+			GetUpdater()->GetLogger()->Log(str);
 			continue;
 		}
 		if( SendDdiApiCommand(&api_scsi_inquiry) == STERR_NONE )
@@ -880,7 +883,10 @@ ST_ERROR CStScsi_Nt::OpenPhysicalDrive(USHORT driveToFind, USHORT UpgradeOrNorma
 		
 			if (InquiryData.DeviceType != DIRECT_ACCESS_DEVICE)
 			{
-                CloseHandle( m_handle );
+				str.Format(_T("    CStScsi_Nt::OpenPhysicalDrive() - %s is not a Direct Access drive. Skipping."), DriveToOpen);
+				GetUpdater()->GetLogger()->Log(str);
+
+				CloseHandle( m_handle );
 				m_handle = INVALID_HANDLE_VALUE;
 				continue;
 			}
@@ -902,6 +908,9 @@ ST_ERROR CStScsi_Nt::OpenPhysicalDrive(USHORT driveToFind, USHORT UpgradeOrNorma
 					// Is this the drive we want?  
 					if (driveFound != driveToFind)
 					{
+						str.Format(_T("    CStScsi_Nt::OpenPhysicalDrive() - %s : Not the right data drive on the device. %d != %d. Skipping."), DriveToOpen, driveFound, driveToFind);
+						GetUpdater()->GetLogger()->Log(str);
+
 						CloseHandle( m_handle );  // no, continue
 						m_handle = INVALID_HANDLE_VALUE;
 						++driveFound;
@@ -912,7 +921,18 @@ ST_ERROR CStScsi_Nt::OpenPhysicalDrive(USHORT driveToFind, USHORT UpgradeOrNorma
 					drive_opened = TRUE;
 					break; //stop
 				}
+				else
+				{
+					str.Format(_T("    CStScsi_Nt::OpenPhysicalDrive() - %s : SCSI vendor strings do not match. %s != %s. Skipping."), DriveToOpen, A2T((const char *)InquiryData.VendorId), A2T(strSCSIMfgString.c_str()));
+					GetUpdater()->GetLogger()->Log(str);
+				}
 			}
+			else
+			{
+				str.Format(_T("    CStScsi_Nt::OpenPhysicalDrive() - %s : SCSI product strings do not match. %s != %s. Skipping."), DriveToOpen, A2T((const char *)InquiryData.ProductId), A2T(strSCSIProductString.c_str()));
+				GetUpdater()->GetLogger()->Log(str);
+			}
+
 		}
 		if( m_handle && (m_handle != INVALID_HANDLE_VALUE) )
 		{

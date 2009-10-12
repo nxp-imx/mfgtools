@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -735,6 +736,38 @@ namespace DevSupport.DeviceManager
                 return UsbDevice.DeviceInstanceId.ToUpper().Contains(searchString);
             else
                 return DeviceInstanceId.ToUpper().Contains(searchString);
+        }
+
+        public UInt16 Vid
+        {
+            get
+            {
+                UInt16 vid = 0;
+
+                if (IsUsb)
+                {
+                    String vidStr = UsbDevice.DeviceInstanceId.Substring(UsbDevice.DeviceInstanceId.IndexOf("VID_", StringComparison.InvariantCultureIgnoreCase) + 4, 4);
+                    UInt16.TryParse(vidStr, System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture, out vid);
+                }
+
+                return vid;
+            }
+        }
+
+        public UInt16 Pid
+        {
+            get
+            {
+                UInt16 pid = 0;
+
+                if (IsUsb)
+                {
+                    String pidStr = UsbDevice.DeviceInstanceId.Substring(UsbDevice.DeviceInstanceId.IndexOf("&PID_", StringComparison.InvariantCultureIgnoreCase) + 5, 4);
+                    UInt16.TryParse(pidStr, System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture, out pid);
+                }
+
+                return pid;
+            }
         }
 
         /// <summary>

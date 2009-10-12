@@ -1,14 +1,19 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StMfgTool", "StMfgTool.vcproj", "{6A0D966B-4479-402B-9C8B-CF403C22BF98}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MfgTool", "StMfgTool.vcproj", "{6A0D966B-4479-402B-9C8B-CF403C22BF98}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8B1FD486-E75E-48AD-9C43-374330BC6D8D} = {8B1FD486-E75E-48AD-9C43-374330BC6D8D}
 		{FB60A1A0-B4A1-4E91-927F-45C8428AF703} = {FB60A1A0-B4A1-4E91-927F-45C8428AF703}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DevSupport", "..\..\Libs\DevSupport\DevSupport.vcproj", "{8B1FD486-E75E-48AD-9C43-374330BC6D8D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7FB73DF9-70D9-4A25-8950-8E4D560152C3} = {7FB73DF9-70D9-4A25-8950-8E4D560152C3}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinSupport", "..\..\Libs\WinSupport\WinSupport.vcproj", "{FB60A1A0-B4A1-4E91-927F-45C8428AF703}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MXLib", "..\..\Libs\MXLib\MXLib.vcproj", "{7FB73DF9-70D9-4A25-8950-8E4D560152C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,6 +33,10 @@ Global
 		{FB60A1A0-B4A1-4E91-927F-45C8428AF703}.Debug|Win32.Build.0 = Debug|Win32
 		{FB60A1A0-B4A1-4E91-927F-45C8428AF703}.Release|Win32.ActiveCfg = Release|Win32
 		{FB60A1A0-B4A1-4E91-927F-45C8428AF703}.Release|Win32.Build.0 = Release|Win32
+		{7FB73DF9-70D9-4A25-8950-8E4D560152C3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7FB73DF9-70D9-4A25-8950-8E4D560152C3}.Debug|Win32.Build.0 = Debug|Win32
+		{7FB73DF9-70D9-4A25-8950-8E4D560152C3}.Release|Win32.ActiveCfg = Release|Win32
+		{7FB73DF9-70D9-4A25-8950-8E4D560152C3}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
