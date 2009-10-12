@@ -3,8 +3,8 @@
 //#if defined(__cplusplus)
 //    extern "C" {
 //#endif
-#include "../MxUsb/wdu_lib.h"
-#include "../MxUsb/usb_diag_lib.h"
+#include "wdu_lib.h"
+#include "usb_diag_lib.h"
 //#ifdef __cplusplus
 //}
 //#endif

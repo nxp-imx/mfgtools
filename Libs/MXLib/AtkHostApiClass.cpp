@@ -884,7 +884,7 @@ int AtkHostApiClass::InitFlash(void)
 
 	if (res.ack != RET_SUCCESS) {
 		// if response is not ok, return failed
-		DEBUG("AtkFlashinitial(): get response: %d\n", res.ack);
+		TRACE("AtkFlashinitial(): get response: %d\n", res.ack);
 		return -res.ack;
 	}
 
@@ -940,13 +940,13 @@ int AtkHostApiClass::EraseFlash(unsigned long addr, unsigned long size)
 		if (res.ack == FLASH_ERASE) {
 			/* send message to UI to show progress */
 			::SendMessage(m_hWnd, WM_USER_PROGRESS, (WPARAM)OPMODE_FLASH_ERASE, (LPARAM)finished);
-			DEBUG("AtkFlashErase(): get flash erase partly message!erase block id:%d\n,res",res.csum);
+			TRACE("AtkFlashErase(): get flash erase partly message!erase block id:%d\n,res",res.csum);
 		} else if (res.ack == RET_SUCCESS) {
 			::SendMessage(m_hWnd, WM_USER_PROGRESS, (WPARAM)OPMODE_FLASH_ERASE, 0);
 			break;
 		} else {
 			// if response is not ok, return failed
-			DEBUG("AtkFlasherase(): get response: %d\n", res.ack);
+			TRACE("AtkFlasherase(): get response: %d\n", res.ack);
 			SetUartTimeout(DEFAULT_UART_TIMEOUT);
 			return -res.ack;
 		}
@@ -984,7 +984,7 @@ int AtkHostApiClass::ReadFlash(unsigned long addr, unsigned char *buffer,
 	//continue reading flag
 	go_on = (done == 0) ? 0 : 1;
 
-	DEBUG("Dump:the go_on flag from host is %d\n",go_on);
+	TRACE("Dump:the go_on flag from host is %d\n",go_on);
 	
 	// check the size
 	if (count == 0 || buffer == NULL)
@@ -1013,7 +1013,7 @@ int AtkHostApiClass::ReadFlash(unsigned long addr, unsigned char *buffer,
 
 		if (res.ack != RET_SUCCESS && res.ack != FLASH_PARTLY) {
 			// if response is not ok, return failed
-			DEBUG("AtkFlashread(): get response: %d\n", res.ack);
+			TRACE("AtkFlashread(): get response: %d\n", res.ack);
 			return -res.ack;
 		}
 
@@ -1028,11 +1028,11 @@ int AtkHostApiClass::ReadFlash(unsigned long addr, unsigned char *buffer,
 
 		// update UI progress
 		::SendMessage(m_hWnd, WM_USER_PROGRESS, (WPARAM)OPMODE_FLASH_DUMP, (LPARAM)(size + done));
-		DEBUG("AtkFlashRead(): recv response:%d, %d, %d\n", res.ack, res.csum, res.len);
+		TRACE("AtkFlashRead(): recv response:%d, %d, %d\n", res.ack, res.csum, res.len);
 		
 		// do checksum, and compare with the csum in response
 		if (res.csum != (checksum = MakeChecksum(buf, res.len))) {
-			DEBUG("AtkFlashread(): invalid checksum (%x)<->(%x)\n", res.csum, checksum);
+			TRACE("AtkFlashread(): invalid checksum (%x)<->(%x)\n", res.csum, checksum);
 			return INVALID_CHECKSUM;
 		}
 		
@@ -1082,7 +1082,7 @@ int AtkHostApiClass::ProgramFlash(unsigned long addr, const unsigned char *buffe
 
 	param1 = format | readbackcheck << 16;
 
-	DEBUG("Prog:the go_on flag from host is %d\n", done ==0 ? 0 :1);
+	TRACE("Prog:the go_on flag from host is %d\n", done ==0 ? 0 :1);
 
 	// pack command requeset
 	PackCommand(command, flashMode, addr, count, done == 0 ? param1 : param1 | 1 << 8);
@@ -1104,7 +1104,7 @@ int AtkHostApiClass::ProgramFlash(unsigned long addr, const unsigned char *buffe
 
 	if (res.ack != RET_SUCCESS) {
 		// if response is not ok, return failed
-		DEBUG("AtkFlashprogram(): get response: %d\n", res.ack);
+		TRACE("AtkFlashprogram(): get response: %d\n", res.ack);
 		return -res.ack;
 	}
 
@@ -1124,7 +1124,7 @@ int AtkHostApiClass::ProgramFlash(unsigned long addr, const unsigned char *buffe
 		return INVALID_CHANNEL;
 	}
 
-	DEBUG(">> after transdata\n");
+	TRACE(">> after transdata\n");
 
 	do {
 
@@ -1136,12 +1136,12 @@ int AtkHostApiClass::ProgramFlash(unsigned long addr, const unsigned char *buffe
 		// unpack the response
 		res = UnPackResponse(retBuf);
 
-		DEBUG("Do Flash program, programing: get response: %d:program block id: %d:program size:%d\n", res.ack,res.csum,res.len);
+		TRACE("Do Flash program, programing: get response: %d:program block id: %d:program size:%d\n", res.ack,res.csum,res.len);
 
 		if (res.ack != FLASH_PARTLY && res.ack != FLASH_VERIFY &&
 			res.ack !=RET_SUCCESS) {
 			// if response is not ok, return failed
-			DEBUG("AtkFlashprogram(): get response: %d\n", res.ack);
+			TRACE("AtkFlashprogram(): get response: %d\n", res.ack);
 			return -res.ack;
 		}
 			
@@ -1170,11 +1170,11 @@ int AtkHostApiClass::ProgramFlash(unsigned long addr, const unsigned char *buffe
 			// unpack the response
 			res = UnPackResponse(retBuf);
 
-			DEBUG("Do Flash program, verifing: get response: %d : block is %d\n", res.ack,res.csum);
+			TRACE("Do Flash program, verifing: get response: %d : block is %d\n", res.ack,res.csum);
 
 			if (res.ack != RET_SUCCESS && res.ack != FLASH_VERIFY) {
 				// if response is not ok, return failed
-				DEBUG("AtkFlashprogram(): ++++++get response-------: %d\n", res.ack);
+				TRACE("AtkFlashprogram(): ++++++get response-------: %d\n", res.ack);
 				SetUartTimeout(DEFAULT_UART_TIMEOUT);
 				//return -res.ack;
 			}
@@ -1192,7 +1192,7 @@ int AtkHostApiClass::ProgramFlash(unsigned long addr, const unsigned char *buffe
 		
 		// do checksum, and compare with the csum in response
 		if (res.csum != (checksum = MakeChecksum(buf, count))) {
-			DEBUG("AtkFlashprogram(): invalid checksum (%x)<->(%x)\n", res.csum, checksum);
+			TRACE("AtkFlashprogram(): invalid checksum (%x)<->(%x)\n", res.csum, checksum);
 			SetUartTimeout(DEFAULT_UART_TIMEOUT);
 			return INVALID_CHECKSUM;
 		}
@@ -1293,7 +1293,7 @@ int AtkHostApiClass::GetRKLVersion(unsigned char *fmodel, int *len, int *mxType)
 	status = WriteToDevice(command, RAM_KERNEL_CMD_SIZE);
 	
 	if (!status) {
-		DEBUG("atk_common_getver(): failed to send to device\n");
+		TRACE("atk_common_getver(): failed to send to device\n");
 		return INVALID_CHANNEL;
 	}
 		
@@ -1302,7 +1302,7 @@ int AtkHostApiClass::GetRKLVersion(unsigned char *fmodel, int *len, int *mxType)
 		// read repsonse from device
 		status = ReadFromDevice(retBuf, 4);
 		if (!status) {
-			DEBUG("atk_common_getver(): failed to read bootstrap from device\n");
+			TRACE("atk_common_getver(): failed to read bootstrap from device\n");
 			return INVALID_CHANNEL;
 		}
 		
@@ -1315,14 +1315,14 @@ int AtkHostApiClass::GetRKLVersion(unsigned char *fmodel, int *len, int *mxType)
 		
 		status = ReadFromDevice(retBuf + 4, RAM_KERNEL_ACK_SIZE - 4);
 		if (!status) {
-			DEBUG("atk_common_getver(): failed to read RKL from device\n");
+			TRACE("atk_common_getver(): failed to read RKL from device\n");
 			return INVALID_CHANNEL;
 		}
 		
 	} else {
 		status = ReadFromDevice(retBuf, RAM_KERNEL_ACK_SIZE);
 		if (!status) {
-			DEBUG("atk_common_getver(): failed to read bootstrap from device\n");
+			TRACE("atk_common_getver(): failed to read bootstrap from device\n");
 			return INVALID_CHANNEL;
 		}
 		
@@ -1346,10 +1346,10 @@ int AtkHostApiClass::GetRKLVersion(unsigned char *fmodel, int *len, int *mxType)
 		*len = res.len;
 		*mxType = res.csum;
 		fmodel[res.len] = '\0';
-		DEBUG("atk_common_getver(): get version: %s\n", fmodel);
+		TRACE("atk_common_getver(): get version: %s\n", fmodel);
 	} else {
 		// if response is not ok, return failed
-		DEBUG("atk_common_getver(): get response: %d\n", res.ack);
+		TRACE("atk_common_getver(): get response: %d\n", res.ack);
 	}
 	
 	return -res.ack;
@@ -1369,7 +1369,7 @@ int AtkHostApiClass::CommonDownload(unsigned long addr, unsigned long size, cons
 	status = WriteToDevice((unsigned char *)command, RAM_KERNEL_CMD_SIZE);
 	
 	if (!status) {
-		DEBUG("atk_common_download(): failed to send to device\n");
+		TRACE("atk_common_download(): failed to send to device\n");
 		return INVALID_CHANNEL;
 	}
 	
@@ -1381,7 +1381,7 @@ int AtkHostApiClass::CommonDownload(unsigned long addr, unsigned long size, cons
 	
 	status = ReadFromDevice(retBuf, RAM_KERNEL_ACK_SIZE);
 	if (!status) {
-		DEBUG("atk_common_getver(): failed to read bootstrap from device\n");
+		TRACE("atk_common_getver(): failed to read bootstrap from device\n");
 		return INVALID_CHANNEL;
 	}
 	
@@ -1452,7 +1452,7 @@ BOOL AtkHostApiClass::WriteToDevice(const unsigned char *buf, unsigned int count
 		ret = WriteBuffer((unsigned char*)buf, count);
 	}
 
-	DEBUG("write to device(%d):%d\n", m_channelMode, ret);
+	TRACE("write to device(%d):%d\n", m_channelMode, ret);
 	return ret;
 }
 
@@ -1489,7 +1489,7 @@ BOOL AtkHostApiClass::ReadFromDevice(unsigned char *buf, unsigned int count)
 		count -= size;
 	}
 
-	DEBUG("Read from device(%d):%d\n", m_channelMode, ret);
+	TRACE("Read from device(%d):%d\n", m_channelMode, ret);
 	return ret;
 }
 
@@ -1760,7 +1760,7 @@ int AtkHostApiClass::SetBISwapFlag(int flag)
 
 	if (res.ack != RET_SUCCESS) {
 		// if response is not ok, return failed
-		DEBUG("ATKSetBISwapFlag(): get response: %d\n", res.ack);
+		TRACE("ATKSetBISwapFlag(): get response: %d\n", res.ack);
 		return -res.ack;
 	}
 
@@ -1803,7 +1803,7 @@ int AtkHostApiClass::SetBBTFlag(int flag)
 
 	if (res.ack != RET_SUCCESS) {
 		// if response is not ok, return failed
-		DEBUG("ATKSetBBTFlag(): get response: %d\n", res.ack);
+		TRACE("ATKSetBBTFlag(): get response: %d\n", res.ack);
 		return -res.ack;
 	}
 
@@ -1844,7 +1844,7 @@ int AtkHostApiClass::GetFlashCapacity(unsigned long *size)
 
 	if (res.ack != RET_SUCCESS) {
 		// if response is not ok, return failed
-		DEBUG("GetFlashCapacity(): get response: %d\n", res.ack);
+		TRACE("GetFlashCapacity(): get response: %d\n", res.ack);
 		return -res.ack;
 	}
 
@@ -1887,7 +1887,7 @@ int AtkHostApiClass::SetINTLVFlag(int flag)
 
 	if (res.ack != RET_SUCCESS) {
 		// if response is not ok, return failed
-		DEBUG("ATKSetINTLVFlag(): get response: %d\n", res.ack);
+		TRACE("ATKSetINTLVFlag(): get response: %d\n", res.ack);
 		return -res.ack;
 	}
 
@@ -1930,7 +1930,7 @@ int AtkHostApiClass::SetLBAFlag(int flag)
 
 	if (res.ack != RET_SUCCESS) {
 		// if response is not ok, return failed
-		DEBUG("ATKSetLBAFlag(): get response: %d\n", res.ack);
+		TRACE("ATKSetLBAFlag(): get response: %d\n", res.ack);
 		return -res.ack;
 	}
 

@@ -86,7 +86,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo copy $(TargetPath) to $(ProjectDir)..\host_dll&#x0D;&#x0A;copy $(TargetPath) $(ProjectDir)..\host_dll&#x0D;&#x0A;"
+				CommandLine="&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -159,7 +159,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo copy $(TargetPath) to $(ProjectDir)..\host_dll&#x0D;&#x0A;copy $(TargetPath) $(ProjectDir)..\host_dll&#x0D;&#x0A;"
+				CommandLine="&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
