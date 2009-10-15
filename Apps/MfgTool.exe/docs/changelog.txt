@@ -1,4 +1,17 @@
 ****************************************
+RELEASE_STMFGTOOL_1.6.0.003c
+****************************************
+10/15/2009
+	- Ryan Qian: 
+	  Failed to create ‘new’ profile again, if last ‘new profile’ operation was cancelled.
+	  The button of ‘Delete’ should be disabled all the way, if there’s no any profiles available.
+	  
+	  Switch the m_bNewProfileMode to FALSE if the Cancel button is pressed.
+	  Don't enable the Delete button unless there are profiles detected.
+	  
+	Apps\MfgTool.exe\ConfigPlayerProfilePage.cpp
+
+****************************************
 RELEASE_STMFGTOOL_1.6.0.003b
 ****************************************
 10/12/2009

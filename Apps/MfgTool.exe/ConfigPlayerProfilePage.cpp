@@ -283,6 +283,7 @@ void CConfigPlayerProfilePage::OnCancel()
 	{
 		delete m_pNewPlayerProfile;
 		m_pNewPlayerProfile = NULL;
+		m_bNewProfileMode = FALSE;
 	}
 
 	InitProfileList(); // re-initialize from registry
@@ -362,7 +363,7 @@ void CConfigPlayerProfilePage::OnBnClickedNewSave()
 
 	if ( m_ProfileList.GetCount() == 0 )
 	{
-        m_delete_ctrl.EnableWindow(TRUE);
+        m_delete_ctrl.EnableWindow(FALSE);
 		m_operations_ctrl.EnableWindow(TRUE);
 		m_vve_player_profile_ctrl.EnableWindow(TRUE);
 		m_usb_vid_ctrl.EnableWindow(TRUE);
@@ -431,7 +432,9 @@ void CConfigPlayerProfilePage::OnBnClickedNewSave()
 
 			m_operations_ctrl.EnableWindow(TRUE);
 			if ( m_ProfileList.GetCount() == 1 ) // first added?
+			{
 		        InitListCtrl(m_operations_ctrl);
+			}
 
 			m_bNewProfileMode = FALSE;
 		}
