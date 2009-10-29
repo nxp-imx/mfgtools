@@ -956,7 +956,7 @@ UINT DoListThreadProc( LPVOID pParam )
 	bstr_log_text = logText.AllocSysString();
 	((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
 
-	for ( size_t i = 0; i < pOperation->m_pCmdList->GetChildCount(); ++i )
+	for ( size_t i = 0; i < pOperation->m_pCmdList->GetCommandCount(); ++i )
 	{
 		pOperation->m_pPortMgrDlg->UpdateUI(NULL, pOperation->ProgressDelta(i*2+1));
 

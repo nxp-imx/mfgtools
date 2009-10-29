@@ -7,17 +7,17 @@ mkdir temp
 
 @echo ****************** APPS ***************************************************
 mkdir temp\Apps
-if exist  Apps\StMfgTool.exe\Release rmdir /S /Q Apps\StMfgTool.exe\Release
-if exist  Apps\StMfgTool.exe\Debug   rmdir /S /Q Apps\StMfgTool.exe\Debug
-del /Q Apps\StMfgTool.exe\*.aps
-del /Q Apps\StMfgTool.exe\*.bak
-del /Q Apps\StMfgTool.exe\*.user
-del /Q Apps\StMfgTool.exe\*.ncb
-del /Q Apps\StMfgTool.exe\*.suo	
+if exist  Apps\StMfgTool.exe\Release rmdir /S /Q Apps\MfgTool.exe\Release
+if exist  Apps\MfgTool.exe\Debug   rmdir /S /Q Apps\MfgTool.exe\Debug
+del /Q Apps\MfgTool.exe\*.aps
+del /Q Apps\MfgTool.exe\*.bak
+del /Q Apps\MfgTool.exe\*.user
+del /Q Apps\MfgTool.exe\*.ncb
+del /Q Apps\MfgTool.exe\*.suo	
 
-xcopy /I Apps\StMfgTool.exe temp\Apps\StMfgTool.exe
-xcopy /I Apps\StMfgTool.exe\docs temp\Apps\StMfgTool.exe\docs
-xcopy /I Apps\StMfgTool.exe\res temp\Apps\StMfgTool.exe\res
+xcopy /I Apps\MfgTool.exe temp\Apps\MfgTool.exe
+xcopy /I Apps\MfgTool.exe\docs temp\Apps\MfgTool.exe\docs
+xcopy /I Apps\MfgTool.exe\res temp\Apps\MfgTool.exe\res
 
 @echo ****************** COMMON *************************************************
 mkdir temp\Common
@@ -46,6 +46,15 @@ del /Q Libs\DevSupport\*.ncb
 del /Q Libs\DevSupport\*.suo	
 xcopy /S /I Libs\DevSupport	temp\Libs\DevSupport
 
+mkdir temp\Libs\MXLib
+if exist  Libs\MXLib\Release rmdir /S /Q Libs\MXLib\Release
+if exist  Libs\MXLib\Debug   rmdir /S /Q Libs\MXLib\Debug
+del /Q Libs\MXLib\*.bak
+del /Q Libs\MXLib\*.user
+del /Q Libs\MXLib\*.ncb
+del /Q Libs\MXLib\*.suo	
+xcopy /S /I Libs\MXLib	temp\Libs\MXLib
+
 mkdir temp\Libs\Loki
 xcopy /S /I Libs\Loki temp\Libs\Loki
 
@@ -69,15 +78,15 @@ copy Libs\OtpAccessPitc\bin\VS2005\Debug\OtpAccess.* temp\Libs\OtpAccessPitc\bin
 
 
 @echo ****************** VERSIONING ****************************************************
-copy Apps\StMfgTool.exe\version.h version.h
+copy Apps\MfgTool.exe\version.h version.h
 %PERL%\bin\perl.exe "Customization\bin\version.pl" release
 call ver.bat
 
 @echo ******************* ZIP **********************************************************
-if exist "stmfgtool.v%STMP_BUILD_VERSION%_src.zip" del "stmfgtool.v%STMP_BUILD_VERSION%_src.zip"
-"%TOOLS%\pkzipc.exe" -silent -add  -exclude=?svn -dir=relative "stmfgtool.v%STMP_BUILD_VERSION%_src.zip"  "temp\*.*"
+if exist "MfgTool.v%STMP_BUILD_VERSION%_src.zip" del "MfgTool.v%STMP_BUILD_VERSION%_src.zip"
+"%TOOLS%\pkzipc.exe" -silent -add  -exclude=?svn -dir=relative "MfgTool.v%STMP_BUILD_VERSION%_src.zip"  "temp\*.*"
 
-if exist "stmfgtool.v%STMP_BUILD_VERSION%_profiles.zip" del "stmfgtool.v%STMP_BUILD_VERSION%_profiles.zip"
-"%TOOLS%\pkzipc.exe" -silent -add  -exclude=?svn -dir=relative "stmfgtool.v%STMP_BUILD_VERSION%_profiles.zip"  "Apps\StMfgTool.exe\bin\profiles\*.*"
+if exist "MfgTool.v%STMP_BUILD_VERSION%_profiles.zip" del "MfgTool.v%STMP_BUILD_VERSION%_profiles.zip"
+"%TOOLS%\pkzipc.exe" -silent -add  -exclude=?svn -dir=relative "MfgTool.v%STMP_BUILD_VERSION%_profiles.zip"  "Apps\MfgTool.exe\bin\profiles\*.*"
 
-cd Apps/StMfgTool.exe/bin
+cd Apps/MfgTool.exe/bin
