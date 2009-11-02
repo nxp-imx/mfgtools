@@ -216,7 +216,15 @@ void CConfigPlayerProfilePage::OnOK()
 
 	// save current profile changes
 	if (!SaveProfileStrings(m_p_player_profile))
+	{
+		if ( m_pNewPlayerProfile )
+		{
+			delete m_pNewPlayerProfile;
+			m_pNewPlayerProfile = NULL;
+		}
+		m_bNewProfileMode = FALSE;
 		return;
+	}
 
 	// validate each profile
 	for (int i = 0; i < m_ProfileList.GetCount(); ++i )

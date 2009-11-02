@@ -1,4 +1,26 @@
 ****************************************
+RELEASE_STMFGTOOL_1.6.1.001
+****************************************
+10/29/2009
+	- ENGR00117879: Not able to "New" profile again if previously new a profile then click "OK" button on MFG.exe UI. 
+	  In OnOK() if profile was not saved, reset the newProfile flag and delete the newProfile object.
+	  
+	Apps/MfgTool.exe/OpUtpUpdate.cpp
+
+****************************************
+RELEASE_STMFGTOOL_1.6.1.000
+****************************************
+10/29/2009
+	- ENGR00117829: MFGTool.exe will crash when ucl.xml contains a commented out field in the <LIST/> node. 
+	  DoListThreadProc() was trying to process all <LIST/> nodes instead of all <LIST/> <CMD/> nodes. When
+	  some commands were commented out, the count was off and the app was trying to get a <CMD/> node that
+	  was not in the list. I.e. the accessed index was bigger than the array.
+	  
+	  Changed the loop to only process <CMD/> nodes instead of all child nodes.
+	  
+	Apps/MfgTool.exe/OpUtpUpdate.cpp
+
+****************************************
 RELEASE_STMFGTOOL_1.6.0.003c
 ****************************************
 10/15/2009
