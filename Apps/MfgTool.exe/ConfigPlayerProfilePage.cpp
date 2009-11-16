@@ -394,6 +394,7 @@ void CConfigPlayerProfilePage::OnBnClickedNewSave()
 
 		m_operations_ctrl.RemoveAllGroups();
 		m_operations_ctrl.EnableWindow(FALSE);
+		((CPropertySheet*)GetParent())->GetDlgItem(IDOK)->EnableWindow(FALSE);
 
 		m_pNewPlayerProfile = new CPlayerProfile();
 		m_pNewPlayerProfile->Init(NULL);
@@ -445,6 +446,7 @@ void CConfigPlayerProfilePage::OnBnClickedNewSave()
 			}
 
 			m_bNewProfileMode = FALSE;
+			((CPropertySheet*)GetParent())->GetDlgItem(IDOK)->EnableWindow(TRUE);
 		}
 		else
 		{
