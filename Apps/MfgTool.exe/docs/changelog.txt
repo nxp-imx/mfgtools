@@ -1,6 +1,15 @@
 http://psg-host.svn-tx30.am.freescale.net/svn/psg-host/branches/dev/0004
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.1.002
+****************************************
+11/16/2009
+	- ENGR118101: :Suggest to gray out the "OK" button in the duration of after click "New" and before click "Save" in configuration window. 
+	  Add code to gray out OK button after New is selected. Add code to un gray OK button after Save is selected. 
+	  	  
+	Apps/MfgTool.exe/ConfigPlayerProfilePage.cpp
+
+****************************************
 RELEASE_STMFGTOOL_1.6.1.001
 ****************************************
 10/29/2009
