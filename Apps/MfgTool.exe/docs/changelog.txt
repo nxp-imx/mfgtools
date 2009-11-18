@@ -1,6 +1,17 @@
 http://psg-host.svn-tx30.am.freescale.net/svn/psg-host/branches/dev/0004
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.1.003
+****************************************
+11/18/2009
+	- ENGR118070: the operation will fail if first assign port, then click "Start", and then connect device to USB port.
+	  Reset Device Change Event before we start to wait on a device change event since we know the mode is different than
+	  we want before we start waiting. This fixes the problem where the update operation fails if the Start button is 
+	  pressed before the device is connected.
+	  	  
+	Apps/MfgTool.exe/OpUtpUpdate.cpp
+
+****************************************
 RELEASE_STMFGTOOL_1.6.1.002
 ****************************************
 11/16/2009

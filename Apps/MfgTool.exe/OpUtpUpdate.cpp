@@ -1177,6 +1177,7 @@ DWORD COpUtpUpdate::DoFind(UCL::Command* pCmd)
             return 0;
     }
 
+   	VERIFY(::ResetEvent(m_hChangeEvent));
     // Wait for device to connect to the bus.
     while (m_CurrentDeviceMode != newDevMode)
     {

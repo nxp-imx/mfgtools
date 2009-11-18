@@ -46,7 +46,7 @@ namespace media
 		DriveTag_SettingsBin  = 0x07,
 		DriveTag_OtgRsc		  = 0x08,
 		DriveTag_Data         = 0x0A,
-		DriveTag_Data2        = 0x1A,
+		DriveTag_Data2        = 0x1A, 
 		DriveTag_DataJanus    = 0x0B,
 		DriveTag_DataSettings = 0x0C,
 		DriveTag_Bootmanger   = 0x50,
