@@ -17,7 +17,7 @@
 	#include "Common/StdInt.h"
 	#include <Wtypes.h>
 	#define _NTSRB_     // to keep srb.h from being included
-	#include <scsi.h>
+	#include <ddk/scsi.h>
 	#include <ntddscsi.h>
 #endif	 // WIN32
 

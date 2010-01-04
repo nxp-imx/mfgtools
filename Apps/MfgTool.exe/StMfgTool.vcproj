@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../;&quot;$(XPDDK)/inc/ddk/wxp&quot;;&quot;$(XPDDK)\inc\ddk\wdm\wxp&quot;;&quot;$(WMSDK)\WMDM\inc&quot;"
+				AdditionalIncludeDirectories="../../;&quot;$(WDK)/inc/&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -131,7 +131,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../../;&quot;$(XPDDK)/inc/ddk/wxp&quot;;&quot;$(XPDDK)\inc\ddk\wdm\wxp&quot;;&quot;$(WMSDK)\WMDM\inc&quot;"
+				AdditionalIncludeDirectories="../../;&quot;$(WDK)/inc/&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="false"
 				RuntimeLibrary="0"

@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\;&quot;$(XPDDK)\inc\ddk\wdm\wxp&quot;;&quot;$(XPDDK)\inc\ddk\wxp&quot;;&quot;$(WMSDK)\WMDM\inc&quot;;..\"
+				AdditionalIncludeDirectories="..\..\;..\;$(WDK)\inc\"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -54,11 +54,9 @@
 				PrecompiledHeaderThrough="StdAfx.h"
 				BrowseInformation="1"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 				CallingConvention="0"
 				DisableSpecificWarnings="4311"
-				ShowIncludes="false"
 				EnablePREfast="false"
 			/>
 			<Tool
@@ -72,9 +70,10 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="mssachlp.lib hid.lib"
+				LinkLibraryDependencies="true"
+				AdditionalDependencies="mssachlp.lib hid.lib MXLib.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="&quot;$(WMSDK)\lib&quot;;&quot;$(WMSDK)\WMDM\lib&quot;;&quot;$(XPDDK)\lib\wxp\i386&quot;"
+				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;&quot;$(WDK)/lib/wxp/i386&quot;;&quot;../MXLib/$(OutDir)&quot;"
 				IgnoreAllDefaultLibraries="false"
 			/>
 			<Tool
@@ -118,14 +117,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\;&quot;$(XPDDK)\inc\ddk\wxp&quot;;&quot;$(XPDDK)\inc\ddk\wdm\wxp&quot;;&quot;$(WMSDK)\WMDM\inc&quot;;..\"
+				AdditionalIncludeDirectories="..\..\;..\;$(WDK)\inc\"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="0"
 				TreatWChar_tAsBuiltInType="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4311"
 				EnablePREfast="false"
@@ -141,9 +139,9 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="mssachlp.lib hid.lib"
+				AdditionalDependencies="mssachlp.lib hid.lib MXLib.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;$(XPDDK)\lib\wxp\i386"
+				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;&quot;$(WDK)/lib/wxp/i386&quot;;&quot;../MXLib/$(OutDir)&quot;"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -203,6 +201,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MxRomDevice.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MxRomDeviceClass.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Observer.cpp"
 				>
 			</File>
@@ -252,6 +258,10 @@
 			</File>
 			<File
 				RelativePath=".\StVersionInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UpdateTransportProtocol.cpp"
 				>
 			</File>
 			<File
@@ -325,6 +335,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MxRomDevice.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MxRomDeviceClass.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Observer.h"
 				>
 			</File>
@@ -390,6 +408,14 @@
 			</File>
 			<File
 				RelativePath=".\StVersionInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UpdateTransportProtocol.Api.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UpdateTransportProtocol.h"
 				>
 			</File>
 			<File

@@ -21,8 +21,8 @@ public:
 	Device(DeviceClass * deviceClass, DEVINST devInst, CStdString path);
 	virtual ~Device(void);
 
-//	static const uint32_t MaxTransferSizeInBytes	= 128 * 512; //(128 sectors of 512 bytes each at a time) says who??
-	static const uint32_t MaxTransferSizeInBytes	= 2 * 1024 * 1024; //2 MB per Frank Li
+	static const uint32_t MaxTransferSizeInBytes	= 128 * 512; //(128 sectors of 512 bytes each at a time) says who??
+//	static const uint32_t MaxTransferSizeInBytes	= 2 * 1024 * 1024; //2 MB per Frank Li
 
 	typedef enum DeviceCapabilities
     {

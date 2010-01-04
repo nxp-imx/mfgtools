@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../..;&quot;$(XPDDK)\inc\ddk\wdm\wxp&quot;;&quot;$(XPDDK)\inc\ddk\wxp&quot;"
+				AdditionalIncludeDirectories="../..;&quot;$(WDK)/inc/&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -116,7 +116,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../..;&quot;$(XPDDK)\inc\ddk\wdm\wxp&quot;;&quot;$(XPDDK)\inc\ddk\wxp&quot;"
+				AdditionalIncludeDirectories="../..;&quot;$(WDK)/inc/&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="0"
 				TreatWChar_tAsBuiltInType="true"

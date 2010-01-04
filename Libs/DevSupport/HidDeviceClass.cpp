@@ -1,6 +1,6 @@
 #include "HidDeviceClass.h"
 #include "HidDevice.h"
-#include <hidclass.h>
+#include <ddk/hidclass.h>
 
 HidDeviceClass::HidDeviceClass(void)
 : DeviceClass(&GUID_DEVINTERFACE_HID, &GUID_DEVCLASS_HIDCLASS, _T("HID"), DeviceTypeHid)

@@ -6,7 +6,7 @@
 #include <initguid.h>
 #include <devguid.h>
 //#include <hidclass.h>
-#include <usbiodef.h>
+#include <api/usbiodef.h>
 
 class SetupApi
 {

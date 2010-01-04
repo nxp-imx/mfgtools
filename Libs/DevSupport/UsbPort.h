@@ -3,7 +3,7 @@
 #pragma once
 
 #pragma warning( disable : 4200 )
-#include <usbioctl.h>
+#include <api/usbioctl.h>
 #pragma warning( default : 4200 )
 
 #include "Property.h"

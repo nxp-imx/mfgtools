@@ -1,6 +1,45 @@
 http://psg-host.svn-tx30.am.freescale.net/svn/psg-host/branches/dev/0004
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.1.006
+****************************************
+01/04/2010
+	- Port to Windows Driver Kit(WDK).
+	  Removes dependence on XP DDK since it is no longer available from Microsoft.
+	  	  
+	Apps/MfgTool.exe/docs/changelog.txt
+	Apps/MfgTool.exe/stdafx.h
+	Apps/MfgTool.exe/StMfgTool.sln
+	Apps/MfgTool.exe/StMfgTool.vcproj
+	Apps/MfgTool.exe/StMfgTool.vs2005.vcproj
+	Apps/MfgTool.exe/version.h
+	Libs/DevSupport/Device.cpp
+	Libs/DevSupport/Device.h
+	Libs/DevSupport/DevSupport.vcproj
+	Libs/DevSupport/DevSupport.vs2005.vcproj
+	Libs/DevSupport/HidDevice.h
+	Libs/DevSupport/HidDeviceClass.cpp
+	Libs/DevSupport/SetupApi.h
+	Libs/DevSupport/StApi.h
+	Libs/DevSupport/stdafx.h
+	Libs/DevSupport/UsbController.cpp
+	Libs/DevSupport/UsbPort.cpp
+	Libs/DevSupport/UsbPort.h
+	Libs/OtpAccessPitc/OtpAccessPitc.vcproj
+	Libs/OtpAccessPitc/OtpAccessPitc.vs2005.vcproj
+	Libs/WinSupport/stdafx.h
+	Libs/WinSupport/WinSupport.vcproj
+	Libs/WinSupport/WinSupport.vs2005.vcproj
+
+****************************************
+RELEASE_STMFGTOOL_1.6.1.005
+****************************************
+12/03/2009
+	- ENGR00118843, ENGR118844: Reverse changes from 1.6.1.004. Change MaxTransferSizeInBytes back to 64KB from 2MB.
+	  	  
+	Libs/DevSupport/Device.h
+
+****************************************
 RELEASE_STMFGTOOL_1.6.1.004
 ****************************************
 11/18/2009

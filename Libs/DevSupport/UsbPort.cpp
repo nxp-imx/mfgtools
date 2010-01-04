@@ -10,14 +10,6 @@
 #define new DEBUG_NEW
 #endif
 
-typedef enum _USB_DEVICE_SPEED {
-    UsbLowSpeed = 0,
-    UsbFullSpeed,
-    UsbHighSpeed
-} USB_DEVICE_SPEED;
-
-
-
 usb::Port::Port(usb::Hub* pHub, int32_t index) 
 : Property(true)
 , _parentHub(pHub)
