@@ -108,6 +108,16 @@ typedef enum
 	MX_MAX,
 } MX_T;
 
+//define ram memory type
+typedef enum 
+{ 
+	MM_DDR = 0, 
+	MM_SDRAM, 
+	MM_CUSTOM, 
+	MM_DDR2, 
+	MM_MDDR, 
+}MM_T;
+
 // UART configurations for each processor
 static char uart_conf[MX_MAX] = 
 {

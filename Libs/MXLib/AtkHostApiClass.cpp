@@ -566,16 +566,17 @@ BOOL AtkHostApiClass::DownloadCSF(UINT address, int byteCount, const unsigned ch
 	return FALSE;
 }
 
+#define FLASH_HEADER_SIZE	0x20
+#define ROM_TRANSFER_SIZE	0x400
+#define MX_51_NK_LOAD_ADDRESS			0x90200000
+#define MX_51_EBOOT_LOAD_ADDRESS		0x90040000
 
 BOOL AtkHostApiClass::DownloadImage(UINT address, UINT byteCount, const unsigned char* pBuf)
-
 {
-
 	int counter = 0;
 	int bytePerCommand = 0;
-	const unsigned char*  pBuffer = pBuf;		
-	//BOOL status = FALSE;
-	//int downloadPerOnce = WR_BUF_MAX_SIZE;
+	const unsigned char*  pBuffer = pBuf;
+	int ActualImageAddr = address, FlashHdrAddr = address - FLASH_HEADER_SIZE;
 
 	while (1)
 	{
@@ -590,7 +591,7 @@ BOOL AtkHostApiClass::DownloadImage(UINT address, UINT byteCount, const unsigned
 			byteCount = 0;
 		}
 
-		if (!SendCommand2RoK(address + counter*MAX_SIZE_PER_DOWNLOAD_COMMAND, 
+		if (!SendCommand2RoK(ActualImageAddr + counter*MAX_SIZE_PER_DOWNLOAD_COMMAND, 
 										   bytePerCommand, ROM_KERNEL_WF_FT_OTH))
 		{
 			return FALSE;
@@ -609,7 +610,16 @@ BOOL AtkHostApiClass::DownloadImage(UINT address, UINT byteCount, const unsigned
 		
 		if (!byteCount)
 		{
-			if (!SendCommand2RoK(address, 0x400, ROM_KERNEL_WF_FT_APP))
+			//transfer length of ROM_TRANSFER_SIZE is a must to ROM code.
+			unsigned char FlashHdr[ROM_TRANSFER_SIZE];
+			//Init the memory
+			memset(FlashHdr,0, ROM_TRANSFER_SIZE);
+			//Copy image data with an offset of FLASH_HEADER_SIZE to the temp buffer.
+			memcpy(FlashHdr+FLASH_HEADER_SIZE, pBuf, ROM_TRANSFER_SIZE-FLASH_HEADER_SIZE);
+			//We should write actual image address to the first dowrd of flash header.
+			((int *)FlashHdr)[0] = ActualImageAddr;
+			//Jump to RAM kernel to execute it.
+			if (!SendCommand2RoK(FlashHdrAddr, ROM_TRANSFER_SIZE, ROM_KERNEL_WF_FT_APP))
 			{
 				return FALSE;
 			}
@@ -617,7 +627,7 @@ BOOL AtkHostApiClass::DownloadImage(UINT address, UINT byteCount, const unsigned
 			{
 				Sleep(10);
 				pBuffer = pBuf;
-				if(!TransData(0x400,pBuffer,OPMODE_DOWNLOAD))
+				if(!TransData(ROM_TRANSFER_SIZE,(const unsigned char *)FlashHdr,OPMODE_DOWNLOAD))
 				{
 					return FALSE;
 				}

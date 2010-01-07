@@ -3,7 +3,7 @@
 #pragma once
 
 #pragma warning( disable : 4200 )
-#include <api/usbioctl.h>
+#include "Libs/WDK/usbioctl.h"
 #pragma warning( default : 4200 )
 
 #include "Property.h"

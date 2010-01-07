@@ -1,5 +1,6 @@
+#include "stdafx.h"
 #include "StPitc.h"
-
+#include "MxRomDevice.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -7,6 +8,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 StPitc::StPitc(Device * const pDevice, LPCTSTR fileName, StFwComponent::LoadFlag loadFlag, const uint16_t langId)
  : _pDevice(pDevice)
  , _fwComponent(fileName, loadFlag, langId)
@@ -85,6 +87,28 @@ uint32_t StPitc::DownloadPitc(Device::UI_Callback callbackFn)
     
     return ret;
 }
+
+uint32_t StPitc::DownloadMxRomImg(Device::UI_Callback callbackFn)
+{
+    if ( _fwComponent.GetLastError() != ERROR_SUCCESS )
+        return _fwComponent.GetLastError();
+    
+	//MxRomDownloadFw api(_fwComponent.GetDataPtr(), _fwComponent.size());
+
+    HANDLE cb = _pDevice->RegisterCallback(callbackFn);
+
+    //MxRomDevice objMxRomDevice();
+
+    bool ret = (dynamic_cast<MxRomDevice*>(_pDevice))->DownloadRKL((unsigned char *)_fwComponent.GetDataPtr(), _fwComponent.size());
+    
+    bool check = _pDevice->UnregisterCallback(cb);
+    
+	if(ret)
+		return ERROR_SUCCESS;
+	else
+		return !(ERROR_SUCCESS);
+}
+
 
 bool StPitc::IsPitcLoaded()
 {

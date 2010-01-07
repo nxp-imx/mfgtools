@@ -1,26 +1,35 @@
 #pragma once
 
 #include "Device.h"
-#include "Observer.h"
-#include "StFwComponent.h"
+//#include "Observer.h"
+//#include "StFwComponent.h"
 
 #include "Common/StdString.h"
 #include "Common/StdInt.h"
+
+#include "../MxLib/Platform/MXDefine.h"
+
 
 //#include "Common/WinDriver/wdu_lib.h"
 
 /// <summary>
 /// A WinUSB device.
 /// </summary>
+
 class MxRomDevice : public Device//, IComparable
 {
+
 public:
 	char DefaultLicenseString[128];// = "6c3cd57876b3a6e415f93fd697134bd97ee1ec50.Motorola Semiconductors";
 
 	MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path);
 	
 	virtual ~MxRomDevice(void) {};
-//    uint32_t Download(const StFwComponent& fwComponent, Device::UI_Callback callbackFn); 	
+//    uint32_t Download(const StFwComponent& fwComponent, Device::UI_Callback callbackFn); 
+	static void SetIMXDevPara(CString cMXType, CString cSecurity, CString cRAMType, unsigned int RAMKNLAddr);
+	BOOL OpenUSBPort();
+	BOOL InitMemoryDevice();
+	BOOL DownloadRKL(unsigned char *rkl, int rklsize);
 };
 //private:
 //	static const uint32_t PipeSize = 4096;      //TODO:??? where did this come from?

@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\;..\;$(WDK)\inc\"
+				AdditionalIncludeDirectories="..\..\;..\;$(WMSDK)\WMDM\inc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -73,7 +73,7 @@
 				LinkLibraryDependencies="true"
 				AdditionalDependencies="mssachlp.lib hid.lib MXLib.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;&quot;$(WDK)/lib/wxp/i386&quot;;&quot;../MXLib/$(OutDir)&quot;"
+				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;../WDK/wxp/i386;&quot;../MXLib/$(OutDir)&quot;"
 				IgnoreAllDefaultLibraries="false"
 			/>
 			<Tool
@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\;..\;$(WDK)\inc\"
+				AdditionalIncludeDirectories="..\..\;..\;$(WMSDK)\WMDM\inc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="0"
 				TreatWChar_tAsBuiltInType="true"
@@ -141,7 +141,7 @@
 				Name="VCLibrarianTool"
 				AdditionalDependencies="mssachlp.lib hid.lib MXLib.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;&quot;$(WDK)/lib/wxp/i386&quot;;&quot;../MXLib/$(OutDir)&quot;"
+				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;../WDK/wxp/i386;&quot;../MXLib/$(OutDir)&quot;"
 			/>
 			<Tool
 				Name="VCALinkTool"

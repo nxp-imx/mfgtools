@@ -1,5 +1,7 @@
 #pragma once
 #include "DeviceClass.h"
+#include "MxRomDevice.h"
+#include "../MxLib/Platform/usbinf.h"
 
 #include <initguid.h>
 // Device Class GUID for the Jungo/WinDriver iMX ROM Driver
@@ -15,7 +17,6 @@ private:
     /// Initializes a new instance of the MxRomDeviceClass class.
     /// </summary>
     MxRomDeviceClass();
-
 	virtual ~MxRomDeviceClass(void) {}
 
     Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CStdString path);

@@ -5,8 +5,7 @@
 #include <cfgmgr32.h>
 #include <initguid.h>
 #include <devguid.h>
-//#include <hidclass.h>
-#include <api/usbiodef.h>
+#include "Libs/WDK/usbiodef.h"
 
 class SetupApi
 {

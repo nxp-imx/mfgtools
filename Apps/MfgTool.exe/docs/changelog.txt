@@ -1,6 +1,18 @@
 http://psg-host.svn-tx30.am.freescale.net/svn/psg-host/branches/dev/0004
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.1.007
+****************************************
+01/04/2010
+	- Port to Windows Driver Kit(WDK) fixes.
+	  Found problems compiling with latest MS WDK.
+	  Created a Libs/WDK to hold functioanly static header files and a wxp/i386 hid.lib.
+	  Removed all WDK dependence.
+	  Still requires WMFSDK.
+	  
+	- Support MX51 UTP updates.
+	  	  
+****************************************
 RELEASE_STMFGTOOL_1.6.1.006
 ****************************************
 01/04/2010

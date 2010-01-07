@@ -13,6 +13,7 @@ public:
 public:
     StFwComponent& GetFwComponent() { return _fwComponent; };
     uint32_t DownloadPitc(Device::UI_Callback callbackFn);
+	uint32_t DownloadMxRomImg(Device::UI_Callback callbackFn);
     bool IsPitcLoaded();
     uint32_t SendPitcCommand(StApi& api);
 	CStdString GetResponseStr() { return _strResponse; };

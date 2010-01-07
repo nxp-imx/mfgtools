@@ -51,6 +51,9 @@ public:
 			case DeviceTypeUsbHub:
 				str = _T("UsbHub");
 				break;
+			case DeviceTypeMxRom:
+				str = _T("IMX");
+				break;
 			case DeviceTypeNone:
 			default:
 				str = _T("None");

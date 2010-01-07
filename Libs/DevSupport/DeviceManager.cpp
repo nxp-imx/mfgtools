@@ -41,7 +41,7 @@ DeviceManager::DeviceManager()
 	_devClasses[DeviceClass::DeviceTypeUsbHub]        = new usb::HubMgr;
 	_devClasses[DeviceClass::DeviceTypeMxRom]         = new MxRomDeviceClass;
 //	_devClasses[DeviceClass::DeviceTypeUsbDevice]     = new usb::DeviceMgr;
-	if ( _devClasses.size() != 6/*7*/ )
+	if ( _devClasses.size() != 7/*6*/ )
 	{
 		ATLTRACE(" *** FAILED TO CREATE ALL DEVICECLASSES.\n");
 	}
@@ -309,6 +309,9 @@ void DeviceManager::UpdateDeviceFilters(LPCTSTR usbVid, LPCTSTR usbPid)
 	(*this)[DeviceClass::DeviceTypeHid]->AddFilter(0x066f, 0x3770);
 	(*this)[DeviceClass::DeviceTypeHid]->AddFilter(0x066f, 0x3780);
 	(*this)[DeviceClass::DeviceTypeHid]->AddFilter(usbVid, usbPid);
+	for(uint32_t i=0;i<MX_MAX;i++)
+		(*this)[DeviceClass::DeviceTypeMxRom]->AddFilter(mxusb_inf[i].vendor, mxusb_inf[i].product);
+	
 	// MTP
 	(*this)[DeviceClass::DeviceTypeMtp]->AddFilter(usbVid, usbPid);
 	// MSC

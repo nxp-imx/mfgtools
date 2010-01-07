@@ -7,6 +7,7 @@
 #include "UpdateCommandList.h"
 #include "../../Libs/DevSupport/Volume.h"
 #include "../../Libs/DevSupport/UpdateTransportProtocol.h"
+#include "../../Libs/DevSupport/DeviceClass.h"
 
 #define OP_UPDATE_INCOMPLETE	-1L
 
@@ -52,6 +53,7 @@ protected:
 	UCL m_UclNode;
 	UCL::CommandList* m_pCmdList;
 	UCL::DeviceDesc::DeviceMode m_CurrentDeviceMode;
+	DeviceClass::DeviceType m_CurrentDeviceType;
 	std::map<UCL::DeviceDesc::DeviceMode, UCL::DeviceDesc*> m_DeviceDescs;
     HANDLE m_hChangeEvent;
 	BOOL m_bProcessingList;
@@ -66,6 +68,7 @@ protected:
 	DWORD DoResetToRecovery();
 	DWORD DoBurn(UCL::Command* pCmd);
 	DWORD DoLoad(CString filename);
+	DWORD DoMxRomLoad(CString filename);
 	DWORD DoShow(UCL::Command* pCmd);
 
 };

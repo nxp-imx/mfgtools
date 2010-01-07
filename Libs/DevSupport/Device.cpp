@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Device.h"
 #pragma warning( disable : 4200 )
-#include <api/usbioctl.h>
+#include "Libs/WDK/usbioctl.h"
 #pragma warning( default : 4200 )
 
 CMutex Device::m_mutex(FALSE, _T("Device.SendCommand"));
@@ -457,6 +457,9 @@ bool Device::IsUsb()
 
 	if (_enumerator.get().CompareNoCase(_T("USB")) == 0)
 		return true;
+
+//	if (_enumerator.get().CompareNoCase(_T("ROOT")) == 0)
+//		return true;
 /*
 	if (_enumerator.get().CompareNoCase(_T("USBSTOR")) == 0)
 		return true;

@@ -5,7 +5,7 @@
 
 #include "MXDefine.h"
 
-stMemoryInit ddrMx31[] = 
+static stMemoryInit ddrMx31[] = 
 {
 	{0xB8002050, 0x0000DCF6,32},
 	{0xB8002054, 0x444a4541,32},
@@ -28,7 +28,7 @@ stMemoryInit ddrMx31[] =
 	{0x80000000, 0xDEADBEEF, 32}
 };
 
-stMemoryInit ddrMx27[] = 
+static stMemoryInit ddrMx27[] = 
 {
 	{0xd8002000,  0x0000CC03, 32}, 
 	{0xd8002004,  0xa0330D01, 32}, 
@@ -49,7 +49,7 @@ stMemoryInit ddrMx27[] =
 };
 
 
-stMemoryInit sdrMx31[] = 
+static stMemoryInit sdrMx31[] = 
 {
 	{0xB8001004, 0x0079E7BA, 32}, 
 	{0xB8001000, 0x92100000, 32}, 
@@ -64,7 +64,7 @@ stMemoryInit sdrMx31[] =
 	{0x80000000, 0xDEADBEEF}, 
 };
 
-stMemoryInit ddrMx35[] = 
+static stMemoryInit ddrMx35[] = 
 {
 	// CS0 settings
 //	{0xB8002000, 0x0000CC03, 32},
@@ -95,7 +95,7 @@ stMemoryInit ddrMx35[] =
 
 };
 
-stMemoryInit mddrMx35[]=
+static stMemoryInit mddrMx35[]=
 {
     {0xB8001010, 0x0000004C, 32},
     {0xB8001004, 0x006ac73a, 32},
@@ -138,7 +138,7 @@ stMemoryInit ddr2Mx35[]=
 };
 */
 
-stMemoryInit ddr2Mx35[]=
+static stMemoryInit ddr2Mx35[]=
 {
 0x43FAC368, 0x00000002, 32,
 0x43FAC36C, 0x00000002, 32,
@@ -284,7 +284,7 @@ stMemoryInit ddr2Mx35[]=
 0xB8001008, 0x00002000, 32,
 };
 
-stMemoryInit ddrMx37[] = 
+static stMemoryInit ddrMx37[] = 
 {
 	{0xc3f98000,0x0030,32},
 	{0xe3fd9000,0x80000000,32},
@@ -369,7 +369,7 @@ stMemoryInit ddrMx37[] =
 	{0xc3fa82c0,0x02c4,32},
 };
 
-stMemoryInit ddrMx51[] = 
+static stMemoryInit ddrMx51[] = 
 {
 	//{0x73f98000, 0x30, 16},
 	{0x73fd4018, 0x0000EBC0, 32},
@@ -385,7 +385,7 @@ stMemoryInit ddrMx51[] =
     {0x83fd9014, 0x00000000, 32},
 };
 
-stMemoryInit ddrMx51_To2[] = 
+static stMemoryInit ddrMx51_To2[] = 
 {
 	{0x73fa88a0, 0x0000020,  32},
 	{0x73fa850c, 0x000020c5, 32},
@@ -441,7 +441,7 @@ stMemoryInit ddrMx51_To2[] =
 	{0x83fd9034, 0x90000000, 32},
 	{0x83fd9014, 0x00000000, 32},
 };
-stMemoryInit mddrMx51_To2[] = 
+static stMemoryInit mddrMx51_To2[] = 
 {
 	{0x73FA84B8, 0x000000E7, 32},
 	{0x83FD9000, 0x83220000, 32},
@@ -471,7 +471,7 @@ stMemoryInit mddrMx51_To2[] =
 	{0x83FD9030, 0x00F78000, 32},
 };
 
-stMemoryInit ddrMx25[] = 
+static stMemoryInit ddrMx25[] = 
 {
     {0xB8001004, 0x0076EB3F, 32},
     {0xB8001010, 0x0000004C, 32},
@@ -486,7 +486,7 @@ stMemoryInit ddrMx25[] =
     {0xB8001000, 0x82118485, 32}
 };
 
-stMemoryInit mddrMx25[] = 
+static stMemoryInit mddrMx25[] = 
 {
 	{0xB8001010, 0x00000004, 32},
 	{0xB8001000, 0x92100000, 32},
@@ -518,7 +518,7 @@ stMemoryInit mddrMx25[] =
 	{0x53f80064, 0x43300000, 32},
 };
 
-stMemoryInit ddr2Mx25_To11[] = 
+static stMemoryInit ddr2Mx25_To11[] = 
 {
 	{0xB8002050, 0x0000D843, 32},
 	{0xB8002054, 0x22252521, 32},

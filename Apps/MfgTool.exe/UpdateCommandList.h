@@ -110,7 +110,7 @@ public:
 	class DeviceDesc : public XNode
 	{
 	public:
-		typedef enum _DeviceMode { Unknown, Recovery, Updater, UserMtp, UserMsc, User, ConnectedUnknown, Disconnected } DeviceMode;
+		typedef enum _DeviceMode { Unknown, Recovery, Updater, UserMtp, UserMsc, User, ConnectedUnknown, Disconnected, IMXInfo } DeviceMode;
 		
 		static CString DeviceModeToString(DeviceMode mode)
 		{
@@ -134,6 +134,9 @@ public:
 					break;
 				case Disconnected:
 					str = _T("Disconnected");
+					break;
+				case IMXInfo:
+					str = _T("IMXInfo");
 					break;
 				case Unknown:
 				default:
@@ -162,6 +165,8 @@ public:
 				mode = User;
 			else if ( modeString == _T("Disconnected") )
 				mode = Disconnected;
+			else if ( modeString == _T("IMXInfo") )
+				mode = IMXInfo;
 
 			return mode;
 		}
@@ -181,7 +186,23 @@ public:
 
 		// [XmlAttribute("pid")]
 		CString GetPid() { return GetAttrValue(_T("pid")) ? GetAttrValue(_T("pid")) : _T("xxxx"); };
+		CString GetMXType() { return GetAttrValue(_T("MXType")) ? GetAttrValue(_T("MXType")) : _T("xxxx"); }
+		CString GetSecurity() { return GetAttrValue(_T("security")) ? GetAttrValue(_T("security")) : _T("xxxx"); }
+		CString GetRAMType() { return GetAttrValue(_T("RAMType")) ? GetAttrValue(_T("RAMType")) : _T("xxxx"); }
+		//CString GetRAMKNLAddr() { return GetAttrValue(_T("RAMKNLAddr")) ? GetAttrValue(_T("RAMKNLAddr")) : _T("xxxx"); }
+		//To specify the RAM address where kernel is downloaded in recovery stage. 
+		unsigned int GetRAMKNLAddr()
+		{ 
+			unsigned int RAMKNLAddr = 0; // default to 0
 
+			LPCTSTR attr = GetAttrValue(_T("RAMKNLAddr"));
+			if ( attr != NULL )
+			{
+				RAMKNLAddr = _tstoi64(attr);
+			}
+
+			return RAMKNLAddr; 
+		};
 //			[XmlIgnore()]
 //			public UInt16? Pid
 //			{

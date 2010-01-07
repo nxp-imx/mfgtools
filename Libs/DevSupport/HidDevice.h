@@ -4,7 +4,7 @@
 #include "StHidApi.h"
 
 extern "C" {
-#include <api/hidsdi.h>
+#include "Libs/WDK/hidsdi.h"
 }
 
 class HidDevice : public Device

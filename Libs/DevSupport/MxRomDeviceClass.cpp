@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "MxRomDeviceClass.h"
 #include "MxRomDevice.h"
 
@@ -11,7 +12,10 @@ MxRomDeviceClass::MxRomDeviceClass()
 
 Device* MxRomDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CStdString path)
 {
-    MxRomDevice* pDev = new MxRomDevice(deviceClass, deviceInfoData.DevInst, path);
+	if(deviceInfoData.ClassGuid == GUID_DEVCLASS_MX_ROM_USB_DEVICE && this->_deviceClassType == DeviceTypeMxRom)
+		TRACE("DeviceClass::Devices:Init i.mx device object.\r\n");
+
+	MxRomDevice* pDev = new MxRomDevice(deviceClass, deviceInfoData.DevInst, path);
     if ( pDev->IsUsb() )
 		return pDev;
 	else

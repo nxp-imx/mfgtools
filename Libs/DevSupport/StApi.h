@@ -16,8 +16,8 @@
 #else // !WIN32
 	#include "Common/StdInt.h"
 	#include <Wtypes.h>
-	#define _NTSRB_     // to keep srb.h from being included
-	#include <ddk/scsi.h>
+	#define _NTSCSI_USER_MODE_     // to keep srb.h from being included
+	#include "Libs/WDK/scsi.h"
 	#include <ntddscsi.h>
 #endif	 // WIN32
 
