@@ -1,6 +1,25 @@
 http://psg-host.svn-tx30.am.freescale.net/svn/psg-host/branches/dev/0004
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.1.008
+****************************************
+01/14/2010
+	- Fixes an issue in which a big file(i.e. >200MB) can't be downloaded to target. 
+	  Problem: When a file needs to be downloaded, we just allocate a single buffer to contains all the data.
+	           Also, there are too many copy operation among the whole transfer process. 
+	           All of this lead to memory to be exhuasted on PC.
+	  Fix: For UtpWrite() - Don't open file and read into a buffer, only pass name of file to WriteTransaction() constructor.
+	       For WriteTransaction() - Open file and get size.
+	       For WriteTransaction::Next() - Close the file if NextState == DoneState.
+	       For WriteTransaction::GetData(size) - Add size parameter and read only size number of bytes from file.
+	       For PutDataState(data) - Use data directly (instead of copy) for Put message.
+
+	Apps/MfgTool.exe/docs/changelog.txt
+	Apps/MfgTool.exe/version.h
+	Libs/DevSupport/UpdateTransportProtocol.Api.h
+	Libs/DevSupport/UpdateTransportProtocol.h
+	  
+****************************************
 RELEASE_STMFGTOOL_1.6.1.007
 ****************************************
 01/04/2010

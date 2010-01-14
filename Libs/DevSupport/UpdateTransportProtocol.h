@@ -193,7 +193,7 @@ public:
 					case ScsiUtpMsg::SIZE:
                         m_TotalSize = m_pCurrentState->GetUtpMsg()->GetResponseSize();
                         m_CurrentSize = 0;
-                        m_Data.resize(m_TotalSize);
+                        m_Data.resize((size_t)m_TotalSize);
 						// Data = new Byte[TotalSize];
                         pNextState = new GetDataState(this);
                         break;
@@ -266,20 +266,41 @@ public:
     {
 	private:
 		std::vector<uint8_t> m_Data;
+		std::ifstream file;
 
 	public:
-        std::vector<uint8_t> GetData()
+        std::vector<uint8_t>& GetData(int64_t size)
 		{
+			if(m_Data.size()!=size)
+				m_Data.resize((size_t)size);
+
+			// read the file
+			file.read(reinterpret_cast<char*>(&m_Data[0]), (size_t)size);
+
             return m_Data;
         }
 
-        WriteTransaction(UpdateTransportProtocol* pUtpInstance, CString command, std::vector<uint8_t> data)
+        WriteTransaction(UpdateTransportProtocol* pUtpInstance, CString command, CString filename)
             : Transaction(pUtpInstance, command)
         {
-            m_LParam = m_TotalSize = data.size();
-			m_Data.assign(data.begin(), data.end());
+			// open the file for binary reading
+			file.open(filename, std::ios_base::binary);
+			if(!file.is_open())
+			{
+				CString msg; msg.Format(_T("!ERROR(%d): UpdateTransportProtocol.UtpWrite(%s, %s), tag:%d"), ERROR_OPEN_FAILED, command, filename, g_TransactionTag);
+				TRACE(msg);
+			}
+			else
+			{
+				// get the length of the file
+				file.seekg(0, std::ios::end);
+				size_t fileSize = file.tellg();
+				file.seekg(0, std::ios::beg);
 
-            m_pCurrentState = new StartState(this);
+				m_LParam = m_TotalSize = fileSize;
+
+				m_pCurrentState = new StartState(this);				
+			}
         }
 
         int64_t GetPacketCount() { return m_CurrentSize/m_pUpdateProtocol->GetMaxPacketSize(); };
@@ -297,7 +318,7 @@ public:
                         m_TotalSize = m_pCurrentState->GetUtpMsg()->GetResponseInfo();
                         m_CurrentSize = 0;
 
-                        pNextState = new BusyState(this, m_TotalSize);
+                        pNextState = new BusyState(this, (size_t)m_TotalSize);
                         Sleep(m_pUpdateProtocol->GetBusyDelay());
                         
                         break;
@@ -357,6 +378,10 @@ public:
             }
 			delete m_pCurrentState;
 			m_pCurrentState = pNextState;
+
+			// Close the file;
+			if ( m_pCurrentState->GetStateType() == State::DoneState )
+				file.close();
         }
 
     };
@@ -527,16 +552,8 @@ public:
             // Get some data to put.
             int64_t numBytesToWrite = min(pTransaction->GetProtocol()->GetMaxPacketSize(), pTransaction->GetTotalSize() - pTransaction->GetCurrentSize());
 
-			std::vector<uint8_t> data(numBytesToWrite);
-			std::vector<uint8_t> source = pTransaction->GetData();
-			int64_t sourceStart = pTransaction->GetCurrentSize();
-			for ( int64_t count = 0; count < numBytesToWrite; ++count )
-			{
-				data[count] = source[sourceStart + count];
-			}
-//            Array.Copy(pTransaction->Data, transaction.CurrentSize, buffer, 0, numBytesToWrite);
-            // Send it.
-			m_pMsg = new api::Put(pTransaction->GetTag(), pTransaction->GetPacketCount(), data);
+			// Send it.
+			m_pMsg = new api::Put(pTransaction->GetTag(), pTransaction->GetPacketCount(), pTransaction->GetData(numBytesToWrite));
             pTransaction->SetCurrentSize(pTransaction->GetCurrentSize() + numBytesToWrite);
         }
     
@@ -640,8 +657,8 @@ public:
 			m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
 
             // Update the UI
-			cmdProgress.maximum = transaction.GetTotalSize();
-            cmdProgress.position = transaction.GetCurrentSize();
+			cmdProgress.maximum = (uint32_t)transaction.GetTotalSize();
+            cmdProgress.position = (uint32_t)transaction.GetCurrentSize();
 //            cmdProgress.status = transaction.GetCurrentState()->ToString() + _T(" // pos:") + transaction.GetCurrentSize().ToString("#,#0");
 			cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
 			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
@@ -677,8 +694,8 @@ public:
                 transaction.CopyData();
 
             // Update the UI
-            cmdProgress.maximum = transaction.GetTotalSize();
-            cmdProgress.position = (int32_t)transaction.GetCurrentSize();
+            cmdProgress.maximum = (uint32_t)transaction.GetTotalSize();
+            cmdProgress.position = (uint32_t)transaction.GetCurrentSize();
             cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
 			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
@@ -723,28 +740,7 @@ public:
 
     int32_t UtpWrite(CString cmd, CString filename, Device::UI_Callback callback)
     {
-		// open the file for binary reading
-		std::ifstream file;
-		file.open(filename, std::ios_base::binary);
-		if(!file.is_open())
-		{
-			CString msg; msg.Format(_T("!ERROR(%d): UpdateTransportProtocol.UtpWrite(%s, %s), tag:%d"), ERROR_OPEN_FAILED, cmd, filename, g_TransactionTag);
-            TRACE(msg);
-            return ERROR_OPEN_FAILED;
-		}
-		// get the length of the file
-		file.seekg(0, std::ios::end);
-		size_t fileSize = file.tellg();
-		file.seekg(0, std::ios::beg);
 
-		// create a vector to hold all the bytes in the file
-		std::vector<uint8_t> data(fileSize, 0);
-
-		// read the file
-		file.read(reinterpret_cast<char*>(&data[0]), fileSize);
-
-		// close the file
-		file.close();
 /*
         // Get the data to send
         Byte[] data = null;
@@ -759,13 +755,15 @@ public:
             return retVal;
         }
 */
-        WriteTransaction transaction(this, cmd, data);
+        WriteTransaction transaction(this, cmd, filename);
+		if(transaction.GetTotalSize()==0)
+			return ERROR_OPEN_FAILED;
 
         // tell the UI we are beginning a command.
 		HANDLE hCallback = m_pUtpDevice->RegisterCallback(callback);
 //        Utils.ByteFormatConverter byteConverter = new Utils.ByteFormatConverter();
 //	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, (int)myNewFwCommandSupport.GetFwComponent().size(), 0);       // STAGE 2 of the Load Operation
-		Device::NotifyStruct cmdProgress(_T("UtpWrite"), Device::NotifyStruct::dataDir_ToDevice, transaction.GetTotalSize());
+		Device::NotifyStruct cmdProgress(_T("UtpWrite"), Device::NotifyStruct::dataDir_ToDevice, (uint32_t)transaction.GetTotalSize());
         cmdProgress.status.Format(_T(" UtpWrite(%s, %s) tag:%d totalSize:%d"), cmd, filename, transaction.GetTag(), transaction.GetTotalSize());
 		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
@@ -774,8 +772,8 @@ public:
 			m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
             
             // Update the UI
-            cmdProgress.maximum = transaction.GetTotalSize();
-            cmdProgress.position = (int32_t)transaction.GetCurrentSize();
+            cmdProgress.maximum = (uint32_t)transaction.GetTotalSize();
+            cmdProgress.position = (uint32_t)transaction.GetCurrentSize();
 			cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
 			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 

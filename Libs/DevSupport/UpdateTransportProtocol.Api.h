@@ -81,7 +81,7 @@ namespace api
 			_cdb.Tag = Swap4((uint8_t*)&tag);
 			_cdb.LParam = Swap8((uint8_t*)&lparam);
 
-            _xferLength = length;
+            _xferLength = (uint32_t)length;
         }
 
 	public:
@@ -291,7 +291,7 @@ namespace api
     {
 	public:
         // Constructor
-		Put(uint32_t tag, int64_t lParam, std::vector<uint8_t> data)
+		Put(uint32_t tag, int64_t lParam, std::vector<uint8_t>& data)
 			: ScsiUtpMsg(ScsiUtpMsg::Put, ST_WRITE_CMD_PLUS_DATA, data.size(), tag, lParam)
         {
 			if ( data.size() )
