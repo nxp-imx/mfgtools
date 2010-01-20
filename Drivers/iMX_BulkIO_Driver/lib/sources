@@ -1,0 +1,19 @@
+TARGETNAME=imxusb
+TARGETTYPE=LIBRARY
+
+_NT_TARGET_VERSION= $(_NT_TARGET_VERSION_WS03)
+
+
+INCLUDES=$(DDK_INC_PATH); \
+     ..\sys
+
+
+SOURCELIBS= $(DDK_LIB_PATH)\usbd.lib \
+            $(SDK_LIB_PATH)\setupapi.lib
+
+SOURCES=      \
+        imxusb.cpp  \
+        imxusb.rc
+
+TARGET_DESTINATION=wdf
+
