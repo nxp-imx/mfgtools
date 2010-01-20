@@ -1,0 +1,278 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{63fdef31-6a60-4b2e-844d-919954ad347c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Loki">
+      <UniqueIdentifier>{ba31dab8-8559-4e03-bea3-9fc2f8a7d045}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Loki\Singleton.cpp">
+      <Filter>Loki</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Loki\SmallObj.cpp">
+      <Filter>Loki</Filter>
+    </ClCompile>
+    <ClCompile Include="Device.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HidDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HidDeviceClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KernelApi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MtpDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MtpDeviceClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MxRomDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MxRomDeviceClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Observer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParameterT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RecoveryDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RecoveryDeviceClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SetupApi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StApi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StFormatImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StFormatInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StFwComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StHidApi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StMtpApi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StPitc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StVersionInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateTransportProtocol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UsbController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UsbControllerMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UsbHub.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UsbHubMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UsbPort.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Volume.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VolumeDeviceClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsVersionInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Common\StdInt.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\StdString.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\EmptyType.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\Functor.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\LokiExport.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\NullType.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\Sequence.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\Singleton.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\SmallObj.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\Threads.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\Typelist.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\TypelistMacros.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\TypeManip.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Loki\TypeTraits.h">
+      <Filter>Loki</Filter>
+    </ClInclude>
+    <ClInclude Include="Device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HidDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HidDeviceClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MtpDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MtpDeviceClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MxRomDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MxRomDeviceClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParameterT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Property.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RecoveryDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RecoveryDeviceClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RecoveryDeviceGuid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SetupApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StFormatImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StFormatInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StFwComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StHidApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StMedia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StMtpApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StPitc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StVersionInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateTransportProtocol.Api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateTransportProtocol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UsbController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UsbControllerMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UsbHub.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UsbHubMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UsbPort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Volume.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VolumeDeviceClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowsVersionInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

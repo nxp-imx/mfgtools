@@ -99,7 +99,7 @@ uint32_t StPitc::DownloadMxRomImg(Device::UI_Callback callbackFn)
 
     //MxRomDevice objMxRomDevice();
 
-    bool ret = (dynamic_cast<MxRomDevice*>(_pDevice))->DownloadRKL((unsigned char *)_fwComponent.GetDataPtr(), _fwComponent.size());
+    BOOL ret = (dynamic_cast<MxRomDevice*>(_pDevice))->DownloadRKL((unsigned char *)_fwComponent.GetDataPtr(), _fwComponent.size());
     
     bool check = _pDevice->UnregisterCallback(cb);
     

@@ -37,9 +37,9 @@ DeviceManager::DeviceManager()
 	_devClasses[DeviceClass::DeviceTypeMsc]		      = new VolumeDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeMtp]		      = new MtpDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeHid]		      = new HidDeviceClass;
+	_devClasses[DeviceClass::DeviceTypeMxRom]         = new MxRomDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeUsbController] = new usb::ControllerMgr;
 	_devClasses[DeviceClass::DeviceTypeUsbHub]        = new usb::HubMgr;
-	_devClasses[DeviceClass::DeviceTypeMxRom]         = new MxRomDeviceClass;
 //	_devClasses[DeviceClass::DeviceTypeUsbDevice]     = new usb::DeviceMgr;
 	if ( _devClasses.size() != 7/*6*/ )
 	{
@@ -309,9 +309,6 @@ void DeviceManager::UpdateDeviceFilters(LPCTSTR usbVid, LPCTSTR usbPid)
 	(*this)[DeviceClass::DeviceTypeHid]->AddFilter(0x066f, 0x3770);
 	(*this)[DeviceClass::DeviceTypeHid]->AddFilter(0x066f, 0x3780);
 	(*this)[DeviceClass::DeviceTypeHid]->AddFilter(usbVid, usbPid);
-	for(uint32_t i=0;i<MX_MAX;i++)
-		(*this)[DeviceClass::DeviceTypeMxRom]->AddFilter(mxusb_inf[i].vendor, mxusb_inf[i].product);
-	
 	// MTP
 	(*this)[DeviceClass::DeviceTypeMtp]->AddFilter(usbVid, usbPid);
 	// MSC

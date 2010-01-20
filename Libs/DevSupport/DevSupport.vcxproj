@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8B1FD486-E75E-48AD-9C43-374330BC6D8D}</ProjectGuid>
+    <RootNamespace>DevSupport</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.21006.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\;..\;$(WMSDK)\WMDM\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <StructMemberAlignment>8Bytes</StructMemberAlignment>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CallingConvention>Cdecl</CallingConvention>
+      <DisableSpecificWarnings>4311;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <EnablePREfast>false</EnablePREfast>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Lib>
+      <AdditionalDependencies>mssachlp.lib;hid.lib;MXLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)DevSupport.lib</OutputFile>
+      <AdditionalLibraryDirectories>$(WMSDK)\WMDM\lib;../WDK/wxp/i386;../MXLib/$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\;..\;$(WMSDK)\WMDM\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4311;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <EnablePREfast>false</EnablePREfast>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>mssachlp.lib;hid.lib;MXLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)DevSupport.lib</OutputFile>
+      <AdditionalLibraryDirectories>$(WMSDK)\WMDM\lib;../WDK/wxp/i386;../MXLib/$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Device.cpp" />
+    <ClCompile Include="DeviceClass.cpp" />
+    <ClCompile Include="DeviceManager.cpp" />
+    <ClCompile Include="HidDevice.cpp" />
+    <ClCompile Include="HidDeviceClass.cpp" />
+    <ClCompile Include="KernelApi.cpp" />
+    <ClCompile Include="MtpDevice.cpp" />
+    <ClCompile Include="MtpDeviceClass.cpp" />
+    <ClCompile Include="MxRomDevice.cpp" />
+    <ClCompile Include="MxRomDeviceClass.cpp" />
+    <ClCompile Include="Observer.cpp" />
+    <ClCompile Include="ParameterT.cpp" />
+    <ClCompile Include="RecoveryDevice.cpp" />
+    <ClCompile Include="RecoveryDeviceClass.cpp" />
+    <ClCompile Include="SetupApi.cpp" />
+    <ClCompile Include="StApi.cpp" />
+    <ClCompile Include="StFormatImage.cpp" />
+    <ClCompile Include="StFormatInfo.cpp" />
+    <ClCompile Include="StFwComponent.cpp" />
+    <ClCompile Include="StHidApi.cpp" />
+    <ClCompile Include="StMtpApi.cpp" />
+    <ClCompile Include="StPitc.cpp" />
+    <ClCompile Include="StVersionInfo.cpp" />
+    <ClCompile Include="UpdateTransportProtocol.cpp" />
+    <ClCompile Include="UsbController.cpp" />
+    <ClCompile Include="UsbControllerMgr.cpp" />
+    <ClCompile Include="UsbHub.cpp" />
+    <ClCompile Include="UsbHubMgr.cpp" />
+    <ClCompile Include="UsbPort.cpp" />
+    <ClCompile Include="Volume.cpp" />
+    <ClCompile Include="VolumeDeviceClass.cpp" />
+    <ClCompile Include="WindowsVersionInfo.cpp" />
+    <ClCompile Include="..\Loki\Singleton.cpp" />
+    <ClCompile Include="..\Loki\SmallObj.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Device.h" />
+    <ClInclude Include="DeviceClass.h" />
+    <ClInclude Include="DeviceManager.h" />
+    <ClInclude Include="HidDevice.h" />
+    <ClInclude Include="HidDeviceClass.h" />
+    <ClInclude Include="KernelApi.h" />
+    <ClInclude Include="MtpDevice.h" />
+    <ClInclude Include="MtpDeviceClass.h" />
+    <ClInclude Include="MxRomDevice.h" />
+    <ClInclude Include="MxRomDeviceClass.h" />
+    <ClInclude Include="Observer.h" />
+    <ClInclude Include="ParameterT.h" />
+    <ClInclude Include="Property.h" />
+    <ClInclude Include="RecoveryDevice.h" />
+    <ClInclude Include="RecoveryDeviceClass.h" />
+    <ClInclude Include="RecoveryDeviceGuid.h" />
+    <ClInclude Include="SetupApi.h" />
+    <ClInclude Include="StApi.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="StFormatImage.h" />
+    <ClInclude Include="StFormatInfo.h" />
+    <ClInclude Include="StFwComponent.h" />
+    <ClInclude Include="StHidApi.h" />
+    <ClInclude Include="StMedia.h" />
+    <ClInclude Include="StMtpApi.h" />
+    <ClInclude Include="StPitc.h" />
+    <ClInclude Include="StVersionInfo.h" />
+    <ClInclude Include="UpdateTransportProtocol.Api.h" />
+    <ClInclude Include="UpdateTransportProtocol.h" />
+    <ClInclude Include="UsbController.h" />
+    <ClInclude Include="UsbControllerMgr.h" />
+    <ClInclude Include="UsbHub.h" />
+    <ClInclude Include="UsbHubMgr.h" />
+    <ClInclude Include="UsbPort.h" />
+    <ClInclude Include="Volume.h" />
+    <ClInclude Include="VolumeDeviceClass.h" />
+    <ClInclude Include="WindowsVersionInfo.h" />
+    <ClInclude Include="..\..\Common\StdInt.h" />
+    <ClInclude Include="..\..\Common\StdString.h" />
+    <ClInclude Include="..\Loki\EmptyType.h" />
+    <ClInclude Include="..\Loki\Functor.h" />
+    <ClInclude Include="..\Loki\LokiExport.h" />
+    <ClInclude Include="..\Loki\NullType.h" />
+    <ClInclude Include="..\Loki\Sequence.h" />
+    <ClInclude Include="..\Loki\Singleton.h" />
+    <ClInclude Include="..\Loki\SmallObj.h" />
+    <ClInclude Include="..\Loki\Threads.h" />
+    <ClInclude Include="..\Loki\Typelist.h" />
+    <ClInclude Include="..\Loki\TypelistMacros.h" />
+    <ClInclude Include="..\Loki\TypeManip.h" />
+    <ClInclude Include="..\Loki\TypeTraits.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MXLib\MXLib.vcxproj">
+      <Project>{7fb73df9-70d9-4a25-8950-8e4d560152c3}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

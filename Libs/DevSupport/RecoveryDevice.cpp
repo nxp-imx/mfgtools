@@ -35,10 +35,10 @@ DWORD RecoveryDevice::Close()
 	{
         if ( !CloseHandle(m_RecoveryHandle) )
 			error = GetLastError();
+
+		m_RecoveryHandle = INVALID_HANDLE_VALUE;
 	}
 	
-	m_RecoveryHandle = INVALID_HANDLE_VALUE;
-
 	return error;
 }
 

@@ -131,11 +131,11 @@ const UCL::DeviceDesc::DeviceMode COpUtpUpdate::GetDeviceMode()
 			break;
 		case DeviceClass::DeviceTypeMxRom:
 			mode = UCL::DeviceDesc::Recovery;
-			MxRomDevice::SetIMXDevPara(\
-				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetMXType(),\
-				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetSecurity(),\
-				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRAMType(),\
-				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRAMKNLAddr());
+//			MxRomDevice::SetIMXDevPara(\
+//				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetMXType(),\
+//				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetSecurity(),\
+//				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRAMType(),\
+//				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRAMKNLAddr());
 			m_CurrentDeviceType = DeviceClass::DeviceTypeMxRom;
 			break;
 		case DeviceClass::DeviceTypeMsc:
@@ -677,6 +677,12 @@ bstr_log_text = _logText.AllocSysString();
 		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
 		return ReturnVal;
 	}
+
+	pMxRomDevice->SetIMXDevPara( m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetMXType(),
+									m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetSecurity(),
+									m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRAMType(),
+									m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRAMKNLAddr() );
+
 
 	StPitc myNewFwCommandSupport(pMxRomDevice, (LPCTSTR)filename,
 		m_pOpInfo->GetProfile()->m_bLockedProfile ? 

@@ -435,6 +435,26 @@ int32_t Device::hubIndex::get()
 }
 
 /// <summary>
+/// Property: Gets the system icon index for the device class.
+/// </summary>
+int32_t Device::maxPacketSize::get()
+{
+	Device* dev = dynamic_cast<Device*>(_owner);
+	ASSERT(dev);
+
+	DWORD error;
+	if ( Value == -1 )
+		if ( !gSetupApi().SetupDiGetClassImageIndex(dev->_deviceClass->ImageListPtr(), dev->_classGuid.get(), (PINT)&Value))
+			error = GetLastError();
+//	BOOL ret = SetupDiGetClassBitmapIndex(dev->_classGuid.get(), (PINT)&_value);
+//	if (!ret)
+//		error = GetLastError();
+
+	return Value;
+}
+
+
+/// <summary>
 /// Gets the device's capabilities.
 /// </summary>
 Device::DeviceCapabilities Device::Capabilities()

@@ -88,6 +88,7 @@
     </Compile>
     <Compile Include="DeviceManager.Api.Recovery.cs" />
     <Compile Include="DeviceManager.Api.Scsi.cs" />
+    <Compile Include="DeviceManager.Api.SDP.cs" />
     <Compile Include="DeviceManager.Api.Utp.cs" />
     <Compile Include="DeviceManager.Api.Wpd.cs" />
     <Compile Include="DeviceManager.cs">

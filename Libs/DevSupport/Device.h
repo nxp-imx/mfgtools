@@ -96,6 +96,7 @@ public:
 	class classIconIndex : public Int32Property { public: int32_t get(); }_classIconIndex;
 	class hub : public StringProperty { public: CStdString get(); }_hub;
 	class hubIndex : public Int32Property { public: int32_t get(); }_hubIndex;
+	class maxPacketSize : public Int32Property { public: int32_t get();}_maxPacketSize;
 
 protected:
     DeviceClass *_deviceClass;

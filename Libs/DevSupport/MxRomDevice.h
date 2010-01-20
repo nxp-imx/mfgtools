@@ -7,29 +7,40 @@
 #include "Common/StdString.h"
 #include "Common/StdInt.h"
 
-#include "../MxLib/Platform/MXDefine.h"
-
+#include "iMX/MXDefine.h"
+#include "iMX/ADSTkConfigure.h"
 
 //#include "Common/WinDriver/wdu_lib.h"
 
 /// <summary>
-/// A WinUSB device.
+/// A MxRomDevice device.
 /// </summary>
 
 class MxRomDevice : public Device//, IComparable
 {
 
 public:
-	char DefaultLicenseString[128];// = "6c3cd57876b3a6e415f93fd697134bd97ee1ec50.Motorola Semiconductors";
-
 	MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path);
 	
 	virtual ~MxRomDevice(void) {};
 //    uint32_t Download(const StFwComponent& fwComponent, Device::UI_Callback callbackFn); 
-	static void SetIMXDevPara(CString cMXType, CString cSecurity, CString cRAMType, unsigned int RAMKNLAddr);
-	BOOL OpenUSBPort();
-	BOOL InitMemoryDevice();
+	void SetIMXDevPara(CString cMXType, CString cSecurity, CString cRAMType, unsigned int RAMKNLAddr);
 	BOOL DownloadRKL(unsigned char *rkl, int rklsize);
+
+private:
+	BOOL InitMemoryDevice();
+	BOOL WriteMemory(int mode, UINT address, UINT Data, UINT Format);
+	BOOL GetHABType(int mode);
+	BOOL Jump2Rak(int mode, BOOL is_hab_prod);
+	BOOL DownloadImage(UINT address, UINT byteCount, const unsigned char* pBuf);
+	BOOL SendCommand2RoK(UINT address, UINT byteCount, UCHAR type);
+	BOOL TransData(UINT byteCount, const unsigned char * pBuf,int opMode);
+	BOOL WriteToDevice(const unsigned char *buf, UINT count);
+	BOOL ReadFromDevice(PUCHAR buf, UINT count);
+//    HANDLE Open();
+//    BOOL Close(HANDLE hDevice);
+
+	CADSTkConfigure atkConfigure;
 };
 //private:
 //	static const uint32_t PipeSize = 4096;      //TODO:??? where did this come from?
