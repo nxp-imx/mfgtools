@@ -6,7 +6,7 @@
 // Device Class GUID for the Jungo/WinDriver iMX ROM Driver
 // Used in mx*.inf
 // {C671678C-82C1-43F3-D700-0049433E9A4B}
-DEFINE_GUID(GUID_DEVCLASS_MX_ROM_USB_DEVICE, 0xC671678C, 0x82C1, 0x43F3, 0xD7, 0x00, 0x00, 0x49, 0x43, 0x3E, 0x9A, 0x4B);
+// DEFINE_GUID(GUID_DEVCLASS_MX_ROM_USB_DEVICE, 0xC671678C, 0x82C1, 0x43F3, 0xD7, 0x00, 0x00, 0x49, 0x43, 0x3E, 0x9A, 0x4B);
 
 // Device Interface GUID for the MX ROM WDF USB Bulk Recovery Driver
 // Used by imxusb.inf, imxusb.sys

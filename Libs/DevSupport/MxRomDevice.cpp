@@ -2,14 +2,39 @@
 #include "stdafx.h"
 #include "MxRomDevice.h"
 #include "DeviceManager.h"
+#include "Libs/WDK/usb100.h"
 #include <sys/stat.h>
 
 #include "iMX/MemoryInit.h"
 #include "iMX/AtkHostApiClass.h"
+#include "../../Drivers/iMX_BulkIO_Driver/sys/public.h"
 
 MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path)
 	: Device(deviceClass, devInst, path)
 {
+	_maxPacketSize.describe(this, _T("Max Packet Size"), _T(""));
+
+}
+
+/// <summary>
+/// Property: Gets the system icon index for the device class.
+/// </summary>
+int32_t MxRomDevice::maxPacketSize::get()
+{
+	MxRomDevice* dev = dynamic_cast<MxRomDevice*>(_owner);
+	ASSERT(dev);
+
+	USB_DEVICE_DESCRIPTOR devDescriptor;
+	
+	if ( Value == 0 )
+	{
+		if ( dev->DeviceIoControl(IOCTL_IMXDEVICE_GET_DEVICE_DESCRIPTOR, &devDescriptor) )
+		{
+			Value = devDescriptor.bMaxPacketSize0;
+		}
+	}
+
+	return Value;
 }
 
 void MxRomDevice::SetIMXDevPara(CString cMXType, CString cSecurity, CString cRAMType, unsigned int RAMKNLAddr)
@@ -879,7 +904,9 @@ BOOL MxRomDevice::WriteToDevice(const unsigned char *buf, UINT count)
 	BOOL retValue = TRUE;
 
 	// Open the device
-	HANDLE hDevice = CreateFile(_path.get(), GENERIC_WRITE,
+	CString pipePath = _path.get();
+	pipePath += _T("\\PIPE00");							  // pipe name for bulk output pipe on our test board
+	HANDLE hDevice = CreateFile(pipePath, GENERIC_WRITE,
         FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     if( hDevice == INVALID_HANDLE_VALUE )
 	{
@@ -910,7 +937,9 @@ BOOL MxRomDevice::ReadFromDevice(PUCHAR buf, UINT count)
 	BOOL retValue = TRUE;
 
 	// Open the device
-	HANDLE hDevice = CreateFile(_path.get(), GENERIC_READ,
+	CString pipePath = _path.get();
+	pipePath += _T("\\PIPE01");								   // pipe name for bulk input pipe on our test board
+	HANDLE hDevice = CreateFile(pipePath, GENERIC_READ,
         FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     if( hDevice == INVALID_HANDLE_VALUE )
 	{
@@ -930,6 +959,64 @@ BOOL MxRomDevice::ReadFromDevice(PUCHAR buf, UINT count)
 	if ( !CloseHandle(hDevice) )
 	{
         TRACE(_T("MxRomDevice::ReadFromDevice() CloseHandle() ERROR = %d.\n"), GetLastError());
+		retValue = FALSE;
+	}
+
+	return retValue;
+}
+
+BOOL MxRomDevice::DeviceIoControl(DWORD controlCode, PVOID pRequest)
+{
+	BOOL retValue = TRUE;
+
+	DWORD totalSize = 0;
+	USB_DEVICE_DESCRIPTOR devDescriptor;
+	USB_CONFIGURATION_DESCRIPTOR configDescriptor;
+
+	switch (controlCode)
+	{
+		case IOCTL_IMXDEVICE_GET_CONFIG_DESCRIPTOR:
+			totalSize = sizeof(configDescriptor);
+			break;
+		case IOCTL_IMXDEVICE_RESET_DEVICE:
+			break;
+		case IOCTL_IMXDEVICE_RESET_PIPE:
+			break;
+		case IOCTL_IMXDEVICE_GET_DEVICE_DESCRIPTOR:
+			totalSize = sizeof(devDescriptor);
+			break;
+		default:
+			break;
+	}
+
+	// Open the device
+	HANDLE hDevice = CreateFile(_path.get(), GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+    if( hDevice == INVALID_HANDLE_VALUE )
+	{
+        TRACE(_T("MxRomDevice::DeviceIoControl() CreateFile() ERROR = %d.\n"), GetLastError());
+		return FALSE;
+	}
+
+	// Send the DeviceIo command
+	DWORD dwBytesReturned;
+	retValue = ::DeviceIoControl(hDevice, controlCode, pRequest, totalSize, pRequest, totalSize, &dwBytesReturned, NULL);
+	if (!retValue)
+	{
+        TRACE(_T("MxRomDevice::DeviceIoControl() DeviceIoControl() ERROR = %d.\n"), GetLastError());
+		retValue = FALSE;
+	}
+
+	if ( dwBytesReturned != totalSize )
+	{
+        TRACE(_T("MxRomDevice::DeviceIoControl() DeviceIoControl() Only returned %d of %d requested bytes.\n"), dwBytesReturned, totalSize);
+		retValue = FALSE;
+	}
+
+	// Close the device
+	if ( !CloseHandle(hDevice) )
+	{
+        TRACE(_T("MxRomDevice::DeviceIoControl() CloseHandle() ERROR = %d.\n"), GetLastError());
 		retValue = FALSE;
 	}
 

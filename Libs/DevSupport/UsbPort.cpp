@@ -138,7 +138,6 @@ int32_t usb::Port::Refresh()
 			_device = FindDevice(driverName->DriverKeyName);
 			if ( _device != NULL )
 			{
-				_device->_maxPacketSize.put(_connectionInfo.DeviceDescriptor.bMaxPacketSize0);
 				_device->describe(this, _T("Device"));
 				_name.Format(_T("Port %d [Connected] %s"), _index.get(), _device->_description.get());
 			}

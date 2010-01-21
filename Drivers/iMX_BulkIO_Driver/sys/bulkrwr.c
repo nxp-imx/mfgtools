@@ -79,7 +79,7 @@ Return Value:
     USBD_PIPE_HANDLE        usbdPipeHandle;
     PDEVICE_CONTEXT         deviceContext;
 
-    //DbgPrint("ReadWriteBulkEndPoints - begins\n");
+    DbgPrint("ReadWriteBulkEndPoints - begins\n");
 
     //
     // First validate input parameters.
@@ -412,19 +412,19 @@ ReadWriteWorkItem(
     PWORKITEM_CONTEXT pItemContext;
     NTSTATUS status;
 
-    UsbSamp_DbgPrint(3, ("ReadWriteWorkItem called\n"));
+    iMX_DbgPrint(3, ("ReadWriteWorkItem called\n"));
 
     pItemContext = GetWorkItemContext(WorkItem);
 
     status = ResetPipe(pItemContext->Pipe);
     if (!NT_SUCCESS(status)) {
 
-        UsbSamp_DbgPrint(1, ("ResetPipe failed 0x%x\n", status));
+        iMX_DbgPrint(1, ("ResetPipe failed 0x%x\n", status));
 
         status = ResetDevice(pItemContext->Device);
         if(!NT_SUCCESS(status)){
 
-            UsbSamp_DbgPrint(1, ("ResetDevice failed 0x%x\n", status));
+            iMX_DbgPrint(1, ("ResetDevice failed 0x%x\n", status));
         }
     }
 
@@ -493,15 +493,15 @@ DbgPrintRWContext(
 {
     UNREFERENCED_PARAMETER(rwContext);
 
-    UsbSamp_DbgPrint(3, ("rwContext->UrbMemory       = %p\n",
+    iMX_DbgPrint(3, ("rwContext->UrbMemory       = %p\n",
                          rwContext->UrbMemory));
-    UsbSamp_DbgPrint(3, ("rwContext->Mdl             = %p\n",
+    iMX_DbgPrint(3, ("rwContext->Mdl             = %p\n",
                          rwContext->Mdl));
-    UsbSamp_DbgPrint(3, ("rwContext->Length          = %d\n",
+    iMX_DbgPrint(3, ("rwContext->Length          = %d\n",
                          rwContext->Length));
-    UsbSamp_DbgPrint(3, ("rwContext->Numxfer         = %d\n",
+    iMX_DbgPrint(3, ("rwContext->Numxfer         = %d\n",
                          rwContext->Numxfer));
-    UsbSamp_DbgPrint(3, ("rwContext->VirtualAddress  = %p\n",
+    iMX_DbgPrint(3, ("rwContext->VirtualAddress  = %p\n",
                          rwContext->VirtualAddress));
     return;
 }

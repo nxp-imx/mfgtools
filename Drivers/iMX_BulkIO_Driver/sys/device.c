@@ -237,14 +237,14 @@ Return Value:
     queueAttributes.SynchronizationScope=WdfSynchronizationScopeQueue;
     
 
-    ioQueueConfig.EvtIoRead = UsbSamp_EvtIsochRead;
+    ioQueueConfig.EvtIoRead = IMX_IsochRead;
 
     status = WdfIoQueueCreate(device,
                               &ioQueueConfig,
                               &queueAttributes,
                               &pDevContext->IsochReadQ);// pointer to IsochRead queue
     if (!NT_SUCCESS(status)) {
-        UsbSamp_DbgPrint(1, ("WdfIoQueueCreate failed  for IsochRead Queue %!STATUS!\n", status));
+        iMX_DbgPrint(1, ("WdfIoQueueCreate failed  for IsochRead Queue %!STATUS!\n", status));
         return status;
     }
 
@@ -255,14 +255,14 @@ Return Value:
     queueAttributes.SynchronizationScope=WdfSynchronizationScopeQueue;
     
 
-    ioQueueConfig.EvtIoWrite = UsbSamp_EvtIsochWrite;
+    ioQueueConfig.EvtIoWrite = IMX_IsochWrite;
 
     status = WdfIoQueueCreate(device,
                               &ioQueueConfig,
                               &queueAttributes,
                               &pDevContext->IsochWriteQ);// pointer to IsochWrite queue
     if (!NT_SUCCESS(status)) {
-        UsbSamp_DbgPrint(1, ("WdfIoQueueCreate failed  for IsochWrite Queue %!STATUS!\n", status));
+        iMX_DbgPrint(1, ("WdfIoQueueCreate failed  for IsochWrite Queue %!STATUS!\n", status));
         return status;
     }
 */
@@ -408,6 +408,8 @@ Return Value:
 
     DbgPrint("IMX_DeviceReleaseHardware - begins\n");
 
+    PAGED_CODE();
+
     pDeviceContext = GetDeviceContext(Device);
 	
 	// It is possible that IMX_DevicePrepareHardware failed half way thru, so make sure the UsbTarget exists.
@@ -425,10 +427,13 @@ Return Value:
 	status = WdfUsbTargetDeviceSelectConfig(pDeviceContext->WdfUsbTargetDevice,
                                         WDF_NO_OBJECT_ATTRIBUTES,
                                         &configParams);
+    if (!NT_SUCCESS(status)) {
+        DbgPrint("WdfUsbTargetDeviceSelectConfig failed  %!STATUS!\n", status);
+    }
 	
 	DbgPrint("IMX_DeviceReleaseHardware - ends\n");
 	
-	return STATUS_SUCCESS;
+	return status;
 }
 
 NTSTATUS

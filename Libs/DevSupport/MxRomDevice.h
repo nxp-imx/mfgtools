@@ -27,6 +27,9 @@ public:
 	void SetIMXDevPara(CString cMXType, CString cSecurity, CString cRAMType, unsigned int RAMKNLAddr);
 	BOOL DownloadRKL(unsigned char *rkl, int rklsize);
 
+	// PROPERTIES
+	class maxPacketSize : public Int32Property { public: int32_t get(); } _maxPacketSize;
+
 private:
 	BOOL InitMemoryDevice();
 	BOOL WriteMemory(int mode, UINT address, UINT Data, UINT Format);
@@ -37,6 +40,7 @@ private:
 	BOOL TransData(UINT byteCount, const unsigned char * pBuf,int opMode);
 	BOOL WriteToDevice(const unsigned char *buf, UINT count);
 	BOOL ReadFromDevice(PUCHAR buf, UINT count);
+	BOOL DeviceIoControl(DWORD controlCode, PVOID pRequest = NULL);
 //    HANDLE Open();
 //    BOOL Close(HANDLE hDevice);
 

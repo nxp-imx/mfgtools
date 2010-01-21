@@ -720,7 +720,7 @@ bstr_log_text = _logText.AllocSysString();
 ((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
 #endif
 		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, ReturnVal);
-		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load HID device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load i.MXxx device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
 		return ReturnVal;
 	}
 
@@ -733,7 +733,7 @@ bstr_log_text = _logText.AllocSysString();
 ((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
 #endif
 
-	ATLTRACE(_T("%s RecoverHidDevice - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
+	ATLTRACE(_T("%s Recover i.MXDevice - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
 	return ERROR_SUCCESS;
 }
 

@@ -174,6 +174,8 @@ Return Value:
     switch(IoControlCode) {
     case IOCTL_IMXDEVICE_GET_DEVICE_DESCRIPTOR:
          
+         DbgPrint("   IOCTL_IMXDEVICE_GET_DEVICE_DESCRIPTOR\n");
+
          length = pDevContext->UsbDeviceDescriptor.bLength;
          
          status = WdfRequestRetrieveOutputBuffer(Request, length, &ioBuffer, &bufLength);
@@ -190,6 +192,8 @@ Return Value:
 
     case IOCTL_IMXDEVICE_RESET_PIPE:
 
+        DbgPrint("   IOCTL_IMXDEVICE_RESET_PIPE\n");
+
         pFileContext = GetFileContext(WdfRequestGetFileObject(Request));
 
         if (pFileContext->Pipe == NULL) {
@@ -203,6 +207,7 @@ Return Value:
 
     case IOCTL_IMXDEVICE_GET_CONFIG_DESCRIPTOR:
 
+        DbgPrint("   IOCTL_IMXDEVICE_GET_CONFIG_DESCRIPTOR\n");
 
         if (pDevContext->UsbConfigurationDescriptor) {
 
@@ -228,10 +233,12 @@ Return Value:
 
     case IOCTL_IMXDEVICE_RESET_DEVICE:
 
+        DbgPrint("   IOCTL_IMXDEVICE_RESET_DEVICE\n");
         status = ResetDevice(device);
         break;
 
     default :
+        DbgPrint("   STATUS_INVALID_DEVICE_REQUEST\n");
         status = STATUS_INVALID_DEVICE_REQUEST;
         break;
     }

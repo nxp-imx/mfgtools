@@ -9,19 +9,19 @@
 ;
 ;Module Name:
 ;
-;    USBSamp.INF
+;    IMXUSB.INF
 ;
 ;Abstract:
-;    Installation inf for the Intel 82930 USB Test Board
+;    Installation inf for the Freescale i.MX Evaluation Boards
 ;
 ;--*/
 
 [Version]
 Signature="$WINDOWS NT$"
-Class=Sample
-ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171}
+Class=USB
+ClassGuid={36fc9e60-c465-11cf-8056-444553540000}
 Provider=%MSFT%
-DriverVer=03/20/2003,5.00.3788
+DriverVer=09/08/2009,6.1.7600.16385
 CatalogFile=KmdfSamples.cat
 
 
@@ -40,79 +40,77 @@ DefaultDestDir = 12
 ; ================= Device section =====================
 
 [Manufacturer]
-%MfgName%=Microsoft,NT$ARCH$
+%MfgName%=Microsoft,NTx86
 
 ; For Win2K
 [Microsoft]
-%USB\VID_0547&PID_1002.DeviceDesc%=usbsamp.Dev, USB\VID_0547&PID_1002    ; OSR USB-FX
-%USB\VID_045E&PID_930A.DeviceDesc%=usbsamp.Dev, USB\VID_045E&PID_930A   ; Intel 82930
 
 ; For XP and later
-[Microsoft.NT$ARCH$]
-%USB\VID_0547&PID_1002.DeviceDesc%=usbsamp.Dev, USB\VID_0547&PID_1002    ; OSR USB-FX
-%USB\VID_045E&PID_930A.DeviceDesc%=usbsamp.Dev, USB\VID_045E&PID_930A   ; Intel 82930
+[Microsoft.NTx86]
+%USB\VID_15A2&PID_0041.DeviceDesc%=imxusb.Dev, USB\VID_15A2&PID_0041   ; Freescale i.MX51 board
+%USB\VID_15A2&PID_0030.DeviceDesc%=imxusb.Dev, USB\VID_15A2&PID_0030   ; Freescale i.MX35 board
 
 
-[usbsamp.Dev.NT]
-CopyFiles=usbsamp.Files.Ext
+[imxusb.Dev.NT]
+CopyFiles=imxusb.Files.Ext
 
-[usbsamp.Dev.NT.Services]
-Addservice = usbsamp, 0x00000002, usbsamp.AddService
+[imxusb.Dev.NT.Services]
+Addservice = imxusb, 0x00000002, imxusb.AddService
 
-[usbsamp.AddService]
-DisplayName    = %usbsamp.SvcDesc%
+[imxusb.AddService]
+DisplayName    = %imxusb.SvcDesc%
 ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
 StartType      = 3                  ; SERVICE_DEMAND_START
 ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
-ServiceBinary  = %10%\System32\Drivers\usbsamp.sys
-AddReg         = usbsamp.AddReg
+ServiceBinary  = %10%\System32\Drivers\imxusb.sys
+AddReg         = imxusb.AddReg
 LoadOrderGroup = Base
 
-[usbsamp.AddReg]
-HKR,"Parameters","MaximumTransferSize",0x10001,65536
+[imxusb.AddReg]
+HKR,"Parameters","MaximumTransferSize",0x10001,4194304
 HKR,"Parameters","DebugLevel",0x10001,2
 
-[usbsamp.Files.Ext]
-usbsamp.sys
+[imxusb.Files.Ext]
+imxusb.sys
 
 [SourceDisksNames]
 1=%Disk_Description%,,,
 
 [SourceDisksFiles]
-usbsamp.sys = 1
+imxusb.sys = 1
 
 ;-------------- WDF Coinstaller installation
 [DestinationDirs]
 CoInstaller_CopyFiles = 11
 
-[usbsamp.Dev.NT.CoInstallers]
+[imxusb.Dev.NT.CoInstallers]
 AddReg=CoInstaller_AddReg
 CopyFiles=CoInstaller_CopyFiles
 
 [CoInstaller_CopyFiles]
-WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+WdfCoInstaller01009.dll
 
 [SourceDisksFiles]
-WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+WdfCoInstaller01009.dll=1 ; make sure the number matches with SourceDisksNames
 
 [CoInstaller_AddReg]
-HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller01009.dll,WdfCoInstaller"
 
-[usbsamp.Dev.NT.Wdf]
-KmdfService = usbsamp, usbsamp_wdfsect
+[imxusb.Dev.NT.Wdf]
+KmdfService = imxusb, imxusb_wdfsect
 
-[usbsamp_wdfsect]
-KmdfLibraryVersion = $KMDFVERSION$
+[imxusb_wdfsect]
+KmdfLibraryVersion = 1.9
 
 ;---------------------------------------------------------------;
 
 [Strings]
 MSFT            = "Microsoft"
-MfgName         = "Intel/OSR"
-Disk_Description= "usbsamp Installation Disk"
-usbsamp.SvcDesc = "WDF Sample Driver for Intel 82930 USB Test Board"
-ClassName       = "Sample Device"
-USB\VID_0547&PID_1002.DeviceDesc="WDF Sample for OSR USB-FX2 Learning Kit"
-USB\VID_045E&PID_930A.DeviceDesc="WDF Sample for Intel 82930 USB Test Board"
+MfgName         = "Freescale"
+Disk_Description= "imxusb Installation Disk"
+imxusb.SvcDesc = "WDF USB Driver for Freescale i.MX board"
+ClassName       = "IMX USB Device"
+USB\VID_15A2&PID_0041.DeviceDesc="Freescale i.MX51 USB BulkIO USB Device"
+USB\VID_15A2&PID_0030.DeviceDesc="Freescale i.MX35 USB BulkIO USB Device"
 
 

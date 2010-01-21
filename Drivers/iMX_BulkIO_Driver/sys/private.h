@@ -60,14 +60,14 @@ Copyright (c) Microsoft Corporation.  All rights reserved.
 
 #if DBG
 
-#define UsbSamp_DbgPrint(level, _x_) \
+#define iMX_DbgPrint(level, _x_) \
             if((level) <= DebugLevel) { \
-                DbgPrint("UsbSamp: "); DbgPrint _x_; \
+                DbgPrint("iMX USB: "); DbgPrint _x_; \
             }
 
 #else
 
-#define UsbSamp_DbgPrint(level, _x_)
+#define iMX_DbgPrint(level, _x_)
 
 #endif
 
