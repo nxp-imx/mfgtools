@@ -28,23 +28,26 @@ public:
 	BOOL DownloadRKL(unsigned char *rkl, int rklsize);
 
 	// PROPERTIES
-	class maxPacketSize : public Int32Property { public: int32_t get(); } _maxPacketSize;
+	class MaxPacketSize : public Int32Property { public: int32_t get(); } _MaxPacketSize;
 
 private:
 	BOOL InitMemoryDevice();
 	BOOL WriteMemory(int mode, UINT address, UINT Data, UINT Format);
 	BOOL GetHABType(int mode);
 	BOOL Jump2Rak(int mode, BOOL is_hab_prod);
-	BOOL DownloadImage(UINT address, UINT byteCount, const unsigned char* pBuf);
+	BOOL DownloadImage(UINT byteCount, const unsigned char* pBuf);
 	BOOL SendCommand2RoK(UINT address, UINT byteCount, UCHAR type);
 	BOOL TransData(UINT byteCount, const unsigned char * pBuf,int opMode);
 	BOOL WriteToDevice(const unsigned char *buf, UINT count);
 	BOOL ReadFromDevice(PUCHAR buf, UINT count);
 	BOOL DeviceIoControl(DWORD controlCode, PVOID pRequest = NULL);
-//    HANDLE Open();
-//    BOOL Close(HANDLE hDevice);
+    BOOL USB_OpenDevice();
+    BOOL USB_CloseDevice();
 
 	CADSTkConfigure atkConfigure;
+	HANDLE _hDevice;
+	HANDLE _hWrite;
+	HANDLE _hRead;
 };
 //private:
 //	static const uint32_t PipeSize = 4096;      //TODO:??? where did this come from?

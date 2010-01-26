@@ -9,17 +9,21 @@
 #include "iMX/AtkHostApiClass.h"
 #include "../../Drivers/iMX_BulkIO_Driver/sys/public.h"
 
+static BOOL bMutex4RamKnlDld = TRUE;//mutex flag for ram kernel downloading process to prevent other object from starting downloading.
 MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path)
 	: Device(deviceClass, devInst, path)
+	, _hDevice(INVALID_HANDLE_VALUE)
+	, _hWrite(INVALID_HANDLE_VALUE)
+	, _hRead(INVALID_HANDLE_VALUE)
 {
-	_maxPacketSize.describe(this, _T("Max Packet Size"), _T(""));
+	_MaxPacketSize.describe(this, _T("Max Packet Size"), _T(""));
 
 }
 
 /// <summary>
-/// Property: Gets the system icon index for the device class.
+/// Property: Gets the max packet size for the device.
 /// </summary>
-int32_t MxRomDevice::maxPacketSize::get()
+int32_t MxRomDevice::MaxPacketSize::get()
 {
 	MxRomDevice* dev = dynamic_cast<MxRomDevice*>(_owner);
 	ASSERT(dev);
@@ -149,12 +153,26 @@ BOOL MxRomDevice::InitMemoryDevice()
 
 BOOL MxRomDevice::DownloadRKL(unsigned char *rkl, int rklsize)
 {
-	int cType, cId, PhyRAMAddr4KRL;
+	int cType, cId;
 	unsigned long cHandle;
 	BOOL status;
 	BOOL is_hab_prod = false;
 	CString m_strCSFName;
 	CString m_strDCDName;
+
+	while(!bMutex4RamKnlDld)
+	{
+		Sleep(100);
+	}
+	bMutex4RamKnlDld = FALSE;
+
+	// Get handles for write operation
+	if(!USB_OpenDevice())
+	{
+		goto Exit;
+	}
+
+	TRACE("************Initialize i.mx device with port #%x***************\n",_hubIndex.get());
 
 	if ( GetHABType(atkConfigure.GetMXType()) )
 	{
@@ -166,7 +184,7 @@ BOOL MxRomDevice::DownloadRKL(unsigned char *rkl, int rklsize)
 	// do initial DDR
 	if (!InitMemoryDevice()) {
 		TRACE("Initial memory failed!\n");
-		return FALSE;
+		goto CloseThenExit;
 	}
 	
 	atkConfigure.GetChannel(&cType, &cId, &cHandle);
@@ -176,7 +194,7 @@ BOOL MxRomDevice::DownloadRKL(unsigned char *rkl, int rklsize)
 		cType, 32))
 	{
 		TRACE("Write channel type to memory failed!\n");
-		return FALSE;
+		goto CloseThenExit;
 	}
 
 	// Download DCD and CSF file if security
@@ -261,27 +279,42 @@ BOOL MxRomDevice::DownloadRKL(unsigned char *rkl, int rklsize)
 		}
 	}*/
 
-	// do download
 	// download the RKL
-	//Here we must transfer virtual address to physical address before downloading ram kernel.
-	PhyRAMAddr4KRL = atkConfigure.GetMemoryAddr(MEMORY_START_ADDR) | \
-		(atkConfigure.GetRAMKNLAddr() & (~0xF0000000));
-	status = DownloadImage(PhyRAMAddr4KRL, rklsize, rkl);
+	status = DownloadImage(rklsize, rkl);
 	
 	if (!status) {
-		TRACE("Can not load RAM Kernel to device\n");
-		return FALSE;
+		TRACE("Error: Can not load RAM Kernel to device\n");
+		goto CloseThenExit;
 	} else {		
 		// Send the complete command to the device 
 		status = Jump2Rak(atkConfigure.GetMXType(), is_hab_prod);
 
 		// check the status
 		if (!status) {
-			TRACE("Can not execute RAM Kernel\n");
-			return FALSE;
+			TRACE("Error: Can not execute RAM Kernel\n");
+			goto CloseThenExit;
 		}
+		
+		// Send reset command to device.
+		if(!DeviceIoControl(IOCTL_IMXDEVICE_RESET_DEVICE)) {
+			TRACE("Error: Device reset failed.\n");
+			goto CloseThenExit;
+		}
+
 	}
+
+	if ( !USB_CloseDevice() )
+		goto Exit;
+
+	bMutex4RamKnlDld = TRUE;
+
 	return TRUE;
+
+CloseThenExit:
+	USB_CloseDevice();
+Exit:
+	bMutex4RamKnlDld = TRUE;
+	return FALSE;
 }
 
 // Write the register of i.MX
@@ -636,12 +669,17 @@ BOOL MxRomDevice::Jump2Rak(int mode, BOOL is_hab_prod)
 //#define MX_51_NK_LOAD_ADDRESS			0x90200000
 //#define MX_51_EBOOT_LOAD_ADDRESS		0x90040000
 
-BOOL MxRomDevice::DownloadImage(UINT address, UINT byteCount, const unsigned char* pBuf)
+BOOL MxRomDevice::DownloadImage(UINT byteCount, const unsigned char* pBuf)
 {
 	int counter = 0;
 	int bytePerCommand = 0;
 	const unsigned char*  pBuffer = pBuf;
-	int ActualImageAddr = address, FlashHdrAddr = address - FLASH_HEADER_SIZE;
+
+	//Here we must transfer virtual address to physical address before downloading ram kernel.
+	int PhyRAMAddr4KRL = atkConfigure.GetMemoryAddr(MEMORY_START_ADDR) | \
+		(atkConfigure.GetRAMKNLAddr() & (~0xF0000000));
+	int ActualImageAddr = PhyRAMAddr4KRL;
+	int FlashHdrAddr = PhyRAMAddr4KRL - FLASH_HEADER_SIZE;
 
 	while (1)
 	{
@@ -801,7 +839,7 @@ BOOL MxRomDevice::TransData(UINT byteCount, const unsigned char * pBuf,int opMod
 			byteCount = 0;
 		} else {
 
-			UINT uintMaxPacketSize0 = _maxPacketSize.get();
+			UINT uintMaxPacketSize0 = _MaxPacketSize.get();
 
 			#define MINUM_TRANSFER_SIZE 0x20
 
@@ -899,7 +937,7 @@ BOOL MxRomDevice::Close(HANDLE hDevice)
 	return error;
 }
 */
-BOOL MxRomDevice::WriteToDevice(const unsigned char *buf, UINT count)
+/*BOOL MxRomDevice::WriteToDevice(const unsigned char *buf, UINT count)
 {
 	BOOL retValue = TRUE;
 
@@ -963,44 +1001,41 @@ BOOL MxRomDevice::ReadFromDevice(PUCHAR buf, UINT count)
 	}
 
 	return retValue;
-}
+}*/
 
 BOOL MxRomDevice::DeviceIoControl(DWORD controlCode, PVOID pRequest)
 {
 	BOOL retValue = TRUE;
-
 	DWORD totalSize = 0;
-	USB_DEVICE_DESCRIPTOR devDescriptor;
-	USB_CONFIGURATION_DESCRIPTOR configDescriptor;
 
 	switch (controlCode)
 	{
 		case IOCTL_IMXDEVICE_GET_CONFIG_DESCRIPTOR:
-			totalSize = sizeof(configDescriptor);
+			totalSize = sizeof(USB_CONFIGURATION_DESCRIPTOR);
 			break;
 		case IOCTL_IMXDEVICE_RESET_DEVICE:
 			break;
 		case IOCTL_IMXDEVICE_RESET_PIPE:
 			break;
 		case IOCTL_IMXDEVICE_GET_DEVICE_DESCRIPTOR:
-			totalSize = sizeof(devDescriptor);
+			totalSize = sizeof(USB_DEVICE_DESCRIPTOR);
 			break;
 		default:
 			break;
 	}
 
 	// Open the device
-	HANDLE hDevice = CreateFile(_path.get(), GENERIC_READ | GENERIC_WRITE,
+	/*HANDLE hDevice = CreateFile(_path.get(), GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
     if( hDevice == INVALID_HANDLE_VALUE )
 	{
         TRACE(_T("MxRomDevice::DeviceIoControl() CreateFile() ERROR = %d.\n"), GetLastError());
 		return FALSE;
-	}
+	}*/
 
 	// Send the DeviceIo command
 	DWORD dwBytesReturned;
-	retValue = ::DeviceIoControl(hDevice, controlCode, pRequest, totalSize, pRequest, totalSize, &dwBytesReturned, NULL);
+	retValue = ::DeviceIoControl(_hDevice, controlCode, pRequest, totalSize, pRequest, totalSize, &dwBytesReturned, NULL);
 	if (!retValue)
 	{
         TRACE(_T("MxRomDevice::DeviceIoControl() DeviceIoControl() ERROR = %d.\n"), GetLastError());
@@ -1014,11 +1049,88 @@ BOOL MxRomDevice::DeviceIoControl(DWORD controlCode, PVOID pRequest)
 	}
 
 	// Close the device
-	if ( !CloseHandle(hDevice) )
+	/*if ( !CloseHandle(_hDevice) )
 	{
         TRACE(_T("MxRomDevice::DeviceIoControl() CloseHandle() ERROR = %d.\n"), GetLastError());
 		retValue = FALSE;
-	}
+	}*/
 
 	return retValue;
+}
+
+BOOL OpenUSBHandle(HANDLE *pHandle, CString pipePath)
+{
+	//TRACE(_T("complete pipe handle name is (%s)\n"), pipePath);
+
+	*pHandle = CreateFile(pipePath,
+		GENERIC_WRITE | GENERIC_READ,
+		FILE_SHARE_WRITE | FILE_SHARE_READ,
+		NULL,
+		OPEN_EXISTING,
+		0,
+		NULL);
+
+	if (pHandle== INVALID_HANDLE_VALUE) {
+		TRACE(_T("MxRomDevice: Failed to open (%s) = %d"), pipePath, GetLastError());
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL MxRomDevice::USB_OpenDevice(void)
+{
+	CString pipePath = _path.get();
+
+	// Get handles for write operation
+	if( !OpenUSBHandle(&_hDevice, pipePath) ||
+		!OpenUSBHandle(&_hWrite, pipePath+_T("\\PIPE00")) ||
+		!OpenUSBHandle(&_hRead, pipePath+_T("\\PIPE01"))
+		)
+	{
+		return FALSE;
+	}
+//	_MaxPacketSize0 = _maxPacketSize.get();
+
+	return TRUE;
+}
+
+BOOL MxRomDevice::USB_CloseDevice(void)
+{
+
+//	if(!DeviceIoControl(IOCTL_IMXDEVICE_RESET_DEVICE, NULL))
+//		return FALSE;
+
+	if (!CloseHandle(_hRead) || 
+		!CloseHandle(_hWrite) || 
+		!CloseHandle(_hDevice))
+	{
+        TRACE(_T("MxRomDevice::WriteToDevice() CloseHandle() ERROR = %d.\n"), GetLastError());
+		return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL MxRomDevice::WriteToDevice(const unsigned char *buf, UINT count)
+{
+	int    nBytesWrite; // for bytes actually written
+
+	if( !WriteFile(_hWrite, buf, count, (PULONG) &nBytesWrite, NULL) )
+	{
+		TRACE(_T("MxRomDevice::WriteToDevice() Error writing to device 0x%x(%d).\r\n"), GetLastError(), GetLastError());
+		return FALSE;
+	}
+	return TRUE;	
+}
+
+BOOL MxRomDevice::ReadFromDevice(PUCHAR buf, UINT count)
+{
+	int    nBytesRead; // for bytes actually read
+
+	if( !ReadFile(_hRead, buf, count, (PULONG) &nBytesRead, NULL) )
+	{
+		TRACE(_T("MxRomDevice::ReadFromDevice() Error reading from device 0x%x(%d).\r\n"), GetLastError(), GetLastError());
+		return FALSE;
+	}
+	return TRUE;
 }
