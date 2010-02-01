@@ -1058,7 +1058,7 @@ BOOL MxRomDevice::DeviceIoControl(DWORD controlCode, PVOID pRequest)
 	return retValue;
 }
 
-BOOL OpenUSBHandle(HANDLE *pHandle, CString pipePath)
+BOOL MxRomDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 {
 	//TRACE(_T("complete pipe handle name is (%s)\n"), pipePath);
 
@@ -1071,7 +1071,7 @@ BOOL OpenUSBHandle(HANDLE *pHandle, CString pipePath)
 		NULL);
 
 	if (pHandle== INVALID_HANDLE_VALUE) {
-		TRACE(_T("MxRomDevice: Failed to open (%s) = %d"), pipePath, GetLastError());
+		TRACE(_T("MxRomDevice::OpenUSBHandle() Failed to open (%s) = %d"), pipePath, GetLastError());
 		return FALSE;
 	}
 
@@ -1105,7 +1105,7 @@ BOOL MxRomDevice::USB_CloseDevice(void)
 		!CloseHandle(_hWrite) || 
 		!CloseHandle(_hDevice))
 	{
-        TRACE(_T("MxRomDevice::WriteToDevice() CloseHandle() ERROR = %d.\n"), GetLastError());
+        TRACE(_T("MxRomDevice::USB_CloseDevice() CloseHandle() ERROR = %d.\n"), GetLastError());
 		return FALSE;
 	}
 	return TRUE;

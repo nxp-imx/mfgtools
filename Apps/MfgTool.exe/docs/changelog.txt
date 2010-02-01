@@ -1,6 +1,26 @@
 http://psg-host.svn-tx30.am.freescale.net/svn/psg-host/branches/dev/0004
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.1.008a
+****************************************
+02/01/2010
+	- Fixes AddUsbDevice() and RemoveUsbDevice() for MxRomDeviceClass.
+	  Problem: Windows DeviceArrival path contains the GUID_DEVINTERFACE_USB_DEVICE instead of the 
+			   GUID_DEVINTERFACE_MX_ROM_WDF_USB_BULK_DEVICE so the Add and Remove functions were failing to 
+			   find the device in DeviceClass.
+	  Fix: Strip the GUID_DEVINTERFACE_USB_DEVICE from the DeviceArrival/Removal path when comparing it to
+	       devices in the MxRomDeviceClass lists.
+
+	Apps/MfgTool.exe/docs/changelog.txt
+	Libs/DevSupport/DeviceClass.cpp
+	Libs/DevSupport/DeviceClass.h
+	Libs/DevSupport/MxRomDevice.cpp
+	Libs/DevSupport/MxRomDevice.h
+	Libs/DevSupport/MxRomDeviceClass.cpp
+	Libs/DevSupport/MxRomDeviceClass.h
+	Libs/DevSupport/Property.h
+
+****************************************
 RELEASE_STMFGTOOL_1.6.1.008
 ****************************************
 01/14/2010

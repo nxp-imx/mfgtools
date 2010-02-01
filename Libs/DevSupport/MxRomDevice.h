@@ -41,7 +41,8 @@ private:
 	BOOL WriteToDevice(const unsigned char *buf, UINT count);
 	BOOL ReadFromDevice(PUCHAR buf, UINT count);
 	BOOL DeviceIoControl(DWORD controlCode, PVOID pRequest = NULL);
-    BOOL USB_OpenDevice();
+	BOOL OpenUSBHandle(HANDLE *pHandle, CString pipePath);
+	BOOL USB_OpenDevice();
     BOOL USB_CloseDevice();
 
 	CADSTkConfigure atkConfigure;

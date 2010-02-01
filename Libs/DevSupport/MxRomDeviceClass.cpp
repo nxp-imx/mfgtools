@@ -19,3 +19,146 @@ Device* MxRomDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA
 	return pDev;
 }
 
+Device* MxRomDeviceClass::FindDeviceByUsbPath(CStdString pathToFind, const DeviceListType devListType, const DeviceListAction devListAction )
+{
+
+	if (pathToFind.IsEmpty())
+    {
+        return NULL;
+    }
+
+    // Remove the GUID_DEVINTERFACE_USB_DEVICE from devPath before doing the compare.
+    GuidProperty usbGuid;
+	usbGuid.put(GUID_DEVINTERFACE_USB_DEVICE);
+	CStdString usbGuidStr = usbGuid.ToString();
+	usbGuidStr.MakeUpper();
+    pathToFind.MakeUpper();
+	pathToFind.Replace(usbGuidStr, _T(""));
+
+    Device * pDevice = NULL;
+
+	// existing application device list or new OS device list?
+    switch ( devListType )
+	{
+		case DeviceListType_Old:
+		{
+			// Find the Device in our list of OLD devices.
+			std::list<Device*>::iterator device;
+			for ( device=_oldDevices.begin(); device != _oldDevices.end(); ++device )
+			{
+				if ( (*device)->IsUsb() )
+				{
+					CStdString usbDevPath = (*device)->_usbPath.get();
+					usbDevPath = usbDevPath.Left(pathToFind.GetLength());
+					if ( pathToFind.CompareNoCase( usbDevPath ) == 0 )
+					{
+						if ( devListAction == DeviceListAction_Remove )
+						{
+							delete (*device);
+							_oldDevices.erase(device);
+						}
+						break;
+					}
+				}
+			}
+			break;
+		}
+		case DeviceListType_Current:
+		{		
+			// Find the Device in our list of CURRENT devices.
+			std::list<Device*>::iterator device;
+			for ( device=_devices.begin(); device != _devices.end(); ++device )
+			{
+				if ( (*device)->IsUsb() )
+				{
+					CStdString usbDevPath = (*device)->_usbPath.get();
+					usbDevPath = usbDevPath.Left(pathToFind.GetLength());
+					if ( pathToFind.CompareNoCase( usbDevPath ) == 0 )
+					{
+						pDevice = (*device);
+
+						if ( devListAction == DeviceListAction_Remove )
+						{
+							WaitForSingleObject(devicesMutex, INFINITE);
+							_oldDevices.push_back(pDevice);
+							_devices.erase(device);
+							ReleaseMutex(devicesMutex);
+						}
+						break;
+					}
+				}
+			}
+			break;
+		}
+		case DeviceListType_New:
+		{
+			// Get a new list of our devices from Windows and see if it is there.
+
+			int32_t error;
+
+			SP_DEVINFO_DATA devData;
+			devData.cbSize = sizeof(SP_DEVINFO_DATA);
+			CStdString devPath = _T("");
+
+			GetClassDevs();
+			
+			for (int32_t index=0; /*no condition*/; ++index)
+			{
+				if ( *_classIfaceGuid.get() != GUID_NULL /*&&
+						gWinVersionInfo().IsWinNT()*/ )
+				{
+					error = EnumDeviceInterfaceDetails(index, devPath, &devData);
+					if ( error != ERROR_SUCCESS )
+					{	// No match
+						// Enum() will return ERROR_NO_MORE_ITEMS when done
+						// but regardless, we can't add the device
+						pDevice = NULL;
+						break;
+					}
+				}
+				else
+				{
+					if (!gSetupApi().SetupDiEnumDeviceInfo(_deviceInfoSet, index, &devData))
+					{
+						// Enum() will return ERROR_NO_MORE_ITEMS when done
+						// but regardless, we can't add the device
+						pDevice = NULL;
+						break;
+					}
+				}
+
+				pDevice = CreateDevice(this, devData, devPath);
+				if ( pDevice && pDevice->IsUsb() )
+				{
+					CStdString usbDevPath = pDevice->_usbPath.get();
+					usbDevPath = usbDevPath.Left(pathToFind.GetLength());
+					if ( pathToFind.CompareNoCase( usbDevPath ) == 0 )
+					{
+						// Found what we are looking for
+						if ( devListAction == DeviceListAction_Add )
+						{
+							WaitForSingleObject(devicesMutex, INFINITE);
+							_devices.push_back(pDevice);
+							ReleaseMutex(devicesMutex);
+						}
+						break;
+					}
+				}
+				// if we got here, the device isn't the device we
+				// are looking for, so clean up.
+				if ( pDevice )
+				{
+					delete pDevice;
+					pDevice = NULL;
+				}
+			}
+			break;
+		}  // end case DeviceListNew:
+		
+		default:
+			break;
+	} // end switch (devListType)
+
+	return pDevice;
+}
+

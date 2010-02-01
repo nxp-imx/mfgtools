@@ -28,6 +28,8 @@ private:
 public:
 	CStdString ToString() { return _T("MxRomDeviceClass"); }
 
+protected:
+	virtual Device* FindDeviceByUsbPath(CStdString pathToFind, const DeviceListType devListType, const DeviceListAction devListAction );
 };
 
 

@@ -78,7 +78,7 @@ namespace property
 		virtual LPGUID get() { return(&_value); };
 		virtual void put(const GUID& guid) { _value = guid; };
 		virtual void put(const LPCGUID guid) { _value = *guid; };
-		virtual CStdString ToString(LPCTSTR)
+		virtual CStdString ToString()
 		{
 			CStdString guidStr;
 			POLESTR str;

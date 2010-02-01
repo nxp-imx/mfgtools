@@ -332,95 +332,154 @@ std::list<Device*>& DeviceClass::Refresh()
 	return Devices();
 }
 
+Device* DeviceClass::FindDeviceByUsbPath(CStdString pathToFind, const DeviceListType devListType, const DeviceListAction devListAction )
+{
+
+	if (pathToFind.IsEmpty())
+    {
+        return NULL;
+    }
+
+    Device * pDevice = NULL;
+
+	// existing application device list or new OS device list?
+    switch ( devListType )
+	{
+		case DeviceListType_Old:
+		{
+			// Find the Device in our list of OLD devices.
+			std::list<Device*>::iterator device;
+			for ( device=_oldDevices.begin(); device != _oldDevices.end(); ++device )
+			{
+				if ( (*device)->IsUsb() )
+				{
+					if ( pathToFind.CompareNoCase( (*device)->_usbPath.get() ) == 0 )
+					{
+						if ( devListAction == DeviceListAction_Remove )
+						{
+							delete (*device);
+							_oldDevices.erase(device);
+						}
+						break;
+					}
+				}
+			}
+			break;
+		}
+		case DeviceListType_Current:
+		{
+			// Find the Device in our list of CURRENT devices.
+			std::list<Device*>::iterator device;
+			for ( device=_devices.begin(); device != _devices.end(); ++device )
+			{
+				if ( (*device)->IsUsb() )
+				{
+					if ( pathToFind.CompareNoCase( (*device)->_usbPath.get() ) == 0 )
+					{
+						pDevice = (*device);
+
+						if ( devListAction == DeviceListAction_Remove )
+						{
+							WaitForSingleObject(devicesMutex, INFINITE);
+							_oldDevices.push_back(pDevice);
+							_devices.erase(device);
+							ReleaseMutex(devicesMutex);
+						}
+						break;
+					}
+				}
+			}
+			break;
+		}
+		case DeviceListType_New:
+		{
+			// Get a new list of our devices from Windows and see if it is there.
+
+			int32_t error;
+
+			SP_DEVINFO_DATA devData;
+			devData.cbSize = sizeof(SP_DEVINFO_DATA);
+			CStdString devPath = _T("");
+
+			GetClassDevs();
+			
+			for (int32_t index=0; /*no condition*/; ++index)
+			{
+				if ( *_classIfaceGuid.get() != GUID_NULL /*&&
+						gWinVersionInfo().IsWinNT()*/ )
+				{
+					error = EnumDeviceInterfaceDetails(index, devPath, &devData);
+					if ( error != ERROR_SUCCESS )
+					{	// No match
+						// Enum() will return ERROR_NO_MORE_ITEMS when done
+						// but regardless, we can't add the device
+						pDevice = NULL;
+						break;
+					}
+				}
+				else
+				{
+					if (!gSetupApi().SetupDiEnumDeviceInfo(_deviceInfoSet, index, &devData))
+					{
+						// Enum() will return ERROR_NO_MORE_ITEMS when done
+						// but regardless, we can't add the device
+						pDevice = NULL;
+						break;
+					}
+				}
+
+				pDevice = CreateDevice(this, devData, devPath);
+				if ( pDevice && pDevice->IsUsb() )
+				{
+					if ( pathToFind.CompareNoCase( pDevice->_usbPath.get() ) == 0 )
+					{
+						// Found what we are looking for
+						if ( devListAction == DeviceListAction_Add )
+						{
+							WaitForSingleObject(devicesMutex, INFINITE);
+							_devices.push_back(pDevice);
+							ReleaseMutex(devicesMutex);
+						}
+						break;
+					}
+				}
+				// if we got here, the device isn't the device we
+				// are looking for, so clean up.
+				if ( pDevice )
+				{
+					delete pDevice;
+					pDevice = NULL;
+				}
+			}
+			break;
+		}  // end case DeviceListNew:
+		
+		default:
+			break;
+	} // end switch (devListType)
+
+	return pDevice;
+}
+
 DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
 {
 	NotifyStruct nsInfo = {0};
     Device * pDevice = NULL;
+	CStdString pathToFind = path + 4;
 
 //t	ATLTRACE2(_T("%s::AddUsbDevice()  %s\r\n"), this->ToString().c_str(), path);
 
-	CStdString pathToFind = path + 4;
+    // see if it is already in our list of Devices()
+    pDevice = FindDeviceByUsbPath(pathToFind, DeviceListType_Current, DeviceListAction_None);
 
-	// see if it is already in our list of Devices()
-	std::list<Device*>::iterator device;
-	for ( device=_devices.begin(); device != _devices.end(); ++device )
-	{
-		if ( (*device)->IsUsb() )
-		{
-			if ( pathToFind.CompareNoCase( (*device)->_usbPath.get() ) == 0 )
-			{
-				pDevice = (*device);
-//t				ATLTRACE2(_T("%s::AddUsbDevice()  Found existing(%d): %s\r\n"), this->ToString().c_str(), _devices.size(), pDevice->_usbPath.get().c_str());
-				break;
-			}
-		}
-	}
+    if ( pDevice == NULL )
+    {
+        // it's not in our Collection of constructed devices
+        // so lets get a new list of our devices from Windows
+        // and see if it is there.
+        pDevice = FindDeviceByUsbPath(pathToFind, DeviceListType_New, DeviceListAction_Add);
+    }
 
-	if ( pDevice == NULL )
-	{
-		// it's not in our vector of constructed devices
-		// so lets get a new list of our devices from Windows
-		// and see if it is there.
-
-		int32_t error;
-
-		SP_DEVINFO_DATA devData;
-		devData.cbSize = sizeof(SP_DEVINFO_DATA);
-		CStdString devPath = _T("");
-
-		GetClassDevs();
-		
-		for (int32_t index=0; /*no condition*/; ++index)
-		{
-		    if ( *_classIfaceGuid.get() != GUID_NULL /*&&
-				    gWinVersionInfo().IsWinNT()*/ )
-		    {
-			    error = EnumDeviceInterfaceDetails(index, devPath, &devData);
-			    if ( error != ERROR_SUCCESS )
-			    {	// No match
-				    // Enum() will return ERROR_NO_MORE_ITEMS when done
-				    // but regardless, we can't add the device
-				    pDevice = NULL;
-				    break;
-			    }
-		    }
-		    else
-		    {
-		        if (!gSetupApi().SetupDiEnumDeviceInfo(_deviceInfoSet, index, &devData))
-		        {
-			        // Enum() will return ERROR_NO_MORE_ITEMS when done
-			        // but regardless, we can't add the device
-			        pDevice = NULL;
-			        break;
-		        }
-            }
-// moved to MxRomDeviceClass::CreateDevice()
-//			if(devData.ClassGuid == GUID_DEVCLASS_MX_ROM_USB_DEVICE)
-//				TRACE("DeviceClass::AddUsbDevice:Find i.mx device!\r\n");
-            pDevice = CreateDevice(this, devData, devPath);
-			if ( pDevice && pDevice->IsUsb() )
-			{
-				if ( pathToFind.CompareNoCase( pDevice->_usbPath.get() ) == 0 )
-				{
-					// found the new device
-					// so add it to our vector
-					WaitForSingleObject(devicesMutex, INFINITE);
-					_devices.push_back(pDevice);
-					ReleaseMutex(devicesMutex);
-//t					ATLTRACE2(_T("%s::AddUsbDevice()  Created new(%d):%s\r\n"), this->ToString().c_str(), _devices.size(), pDevice->_usbPath.get().c_str());
-					break;
-				}
-			}
-			// if we got here, the device isn't the device we
-			// are looking for, so clean up.
-			if ( pDevice )
-			{
-				delete pDevice;
-				pDevice = NULL;
-			}
-		}
-	}
-	
 	if ( pDevice )
 	{
 		nsInfo.Device = pDevice;
@@ -428,19 +487,8 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
 		nsInfo.HubIndex = pDevice->_hubIndex.get();
 		nsInfo.Hub = pDevice->_hub.get();
 
-		for ( device=_oldDevices.begin(); device != _oldDevices.end(); ++device )
-		{
-			if ( (*device)->IsUsb() )
-			{
-				if ( pathToFind.CompareNoCase( (*device)->_usbPath.get() ) == 0 )
-				{
-//t					ATLTRACE2(_T("%s::AddUsbDevice()  Found previous device(%d): %s\r\n"), this->ToString().c_str(), _oldDevices.size(), (*device)->_usbPath.get().c_str());
-					delete (*device);
-					_oldDevices.erase(device);
-					break;
-				}
-			}
-		}
+		// Delete device from old device list since it's in our current list
+		FindDeviceByUsbPath(pathToFind, DeviceListType_Old, DeviceListAction_Remove);
 
 		RefreshPort(nsInfo.Hub, nsInfo.HubIndex);
 	}
@@ -453,31 +501,18 @@ DeviceClass::NotifyStruct DeviceClass::RemoveUsbDevice(LPCTSTR path)
 	NotifyStruct nsInfo = {0};
 
 	CStdString trimmedPath = path + 4;
-	std::list<Device*>::iterator device;
-	for ( device=_devices.begin(); device != _devices.end(); ++device )
-	{
-		if ( (*device)->IsUsb() )
-		{
-			if ( trimmedPath.CompareNoCase( (*device)->_usbPath.get() ) == 0 )
-			{
-				nsInfo.Device = (*device);
-				nsInfo.Type = _deviceClassType;
-				nsInfo.HubIndex = (*device)->_hubIndex.get();
-				nsInfo.Hub = (*device)->_hub.get();
-				break;
-			}
-		}
-	}
 
-	if ( nsInfo.Device )
+	// see if it is in our list of Devices
+    Device* pDevice = FindDeviceByUsbPath(trimmedPath, DeviceListType_Current, DeviceListAction_Remove);
+
+	if ( pDevice )
 	{
+		nsInfo.Device = pDevice;
+		nsInfo.Type = _deviceClassType;
+		nsInfo.HubIndex = pDevice->_hubIndex.get();
+		nsInfo.Hub = pDevice->_hub.get();
+
 		ClearPort(nsInfo.Hub, nsInfo.HubIndex);
-
-		WaitForSingleObject(devicesMutex, INFINITE);
-		_oldDevices.push_back((*device));
-//		delete (*device);
-		_devices.erase(device);
-		ReleaseMutex(devicesMutex);
 
 //t		ATLTRACE2(_T("%s::RemoveUsbDevice() - %s\r\n"), this->ToString().c_str(), path);
 	}

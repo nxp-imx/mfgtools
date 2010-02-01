@@ -77,6 +77,8 @@ public:
 	int32_t EnumDeviceInterfaceDetails(int32_t index, CStdString& devPath, PSP_DEVINFO_DATA pDevData);
 
 protected:
+	enum DeviceListType { DeviceListType_Old, DeviceListType_Current, DeviceListType_New };
+	enum DeviceListAction { DeviceListAction_None, DeviceListAction_Add, DeviceListAction_Remove };
 	StdStringArray _filters;
 	DeviceType _deviceClassType;
 	std::list<Device*> _devices;
@@ -84,6 +86,7 @@ protected:
 	int32_t ClearPort(const CStdString hubPath, const int32_t hubIndex);
 	HDEVINFO _deviceInfoSet;
 	std::list<Device*> _oldDevices;
+	virtual Device* FindDeviceByUsbPath(CStdString pathToFind, const DeviceListType devList, const DeviceListAction devListAction = DeviceListAction_None);
 
 public:
 	// PROPERTIES
