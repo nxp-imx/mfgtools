@@ -24,18 +24,27 @@ public:
 	
 	virtual ~MxRomDevice(void) {};
 //    uint32_t Download(const StFwComponent& fwComponent, Device::UI_Callback callbackFn); 
-	void SetIMXDevPara(CString cMXType, CString cSecurity, CString cRAMType, unsigned int RAMKNLAddr);
-	BOOL DownloadRKL(unsigned char *rkl, int rklsize);
+	void SetIMXDevPara(void);
+	BOOL DownloadRKL(unsigned char *rkl, int rklsize, unsigned int RAMKNLAddr, bool bPreload);
 
 	// PROPERTIES
 	class MaxPacketSize : public Int32Property { public: int32_t get(); } _MaxPacketSize;
+	typedef struct _MxRomParamt
+	{
+		CString cMXType;
+		CString cSecurity; 
+		CString cRAMType;
+		CString cMemInitFilePath;
+	}MxRomParamt, * PMxRomParamt;
+	MxRomParamt m_MxRomParamt;
+	BOOL m_bMemInited;
 
 private:
 	BOOL InitMemoryDevice();
 	BOOL WriteMemory(int mode, UINT address, UINT Data, UINT Format);
 	BOOL GetHABType(int mode);
 	BOOL Jump2Rak(int mode, BOOL is_hab_prod);
-	BOOL DownloadImage(UINT byteCount, const unsigned char* pBuf);
+	BOOL DownloadImage(UINT byteCount, const unsigned char* pBuf, unsigned int RamAddr, bool bPreload);
 	BOOL SendCommand2RoK(UINT address, UINT byteCount, UCHAR type);
 	BOOL TransData(UINT byteCount, const unsigned char * pBuf,int opMode);
 	BOOL WriteToDevice(const unsigned char *buf, UINT count);

@@ -6,8 +6,8 @@
 #define AFX_ADSTKCONFIGURE_H
 
 //#include "ConfigurePage.h"
-//#include "MXDefine.h"
-#include "MemoryInit.h"
+#include "MXDefine.h"
+//#include " MemoryInit.h"
 
 using namespace std;
 
@@ -52,7 +52,6 @@ public:
 	void GetChannel(int *type, int *id, unsigned long *handle);
 	stMemoryInit * GetMemoryInitScript(int *lines);
 	int GetMXType();
-	UINT GetRAMKNLAddr();
 	BOOL GetSecurity();
 	BOOL GetByPass();
 	void SetChannel(int type, int id, unsigned long handle);
@@ -60,9 +59,9 @@ public:
 	CADSTkConfigure();
 	virtual ~CADSTkConfigure();
 	void SetMemoryAddr(unsigned long mmAddrs[]);
-	void SetMemoryType(stMemoryInit *pScript, int lines);
+	char* GetMemoryTypeName(int mx_Type, MM_T mm_Type);
+	void SetMemoryType(int mx_Type,MM_T mm_Type,CString cFilePath);
 	void SetMXType(int type);
-	void SetRAMKNLAddr(UINT RAMKNLAddr);
 	MM_T GetRAMType();
 	void SetRAMType(MM_T type);
 	void SetSecurity(BOOL bSecurity);
@@ -81,6 +80,9 @@ private:
 	int m_iChannelType;		// USB or UART
 	int m_iChannelID;		// USB default ID or UART com port id
 	MM_T m_iMemoryType;
+	CString m_csFilePath;
+	stMemoryInit *m_pScriptT;
+	int m_iScriptLineT;
 };
 
 #endif // !defined(AFX_ADSTKCONFIGURE_H)

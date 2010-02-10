@@ -19,6 +19,26 @@ public:
 		// [XmlAttribute("body")]
 		CString GetBody() { return CString(GetAttrValue(_T("body"))); };
 
+		// [XmlAttribute("addr")]
+		unsigned int GetAddr()
+		{ 
+			unsigned int addr = 0; // default to 0
+
+			CString attr = GetAttrValue(_T("addr"));
+
+			if(attr.Left(2) == _T("0x"))
+			{
+				TCHAR *p;
+				addr = _tcstoul(attr.Mid(2),&p,16);
+			}
+			else
+			{
+				addr = _tstoi64(attr);
+			}
+
+			return addr; 
+		};
+
 		// [XmlAttribute("file")]
 		CString GetFile() { return CString(GetAttrValue(_T("file"))); };
 
@@ -153,7 +173,7 @@ public:
 
 			if ( modeString == _T("Unknown") )
 				mode = Unknown;
-			else if ( modeString == _T("Recovery") )
+			else if ( modeString == _T("Recovery") || modeString == _T("Load"))
 				mode = Recovery;
 			else if ( modeString == _T("Updater") )
 				mode = Updater;
@@ -189,26 +209,7 @@ public:
 		CString GetMXType() { return GetAttrValue(_T("MXType")) ? GetAttrValue(_T("MXType")) : _T("xxxx"); }
 		CString GetSecurity() { return GetAttrValue(_T("security")) ? GetAttrValue(_T("security")) : _T("xxxx"); }
 		CString GetRAMType() { return GetAttrValue(_T("RAMType")) ? GetAttrValue(_T("RAMType")) : _T("xxxx"); }
-		//CString GetRAMKNLAddr() { return GetAttrValue(_T("RAMKNLAddr")) ? GetAttrValue(_T("RAMKNLAddr")) : _T("xxxx"); }
-		//To specify the RAM address where kernel is downloaded in recovery stage. 
-		unsigned int GetRAMKNLAddr()
-		{ 
-			unsigned int RAMKNLAddr = 0; // default to 0
-
-			LPCTSTR attr = GetAttrValue(_T("RAMKNLAddr"));
-			if ( attr != NULL )
-			{
-				RAMKNLAddr = _tstoi64(attr);
-			}
-
-			return RAMKNLAddr; 
-		};
-//			[XmlIgnore()]
-//			public UInt16? Pid
-//			{
-//				get { if (XmlPid == null) return null; else return UInt16.Parse(XmlPid, System.Globalization.NumberStyles.HexNumber | System.Globalization.NumberStyles.AllowHexSpecifier); }
-//				set { XmlPid = value == null ? null : value.ToString(); }
-//			}
+		CString GetRamScript() { return GetAttrValue(_T("RamScript")) ? GetAttrValue(_T("RamScript")) : _T("xxxx"); }
 
 		// [XmlAttribute("body")]
 		CString GetCommandString() { return GetAttrValue(_T("body")); };

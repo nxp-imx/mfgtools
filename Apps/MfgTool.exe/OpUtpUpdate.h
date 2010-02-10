@@ -68,7 +68,7 @@ protected:
 	DWORD DoResetToRecovery();
 	DWORD DoBurn(UCL::Command* pCmd);
 	DWORD DoLoad(CString filename);
-	DWORD DoMxRomLoad(CString filename);
+	DWORD DoMxRomLoad(CString filename, unsigned int RAMKNLAddr, bool bPreload);
 	DWORD DoShow(UCL::Command* pCmd);
 
 };

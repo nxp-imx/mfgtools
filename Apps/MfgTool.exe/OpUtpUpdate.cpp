@@ -131,11 +131,6 @@ const UCL::DeviceDesc::DeviceMode COpUtpUpdate::GetDeviceMode()
 			break;
 		case DeviceClass::DeviceTypeMxRom:
 			mode = UCL::DeviceDesc::Recovery;
-//			MxRomDevice::SetIMXDevPara(\
-//				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetMXType(),\
-//				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetSecurity(),\
-//				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRAMType(),\
-//				m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRAMKNLAddr());
 			m_CurrentDeviceType = DeviceClass::DeviceTypeMxRom;
 			break;
 		case DeviceClass::DeviceTypeMsc:
@@ -648,7 +643,7 @@ DWORD COpUtpUpdate::RecoverDevice()
 //
 ////
 
-DWORD COpUtpUpdate::DoMxRomLoad(CString filename) // RecoverHidDevice()
+DWORD COpUtpUpdate::DoMxRomLoad(CString filename, unsigned int RAMKNLAddr, bool bPreload) // RecoverHidDevice()
 {
 
 	DWORD ReturnVal = ERROR_SUCCESS;
@@ -678,11 +673,13 @@ bstr_log_text = _logText.AllocSysString();
 		return ReturnVal;
 	}
 
-	pMxRomDevice->SetIMXDevPara( m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetMXType(),
-									m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetSecurity(),
-									m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRAMType(),
-									m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRAMKNLAddr() );
+	pMxRomDevice->m_MxRomParamt.cMXType = m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetMXType();
+	pMxRomDevice->m_MxRomParamt.cSecurity = m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetSecurity();
+	pMxRomDevice->m_MxRomParamt.cRAMType = m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRAMType();
+	pMxRomDevice->m_MxRomParamt.cMemInitFilePath= m_pOpInfo->GetPath() + _T("\\") +\
+		m_DeviceDescs[UCL::DeviceDesc::IMXInfo]->GetRamScript();
 
+	pMxRomDevice->SetIMXDevPara();
 
 	StPitc myNewFwCommandSupport(pMxRomDevice, (LPCTSTR)filename,
 		m_pOpInfo->GetProfile()->m_bLockedProfile ? 
@@ -710,7 +707,7 @@ bstr_log_text = _logText.AllocSysString();
 ((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
 #endif
 	Device::UI_Callback callback(this, &COpUtpUpdate::OnDownloadProgress);
-	ReturnVal = myNewFwCommandSupport.DownloadMxRomImg(callback);
+	ReturnVal = myNewFwCommandSupport.DownloadMxRomImg(callback, RAMKNLAddr, bPreload);
 
 	if(ReturnVal != ERROR_SUCCESS) 
 	{
@@ -1351,7 +1348,7 @@ DWORD COpUtpUpdate::DoBoot(UCL::Command* pCmd)
 		//if current device is i.MXxx device
 		if(m_CurrentDeviceType == DeviceClass::DeviceTypeMxRom)
 		{
-			retValue = DoMxRomLoad(fullFileName);
+			retValue = DoMxRomLoad(fullFileName, pCmd->GetAddr(), (pCmd->GetBody() == _T("Load")));
 		}
 		else
 		{//HID device

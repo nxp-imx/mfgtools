@@ -32,6 +32,8 @@ Environment:
 #pragma alloc_text(PAGE, GetPipeFromName)
 #pragma alloc_text(PAGE, ResetPipe)
 #pragma alloc_text(PAGE, ResetDevice)
+#pragma alloc_text(PAGE, StopAllPipes)
+#pragma alloc_text(PAGE, StartAllPipes)
 #endif
 
 
