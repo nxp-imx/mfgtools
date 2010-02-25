@@ -10,6 +10,7 @@
 #include "OpMonitor.h"
 #include "OpUpdater.h"
 #include "OpUtpUpdate.h"
+#include "OpMxRomUpdate.h"
 #include "OpErase.h"
 #include "OpLoader.h"
 #include "OpOTP.h"
@@ -316,6 +317,16 @@ INT_PTR CPortMgrDlg::CreateOps(void)
 					}
 					m_duration += pOp->GetDuration();
 					ATLTRACE("Panel %c - CreateOps() - created a UTP_UPDATE operation(%#x, %d).\n", _T('A')+m_port_display_index, pOp->m_nThreadID, pOp->m_nThreadID);
+					break;
+				case COperation::MX_UPDATE_OP:
+					m_op_list.AddTail( pOp = new COpMxRomUpdate(this, m_p_usb_port, pOpInfo) );
+					if (!pOp->CreateThread(/*CREATE_SUSPENDED*/)) {
+						delete pOp;
+						ATLTRACE("Error: Panel %c - CreateOps() - failed to create a MX_UPDATE operation.\n", _T('A')+m_port_display_index);
+						return false;
+					}
+					m_duration += pOp->GetDuration();
+					ATLTRACE("Panel %c - CreateOps() - created a MX_UPDATE operation(%#x, %d).\n", _T('A')+m_port_display_index, pOp->m_nThreadID, pOp->m_nThreadID);
 					break;
 				case COperation::INVALID_OP:
 					ATLTRACE("Warning: Panel %c - CreateOps() - INVALID operation, operation ignored.\n", _T('A')+m_port_display_index);

@@ -267,6 +267,7 @@ private:
 
 	// Message Support
 	HDEVNOTIFY _hUsbDev;
+	HDEVNOTIFY _hMxUsbDev;
 	HDEVNOTIFY _hUsbHub;
 
 	// WMDM Support

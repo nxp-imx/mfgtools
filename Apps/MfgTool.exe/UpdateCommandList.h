@@ -130,18 +130,292 @@ public:
 	class DeviceDesc : public XNode
 	{
 	public:
-		typedef enum _DeviceMode { Unknown, Recovery, Updater, UserMtp, UserMsc, User, ConnectedUnknown, Disconnected, IMXInfo } DeviceMode;
+		// [XmlAttribute("name")]
+		LPCTSTR GetChipType() { return GetAttrValue(_T("name")) ? GetAttrValue(_T("name")) : _T(""); }
+
+		// [XmlAttribute("vid")]
+		LPCTSTR GetVid() { return GetAttrValue(_T("vid")) ? GetAttrValue(_T("vid")) : _T("xxxx"); };
+
+		// [XmlAttribute("pid")]
+		LPCTSTR GetPid() { return GetAttrValue(_T("pid")) ? GetAttrValue(_T("pid")) : _T("xxxx"); };
+
+		// [XmlAttribute("rev")]
+//		LPCTSTR GetRevision() { return GetAttrValue(_T("rev")) ? GetAttrValue(_T("rev")) : _T(""); };
+
+		// [XmlAttribute("ram")]
+//		LPCTSTR GetMemoryType() { return GetAttrValue(_T("ram")) ? GetAttrValue(_T("ram")) : _T(""); };
+
+		class MemInitCmd : public XNode
+		{
+		public:
+			// [XmlAttribute("addr")]
+			unsigned int GetAddress()
+			{ 
+				unsigned int addr = 0; // default to 0
+
+				CString attr = GetAttrValue(_T("addr"));
+
+				if(attr.Left(2) == _T("0x"))
+				{
+					TCHAR *p;
+					addr = _tcstoul(attr.Mid(2),&p,16);
+				}
+				else
+				{
+					addr = _tstoi64(attr);
+				}
+
+				return addr; 
+			};
+
+			// [XmlAttribute("data")]
+			unsigned int GetData()
+			{ 
+				unsigned int data = 0; // default to 0
+
+				CString attr = GetAttrValue(_T("data"));
+
+				if(attr.Left(2) == _T("0x"))
+				{
+					TCHAR *p;
+					data = _tcstoul(attr.Mid(2),&p,16);
+				}
+				else
+				{
+					data = _tstoi64(attr);
+				}
+
+				return data; 
+			};
+
+			// [XmlAttribute("format")]
+			unsigned int GetFormat()
+			{ 
+				unsigned char format = 0; // default to 0
+
+				CString attr = GetAttrValue(_T("format"));
+
+				if(attr.Left(2) == _T("0x"))
+				{
+					TCHAR *p;
+					format = _tcstoul(attr.Mid(2),&p,16);
+				}
+				else
+				{
+					format = _tstoi64(attr);
+				}
+
+				return format; 
+			};
+
+			CString ToString()
+			{
+				CString str;
+				str.Format(_T("addr=\"0x%X\" data=\"0x%X\" format=\"%d\""), GetAddress(), GetData(), GetFormat());
+				return str;
+			}
+	/*
+			public Command() { }
+
+			public Command(String type, String command, String filename, String description)
+			{
+				CmdType = type;
+				CommandString = command;
+				Filename = filename;
+				Description = description;
+			}
+	*/
+		};
+		typedef std::vector<MemInitCmd*> Script;
 		
-		static CString DeviceModeToString(DeviceMode mode)
+		class MemInitScript : public XNode
+		{
+		public:
+			// [XmlAttribute("name")]
+			CString GetName() { return CString(GetAttrValue(_T("name"))); };
+			// [XmlAttribute("desc")]
+			CString GetDescription() { return CString(GetAttrValue(_T("desc"))); };
+			// [XmlElement(ElementName="CMD")]
+			MemInitCmd* GetCommand(size_t index)
+			{
+				XNodes cmds = GetChilds(_T("CMD"));
+
+				if( index >= 0 && index < cmds.size() )
+					return (MemInitCmd*)cmds[index];
+				
+				return NULL;
+			}
+
+			Script GetScript()
+			{
+				Script script;
+				XNodes nodes = GetChilds(_T("CMD"));
+
+				std::vector<LPXNode>::iterator it = nodes.begin();
+				for( ; it != nodes.end(); ++(it))
+				{
+					script.push_back((MemInitCmd*)(*it));
+				}
+
+				return script;
+			}
+
+			size_t GetScriptSize()
+			{
+				XNodes cmds = GetChilds(_T("CMD"));
+				return cmds.size();
+			}
+
+			CString ToString()
+			{
+				CString str;
+				str.Format(_T("%s, %s"), GetName(), GetDescription());
+			}
+
+		};
+
+		class Revision : public XNode
+		{
+		public:
+			// [XmlAttribute("major")]
+			int GetMajor() { return GetAttrValue(_T("major")) ? _tstoi(GetAttrValue(_T("major"))) : 0; }
+
+			// [XmlAttribute("minor")]
+			int GetMinor() { return GetAttrValue(_T("minor")) ? _tstoi(GetAttrValue(_T("minor"))) : 0; }
+
+			// [XmlElement(ElementName="RAM")]
+			Script GetRamScript(LPCTSTR name)
+			{
+				XNodes scripts = GetChilds(_T("RAM"));
+
+				if ( name == NULL && !scripts.empty() )
+				{
+					return ((MemInitScript*)scripts[0])->GetScript();
+
+				}
+				else if ( name != NULL )
+				{
+					std::vector<LPXNode>::iterator it = scripts.begin();
+					for( ; it != scripts.end(); ++(it))
+					{
+						MemInitScript* pScript = (MemInitScript*)(*it);
+						if( pScript->GetName() == name )
+						{
+							return pScript->GetScript();
+						}
+					}
+				}
+
+				return Script();
+			}
+
+			CString ToString()
+			{
+				CString str;
+				str.Format(_T("%d.%d"), GetMajor(), GetMinor());
+				return str;
+			}
+		};
+
+		// [XmlElement(ElementName="REV")]
+		Revision* GetRevision(CString revString)
+		{
+			XNodes revs = GetChilds(_T("REV"));
+
+			std::vector<LPXNode>::iterator rev = revs.begin();
+			for( ; rev != revs.end(); ++(rev))
+			{
+				if( ((Revision*)*rev)->ToString() == revString )
+				{
+					return (Revision*)(*rev);
+				}
+			}
+
+			return NULL;
+		}
+
+
+		Script GetRamScript()
+		{ 
+			// if revision is specified, look there first
+			if ( GetAttrValue(_T("rev")) )
+			{
+				// Look under <DEV/> <REV/>
+				if ( GetRevision(GetAttrValue(_T("rev"))) )
+				{
+					// GetRamScript gets the first <RAM/> script if ram= is not specified in <DEV/>
+					return GetRevision(GetAttrValue(_T("rev")))->GetRamScript(GetAttrValue(_T("ram")));
+				}
+			}
+			else
+			{
+				// otherwise, see if there is a <RAM/> node under the <DEV/> node
+				XNodes scripts = GetChilds(_T("RAM"));
+
+				if ( GetAttrValue(_T("ram")) == NULL && !scripts.empty() )
+				{
+					return ((MemInitScript*)scripts[0])->GetScript();
+
+				}
+				else if ( GetAttrValue(_T("ram")) != NULL )
+				{
+					std::vector<LPXNode>::iterator it = scripts.begin();
+					for( ; it != scripts.end(); ++(it))
+					{
+						MemInitScript* pScript = (MemInitScript*)(*it);
+						if( pScript->GetName() == GetAttrValue(_T("ram")) )
+						{
+							return pScript->GetScript();
+						}
+					}
+				}
+			}
+			
+			return Script();
+		}
+
+//		LPCTSTR GetSecurity() { return GetAttrValue(_T("security")) ? GetAttrValue(_T("security")) : _T("xxxx"); }
+//		LPCTSTR GetFlashModel() { return GetAttrValue(_T("FlashModel")) ? GetAttrValue(_T("FlashModel")) : _T("xxxx"); }
+//		BOOL  GetBISWAP() { CString str = GetAttrValue(_T("BISWAP")) ? GetAttrValue(_T("BISWAP")) : _T("false"); return str.CompareNoCase(_T("true")) == 0;}
+//		BOOL  GetInterleave() { CString str = GetAttrValue(_T("Interleave")) ? GetAttrValue(_T("Interleave")) : _T("false"); return str.CompareNoCase(_T("true")) == 0;}
+//		BOOL  GetReadCheckBack() { CString str = GetAttrValue(_T("ReadCheckBack")) ? GetAttrValue(_T("ReadCheckBack")) : _T("false"); return str.CompareNoCase(_T("true")) == 0;}
+//		BOOL  GetLBA() { CString str = GetAttrValue(_T("LBA")) ? GetAttrValue(_T("LBA")) : _T("false"); return str.CompareNoCase(_T("true")) == 0;}
+//		BOOL  GetBBT() { CString str = GetAttrValue(_T("BBT")) ? GetAttrValue(_T("BBT")) : _T("false"); return str.CompareNoCase(_T("true")) == 0; }
+
+		// [XmlAttribute("body")]
+//		CString GetCommandString() { return GetAttrValue(_T("body")); };
+
+
+		CString ToString()
 		{
 			CString str;
-			switch (mode)
+			str.Format(_T("%s - %s/%s"), GetChipType(), GetVid(), GetPid());
+
+			return str;
+		}
+	};
+	
+	class DeviceState : public XNode
+	{
+	public:
+		typedef enum DeviceState_t { Unknown, Recovery, BootStrap, Updater, RamKernel, UserMtp, UserMsc, User, ConnectedUnknown, Disconnected };
+		
+		static CString DeviceStateToString(DeviceState_t state)
+		{
+			CString str;
+			switch (state)
 			{
 				case Recovery:
 					str = _T("Recovery");
 					break;
+				case BootStrap:
+					str = _T("BootStrap");
+					break;
 				case Updater:
 					str = _T("Updater");
+					break;
+				case RamKernel:
+					str = _T("RamKernel");
 					break;
 				case UserMtp:
 					str = _T("UserMtp");
@@ -155,9 +429,6 @@ public:
 				case Disconnected:
 					str = _T("Disconnected");
 					break;
-				case IMXInfo:
-					str = _T("IMXInfo");
-					break;
 				case Unknown:
 				default:
 					str = _T("Unknown");
@@ -167,61 +438,37 @@ public:
 			return str;
 		}
 
-		static DeviceMode StringToDeviceMode(CString modeString)
+		static DeviceState_t StringToDeviceState(CString stateString)
 		{
-			DeviceMode mode = Unknown;
+			DeviceState_t state = Unknown;
 
-			if ( modeString == _T("Unknown") )
-				mode = Unknown;
-			else if ( modeString == _T("Recovery") || modeString == _T("Load"))
-				mode = Recovery;
-			else if ( modeString == _T("Updater") )
-				mode = Updater;
-			else if ( modeString == _T("UserMtp") )
-				mode = UserMtp;
-			else if ( modeString == _T("UserMsc") )
-				mode = UserMsc;
-			else if ( modeString == _T("User") )
-				mode = User;
-			else if ( modeString == _T("Disconnected") )
-				mode = Disconnected;
-			else if ( modeString == _T("IMXInfo") )
-				mode = IMXInfo;
+			if ( stateString == _T("Unknown") )
+				state = Unknown;
+			else if ( stateString == _T("Recovery") )
+				state = Recovery;
+			else if ( stateString == _T("BootStrap") )
+				state = BootStrap;
+			else if ( stateString == _T("Updater") )
+				state = Updater;
+			else if ( stateString == _T("RamKernel") )
+				state = RamKernel;
+			else if ( stateString == _T("UserMtp") )
+				state = UserMtp;
+			else if ( stateString == _T("UserMsc") )
+				state = UserMsc;
+			else if ( stateString == _T("User") )
+				state = User;
+			else if ( stateString == _T("Disconnected") )
+				state = Disconnected;
 
-			return mode;
+			return state;
 		}
 
-		// [XmlAttribute("mode")]
-		CString GetDeviceMode() { return GetAttrValue(_T("mode")); };
+		// [XmlAttribute("name")]
+		CString GetDeviceState() { return CString(GetAttrValue(_T("name"))); };
 
-		// [XmlAttribute("vid")]
-		CString GetVid() { return GetAttrValue(_T("vid")) ? GetAttrValue(_T("vid")) : _T("xxxx"); };
-
-//			[XmlIgnore()]
-//			public UInt16? Vid
-//			{
-//				get { if (XmlVid == null) return null; else return UInt16.Parse(XmlVid, System.Globalization.NumberStyles.HexNumber | System.Globalization.NumberStyles.AllowHexSpecifier); }
-//				set { XmlVid = value == null ? null : value.ToString(); }
-//			}
-
-		// [XmlAttribute("pid")]
-		CString GetPid() { return GetAttrValue(_T("pid")) ? GetAttrValue(_T("pid")) : _T("xxxx"); };
-		CString GetMXType() { return GetAttrValue(_T("MXType")) ? GetAttrValue(_T("MXType")) : _T("xxxx"); }
-		CString GetSecurity() { return GetAttrValue(_T("security")) ? GetAttrValue(_T("security")) : _T("xxxx"); }
-		CString GetRAMType() { return GetAttrValue(_T("RAMType")) ? GetAttrValue(_T("RAMType")) : _T("xxxx"); }
-		CString GetRamScript() { return GetAttrValue(_T("RamScript")) ? GetAttrValue(_T("RamScript")) : _T("xxxx"); }
-
-		// [XmlAttribute("body")]
-		CString GetCommandString() { return GetAttrValue(_T("body")); };
-
-
-		CString ToString()
-		{
-			CString str;
-			str.Format(_T("%s - %s/%s"), GetDeviceMode(), GetVid(), GetPid());
-
-			return str;
-		}
+		// [XmlAttribute("dev")]
+		LPCTSTR GetDeviceDesc() { return GetAttrValue(_T("dev")); };
 	};
 
 	class FirmwareVersion : public XNode
@@ -232,17 +479,40 @@ public:
 	{
 	public:
 		// [XmlElement("DEV")]
-		std::map<DeviceDesc::DeviceMode, DeviceDesc*> GetDeviceDescs()
+		std::map<DeviceState::DeviceState_t, DeviceDesc*> GetDeviceStates()
 		{
-			std::map<DeviceDesc::DeviceMode, DeviceDesc*> devDescs;
+			std::map<DeviceState::DeviceState_t, DeviceDesc*> devStates;
 
-			XNodes nodes = GetChilds(_T("DEV"));
-			std::vector<LPXNode>::iterator it = nodes.begin();
-			for ( ; it != nodes.end(); ++it )
-				devDescs[DeviceDesc::StringToDeviceMode(((DeviceDesc*)*it)->GetDeviceMode())] = (DeviceDesc*)(*it);
-
-			return devDescs;
+			XNodes states = GetChilds(_T("STATE"));
+			
+			// for each STATE
+			std::vector<LPXNode>::iterator state = states.begin();
+			for ( ; state != states.end(); ++state )
+			{
+				devStates[DeviceState::StringToDeviceState(((DeviceState*)*state)->GetDeviceState())] = GetDeviceDesc(((DeviceState*)*state)->GetDeviceDesc());
+			}
+			
+			return devStates;
 		};
+
+		// [XmlElement(ElementName="DEV")]
+		DeviceDesc* GetDeviceDesc(LPCTSTR name)
+		{
+			XNodes devs = GetChilds(_T("DEV"));
+
+			std::vector<LPXNode>::iterator dev = devs.begin();
+			for( ; dev != devs.end(); ++(dev))
+			{
+				DeviceDesc* pDev = (DeviceDesc*)(*dev);
+				CString chipType = pDev->GetChipType();
+				if( chipType.CompareNoCase(name) == 0 )
+				{
+					return pDev;
+				}
+			}
+
+			return NULL;
+		}
 
 		// [XmlElement("VER")]
 		FirmwareVersion* GetFirmwareVersion() { return (FirmwareVersion*)GetChild(_T("VER")); };

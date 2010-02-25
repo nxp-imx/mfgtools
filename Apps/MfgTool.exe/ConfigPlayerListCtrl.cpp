@@ -591,6 +591,7 @@ void CConfigPlayerListCtrl::OnContextMenu(CWnd* pWnd, CPoint point)
 	resStr.LoadString(IDS_OPERATION_OTP_REGISTER);
 	cntxtSubMenu.AppendMenu(MF_STRING | MF_ENABLED , IDM_NEW_OTP_OP , resStr);
 	cntxtSubMenu.AppendMenu(MF_STRING | MF_ENABLED , IDM_NEW_UTP_UPDATE_OP , _T("UTP_UPDATE"));
+	cntxtSubMenu.AppendMenu(MF_STRING | MF_ENABLED , IDM_NEW_MX_UPDATE_OP , _T("MX_UPDATE"));
 
 	MENUITEMINFO mii = { sizeof(MENUITEMINFO) };
 

@@ -19,6 +19,7 @@ const PTCHAR COperation::OperationStrings[]     = { _T("UPDATE"),
 												    _T("LOAD"),
 													_T("OTP"),
 													_T("UTP_UPDATE"),
+													_T("MX_UPDATE"),
 													_T("INVALID OPERATION"),
 												    _T("ERASE"), 
 												    _T("REGISTRY SCRUB") };
@@ -87,6 +88,7 @@ const COperation::DeviceState_t COperation::GetDeviceState() const
 		case DeviceClass::DeviceTypeHid:
 			devState = HID_MODE;
 			break;
+		case DeviceClass::DeviceTypeMxRom:
 		case DeviceClass::DeviceTypeRecovery:
 			devState = RECOVERY_MODE;
 			break;

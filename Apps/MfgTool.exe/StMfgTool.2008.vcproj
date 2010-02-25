@@ -277,6 +277,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OpMxRomUpdate.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OpOTP.cpp"
 				>
 			</File>
@@ -452,6 +456,10 @@
 			</File>
 			<File
 				RelativePath=".\OpMonitor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OpMxRomUpdate.h"
 				>
 			</File>
 			<File

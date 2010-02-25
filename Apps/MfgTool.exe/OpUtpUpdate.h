@@ -47,14 +47,14 @@ protected:
 	DWORD	m_dwStartTime;
 	BOOL WaitForDeviceChange(int seconds);
 
-	const UCL::DeviceDesc::DeviceMode GetDeviceMode();
+	const UCL::DeviceState::DeviceState_t GetDeviceState();
 
 	UpdateTransportProtocol* m_pUTP;
 	UCL m_UclNode;
 	UCL::CommandList* m_pCmdList;
-	UCL::DeviceDesc::DeviceMode m_CurrentDeviceMode;
+	UCL::DeviceState::DeviceState_t m_CurrentDeviceState;
 	DeviceClass::DeviceType m_CurrentDeviceType;
-	std::map<UCL::DeviceDesc::DeviceMode, UCL::DeviceDesc*> m_DeviceDescs;
+	std::map<UCL::DeviceState::DeviceState_t, UCL::DeviceDesc*> m_DeviceStates;
     HANDLE m_hChangeEvent;
 	BOOL m_bProcessingList;
 

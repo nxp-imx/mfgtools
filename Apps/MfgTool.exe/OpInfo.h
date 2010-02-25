@@ -43,6 +43,7 @@ friend class CLoadFileOpDlg;
 friend class COpUpdateDlg;
 friend class COpOTPDlg;
 friend class COpUtpUpdateDlg;
+//friend class COpMxRomUpdateDlg;
 private:
 	static const PTCHAR OptionsCmdStrings[];
 	static const PTCHAR UpdateFwString;
@@ -73,6 +74,7 @@ private:
 //	CString m_cs_original_name;
 	int m_update_boot_fname_list_index;
 	int m_ucl_fname_list_index;
+	int m_rkl_fname_list_index;
 	CString m_UclInstallSection;
 
     // DriveArray s_usbmsc_drive_array;
@@ -115,12 +117,17 @@ public:
 	CString GetUpdaterBootPathname(void);
 	void SetUpdaterBootFilename(CString _fName, CFileList::FileListAction _action);
 	void RemoveUpdaterBootFilename(void);
+//	CString GetRklFilename(void);
 	CString GetUclFilename(void);
+//	CString GetRklPathname(void);
 	CString GetUclPathname(void);
 	void SetUclFilename(CString _fName, CFileList::FileListAction _action);
+	void SetRklFilename(CString _fName, CFileList::FileListAction _action);
 	void RemoveUclFilename(void);
+//	void RemoveRklFilename(void);
 	int GetUpdaterBootFilenameIndex(void) { return m_update_boot_fname_list_index; };
 	int GetUclFilenameIndex(void) { return m_ucl_fname_list_index; };
+//	int GetRklFilenameIndex(void) { return m_rkl_fname_list_index; };
 	CString GetOTPRegisterValue(void) { return m_csOTPValue; };
 	CString GetUclInstallSection() { return m_UclInstallSection; };
 

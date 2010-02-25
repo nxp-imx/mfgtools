@@ -21,6 +21,7 @@
 #define IDM_NEW_LOAD_OP		  (WM_APP + 19)
 #define IDM_NEW_OTP_OP		  (WM_APP + 20)
 #define IDM_NEW_UTP_UPDATE_OP (WM_APP + 21)
+#define IDM_NEW_MX_UPDATE_OP  (WM_APP + 22)
 
 
 ///////////////////////////////////////////////////////////////////////////////

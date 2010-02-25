@@ -5,6 +5,13 @@
 
 #include "MXDefine.h"
 
+typedef struct 
+{
+	UINT addr;
+	UINT data;
+	UINT format;
+} stMemoryInit;
+
 static stMemoryInit ddrMx31[] = 
 {
 	{0xB8002050, 0x0000DCF6,32},
@@ -545,20 +552,26 @@ static stMemoryInit ddr2Mx25_To11[] =
 	{0x43FAC454, 0x00001000, 32},
 };
 
-static mmInitScript_t mmInitScripts[MX_MAX][2] = {
-    { {mddrMx25, sizeof(mddrMx25)/sizeof(stMemoryInit)} , {mddrMx25, sizeof(mddrMx25)/sizeof(stMemoryInit)} },
-	{ {ddr2Mx25_To11, sizeof(ddr2Mx25_To11)/sizeof(stMemoryInit)} , {ddr2Mx25_To11, sizeof(ddr2Mx25_To11)/sizeof(stMemoryInit)} },
-	{ {ddrMx27, sizeof(ddrMx27)/sizeof(stMemoryInit)} , {ddrMx27, sizeof(ddrMx27)/sizeof(stMemoryInit)} },
-	{ {ddrMx27, sizeof(ddrMx27)/sizeof(stMemoryInit)} , {ddrMx27, sizeof(ddrMx27)/sizeof(stMemoryInit)} },
-	{ {ddrMx31, sizeof(ddrMx31)/sizeof(stMemoryInit)} , {sdrMx31, sizeof(sdrMx31)/sizeof(stMemoryInit)} },
-	{ {ddrMx31, sizeof(ddrMx31)/sizeof(stMemoryInit)} , {sdrMx31, sizeof(sdrMx31)/sizeof(stMemoryInit)} },
-	{ {ddrMx31, sizeof(ddrMx31)/sizeof(stMemoryInit)} , {sdrMx31, sizeof(sdrMx31)/sizeof(stMemoryInit)} },
-	{ {ddrMx31, sizeof(ddrMx31)/sizeof(stMemoryInit)} , {sdrMx31, sizeof(sdrMx31)/sizeof(stMemoryInit)} },
-	{ {ddr2Mx35, sizeof(ddr2Mx35)/sizeof(stMemoryInit)} , {mddrMx35, sizeof(mddrMx35)/sizeof(stMemoryInit)} },
-	{ {ddr2Mx35, sizeof(ddr2Mx35)/sizeof(stMemoryInit)} , {mddrMx35, sizeof(mddrMx35)/sizeof(stMemoryInit)} },
-	{ {ddrMx37, sizeof(ddrMx37)/sizeof(stMemoryInit)} , {ddrMx37, sizeof(ddrMx37)/sizeof(stMemoryInit)} },
-    { {ddrMx51, sizeof(ddrMx51)/sizeof(stMemoryInit)} , {ddrMx51, sizeof(ddrMx51)/sizeof(stMemoryInit)} },
-	{ {ddrMx51_To2, sizeof(ddrMx51_To2)/sizeof(stMemoryInit)} , {mddrMx51_To2, sizeof(mddrMx51_To2)/sizeof(stMemoryInit)} },
+typedef struct
+{
+	stMemoryInit *script;
+	int lines;
+} mmInitScript_t;
+
+static mmInitScript_t mmInitScripts[MX_MAX][2] = { // DDR/DDR2	SDRAM/MDDR
+    { {mddrMx25, sizeof(mddrMx25)/sizeof(stMemoryInit)} , {mddrMx25, sizeof(mddrMx25)/sizeof(stMemoryInit)} },						// MX_MX25_TO1
+	{ {ddr2Mx25_To11, sizeof(ddr2Mx25_To11)/sizeof(stMemoryInit)} , {ddr2Mx25_To11, sizeof(ddr2Mx25_To11)/sizeof(stMemoryInit)} },	// MX_MX25_TO11
+	{ {ddrMx27, sizeof(ddrMx27)/sizeof(stMemoryInit)} , {ddrMx27, sizeof(ddrMx27)/sizeof(stMemoryInit)} },							// MX_MX27_TO1
+	{ {ddrMx27, sizeof(ddrMx27)/sizeof(stMemoryInit)} , {ddrMx27, sizeof(ddrMx27)/sizeof(stMemoryInit)} },							// MX_MX27_TO2
+	{ {ddrMx31, sizeof(ddrMx31)/sizeof(stMemoryInit)} , {sdrMx31, sizeof(sdrMx31)/sizeof(stMemoryInit)} },							// MX_MX31_TO1
+	{ {ddrMx31, sizeof(ddrMx31)/sizeof(stMemoryInit)} , {sdrMx31, sizeof(sdrMx31)/sizeof(stMemoryInit)} },							// MX_MX31_TO2
+	{ {ddrMx31, sizeof(ddrMx31)/sizeof(stMemoryInit)} , {sdrMx31, sizeof(sdrMx31)/sizeof(stMemoryInit)} },							// MX_MX31_TO201
+	{ {ddrMx31, sizeof(ddrMx31)/sizeof(stMemoryInit)} , {sdrMx31, sizeof(sdrMx31)/sizeof(stMemoryInit)} },							// MX_MX32
+	{ {ddr2Mx35, sizeof(ddr2Mx35)/sizeof(stMemoryInit)} , {mddrMx35, sizeof(mddrMx35)/sizeof(stMemoryInit)} },						// MX_MX35_TO1
+	{ {ddr2Mx35, sizeof(ddr2Mx35)/sizeof(stMemoryInit)} , {mddrMx35, sizeof(mddrMx35)/sizeof(stMemoryInit)} },						// MX_MX35_TO2
+	{ {ddrMx37, sizeof(ddrMx37)/sizeof(stMemoryInit)} , {ddrMx37, sizeof(ddrMx37)/sizeof(stMemoryInit)} },							// MX_MX37
+    { {ddrMx51, sizeof(ddrMx51)/sizeof(stMemoryInit)} , {ddrMx51, sizeof(ddrMx51)/sizeof(stMemoryInit)} },							// MX_MX51_TO1
+	{ {ddrMx51_To2, sizeof(ddrMx51_To2)/sizeof(stMemoryInit)} , {mddrMx51_To2, sizeof(mddrMx51_To2)/sizeof(stMemoryInit)} },		// MX_MX51_TO2
 };
 
 #endif

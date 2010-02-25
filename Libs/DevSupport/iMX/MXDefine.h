@@ -5,89 +5,11 @@
 #define HWC_OFFSET					0x1010
 #define CSF_OFFSET					0x1200
 #define EXE_OFFSET					0x4000
+#define IMG_OFFSET				   0x10000
 
 #define FLASH_PROGRAM_SIZE			0xC000
 #define MAX_HWC_SIZE				(CSF_OFFSET - HWC_OFFSET)
 #define MAX_CSF_SIZE				(EXE_OFFSET - CSF_OFFSET)
-
-/************ MX25 Default Address Setting*******************************/
-#define MX25_MEMORY_START_ADDR		0x80000000								
-#define MX25_MEMORY_END_ADDR		0x8FFFFFFF								
-#define MX25_DEF_HWC_ADDR			(MX25_MEMORY_START_ADDR + HWC_OFFSET)	
-#define MX25_DEF_CSF_ADDR			(MX25_MEMORY_START_ADDR + CSF_OFFSET) 	
-#define MX25_DEF_RKL_ADDR			(MX25_MEMORY_START_ADDR + EXE_OFFSET)	
-#define MX25_DEF_DOWNLOAD_ADDR		(MX25_MEMORY_START_ADDR + EXE_OFFSET)									
-#define MX25_DEF_NOR_FLASH_ADDR		0xA0000000								
-#define MX25_INT_RAM_START			0x78000000								
-#define MX25_INT_RAM_END			0x7801FFFF								
-#define MX25_IMAGE_START_ADDR		(MX25_MEMORY_START_ADDR	+ 0x10000)	
-
-/************ MX27 Default Address Setting*******************************/
-#define MX27_MEMORY_START_ADDR		0xA0000000								
-#define MX27_MEMORY_END_ADDR		0xD8000FFF								
-#define MX27_DEF_HWC_ADDR			(MX27_MEMORY_START_ADDR + HWC_OFFSET)	
-#define MX27_DEF_CSF_ADDR			(MX27_MEMORY_START_ADDR + CSF_OFFSET) 	
-#define MX27_DEF_RKL_ADDR			(MX27_MEMORY_START_ADDR + EXE_OFFSET)	
-#define MX27_DEF_DOWNLOAD_ADDR		(MX27_MEMORY_START_ADDR + EXE_OFFSET)									
-#define MX27_DEF_NOR_FLASH_ADDR		0xC0000000								
-#define MX27_INT_RAM_START			0xFFFF4C00								
-#define MX27_INT_RAM_END			0xFFFFFFFF								
-#define MX27_IMAGE_START_ADDR		0xA0010000
-/************************************************************************/
-
-/************ MX31 Default Address Setting*******************************/
-#define MX31_MEMORY_START_ADDR		0x80000000								
-#define MX31_MEMORY_END_ADDR		0xB8000000							
-#define MX31_DEF_HWC_ADDR			(MX31_MEMORY_START_ADDR + HWC_OFFSET)	
-#define MX31_DEF_CSF_ADDR			(MX31_MEMORY_START_ADDR + CSF_OFFSET) 	
-#define MX31_DEF_RKL_ADDR			(MX31_MEMORY_START_ADDR + EXE_OFFSET)	
-#define MX31_DEF_DOWNLOAD_ADDR		(MX31_MEMORY_START_ADDR + EXE_OFFSET)								
-#define MX31_DEF_NOR_FLASH_ADDR		0xA0000000								
-#define MX31_INT_RAM_START			0x1FFFC000							
-#define MX31_INT_RAM_END			0x1FFFFFFF							
-#define MX31_IMAGE_START_ADDR		0x80010000								
-/************************************************************************/
-
-/************ MX35 Default Address Setting*******************************/
-#define MX35_MEMORY_START_ADDR		0x80000000								
-#define MX35_MEMORY_END_ADDR		0x8FFFFFFF							
-#define MX35_DEF_HWC_ADDR			(MX35_MEMORY_START_ADDR + HWC_OFFSET)	
-#define MX35_DEF_CSF_ADDR			(MX35_MEMORY_START_ADDR + CSF_OFFSET) 	
-#define MX35_DEF_RKL_ADDR			(MX35_MEMORY_START_ADDR + EXE_OFFSET)	
-#define MX35_DEF_DOWNLOAD_ADDR		(MX35_MEMORY_START_ADDR	+ EXE_OFFSET)
-#define MX35_DEF_NOR_FLASH_ADDR		0xA0000000								
-#define MX35_INT_RAM_START			0x10000000							
-#define MX35_INT_RAM_END			0x1001FFFF							
-#define MX35_IMAGE_START_ADDR		(MX35_MEMORY_START_ADDR	+ 0x10000)								
-/************************************************************************/
-
-/************ MX37 Default Address Setting*******************************/
-#define MX37_MEMORY_START_ADDR		0x40000000								
-#define MX37_MEMORY_END_ADDR		0x4FFFFFFF							
-#define MX37_DEF_HWC_ADDR			(MX37_MEMORY_START_ADDR + HWC_OFFSET)	
-#define MX37_DEF_CSF_ADDR			(MX37_MEMORY_START_ADDR + CSF_OFFSET) 	
-#define MX37_DEF_RKL_ADDR			(MX37_MEMORY_START_ADDR + EXE_OFFSET)	
-#define MX37_DEF_DOWNLOAD_ADDR		(MX37_MEMORY_START_ADDR	+ EXE_OFFSET)								
-#define MX37_DEF_NOR_FLASH_ADDR		0x60000000								
-#define MX37_INT_RAM_START			0x10000000							
-#define MX37_INT_RAM_END			0x10011FFF							
-#define MX37_IMAGE_START_ADDR		(MX37_MEMORY_START_ADDR	+ 0x10000)								
-/************************************************************************/
-
-/************ MX51 Default Address Setting*******************************/
-#define MX51_MEMORY_START_ADDR		0x90000000								
-#define MX51_MEMORY_END_ADDR		0x9FFFFFFF							
-#define MX51_DEF_HWC_ADDR			(MX51_MEMORY_START_ADDR + HWC_OFFSET)	
-#define MX51_DEF_CSF_ADDR			(MX51_MEMORY_START_ADDR + CSF_OFFSET) 	
-#define MX51_DEF_RKL_ADDR			(MX51_MEMORY_START_ADDR + EXE_OFFSET)	
-#define MX51_DEF_DOWNLOAD_ADDR		(MX51_MEMORY_START_ADDR	+ EXE_OFFSET)								
-#define MX51_DEF_NOR_FLASH_ADDR		0xB0000000								
-#define MX51_INT_RAM_START			0x1FFE8000							
-#define MX51_INT_RAM_END			0x1FFFFFFF
-#define MX51_INT_RAM_START_TO2		0x1FFE0000							
-#define MX51_INT_RAM_END_TO2		0x1FFFFFFF							
-#define MX51_IMAGE_START_ADDR		(MX51_MEMORY_START_ADDR	+ 0x10000)								
-/************************************************************************/
 
 typedef enum 
 {
@@ -193,6 +115,7 @@ static char *mx_string[MX_MAX] = {
 };
 
 // define each MX chip memory address
+/*
 static unsigned long mm_addrs[MX_MAX][10] = {
 	{MX25_MEMORY_START_ADDR, MX25_MEMORY_END_ADDR, MX25_DEF_RKL_ADDR, MX25_DEF_HWC_ADDR,
 		MX25_DEF_CSF_ADDR, MX25_MEMORY_START_ADDR, MX25_DEF_NOR_FLASH_ADDR,
@@ -234,18 +157,5 @@ static unsigned long mm_addrs[MX_MAX][10] = {
 		MX51_DEF_CSF_ADDR, MX51_MEMORY_START_ADDR, MX51_DEF_NOR_FLASH_ADDR,
 		MX51_INT_RAM_START_TO2, MX51_INT_RAM_END_TO2},
 };
-
-typedef struct 
-{
-	UINT addr;
-	UINT data;
-	UINT format;
-} stMemoryInit;
-
-typedef struct
-{
-	stMemoryInit *script;
-	int lines;
-} mmInitScript_t;
-
+*/
 #endif

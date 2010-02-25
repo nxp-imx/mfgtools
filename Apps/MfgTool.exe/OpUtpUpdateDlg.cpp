@@ -5,12 +5,6 @@
 #include "StMfgTool.h"
 #include "OpUtpUpdateDlg.h"
 
-void MyFileDialog::OnTypeChange( )
-{
-//	CFileDialog::UpdateOFNFromShellDialog();
-}
-
-
 // COpUtpUpdateDlg dialog
 
 IMPLEMENT_DYNAMIC(COpUtpUpdateDlg, CDialog)
@@ -20,7 +14,7 @@ COpUtpUpdateDlg::COpUtpUpdateDlg(CWnd* pParent /*=NULL*/, COpInfo* pInfo)
     , m_pOpInfo(pInfo)
 	, m_required_files_filter(_T(""))
 {
-	m_pOpInfo->m_e_type = COperation::UTP_UPDATE_OP;
+//	m_pOpInfo->m_e_type = COperation::UTP_UPDATE_OP;
     m_pOpInfo->m_cs_desc = COperation::OperationStrings[m_pOpInfo->m_e_type];
 }
 
@@ -277,7 +271,7 @@ void COpUtpUpdateDlg::OnCbnSelchangeOpUtpUpdateUclListCombo()
 
 void COpUtpUpdateDlg::OnBnClickedRequiredFilesBrowseBtn()
 {
-    MyFileDialog dlg( TRUE, NULL, NULL, OFN_FILEMUSTEXIST | OFN_ALLOWMULTISELECT,
+    CFileDialog dlg( TRUE, NULL, NULL, OFN_FILEMUSTEXIST | OFN_ALLOWMULTISELECT,
 		m_required_files_filter, this, 0, FALSE);
 
 	if ( IDOK == dlg.DoModal() )

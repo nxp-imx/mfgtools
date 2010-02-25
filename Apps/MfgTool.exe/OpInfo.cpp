@@ -442,6 +442,7 @@ validate:
 			break;
 
 		case COperation::UTP_UPDATE_OP:
+		case COperation::MX_UPDATE_OP:
 		{
 			// see if <AppDir>\Profiles\<Player Description>\<Operation Description> exists
 			if ( !m_b_new_op && _taccess(m_cs_path, 0) == -1 ) {
@@ -475,7 +476,117 @@ validate:
 			}
 			break;
 		}
-		default:
+/*		case COperation::MX_UPDATE_OP:
+		{
+			// see if <AppDir>\Profiles\<Player Description>\<Operation Description> exists
+			if ( !m_b_new_op && _taccess(m_cs_path, 0) == -1 ) {
+				csTemp.LoadString(IDS_OPINFO_ERR_MISSING_DIRECTORY);
+				m_error_msg.Format(csTemp, m_cs_path);
+				return (  m_status = OPINFO_ERROR );
+			}
+
+			if ( !m_b_new_op )
+			{
+				GetPrivateProfileString(m_cs_ini_section, _T("RKL_FW"), _T(""), csTemp.GetBufferSetLength(_MAX_PATH), _MAX_PATH, m_p_profile->m_cs_ini_file);
+				csTemp.ReleaseBuffer();
+				if ( !csTemp.IsEmpty() )
+				{
+					CString csRklFilename;
+					csRklFilename.Format(_T("%s\\%s"), m_cs_path, csTemp);
+					if ( _taccess(csRklFilename, 0) != -1 )
+					{
+						SetRklFilename( csRklFilename, CFileList::EXISTS_IN_TARGET );
+					}
+				}
+
+				GetPrivateProfileString(m_cs_ini_section, NULL, NULL, csTemp.GetBufferSetLength(_MAX_PATH), _MAX_PATH, m_p_profile->m_cs_ini_file);
+				// get firmware file names
+				int n_copied_chars, pos = 0;
+				n_copied_chars = GetPrivateProfileSection(m_cs_ini_section, csFile.GetBufferSetLength(1024), 1024, m_p_profile->m_cs_ini_file);
+				csFile.ReleaseBuffer(n_copied_chars+1);
+				if ( n_copied_chars != 0 && n_copied_chars != (1024-2) ) {
+					// parse section
+					// Need to store the file names for the profile editor
+					while (csFile.GetAt(pos) != _T('\0')) {
+						DWORD dwStatus;
+						CString csField;
+						int lpos = 0;
+						CString csLine = csFile.Tokenize(_T("\r\n"), pos);
+						// already handled the STATIC_ID_FW case
+						if ( csLine.Find(_T("RKL_FW")) != -1 )
+							continue;
+						media::MxImageObject imageObj;
+						// file name
+						if ( csLine.GetAt(0) != _T(',') ) { 
+							csField = csLine.Tokenize(_T(","), lpos);
+							// skip the file if it is the static id manufacturing firmware
+							if ( (csField.MakeLower().Find(STATIC_ID_FW_FILENAME) != -1) ||
+								(csField.MakeLower().Find(UPDATER_FW_FILENAME) != -1) )
+							{
+								CString csUpdateBootFilename;
+								csUpdateBootFilename.Format(_T("%s\\%s"), m_cs_path, csField);
+								if ( _taccess(csUpdateBootFilename, 0) != -1 )
+								{
+									SetUpdaterBootFilename( csUpdateBootFilename, CFileList::EXISTS_IN_TARGET );
+								}
+								continue;
+							}
+							// Add to string list for the profile editor
+
+							csTemp.Format(_T("%s\\%s"), m_cs_path, csField);
+							dd.Name = csTemp;
+							dd.FileListIndex = m_FileList.AddFile(csTemp, CFileList::EXISTS_IN_TARGET);
+						}
+						else ++lpos;
+						if ( lpos == -1 || lpos > csLine.GetLength() ) goto validate;
+						// file description
+						if ( csLine.GetAt(lpos) != _T(',') ) { 
+							dd.Description = csLine.Tokenize(_T(","), lpos);
+						}
+						else ++lpos;
+						if ( lpos == -1 || lpos > csLine.GetLength() ) goto validate;
+						// drive type
+						if ( csLine.GetAt(lpos) != _T(',') ) { 
+							dd.Type = (media::LogicalDriveType)_tstoi(csLine.Tokenize(_T(","), lpos));
+						}
+						else ++lpos;
+						if ( lpos == -1 || lpos > csLine.GetLength() ) goto validate;
+						// drive tag
+						if ( csLine.GetAt(lpos) != _T(',') ) {
+							CString str = csLine.Tokenize(_T(","), lpos);
+							_stscanf_s(str, _T("%x"), &dd.Tag);
+						}
+						else ++lpos;
+						if ( lpos == -1 || lpos > csLine.GetLength() ) goto validate;
+						// drive flags
+						if ( csLine.GetAt(lpos) != _T(',') ) {
+							CString str = csLine.Tokenize(_T(","), lpos);
+							_stscanf_s(str, _T("%x"), &dd.Flags);
+						}
+						else ++lpos;
+						if ( lpos == -1 || lpos > csLine.GetLength() ) goto validate;
+						// requested_drive_size_kb
+						if ( csLine.GetAt(lpos) != _T(',') ) { 
+							dd.RequestedKB = _tstoi(csLine.Tokenize(_T(","), lpos));
+						}
+	validate:
+						if (dd.Type != media::DriveType_Invalid)
+						{
+							m_drive_array.AddDrive(dd);
+
+							if ( (dwStatus = ValidateDrvInfo(&dd) ) != OPINFO_OK )
+							{
+								m_status = dwStatus;
+								//return ( m_status );
+							}
+						}
+					}
+
+				} // end if (got section)
+			}
+			break;
+		}
+*/		default:
 			m_error_msg.LoadString(IDS_OPINFO_ERR_INVALID_OPERATION);
 			return m_status = OPINFO_ERROR;
 	} // end switch(type)
@@ -506,6 +617,7 @@ DWORD COpInfo::Validate(void)
 		case COperation::COPY_OP:
 		case COperation::LOADER_OP:
 		case COperation::UTP_UPDATE_OP:
+		case COperation::MX_UPDATE_OP:
 		{
 			// if an existing op, check that the folder and file(s) exist
 			if ( !m_b_new_op )
@@ -642,6 +754,7 @@ DWORD COpInfo::WriteIniSection(LPCTSTR _section, LPCTSTR _old_section)
 			csSection.AppendChar(_T('\0'));
 			break;
 		case COperation::UTP_UPDATE_OP:
+		case COperation::MX_UPDATE_OP:
 			csSection.AppendFormat(_T("UCL_INSTALL_SECTION=%s\r\n"), m_UclInstallSection);
 			csSection.AppendChar(_T('\0'));
 			break;
@@ -878,14 +991,28 @@ CString COpInfo::GetUclFilename(void)
 		return m_FileList.GetFileNameAt(m_ucl_fname_list_index);
 	else return NULL;
 }
-
+/*
+CString COpInfo::GetRklFilename(void)
+{
+	if (m_rkl_fname_list_index != -1)
+		return m_FileList.GetFileNameAt(m_rkl_fname_list_index);
+	else return NULL;
+}
+*/
 CString COpInfo::GetUclPathname(void)
 {
 	if (m_ucl_fname_list_index != -1)
 		return m_FileList.GetPathNameAt(m_ucl_fname_list_index);
 	else return NULL;
 }
-
+/*
+CString COpInfo::GetRklPathname(void)
+{
+	if (m_rkl_fname_list_index != -1)
+		return m_FileList.GetPathNameAt(m_rkl_fname_list_index);
+	else return NULL;
+}
+*/
 void COpInfo::SetUclFilename(CString _fName, CFileList::FileListAction _action)
 {
 	int index = -1;
@@ -901,7 +1028,23 @@ void COpInfo::SetUclFilename(CString _fName, CFileList::FileListAction _action)
 		m_ucl_fname_list_index = m_FileList.AddFile(_fName, _action);
 	}
 }
+/*
+void COpInfo::SetRklFilename(CString _fName, CFileList::FileListAction _action)
+{
+	int index = -1;
+	if ( m_FileList.FindFile(_fName, index) != NULL )
+	{
+		m_rkl_fname_list_index = index;
+	}
+	else
+	{
+		if (m_rkl_fname_list_index != -1)
+			RemoveRklFilename();
 
+		m_rkl_fname_list_index = m_FileList.AddFile(_fName, _action);
+	}
+}
+*/
 void COpInfo::RemoveUclFilename(void)
 {
 	if (m_ucl_fname_list_index != -1)
@@ -910,3 +1053,13 @@ void COpInfo::RemoveUclFilename(void)
 		m_ucl_fname_list_index = -1;
 	}
 }
+/*
+void COpInfo::RemoveRklFilename(void)
+{
+	if (m_rkl_fname_list_index != -1)
+	{
+		m_FileList.RemoveFile(m_rkl_fname_list_index);
+		m_rkl_fname_list_index = -1;
+	}
+}
+*/

@@ -7,7 +7,11 @@
 #include "Common/StdString.h"
 #include "Common/StdInt.h"
 
-#include "iMX/MXDefine.h"
+//#include "iMX/MXDefine.h"
+//#include "iMX/MemoryInit.h"
+
+//#include "Apps/MfgTool.exe/UpdateCommandList.h" // UGLY!!!!
+
 #include "iMX/ADSTkConfigure.h"
 
 //#include "Common/WinDriver/wdu_lib.h"
@@ -18,12 +22,14 @@
 
 class MxRomDevice : public Device//, IComparable
 {
-
+	friend class DeviceManager;
 public:
 	MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path);
-	
-	virtual ~MxRomDevice(void) {};
-//    uint32_t Download(const StFwComponent& fwComponent, Device::UI_Callback callbackFn); 
+	virtual ~MxRomDevice(void);
+	int GetRKLVersion(unsigned char *fmodel, int *len, int *mxType);
+//	BOOL InitMemoryDevice(MxRomDevice::MemoryInitScript script);
+	BOOL DownloadRKL(const StFwComponent& fwComponent, Device::UI_Callback callbackFn);
+
 	void SetIMXDevPara(void);
 	BOOL DownloadRKL(unsigned char *rkl, int rklsize, unsigned int RAMKNLAddr, bool bPreload);
 
@@ -37,14 +43,36 @@ public:
 		CString cMemInitFilePath;
 	}MxRomParamt, * PMxRomParamt;
 	MxRomParamt m_MxRomParamt;
-	BOOL m_bMemInited;
 
 private:
-	BOOL InitMemoryDevice();
-	BOOL WriteMemory(int mode, UINT address, UINT Data, UINT Format);
-	BOOL GetHABType(int mode);
-	BOOL Jump2Rak(int mode, BOOL is_hab_prod);
-	BOOL DownloadImage(UINT byteCount, const unsigned char* pBuf, unsigned int RamAddr, bool bPreload);
+	enum HAB_t
+	{
+		HabUnknown  = -1,
+		HabEnabled  = 0x12343412,
+		HabDisabled = 0x56787856
+	};
+
+    enum ChipFamily_t
+    {
+        ChipUnknown = 0,
+        MX25,
+        MX27,
+        MX31,
+        MX32,
+        MX35,
+        MX37,
+        MX51
+    };
+
+	ChipFamily_t GetChipFamily();
+
+	BOOL WriteMemory(UINT address, UINT data, UINT format);
+	BOOL ValidAddress(const UINT address) const;
+	HAB_t GetHABType(ChipFamily_t chipType);
+	void PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsigned long addr, unsigned long param, unsigned long param1);
+	struct Response UnPackRklResponse(unsigned char *resBuf);
+	BOOL Jump2Rak();
+	BOOL DownloadImage(UINT address, const StFwComponent& fwComponent, Device::UI_Callback callbackFn);
 	BOOL SendCommand2RoK(UINT address, UINT byteCount, UCHAR type);
 	BOOL TransData(UINT byteCount, const unsigned char * pBuf,int opMode);
 	BOOL WriteToDevice(const unsigned char *buf, UINT count);
@@ -55,9 +83,104 @@ private:
     BOOL USB_CloseDevice();
 
 	CADSTkConfigure atkConfigure;
+
 	HANDLE _hDevice;
 	HANDLE _hWrite;
 	HANDLE _hRead;
+	ChipFamily_t _chipFamily;
+	HAB_t _habType;
+
+	enum ChannelType { ChannelType_UART = 0, ChannelType_USB };
+	typedef struct RomVersion
+	{
+		UINT Major;
+		UINT Minor;
+		
+		RomVersion(UINT major, UINT minor) : Major(major), Minor(minor) {};
+		BOOL operator==(const RomVersion& rhs) const { return Major == rhs.Major && Minor == rhs.Minor; };
+	};
+	RomVersion _romVersion;
+	
+	enum MemoryType { MemUnknown, DDR, SDRAM, DDR2, mDDR };
+	MemoryType StringToMemoryType(CString strMemType)
+	{
+		MemoryType memType = MemUnknown;
+
+		if ( strMemType.CompareNoCase(_T("DDR")) == 0 )
+			memType = DDR;
+		else if ( strMemType.CompareNoCase(_T("SDRAM")) == 0 )
+			memType = SDRAM;
+		else if ( strMemType.CompareNoCase(_T("DDR2")) == 0 )
+			memType = DDR2;
+		else if ( strMemType.CompareNoCase(_T("mDDR")) == 0 )
+			memType = mDDR;
+
+		return memType;
+	}
+
+public:
+	typedef struct MemoryInitCommand
+	{
+		UINT Address;
+		UINT Data;
+		UINT Format;
+
+		MemoryInitCommand(UINT addr, UINT data, UINT format) : Address(addr), Data(data), Format(format) {};
+	};
+
+	typedef std::vector<MemoryInitCommand> MemoryInitScript;
+	MemoryInitScript* GetMemoryScript(ChipFamily_t chipType, RomVersion romVersion, MemoryType memoryType) const;
+
+	static void InializeMemoryScripts();
+
+	BOOL InitMemoryDevice(MxRomDevice::MemoryInitScript script);
+	static MemoryInitScript ddrMx31;
+	static MemoryInitScript ddrMx27;
+	static MemoryInitScript sdrMx31;
+	static MemoryInitScript ddrMx35;
+	static MemoryInitScript mddrMx35;
+	static MemoryInitScript ddr2Mx35;
+	static MemoryInitScript ddrMx37;
+	static MemoryInitScript ddrMx51;
+	static MemoryInitScript ddrMx51_To2;
+	static MemoryInitScript mddrMx51_To2;
+	static MemoryInitScript ddrMx25;
+	static MemoryInitScript mddrMx25;
+	static MemoryInitScript ddr2Mx25_To11;
+
+	struct MxAddress
+	{
+		UINT MemoryStart;
+		UINT MemoryEnd;
+		UINT DefaultRKL;
+		UINT DefaultHWC;
+		UINT DefaultCSF;
+		UINT DefaultDownload;
+		UINT DefaultNorFlash;
+		UINT InternalRamStart;
+		UINT InternalRamEnd;
+		UINT ImageStart;
+
+		MxAddress(UINT memStart, UINT memEnd, UINT rkl, UINT hwc, UINT csf, UINT download, UINT nor, UINT ramStart, UINT ramEnd, UINT img)
+			: MemoryStart(memStart), MemoryEnd(memEnd), DefaultRKL(rkl), DefaultHWC(hwc), DefaultCSF(csf), DefaultDownload(download)
+			, DefaultNorFlash(nor), InternalRamStart(ramStart), InternalRamEnd(ramEnd), ImageStart(img)
+		{}
+		
+		MxAddress()
+			: MemoryStart(0), MemoryEnd(0), DefaultRKL(0), DefaultHWC(0), DefaultCSF(0), DefaultDownload(0)
+			, DefaultNorFlash(0), InternalRamStart(0), InternalRamEnd(0), ImageStart(0)
+		{}
+	};
+	MxAddress _defaultAddress;
+	BOOL InitRomVersion(ChipFamily_t chipType, RomVersion& romVersion, MxAddress& defaultAddrs) const;
+
+	static MxAddress MX25Addrs;
+	static MxAddress MX27Addrs;
+	static MxAddress MX31Addrs;
+	static MxAddress MX35Addrs;
+	static MxAddress MX37Addrs;
+	static MxAddress MX51Addrs;
+	static MxAddress MX51_TO2Addrs;
 };
 //private:
 //	static const uint32_t PipeSize = 4096;      //TODO:??? where did this come from?

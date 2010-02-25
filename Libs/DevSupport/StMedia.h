@@ -1,5 +1,4 @@
 #pragma once
-
 #include "ParameterT.h"
 #include "StFwComponent.h"
 
@@ -307,6 +306,12 @@ namespace media
 		const uint16_t JanusFormatID;
 		const uint16_t JanusBootSectorOffset;
 		const uint32_t JanusDriveTotalSectors;
+	};
+
+	struct MxImageObject
+	{
+		CStdString ImageFilename;
+		uint32_t Address;
 	};
 
 	#pragma pack (pop, 1)

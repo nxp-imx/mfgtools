@@ -47,6 +47,7 @@ protected:
 									//       {COPY, _T("Test Media Files")},
 									//		 {UPDATE, _T("Retail Firmware Files")},
 									//       {UTP_UPDATE, _T("Retail Firmware Files")},
+									//       {MX_UPDATE, _T("Retail Firmware Files")},
 									//       {COPY, _T("Retail Media Files")},
 									//       {REG_SCRUB, _T("")} }
 	COpInfoList m_p_op_delete_list;	// list of deleted ops

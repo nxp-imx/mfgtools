@@ -4,16 +4,6 @@
 #include "../../Libs/WinSupport/dropedit.h"
 #include "UpdateCommandList.h"
 
-class MyFileDialog : public CFileDialog
-{
-public:
-	MyFileDialog( BOOL bOpen, LPCTSTR ext, LPCTSTR filename, DWORD flags,  LPCTSTR filter, CWnd* parent, DWORD size, BOOL bVista )
-		: CFileDialog( bOpen, ext, filename, flags, filter, parent, size, bVista)
-	{}
-
-	void OnTypeChange();
-};
-
 // COpUtpUpdateDlg dialog
 
 class COpUtpUpdateDlg : public CDialog

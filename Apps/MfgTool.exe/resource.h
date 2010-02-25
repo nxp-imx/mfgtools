@@ -42,6 +42,7 @@
 #define IDD_UTPUPDATEOPDLG              154
 #define IDR_BOUND_RESOURCE_TABLE_LEN    154
 #define IDR_USE_LOCAL_RESOURCES         155
+#define IDD_MXUPDATEOPDLG               155
 #define IDR_DEFAULT_DIALOG              156
 #define IDR_STMP3REC_SYS                160
 #define IDR_STMP3REC_INF                161
@@ -188,6 +189,7 @@
 #define IDC_FILE_TYPE_COMBO             1081
 #define IDC_OP_NAME_EDIT                1082
 #define IDC_LIST1                       1083
+#define IDC_IMAGE_LIST                  1083
 #define IDC_DRIVE_LIST                  1083
 #define IDC_OP_OPTIONS_LIST             1084
 #define IDC_OP_PATH_EDIT                1085
@@ -266,9 +268,13 @@
 #define IDC_UCL_FNAME_EDIT              1148
 #define IDC_UCL_BROWSE_BTN              1149
 #define IDC_STATUS_GRP_TEXT             1150
+#define IDC_RKL_FNAME_EDIT              1150
 #define IDC_STATUS_PROFILE_TEXT         1151
+#define IDC_OP_MX_UPDATE_IMAGE_LIST_TEXT2 1151
 #define IDC_STATUS_PROFILE              1152
+#define IDC_IMAGE_FILES_BROWSE_BTN      1152
 #define IDC_STATUS_VIDPID_TEXT          1153
+#define IDC_RKL_BROWSE_BTN              1153
 #define IDC_STATUS_VIDPID               1154
 #define IDC_STATUS_FW_VER_TEXT          1155
 #define IDC_STATUS_FW_VER               1156
@@ -619,7 +625,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        154
 #define _APS_NEXT_COMMAND_VALUE         32790
-#define _APS_NEXT_CONTROL_VALUE         1150
+#define _APS_NEXT_CONTROL_VALUE         1154
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

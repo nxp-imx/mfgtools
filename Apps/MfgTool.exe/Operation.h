@@ -31,6 +31,7 @@ public:
 							LOADER_OP,
 							OTP_OP,
 							UTP_UPDATE_OP,
+							MX_UPDATE_OP,
 							NO_MORE_OPS, // move after loader_op to enable loader op
 							ERASE_OP,
 							REGISTRY_OP,

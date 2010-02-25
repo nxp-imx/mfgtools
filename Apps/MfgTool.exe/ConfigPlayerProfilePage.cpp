@@ -9,6 +9,7 @@
 #include "LoadFileOpDlg.h"
 #include "OpOTPDlg.h"
 #include "OpUtpUpdateDlg.h"
+#include "OpMxRomUpdateDlg.h"
 #include "ConfigUSBPortPage.h"
 #include "StMfgTool.h"
 #include "DefaultProfile.h"
@@ -79,6 +80,7 @@ BEGIN_MESSAGE_MAP(CConfigPlayerProfilePage, CPropertyPage)
     ON_NOTIFY(LVN_KEYDOWN, IDC_OPERATIONS_LIST, OnLvnKeydownOperationsList)
     ON_NOTIFY(NM_DBLCLK, IDC_OPERATIONS_LIST, OnNMDblclkOperationsList)
     ON_COMMAND_RANGE(IDM_ENABLED, IDM_NEW_UTP_UPDATE_OP, OnListCtrlContextMenu)
+    ON_COMMAND_RANGE(IDM_ENABLED, IDM_NEW_MX_UPDATE_OP, OnListCtrlContextMenu)
 //    ON_COMMAND_RANGE(IDM_ENABLED, IDM_NEW_OTP_OP, OnListCtrlContextMenu)
 END_MESSAGE_MAP()
 
@@ -945,7 +947,8 @@ DWORD CConfigPlayerProfilePage::InsertOpsList(CPlayerProfile * _pProfile)
 				{
 					csText.Append(pOpInfo->m_csOTPValue);
 				}
-				else if ( pOpInfo->m_e_type == COperation::UTP_UPDATE_OP )
+				else if ( pOpInfo->m_e_type == COperation::UTP_UPDATE_OP ||
+					      pOpInfo->m_e_type == COperation::MX_UPDATE_OP)
 				{
 					csText.Append(pOpInfo->m_UclInstallSection);
 				}
@@ -1623,12 +1626,18 @@ DWORD CConfigPlayerProfilePage::OpWorkerNew(COperation::OpTypes _opType)
 	    ret = pOpEditor->DoModal();
 	    delete pOpEditor;
 	}
-	else if (_opType == COperation::UTP_UPDATE_OP)
+	else if (_opType == COperation::UTP_UPDATE_OP || _opType == COperation::MX_UPDATE_OP)
 	{
 		COpUtpUpdateDlg *pOpEditor = new COpUtpUpdateDlg(this, pInfo);
 	    ret = pOpEditor->DoModal();
 	    delete pOpEditor;
 	}
+//	else if (_opType == COperation::MX_UPDATE_OP)
+//	{
+//		COpMxRomUpdateDlg *pOpEditor = new COpMxRomUpdateDlg(this, pInfo);
+//	    ret = pOpEditor->DoModal();
+//	    delete pOpEditor;
+//	}
 
     if (ret == IDOK)
 	{
@@ -1682,12 +1691,18 @@ DWORD CConfigPlayerProfilePage::OpWorkerEdit()
 	    ret = pOpEditor->DoModal();
 	    delete pOpEditor;
 	}
-	else if (pOpInfo->GetType() == COperation::UTP_UPDATE_OP)
+	else if (pOpInfo->GetType() == COperation::UTP_UPDATE_OP || pOpInfo->GetType() == COperation::MX_UPDATE_OP)
 	{
 		COpUtpUpdateDlg *pOpEditor = new COpUtpUpdateDlg(this, pOpInfo);
 	    ret = pOpEditor->DoModal();
 	    delete pOpEditor;
 	}
+//	else if (pOpInfo->GetType() == COperation::MX_UPDATE_OP)
+//	{
+//		COpMxRomUpdateDlg *pOpEditor = new COpMxRomUpdateDlg(this, pOpInfo);
+//	    ret = pOpEditor->DoModal();
+//	    delete pOpEditor;
+//	}
 
 //    pInfo->Validate();
     InsertOpsList(m_p_player_profile);
@@ -1851,6 +1866,9 @@ void CConfigPlayerProfilePage::OnListCtrlContextMenu(UINT nID)
 		break;
 	case IDM_NEW_UTP_UPDATE_OP:
 		OpWorkerNew(COperation::UTP_UPDATE_OP);
+		break;
+	case IDM_NEW_MX_UPDATE_OP:
+		OpWorkerNew(COperation::MX_UPDATE_OP);
 		break;
 	case IDM_ST_EDIT:
         OpWorkerEdit();

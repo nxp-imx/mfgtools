@@ -145,7 +145,12 @@ BOOL DeviceManager::InitInstance()
 		// register for usb hubs
 		_hUsbHub=RegisterDeviceNotification(_DevChangeWnd.GetSafeHwnd(),&broadcastInterface,
 											DEVICE_NOTIFY_WINDOW_HANDLE);
-    }
+
+		// register for MX ROM usb devices /////// THIS IS VERY COOL //////
+//		memcpy(&(broadcastInterface.dbcc_classguid),&(GUID_DEVINTERFACE_MX_ROM_WDF_USB_BULK_DEVICE),sizeof(struct _GUID));
+//		_hMxUsbDev=RegisterDeviceNotification(_DevChangeWnd.GetSafeHwnd(), &broadcastInterface, DEVICE_NOTIFY_WINDOW_HANDLE);
+	
+	}
     else
     {
         ATLTRACE(_T(" *** FAILED TO CREATE WINDOW FOR WM_DEVCHANGE NOTIFICATIONS.\n"));
@@ -162,6 +167,9 @@ BOOL DeviceManager::InitInstance()
 	Devices();
 	// Init all the USB Ports.
 	((usb::HubMgr*)_devClasses[DeviceClass::DeviceTypeUsbHub])->RefreshHubs();
+
+	// Kinda ugly.... CLW TODO
+	MxRomDevice::InializeMemoryScripts();
 
 	// Let the client thread that called Open() resume.
 	VERIFY(::SetEvent(_hStartEvent));

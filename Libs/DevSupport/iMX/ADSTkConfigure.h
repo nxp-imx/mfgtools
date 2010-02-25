@@ -7,7 +7,7 @@
 
 //#include "ConfigurePage.h"
 #include "MXDefine.h"
-//#include " MemoryInit.h"
+#include "MemoryInit.h"
 
 using namespace std;
 
