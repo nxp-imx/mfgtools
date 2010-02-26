@@ -53,7 +53,6 @@ protected:
 	UCL m_UclNode;
 	UCL::CommandList* m_pCmdList;
 	UCL::DeviceState::DeviceState_t m_CurrentDeviceState;
-	DeviceClass::DeviceType m_CurrentDeviceType;
 	std::map<UCL::DeviceState::DeviceState_t, UCL::DeviceDesc*> m_DeviceStates;
     HANDLE m_hChangeEvent;
 	BOOL m_bProcessingList;
@@ -67,8 +66,9 @@ protected:
 	DWORD DoBoot(UCL::Command* pCmd);
 	DWORD DoResetToRecovery();
 	DWORD DoBurn(UCL::Command* pCmd);
-	DWORD DoLoad(CString filename);
-	DWORD DoMxRomLoad(CString filename, unsigned int RAMKNLAddr, bool bPreload);
+	DWORD DoHidLoad(UCL::Command* pCmd);
+	DWORD DoInit(UCL::Command* pCmd);
+	DWORD DoMxRomLoad(UCL::Command* pCmd);
 	DWORD DoShow(UCL::Command* pCmd);
 
 };

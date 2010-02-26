@@ -5,9 +5,8 @@
 #include "Libs/WDK/usb100.h"
 #include <sys/stat.h>
 
-//#include "iMX/MemoryInit.h"
-#include "iMX/MxDefine.h"
 #include "iMX/AtkHostApiClass.h"
+//#include "iMX/MxDefine.h"
 #include "../../Drivers/iMX_BulkIO_Driver/sys/public.h"
 
 static BOOL bMutex4RamKnlDld = TRUE;//mutex flag for ram kernel downloading process to prevent other object from starting downloading.
@@ -259,88 +258,38 @@ BOOL MxRomDevice::InitRomVersion(ChipFamily_t chipType, RomVersion& romVersion, 
 	return success;
 }
 
-void MxRomDevice::SetIMXDevPara(void)
+BOOL MxRomDevice::InitMemoryDevice(CString filename)
 {
-	atkConfigure.SetChannel(ChannelType_USB, 0, 1);
+	USES_CONVERSION;
 
-	if(m_MxRomParamt.cMXType ==  _T("25_TO1"))
-		atkConfigure.SetMXType(MX_MX25_TO1);
-	else if(m_MxRomParamt.cMXType ==  _T("25_TO11"))
-		atkConfigure.SetMXType(MX_MX25_TO11);
-	else if(m_MxRomParamt.cMXType ==  _T("31_TO1"))
-		atkConfigure.SetMXType(MX_MX31_TO1);
-	else if(m_MxRomParamt.cMXType ==  _T("31_TO2"))
-		atkConfigure.SetMXType(MX_MX31_TO2);
-	else if(m_MxRomParamt.cMXType ==  _T("35_TO1"))
-		atkConfigure.SetMXType(MX_MX35_TO1);
-	else if(m_MxRomParamt.cMXType ==  _T("35_TO2"))
-		atkConfigure.SetMXType(MX_MX35_TO2);
-	else if(m_MxRomParamt.cMXType ==  _T("37"))
-		atkConfigure.SetMXType(MX_MX37);
-	else if(m_MxRomParamt.cMXType ==  _T("51_TO1"))
-		atkConfigure.SetMXType(MX_MX51_TO1);
-	else if(m_MxRomParamt.cMXType ==  _T("51_TO2"))
-		atkConfigure.SetMXType(MX_MX51_TO2);
-	else
+	CFile scriptFile;
+	CFileException fileException;
+	if( !scriptFile.Open(filename, CFile::modeRead, &fileException) )
 	{
-		TRACE(("Please check the MXType in ucl.xml, there is no handle for %s!\n"),m_MxRomParamt.cMXType);
+		TRACE( _T("Can't open file %s, error = %u\n"), filename, fileException.m_cause );
 	}
 
-	if(m_MxRomParamt.cSecurity == _T("true"))
+	CStringT<char,StrTraitMFC<char> > cmdString;
+	scriptFile.Read(cmdString.GetBufferSetLength(scriptFile.GetLength()), scriptFile.GetLength());
+	cmdString.ReleaseBuffer();
+
+	
+	XNode script;
+	if ( script.Load(A2T(cmdString)) != NULL )
 	{
-		atkConfigure.SetSecurity(TRUE);
-	}
-	else
-	{
-		atkConfigure.SetSecurity(FALSE);
-	}
-
-	if(m_MxRomParamt.cRAMType == _T("DDR"))
-		atkConfigure.SetRAMType(MM_DDR);
-	else if(m_MxRomParamt.cRAMType == _T("SDRAM"))
-		atkConfigure.SetRAMType(MM_SDRAM);
-	else if(m_MxRomParamt.cRAMType == _T("DDR2"))
-		atkConfigure.SetRAMType(MM_DDR2);
-	else if(m_MxRomParamt.cRAMType == _T("MDDR"))
-		atkConfigure.SetRAMType(MM_MDDR);
-	else if(m_MxRomParamt.cRAMType == _T("CUSTOM"))
-		atkConfigure.SetRAMType(MM_CUSTOM);
-
-//	atkConfigure.SetChannel(ChannelType_USB, 0, 1);
-//	atkConfigure.SetMemoryAddr(mm_addrs[atkConfigure.GetMXType()]);
-	//theApp.atkConfigure.SetRAMType(RAMType);
-	//		theApp.objHostApiClass.SetUsbTimeout(USB_OPEN_USR_TIMEOUT,USB_TRANS_USR_TIMEOUT);
-	//		TRACE("Set the usb timeout open %d secs, trans %d msecs\n",USB_OPEN_USR_TIMEOUT,USB_TRANS_USR_TIMEOUT);
-
-	// Read mmInitScripts from MxMemoryDefines.txt file
-	atkConfigure.SetMemoryType(atkConfigure.GetMXType(),
-		atkConfigure.GetRAMType(),
-		m_MxRomParamt.cMemInitFilePath);
-}
-
-BOOL MxRomDevice::InitMemoryDevice(MxRomDevice::MemoryInitScript script)
-{
-	MemoryInitScript::iterator command;
-	for ( command = script.begin(); command != script.end(); ++command )
-	{
-		if ( !WriteMemory((*command).Address, (*command).Data, (*command).Format) )
+		XNodes cmds = script.GetChilds(_T("CMD"));
+		XNodes::iterator cmd = cmds.begin();
+		for ( ; cmd != cmds.end(); ++cmd )
 		{
-			TRACE("In InitMemoryDevice(): write memory failed\n");
-			return FALSE;
+			MemoryInitCommand* pCmd = (MemoryInitCommand*)(*cmd);
+			if ( !WriteMemory(pCmd->GetAddress(), pCmd->GetData(), pCmd->GetFormat()) )
+			{
+				TRACE("In InitMemoryDevice(): write memory failed\n");
+				return FALSE;
+			}
 		}
 	}
 
-	return TRUE;
-}
-
-BOOL MxRomDevice::DownloadRKL(const StFwComponent& fwComponent, Device::UI_Callback callbackFn)
-{
-	// do initial DDR
-//	if (!InitMemoryDevice()) {
-//		InsertLog(CString("Initial memory failed!"));
-//		return FALSE;
-//	}
-	
 	// set the communication mode through write memory interace
 	if ( !WriteMemory(_defaultAddress.MemoryStart, ChannelType_USB, 32) )
 	{
@@ -348,120 +297,21 @@ BOOL MxRomDevice::DownloadRKL(const StFwComponent& fwComponent, Device::UI_Callb
 		return ERROR_COMMAND;
 	}
 
-     //  InsertLog(CString("Loading RAM Kernel!"));
-	// do download
-//	m_ctrlPro.SetRange32(0, rklsize/MINIFICATION);
-//	m_ctrlPro.SetStep(WR_BUF_MAX_SIZE/MINIFICATION);
-//	m_ctrlPro.SetPos(0);
-	// download the RKL
-	BOOL success = DownloadImage(_defaultAddress.DefaultRKL, fwComponent, callbackFn);
-	
-	if (!success) {
-		TRACE(CString("Can not load RAM Kernel to device\n"));
-		return ERROR_COMMAND;
-	} else {
-		
-		// Send the complete command to the device 
-		success = Jump2Rak();
-
-		// check the status
-		if (!success) {
-			TRACE(CString("Can not execute RAM Kernel\n"));
-			return ERROR_COMMAND;
-		}
-	}
-//	m_ctrlPro.SetPos(rklsize/MINIFICATION);
-
-	return ERROR_SUCCESS;
+	return TRUE;
 }
 
-BOOL MxRomDevice::DownloadRKL(unsigned char *rkl, int rklsize, unsigned int RAMKNLAddr, bool bPreload)
+BOOL MxRomDevice::Reset()
 {
-	int cType, cId;
-	unsigned long cHandle;
-	BOOL status;
-	BOOL is_hab_prod = false;
-	CString m_strCSFName;
-	CString m_strDCDName;
-
-//	while(!bMutex4RamKnlDld)
-//	{
-//		Sleep(100);
-//	}
-	bMutex4RamKnlDld = FALSE;
-/*
-	// Get handles for write operation
-	if(!USB_OpenDevice())
+	// If we do have to reset, can we use device commands? Seems there is both a ROM and RKL command to reset device.
+	// Driver command seems heavy handed?
+	// Send reset command to device.
+	if(!DeviceIoControl(IOCTL_IMXDEVICE_RESET_DEVICE))
 	{
-		goto Exit;
+		TRACE("Error: Device reset failed.\n");
+		return ERROR_COMMAND;
 	}
 
-	TRACE("************Initialize i.mx device with port #%x***************\n",_hubIndex.get());
-
-	if ( GetHABType() )
-	{
-		is_hab_prod = true;
-	} else {
-		is_hab_prod = false;
-	}
-
-	if(!m_bMemInited)
-	{
-		// do initial DDR
-		if (!InitMemoryDevice()) {
-			TRACE("Initial memory failed!\n");
-			goto CloseThenExit;
-		}
-
-		atkConfigure.GetChannel(&cType, &cId, &cHandle);
-		// set the communication mode through write memory interace
-		if (!WriteMemory(atkConfigure.GetMXType(),
-			atkConfigure.GetMemoryAddr(MEMORY_START_ADDR), 
-			cType, 32))
-		{
-			TRACE("Write channel type to memory failed!\n");
-			goto CloseThenExit;
-		}
-		m_bMemInited = TRUE;
-	}
-
-	// download the RKL
-	//RamAddr = (bPreload)? m_MxRomParamt.PreLoadAddr : m_MxRomParamt.RAMKNLAddr;
-	status = DownloadImage(rklsize, rkl, RAMKNLAddr, bPreload);
-
-
-	if (!status) {
-		TRACE("Error: Can not load RAM Kernel to device\n");
-		goto CloseThenExit;
-	} else if(!bPreload){		
-		// Send the complete command to the device 
-		status = Jump2Rak(atkConfigure.GetMXType(), is_hab_prod);
-
-		// check the status
-		if (!status) {
-			TRACE("Error: Can not execute RAM Kernel\n");
-			goto CloseThenExit;
-		}
-
-		// Send reset command to device.
-		if(!DeviceIoControl(IOCTL_IMXDEVICE_RESET_DEVICE)) {
-			TRACE("Error: Device reset failed.\n");
-			goto CloseThenExit;
-		}
-	}
-
-	if ( !USB_CloseDevice() )
-		goto Exit;
-	bMutex4RamKnlDld = TRUE;
-
-	return TRUE;
-
-CloseThenExit:
-	USB_CloseDevice();
-*/
-Exit:
-	bMutex4RamKnlDld = TRUE;
-	return FALSE;
+	return ERROR_SUCCESS;
 }
 
 // Write the register of i.MX
@@ -691,22 +541,22 @@ BOOL MxRomDevice::Jump2Rak()
 void MxRomDevice::PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsigned long addr, 
 								  unsigned long param, unsigned long param1)
 {
-	cmd[0] = (unsigned char)(RAM_KERNEL_CMD_HEADER >> 8);
-	cmd[1] = (unsigned char)(RAM_KERNEL_CMD_HEADER & 0x00ff);
-	cmd[2] = (unsigned char)(cmdId >> 8);
-	cmd[3] = (unsigned char)cmdId;
-	cmd[4] = (unsigned char)(addr >> 24);
-	cmd[5] = (unsigned char)(addr >> 16);
-	cmd[6] = (unsigned char)(addr >> 8);
-	cmd[7] = (unsigned char)addr;
-	cmd[8] = (unsigned char)(param >> 24);
-	cmd[9] = (unsigned char)(param >> 16);
+	cmd[0]  = (unsigned char)(RAM_KERNEL_CMD_HEADER >> 8);
+	cmd[1]  = (unsigned char)(RAM_KERNEL_CMD_HEADER & 0x00ff);
+	cmd[2]  = (unsigned char)(cmdId >> 8);
+	cmd[3]  = (unsigned char) cmdId;
+	cmd[4]  = (unsigned char)(addr >> 24);
+	cmd[5]  = (unsigned char)(addr >> 16);
+	cmd[6]  = (unsigned char)(addr >> 8);
+	cmd[7]  = (unsigned char) addr;
+	cmd[8]  = (unsigned char)(param >> 24);
+	cmd[9]  = (unsigned char)(param >> 16);
 	cmd[10] = (unsigned char)(param >> 8);
-	cmd[11] = (unsigned char)param;
+	cmd[11] = (unsigned char) param;
 	cmd[12] = (unsigned char)(param1 >> 24);
 	cmd[13] = (unsigned char)(param1 >> 16);
 	cmd[14] = (unsigned char)(param1 >> 8);
-	cmd[15] = (unsigned char)param1;
+	cmd[15] = (unsigned char) param1;
 	return;
 }
 
@@ -721,10 +571,10 @@ struct Response MxRomDevice::UnPackRklResponse(unsigned char *resBuf)
 {
 	struct Response res;
 
-	res.ack = (unsigned short)(((unsigned short)resBuf[0] << 8) | resBuf[1]);
-	res.csum = (unsigned short)(((unsigned short)resBuf[2] << 8) | resBuf[3]);
-	res.len = ((unsigned long)resBuf[4] << 24) | ((unsigned long)resBuf[5] << 16) |
-				((unsigned long)resBuf[6] << 8) | ((unsigned long)resBuf[7]);
+	res.ack  =  (unsigned short)(((unsigned short)resBuf[0] << 8) | resBuf[1]);
+	res.csum =  (unsigned short)(((unsigned short)resBuf[2] << 8) | resBuf[3]);
+	res.len  = ((unsigned long)resBuf[4] << 24) | ((unsigned long)resBuf[5] << 16) |
+			   ((unsigned long)resBuf[6] << 8) | ((unsigned long)resBuf[7]);
 
 	return res;
 }
@@ -738,7 +588,7 @@ struct Response MxRomDevice::UnPackRklResponse(unsigned char *resBuf)
 //   If RAM Kernel or bootstrap is running, return RET_SUCCESS; 
 //   If no program running return INVALID_CHANNEL.
 //-------------------------------------------------------------------------------------		
-int MxRomDevice::GetRKLVersion(unsigned char *fmodel, int *len, int *mxType)
+int MxRomDevice::GetRKLVersion(CString& fmodel, int& len, int& mxType)
 {
 	unsigned char command[RAM_KERNEL_CMD_SIZE] = {0},
 				  retBuf[RAM_KERNEL_ACK_SIZE] = {0};
@@ -751,44 +601,45 @@ int MxRomDevice::GetRKLVersion(unsigned char *fmodel, int *len, int *mxType)
 	// send command to remote device
 	if (!WriteToDevice(command, RAM_KERNEL_CMD_SIZE))
 	{
-		DEBUG("atk_common_getver(): failed to send to device\n");
+		TRACE("atk_common_getver(): failed to send to device\n");
 		return INVALID_CHANNEL;
 	}
 		
 	if (!ReadFromDevice(retBuf, RAM_KERNEL_ACK_SIZE))
 	{
-		DEBUG("atk_common_getver(): failed to read bootstrap from device\n");
+		TRACE("atk_common_getver(): failed to read bootstrap from device\n");
 		return INVALID_CHANNEL;
 	}
 	
-	DEBUG("atk_common_getver(): retBuf[0]: %d\n", retBuf[0]);
+	TRACE("atk_common_getver(): retBuf[0]: %d\n", retBuf[0]);
 	// check if is bootstrap
 	PUINT pReturn = (PUINT)&retBuf[0];
 	if (*pReturn == HabEnabled || *pReturn == HabDisabled)
 	{
-		*len = 0;
+		len = 0;
 		return RET_SUCCESS;
 	}
 		
-//	}
 	// unpack the response
 	res = UnPackRklResponse(retBuf);
 
 	if (res.ack == RET_SUCCESS) {
 		
-		DEBUG("atk_common_getver(): chip id: %x\n", res.csum);
+		TRACE("atk_common_getver(): chip id: %x\n", res.csum);
 
-		status = ReadFromDevice(fmodel, res.len);
+		unsigned char model[MAX_MODEL_LEN] = {0};
+		status = ReadFromDevice(model, res.len);
 		if (!status) {
 			return INVALID_CHANNEL;
 		}
-		*len = res.len;
-		*mxType = res.csum;
-		fmodel[res.len] = '\0';
-		DEBUG("atk_common_getver(): get version: %s\n", fmodel);
+		len = res.len;
+		mxType = res.csum;
+		fmodel = model;
+		fmodel.AppendChar(_T('\0'));
+		TRACE("atk_common_getver(): get version: %s\n", fmodel);
 	} else {
 		// if response is not ok, return failed
-		DEBUG("atk_common_getver(): get response: %d\n", res.ack);
+		TRACE("atk_common_getver(): get response: %d\n", res.ack);
 	}
 	
 	return -res.ack;
@@ -799,7 +650,7 @@ int MxRomDevice::GetRKLVersion(unsigned char *fmodel, int *len, int *mxType)
 //#define MX_51_NK_LOAD_ADDRESS			0x90200000
 //#define MX_51_EBOOT_LOAD_ADDRESS		0x90040000
 
-BOOL MxRomDevice::DownloadImage(UINT address, const StFwComponent& fwComponent, Device::UI_Callback callbackFn)
+BOOL MxRomDevice::DownloadImage(UINT address, MemorySection loadSection, MemorySection setSection, const StFwComponent& fwComponent, Device::UI_Callback callbackFn)
 {
 	int counter = 0;
 	int bytePerCommand = 0;
@@ -821,8 +672,9 @@ BOOL MxRomDevice::DownloadImage(UINT address, const StFwComponent& fwComponent, 
 //		numBytesToWrite = min(MAX_SIZE_PER_DOWNLOAD_COMMAND, dataSize - byteIndex);
 //		memcpy_s(buffer, sizeof(buffer), &fwComponent.GetData()[byteIndex], numBytesToWrite);
 
-		if (!SendCommand2RoK(address, dataSize, ROM_KERNEL_WF_FT_OTH))
+		if (!SendCommand2RoK(address, dataSize, loadSection))
 		{
+			TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), address, dataSize, loadSection);
 			return FALSE;
 		}
 		else
@@ -830,6 +682,7 @@ BOOL MxRomDevice::DownloadImage(UINT address, const StFwComponent& fwComponent, 
 			Sleep(10);
 			if(!TransData(dataSize, fwComponent.GetDataPtr(), OPMODE_DOWNLOAD))
 			{
+				TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X) failed.\n"), address, dataSize, loadSection);
 				return FALSE;
 			}
 		}
@@ -847,9 +700,10 @@ BOOL MxRomDevice::DownloadImage(UINT address, const StFwComponent& fwComponent, 
 //		((int *)FlashHdr)[0] = ActualImageAddr;
 		memcpy_s(FlashHdr, ROM_TRANSFER_SIZE, fwComponent.GetDataPtr(), ROM_TRANSFER_SIZE);
 
-		//Jump to RAM kernel to execute it.
-		if (!SendCommand2RoK(address, ROM_TRANSFER_SIZE, /*(bPreload)? ROM_KERNEL_WF_FT_OTH:*/ ROM_KERNEL_WF_FT_APP))
+		//Set execute address.
+		if (!SendCommand2RoK(address, ROM_TRANSFER_SIZE, setSection /*(bPreload)? MemSectionOTH : MemSectionAPP*/))
 		{
+			TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), address, ROM_TRANSFER_SIZE, setSection);
 			return FALSE;
 		}
 		else
@@ -858,11 +712,40 @@ BOOL MxRomDevice::DownloadImage(UINT address, const StFwComponent& fwComponent, 
 //			pBuffer = pBuf;
 			if(!TransData(ROM_TRANSFER_SIZE,(const unsigned char *)FlashHdr,OPMODE_DOWNLOAD))
 			{
+				TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X) failed.\n"), address, ROM_TRANSFER_SIZE, setSection);
 				return FALSE;
 			}
 		}
 	}
 
+	return TRUE;
+}
+
+BOOL MxRomDevice::Jump()
+{
+	// Send the complete command to the device 
+	if ( !Jump2Rak() )
+	{
+		TRACE(_T("DownloadImage(): Jump2Rak() failed.\n"));
+		return FALSE;
+	}
+/*  I can't get GetRKLVersion() to work. What am I doing wrong?	
+	USB_CloseDevice();
+	Sleep(500);
+	if ( USB_OpenDevice() )
+	{
+		int len = 0, type = 0;
+		CString model;
+		if ( GetRKLVersion(model, len, type) == ERROR_SUCCESS )
+		{
+			if ( len == 0 && type == 0 )
+				TRACE(_T("DownloadImage(): BootStrap mode.\n"));
+			else
+				TRACE(_T("DownloadImage(): RamKernel mode.\n"));
+		}
+		TRACE(_T("DownloadImage(): ReOpened Device handles.\n"));
+	}
+*/
 	return TRUE;
 }
 
@@ -925,45 +808,49 @@ BOOL MxRomDevice::SendCommand2RoK(UINT address, UINT byteCount, UCHAR type)
 
 }
 
+#define MINUM_TRANSFER_SIZE 0x20
+
 BOOL MxRomDevice::TransData(UINT byteCount, const unsigned char * pBuf,int opMode)
 {
-
 	//	BOOL status = FALSE;
 	const unsigned char * pBuffer = pBuf;
 	UINT downloadPerOnce = WR_BUF_MAX_SIZE;
 
-	for (; byteCount >= downloadPerOnce; byteCount -= downloadPerOnce, pBuffer += downloadPerOnce) {
-		if (!WriteToDevice(pBuffer, downloadPerOnce))
+	for ( ; byteCount >= downloadPerOnce; byteCount -= downloadPerOnce, pBuffer += downloadPerOnce )
+	{
+		if ( !WriteToDevice(pBuffer, downloadPerOnce) )
 			return FALSE;
 	}
-	if (((atkConfigure.GetMXType() == MX_MX31_TO1) || (atkConfigure.GetMXType() == MX_MX31_TO2) ||
-		(atkConfigure.GetMXType() == MX_MX31_TO201) || (atkConfigure.GetMXType() == MX_MX32)) && byteCount > 0) {
+	if ( ( _chipFamily == MX31 || _chipFamily == MX32 ) && byteCount > 0)
+	{
 
 			TRACE("Lat will Transfer Size: %d\n", byteCount);
 			if (!WriteToDevice(pBuffer, byteCount))
 				return FALSE;
 
 			byteCount = 0;
-	} else {
+	}
+	else
+	{
 		UINT uintMaxPacketSize0 = _MaxPacketSize.get();
 
-#define MINUM_TRANSFER_SIZE 0x20
-
-		for (; byteCount > uintMaxPacketSize0; \
-			byteCount -= uintMaxPacketSize0, pBuffer += uintMaxPacketSize0) {
+		for ( ; byteCount > uintMaxPacketSize0; byteCount -= uintMaxPacketSize0, pBuffer += uintMaxPacketSize0 )
+		{
 				if (!WriteToDevice(pBuffer, uintMaxPacketSize0))
 					return FALSE;
 				//TRACE("Transfer Size: %d\n", uintMaxPacketSize0);
 		}
 
-		for (; byteCount >= MINUM_TRANSFER_SIZE; \
-			byteCount -= MINUM_TRANSFER_SIZE, pBuffer += MINUM_TRANSFER_SIZE) {
+		for ( ; byteCount >= MINUM_TRANSFER_SIZE; byteCount -= MINUM_TRANSFER_SIZE, pBuffer += MINUM_TRANSFER_SIZE )
+		{
 				if (!WriteToDevice(pBuffer, MINUM_TRANSFER_SIZE))
 					return FALSE;
 				//TRACE("Transfer Size: %d\n", MINUM_TRANSFER_SIZE);
 		}
 	}
-	if (0 != byteCount) {
+	
+	if (0 != byteCount)
+	{
 		if (!WriteToDevice(pBuffer, byteCount))
 			return FALSE;
 	}
@@ -1134,584 +1021,10 @@ BOOL MxRomDevice::ReadFromDevice(PUCHAR buf, UINT count)
 	return TRUE;
 }
 
-MxRomDevice::MemoryInitScript* MxRomDevice::GetMemoryScript(ChipFamily_t chipType, RomVersion romVersion, MemoryType memoryType) const
-{
-	MemoryInitScript* pScript = NULL;
-
-	switch ( chipType )
-	{
-		case MX25:
-			if ( romVersion == RomVersion(1,0) )
-				pScript = &mddrMx25;
-			else if ( romVersion == RomVersion(1,1) )
-				pScript = &ddr2Mx25_To11;
-			break;
-
-		case MX27:
-			pScript = &ddrMx27;
-			break;
-
-		case MX31:
-		case MX32:
-			if ( memoryType == DDR || memoryType == DDR2 )
-				pScript = &ddrMx31;
-			else if ( memoryType == SDRAM || memoryType == mDDR )
-				pScript = &sdrMx31;
-			break;
-
-		case MX35:
-			if ( memoryType == DDR || memoryType == DDR2 )
-				pScript = &ddr2Mx35;
-			else if ( memoryType == SDRAM || memoryType == mDDR )
-				pScript = &mddrMx35;
-			break;
-
-		case MX37:
-			pScript = &ddrMx37;
-			break;
-
-		case MX51:
-			if ( romVersion == RomVersion(1,0) )
-				pScript = &ddrMx51;
-			else if ( romVersion == RomVersion(2,0) )
-				if ( memoryType == DDR || memoryType == DDR2 )
-					pScript = &ddrMx51_To2;
-				else if ( memoryType == SDRAM || memoryType == mDDR )
-					pScript = &mddrMx51_To2;
-			break;
-		
-		default:
-			break;
-	}
-
-	return pScript;
-}
-
-MxRomDevice::MemoryInitScript MxRomDevice::ddrMx31;
-MxRomDevice::MemoryInitScript MxRomDevice::ddrMx27;
-MxRomDevice::MemoryInitScript MxRomDevice::sdrMx31;
-MxRomDevice::MemoryInitScript MxRomDevice::ddrMx35;
-MxRomDevice::MemoryInitScript MxRomDevice::mddrMx35;
-MxRomDevice::MemoryInitScript MxRomDevice::ddr2Mx35;
-MxRomDevice::MemoryInitScript MxRomDevice::ddrMx37;
-MxRomDevice::MemoryInitScript MxRomDevice::ddrMx51;
-MxRomDevice::MemoryInitScript MxRomDevice::ddrMx51_To2;
-MxRomDevice::MemoryInitScript MxRomDevice::mddrMx51_To2;
-MxRomDevice::MemoryInitScript MxRomDevice::ddrMx25;
-MxRomDevice::MemoryInitScript MxRomDevice::mddrMx25;
-MxRomDevice::MemoryInitScript MxRomDevice::ddr2Mx25_To11;
-
-void MxRomDevice::InializeMemoryScripts()
-{
-	// MX31 - DDR
-	ddrMx31.push_back( MemoryInitCommand(0xB8002050, 0x0000DCF6, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0xB8002054, 0x444a4541, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0xb8002058, 0x44443302, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0xB6000000, 0xCAFECAFE, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0xb8002000, 0x0000CC03, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0xb8002004, 0xa0330D01, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0xb8002008, 0x00220800, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0xB8001010, 0x00000004, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0xB8001004, 0x006ac73a, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0xB8001000, 0x92100000, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0x80000f00, 0x12344321, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0xB8001000, 0xa2100000, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0x80000000, 0x12344321, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0x80000000, 0x12344321, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0xB8001000, 0xb2100000, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0x80000033, 0xda, 8) );
-	ddrMx31.push_back( MemoryInitCommand(0x81000000, 0xff, 8) );
-	ddrMx31.push_back( MemoryInitCommand(0xB8001000, 0x82226080, 32) );
-	ddrMx31.push_back( MemoryInitCommand(0x80000000, 0xDEADBEEF, 32) );
-
-	// MX27 - DDR
-	ddrMx27.push_back( MemoryInitCommand(0xd8002000,  0x0000CC03, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xd8002004,  0xa0330D01, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xd8002008,  0x00220800, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xD8001010,  0x00000004, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xD8001004,  0x006AC73A, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xD8001000,  0x92100000, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xA0000400,  0x00000000, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xD8001000,  0xA2100000, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xA0000000,  0x00000000, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xA0000000,  0x00000000, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xD8001000,  0xB2100000, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xA0000033,  0x00, 8) );
-	ddrMx27.push_back( MemoryInitCommand(0xA1000000,  0x00, 8) );
-	ddrMx27.push_back( MemoryInitCommand(0xD8001000,  0x82226080, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xA0000000,  0x00000000, 32) );
-	ddrMx27.push_back( MemoryInitCommand(0xD8001010,  0x0000000C, 32) );
-
-	// MX31 - SDRAM
-	sdrMx31.push_back( MemoryInitCommand(0xB8001004, 0x0079E7BA, 32) );
-	sdrMx31.push_back( MemoryInitCommand(0xB8001000, 0x92100000, 32) );
-	sdrMx31.push_back( MemoryInitCommand(0x80000f00, 0x12344321, 32) );
-	sdrMx31.push_back( MemoryInitCommand(0xB8001000, 0xa2100000, 32) );
-	sdrMx31.push_back( MemoryInitCommand(0x80000000, 0x12344321, 32) );
-	sdrMx31.push_back( MemoryInitCommand(0x80000000, 0x12344321, 32) );
-	sdrMx31.push_back( MemoryInitCommand(0xB8001000, 0xb2100000, 32) );
-	sdrMx31.push_back( MemoryInitCommand(0x80000037, 0xda, 8) );
-	sdrMx31.push_back( MemoryInitCommand(0x81000000, 0xff, 8) );
-	sdrMx31.push_back( MemoryInitCommand(0xB8001000, 0x82126180, 32) );
-	sdrMx31.push_back( MemoryInitCommand(0x80000000, 0xDEADBEEF, 32) );
-
-	// MX35 - DDR
-	// CS0 settings
-//	ddrMx35.push_back( MemoryInitCommand(0xB8002000, 0x0000CC03, 32) );
-//	ddrMx35.push_back( MemoryInitCommand(0xB8002004, 0xA0330D01, 32) );
-//	ddrMx35.push_back( MemoryInitCommand(0xB8002008, 0x00220800, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0xB8001010, 0x00000244, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0xB8001004, 0x00795429, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0xB8001000, 0x92220000, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0x80000400, 0x12344321, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0xB8001000, 0xA2220000, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0x80000000, 0x12344321, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0x80000000, 0x12344321, 32) );
-
-	ddrMx35.push_back( MemoryInitCommand(0xB8001000, 0xb2220000, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0x80000033, 0xda, 8) );
-	ddrMx35.push_back( MemoryInitCommand(0xB8001000, 0x82226C80, 32) );
-
-	ddrMx35.push_back( MemoryInitCommand(0xB800100C, 0x00795429, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0xB8001008, 0x92220000, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0x90000400, 0x12344321, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0xB8001008, 0xA2220000, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0x90000000, 0x12344321, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0x90000000, 0x12344321, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0xB8001008, 0xb2220000, 32) );
-	ddrMx35.push_back( MemoryInitCommand(0x90000033, 0xda, 8) );
-	ddrMx35.push_back( MemoryInitCommand(0xB8001008, 0x82226C80, 32) );
-
-	// MX35 - MDDR
-	mddrMx35.push_back( MemoryInitCommand(0xB8001010, 0x0000004C, 32) );
-	mddrMx35.push_back( MemoryInitCommand(0xB8001004, 0x006ac73a, 32) );
-	mddrMx35.push_back( MemoryInitCommand(0xB8001000, 0x92100000, 32) );
-	mddrMx35.push_back( MemoryInitCommand(0x80000f00, 0x12344321, 32) );
-	mddrMx35.push_back( MemoryInitCommand(0xB8001000, 0xa2100000, 32) );
-	mddrMx35.push_back( MemoryInitCommand(0x80000000, 0x12344321, 32) );
-	mddrMx35.push_back( MemoryInitCommand(0x80000000, 0x12344321, 32) );
-	mddrMx35.push_back( MemoryInitCommand(0xB8001000, 0xb2100000, 32) );
-	mddrMx35.push_back( MemoryInitCommand(0x80000033, 0xda, 8) );
-	mddrMx35.push_back( MemoryInitCommand(0x81000000, 0xff, 8) );
-	mddrMx35.push_back( MemoryInitCommand(0xB8001000, 0x82226080, 32) );
-	mddrMx35.push_back( MemoryInitCommand(0xB8001000, 0x82226007, 32) );
-	mddrMx35.push_back( MemoryInitCommand(0x80000000, 0xDEADBEEF, 32) );
-	mddrMx35.push_back( MemoryInitCommand(0xB8001010, 0x0000000c, 32) );
-
-	// MX35 - DDR2
-/*	ddr2Mx35.push_back( MemoryInitCommand(0xB8001010, 0x00000204, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001004, 0x007fff2f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0x92220000, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x80000400, 0x12345678, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0xB2220000, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x84000000, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x86000000, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x82000400, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x80000333, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0x92220000, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x80000400, 0x12345678, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0xA2220000, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x80000000, 0x87654321, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x80000000, 0x87654321, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0xB2220000, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x80000233, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x82000780, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x82000400, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0x82220080, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001008, 0x00002000, 32) );
-*/
-	// MX35 - DDR2
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC368, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC36C, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC370, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC374, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC378, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC37C, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC380, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC384, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC388, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC38C, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC390, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC394, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC398, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC39C, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3A0, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3A4, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3A8, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3AC, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3B0, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3B4, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3B8, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3BC, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3C0, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3C4, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3C8, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3CC, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3D0, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3D4, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3D8, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3DC, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3E0, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3E4, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3E8, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3EC, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3F0, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3F4, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3F8, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC3FC, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC400, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC404, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC408, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC40C, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC410, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC414, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC418, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC41c, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC420, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC424, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC428, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC42c, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC430, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC434, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC438, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC43c, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC440, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC444, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC448, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC44c, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC450, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC454, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC458, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC45c, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC460, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC464, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC468, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC46c, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC470, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC474, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC478, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC47c, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC480, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC484, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC488, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC48c, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC490, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC494, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC498, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC49c, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC4A0, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC4A4, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC4A8, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC4Ac, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC4B0, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC4B4, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC4B8, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC4Bc, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC4C0, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC4C4, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x43FAC4C8, 0x00000002, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001010, 0x0000030C, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001004, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0x92220000, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x80000400, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0xB2220000, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x84000000, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x86000000, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x82000400, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x80000333, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0x92220000, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x80000400, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0xA2220000, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x80000000, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0xB2220000, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x80000233, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x82000780, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0x82000400, 0xda, 8) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0x82220080, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB800100C, 0x007ffc3f, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001010, 0x00000304, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001000, 0x82228080, 32) );
-	ddr2Mx35.push_back( MemoryInitCommand(0xB8001008, 0x00002000, 32) );
-
-	// MX37 - DDR
-	ddrMx37.push_back( MemoryInitCommand(0xc3f98000, 0x0030, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xe3fd9000, 0x80000000, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xe3fd9014, 0x04008008, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xe3fd9014, 0x00008010, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xe3fd9014, 0x00008010, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xe3fd9014, 0x00338018, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xe3fd9000, 0xB2220000, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xe3fd9004, 0x899f6bba, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xe3fd9010, 0x000a0104, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xe3fd9014, 0x00000000, 32) );
-
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84fc, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8504, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa848c, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa849c, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8270, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8274, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84f0, 0x0200, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84a8, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84b0, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84b4, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84e0, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8278, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa827c, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8280, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8284, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8288, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa828c, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8290, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8294, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8298, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84f8, 0x0200, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84d4, 0x0, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa829c, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa82a0, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa82a4, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8008, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8230, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84d8, 0x0200, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84c4, 0x0, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84e4, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa800c, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8234, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8010, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8238, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8014, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa823c, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8018, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8240, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa801c, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8244, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8020, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8248, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8024, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa824c, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8028, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8250, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84e8, 0x0200, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa84f4, 0x0004, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa802c, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8254, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8030, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8258, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8034, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa825c, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8038, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8260, 0x0080,32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa803c, 0x1,32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8264, 0x0080,32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8040, 0x1,32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8268, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8044, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa826c, 0x0080, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8048, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa82a8, 0x0204, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa804c, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa82ac, 0x0204, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa805c, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa82bc, 0x02c4, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa8060, 0x1, 32) );
-	ddrMx37.push_back( MemoryInitCommand(0xc3fa82c0, 0x02c4, 32) );
-
-	// MX51 - DDR
-	//ddrMx51.push_back( MemoryInitCommand({0x73f98000, 0x30, 16) );
-	ddrMx51.push_back( MemoryInitCommand(0x73fd4018, 0x0000EBC0, 32) );
-	ddrMx51.push_back( MemoryInitCommand(0x73fd4014, 0x012B9145, 32) );
-	ddrMx51.push_back( MemoryInitCommand(0x83fd9000, 0x80000000, 32) );
-	ddrMx51.push_back( MemoryInitCommand(0x83fd9014, 0x04008008, 32) );
-	ddrMx51.push_back( MemoryInitCommand(0x83fd9014, 0x00008010, 32) );
-	ddrMx51.push_back( MemoryInitCommand(0x83fd9014, 0x00008010, 32) );
-	ddrMx51.push_back( MemoryInitCommand(0x83fd9014, 0x00338018, 32) );
-	ddrMx51.push_back( MemoryInitCommand(0x83fd9000, 0xB2220000, 32) );
-	ddrMx51.push_back( MemoryInitCommand(0x83fd9004, 0x899f6bba, 32) );
-	ddrMx51.push_back( MemoryInitCommand(0x83fd9010, 0x000a0104, 32) );
-	ddrMx51.push_back( MemoryInitCommand(0x83fd9014, 0x00000000, 32) );
-
-	// MX51_TO2 - DDR
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa88a0, 0x0000020,  32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa850c, 0x000020c5, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa8510, 0x000020c5, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa883c, 0x00000002, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa8848, 0x00000002, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84b8, 0x000000e7, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84bc, 0x00000045, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84c0, 0x00000045, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84c4, 0x00000045, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84c8, 0x00000045, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa8820, 0x00000000, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84a4, 0x00000003, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84a8, 0x00000003, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84ac, 0x000000e3, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84b0, 0x000000e3, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84b4, 0x000000e3, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84cc, 0x000000e3, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x73fa84d0, 0x000000e2, 32) );
-
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9000, 0x82a20000, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9008, 0x82a20000, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9010, 0x000ad0d0, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9004, 0x333574aa, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd900c, 0x333574aa, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x04008008, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x0000801a, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x0000801b, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x00448019, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x07328018, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x04008008, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x00008010, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x00008010, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x06328018, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x03808019, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x00408019, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x00008000, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x0400800c, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x0000801e, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x0000801f, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x0000801d, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x0732801c, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x0400800c, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x00008014, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x00008014, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x0632801c, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x0380801d, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x0040801d, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x00008004, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9000, 0xb2a20000, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9008, 0xb2a20000, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9010, 0x000ad6d0, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9034, 0x90000000, 32) );
-	ddrMx51_To2.push_back( MemoryInitCommand(0x83fd9014, 0x00000000, 32) );
-
-	// MX51_TO2 - MDDR
-	mddrMx51_To2.push_back( MemoryInitCommand(0x73FA84B8, 0x000000E7, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9000, 0x83220000, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x04008008, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x00008010, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x00008010, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x00338018, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x0020801a, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x00008000, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9000, 0xC3220000, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9004, 0xC33574AA, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9010, 0x000A1700, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9008, 0x83220000, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x0400800C, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x00008014, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x00008014, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x0033801C, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x0020801E, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x00008004, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9008, 0xC3220000, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD900C, 0xC33574AA, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9014, 0x00000000, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9020, 0x00F68000, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9024, 0x00FC8000, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9028, 0x00EE8000, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD902C, 0x00EF8000, 32) );
-	mddrMx51_To2.push_back( MemoryInitCommand(0x83FD9030, 0x00F78000, 32) );
-
-	// MX25 - DDR
-	ddrMx25.push_back( MemoryInitCommand(0xB8001004, 0x0076EB3F, 32) );
-	ddrMx25.push_back( MemoryInitCommand(0xB8001010, 0x0000004C, 32) );
-	ddrMx25.push_back( MemoryInitCommand(0xB8001000, 0x92100000, 32) );
-	ddrMx25.push_back( MemoryInitCommand(0x80000f00, 0x12344321, 32) );
-	ddrMx25.push_back( MemoryInitCommand(0xB8001000, 0xA2200000, 32) );
-	ddrMx25.push_back( MemoryInitCommand(0x80000F00, 0x12344321, 32) );
-	ddrMx25.push_back( MemoryInitCommand(0x80000F00, 0x12344321, 32) );
-	ddrMx25.push_back( MemoryInitCommand(0xB8001000, 0xb2200000, 32) );
-	ddrMx25.push_back( MemoryInitCommand(0x80000033, 0xda, 8) );
-	ddrMx25.push_back( MemoryInitCommand(0x81000000, 0xff, 8) );
-	ddrMx25.push_back( MemoryInitCommand(0xB8001000, 0x82118485, 32) );
-
-	// MX25 - MDDR
-	mddrMx25.push_back( MemoryInitCommand(0xB8001010, 0x00000004, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0xB8001000, 0x92100000, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x80000400, 0x12344321, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0xB8001000, 0xa2100000, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x80000000, 0x12344321, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x80000000, 0x12344321, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0xB8001000, 0xb2100000, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x80000033, 0xda, 8) );
-	mddrMx25.push_back( MemoryInitCommand(0x81000000, 0xff, 8) );
-	mddrMx25.push_back( MemoryInitCommand(0xB8001000, 0x82216080, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0xB8001000, 0x82216880, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0xB8001004, 0x00295729, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x80000000, 0x0000, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x43F00040, 0x0, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x43F00044, 0x0, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x43F00048, 0x0, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x43F0004C, 0x0, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x43F00050, 0x0, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x43F00000, 0x77777777, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x43F00004, 0x77777777, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x53F00040, 0x0, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x53F00044, 0x0, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x53F00048, 0x0, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x53F0004C, 0x0, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x53F00050, 0x0, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x53F00000, 0x77777777, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x53F00004, 0x77777777, 32) );
-	mddrMx25.push_back( MemoryInitCommand(0x53f80064, 0x43300000, 32) );
-
-	// MX25_TO11 - DDR2
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0xB8002050, 0x0000D843, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0xB8002054, 0x22252521, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0xB8002058, 0x22220A00, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0xB8001004, 0x0076E83a, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0xB8001010, 0x00000204, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0xB8001000, 0x92210000, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x80000f00, 0x12344321, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0xB8001000, 0xB2210000, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x82000000, 0xda, 8) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x83000000, 0xda, 8) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x81000400, 0xda, 8) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x80000333, 0xda, 8) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0xB8001000, 0x92210000, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x80000400, 0x12345678, 8) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0xB8001000, 0xA2210000, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x80000000, 0x87654321, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x80000000, 0x87654321, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0xB8001000, 0xB2210000, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x80000233, 0xda, 8) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x81000780, 0xda, 8) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x81000400, 0xda, 8) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0xB8001000, 0x82216080, 32) );
-	ddr2Mx25_To11.push_back( MemoryInitCommand(0x43FAC454, 0x00001000, 32) );
-}
+#define HWC_OFFSET					0x1010
+#define CSF_OFFSET					0x1200
+#define EXE_OFFSET					0x4000
+#define IMG_OFFSET				   0x10000
 
 MxRomDevice::MxAddress MxRomDevice::MX25Addrs(
 	/* #define MX25_MEMORY_START_ADDR  */	0x80000000,

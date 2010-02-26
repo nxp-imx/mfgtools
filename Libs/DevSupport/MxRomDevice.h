@@ -7,14 +7,7 @@
 #include "Common/StdString.h"
 #include "Common/StdInt.h"
 
-//#include "iMX/MXDefine.h"
-//#include "iMX/MemoryInit.h"
-
-//#include "Apps/MfgTool.exe/UpdateCommandList.h" // UGLY!!!!
-
-#include "iMX/ADSTkConfigure.h"
-
-//#include "Common/WinDriver/wdu_lib.h"
+#include "../../Libs/WinSupport/XMLite.h"
 
 /// <summary>
 /// A MxRomDevice device.
@@ -24,14 +17,36 @@ class MxRomDevice : public Device//, IComparable
 {
 	friend class DeviceManager;
 public:
+	
+	enum MemorySection { MemSectionOTH = 0x00, MemSectionAPP = 0xAA, MemSectionCSF = 0xCC, MemSectionDCD = 0xEE };
+	static MemorySection StringToMemorySection(CString section)
+	{
+		if ( section.CompareNoCase(_T("DCD")) == 0 )
+			return MemSectionDCD;
+		else if ( section.CompareNoCase(_T("CSF")) == 0 )
+			return MemSectionCSF;
+		else if ( section.CompareNoCase(_T("APP")) == 0 )
+			return MemSectionAPP;
+		else return MemSectionOTH;
+	}
+
+	enum MemoryAction { MemAction_None, MemAction_Set, MemAction_Jump };
+	static MemoryAction StringToMemoryAction(CString action)
+	{
+		if ( action.CompareNoCase(_T("Set")) == 0 )
+			return MemAction_Set;
+		else if ( action.CompareNoCase(_T("Jump")) == 0 )
+			return MemAction_Jump;
+		else return MemAction_None;
+	}
+
 	MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path);
 	virtual ~MxRomDevice(void);
-	int GetRKLVersion(unsigned char *fmodel, int *len, int *mxType);
-//	BOOL InitMemoryDevice(MxRomDevice::MemoryInitScript script);
-	BOOL DownloadRKL(const StFwComponent& fwComponent, Device::UI_Callback callbackFn);
-
-	void SetIMXDevPara(void);
-	BOOL DownloadRKL(unsigned char *rkl, int rklsize, unsigned int RAMKNLAddr, bool bPreload);
+	int GetRKLVersion(CString& fmodel, int& len, int& mxType);
+	BOOL InitMemoryDevice(CString filename);
+	BOOL DownloadImage(UINT address, MemorySection loadSection, MemorySection setSection, const StFwComponent& fwComponent, Device::UI_Callback callbackFn);
+	BOOL Jump();
+	BOOL Reset();
 
 	// PROPERTIES
 	class MaxPacketSize : public Int32Property { public: int32_t get(); } _MaxPacketSize;
@@ -72,7 +87,6 @@ private:
 	void PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsigned long addr, unsigned long param, unsigned long param1);
 	struct Response UnPackRklResponse(unsigned char *resBuf);
 	BOOL Jump2Rak();
-	BOOL DownloadImage(UINT address, const StFwComponent& fwComponent, Device::UI_Callback callbackFn);
 	BOOL SendCommand2RoK(UINT address, UINT byteCount, UCHAR type);
 	BOOL TransData(UINT byteCount, const unsigned char * pBuf,int opMode);
 	BOOL WriteToDevice(const unsigned char *buf, UINT count);
@@ -81,8 +95,6 @@ private:
 	BOOL OpenUSBHandle(HANDLE *pHandle, CString pipePath);
 	BOOL USB_OpenDevice();
     BOOL USB_CloseDevice();
-
-	CADSTkConfigure atkConfigure;
 
 	HANDLE _hDevice;
 	HANDLE _hWrite;
@@ -101,53 +113,7 @@ private:
 	};
 	RomVersion _romVersion;
 	
-	enum MemoryType { MemUnknown, DDR, SDRAM, DDR2, mDDR };
-	MemoryType StringToMemoryType(CString strMemType)
-	{
-		MemoryType memType = MemUnknown;
-
-		if ( strMemType.CompareNoCase(_T("DDR")) == 0 )
-			memType = DDR;
-		else if ( strMemType.CompareNoCase(_T("SDRAM")) == 0 )
-			memType = SDRAM;
-		else if ( strMemType.CompareNoCase(_T("DDR2")) == 0 )
-			memType = DDR2;
-		else if ( strMemType.CompareNoCase(_T("mDDR")) == 0 )
-			memType = mDDR;
-
-		return memType;
-	}
-
 public:
-	typedef struct MemoryInitCommand
-	{
-		UINT Address;
-		UINT Data;
-		UINT Format;
-
-		MemoryInitCommand(UINT addr, UINT data, UINT format) : Address(addr), Data(data), Format(format) {};
-	};
-
-	typedef std::vector<MemoryInitCommand> MemoryInitScript;
-	MemoryInitScript* GetMemoryScript(ChipFamily_t chipType, RomVersion romVersion, MemoryType memoryType) const;
-
-	static void InializeMemoryScripts();
-
-	BOOL InitMemoryDevice(MxRomDevice::MemoryInitScript script);
-	static MemoryInitScript ddrMx31;
-	static MemoryInitScript ddrMx27;
-	static MemoryInitScript sdrMx31;
-	static MemoryInitScript ddrMx35;
-	static MemoryInitScript mddrMx35;
-	static MemoryInitScript ddr2Mx35;
-	static MemoryInitScript ddrMx37;
-	static MemoryInitScript ddrMx51;
-	static MemoryInitScript ddrMx51_To2;
-	static MemoryInitScript mddrMx51_To2;
-	static MemoryInitScript ddrMx25;
-	static MemoryInitScript mddrMx25;
-	static MemoryInitScript ddr2Mx25_To11;
-
 	struct MxAddress
 	{
 		UINT MemoryStart;
@@ -171,6 +137,7 @@ public:
 			, DefaultNorFlash(0), InternalRamStart(0), InternalRamEnd(0), ImageStart(0)
 		{}
 	};
+	
 	MxAddress _defaultAddress;
 	BOOL InitRomVersion(ChipFamily_t chipType, RomVersion& romVersion, MxAddress& defaultAddrs) const;
 
@@ -181,6 +148,77 @@ public:
 	static MxAddress MX37Addrs;
 	static MxAddress MX51Addrs;
 	static MxAddress MX51_TO2Addrs;
+
+	class MemoryInitCommand : public XNode
+	{
+	public:
+		// [XmlAttribute("addr")]
+		unsigned int GetAddress()
+		{ 
+			unsigned int addr = 0; // default to 0
+
+			CString attr = GetAttrValue(_T("addr"));
+
+			if(attr.Left(2) == _T("0x"))
+			{
+				TCHAR *p;
+				addr = _tcstoul(attr.Mid(2),&p,16);
+			}
+			else
+			{
+				addr = _tstoi64(attr);
+			}
+
+			return addr; 
+		};
+
+		// [XmlAttribute("data")]
+		unsigned int GetData()
+		{ 
+			unsigned int data = 0; // default to 0
+
+			CString attr = GetAttrValue(_T("data"));
+
+			if(attr.Left(2) == _T("0x"))
+			{
+				TCHAR *p;
+				data = _tcstoul(attr.Mid(2),&p,16);
+			}
+			else
+			{
+				data = _tstoi64(attr);
+			}
+
+			return data; 
+		};
+
+		// [XmlAttribute("format")]
+		unsigned int GetFormat()
+		{ 
+			unsigned char format = 0; // default to 0
+
+			CString attr = GetAttrValue(_T("format"));
+
+			if(attr.Left(2) == _T("0x"))
+			{
+				TCHAR *p;
+				format = _tcstoul(attr.Mid(2),&p,16);
+			}
+			else
+			{
+				format = _tstoi64(attr);
+			}
+
+			return format; 
+		};
+
+		CString ToString()
+		{
+			CString str;
+			str.Format(_T("addr=\"0x%X\" data=\"0x%X\" format=\"%d\""), GetAddress(), GetData(), GetFormat());
+			return str;
+		}
+	};
 };
 //private:
 //	static const uint32_t PipeSize = 4096;      //TODO:??? where did this come from?

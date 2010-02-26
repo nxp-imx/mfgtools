@@ -125,14 +125,24 @@ const UCL::DeviceState::DeviceState_t COpUtpUpdate::GetDeviceState()
 	switch ( (DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() )
 	{
 		case DeviceClass::DeviceTypeHid:
-			m_CurrentDeviceType = DeviceClass::DeviceTypeHid;
 		case DeviceClass::DeviceTypeRecovery:
 			state = UCL::DeviceState::Recovery;
 			break;
 		case DeviceClass::DeviceTypeMxRom:
-			state = UCL::DeviceState::Recovery;
-			m_CurrentDeviceType = DeviceClass::DeviceTypeMxRom;
+		{
+			MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+			
+			int len = 0, type = 0;
+			CString model;
+			if ( pMxRomDevice->GetRKLVersion(model, len, type) == ERROR_SUCCESS )
+			{
+				if ( len == 0 && type == 0 )
+					state = UCL::DeviceState::BootStrap;
+				else
+					state = UCL::DeviceState::RamKernel;
+			}
 			break;
+		}
 		case DeviceClass::DeviceTypeMsc:
 		{
 			CString devPath = m_pUSBPort->GetUsbDevicePath();
@@ -642,108 +652,64 @@ DWORD COpUtpUpdate::RecoverDevice()
 // changes member variable m_OpState
 //
 ////
-
-DWORD COpUtpUpdate::DoMxRomLoad(CString filename, unsigned int RAMKNLAddr, bool bPreload) // RecoverHidDevice()
+/*
+DWORD COpUtpUpdate::DoMxRomLoad(UCL::Command* pCmd)
 {
 
-	DWORD ReturnVal = ERROR_SUCCESS;
+	DWORD returnVal = ERROR_SUCCESS;
 	CString taskMsg;
-#ifdef DEBUGOTPINIT
-BSTR bstr_log_text;
-CString _logText;
-#endif
+
 ///	taskMsg.LoadString(IDS_OPLOADER_LOAD_STARTED);
 ///	m_pPortMgrDlg->UpdateUI(taskMsg, ProgressDelta(2));
 
 	MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
-	//Till now, pMxRomDevice->_path has contains the port #. i.e. \\?\USB#Vid_15a2&Pid_0041#5&2416e801&0&8#{a5dcbf10-6530-11d2-901f-00c04fb951ed}
-	//&8# indicates the port # is 8.
-	//So we should create a new file by using pMxRomDevice->_path as an input parameter.
-
 //	TRACE(_T("%s"),m_pUSBPort->_device->name.c_str());
 	if ( pMxRomDevice == NULL )
 	{
-#ifdef DEBUGOTPINIT
-_logText.Format(_T("%s HidRecover - pHiddevice is NULL\r\n"), m_pPortMgrDlg->GetPanel());
-bstr_log_text = _logText.AllocSysString();
-((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
-#endif
-		ReturnVal = ERROR_INVALID_HANDLE;
-		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
-		return ReturnVal;
+		returnVal = ERROR_INVALID_HANDLE;
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
 	}
 
-//	pMxRomDevice->m_MxRomParamt.cMXType = m_DeviceStates[UCL::DeviceState::IMXInfo]->GetMXType();
-//	pMxRomDevice->m_MxRomParamt.cSecurity = m_DeviceStates[UCL::DeviceState::IMXInfo]->GetSecurity();
-//	pMxRomDevice->m_MxRomParamt.cRAMType = m_DeviceStates[UCL::DeviceState::IMXInfo]->GetRAMType();
-//	pMxRomDevice->m_MxRomParamt.cMemInitFilePath= m_pOpInfo->GetPath() + _T("\\") +\
-//		m_DeviceStates[UCL::DeviceState::IMXInfo]->GetRamScript();
-
-	pMxRomDevice->SetIMXDevPara();
-
-	StPitc myNewFwCommandSupport(pMxRomDevice, (LPCTSTR)filename,
-		m_pOpInfo->GetProfile()->m_bLockedProfile ? 
-			StFwComponent::LoadFlag_ResourceOnly :
-			StFwComponent::LoadFlag_FileFirst); 
-
-	if ( myNewFwCommandSupport.GetFwComponent().GetLastError() != ERROR_SUCCESS )
+	CString fileName = m_pOpInfo->GetPath() + _T("\\") + pCmd->GetFile();
+	StFwComponent fwObject((LPCTSTR)fileName);
+	if ( fwObject.GetLastError() != ERROR_SUCCESS )
 	{
-#ifdef DEBUGOTPINIT
-_logText.Format(_T("%s HidRecover - No FW component\r\n"), m_pPortMgrDlg->GetPanel());
-bstr_log_text = _logText.AllocSysString();
-((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
-#endif
-		ReturnVal = myNewFwCommandSupport.GetFwComponent().GetLastError();
-		ATLTRACE(_T("!!!ERROR!!! (%d): %s No FW component. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
-		return ReturnVal;
+		returnVal = fwObject.GetLastError();
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No FW component. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
 	}
 
 	// Set up the Task progress bar and bump the Operation progress bar
 ///	taskMsg.Format(IDS_OPUPDATER_LOADING_FILE, myNewFwCommandSupport.GetFwComponent().GetShortFileName().c_str());   // "Loading <filename> ..."
-	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, (int)myNewFwCommandSupport.GetFwComponent().size(), 0);       // STAGE 2 of the Load Operation
-#ifdef DEBUGOTPINIT
-_logText.Format(_T("%s HidRecover - Downloading...\r\n"), m_pPortMgrDlg->GetPanel());
-bstr_log_text = _logText.AllocSysString();
-((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
-#endif
+	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, fwObject.size(), 0);       // STAGE 2 of the Load Operation
 	Device::UI_Callback callback(this, &COpUtpUpdate::OnDownloadProgress);
-	ReturnVal = myNewFwCommandSupport.DownloadMxRomImg(callback, RAMKNLAddr, bPreload);
 
-	if(ReturnVal != ERROR_SUCCESS) 
+	returnVal = pMxRomDevice->DownloadImage(pCmd->GetAddress(), MxRomDevice::MemSectionOTH, MxRomDevice::MemSectionAPP, fwObject, callback);
+
+	if(returnVal != ERROR_SUCCESS) 
 	{
-#ifdef DEBUGOTPINIT
-_logText.Format(_T("%s HidRecover - Download failed rc: %x\r\n"), m_pPortMgrDlg->GetPanel(), ReturnVal);
-bstr_log_text = _logText.AllocSysString();
-((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
-#endif
-		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, ReturnVal);
-		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load i.MXxx device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
-		return ReturnVal;
+		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, returnVal);
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load i.MXxx device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
 	}
 
 	// Turn off the Task progress bar
 	m_pPortMgrDlg->UpdateUI(NULL);
 
-#ifdef DEBUGOTPINIT
-_logText.Format(_T("%s HidRecover - Complete\r\n"), m_pPortMgrDlg->GetPanel());
-bstr_log_text = _logText.AllocSysString();
-((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
-#endif
-
 	ATLTRACE(_T("%s Recover i.MXDevice - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
 	return ERROR_SUCCESS;
 }
+*/
 
-
-DWORD COpUtpUpdate::DoLoad(CString filename) // RecoverHidDevice()
+DWORD COpUtpUpdate::DoHidLoad(UCL::Command* pCmd)
 {
 
 	DWORD ReturnVal = ERROR_SUCCESS;
 	CString taskMsg;
-#ifdef DEBUGOTPINIT
-BSTR bstr_log_text;
-CString _logText;
-#endif
+
+	CString filename = m_pOpInfo->GetPath() + _T("\\") + pCmd->GetFile();
+
 ///	taskMsg.LoadString(IDS_OPLOADER_LOAD_STARTED);
 ///	m_pPortMgrDlg->UpdateUI(taskMsg, ProgressDelta(2));
 
@@ -752,12 +718,6 @@ CString _logText;
 
 	if ( pHidDevice == NULL )
 	{
-//		MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
-#ifdef DEBUGOTPINIT
-_logText.Format(_T("%s HidRecover - pHiddevice is NULL\r\n"), m_pPortMgrDlg->GetPanel());
-bstr_log_text = _logText.AllocSysString();
-((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
-#endif
 		ReturnVal = ERROR_INVALID_HANDLE;
 		ATLTRACE(_T("!!!ERROR!!! (%d): %s No HID device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
 		return ReturnVal;
@@ -770,11 +730,6 @@ bstr_log_text = _logText.AllocSysString();
 
 	if ( myNewFwCommandSupport.GetFwComponent().GetLastError() != ERROR_SUCCESS )
 	{
-#ifdef DEBUGOTPINIT
-_logText.Format(_T("%s HidRecover - No FW component\r\n"), m_pPortMgrDlg->GetPanel());
-bstr_log_text = _logText.AllocSysString();
-((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
-#endif
 		ReturnVal = myNewFwCommandSupport.GetFwComponent().GetLastError();
 		ATLTRACE(_T("!!!ERROR!!! (%d): %s No FW component. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
 		return ReturnVal;
@@ -783,21 +738,11 @@ bstr_log_text = _logText.AllocSysString();
 	// Set up the Task progress bar and bump the Operation progress bar
 ///	taskMsg.Format(IDS_OPUPDATER_LOADING_FILE, myNewFwCommandSupport.GetFwComponent().GetShortFileName().c_str());   // "Loading <filename> ..."
 	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, (int)myNewFwCommandSupport.GetFwComponent().size(), 0);       // STAGE 2 of the Load Operation
-#ifdef DEBUGOTPINIT
-_logText.Format(_T("%s HidRecover - Downloading...\r\n"), m_pPortMgrDlg->GetPanel());
-bstr_log_text = _logText.AllocSysString();
-((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
-#endif
 	Device::UI_Callback callback(this, &COpUtpUpdate::OnDownloadProgress);
 	ReturnVal = myNewFwCommandSupport.DownloadPitc(callback);
 
 	if(ReturnVal != ERROR_SUCCESS) 
 	{
-#ifdef DEBUGOTPINIT
-_logText.Format(_T("%s HidRecover - Download failed rc: %x\r\n"), m_pPortMgrDlg->GetPanel(), ReturnVal);
-bstr_log_text = _logText.AllocSysString();
-((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
-#endif
 		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, ReturnVal);
 		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load HID device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
 		return ReturnVal;
@@ -805,12 +750,6 @@ bstr_log_text = _logText.AllocSysString();
 
 	// Turn off the Task progress bar
 	m_pPortMgrDlg->UpdateUI(NULL);
-
-#ifdef DEBUGOTPINIT
-_logText.Format(_T("%s HidRecover - Complete\r\n"), m_pPortMgrDlg->GetPanel());
-bstr_log_text = _logText.AllocSysString();
-((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
-#endif
 
 	ATLTRACE(_T("%s RecoverHidDevice - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
 	return ERROR_SUCCESS;
@@ -1140,6 +1079,40 @@ DWORD COpUtpUpdate::DoCommand(UCL::Command* pCmd)
 		// Reset device to ROM and load file.
         retValue = DoBoot(pCmd);
 	}
+	else if ( pCmd->GetType() == _T("init") )
+	{
+        retValue = DoInit(pCmd);
+	}
+	else if ( pCmd->GetType() == _T("load") )
+	{
+		retValue = DoMxRomLoad(pCmd);
+	}
+	else if ( pCmd->GetType() == _T("jump") )
+	{
+		MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+		if ( pMxRomDevice )
+		{
+			if ( (retValue = pMxRomDevice->Jump()) == TRUE )
+				retValue = ERROR_SUCCESS;
+			else
+				retValue = ERROR_INVALID_HANDLE;
+		}
+		else
+			retValue = ERROR_INVALID_HANDLE;
+	}
+	else if ( pCmd->GetType() == _T("reset") )
+	{
+		MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+		if ( pMxRomDevice )
+		{
+			if ( (retValue = pMxRomDevice->Reset()) == TRUE )
+				retValue = ERROR_SUCCESS;
+			else
+				retValue = ERROR_INVALID_HANDLE;
+		}
+		else
+			retValue = ERROR_INVALID_HANDLE;
+	}
 	else if ( pCmd->GetType() == _T("burn") )
 	{
         retValue = DoBurn(pCmd);
@@ -1343,21 +1316,19 @@ DWORD COpUtpUpdate::DoBoot(UCL::Command* pCmd)
 		return retValue;
     }
 
-	CString fullFileName = m_pOpInfo->GetPath() + _T("\\") + pCmd->GetFile();
-
 	//if current device is i.MXxx device
-	if(m_CurrentDeviceType == DeviceClass::DeviceTypeMxRom)
+	if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxRom)
 	{
-		retValue = DoMxRomLoad(fullFileName, pCmd->GetAddr(), (pCmd->GetBody() == _T("Load")));
+		retValue = DoMxRomLoad(pCmd);
 	}
 	else
 	{//HID device
-		retValue = DoLoad(fullFileName);
+		retValue = DoHidLoad(pCmd);
 	}
 
     if (retValue != 0)
     {
-		logText.Format(_T("%s DoBoot() - Failed to load %s to Recovery mode device. (err=%d)\r\n"), m_pPortMgrDlg->GetPanel(), fullFileName,retValue);
+		logText.Format(_T("%s DoBoot() - Failed to load %s to Recovery mode device. (err=%d)\r\n"), m_pPortMgrDlg->GetPanel(), pCmd->GetFile(), retValue);
 		bstr_log_text = logText.AllocSysString();
 		((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
     }
@@ -1427,6 +1398,84 @@ DWORD COpUtpUpdate::DoBurn(UCL::Command* pCmd)
     
 	return retValue;
 }
+
+DWORD COpUtpUpdate::DoInit(UCL::Command* pCmd)
+{
+	DWORD returnVal = ERROR_SUCCESS;
+
+	MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+//	TRACE(_T("%s"),m_pUSBPort->_device->name.c_str());
+	if ( pMxRomDevice == NULL )
+	{
+		returnVal = ERROR_INVALID_HANDLE;
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	CString fullFileName;
+	fullFileName.Format(_T("%s//%s"), m_pOpInfo->GetPath(), pCmd->GetFile());
+
+	if( !pMxRomDevice->InitMemoryDevice(fullFileName) ) 
+	{
+		returnVal = ERROR_INVALID_HANDLE;
+//		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, 0);
+		ATLTRACE(_T("!!!ERROR!!! %s Failed to initialize i.MXxx memory. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	return returnVal;
+}
+
+DWORD COpUtpUpdate::DoMxRomLoad(UCL::Command* pCmd)
+{
+
+	DWORD returnVal = ERROR_SUCCESS;
+	CString taskMsg;
+
+///	taskMsg.LoadString(IDS_OPLOADER_LOAD_STARTED);
+///	m_pPortMgrDlg->UpdateUI(taskMsg, ProgressDelta(2));
+
+	MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+//	TRACE(_T("%s"),m_pUSBPort->_device->name.c_str());
+	if ( pMxRomDevice == NULL )
+	{
+		returnVal = ERROR_INVALID_HANDLE;
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	CString fileName = m_pOpInfo->GetPath() + _T("\\") + pCmd->GetFile();
+	StFwComponent fwObject((LPCTSTR)fileName);
+	if ( fwObject.GetLastError() != ERROR_SUCCESS )
+	{
+		returnVal = fwObject.GetLastError();
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No FW component. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	// Set up the Task progress bar and bump the Operation progress bar
+///	taskMsg.Format(IDS_OPUPDATER_LOADING_FILE, myNewFwCommandSupport.GetFwComponent().GetShortFileName().c_str());   // "Loading <filename> ..."
+	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, fwObject.size(), 0);       // STAGE 2 of the Load Operation
+	Device::UI_Callback callback(this, &COpUtpUpdate::OnDownloadProgress);
+
+	MxRomDevice::MemorySection loadSection = MxRomDevice::StringToMemorySection(pCmd->GetLoadSection());
+	MxRomDevice::MemorySection setSection = MxRomDevice::StringToMemorySection(pCmd->GetSetSection());
+	returnVal = pMxRomDevice->DownloadImage(pCmd->GetAddress(), loadSection, setSection, fwObject, callback);
+
+	if(returnVal != TRUE) 
+	{
+		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, returnVal);
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load i.MXxx device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	// Turn off the Task progress bar
+	m_pPortMgrDlg->UpdateUI(NULL);
+
+	ATLTRACE(_T("%s Recover i.MXDevice - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
+	return ERROR_SUCCESS;
+}
+
 /*
 DWORD COpUtpUpdate::DoLoad(CString filename)
 {

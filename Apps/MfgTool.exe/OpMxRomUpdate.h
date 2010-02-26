@@ -53,8 +53,8 @@ protected:
 	DWORD DoFind(UCL::Command* pCmd);
 	DWORD DoBoot(UCL::Command* pCmd);
 //	DWORD DoBurn(UCL::Command* pCmd);
-	DWORD DoLoad(UCL::Command* pCmd);
-//	DWORD DoMxRomLoad(CString filename, unsigned int RAMKNLAddr, bool bPreload);
+	DWORD DoInit(UCL::Command* pCmd);
+	DWORD DoMxRomLoad(UCL::Command* pCmd);
 	DWORD DoShow(UCL::Command* pCmd);
 
 };

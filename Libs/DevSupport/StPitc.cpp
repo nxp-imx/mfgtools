@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "StPitc.h"
-#include "MxRomDevice.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -87,28 +86,6 @@ uint32_t StPitc::DownloadPitc(Device::UI_Callback callbackFn)
     
     return ret;
 }
-
-uint32_t StPitc::DownloadMxRomImg(Device::UI_Callback callbackFn, unsigned int RAMKNLAddr, bool bPreload)
-{
-    if ( _fwComponent.GetLastError() != ERROR_SUCCESS )
-        return _fwComponent.GetLastError();
-    
-	//MxRomDownloadFw api(_fwComponent.GetDataPtr(), _fwComponent.size());
-
-    HANDLE cb = _pDevice->RegisterCallback(callbackFn);
-
-    //MxRomDevice objMxRomDevice();
-
-    BOOL ret = (dynamic_cast<MxRomDevice*>(_pDevice))->DownloadRKL((unsigned char *)_fwComponent.GetDataPtr(), _fwComponent.size(), RAMKNLAddr, bPreload);
-    
-    bool check = _pDevice->UnregisterCallback(cb);
-    
-	if(ret)
-		return ERROR_SUCCESS;
-	else
-		return !(ERROR_SUCCESS);
-}
-
 
 bool StPitc::IsPitcLoaded()
 {

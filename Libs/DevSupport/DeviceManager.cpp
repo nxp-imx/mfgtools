@@ -168,9 +168,6 @@ BOOL DeviceManager::InitInstance()
 	// Init all the USB Ports.
 	((usb::HubMgr*)_devClasses[DeviceClass::DeviceTypeUsbHub])->RefreshHubs();
 
-	// Kinda ugly.... CLW TODO
-	MxRomDevice::InializeMemoryScripts();
-
 	// Let the client thread that called Open() resume.
 	VERIFY(::SetEvent(_hStartEvent));
 

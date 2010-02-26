@@ -19,28 +19,46 @@ public:
 		// [XmlAttribute("body")]
 		CString GetBody() { return CString(GetAttrValue(_T("body"))); };
 
-		// [XmlAttribute("addr")]
-		unsigned int GetAddr()
+		// [XmlAttribute("address")]
+		unsigned int GetAddress()
 		{ 
-			unsigned int addr = 0; // default to 0
+			unsigned int address = 0; // default to 0
 
-			CString attr = GetAttrValue(_T("addr"));
+			CString attr = GetAttrValue(_T("address"));
 
 			if(attr.Left(2) == _T("0x"))
 			{
 				TCHAR *p;
-				addr = _tcstoul(attr.Mid(2),&p,16);
+				address = _tcstoul(attr.Mid(2),&p,16);
 			}
 			else
 			{
-				addr = _tstoi64(attr);
+				address = _tstoi64(attr);
 			}
 
-			return addr; 
+			return address; 
 		};
 
 		// [XmlAttribute("file")]
 		CString GetFile() { return CString(GetAttrValue(_T("file"))); };
+		
+		// [XmlAttribute("loadSection")]
+		CString GetLoadSection()
+		{ 
+			return CString(GetAttrValue(_T("loadSection")));
+		};
+
+		// [XmlAttribute("setSection")]
+		CString GetSetSection()
+		{ 
+			return CString(GetAttrValue(_T("setSection")));
+		};
+
+		// [XmlAttribute("jump")]
+		CString GetJump()
+		{ 
+			return CString(GetAttrValue(_T("action")));
+		};
 
 		// [XmlAttribute("timeout")]
 		int GetTimeout() 
@@ -145,235 +163,6 @@ public:
 		// [XmlAttribute("ram")]
 //		LPCTSTR GetMemoryType() { return GetAttrValue(_T("ram")) ? GetAttrValue(_T("ram")) : _T(""); };
 
-		class MemInitCmd : public XNode
-		{
-		public:
-			// [XmlAttribute("addr")]
-			unsigned int GetAddress()
-			{ 
-				unsigned int addr = 0; // default to 0
-
-				CString attr = GetAttrValue(_T("addr"));
-
-				if(attr.Left(2) == _T("0x"))
-				{
-					TCHAR *p;
-					addr = _tcstoul(attr.Mid(2),&p,16);
-				}
-				else
-				{
-					addr = _tstoi64(attr);
-				}
-
-				return addr; 
-			};
-
-			// [XmlAttribute("data")]
-			unsigned int GetData()
-			{ 
-				unsigned int data = 0; // default to 0
-
-				CString attr = GetAttrValue(_T("data"));
-
-				if(attr.Left(2) == _T("0x"))
-				{
-					TCHAR *p;
-					data = _tcstoul(attr.Mid(2),&p,16);
-				}
-				else
-				{
-					data = _tstoi64(attr);
-				}
-
-				return data; 
-			};
-
-			// [XmlAttribute("format")]
-			unsigned int GetFormat()
-			{ 
-				unsigned char format = 0; // default to 0
-
-				CString attr = GetAttrValue(_T("format"));
-
-				if(attr.Left(2) == _T("0x"))
-				{
-					TCHAR *p;
-					format = _tcstoul(attr.Mid(2),&p,16);
-				}
-				else
-				{
-					format = _tstoi64(attr);
-				}
-
-				return format; 
-			};
-
-			CString ToString()
-			{
-				CString str;
-				str.Format(_T("addr=\"0x%X\" data=\"0x%X\" format=\"%d\""), GetAddress(), GetData(), GetFormat());
-				return str;
-			}
-	/*
-			public Command() { }
-
-			public Command(String type, String command, String filename, String description)
-			{
-				CmdType = type;
-				CommandString = command;
-				Filename = filename;
-				Description = description;
-			}
-	*/
-		};
-		typedef std::vector<MemInitCmd*> Script;
-		
-		class MemInitScript : public XNode
-		{
-		public:
-			// [XmlAttribute("name")]
-			CString GetName() { return CString(GetAttrValue(_T("name"))); };
-			// [XmlAttribute("desc")]
-			CString GetDescription() { return CString(GetAttrValue(_T("desc"))); };
-			// [XmlElement(ElementName="CMD")]
-			MemInitCmd* GetCommand(size_t index)
-			{
-				XNodes cmds = GetChilds(_T("CMD"));
-
-				if( index >= 0 && index < cmds.size() )
-					return (MemInitCmd*)cmds[index];
-				
-				return NULL;
-			}
-
-			Script GetScript()
-			{
-				Script script;
-				XNodes nodes = GetChilds(_T("CMD"));
-
-				std::vector<LPXNode>::iterator it = nodes.begin();
-				for( ; it != nodes.end(); ++(it))
-				{
-					script.push_back((MemInitCmd*)(*it));
-				}
-
-				return script;
-			}
-
-			size_t GetScriptSize()
-			{
-				XNodes cmds = GetChilds(_T("CMD"));
-				return cmds.size();
-			}
-
-			CString ToString()
-			{
-				CString str;
-				str.Format(_T("%s, %s"), GetName(), GetDescription());
-			}
-
-		};
-
-		class Revision : public XNode
-		{
-		public:
-			// [XmlAttribute("major")]
-			int GetMajor() { return GetAttrValue(_T("major")) ? _tstoi(GetAttrValue(_T("major"))) : 0; }
-
-			// [XmlAttribute("minor")]
-			int GetMinor() { return GetAttrValue(_T("minor")) ? _tstoi(GetAttrValue(_T("minor"))) : 0; }
-
-			// [XmlElement(ElementName="RAM")]
-			Script GetRamScript(LPCTSTR name)
-			{
-				XNodes scripts = GetChilds(_T("RAM"));
-
-				if ( name == NULL && !scripts.empty() )
-				{
-					return ((MemInitScript*)scripts[0])->GetScript();
-
-				}
-				else if ( name != NULL )
-				{
-					std::vector<LPXNode>::iterator it = scripts.begin();
-					for( ; it != scripts.end(); ++(it))
-					{
-						MemInitScript* pScript = (MemInitScript*)(*it);
-						if( pScript->GetName() == name )
-						{
-							return pScript->GetScript();
-						}
-					}
-				}
-
-				return Script();
-			}
-
-			CString ToString()
-			{
-				CString str;
-				str.Format(_T("%d.%d"), GetMajor(), GetMinor());
-				return str;
-			}
-		};
-
-		// [XmlElement(ElementName="REV")]
-		Revision* GetRevision(CString revString)
-		{
-			XNodes revs = GetChilds(_T("REV"));
-
-			std::vector<LPXNode>::iterator rev = revs.begin();
-			for( ; rev != revs.end(); ++(rev))
-			{
-				if( ((Revision*)*rev)->ToString() == revString )
-				{
-					return (Revision*)(*rev);
-				}
-			}
-
-			return NULL;
-		}
-
-
-		Script GetRamScript()
-		{ 
-			// if revision is specified, look there first
-			if ( GetAttrValue(_T("rev")) )
-			{
-				// Look under <DEV/> <REV/>
-				if ( GetRevision(GetAttrValue(_T("rev"))) )
-				{
-					// GetRamScript gets the first <RAM/> script if ram= is not specified in <DEV/>
-					return GetRevision(GetAttrValue(_T("rev")))->GetRamScript(GetAttrValue(_T("ram")));
-				}
-			}
-			else
-			{
-				// otherwise, see if there is a <RAM/> node under the <DEV/> node
-				XNodes scripts = GetChilds(_T("RAM"));
-
-				if ( GetAttrValue(_T("ram")) == NULL && !scripts.empty() )
-				{
-					return ((MemInitScript*)scripts[0])->GetScript();
-
-				}
-				else if ( GetAttrValue(_T("ram")) != NULL )
-				{
-					std::vector<LPXNode>::iterator it = scripts.begin();
-					for( ; it != scripts.end(); ++(it))
-					{
-						MemInitScript* pScript = (MemInitScript*)(*it);
-						if( pScript->GetName() == GetAttrValue(_T("ram")) )
-						{
-							return pScript->GetScript();
-						}
-					}
-				}
-			}
-			
-			return Script();
-		}
-
 //		LPCTSTR GetSecurity() { return GetAttrValue(_T("security")) ? GetAttrValue(_T("security")) : _T("xxxx"); }
 //		LPCTSTR GetFlashModel() { return GetAttrValue(_T("FlashModel")) ? GetAttrValue(_T("FlashModel")) : _T("xxxx"); }
 //		BOOL  GetBISWAP() { CString str = GetAttrValue(_T("BISWAP")) ? GetAttrValue(_T("BISWAP")) : _T("false"); return str.CompareNoCase(_T("true")) == 0;}
@@ -469,6 +258,9 @@ public:
 
 		// [XmlAttribute("dev")]
 		LPCTSTR GetDeviceDesc() { return GetAttrValue(_T("dev")); };
+
+		// [XmlAttribute("response")]
+		LPCTSTR GetResponse() { return GetAttrValue(_T("response")); };
 	};
 
 	class FirmwareVersion : public XNode
@@ -478,7 +270,7 @@ public:
 	class Configuration : public XNode
 	{
 	public:
-		// [XmlElement("DEV")]
+		// [XmlElement("STATE")]
 		std::map<DeviceState::DeviceState_t, DeviceDesc*> GetDeviceStates()
 		{
 			std::map<DeviceState::DeviceState_t, DeviceDesc*> devStates;
@@ -525,7 +317,6 @@ public:
 	};
 
 	// [XmlElement(ElementName="LIST")]
-//		CArray<CommandList> CommandLists;
 	CommandList* GetCommandList(LPCTSTR name)
 	{
 		XNodes lists = GetChilds(_T("LIST"));

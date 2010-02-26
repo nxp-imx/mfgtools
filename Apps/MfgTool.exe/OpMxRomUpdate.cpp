@@ -7,7 +7,7 @@
 
 #include "../../Libs/DevSupport/StPitc.h"
 #include "../../Libs/DevSupport/MxRomDevice.h"
-#include "../../Libs/DevSupport/iMX/AtkHostApiClass.h"
+//#include "../../Libs/DevSupport/iMX/AtkHostApiClass.h"
 
 #include "OpMxRomUpdate.h"
 
@@ -96,8 +96,8 @@ const UCL::DeviceState::DeviceState_t COpMxRomUpdate::GetDeviceState()
 			MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
 			
 			int len = 0, type = 0;
-			unsigned char model[MAX_MODEL_LEN] = {0};
-			if ( pMxRomDevice->GetRKLVersion(&model[0], &len, &type) == RET_SUCCESS )
+			CString model;
+			if ( pMxRomDevice->GetRKLVersion(model, len, type) == ERROR_SUCCESS )
 			{
 				if ( len == 0 && type == 0 )
 					state = UCL::DeviceState::BootStrap;
@@ -747,6 +747,27 @@ DWORD COpMxRomUpdate::DoCommand(UCL::Command* pCmd)
 		// Reset device to ROM and load file.
         retValue = DoBoot(pCmd);
 	}
+	else if ( pCmd->GetType() == _T("init") )
+	{
+        retValue = DoInit(pCmd);
+	}
+	else if ( pCmd->GetType() == _T("load") )
+	{
+		retValue = DoMxRomLoad(pCmd);
+	}
+	else if ( pCmd->GetType() == _T("jump") )
+	{
+		MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+		if ( pMxRomDevice )
+		{
+			if ( (retValue = pMxRomDevice->Jump()) == TRUE )
+				retValue = ERROR_SUCCESS;
+			else
+				retValue = ERROR_INVALID_HANDLE;
+		}
+		else
+			retValue = ERROR_INVALID_HANDLE;
+	}
 //	else if ( pCmd->GetType() == _T("burn") )
 //	{
 //        retValue = DoBurn(pCmd);
@@ -961,7 +982,7 @@ DWORD COpMxRomUpdate::DoBoot(UCL::Command* pCmd)
 		return retValue;
     }
 
-	retValue = DoLoad(pCmd);
+	retValue = DoMxRomLoad(pCmd);
     if (retValue != 0)
     {
 		logText.Format(_T("%s DoBoot() - Failed to load %s to Recovery mode device. (err=%d)\r\n"), m_pPortMgrDlg->GetPanel(), pCmd->GetFile(), retValue);
@@ -1033,7 +1054,34 @@ DWORD COpMxRomUpdate::DoBurn(UCL::Command* pCmd)
 	return retValue;
 }
 */
-DWORD COpMxRomUpdate::DoLoad(UCL::Command* pCmd)
+DWORD COpMxRomUpdate::DoInit(UCL::Command* pCmd)
+{
+	DWORD returnVal = ERROR_SUCCESS;
+
+	MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+//	TRACE(_T("%s"),m_pUSBPort->_device->name.c_str());
+	if ( pMxRomDevice == NULL )
+	{
+		returnVal = ERROR_INVALID_HANDLE;
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	CString fullFileName;
+	fullFileName.Format(_T("%s//%s"), m_pOpInfo->GetPath(), pCmd->GetFile());
+
+	if( !pMxRomDevice->InitMemoryDevice(fullFileName) ) 
+	{
+		returnVal = ERROR_INVALID_HANDLE;
+//		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, 0);
+		ATLTRACE(_T("!!!ERROR!!! %s Failed to initialize i.MXxx memory. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	return returnVal;
+}
+
+DWORD COpMxRomUpdate::DoMxRomLoad(UCL::Command* pCmd)
 {
 
 	DWORD returnVal = ERROR_SUCCESS;
@@ -1051,22 +1099,6 @@ DWORD COpMxRomUpdate::DoLoad(UCL::Command* pCmd)
 		return returnVal;
 	}
 
-	UCL::DeviceDesc::Script script = m_DeviceStates[UCL::DeviceState::StringToDeviceState(pCmd->GetBody())]->GetRamScript();
-	MxRomDevice::MemoryInitScript mxScript;
-	UCL::DeviceDesc::Script::iterator memCmd = script.begin();
-	for ( ; memCmd != script.end(); ++memCmd )
-	{
-		MxRomDevice::MemoryInitCommand mxCmd((*memCmd)->GetAddress(), (*memCmd)->GetData(), (*memCmd)->GetFormat());
-		mxScript.push_back(mxCmd);
-	}
-
-	if( !pMxRomDevice->InitMemoryDevice(mxScript) ) 
-	{
-		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, 0);
-		ATLTRACE(_T("!!!ERROR!!! %s Failed to initialize i.MXxx memory. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
-		return returnVal;
-	}
-
 	CString fileName = m_pOpInfo->GetPath() + _T("\\") + pCmd->GetFile();
 	StFwComponent fwObject((LPCTSTR)fileName);
 	if ( fwObject.GetLastError() != ERROR_SUCCESS )
@@ -1081,9 +1113,11 @@ DWORD COpMxRomUpdate::DoLoad(UCL::Command* pCmd)
 	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, fwObject.size(), 0);       // STAGE 2 of the Load Operation
 	Device::UI_Callback callback(this, &COpMxRomUpdate::OnDownloadProgress);
 
-	returnVal = pMxRomDevice->DownloadRKL(fwObject, callback);
+	MxRomDevice::MemorySection loadSection = MxRomDevice::StringToMemorySection(pCmd->GetLoadSection());
+	MxRomDevice::MemorySection setSection = MxRomDevice::StringToMemorySection(pCmd->GetSetSection());
+	returnVal = pMxRomDevice->DownloadImage(pCmd->GetAddress(), loadSection, setSection, fwObject, callback);
 
-	if(returnVal != ERROR_SUCCESS) 
+	if(returnVal != TRUE) 
 	{
 		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, returnVal);
 		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load i.MXxx device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
