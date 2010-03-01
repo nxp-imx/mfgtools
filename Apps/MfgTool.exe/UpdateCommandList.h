@@ -54,6 +54,19 @@ public:
 			return CString(GetAttrValue(_T("setSection")));
 		};
 
+		// [XmlAttribute("HasFlashHeader")]
+		BOOL HasFlashHeader()
+		{ 
+			if ( GetAttrValue(_T("HasFlashHeader")) )
+			{
+				 CString attr = GetAttrValue(_T("HasFlashHeader"));
+				 if ( attr.CompareNoCase(_T("TRUE")) == 0 )
+					 return TRUE;
+			}
+			
+			return FALSE;
+		};
+
 		// [XmlAttribute("jump")]
 		CString GetJump()
 		{ 

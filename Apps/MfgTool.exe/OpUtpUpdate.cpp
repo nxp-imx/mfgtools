@@ -1460,7 +1460,7 @@ DWORD COpUtpUpdate::DoMxRomLoad(UCL::Command* pCmd)
 
 	MxRomDevice::MemorySection loadSection = MxRomDevice::StringToMemorySection(pCmd->GetLoadSection());
 	MxRomDevice::MemorySection setSection = MxRomDevice::StringToMemorySection(pCmd->GetSetSection());
-	returnVal = pMxRomDevice->DownloadImage(pCmd->GetAddress(), loadSection, setSection, fwObject, callback);
+	returnVal = pMxRomDevice->DownloadImage(pCmd->GetAddress(), loadSection, setSection, pCmd->HasFlashHeader(), fwObject, callback);
 
 	if(returnVal != TRUE) 
 	{

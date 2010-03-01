@@ -44,7 +44,7 @@ public:
 	virtual ~MxRomDevice(void);
 	int GetRKLVersion(CString& fmodel, int& len, int& mxType);
 	BOOL InitMemoryDevice(CString filename);
-	BOOL DownloadImage(UINT address, MemorySection loadSection, MemorySection setSection, const StFwComponent& fwComponent, Device::UI_Callback callbackFn);
+	BOOL DownloadImage(UINT address, MemorySection loadSection, MemorySection setSection, BOOL HasFlashHeader, const StFwComponent& fwComponent, Device::UI_Callback callbackFn);
 	BOOL Jump();
 	BOOL Reset();
 
@@ -88,7 +88,7 @@ private:
 	struct Response UnPackRklResponse(unsigned char *resBuf);
 	BOOL Jump2Rak();
 	BOOL SendCommand2RoK(UINT address, UINT byteCount, UCHAR type);
-	BOOL TransData(UINT byteCount, const unsigned char * pBuf,int opMode);
+	BOOL TransData(UINT byteCount, const unsigned char * pBuf);
 	BOOL WriteToDevice(const unsigned char *buf, UINT count);
 	BOOL ReadFromDevice(PUCHAR buf, UINT count);
 	BOOL DeviceIoControl(DWORD controlCode, PVOID pRequest = NULL);

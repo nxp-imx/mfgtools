@@ -358,7 +358,7 @@ BOOL MxRomDevice::WriteMemory(UINT address, UINT data, UINT format)
 	}
 
 	// get response of HAB type
-	TRACE("WriteMemory(): Receive ack:%x\n", *(unsigned int *)cmdAck);
+	//TRACE("WriteMemory(): Receive ack:%x\n", *(unsigned int *)cmdAck);
 	if (*(unsigned int *)cmdAck == HabEnabled)
 	{
 		// Validate production address
@@ -504,7 +504,7 @@ BOOL MxRomDevice::Jump2Rak()
 	}
 
 	// 1st CHECK: If first ACK == 0x88888888 then 1st check is successful.
-	TRACE(">> Jump2 Ramkernel result: 0x%x\n", *(unsigned int *)cmdAck);
+	// TRACE(">> Jump2 Ramkernel result: 0x%x\n", *(unsigned int *)cmdAck);
 	if (*(unsigned int *)cmdAck != ROM_STATUS_ACK)
 	{
 		return FALSE;
@@ -518,7 +518,7 @@ BOOL MxRomDevice::Jump2Rak()
 		unsigned char cmdAck2[4] = { 0 };
 		if(ReadFromDevice(cmdAck2, 4))
 		{
-			TRACE(">> Jump2 Ramkernel result(2): 0x%x\n", *(unsigned int *)cmdAck2);
+			// TRACE(">> Jump2 Ramkernel result(2): 0x%x\n", *(unsigned int *)cmdAck2);
 			if (*(unsigned int *)cmdAck2 == ROM_STATUS_ACK2)
 			{
 				return FALSE;
@@ -526,6 +526,7 @@ BOOL MxRomDevice::Jump2Rak()
 		}
 	}
 
+	TRACE("*********Jump to Ramkernel successfully!**********\r\n");
 	return TRUE;
 }
 
@@ -647,74 +648,78 @@ int MxRomDevice::GetRKLVersion(CString& fmodel, int& len, int& mxType)
 
 #define FLASH_HEADER_SIZE	0x20
 #define ROM_TRANSFER_SIZE	0x400
-//#define MX_51_NK_LOAD_ADDRESS			0x90200000
-//#define MX_51_EBOOT_LOAD_ADDRESS		0x90040000
 
-BOOL MxRomDevice::DownloadImage(UINT address, MemorySection loadSection, MemorySection setSection, const StFwComponent& fwComponent, Device::UI_Callback callbackFn)
+BOOL MxRomDevice::DownloadImage(UINT address, MemorySection loadSection, MemorySection setSection, BOOL HasFlashHeader, const StFwComponent& fwComponent, Device::UI_Callback callbackFn)
 {
 	int counter = 0;
 	int bytePerCommand = 0;
-	
+	const unsigned char* const pBuffer = fwComponent.GetDataPtr();
+	const size_t dataSize = fwComponent.size();
+
 	//Here we must transfer virtual address to physical address before downloading ram kernel.
-//	int PhyRAMAddr4KRL = _defaultAddress.MemoryStart | (address & (~0xF0000000));
-//	int ActualImageAddr = PhyRAMAddr4KRL;
-//	int FlashHdrAddr = PhyRAMAddr4KRL - FLASH_HEADER_SIZE;
+	int PhyRAMAddr4KRL = _defaultAddress.MemoryStart | (address & (~0xF0000000));
 
-	size_t dataSize = fwComponent.size();
-	if ( dataSize < MAX_SIZE_PER_DOWNLOAD_COMMAND )
-//	uint32_t byteIndex, numBytesToWrite = 0;
-//	for ( byteIndex = 0; byteIndex < dataSize; byteIndex += numBytesToWrite )
+	uint32_t byteIndex, numBytesToWrite = 0;
+	for ( byteIndex = 0; byteIndex < dataSize; byteIndex += numBytesToWrite )
 	{
-		// Init the buffer to 0
-//		memset(buffer, 0, sizeof(buffer));
-
 		// Get some data
-//		numBytesToWrite = min(MAX_SIZE_PER_DOWNLOAD_COMMAND, dataSize - byteIndex);
-//		memcpy_s(buffer, sizeof(buffer), &fwComponent.GetData()[byteIndex], numBytesToWrite);
+		numBytesToWrite = min(MAX_SIZE_PER_DOWNLOAD_COMMAND, dataSize - byteIndex);
 
-		if (!SendCommand2RoK(address, dataSize, loadSection))
+		if (!SendCommand2RoK(PhyRAMAddr4KRL + byteIndex, numBytesToWrite, loadSection))
 		{
-			TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), address, dataSize, loadSection);
+			TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), PhyRAMAddr4KRL + byteIndex, numBytesToWrite, loadSection);
 			return FALSE;
 		}
 		else
 		{
 			Sleep(10);
-			if(!TransData(dataSize, fwComponent.GetDataPtr(), OPMODE_DOWNLOAD))
+			if(!TransData(numBytesToWrite, pBuffer + byteIndex))
 			{
-				TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X) failed.\n"), address, dataSize, loadSection);
+				TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X) failed.\n"), numBytesToWrite, pBuffer + byteIndex);
 				return FALSE;
 			}
 		}
 	}
 
-//	if (byteIndex == dataSize)
-	{
-		//transfer length of ROM_TRANSFER_SIZE is a must to ROM code.
-		unsigned char FlashHdr[ROM_TRANSFER_SIZE] = { 0 };
-		//Init the memory
-//		memset(FlashHdr,0, ROM_TRANSFER_SIZE);
-		//Copy image data with an offset of FLASH_HEADER_SIZE to the temp buffer.
-//		memcpy(FlashHdr+FLASH_HEADER_SIZE, pBuf, ROM_TRANSFER_SIZE-FLASH_HEADER_SIZE);
-		//We should write actual image address to the first dword of flash header.
-//		((int *)FlashHdr)[0] = ActualImageAddr;
-		memcpy_s(FlashHdr, ROM_TRANSFER_SIZE, fwComponent.GetDataPtr(), ROM_TRANSFER_SIZE);
+	int FlashHdrAddr;
+	const unsigned char * pHeaderData = NULL;
 
-		//Set execute address.
-		if (!SendCommand2RoK(address, ROM_TRANSFER_SIZE, setSection /*(bPreload)? MemSectionOTH : MemSectionAPP*/))
+	//transfer length of ROM_TRANSFER_SIZE is a must to ROM code.
+	unsigned char FlashHdr[ROM_TRANSFER_SIZE] = { 0 };
+	
+	// Just use the front of the data buffer if the data includes the FlashHeader
+	if( HasFlashHeader )
+	{
+		FlashHdrAddr = PhyRAMAddr4KRL;
+		pHeaderData = pBuffer;
+	}
+	else
+	{
+		// Otherwise, create a header and append the data
+		
+		//Copy image data with an offset of FLASH_HEADER_SIZE to the temp buffer.
+		memcpy(FlashHdr + FLASH_HEADER_SIZE, pBuffer, ROM_TRANSFER_SIZE - FLASH_HEADER_SIZE);
+		
+		//We should write actual image address to the first dword of flash header.
+		((int *)FlashHdr)[0] = PhyRAMAddr4KRL;
+
+		FlashHdrAddr = PhyRAMAddr4KRL - FLASH_HEADER_SIZE;
+		pHeaderData = (const unsigned char *)FlashHdr;
+	}
+
+	//Set execute address.
+	if ( !SendCommand2RoK(FlashHdrAddr, ROM_TRANSFER_SIZE, setSection) )
+	{
+		TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), FlashHdrAddr, ROM_TRANSFER_SIZE, setSection);
+		return FALSE;
+	}
+	else
+	{
+		Sleep(10);
+		if(!TransData(ROM_TRANSFER_SIZE, pHeaderData))
 		{
-			TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), address, ROM_TRANSFER_SIZE, setSection);
+			TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X) failed.\n"), ROM_TRANSFER_SIZE, pHeaderData);
 			return FALSE;
-		}
-		else
-		{
-			Sleep(10);
-//			pBuffer = pBuf;
-			if(!TransData(ROM_TRANSFER_SIZE,(const unsigned char *)FlashHdr,OPMODE_DOWNLOAD))
-			{
-				TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X) failed.\n"), address, ROM_TRANSFER_SIZE, setSection);
-				return FALSE;
-			}
 		}
 	}
 
@@ -810,7 +815,7 @@ BOOL MxRomDevice::SendCommand2RoK(UINT address, UINT byteCount, UCHAR type)
 
 #define MINUM_TRANSFER_SIZE 0x20
 
-BOOL MxRomDevice::TransData(UINT byteCount, const unsigned char * pBuf,int opMode)
+BOOL MxRomDevice::TransData(UINT byteCount, const unsigned char * pBuf)
 {
 	//	BOOL status = FALSE;
 	const unsigned char * pBuffer = pBuf;
