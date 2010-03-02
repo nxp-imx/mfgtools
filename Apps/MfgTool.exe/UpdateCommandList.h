@@ -39,6 +39,46 @@ public:
 			return address; 
 		};
 
+		// [XmlAttribute("param1")]
+		unsigned int GetParam1()
+		{ 
+			unsigned int param = 0; // default to 0
+
+			CString attr = GetAttrValue(_T("param1"));
+
+			if(attr.Left(2) == _T("0x"))
+			{
+				TCHAR *p;
+				param = _tcstoul(attr.Mid(2),&p,16);
+			}
+			else
+			{
+				param = _tstoi64(attr);
+			}
+
+			return param; 
+		};
+
+		// [XmlAttribute("param2")]
+		unsigned int GetParam2()
+		{ 
+			unsigned int param = 0; // default to 0
+
+			CString attr = GetAttrValue(_T("param2"));
+
+			if(attr.Left(2) == _T("0x"))
+			{
+				TCHAR *p;
+				param = _tcstoul(attr.Mid(2),&p,16);
+			}
+			else
+			{
+				param = _tstoi64(attr);
+			}
+
+			return param; 
+		};
+
 		// [XmlAttribute("file")]
 		CString GetFile() { return CString(GetAttrValue(_T("file"))); };
 		

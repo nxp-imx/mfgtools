@@ -5,7 +5,7 @@
 #include "Libs/WDK/usb100.h"
 #include <sys/stat.h>
 
-#include "iMX/AtkHostApiClass.h"
+//#include "iMX/AtkHostApiClass.h"
 //#include "iMX/MxDefine.h"
 #include "../../Drivers/iMX_BulkIO_Driver/sys/public.h"
 
@@ -106,21 +106,12 @@ MxRomDevice::ChipFamily_t MxRomDevice::GetChipFamily()
 //-------------------------------------------------------------------------------------
 MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
 {
-	short header = ROM_KERNEL_CMD_WR_MEM;
-	char format = 32;
-	int dataSize = 0;
-	int data = 0;
-	char pointer = 0;
-	int address = 0;
-
-	if ( chipType == MX51 )
-	{
-		address = 0x1FFEA000;
-	}
-	else
-	{
-		address = 0xFFFFFFFF;
-	}
+	const short header = ROM_KERNEL_CMD_WR_MEM;
+	const UINT address = chipType == MX51 ? 0x1FFEA000 : 0xFFFFFFFF;
+	const UINT data = 0;
+	const char format = 32;
+	const UINT dataSize = 0;
+	const char pointer = 0;
 
 	long command[4] = { 0 };
 
@@ -388,6 +379,15 @@ BOOL MxRomDevice::ValidAddress(const UINT address) const
 
 	switch ( _chipFamily )
 	{
+// Please check Starle
+// from pl_check_address_valid( UINT32 address, UINT32 byte_count)
+//	byte_count == format >>3 == 1,2, or 3
+//		    if (((address + byte_count <= WEIM_CS2_END) && (address >= SDRAM_START))
+//       || ((address + byte_count <= IRAM_FREE_END) && (address >= IRAM_FREE_START))
+//       || ((address + byte_count <= NFC_END) && (address >= NFC_START))
+//       || ((address + byte_count <= SDRAM_CTL_END) && (address >= SDRAM_CTL_START))
+//       || ((address + byte_count <= WEIM_END) && (address >= WEIM_START)))
+
 		case MX31:
 		case MX32:
 			if (   ((address <= MX31_NFCend)	&& (address >= MX31_NFCstart)) 
@@ -465,8 +465,8 @@ BOOL MxRomDevice::Jump2Rak()
 	const short header = ROM_KERNEL_CMD_GET_STAT;
 	const UINT address = 0;
 	const UINT data = 0;
-	const UINT dataSize = 0;
 	const char format = 0;
+	const UINT dataSize = 0;
 	const char pointer = 0;
 
 	long command[4] = { 0 };
@@ -540,7 +540,7 @@ BOOL MxRomDevice::Jump2Rak()
 // @return
 //-------------------------------------------------------------------------------------		
 void MxRomDevice::PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsigned long addr, 
-								  unsigned long param, unsigned long param1)
+								  unsigned long param1, unsigned long param2)
 {
 	cmd[0]  = (unsigned char)(RAM_KERNEL_CMD_HEADER >> 8);
 	cmd[1]  = (unsigned char)(RAM_KERNEL_CMD_HEADER & 0x00ff);
@@ -550,14 +550,14 @@ void MxRomDevice::PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsig
 	cmd[5]  = (unsigned char)(addr >> 16);
 	cmd[6]  = (unsigned char)(addr >> 8);
 	cmd[7]  = (unsigned char) addr;
-	cmd[8]  = (unsigned char)(param >> 24);
-	cmd[9]  = (unsigned char)(param >> 16);
-	cmd[10] = (unsigned char)(param >> 8);
-	cmd[11] = (unsigned char) param;
-	cmd[12] = (unsigned char)(param1 >> 24);
-	cmd[13] = (unsigned char)(param1 >> 16);
-	cmd[14] = (unsigned char)(param1 >> 8);
-	cmd[15] = (unsigned char) param1;
+	cmd[8]  = (unsigned char)(param1 >> 24);
+	cmd[9]  = (unsigned char)(param1 >> 16);
+	cmd[10] = (unsigned char)(param1 >> 8);
+	cmd[11] = (unsigned char) param1;
+	cmd[12] = (unsigned char)(param2 >> 24);
+	cmd[13] = (unsigned char)(param2 >> 16);
+	cmd[14] = (unsigned char)(param2 >> 8);
+	cmd[15] = (unsigned char) param2;
 	return;
 }
 
@@ -568,9 +568,9 @@ void MxRomDevice::PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsig
 //
 // @return
 //-------------------------------------------------------------------------------------		
-struct Response MxRomDevice::UnPackRklResponse(unsigned char *resBuf)
+union MxRomDevice::Response MxRomDevice::UnPackRklResponse(unsigned char *resBuf)
 {
-	struct Response res;
+	union Response res;
 
 	res.ack  =  (unsigned short)(((unsigned short)resBuf[0] << 8) | resBuf[1]);
 	res.csum =  (unsigned short)(((unsigned short)resBuf[2] << 8) | resBuf[3]);
@@ -579,6 +579,39 @@ struct Response MxRomDevice::UnPackRklResponse(unsigned char *resBuf)
 
 	return res;
 }
+
+//-------------------------------------------------------------------------------------		
+// Function to RAM Kernel command
+//
+// @return
+//-------------------------------------------------------------------------------------
+union MxRomDevice::Response MxRomDevice::SendRklCommand(unsigned short cmdId, unsigned long addr, unsigned long param1, unsigned long param2)
+{
+	unsigned char command[RAM_KERNEL_CMD_SIZE] = {0},
+				  retBuf[RAM_KERNEL_ACK_SIZE] = {0};
+	union Response res;
+	res.ack = ERROR_COMMAND;
+
+	// pack command requeset
+	PackRklCommand(command, cmdId, addr, param1, param2);
+
+	// send command to remote device
+	if (!WriteToDevice(command, RAM_KERNEL_CMD_SIZE))
+	{
+		TRACE("MxRomDevice::SendRklCommand(): failed to send Ram Kernel command to device.\n");
+		return res;
+	}
+		
+	if (!ReadFromDevice(retBuf, RAM_KERNEL_ACK_SIZE))
+	{
+		TRACE("MxRomDevice::SendRklCommand(): failed to read response from Ram Kernel command.\n");
+		return res;
+	}
+	
+	// unpack the response
+	return UnPackRklResponse(retBuf);
+}
+
 //-------------------------------------------------------------------------------------		
 // Function to get device status (bootstrap or RAM Kernel)
 //
@@ -591,54 +624,35 @@ struct Response MxRomDevice::UnPackRklResponse(unsigned char *resBuf)
 //-------------------------------------------------------------------------------------		
 int MxRomDevice::GetRKLVersion(CString& fmodel, int& len, int& mxType)
 {
-	unsigned char command[RAM_KERNEL_CMD_SIZE] = {0},
-				  retBuf[RAM_KERNEL_ACK_SIZE] = {0};
-	struct Response res;
-	BOOL status;
-		
-	// pack command requeset
-	PackRklCommand(command, RAM_KERNEL_CMD_GETVER, 0, 0, 0);
+	union Response res = SendRklCommand(RAM_KERNEL_CMD_GETVER, 0, 0, 0);
 
-	// send command to remote device
-	if (!WriteToDevice(command, RAM_KERNEL_CMD_SIZE))
-	{
-		TRACE("atk_common_getver(): failed to send to device\n");
-		return INVALID_CHANNEL;
-	}
-		
-	if (!ReadFromDevice(retBuf, RAM_KERNEL_ACK_SIZE))
-	{
-		TRACE("atk_common_getver(): failed to read bootstrap from device\n");
-		return INVALID_CHANNEL;
-	}
+	TRACE("atk_common_getver(): romResponse: 0x%X\n", res.romResponse);
 	
-	TRACE("atk_common_getver(): retBuf[0]: %d\n", retBuf[0]);
 	// check if is bootstrap
-	PUINT pReturn = (PUINT)&retBuf[0];
-	if (*pReturn == HabEnabled || *pReturn == HabDisabled)
+	if (res.romResponse == HabEnabled || res.romResponse == HabDisabled)
 	{
 		len = 0;
 		return RET_SUCCESS;
 	}
 		
-	// unpack the response
-	res = UnPackRklResponse(retBuf);
-
 	if (res.ack == RET_SUCCESS) {
 		
 		TRACE("atk_common_getver(): chip id: %x\n", res.csum);
 
 		unsigned char model[MAX_MODEL_LEN] = {0};
-		status = ReadFromDevice(model, res.len);
-		if (!status) {
+		if ( !ReadFromDevice(model, res.len) )
+		{
 			return INVALID_CHANNEL;
 		}
+		
 		len = res.len;
 		mxType = res.csum;
 		fmodel = model;
 		fmodel.AppendChar(_T('\0'));
 		TRACE("atk_common_getver(): get version: %s\n", fmodel);
-	} else {
+	}
+	else
+	{
 		// if response is not ok, return failed
 		TRACE("atk_common_getver(): get response: %d\n", res.ack);
 	}
@@ -679,6 +693,12 @@ BOOL MxRomDevice::DownloadImage(UINT address, MemorySection loadSection, MemoryS
 				return FALSE;
 			}
 		}
+	}
+
+	// If we are downloading to DCD or CSF, we don't need to send 
+	if ( loadSection == MemSectionDCD || loadSection == MemSectionCSF )
+	{
+		return TRUE;
 	}
 
 	int FlashHdrAddr;
@@ -754,63 +774,55 @@ BOOL MxRomDevice::Jump()
 	return TRUE;
 }
 
-BOOL MxRomDevice::SendCommand2RoK(UINT address, UINT byteCount, UCHAR type)
+BOOL MxRomDevice::SendCommand2RoK(UINT address, UINT dataSize, UCHAR pointer)
 {
+	BOOL status = FALSE;
 
-	int format = 0;
-	long data = 0;	
-	PUINT pCommandAck;	
-	UINT command[4];
-	int commandAckSize = 4;
-	int commandSize = ROM_KERNEL_CMD_SIZE;
 	const short header = ROM_KERNEL_CMD_WR_FILE;
-	//BOOL status = FALSE;
+	const UINT data = 0;	
+	const UINT format = 0;
+	
+	long command[4] = { 0 };
 
-	for (int i=0;i<4;i++)
-	{
-		command[i] = 0;
-	}
+	command[0] = (  ((address  & 0x00FF0000) << 8) 
+		          | ((address  & 0xFF000000) >> 8) 
+		          |  (header   & 0x0000FFFF) );
 
-	command[0] = (((address & 0x00FF0000) <<8) 
-		| ((address & 0xFF000000) >> 8) 
-		|(header & 0xFFFF));
-	command[1] = (((byteCount &0xFF000000) )
-		|((format &0xFF)<<16) 
-		| ((address & 0xFF) << 8)
-		|((address & 0xFF00) >> 8 ));
-	command[2] = ((data & 0xFF000000)
-		|((byteCount & 0xFF)<<16)
-		|(byteCount & 0xFF00)
-		|((byteCount & 0x00FF0000)>>16));
-	command[3] = (((data & 0x00FF0000) >> 16) 
-		| (data & 0xFF00)
-		| ((data & 0xFF)<<16) 
-		| (type << 24) );
+	command[1] = (   (dataSize & 0xFF000000)
+		          | ((format   & 0x000000FF) << 16)
+		          | ((address  & 0x000000FF) <<  8)
+		          | ((address  & 0x0000FF00) >>  8 ));
 
+	command[2] = (   (data     & 0xFF000000)
+		          | ((dataSize & 0x000000FF) << 16)
+		          |  (dataSize & 0x0000FF00)
+		          | ((dataSize & 0x00FF0000) >> 16));
 
-	if(!WriteToDevice((PUCHAR)command, commandSize))
+	command[3] = (  ((pointer  & 0x000000FF) << 24)
+		          | ((data     & 0x00FF0000) >> 16) 
+		          |  (data     & 0x0000FF00)
+		          | ((data     & 0x000000FF) << 16));
+
+	//Send write Command to USB
+	if ( !WriteToDevice((unsigned char *)command, 16) )
 	{
 		return FALSE;
 	}
 
 	//read the ACK
-	pCommandAck = (PUINT)malloc (4);
-
-	if(!ReadFromDevice((PUCHAR)pCommandAck, commandAckSize))
+	unsigned char cmdAck[4] = { 0 };
+	if(!ReadFromDevice(cmdAck, 4))
 	{
 		return FALSE;
 	}
-	if (pCommandAck[0] != HabDisabled && 
-		pCommandAck[0] != HabEnabled ) 
+
+	if ( (*(unsigned int *)cmdAck != HabEnabled)  && 
+		 (*(unsigned int *)cmdAck != HabDisabled) ) 
 	{
-		free(pCommandAck);
 		return FALSE;	
 	}
 
-	free(pCommandAck); 
 	return TRUE;			
-
-
 }
 
 #define MINUM_TRANSFER_SIZE 0x20

@@ -54,6 +54,7 @@ protected:
 	DWORD DoBoot(UCL::Command* pCmd);
 //	DWORD DoBurn(UCL::Command* pCmd);
 	DWORD DoInit(UCL::Command* pCmd);
+	DWORD DoRklSendCommand(UCL::Command* pCmd);
 	DWORD DoMxRomLoad(UCL::Command* pCmd);
 	DWORD DoShow(UCL::Command* pCmd);
 

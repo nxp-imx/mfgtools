@@ -9,15 +9,185 @@
 
 #include "../../Libs/WinSupport/XMLite.h"
 
+// Code from AtkHostApiClass.h
+// Could be moved to SDP protocol or MxRomApi or something like that.
+#define ROM_KERNEL_CMD_COMPLETE 0x0
+#define ROM_KERNEL_CMD_SIZE 0x10
+//#define ROM_KERNEL_WF_FT_CSF 0xCC
+//#define ROM_KERNEL_WF_FT_DCD 0xEE
+//#define ROM_KERNEL_WF_FT_APP 0xAA
+//#define ROM_KERNEL_WF_FT_OTH 0x0
+#define MAX_SIZE_PER_FLASH_COMMAND 0x200000
+#define MAX_SIZE_PER_DOWNLOAD_COMMAND 0x200000
+#define ROM_KERNEL_CMD_RD_MEM 0x0101
+#define ROM_KERNEL_CMD_WR_MEM 0x0202
+#define ROM_KERNEL_CMD_WR_FILE 0x0404
+#define ROM_KERNEL_CMD_GET_STAT 0x0505
+#define RAM_KERNEL_CMD_HEADER 0x0606
+#define ROM_KERNEL_CMD_RE_ENUM 0x0909
+
+#define ROM_WRITE_ACK   0x128A8A12
+#define ROM_STATUS_ACK  0x88888888
+#define ROM_STATUS_ACK2 0xF0F0F0F0
+
+#define RAM_KERNEL_ACK_SIZE 0x08
+#define RAM_KERNEL_CMD_SIZE 0x10
+#define WR_BUF_MAX_SIZE 0x4000
+
+#define RAM_KERNEL_CMD_FLASH_INIT			0x0001
+#define RAM_KERNEL_CMD_FLASH_ERASE			0x0002
+#define RAM_KERNEL_CMD_FLASH_DUMP			0x0003
+#define RAM_KERNEL_CMD_FLASH_PROGR_B		0x0004
+#define RAM_KERNEL_CMD_FLASH_PROGR_UB		0x0005
+#define RAM_KERNEL_CMD_FLASH_GET_CAPACITY	0x0006
+#define RAM_KERNEL_CMD_FUSE_READ			0x0101
+#define RAM_KERNEL_CMD_FUSE_SENSE			0x0102
+#define RAM_KERNEL_CMD_FUSE_OVERRIDE		0x0103
+#define RAM_KERNEL_CMD_FUSE_PROGRAM			0x0104
+#define RAM_KERNEL_CMD_RESET				0x0201
+#define RAM_KERNEL_CMD_DOWNLOAD				0x0202
+#define RAM_KERNEL_CMD_EXECUTE				0x0203
+#define RAM_KERNEL_CMD_GETVER				0x0204
+#define RAM_KERNEL_CMD_COM2USB				0x0301
+#define RAM_KERNEL_CMD_SWAP_BI				0x0302
+#define RAM_KERNEL_CMD_FL_BBT				0x0303
+#define RAM_KERNEL_CMD_FL_INTLV				0x0304
+#define RAM_KERNEL_CMD_FL_LBA				0x0305
+
+#define ERROR_COMMAND		0xffff
+#define RET_SUCCESS		0
+#define FLASH_PARTLY		1	/* response each dump/program size */
+#define FUSE_PARTLY		1
+#define FLASH_ERASE		2	/* response each erase size */
+#define FLASH_VERIFY		3	/* response each verified bytes count */
+
+/* flash failed define */
+#define FLASH_FAILED		-4
+#define FLASH_ECC_FAILED	-5
+
+#define FLASH_ERROR_NO		0
+#define FLASH_ERROR_READ   	-100
+#define FLASH_ERROR_ECC    	-101
+#define FLASH_ERROR_PROG   	-102
+#define FLASH_ERROR_ERASE  	-103
+#define FLASH_ERROR_VERIFY 	-104
+#define FLASH_ERROR_INIT   	-105
+#define FLASH_ERROR_OVER_ADDR	-106
+#define FLASH_ERROR_PART_ERASE	-107
+#define FLASH_ERROR_EOF 		-108
+
+/* fuse failed define */
+#define FUSE_FAILED		-4
+#define FUSE_READ_PROTECT	-5
+#define FUSE_SENSE_PROTECT	-6
+#define FUSE_OVERRIDE_PROTECT	-7
+#define FUSE_WRITE_PROTECT	-8
+#define FUSE_VERIFY_FAILED	-9
+
+/* ram kernel error define */
+#define INVALID_CHANNEL		-256
+#define INVALID_CHECKSUM	-257
+#define INVALID_PARAM		-258
+
+#define MAX_MODEL_LEN	128
+
+// Address ranges for Production parts: 
+
+#define MX25_SDRAM_START       0x80000000 //Senna
+#define MX25_WEIM_CS2_END      0xB1FFFFFF  
+#define MX25_NFC_START         0xBB000000   
+#define MX25_NFC_END           0xBB000FFF        
+#define MX25_SDRAM_CTL_START   0xB8001000 
+#define MX25_SDRAM_CTL_END     0xB8001FFF
+#define MX25_WEIM_START        0xA0000000 
+#define MX25_WEIM_END          0xA7FFFFFF
+#define MX25_IRAM_FREE_START   0x78000000
+#define MX25_IRAM_FREE_END     0x7801FFFF
+#define MX27_MemoryStart        0xA0000000 // Bono
+#define MX27_MemoryEnd          0xAFFFFFFF // Bono
+#define MX27_NFCstart           0xD8000000 // Bono
+#define MX27_NFCend             0xD8000FFF // Bono
+#define MX27_WEIMstart          0xD8002000 // Bono
+#define MX27_WEIMend            0xD8002fff // Bono
+#define MX27_CCMstart           0x10027000 // Bono
+#define MX27_CCMend             0x10027fff // Bono
+#define MX27_ESDCTLstart        0xD8001000 // Bono
+#define MX27_ESDCTLend          0xD8001FFF // Bono
+#define MX27_CCM_CGR0           0x53F80020 // Bono
+
+// 0xB800_0000 0xB800_0FFF (ARM) NANDFC
+#define MX31_NFCstart	0xB8000000  // Tortola 
+#define MX31_NFCend		0xB8000FFF  // Tortola
+// 0xB800_20000 xB800_2FFF (ARM) WEIM 
+#define MX31_WEIMstart	0xB8002000  // Tortola
+#define MX31_WEIMend	0xB8002060  // Tortola
+// 0x8000_0000 0x8FFF_FFFF CSD0 SDRAM 
+#define MX31_MemoryStart 0x80000000 // Tortola
+//0xB600_0000 0xB7FF_FFFF WEIM CS5 
+#define MX31_MemoryEnd	 0xB7FFFFFF // Tortola
+//0x53F8_0000 (CCMR) Control Register 
+#define MX31_CCMstart	0x53f80000  // Tortola
+// 0x53F8_ 0064 (PDR2) Post Divider Register 2 
+#define MX31_CCMend		0x53f80064  // Tortola 
+
+// ESDCTL/MDDRC registers space (4K) READ/WRITE
+#define MX31_ESDCTLstart 0xB8001000 // Tortola
+#define MX31_ESDCTLend	 0xB8001FFF // Tortola
+// 0x53F8_ 0020 (CGR0)Clock Gating Register 
+#define MX31_CCM_CGR0	0x53F80020  // Tortola
+
+#define MX35_SDRAM_START        0x80000000 //Ringo
+#define MX35_WEIM_CS2_END       0xB1FFFFFF
+#define MX35_NFC_START          0xBB000000
+#define MX35_NFC_END            0xBB001FFF
+#define MX35_SDRAM_CTL_START    0xB8001000 
+#define MX35_SDRAM_CTL_END      0xB8001fff
+#define MX35_WEIM_START         0xB8002000
+#define MX35_WEIM_END           0xB8002fff
+#define MX35_IRAM_FREE_START    0x10001B00
+#define MX35_IRAM_FREE_END      0x1000FFFC
+
+#define MX37_SDRAM_START       0x40000000 //marley
+#define MX37_WEIM_CS2_END      0x71ffffff  
+#define MX37_NFC_START         0x7fff0000   
+#define MX37_NFC_END           0x7fffffff        
+#define MX37_SDRAM_CTL_START   0xe3fd9000 
+#define MX37_SDRAM_CTL_END     0xe3fd9fff 
+#define MX37_WEIM_START        0xe3fda000 
+#define MX37_WEIM_END          0xe3fdafff
+#define MX37_IRAM_FREE_START   0x10002000
+#define MX37_IRAM_FREE_END     0x1000fffc
+
+#define MX51_SDRAM_START       0x90000000 //elvis
+#define MX51_WEIM_CS2_END      0xc7ffffff  
+#define MX51_NFC_START         0xcfff0000   
+#define MX51_NFC_END           0xcfffffff        
+#define MX51_SDRAM_CTL_START   0x83fd9000 
+#define MX51_SDRAM_CTL_END     0x83fd9fff 
+#define MX51_WEIM_START        0x83fda000 
+#define MX51_WEIM_END          0x83fdafff
+#define MX51_IRAM_FREE_START   0x1ffe8000
+#define MX51_IRAM_FREE_END     0x1fffffff
+
 /// <summary>
 /// A MxRomDevice device.
 /// </summary>
-
 class MxRomDevice : public Device//, IComparable
 {
 	friend class DeviceManager;
+
 public:
-	
+	union Response
+	{
+		unsigned int romResponse;
+		struct
+		{
+			unsigned short ack;		// ack
+			unsigned short csum;	// data checksum
+			unsigned long len;		// data len
+		};
+	};
+
 	enum MemorySection { MemSectionOTH = 0x00, MemSectionAPP = 0xAA, MemSectionCSF = 0xCC, MemSectionDCD = 0xEE };
 	static MemorySection StringToMemorySection(CString section)
 	{
@@ -42,6 +212,7 @@ public:
 
 	MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path);
 	virtual ~MxRomDevice(void);
+	union Response SendRklCommand(unsigned short cmdId, unsigned long addr, unsigned long param1, unsigned long param2);
 	int GetRKLVersion(CString& fmodel, int& len, int& mxType);
 	BOOL InitMemoryDevice(CString filename);
 	BOOL DownloadImage(UINT address, MemorySection loadSection, MemorySection setSection, BOOL HasFlashHeader, const StFwComponent& fwComponent, Device::UI_Callback callbackFn);
@@ -84,8 +255,8 @@ private:
 	BOOL WriteMemory(UINT address, UINT data, UINT format);
 	BOOL ValidAddress(const UINT address) const;
 	HAB_t GetHABType(ChipFamily_t chipType);
-	void PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsigned long addr, unsigned long param, unsigned long param1);
-	struct Response UnPackRklResponse(unsigned char *resBuf);
+	void PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsigned long addr, unsigned long param1, unsigned long param2);
+	union Response UnPackRklResponse(unsigned char *resBuf);
 	BOOL Jump2Rak();
 	BOOL SendCommand2RoK(UINT address, UINT byteCount, UCHAR type);
 	BOOL TransData(UINT byteCount, const unsigned char * pBuf);

@@ -751,6 +751,10 @@ DWORD COpMxRomUpdate::DoCommand(UCL::Command* pCmd)
 	{
         retValue = DoInit(pCmd);
 	}
+	else if ( pCmd->GetType() == _T("rklCmd") )
+	{
+        retValue = DoRklSendCommand(pCmd);
+	}
 	else if ( pCmd->GetType() == _T("load") )
 	{
 		retValue = DoMxRomLoad(pCmd);
@@ -1079,6 +1083,45 @@ DWORD COpMxRomUpdate::DoInit(UCL::Command* pCmd)
 	}
 
 	return returnVal;
+}
+
+DWORD COpMxRomUpdate::DoRklSendCommand(UCL::Command* pCmd)
+{
+	DWORD returnVal = ERROR_SUCCESS;
+
+	MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+//	TRACE(_T("%s"),m_pUSBPort->_device->name.c_str());
+	if ( pMxRomDevice == NULL )
+	{
+		returnVal = ERROR_INVALID_HANDLE;
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	UINT cmdId = 0;
+	if ( pCmd->GetBody().CompareNoCase(_T("FlashInit")) == 0 )
+		cmdId = RAM_KERNEL_CMD_FLASH_INIT;
+	else if ( pCmd->GetBody().CompareNoCase(_T("SwapBI")) == 0 )
+		cmdId = RAM_KERNEL_CMD_SWAP_BI;
+	else if ( pCmd->GetBody().CompareNoCase(_T("FlashInterleave")) == 0 )
+		cmdId = RAM_KERNEL_CMD_FL_INTLV;
+	else if ( pCmd->GetBody().CompareNoCase(_T("FlashBBT")) == 0 )
+		cmdId = RAM_KERNEL_CMD_FL_BBT;
+	else if ( pCmd->GetBody().CompareNoCase(_T("FlashLBA")) == 0 )
+		cmdId = RAM_KERNEL_CMD_FL_LBA;
+	
+	
+	MxRomDevice::Response response = pMxRomDevice->SendRklCommand(cmdId, pCmd->GetAddress(), pCmd->GetParam1(), pCmd->GetParam2());
+	if ( response.ack != RET_SUCCESS )
+	{
+		returnVal = -response.ack;
+//		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, 0);
+		ATLTRACE(_T("!!!ERROR!!! %s Failed to SendRklCommand(0x%X, 0x%X, 0x%X, 0x%X). err: %d OpState: %s\r\n"), 
+			m_pPortMgrDlg->GetPanel(), cmdId, pCmd->GetAddress(), pCmd->GetParam1(), pCmd->GetParam2(), returnVal, GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	return ERROR_SUCCESS;
 }
 
 DWORD COpMxRomUpdate::DoMxRomLoad(UCL::Command* pCmd)

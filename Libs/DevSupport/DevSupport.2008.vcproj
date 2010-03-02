@@ -304,14 +304,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\iMX\ADSTkConfigure.h"
-				>
-			</File>
-			<File
-				RelativePath=".\iMX\AtkHostApiClass.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Device.h"
 				>
 			</File>
@@ -345,10 +337,6 @@
 			</File>
 			<File
 				RelativePath=".\MtpDeviceClass.h"
-				>
-			</File>
-			<File
-				RelativePath=".\iMX\MXDefine.h"
 				>
 			</File>
 			<File
