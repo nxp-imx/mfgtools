@@ -568,10 +568,10 @@ void MxRomDevice::PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsig
 //
 // @return
 //-------------------------------------------------------------------------------------		
-union MxRomDevice::Response MxRomDevice::UnPackRklResponse(unsigned char *resBuf)
+struct MxRomDevice::Response MxRomDevice::UnPackRklResponse(unsigned char *resBuf)
 {
-	union Response res;
-
+	struct Response res;
+	res.romResponse = *((PUINT)&resBuf[0]);
 	res.ack  =  (unsigned short)(((unsigned short)resBuf[0] << 8) | resBuf[1]);
 	res.csum =  (unsigned short)(((unsigned short)resBuf[2] << 8) | resBuf[3]);
 	res.len  = ((unsigned long)resBuf[4] << 24) | ((unsigned long)resBuf[5] << 16) |
@@ -585,11 +585,11 @@ union MxRomDevice::Response MxRomDevice::UnPackRklResponse(unsigned char *resBuf
 //
 // @return
 //-------------------------------------------------------------------------------------
-union MxRomDevice::Response MxRomDevice::SendRklCommand(unsigned short cmdId, unsigned long addr, unsigned long param1, unsigned long param2)
+struct MxRomDevice::Response MxRomDevice::SendRklCommand(unsigned short cmdId, unsigned long addr, unsigned long param1, unsigned long param2)
 {
 	unsigned char command[RAM_KERNEL_CMD_SIZE] = {0},
 				  retBuf[RAM_KERNEL_ACK_SIZE] = {0};
-	union Response res;
+	struct Response res = {0};
 	res.ack = ERROR_COMMAND;
 
 	// pack command requeset
@@ -624,7 +624,7 @@ union MxRomDevice::Response MxRomDevice::SendRklCommand(unsigned short cmdId, un
 //-------------------------------------------------------------------------------------		
 int MxRomDevice::GetRKLVersion(CString& fmodel, int& len, int& mxType)
 {
-	union Response res = SendRklCommand(RAM_KERNEL_CMD_GETVER, 0, 0, 0);
+	struct Response res = SendRklCommand(RAM_KERNEL_CMD_GETVER, 0, 0, 0);
 
 	TRACE("atk_common_getver(): romResponse: 0x%X\n", res.romResponse);
 	
@@ -665,8 +665,6 @@ int MxRomDevice::GetRKLVersion(CString& fmodel, int& len, int& mxType)
 
 BOOL MxRomDevice::DownloadImage(UINT address, MemorySection loadSection, MemorySection setSection, BOOL HasFlashHeader, const StFwComponent& fwComponent, Device::UI_Callback callbackFn)
 {
-	int counter = 0;
-	int bytePerCommand = 0;
 	const unsigned char* const pBuffer = fwComponent.GetDataPtr();
 	const size_t dataSize = fwComponent.size();
 
@@ -742,6 +740,143 @@ BOOL MxRomDevice::DownloadImage(UINT address, MemorySection loadSection, MemoryS
 			return FALSE;
 		}
 	}
+
+	return TRUE;
+}
+
+BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UINT flags, Device::UI_Callback callback)
+{
+	BOOL success = FALSE;
+	const unsigned char * pBuffer = new unsigned char[MAX_SIZE_PER_FLASH_COMMAND];
+
+	// Get file size
+	file.seekg(0, std::ios::end);
+	const size_t dataSize = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	// Set UI
+
+	uint32_t byteIndex, numBytesToWrite = 0;
+	for ( byteIndex = 0; byteIndex < dataSize; byteIndex += numBytesToWrite )
+	{
+		// reset buffer
+		memset((unsigned char *)pBuffer, 0, MAX_SIZE_PER_FLASH_COMMAND);
+		
+		// How much data to write
+		numBytesToWrite = min(MAX_SIZE_PER_FLASH_COMMAND, dataSize - byteIndex);
+
+		// read the data from the file
+		file.read((char *)pBuffer, (size_t)numBytesToWrite);
+
+		// I guess data size has to be a multiple of 512. Is this a relic from Jungo driver?
+		// Can we check this? Starle? Jun?
+		if( numBytesToWrite % 512 )
+      	{
+          numBytesToWrite = ((numBytesToWrite / 512) + 1) * 512; 
+      	}
+
+		// Adjust flags if not the first time through
+		if ( byteIndex != 0 )
+			flags |= FLASH_PROGRAM_GO_ON;
+
+		//
+		// Program the flash
+		//
+		struct Response res = SendRklCommand(cmdID, address + byteIndex, numBytesToWrite, flags);
+		if ( res.ack == RET_SUCCESS )
+		{
+			TRACE(_T("ProgramFlash(): SendRklCommand(cmd:0x%X, addr:0x%X, size:0x%X, flags:0x%X) failed.\n"), cmdID, address + byteIndex, numBytesToWrite, flags);
+			delete[] pBuffer;
+			return FALSE;
+		}
+
+		// write data to device
+		if(!TransData(numBytesToWrite, pBuffer))
+		{
+			TRACE(_T("ProgramFlash(): TransData(size:0x%X, addr:0x%X) failed.\n"), numBytesToWrite, address + byteIndex);
+			delete[] pBuffer;
+			return FALSE;
+		}
+	
+		unsigned char retBuf[RAM_KERNEL_ACK_SIZE] = {0};
+				  
+		res.ack = FLASH_PARTLY;
+		while ( res.ack == FLASH_PARTLY )
+		{
+			// read response from device
+			if ( !ReadFromDevice(retBuf, RAM_KERNEL_ACK_SIZE) )
+			{
+				TRACE(_T("ProgramFlash(): ReadFromDevice() failed.\n"));
+				delete[] pBuffer;
+				return FALSE;
+			}
+			// unpack the response
+			res = UnPackRklResponse(retBuf);
+
+			TRACE(_T("Do Flash program, programing: get response: %d:program block id: %d:program size:%d\n"), res.ack, res.csum, res.len);
+
+			if ( res.ack != FLASH_PARTLY && res.ack != FLASH_VERIFY && res.ack !=RET_SUCCESS )
+			{
+				// if response is not ok, return failed
+				TRACE(_T("ProgramFlash(): get response: %d\n"), res.ack);
+				delete[] pBuffer;
+				return FALSE;
+			}
+				
+			// finished += res.len;
+			// ::SendMessage(m_hWnd, WM_USER_PROGRESS, (WPARAM)OPMODE_FLASH_PROG, (LPARAM)(finished + done));
+		}
+
+		//
+		// Readback check the flash
+		//
+		if ( flags & FLASH_PROGRAM_READ_BACK )
+		{
+			res.ack = FLASH_VERIFY;
+			while (res.ack == FLASH_VERIFY)
+			{
+				// read response from device
+				if ( !ReadFromDevice(retBuf, RAM_KERNEL_ACK_SIZE) )
+				{
+					TRACE(_T("ProgramFlash(): ReadFromDevice() failed.\n"));
+					delete[] pBuffer;
+					return FALSE;
+				}
+				// unpack the response
+				res = UnPackRklResponse(retBuf);
+
+				TRACE(_T("Do Flash program, verifing: get response: %d : block is %d\n"), res.ack, res.csum);
+
+				if ( res.ack != RET_SUCCESS && res.ack != FLASH_VERIFY )
+				{
+					// if response is not ok, return failed
+					TRACE(_T("ProgramFlash(): ++++++get response-------: %d\n"), res.ack);
+					//delete[] pBuffer;
+					//return FALSE;
+				}
+
+				// finished += res.len;
+				// ::SendMessage(m_hWnd, WM_USER_PROGRESS, (WPARAM)OPMODE_FLASH_VERIFY, (LPARAM)(finished + done));
+			}
+		
+#if 0
+			// do checksum, and compare with the csum in response
+			if (res.csum != (checksum = MakeChecksum(buf, count))) {
+				DEBUG("AtkFlashprogram(): invalid checksum (%x)<->(%x)\n", res.csum, checksum);
+				SetUartTimeout(DEFAULT_UART_TIMEOUT);
+				return INVALID_CHECKSUM;
+			}
+#endif
+		} // end if ( FLASH_PROGRAM_READ_BACK )
+
+		// Update UI
+
+	} // end for ( fileSize )
+
+	// Clean up
+	delete[] pBuffer;
+
+	// Finish UI
 
 	return TRUE;
 }

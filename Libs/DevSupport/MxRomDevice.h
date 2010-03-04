@@ -17,7 +17,7 @@
 //#define ROM_KERNEL_WF_FT_DCD 0xEE
 //#define ROM_KERNEL_WF_FT_APP 0xAA
 //#define ROM_KERNEL_WF_FT_OTH 0x0
-#define MAX_SIZE_PER_FLASH_COMMAND 0x200000
+#define MAX_SIZE_PER_FLASH_COMMAND 0x400000
 #define MAX_SIZE_PER_DOWNLOAD_COMMAND 0x200000
 #define ROM_KERNEL_CMD_RD_MEM 0x0101
 #define ROM_KERNEL_CMD_WR_MEM 0x0202
@@ -61,6 +61,10 @@
 #define FLASH_ERASE		2	/* response each erase size */
 #define FLASH_VERIFY		3	/* response each verified bytes count */
 
+/* flash program flags define */
+#define FLASH_PROGRAM_NB0_FORMAT 0x00000001
+#define FLASH_PROGRAM_GO_ON      0x00000100
+#define FLASH_PROGRAM_READ_BACK  0x00010000
 /* flash failed define */
 #define FLASH_FAILED		-4
 #define FLASH_ECC_FAILED	-5
@@ -177,7 +181,7 @@ class MxRomDevice : public Device//, IComparable
 	friend class DeviceManager;
 
 public:
-	union Response
+	struct Response
 	{
 		unsigned int romResponse;
 		struct
@@ -212,9 +216,10 @@ public:
 
 	MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path);
 	virtual ~MxRomDevice(void);
-	union Response SendRklCommand(unsigned short cmdId, unsigned long addr, unsigned long param1, unsigned long param2);
+	struct Response SendRklCommand(unsigned short cmdId, unsigned long addr, unsigned long param1, unsigned long param2);
 	int GetRKLVersion(CString& fmodel, int& len, int& mxType);
 	BOOL InitMemoryDevice(CString filename);
+	BOOL ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UINT flags, Device::UI_Callback callback);
 	BOOL DownloadImage(UINT address, MemorySection loadSection, MemorySection setSection, BOOL HasFlashHeader, const StFwComponent& fwComponent, Device::UI_Callback callbackFn);
 	BOOL Jump();
 	BOOL Reset();
@@ -256,7 +261,7 @@ private:
 	BOOL ValidAddress(const UINT address) const;
 	HAB_t GetHABType(ChipFamily_t chipType);
 	void PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsigned long addr, unsigned long param1, unsigned long param2);
-	union Response UnPackRklResponse(unsigned char *resBuf);
+	struct Response UnPackRklResponse(unsigned char *resBuf);
 	BOOL Jump2Rak();
 	BOOL SendCommand2RoK(UINT address, UINT byteCount, UCHAR type);
 	BOOL TransData(UINT byteCount, const unsigned char * pBuf);

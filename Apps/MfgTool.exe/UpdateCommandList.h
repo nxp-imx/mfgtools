@@ -107,6 +107,32 @@ public:
 			return FALSE;
 		};
 
+		// [XmlAttribute("mode")]
+		BOOL FlashModeAligned()
+		{ 
+			if ( GetAttrValue(_T("mode")) )
+			{
+				 CString attr = GetAttrValue(_T("mode"));
+				 if ( attr.CompareNoCase(_T("aligned")) == 0 )
+					 return TRUE;
+			}
+			
+			return FALSE;
+		};
+
+		// [XmlAttribute("readback")]
+		BOOL Readback()
+		{ 
+			if ( GetAttrValue(_T("readback")) )
+			{
+				 CString attr = GetAttrValue(_T("readback"));
+				 if ( attr.CompareNoCase(_T("false")) == 0 )
+					 return FALSE;
+			}
+			
+			return TRUE;
+		};
+
 		// [XmlAttribute("jump")]
 		CString GetJump()
 		{ 

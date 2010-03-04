@@ -759,6 +759,10 @@ DWORD COpMxRomUpdate::DoCommand(UCL::Command* pCmd)
 	{
 		retValue = DoMxRomLoad(pCmd);
 	}
+	else if ( pCmd->GetType() == _T("program") )
+	{
+		retValue = DoRklProgramFlash(pCmd);
+	}
 	else if ( pCmd->GetType() == _T("jump") )
 	{
 		MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
@@ -1171,6 +1175,96 @@ DWORD COpMxRomUpdate::DoMxRomLoad(UCL::Command* pCmd)
 	m_pPortMgrDlg->UpdateUI(NULL);
 
 	ATLTRACE(_T("%s Recover i.MXDevice - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
+	return ERROR_SUCCESS;
+}
+
+DWORD COpMxRomUpdate::DoRklProgramFlash(UCL::Command* pCmd)
+{
+
+	DWORD returnVal = ERROR_SUCCESS;
+	CString taskMsg;
+
+///	taskMsg.LoadString(IDS_OPLOADER_LOAD_STARTED);
+///	m_pPortMgrDlg->UpdateUI(taskMsg, ProgressDelta(2));
+
+	MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+//	TRACE(_T("%s"),m_pUSBPort->_device->name.c_str());
+	if ( pMxRomDevice == NULL )
+	{
+		returnVal = ERROR_INVALID_HANDLE;
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	// check the Flash size
+	MxRomDevice::Response response = pMxRomDevice->SendRklCommand(RAM_KERNEL_CMD_FLASH_GET_CAPACITY, 0, 0, 0);
+	if ( response.ack != RET_SUCCESS )
+	{
+		returnVal = -response.ack;
+//		    taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, 0);
+		ATLTRACE(_T("!!!ERROR!!! %s Failed to SendRklCommand(0x%X, 0x%X, 0x%X, 0x%X). err: %d OpState: %s\r\n"), 
+			m_pPortMgrDlg->GetPanel(), RAM_KERNEL_CMD_FLASH_GET_CAPACITY, 0, 0, 0, returnVal, GetOpStateString(m_OpState));
+		return returnVal;
+	}
+	UINT flashSize = response.len;
+	TRACE(_T("Get flash size successul: 0x%xK Bytes\n"), flashSize);
+
+	// open the file for binary reading
+	CString filename = m_pOpInfo->GetPath() + _T("\\") + pCmd->GetFile();
+	std::ifstream file(filename, std::ios_base::binary);
+	if(!file.is_open())
+	{
+		CString msg; msg.Format(_T("!ERROR(%d): COpMxRomUpdate::DoRklProgramFlash(%s)"), ERROR_OPEN_FAILED, pCmd->ToString());
+		TRACE(msg);
+	}
+	else
+	{
+		// get file type
+		TCHAR ext[_MAX_EXT];
+		_tsplitpath_s(filename, NULL, 0, NULL, 0, NULL, 0, ext,_MAX_EXT);
+		CString searchStr = _T(".nb0");
+		UINT format = searchStr.CompareNoCase(ext) == 0 ? FLASH_PROGRAM_NB0_FORMAT : 0;
+
+		// get the length of the file
+		file.seekg(0, std::ios::end);
+		size_t fileSize = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		// will file fit?
+		if ( fileSize > flashSize * 1024 )
+		{
+			file.close();
+			CString msg; msg.Format(_T("!ERROR(%d): COpMxRomUpdate::DoRklProgramFlash(%s) file(0x%x) will not fit on flash(0x%x)."), ERROR_BUFFER_OVERFLOW, pCmd->ToString(), fileSize, flashSize * 1024);
+			TRACE(msg);
+			return ERROR_BUFFER_OVERFLOW;
+		}
+
+		// Set up the Task progress bar and bump the Operation progress bar
+///		taskMsg.Format(IDS_OPUPDATER_LOADING_FILE, myNewFwCommandSupport.GetFwComponent().GetShortFileName().c_str());   // "Loading <filename> ..."
+		m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, fileSize, 0);       // STAGE 2 of the Load Operation
+		Device::UI_Callback callback(this, &COpMxRomUpdate::OnDownloadProgress);
+
+		UINT cmdID = pCmd->FlashModeAligned() ? RAM_KERNEL_CMD_FLASH_PROGR_B : RAM_KERNEL_CMD_FLASH_PROGR_UB;
+		UINT flags = format | (pCmd->Readback() ? FLASH_PROGRAM_READ_BACK : 0);
+
+		returnVal = pMxRomDevice->ProgramFlash(file, pCmd->GetAddress(), cmdID, flags , callback);
+
+		if(returnVal != TRUE) 
+		{
+			taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, returnVal);
+			ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to program i.MXxx device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+			return returnVal;
+		}
+	}
+
+	// Turn off the Task progress bar
+	m_pPortMgrDlg->UpdateUI(NULL);
+
+	int len = 0, type = 0;
+	CString model = _T("");
+	pMxRomDevice->GetRKLVersion(model, len, type);
+
+	ATLTRACE(_T("%s Program i.MXDevice - SUCCESS. RAM Kernel version: %s\r\n"),m_pPortMgrDlg->GetPanel(), model);
 	return ERROR_SUCCESS;
 }
 

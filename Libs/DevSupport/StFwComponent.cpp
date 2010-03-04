@@ -395,7 +395,7 @@ int32_t StFwComponent::LoadFromFile(LPCTSTR fileName)
     _data.resize(fileSize);
 
 	// Put the data from the file in our vector
-	if ( file.rdbuf()->_Sgetn_s((char*)&_data[0], sizeof((char*)&_data[0]), _data.size()) != fileSize )
+	if ( file.rdbuf()->_Sgetn_s((char*)&_data[0], _data.size(), _data.size()) != fileSize )
 	{
 		file.close();
 		return ERROR_INVALID_DATA;

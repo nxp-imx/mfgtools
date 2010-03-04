@@ -56,6 +56,7 @@ protected:
 	DWORD DoInit(UCL::Command* pCmd);
 	DWORD DoRklSendCommand(UCL::Command* pCmd);
 	DWORD DoMxRomLoad(UCL::Command* pCmd);
+	DWORD DoRklProgramFlash(UCL::Command* pCmd);
 	DWORD DoShow(UCL::Command* pCmd);
 
 };
