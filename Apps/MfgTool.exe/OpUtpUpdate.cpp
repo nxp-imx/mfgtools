@@ -1297,7 +1297,9 @@ DWORD COpUtpUpdate::DoBoot(UCL::Command* pCmd)
 ///        Thread.CurrentThread.Name = "DoBoot";
 
     // Reset Device to Recovery-mode
-    retValue = DoResetToRecovery();
+	// NOT YET IMPLEMENTED ON MX/WINCE/LINUX DEVICES
+    /*
+	retValue = DoResetToRecovery();
     if (retValue != 0)
     {
 		logText.Format(_T("%s DoBoot() - Failed to reset device to Recovery mode. (err=%d)\r\n"), m_pPortMgrDlg->GetPanel(), retValue);
@@ -1305,8 +1307,9 @@ DWORD COpUtpUpdate::DoBoot(UCL::Command* pCmd)
 		((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
 		return retValue;
     }
+	*/
 
-    // Look for device in Recovery-mode
+    // Look for device in "Recovery" mode specified in pCmd->GetBody()
     retValue = DoFind(pCmd);
     if (retValue != 0)
     {
@@ -1471,8 +1474,7 @@ DWORD COpUtpUpdate::DoMxRomLoad(UCL::Command* pCmd)
 
 	// Turn off the Task progress bar
 	m_pPortMgrDlg->UpdateUI(NULL);
-
-	ATLTRACE(_T("%s Recover i.MXDevice - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
+	ATLTRACE(_T("RAM kernel %s is downloaded to the device of %s.\r\n"),pCmd->GetFile(), m_pPortMgrDlg->GetPanel());
 	return ERROR_SUCCESS;
 }
 

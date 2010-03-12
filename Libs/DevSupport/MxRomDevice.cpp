@@ -5,12 +5,17 @@
 #include "Libs/WDK/usb100.h"
 #include <sys/stat.h>
 
-//#include "iMX/AtkHostApiClass.h"
-//#include "iMX/MxDefine.h"
 #include "../../Drivers/iMX_BulkIO_Driver/sys/public.h"
 
-static BOOL bMutex4RamKnlDld = TRUE;//mutex flag for ram kernel downloading process to prevent other object from starting downloading.
-static HANDLE sHandle[8][2];
+static BOOL SyncAllDevFlag = FALSE;
+typedef struct _ImgDownloadStatus
+{
+	CString Path;//The path of a device, please notice the path is fixed for a port even if the device attched to the port is different.
+	BOOL Status;// If current device has finished downloading work, then mark status flag as true, or false;
+} ImgDownloadStatus, * PImgDownloadStatus;
+
+static std::list<ImgDownloadStatus> ImgDwdSts;
+
 MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path)
 	: Device(deviceClass, devInst, path)
 	, _hDevice(INVALID_HANDLE_VALUE)
@@ -24,18 +29,37 @@ MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
 	_MaxPacketSize.describe(this, _T("Max Packet Size"), _T(""));
 	
 	_chipFamily = GetChipFamily();
+	ImgDownloadStatus CurImgDwdSts;
 
-	if ( USB_OpenDevice() )
-	{
-		_MaxPacketSize.get();
-		_habType = GetHABType(_chipFamily);
-		BOOL success = InitRomVersion(_chipFamily, _romVersion, _defaultAddress);
-	}
+	CurImgDwdSts.Path = _path.get();
+	CurImgDwdSts.Status = FALSE;
+
+	std::list<ImgDownloadStatus>::iterator iter = ImgDwdSts.begin();
+	std::list<ImgDownloadStatus>::iterator iter_end = ImgDwdSts.end();
+
+
+	for(;iter != iter_end;++iter){
+		if(iter->Path == CurImgDwdSts.Path){
+			//Clear the status flag to invalid when the same port is attched with another device. 
+			iter->Status = FALSE;
+			break;
+		}
+	}	
+	//This is a new port with is attached with a device.
+	if(iter == iter_end)
+		ImgDwdSts.push_back(CurImgDwdSts);
+
+	TRACE(_T("Initialize new i.mx device of path: %s.\r\n"), CurImgDwdSts.Path);
+
+	_MaxPacketSize.get();
+	_habType = GetHABType(_chipFamily);
+	BOOL success = InitRomVersion(_chipFamily, _romVersion, _defaultAddress);
+
+	TRACE("************The new i.mx device is initialized**********\n");
 }
 
 MxRomDevice::~MxRomDevice()
 {
-	USB_CloseDevice();
 }
 
 /// <summary>
@@ -148,7 +172,7 @@ MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
 	}
 
 	// get response of HAB type
-	TRACE("GetHABType(): Receive ack:%x\n", *(unsigned int *)cmdAck);
+	//TRACE("GetHABType(): Receive ack:%x\n", *(unsigned int *)cmdAck);
 	if (*(unsigned int *)cmdAck == HabEnabled)
 	{
 		TRACE("GetHABType(): this is production type\n");
@@ -158,7 +182,7 @@ MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
 			unsigned char writeAck[4] = { 0 };
 			ReadFromDevice(writeAck,4);
 
-			TRACE("GetHABType(): Receive ack2:%x\n", *(unsigned int *)writeAck);
+			//TRACE("GetHABType(): Receive ack2:%x\n", *(unsigned int *)writeAck);
 		}
 
 		return HabEnabled; 
@@ -171,7 +195,7 @@ MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
 		unsigned char writeAck[4] = { 0 };
 		ReadFromDevice(writeAck,4);
 
-		TRACE("GetHABType(): Receive ack2:%x\n", *(unsigned int *)writeAck);
+		//TRACE("GetHABType(): Receive ack2:%x\n", *(unsigned int *)writeAck);
 
 		return HabDisabled;	
 	}
@@ -255,7 +279,7 @@ BOOL MxRomDevice::InitMemoryDevice(CString filename)
 
 	CFile scriptFile;
 	CFileException fileException;
-	if( !scriptFile.Open(filename, CFile::modeRead, &fileException) )
+	if( !scriptFile.Open(filename, CFile::modeRead | CFile::shareDenyNone, &fileException) )
 	{
 		TRACE( _T("Can't open file %s, error = %u\n"), filename, fileException.m_cause );
 	}
@@ -461,7 +485,8 @@ BOOL MxRomDevice::ValidAddress(const UINT address) const
 BOOL MxRomDevice::Jump2Rak()
 {
 	BOOL status = FALSE;
-
+	
+	//Sleep(5000);
 	const short header = ROM_KERNEL_CMD_GET_STAT;
 	const UINT address = 0;
 	const UINT data = 0;
@@ -684,7 +709,7 @@ BOOL MxRomDevice::DownloadImage(UINT address, MemorySection loadSection, MemoryS
 		}
 		else
 		{
-			Sleep(10);
+			//Sleep(10);
 			if(!TransData(numBytesToWrite, pBuffer + byteIndex))
 			{
 				TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X) failed.\n"), numBytesToWrite, pBuffer + byteIndex);
@@ -733,7 +758,7 @@ BOOL MxRomDevice::DownloadImage(UINT address, MemorySection loadSection, MemoryS
 	}
 	else
 	{
-		Sleep(10);
+		//Sleep(10);
 		if(!TransData(ROM_TRANSFER_SIZE, pHeaderData))
 		{
 			TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X) failed.\n"), ROM_TRANSFER_SIZE, pHeaderData);
@@ -883,6 +908,31 @@ BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UI
 
 BOOL MxRomDevice::Jump()
 {
+	CString CurPath = _path.get();
+	std::list<ImgDownloadStatus>::iterator iter = ImgDwdSts.begin();
+	std::list<ImgDownloadStatus>::iterator iter_end = ImgDwdSts.end();
+
+	//Current device has finished downloading work, mark status flag as true;
+	for(;iter != iter_end;++iter){
+		if(iter->Path == CurPath)
+			iter->Status = TRUE;
+	}
+
+	//Poll the status of each device till all devices have finished downloading work.
+	//In a word, we need to syncronize all the device's status in case a reset occurs 
+	//when one device is on downloading work, which will leads to transfer failure.
+	do{
+		SyncAllDevFlag = TRUE;
+		for(iter = ImgDwdSts.begin(); iter != iter_end; ++iter){
+			if(iter->Status == FALSE)
+				SyncAllDevFlag = FALSE;
+		}
+		if(SyncAllDevFlag)
+			break;
+		else
+			Sleep(100);
+	}while(!SyncAllDevFlag);
+
 	// Send the complete command to the device 
 	if ( !Jump2Rak() )
 	{
@@ -976,7 +1026,7 @@ BOOL MxRomDevice::TransData(UINT byteCount, const unsigned char * pBuf)
 	if ( ( _chipFamily == MX31 || _chipFamily == MX32 ) && byteCount > 0)
 	{
 
-			TRACE("Lat will Transfer Size: %d\n", byteCount);
+			//TRACE("Lat will Transfer Size: %d\n", byteCount);
 			if (!WriteToDevice(pBuffer, byteCount))
 				return FALSE;
 
@@ -1093,7 +1143,7 @@ BOOL MxRomDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 	return TRUE;
 }
 
-BOOL MxRomDevice::USB_OpenDevice(void)
+/*BOOL MxRomDevice::USB_OpenDevice(void)
 {
 	CString pipePath = _path.get();
 
@@ -1106,8 +1156,6 @@ BOOL MxRomDevice::USB_OpenDevice(void)
 		return FALSE;
 	}
 
-	sHandle[_hubIndex.get()][0] = _hWrite;
-	sHandle[_hubIndex.get()][1] = _hRead;
 	//	_MaxPacketSize0 = _maxPacketSize.get();
 
 	return TRUE;
@@ -1132,37 +1180,44 @@ BOOL MxRomDevice::USB_CloseDevice(void)
 	_hDevice = INVALID_HANDLE_VALUE;
 	
 	return TRUE;
-}
+}*/
 
 BOOL MxRomDevice::WriteToDevice(const unsigned char *buf, UINT count)
 {
 	int    nBytesWrite; // for bytes actually written
-	if(sHandle[_hubIndex.get()][0] != _hWrite)
-		TRACE(_T("Different handle found: _hWrite = 0x%x.\r\n"), _hWrite);
+	CString pipePath = _path.get();
+
+	if (!OpenUSBHandle(&_hWrite, pipePath+_T("\\PIPE00")))
+	{
+		TRACE(_T("MxRomDevice::WriteToDevice() failed to open the device. Error code = 0x%x(%d).\r\n"), GetLastError(), GetLastError());
+		return FALSE;
+	}
+
 	if( !WriteFile(_hWrite, buf, count, (PULONG) &nBytesWrite, NULL) )
 	{
 		TRACE(_T("MxRomDevice::WriteToDevice() Error writing to device 0x%x(%d).\r\n"), GetLastError(), GetLastError());
-		/*USB_CloseDevice();
-		TRACE(_T("MxRomDevice::USB device closed.\r\n"));
-		USB_OpenDevice();
-		TRACE(_T("MxRomDevice::USB device re-opened.\r\n"));
-		if(!DeviceIoControl(IOCTL_IMXDEVICE_RESET_DEVICE, NULL))
-			return FALSE;
-		USB_CloseDevice();
-		TRACE(_T("MxRomDevice::USB device closed.\r\n"));
-		USB_OpenDevice();
-		TRACE(_T("MxRomDevice::USB device re-opened.\r\n"));
-		if( !WriteFile(_hWrite, buf, count, (PULONG) &nBytesWrite, NULL) )
-			return FALSE;*/
+		return FALSE;
 	}
+
+	if (!CloseHandle(_hWrite))
+	{
+		TRACE(_T("MxRomDevice::WriteToDevice() CloseHandle() ERROR = %d.\n"), GetLastError());
+		return FALSE;
+	}
+
 	return TRUE;	
 }
 
 BOOL MxRomDevice::ReadFromDevice(PUCHAR buf, UINT count)
 {
 	int    nBytesRead; // for bytes actually read
-	if(sHandle[_hubIndex.get()][0] != _hWrite)
-		TRACE(_T("Different handle found: _hRead = 0x%x.\r\n"), _hRead);
+	CString pipePath = _path.get();
+
+	if (!OpenUSBHandle(&_hRead, pipePath+_T("\\PIPE01")))
+	{
+		TRACE(_T("MxRomDevice::ReadFromDevice() failed to open the device. Error code = 0x%x(%d).\r\n"), GetLastError(), GetLastError());
+		return FALSE;
+	}
 
 	if( !ReadFile(_hRead, buf, count, (PULONG) &nBytesRead, NULL) )
 	{
@@ -1170,6 +1225,11 @@ BOOL MxRomDevice::ReadFromDevice(PUCHAR buf, UINT count)
 		return FALSE;
 	}
 
+	if (!CloseHandle(_hRead))
+	{
+		TRACE(_T("MxRomDevice::ReadFromDevice() CloseHandle() ERROR = %d.\n"), GetLastError());
+		return FALSE;
+	}
 	return TRUE;
 }
 

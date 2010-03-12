@@ -46,6 +46,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "res/StFormat.xml"
 
 /////////////////////////////////////////////////////////////////////////////
 //

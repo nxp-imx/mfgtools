@@ -269,8 +269,6 @@ private:
 	BOOL ReadFromDevice(PUCHAR buf, UINT count);
 	BOOL DeviceIoControl(DWORD controlCode, PVOID pRequest = NULL);
 	BOOL OpenUSBHandle(HANDLE *pHandle, CString pipePath);
-	BOOL USB_OpenDevice();
-    BOOL USB_CloseDevice();
 
 	HANDLE _hDevice;
 	HANDLE _hWrite;

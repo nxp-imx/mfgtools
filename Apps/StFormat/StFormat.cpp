@@ -273,7 +273,7 @@ int CStFormatApp::ProcessCommandSection(LPCTSTR sectionName)
 		if ( moreInfo )
 		{
 			msg.Append(_T("\r\n"));
-			msg.Append(_pDevice->GetSendCommandErrorStr());
+//			msg.Append(_pDevice->GetSendCommandErrorStr());
 		}
 		
 		_tprintf(_T("  Response: %s.\r\n"), msg);

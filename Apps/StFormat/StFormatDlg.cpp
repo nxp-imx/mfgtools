@@ -268,16 +268,22 @@ void StFormatDlg::OnCbnSelchangeSelectDeviceCombo()
 	else
     {
 		_pVolume = (Volume*)_selectDeviceCtrl.GetItemDataPtr(selected);
-        GetNandParams(&_sectors, &_sectorSize, &_dataDriveNumber);
-        CString txt = FormatSize(_sectors);
-        _nandSectorsCtrl.SetWindowText(txt);
-        txt = FormatSize(_sectorSize);
-        txt += _T(" bytes");
-        _nandSectorSizeCtrl.SetWindowText(txt);
+        if ( GetNandParams(&_sectors, &_sectorSize, &_dataDriveNumber) == ERROR_SUCCESS )
+		{
+			CString txt = FormatSize(_sectors);
+			_nandSectorsCtrl.SetWindowText(txt);
+			txt = FormatSize(_sectorSize);
+			txt += _T(" bytes");
+			_nandSectorSizeCtrl.SetWindowText(txt);
 
-        FillClusterSizeCombo(_sectorSize);
+			FillClusterSizeCombo(_sectorSize);
 
-        _pDiskParams = new StFormatInfo(_sectors, _sectorSize);
+			_pDiskParams = new StFormatInfo(_sectors, _sectorSize);
+		}
+		else
+		{
+			_nandSectorSizeCtrl.SetWindowText(_T("No media"));
+		}
 
     }
 
@@ -562,6 +568,9 @@ int32_t StFormatDlg::GetNandParams(uint32_t* pNumSectors, uint32_t* pSectorSize,
     StReadCapacity api1;
     // TODO: check return value!
     _pVolume->SendCommand(api1);
+	if ( api1.ScsiSenseStatus != SCSISTAT_GOOD )
+		return api1.ScsiSenseStatus;
+
     READ_CAPACITY_DATA cap = api1.GetCapacity();
     *pSectorSize = cap.BytesPerBlock;
 	*pNumSectors = cap.LogicalBlockAddress + 1;
@@ -569,10 +578,16 @@ int32_t StFormatDlg::GetNandParams(uint32_t* pNumSectors, uint32_t* pSectorSize,
     StGetLogicalTable api2;
     // TODO: check return value!
     _pVolume->SendCommand(api2);
+	if ( api2.ScsiSenseStatus != SCSISTAT_GOOD )
+		return api2.ScsiSenseStatus;
+
 	media::LogicalDriveArray arr = api2.GetEntryArray();
     
 //    *pNumSectors = (uint32_t) arr[0].SizeInBytes / *pSectorSize;
-	*pDriveNumber = arr.GetDrive(media::DriveTag_Data).DriveNumber;
+	if ( arr.Size() )
+	{
+		*pDriveNumber = arr.GetDrive(media::DriveTag_Data).DriveNumber;
+	}
 
     return ERROR_SUCCESS;
 }
@@ -580,9 +595,11 @@ int32_t StFormatDlg::GetNandParams(uint32_t* pNumSectors, uint32_t* pSectorSize,
 void StFormatDlg::OnBnClickedFormatButton()
 {
     const StFormatImage myImage(*_pDiskParams);
-	Device::NotifyStruct callMe(_T("Test"));
     uint8_t moreInfo;
     int32_t err;
+
+	// Dummy info
+	Device::NotifyStruct dummyInfo(_T("Not used"), Device::NotifyStruct::dataDir_Off, 0);
 
 	ULONG sector_count=0;
 	ULONGLONG start_sector = 0;
@@ -625,7 +642,7 @@ void StFormatDlg::OnBnClickedFormatButton()
 //	GetUpdater()->GetProgress()->SetCurrentTask(TASK_TYPE_ERASE_DATADRIVE, 1);
 
 	StEraseLogicalDrive apiErase(_dataDriveNumber);
-    err = _pVolume->SendCommand(hVolume, apiErase, &moreInfo, callMe);
+    err = _pVolume->SendCommand(hVolume, apiErase, &moreInfo, dummyInfo);
 
     _progressCtrl.StepIt();
 //  GetUpdater()->GetProgress()->UpdateProgress();
@@ -643,7 +660,7 @@ void StFormatDlg::OnBnClickedFormatButton()
         // Api constructor copies the data into its own buffer
         StWriteLogicalDriveSector api(_dataDriveNumber, _sectorSize, start_sector, (uint32_t)sectors_per_write, pData);
         // Write the data to the device
-        int32_t err = _pVolume->SendCommand(hVolume, api, &moreInfo, callMe);
+        int32_t err = _pVolume->SendCommand(hVolume, api, &moreInfo, dummyInfo);
 		if( err != ERROR_SUCCESS )
         {
             ATLTRACE(_T("*** failed after %d writes.\n"), iteration);
@@ -664,7 +681,7 @@ void StFormatDlg::OnBnClickedFormatButton()
         // Api constructor copies the data into its own buffer
         StWriteLogicalDriveSector api(_dataDriveNumber, _sectorSize, start_sector, (uint32_t)sectors_left_for_last_iteration, pData);
         // Write the data to the device
-        int32_t err = _pVolume->SendCommand(hVolume, api, &moreInfo, callMe);
+        int32_t err = _pVolume->SendCommand(hVolume, api, &moreInfo, dummyInfo);
 		if( err != ERROR_SUCCESS )
         {
             ATLTRACE(_T("*** failed on last write.\n"));
@@ -705,8 +722,11 @@ void StFormatDlg::OnBnClickedDumpButton()
 {
     CString fileName = _T("stformat.img");
 
-	const StFormatImage myImage(*_pDiskParams);
-	CFile dumpFile(fileName, CFile::modeCreate | CFile::modeWrite | CFile::typeBinary );
-	dumpFile.Write(&myImage._theImage[0], (UINT)myImage._theImage.size());
-	dumpFile.Close();
+	if ( _pDiskParams )
+	{
+		const StFormatImage myImage(*_pDiskParams);
+		CFile dumpFile(fileName, CFile::modeCreate | CFile::modeWrite | CFile::typeBinary );
+		dumpFile.Write(&myImage._theImage[0], (UINT)myImage._theImage.size());
+		dumpFile.Close();
+	}
 }
