@@ -223,7 +223,7 @@ void CDeviceEnumDlg::InitDeviceTree()
 	if ( m_classImageList.cbSize == 0 )
 	{
 		m_classImageList.cbSize = sizeof(m_classImageList);
-        bool success = gSetupApi().SetupDiGetClassImageList(&m_classImageList);
+        BOOL success = gSetupApi().SetupDiGetClassImageList(&m_classImageList);
 		m_ImageList.Attach(m_classImageList.ImageList);
 		m_ImageList.Add(AfxGetApp()->LoadIcon(IDI_COMPUTER_ICON));
 		m_device_tree_ctrl.SetImageList(&m_ImageList, LVSIL_SMALL);

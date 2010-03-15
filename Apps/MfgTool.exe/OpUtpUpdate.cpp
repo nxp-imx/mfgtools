@@ -1474,7 +1474,7 @@ DWORD COpUtpUpdate::DoMxRomLoad(UCL::Command* pCmd)
 
 	// Turn off the Task progress bar
 	m_pPortMgrDlg->UpdateUI(NULL);
-	ATLTRACE(_T("RAM kernel %s is downloaded to the device of %s.\r\n"),pCmd->GetFile(), m_pPortMgrDlg->GetPanel());
+	ATLTRACE(_T("RAM kernel: %s is downloaded to the device of %s.\r\n"),pCmd->GetFile(), m_pPortMgrDlg->GetPanel());
 	return ERROR_SUCCESS;
 }
 

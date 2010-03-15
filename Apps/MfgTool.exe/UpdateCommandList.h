@@ -46,7 +46,15 @@ public:
 
 			CString attr = GetAttrValue(_T("param1"));
 
-			if(attr.Left(2) == _T("0x"))
+			if ( attr.CompareNoCase(_T("true")) == 0 )
+			{
+				param = 1;
+			}
+			else if ( attr.CompareNoCase(_T("false")) == 0 )
+			{
+				param = 0;
+			}
+			else if(attr.Left(2) == _T("0x"))
 			{
 				TCHAR *p;
 				param = _tcstoul(attr.Mid(2),&p,16);
@@ -66,7 +74,15 @@ public:
 
 			CString attr = GetAttrValue(_T("param2"));
 
-			if(attr.Left(2) == _T("0x"))
+			if ( attr.CompareNoCase(_T("true")) == 0 )
+			{
+				param = 1;
+			}
+			else if ( attr.CompareNoCase(_T("false")) == 0 )
+			{
+				param = 0;
+			}
+			else if(attr.Left(2) == _T("0x"))
 			{
 				TCHAR *p;
 				param = _tcstoul(attr.Mid(2),&p,16);

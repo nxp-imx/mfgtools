@@ -1,6 +1,77 @@
 http://psg-host.svn-tx30.am.freescale.net/svn/psg-host/branches/dev/0004
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.000
+****************************************
+02/10/2010 - Starle Li, Chris Williamson
+	
+	- Now both ATK and UTP mode work.
+	- Work arounded for the USB reset issue when multiple board are burned.
+	
+****************************************
+RELEASE_STMFGTOOL_1.6.1.009f
+****************************************
+03/12/2010 - Starle Li
+	
+	- Latest work to enhance multiple device update operation.
+
+	- Starle's work to improve robustness of parallel operation.
+	- Open and close device in ReadFromDevice() and WriteToDevice() functions.
+	- Coordinate Jump2Rak for all panels.
+	- Allow file sharing of memoryInit.xml file.
+	- Improve FindDeviceByUsbPath() functionality.
+
+	- remove non-used code.
+	- archive current testing profiles in bin folder.
+	
+****************************************
+RELEASE_STMFGTOOL_1.6.1.009e
+****************************************
+03/04/2010
+
+	- Latest work to support MxRomUpdateOperation and fix UtpUpdateOperation
+
+	- Add program ucl.xml command to do MxRomDevice.ProgramFlash()
+	- Fixes from Starle's code review.
+	  RKL Response struct change
+	  StFwComponent.cpp: _Sgetn_s parameters
+	  ucl.xml - modified change to support Updater mode for UTP.
+
+****************************************
+RELEASE_STMFGTOOL_1.6.1.009d
+****************************************
+03/02/2010
+
+- Latest work to support MxRomUpdateOperation and fix UtpUpdateOperation
+
+- Add rklCmd ucl.xml command.
+- Some code clean up.
+- Deleted DevSupport/iMX directory.
+
+****************************************
+RELEASE_STMFGTOOL_1.6.1.009c
+****************************************
+03/01/2010
+
+- Latest work to support MxRomUpdateOperation and fix UtpUpdateOperation
+
+- Add HasFlashHeader flag and address translation for load command.
+
+****************************************
+RELEASE_STMFGTOOL_1.6.1.009b
+****************************************
+02/26/2010
+
+- Latest work to support MxRomUpdateOperation and fix UtpUpdateOperation
+
+****************************************
+RELEASE_STMFGTOOL_1.6.1.009a
+****************************************
+02/24/2010
+
+- Latest work to support MxRomUpdateOperation and fix UtpUpdateOperation
+
+****************************************
 RELEASE_STMFGTOOL_1.6.1.009
 ****************************************
 02/10/2010 - Starle Li

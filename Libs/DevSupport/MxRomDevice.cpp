@@ -29,6 +29,21 @@ MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
 	_MaxPacketSize.describe(this, _T("Max Packet Size"), _T(""));
 	
 	_chipFamily = GetChipFamily();
+
+	int len = 0, type = 0;
+	CString model;
+
+	//We MUST check current device status, or a device will be treated as a new i.mx device 
+	//after RAM kernel is downloaded and runing since both bootstrap mode and RAM kernel mode
+	//use the same USB driver under ATK mode. 
+	if ( GetRKLVersion(model, len, type) == ERROR_SUCCESS )
+	{
+		if (!( len == 0 && type == 0 ))
+			//It isn't bootstrap mode, which means it is not a new device, but a device 
+			//running under RAM kernel, so we just quit.
+			return;
+	}
+
 	ImgDownloadStatus CurImgDwdSts;
 
 	CurImgDwdSts.Path = _path.get();
@@ -45,6 +60,7 @@ MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
 			break;
 		}
 	}	
+
 	//This is a new port with is attached with a device.
 	if(iter == iter_end)
 		ImgDwdSts.push_back(CurImgDwdSts);
@@ -56,6 +72,7 @@ MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
 	BOOL success = InitRomVersion(_chipFamily, _romVersion, _defaultAddress);
 
 	TRACE("************The new i.mx device is initialized**********\n");
+	TRACE("\n");
 }
 
 MxRomDevice::~MxRomDevice()
@@ -649,20 +666,30 @@ struct MxRomDevice::Response MxRomDevice::SendRklCommand(unsigned short cmdId, u
 //-------------------------------------------------------------------------------------		
 int MxRomDevice::GetRKLVersion(CString& fmodel, int& len, int& mxType)
 {
+	int i =0;
 	struct Response res = SendRklCommand(RAM_KERNEL_CMD_GETVER, 0, 0, 0);
 
-	TRACE("atk_common_getver(): romResponse: 0x%X\n", res.romResponse);
+	//TRACE("atk_common_getver(): romResponse: 0x%X\n", res.romResponse);
 	
 	// check if is bootstrap
 	if (res.romResponse == HabEnabled || res.romResponse == HabDisabled)
 	{
 		len = 0;
+		TRACE("The device is running under Bootstrap mode.\r\n");
 		return RET_SUCCESS;
 	}
-		
+
+	while(res.ack != RET_SUCCESS){
+		if(i == 10)
+			break;
+		i++;
+		Sleep(1000);
+		res = SendRklCommand(RAM_KERNEL_CMD_GETVER, 0, 0, 0);
+	}
+
 	if (res.ack == RET_SUCCESS) {
 		
-		TRACE("atk_common_getver(): chip id: %x\n", res.csum);
+		//TRACE("atk_common_getver(): chip id: %x\n", res.csum);
 
 		unsigned char model[MAX_MODEL_LEN] = {0};
 		if ( !ReadFromDevice(model, res.len) )
@@ -674,14 +701,16 @@ int MxRomDevice::GetRKLVersion(CString& fmodel, int& len, int& mxType)
 		mxType = res.csum;
 		fmodel = model;
 		fmodel.AppendChar(_T('\0'));
-		TRACE("atk_common_getver(): get version: %s\n", fmodel);
+		//TRACE("atk_common_getver(): get version: %s\n", fmodel);
 	}
 	else
 	{
 		// if response is not ok, return failed
-		TRACE("atk_common_getver(): get response: %d\n", res.ack);
+		TRACE("MxRomDevice::GetRKLVersion: failed to get device status.\n");
 	}
-	
+
+	TRACE("The device is running under RAM kernel mode.\r\n");
+
 	return -res.ack;
 }
 
@@ -808,7 +837,7 @@ BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UI
 		// Program the flash
 		//
 		struct Response res = SendRklCommand(cmdID, address + byteIndex, numBytesToWrite, flags);
-		if ( res.ack == RET_SUCCESS )
+		if ( res.ack != RET_SUCCESS )
 		{
 			TRACE(_T("ProgramFlash(): SendRklCommand(cmd:0x%X, addr:0x%X, size:0x%X, flags:0x%X) failed.\n"), cmdID, address + byteIndex, numBytesToWrite, flags);
 			delete[] pBuffer;
@@ -838,7 +867,7 @@ BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UI
 			// unpack the response
 			res = UnPackRklResponse(retBuf);
 
-			TRACE(_T("Do Flash program, programing: get response: %d:program block id: %d:program size:%d\n"), res.ack, res.csum, res.len);
+			//TRACE(_T("Do Flash program, programing: get response: %d:program block id: %d:program size:%d\n"), res.ack, res.csum, res.len);
 
 			if ( res.ack != FLASH_PARTLY && res.ack != FLASH_VERIFY && res.ack !=RET_SUCCESS )
 			{
@@ -870,7 +899,7 @@ BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UI
 				// unpack the response
 				res = UnPackRklResponse(retBuf);
 
-				TRACE(_T("Do Flash program, verifing: get response: %d : block is %d\n"), res.ack, res.csum);
+				//TRACE(_T("Do Flash program, verifing: get response: %d : block is %d\n"), res.ack, res.csum);
 
 				if ( res.ack != RET_SUCCESS && res.ack != FLASH_VERIFY )
 				{
@@ -939,23 +968,7 @@ BOOL MxRomDevice::Jump()
 		TRACE(_T("DownloadImage(): Jump2Rak() failed.\n"));
 		return FALSE;
 	}
-/*  I can't get GetRKLVersion() to work. What am I doing wrong?	
-	USB_CloseDevice();
-	Sleep(500);
-	if ( USB_OpenDevice() )
-	{
-		int len = 0, type = 0;
-		CString model;
-		if ( GetRKLVersion(model, len, type) == ERROR_SUCCESS )
-		{
-			if ( len == 0 && type == 0 )
-				TRACE(_T("DownloadImage(): BootStrap mode.\n"));
-			else
-				TRACE(_T("DownloadImage(): RamKernel mode.\n"));
-		}
-		TRACE(_T("DownloadImage(): ReOpened Device handles.\n"));
-	}
-*/
+
 	return TRUE;
 }
 

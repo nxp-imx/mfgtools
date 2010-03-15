@@ -15,11 +15,13 @@ Volume::Volume(DeviceClass * deviceClass, DEVINST devInst, CStdString path)
 	_friendlyName.describe(this, _T("Friendly Name"), _T(""));
 	_diskNumber.describe(this, _T("Physical Disk Number"), _T(""));
 
-      _hEvent = CreateEvent( 
-         NULL,    // default security attribute 
-         TRUE,    // manual-reset event 
-         FALSE,    // initial state = not-signaled 
-		 _logicalDrive.get().GetBuffer());   // unnamed event object 
+    _hEvent = CreateEvent( 
+		NULL,    // default security attribute 
+        TRUE,    // manual-reset event 
+        FALSE,    // initial state = not-signaled 
+		_logicalDrive.get().GetBuffer());   // unnamed event object 
+
+	int num = _diskNumber.get();
 }
 
 Volume::~Volume(void)
@@ -169,29 +171,18 @@ int32_t Volume::diskNumber::get()
 /// <summary>
 /// Gets a value indicating whether this volume is a based on USB devices.
 /// </summary>
-/*
+
 bool Volume::IsUsb()
 {
 	CStdString path = _path.get();
 	path.MakeUpper();
 	if ( path.Find(_T("REMOVABLEMEDIA")) != -1 )
 		return true;
+	else if ( path.Find(_T("USBSTOR")) != -1 )
+		return true;
 	else
 		return false;
-*//*clw
-	if (!Disks().empty())
-    {
-		std::list<Device*>::iterator disk;
-		for(disk = Disks().begin(); disk != Disks().end(); ++disk)
-        {
-			// return the 1st IsUSB() == true
-			if ((*disk)->IsUsb())
-                return true;
-        }
-    }
-    return false;
-*///clw
-//}
+}
 
 /// <summary>
 /// Gets the device connected to the USB bus.

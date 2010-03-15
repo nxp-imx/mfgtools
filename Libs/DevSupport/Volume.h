@@ -22,7 +22,7 @@ public:
 //	uint8_t _scsiSenseStatus; //TODO: move this?
 	uint32_t m_BytesWritten;
 	uint32_t m_BytesRead;
-//	bool IsUsb();
+	bool IsUsb();
 //	Device* UsbDevice();
 //	bool ValidateUsbIds();
 //	std::list<Device*>& Disks();

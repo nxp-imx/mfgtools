@@ -72,9 +72,9 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="true"
-				AdditionalDependencies="mssachlp.lib hid.lib MXLib.lib"
+				AdditionalDependencies="mssachlp.lib hid.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;../WDK/wxp/i386;&quot;../MXLib/$(OutDir)&quot;"
+				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;../WDK/wxp/i386"
 				IgnoreAllDefaultLibraries="false"
 			/>
 			<Tool
@@ -140,9 +140,9 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="mssachlp.lib hid.lib MXLib.lib"
+				AdditionalDependencies="mssachlp.lib hid.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;../WDK/wxp/i386;&quot;../MXLib/$(OutDir)&quot;"
+				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;../WDK/wxp/i386"
 			/>
 			<Tool
 				Name="VCALinkTool"

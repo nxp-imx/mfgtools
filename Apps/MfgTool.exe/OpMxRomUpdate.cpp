@@ -96,7 +96,7 @@ const UCL::DeviceState::DeviceState_t COpMxRomUpdate::GetDeviceState()
 			MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
 			
 			int len = 0, type = 0;
-			CString model;
+			CString model = _T("");
 			if ( pMxRomDevice->GetRKLVersion(model, len, type) == ERROR_SUCCESS )
 			{
 				if ( len == 0 && type == 0 )
@@ -206,7 +206,7 @@ void COpMxRomUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 
             UCL::DeviceState::DeviceState_t oldState = m_CurrentDeviceState;
 			m_CurrentDeviceState = GetDeviceState();
-			ATLTRACE(_T("%s MxRomUpdate Event: %s Msg: %s DevState: %s OpState: %s\r\n"),m_pPortMgrDlg->GetPanel(), GetEventString(nEventType), dwData, UCL::DeviceState::DeviceStateToString(m_CurrentDeviceState), GetOpStateString(m_OpState));
+			//ATLTRACE(_T("%s MxRomUpdate Event: %s Msg: %s DevState: %s OpState: %s\r\n"),m_pPortMgrDlg->GetPanel(), GetEventString(nEventType), dwData, UCL::DeviceState::DeviceStateToString(m_CurrentDeviceState), GetOpStateString(m_OpState));
 
 			if (oldState == UCL::DeviceState::Disconnected)
             {
@@ -260,12 +260,12 @@ void COpMxRomUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 				if ( m_hChangeEvent != INVALID_HANDLE_VALUE )
 				{
 					VERIFY(::SetEvent(m_hChangeEvent));
-					ATLTRACE(_T("%s MxRomUpdate Event: %s Msg: %s DevState: %s OpState: %s SET_EVENT\r\n"),m_pPortMgrDlg->GetPanel(), GetEventString(nEventType), dwData, UCL::DeviceState::DeviceStateToString(m_CurrentDeviceState), GetOpStateString(m_OpState));
+					//ATLTRACE(_T("%s MxRomUpdate Event: %s Msg: %s DevState: %s OpState: %s SET_EVENT\r\n"),m_pPortMgrDlg->GetPanel(), GetEventString(nEventType), dwData, UCL::DeviceState::DeviceStateToString(m_CurrentDeviceState), GetOpStateString(m_OpState));
 				}
 			}
 			else
 			{
-				ATLTRACE(_T("%s MxRomUpdate Event: %s Msg: %s DevState: %s OpState: %s NO SET_EVENT!!!\r\n"),m_pPortMgrDlg->GetPanel(), GetEventString(nEventType), dwData, UCL::DeviceState::DeviceStateToString(m_CurrentDeviceState), GetOpStateString(m_OpState));
+				//ATLTRACE(_T("%s MxRomUpdate Event: %s Msg: %s DevState: %s OpState: %s NO SET_EVENT!!!\r\n"),m_pPortMgrDlg->GetPanel(), GetEventString(nEventType), dwData, UCL::DeviceState::DeviceStateToString(m_CurrentDeviceState), GetOpStateString(m_OpState));
 			}
 ///            UpdateStatus();
             
@@ -961,13 +961,13 @@ DWORD COpMxRomUpdate::DoBoot(UCL::Command* pCmd)
 
 	// If we are already in Updater mode, just return success.
 	// Assumes we are trying to go into Updater mode!
-	if ( this->m_CurrentDeviceState == UCL::DeviceState::Updater )
+	/*if ( this->m_CurrentDeviceState == UCL::DeviceState::Updater )
 	{
 		logText.Format(_T("%s DoBoot() - Already in Updater mode. Nothing to do.\r\n"), m_pPortMgrDlg->GetPanel(), retValue);
 		bstr_log_text = logText.AllocSysString();
 		((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
 		return 0;
-	}
+	}*/
 
 /* We might could implement this with RAM_KERNEL_CMD_RESET	
 	// Reset Device to Recovery-mode
@@ -1174,7 +1174,7 @@ DWORD COpMxRomUpdate::DoMxRomLoad(UCL::Command* pCmd)
 	// Turn off the Task progress bar
 	m_pPortMgrDlg->UpdateUI(NULL);
 
-	ATLTRACE(_T("%s Recover i.MXDevice - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
+	ATLTRACE(_T("Ram kernel %s is downloaded into the device of %s.\r\n"),pCmd->GetFile(), m_pPortMgrDlg->GetPanel());
 	return ERROR_SUCCESS;
 }
 
@@ -1207,7 +1207,7 @@ DWORD COpMxRomUpdate::DoRklProgramFlash(UCL::Command* pCmd)
 		return returnVal;
 	}
 	UINT flashSize = response.len;
-	TRACE(_T("Get flash size successul: 0x%xK Bytes\n"), flashSize);
+	//TRACE(_T("Get flash size successul: 0x%xK Bytes\n"), flashSize);
 
 	// open the file for binary reading
 	CString filename = m_pOpInfo->GetPath() + _T("\\") + pCmd->GetFile();
@@ -1259,12 +1259,12 @@ DWORD COpMxRomUpdate::DoRklProgramFlash(UCL::Command* pCmd)
 
 	// Turn off the Task progress bar
 	m_pPortMgrDlg->UpdateUI(NULL);
-
-	int len = 0, type = 0;
+	ATLTRACE(_T("Image: %s is burned into the device of %s.\r\n"),pCmd->GetFile(), m_pPortMgrDlg->GetPanel());
+	/*int len = 0, type = 0;
 	CString model = _T("");
 	pMxRomDevice->GetRKLVersion(model, len, type);
 
-	ATLTRACE(_T("%s Program i.MXDevice - SUCCESS. RAM Kernel version: %s\r\n"),m_pPortMgrDlg->GetPanel(), model);
+	ATLTRACE(_T("%s Program i.MXDevice - SUCCESS. RAM Kernel version: %s\r\n"),m_pPortMgrDlg->GetPanel(), model);*/
 	return ERROR_SUCCESS;
 }
 
