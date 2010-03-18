@@ -34,7 +34,7 @@ MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
 	CString model;
 
 	//We MUST check current device status, or a device will be treated as a new i.mx device 
-	//after RAM kernel is downloaded and runing since both bootstrap mode and RAM kernel mode
+	//after RAM kernel is downloaded and running since both bootstrap mode and RAM kernel mode
 	//use the same USB driver under ATK mode. 
 	if ( GetRKLVersion(model, len, type) == ERROR_SUCCESS )
 	{
@@ -67,12 +67,19 @@ MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
 
 	TRACE(_T("Initialize new i.mx device of path: %s.\r\n"), CurImgDwdSts.Path);
 
-	_MaxPacketSize.get();
+	if(_MaxPacketSize.get() == 0)
+		goto Exit;
 	_habType = GetHABType(_chipFamily);
-	BOOL success = InitRomVersion(_chipFamily, _romVersion, _defaultAddress);
+	if(_habType == HabUnknown)
+		goto Exit;
+	if(!InitRomVersion(_chipFamily, _romVersion, _defaultAddress))
+		goto Exit;
 
 	TRACE("************The new i.mx device is initialized**********\n");
 	TRACE("\n");
+	return;
+Exit:
+	TRACE("Failed to initialize the new i.MX device!!!\n");
 }
 
 MxRomDevice::~MxRomDevice()
@@ -94,6 +101,12 @@ int32_t MxRomDevice::MaxPacketSize::get()
 		if ( dev->DeviceIoControl(IOCTL_IMXDEVICE_GET_DEVICE_DESCRIPTOR, &devDescriptor) )
 		{
 			Value = devDescriptor.bMaxPacketSize0;
+		}
+		else
+		{
+			//We must indicate caller this is an invalid value 
+			//0 is used to indicate an invalid value.
+			Value = 0;
 		}
 	}
 
@@ -178,14 +191,14 @@ MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
 	//Send write Command to USB
 	if ( !WriteToDevice((unsigned char *)command, 16) )
 	{
-		return HabDisabled;
+		return HabUnknown;
 	}
 
 	//read the ACK
 	unsigned char cmdAck[4] = { 0 };
 	if(!ReadFromDevice(cmdAck, 4))
 	{
-		return HabDisabled;
+		return HabUnknown;
 	}
 
 	// get response of HAB type
@@ -197,7 +210,10 @@ MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
 		if ( (_chipFamily == MX35) || (_chipFamily == MX37) || (_chipFamily == MX51) )
 		{
 			unsigned char writeAck[4] = { 0 };
-			ReadFromDevice(writeAck,4);
+			if(!ReadFromDevice(writeAck, 4))
+			{
+				return HabUnknown;
+			}
 
 			//TRACE("GetHABType(): Receive ack2:%x\n", *(unsigned int *)writeAck);
 		}
@@ -210,8 +226,11 @@ MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
 		TRACE("GetHABType(): this is develop/disable type\n");
 
 		unsigned char writeAck[4] = { 0 };
-		ReadFromDevice(writeAck,4);
 
+		if(!ReadFromDevice(writeAck, 4))
+		{
+			return HabUnknown;
+		}
 		//TRACE("GetHABType(): Receive ack2:%x\n", *(unsigned int *)writeAck);
 
 		return HabDisabled;	
@@ -1078,6 +1097,7 @@ BOOL MxRomDevice::DeviceIoControl(DWORD controlCode, PVOID pRequest)
 	BOOL retValue = TRUE;
 	DWORD totalSize = 0;
 	BOOL closeOnExit = FALSE;
+	CString DevPath = _path.get();
 
 	switch (controlCode)
 	{
@@ -1096,17 +1116,17 @@ BOOL MxRomDevice::DeviceIoControl(DWORD controlCode, PVOID pRequest)
 	}
 
 	// Open the device
-	if ( _hDevice == INVALID_HANDLE_VALUE )
+	if (!OpenUSBHandle(&_hDevice, DevPath))
 	{
-		_hDevice = CreateFile(_path.get(), GENERIC_READ | GENERIC_WRITE,
-		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-		if( _hDevice == INVALID_HANDLE_VALUE )
-		{
-			TRACE(_T("MxRomDevice::DeviceIoControl() CreateFile() ERROR = %d.\n"), GetLastError());
-			return FALSE;
-		}
-		closeOnExit = TRUE;
+		TRACE(_T("MxRomDevice::DeviceIoControl() CreateFile() ERROR = %d.\n"), GetLastError());
+		return FALSE;
 	}
+	if( _hDevice == INVALID_HANDLE_VALUE )
+	{
+		TRACE(_T("MxRomDevice::DeviceIoControl() CreateFile() ERROR = %d.\n"), GetLastError());
+		return FALSE;
+	}
+	closeOnExit = TRUE;
 
 	// Send the DeviceIo command
 	DWORD dwBytesReturned = 0;
@@ -1148,7 +1168,7 @@ BOOL MxRomDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 		0,
 		NULL);
 
-	if (pHandle== INVALID_HANDLE_VALUE) {
+	if (*pHandle == INVALID_HANDLE_VALUE) {
 		TRACE(_T("MxRomDevice::OpenUSBHandle() Failed to open (%s) = %d"), pipePath, GetLastError());
 		return FALSE;
 	}
@@ -1156,51 +1176,12 @@ BOOL MxRomDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 	return TRUE;
 }
 
-/*BOOL MxRomDevice::USB_OpenDevice(void)
-{
-	CString pipePath = _path.get();
-
-	// Get handles for write operation
-	if( !OpenUSBHandle(&_hDevice, pipePath) ||
-		!OpenUSBHandle(&_hWrite, pipePath+_T("\\PIPE00")) ||
-		!OpenUSBHandle(&_hRead, pipePath+_T("\\PIPE01"))
-		)
-	{
-		return FALSE;
-	}
-
-	//	_MaxPacketSize0 = _maxPacketSize.get();
-
-	return TRUE;
-}
-
-BOOL MxRomDevice::USB_CloseDevice(void)
-{
-
-	//if(!DeviceIoControl(IOCTL_IMXDEVICE_RESET_DEVICE, NULL))
-	//	return FALSE;
-
-	if (!CloseHandle(_hRead) || 
-		!CloseHandle(_hWrite) || 
-		!CloseHandle(_hDevice))
-	{
-		TRACE(_T("MxRomDevice::USB_CloseDevice() CloseHandle() ERROR = %d.\n"), GetLastError());
-		return FALSE;
-	}
-	
-	_hRead = INVALID_HANDLE_VALUE;
-	_hWrite = INVALID_HANDLE_VALUE;
-	_hDevice = INVALID_HANDLE_VALUE;
-	
-	return TRUE;
-}*/
-
 BOOL MxRomDevice::WriteToDevice(const unsigned char *buf, UINT count)
 {
 	int    nBytesWrite; // for bytes actually written
 	CString pipePath = _path.get();
 
-	if (!OpenUSBHandle(&_hWrite, pipePath+_T("\\PIPE00")))
+	if (!OpenUSBHandle(&_hDevice, pipePath) || !OpenUSBHandle(&_hWrite, pipePath+_T("\\PIPE00")))
 	{
 		TRACE(_T("MxRomDevice::WriteToDevice() failed to open the device. Error code = 0x%x(%d).\r\n"), GetLastError(), GetLastError());
 		return FALSE;
@@ -1226,7 +1207,7 @@ BOOL MxRomDevice::ReadFromDevice(PUCHAR buf, UINT count)
 	int    nBytesRead; // for bytes actually read
 	CString pipePath = _path.get();
 
-	if (!OpenUSBHandle(&_hRead, pipePath+_T("\\PIPE01")))
+	if (!OpenUSBHandle(&_hDevice, pipePath) || !OpenUSBHandle(&_hRead, pipePath+_T("\\PIPE01")))
 	{
 		TRACE(_T("MxRomDevice::ReadFromDevice() failed to open the device. Error code = 0x%x(%d).\r\n"), GetLastError(), GetLastError());
 		return FALSE;

@@ -1,9 +1,19 @@
 http://psg-host.svn-tx30.am.freescale.net/svn/psg-host/branches/dev/0004
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.001
+****************************************
+03/18/2010 - Starle Li
+	
+	- Fixed a serious bug (Line 1171) which can lead to system crash sometimes, 
+          and improve protection when accessing WDF driver.
+
+	Libs/DevSupport/MxRomDevice.cpp
+	
+****************************************
 RELEASE_STMFGTOOL_1.6.2.000
 ****************************************
-02/10/2010 - Starle Li, Chris Williamson
+03/15/2010 - Starle Li, Chris Williamson
 	
 	- Now both ATK and UTP mode work.
 	- Work arounded for the USB reset issue when multiple board are burned.
