@@ -21,7 +21,7 @@ Signature="$WINDOWS NT$"
 Class=USB
 ClassGuid={36fc9e60-c465-11cf-8056-444553540000}
 Provider=%MSFT%
-DriverVer=01/21/2010,6.1.7600.16385
+DriverVer=03/19/2010,6.1.7600.16385
 CatalogFile=KmdfSamples.cat
 
 

@@ -413,8 +413,11 @@ BOOL MxRomDevice::WriteMemory(UINT address, UINT data, UINT format)
 	if (*(unsigned int *)cmdAck == HabEnabled)
 	{
 		// Validate production address
-		if ( ! ValidAddress(address) )
+		if ( ! ValidAddress(address, format) )
+		{
+			TRACE(_T("WriteMemory(): Invalid memory address found! 0x%X/n"), address);
 			return FALSE;
+		}
 	}
 
 	unsigned char writeAck[4] = { 0 };
@@ -423,38 +426,27 @@ BOOL MxRomDevice::WriteMemory(UINT address, UINT data, UINT format)
 		return FALSE;
 	}
 
-	if (*(unsigned int *)writeAck == ROM_WRITE_ACK)
-	{
-		return TRUE;
-	}
-	else
+	if (*(unsigned int *)writeAck != ROM_WRITE_ACK)
 	{
 		TRACE("WriteMemory(): Invalid write ack: 0x%x\n", *(unsigned int *)writeAck);
 		return FALSE; 
 	}
+	return TRUE;
 }
-BOOL MxRomDevice::ValidAddress(const UINT address) const
+BOOL MxRomDevice::ValidAddress(const UINT address, const UINT format) const
 {
 	BOOL status = FALSE;
+	UINT topByteAddress = address + ((format/8) - 1); 
 
 	switch ( _chipFamily )
 	{
-// Please check Starle
-// from pl_check_address_valid( UINT32 address, UINT32 byte_count)
-//	byte_count == format >>3 == 1,2, or 3
-//		    if (((address + byte_count <= WEIM_CS2_END) && (address >= SDRAM_START))
-//       || ((address + byte_count <= IRAM_FREE_END) && (address >= IRAM_FREE_START))
-//       || ((address + byte_count <= NFC_END) && (address >= NFC_START))
-//       || ((address + byte_count <= SDRAM_CTL_END) && (address >= SDRAM_CTL_START))
-//       || ((address + byte_count <= WEIM_END) && (address >= WEIM_START)))
-
 		case MX31:
 		case MX32:
-			if (   ((address <= MX31_NFCend)	&& (address >= MX31_NFCstart)) 
-				|| ((address <= MX31_WEIMend)	&& (address >= MX31_WEIMstart))
-				|| ((address <= MX31_MemoryEnd)	&& (address >= MX31_MemoryStart))
-				|| ((address <= MX31_ESDCTLend)	&& (address >= MX31_ESDCTLstart))
-				|| ((address <= MX31_CCMend)	&& (address >= MX31_CCMstart) && (address != MX31_CCM_CGR0)) )
+			if (   ((topByteAddress <= MX31_NFCend)	   && (address >= MX31_NFCstart)) 
+				|| ((topByteAddress <= MX31_WEIMend)   && (address >= MX31_WEIMstart))
+				|| ((topByteAddress <= MX31_MemoryEnd) && (address >= MX31_MemoryStart))
+				|| ((topByteAddress <= MX31_ESDCTLend) && (address >= MX31_ESDCTLstart))
+				|| ((topByteAddress <= MX31_CCMend)	   && (address >= MX31_CCMstart) && (address != MX31_CCM_CGR0)) )
 			{ 
 				status = TRUE;
 				TRACE("Matching the MX31 address region\n");
@@ -462,11 +454,11 @@ BOOL MxRomDevice::ValidAddress(const UINT address) const
 			break;
 
 		case MX27:
-			if (   ((address <= MX27_NFCend)	&& (address >= MX27_NFCstart)) 
-				|| ((address <= MX27_WEIMend)	&& (address >= MX27_WEIMstart))
-				|| ((address <= MX27_MemoryEnd)	&& (address >= MX27_MemoryStart))
-				|| ((address <= MX27_ESDCTLend)	&& (address >= MX27_ESDCTLstart))
-				|| ((address <= MX27_CCMend)	&& (address >= MX27_CCMstart) && (address != MX27_CCM_CGR0)) )
+			if (   ((topByteAddress <= MX27_NFCend)	   && (address >= MX27_NFCstart)) 
+				|| ((topByteAddress <= MX27_WEIMend)   && (address >= MX27_WEIMstart))
+				|| ((topByteAddress <= MX27_MemoryEnd) && (address >= MX27_MemoryStart))
+				|| ((topByteAddress <= MX27_ESDCTLend) && (address >= MX27_ESDCTLstart))
+				|| ((topByteAddress <= MX27_CCMend)	   && (address >= MX27_CCMstart) && (address != MX27_CCM_CGR0)) )
 			{
 				status = TRUE;
 				TRACE("Matching the MX27 address region\n");
@@ -474,11 +466,11 @@ BOOL MxRomDevice::ValidAddress(const UINT address) const
 			break;
 
 		case MX35:
-			if (   ((address <= MX35_WEIM_CS2_END)    && (address >= MX35_SDRAM_START))
-				|| ((address <= MX35_IRAM_FREE_END)   && (address >= MX35_IRAM_FREE_START))
-				|| ((address <= MX35_NFC_END)         && (address >= MX35_NFC_START))
-				|| ((address <= MX35_SDRAM_CTL_END)   && (address >= MX35_SDRAM_CTL_START))
-				|| ((address <= MX35_WEIM_END)        && (address >= MX35_WEIM_START)) )
+			if (   ((topByteAddress <= MX35_WEIM_CS2_END)  && (address >= MX35_SDRAM_START))
+				|| ((topByteAddress <= MX35_IRAM_FREE_END) && (address >= MX35_IRAM_FREE_START))
+				|| ((topByteAddress <= MX35_NFC_END)       && (address >= MX35_NFC_START))
+				|| ((topByteAddress <= MX35_SDRAM_CTL_END) && (address >= MX35_SDRAM_CTL_START))
+				|| ((topByteAddress <= MX35_WEIM_END)      && (address >= MX35_WEIM_START)) )
 			{
 				status = TRUE;
 				TRACE("Matching the MX35 address region\n");
@@ -486,11 +478,11 @@ BOOL MxRomDevice::ValidAddress(const UINT address) const
 			break;
 
 		case MX37:
-			if (   ((address <= MX37_WEIM_CS2_END)    && (address >= MX37_SDRAM_START))
-				|| ((address <= MX37_IRAM_FREE_END)   && (address >= MX37_IRAM_FREE_START))
-				|| ((address <= MX37_NFC_END)         && (address >= MX37_NFC_START))
-				|| ((address <= MX37_SDRAM_CTL_END)   && (address >= MX37_SDRAM_CTL_START))
-				|| ((address <= MX37_WEIM_END)        && (address >= MX37_WEIM_START)))
+			if (   ((topByteAddress <= MX37_WEIM_CS2_END)  && (address >= MX37_SDRAM_START))
+				|| ((topByteAddress <= MX37_IRAM_FREE_END) && (address >= MX37_IRAM_FREE_START))
+				|| ((topByteAddress <= MX37_NFC_END)       && (address >= MX37_NFC_START))
+				|| ((topByteAddress <= MX37_SDRAM_CTL_END) && (address >= MX37_SDRAM_CTL_START))
+				|| ((topByteAddress <= MX37_WEIM_END)      && (address >= MX37_WEIM_START)))
 			{
 				status = TRUE;
 				TRACE("Matching the MX37 address region\n");
@@ -498,11 +490,11 @@ BOOL MxRomDevice::ValidAddress(const UINT address) const
 			break;
 
 		case MX51:
-			if (   ((address <= MX51_WEIM_CS2_END)    && (address >= MX51_SDRAM_START))
-				|| ((address <= MX51_IRAM_FREE_END)   && (address >= MX51_IRAM_FREE_START))
-				|| ((address <= MX51_NFC_END)         && (address >= MX51_NFC_START))
-				|| ((address <= MX51_SDRAM_CTL_END)   && (address >= MX51_SDRAM_CTL_START))
-				|| ((address <= MX51_WEIM_END)        && (address >= MX51_WEIM_START)))
+			if (   ((topByteAddress <= MX51_WEIM_CS2_END)  && (address >= MX51_SDRAM_START))
+				|| ((topByteAddress <= MX51_IRAM_FREE_END) && (address >= MX51_IRAM_FREE_START))
+				|| ((topByteAddress <= MX51_NFC_END)       && (address >= MX51_NFC_START))
+				|| ((topByteAddress <= MX51_SDRAM_CTL_END) && (address >= MX51_SDRAM_CTL_START))
+				|| ((topByteAddress <= MX51_WEIM_END)      && (address >= MX51_WEIM_START)))
 			{
 				status = TRUE;
 				TRACE("Matching the MX51 address region\n");
@@ -841,8 +833,9 @@ BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UI
 		// read the data from the file
 		file.read((char *)pBuffer, (size_t)numBytesToWrite);
 
-		// I guess data size has to be a multiple of 512. Is this a relic from Jungo driver?
-		// Can we check this? Starle? Jun?
+		// The data size may not be a multiple of 512. The buffer space is enough 
+		// to contain extra data after data byte to write is aligned to 512 boundry
+		// since it is fixed to MAX_SIZE_PER_FLASH_COMMAND which can be divided by 512 without reminders.
 		if( numBytesToWrite % 512 )
       	{
           numBytesToWrite = ((numBytesToWrite / 512) + 1) * 512; 

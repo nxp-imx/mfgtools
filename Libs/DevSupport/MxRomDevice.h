@@ -258,7 +258,7 @@ private:
 	ChipFamily_t GetChipFamily();
 
 	BOOL WriteMemory(UINT address, UINT data, UINT format);
-	BOOL ValidAddress(const UINT address) const;
+	BOOL ValidAddress(const UINT address, const UINT format) const;
 	HAB_t GetHABType(ChipFamily_t chipType);
 	void PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsigned long addr, unsigned long param1, unsigned long param2);
 	struct Response UnPackRklResponse(unsigned char *resBuf);

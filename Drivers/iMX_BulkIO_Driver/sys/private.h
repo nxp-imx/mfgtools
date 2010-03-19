@@ -186,6 +186,15 @@ ResetDevice(
     IN WDFDEVICE Device
     );
 
+VOID
+StopAllPipes(
+    IN PDEVICE_CONTEXT DeviceContext
+    );
+
+VOID
+StartAllPipes(
+    IN PDEVICE_CONTEXT DeviceContext
+    );
 
 NTSTATUS
 ReadAndSelectDescriptors(

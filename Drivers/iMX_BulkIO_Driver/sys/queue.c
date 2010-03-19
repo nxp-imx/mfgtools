@@ -520,7 +520,9 @@ StopAllPipes(
 {
     UCHAR count,i;
 
-    count = DeviceContext->NumberConfiguredPipes;
+    PAGED_CODE();
+
+	count = DeviceContext->NumberConfiguredPipes;
     for (i = 0; i < count; i++) {
         WDFUSBPIPE pipe;
         pipe = WdfUsbInterfaceGetConfiguredPipe(DeviceContext->UsbInterface,
@@ -540,6 +542,8 @@ StartAllPipes(
 {
     NTSTATUS status;
     UCHAR count,i;
+
+    PAGED_CODE();
 
     count = DeviceContext->NumberConfiguredPipes;
     for (i = 0; i < count; i++) {
