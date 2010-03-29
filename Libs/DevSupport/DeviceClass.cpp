@@ -300,9 +300,8 @@ std::list<Device*>& DeviceClass::Devices()
 					break;
 				}
 			}
-// moved to MxRomDeviceClass::CreateDevice()
-//			if(devData.ClassGuid == GUID_DEVCLASS_MX_ROM_USB_DEVICE && this->_deviceClassType == DeviceTypeMxRom)
-//				TRACE("DeviceClass::Devices:Init i.mx device object.\r\n");
+
+//			ATLTRACE(_T("DeviceClass::Devices()\n"));
 			Device* device = CreateDevice(this, devData, devPath);
 			// Create device will return NULL if there are filters in place
 			// and the device does not match a filter
@@ -428,6 +427,7 @@ Device* DeviceClass::FindDeviceByUsbPath(CStdString pathToFind, const DeviceList
 					}
 				}
 
+//				ATLTRACE(_T("DeviceClass::FindDeviceByUsbPath()\n"));
 				pDevice = CreateDevice(this, devData, devPath);
 				if ( pDevice && pDevice->IsUsb() )
 				{

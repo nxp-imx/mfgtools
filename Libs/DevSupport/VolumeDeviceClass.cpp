@@ -138,6 +138,7 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 			}
 			else
 			{
+//				ATLTRACE(_T("VolumeDeviceClass::FindDeviceByUsbPath()\n"));
 				pDevice = CreateDevice(this, devData, devPath);
 				if ( pDevice && pDevice->IsUsb() )
 				{

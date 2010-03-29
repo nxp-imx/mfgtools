@@ -492,7 +492,7 @@ LRESULT CPortMgrDlg::OnMsgStateChange(WPARAM _event_type, LPARAM _msg_string)
 						resStr.LoadString(IDS_WAITING_TO_COMPLETE);						// "Waiting to Complete."
 						m_port_status_ctrl.SetWindowText(resStr);
 						m_port_progress_ctrl.SetPos((int)m_duration);
-						Sleep(3500);
+/*CLW?					Sleep(3500); */
 					}
 					//
 					// Send ScsiStartStopUnit to flush device's cache.
@@ -539,7 +539,7 @@ LRESULT CPortMgrDlg::OnMsgStateChange(WPARAM _event_type, LPARAM _msg_string)
 							resStr.LoadString(IDS_WAITING_TO_COMPLETE);						// "Waiting to Complete."
 							m_port_status_ctrl.SetWindowText(resStr);
 							m_port_progress_ctrl.SetPos((int)m_duration);
-							Sleep(3500);
+/*CLW?					    Sleep(3500); */
 						}
 						//
 						// Send ScsiStartStopUnit to flush device's cache.

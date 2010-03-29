@@ -45,7 +45,7 @@ COpMxRomUpdate::COpMxRomUpdate(CPortMgrDlg *pPortMgrDlg, usb::Port *pUSBPort, CO
 
 	if( !commandFile.Open(fullFileName, CFile::modeRead, &fileException) )
 	{
-		TRACE( _T("Can't open file %s, error = %u\n"), fullFileName, fileException.m_cause );
+		TRACE( _T("%s Can't open file %s, error = %u\n"), m_pPortMgrDlg->GetPanel(), fullFileName, fileException.m_cause );
 	}
 
 	CStringT<char,StrTraitMFC<char> > uclString;
@@ -147,7 +147,7 @@ void COpMxRomUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 
 			int iTPriority = GetThreadPriority();
 			int iPPriority = GetPriorityClass(GetCurrentProcess());
-			ATLTRACE(_T("%s Process-Thread priority: 0x%04x-%d \r\n"),m_pPortMgrDlg->GetPanel(), iPPriority, iTPriority);
+			ATLTRACE(_T("%s OPEVENT_START: Process-Thread priority: 0x%04x-%d \r\n"),m_pPortMgrDlg->GetPanel(), iPPriority, iTPriority);
 
 			m_bStart = true;
 			m_iPercentComplete = 0;
@@ -192,7 +192,7 @@ void COpMxRomUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 				HandleError(ERROR_PROCESS_ABORTED, taskMsg, OP_INVALID);
 			}
 
-			ATLTRACE(_T("STOPPING - %s \r\n"), m_pPortMgrDlg->GetPanel());
+			ATLTRACE(_T("%s STOPPING\r\n"), m_pPortMgrDlg->GetPanel());
 			break;
 		}
 
@@ -319,7 +319,7 @@ BOOL COpMxRomUpdate::WaitForDeviceChange(int seconds)
         // removing each message as we read it.
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) 
         { 
-        ATLTRACE2(_T("   COpMxRomUpdate::WaitForDeviceChange() - Got a message(%0x).\r\n"), msg.message);
+        ATLTRACE2(_T("%s   COpMxRomUpdate::WaitForDeviceChange() - Got a message(%0x).\r\n"), m_pPortMgrDlg->GetPanel(), msg.message);
             // If it is a quit message, exit.
 ///            if (msg.message == WM_QUIT)  
 ///            {
@@ -335,7 +335,7 @@ BOOL COpMxRomUpdate::WaitForDeviceChange(int seconds)
     {
         // unreachable, but catch it just in case.
         retValue = FALSE;
-		ATLTRACE2(_T("   COpMxRomUpdate::WaitForDeviceChange() Invalid waitReturn: %d.\r\n"), waitResult);
+		ATLTRACE2(_T("%s   COpMxRomUpdate::WaitForDeviceChange() Invalid waitReturn: %d.\r\n"), m_pPortMgrDlg->GetPanel(), waitResult);
     }
 
 	// clean up
@@ -397,7 +397,7 @@ void COpMxRomUpdate::HandleError(DWORD _error, LPCTSTR _errorMsg, OpState_t _nex
 
 		if (_error == ERROR_PROCESS_ABORTED)
 		{
-			ATLTRACE(_T("%s Operation aborted\r\n"), m_pPortMgrDlg->GetPanel());
+			ATLTRACE(_T("%s Operation aborted.\r\n"), m_pPortMgrDlg->GetPanel());
 		}
 
         CStdString errorMsgStr;
@@ -653,7 +653,7 @@ UINT DoMxListThreadProc( LPVOID pParam )
 
 	if ( pOperation->m_pCmdList == NULL )
 	{
-		CString msg; msg.Format(_T("No <CMD/>s. Can not find \"%s\" <LIST/> in ucl.xml file."), pOperation->m_pOpInfo->GetUclInstallSection());
+		CString msg; msg.Format(_T("%s No <CMD/>s. Can not find \"%s\" <LIST/> in ucl.xml file."), pOperation->m_pPortMgrDlg->GetPanel(), pOperation->m_pOpInfo->GetUclInstallSection());
 		pOperation->HandleError(-65535, msg, COpMxRomUpdate::OP_INVALID);
 		return -65535;
 	}
@@ -1071,7 +1071,7 @@ DWORD COpMxRomUpdate::DoInit(UCL::Command* pCmd)
 	if ( pMxRomDevice == NULL )
 	{
 		returnVal = ERROR_INVALID_HANDLE;
-		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		ATLTRACE(_T("%s !!!ERROR!!! (%d): No MxRom device. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), returnVal, GetOpStateString(m_OpState));
 		return returnVal;
 	}
 
@@ -1082,7 +1082,7 @@ DWORD COpMxRomUpdate::DoInit(UCL::Command* pCmd)
 	{
 		returnVal = ERROR_INVALID_HANDLE;
 //		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, 0);
-		ATLTRACE(_T("!!!ERROR!!! %s Failed to initialize i.MXxx memory. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		ATLTRACE(_T("%s !!!ERROR!!! Failed to initialize i.MXxx memory. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
 		return returnVal;
 	}
 
@@ -1098,7 +1098,7 @@ DWORD COpMxRomUpdate::DoRklSendCommand(UCL::Command* pCmd)
 	if ( pMxRomDevice == NULL )
 	{
 		returnVal = ERROR_INVALID_HANDLE;
-		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		ATLTRACE(_T("%s !!!ERROR!!! (%d): No MxRom device. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), returnVal, GetOpStateString(m_OpState));
 		return returnVal;
 	}
 
@@ -1120,7 +1120,7 @@ DWORD COpMxRomUpdate::DoRklSendCommand(UCL::Command* pCmd)
 	{
 		returnVal = -response.ack;
 //		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, 0);
-		ATLTRACE(_T("!!!ERROR!!! %s Failed to SendRklCommand(0x%X, 0x%X, 0x%X, 0x%X). err: %d OpState: %s\r\n"), 
+		ATLTRACE(_T("%s !!!ERROR!!! Failed to SendRklCommand(0x%X, 0x%X, 0x%X, 0x%X). err: %d OpState: %s\r\n"), 
 			m_pPortMgrDlg->GetPanel(), cmdId, pCmd->GetAddress(), pCmd->GetParam1(), pCmd->GetParam2(), returnVal, GetOpStateString(m_OpState));
 		return returnVal;
 	}
@@ -1142,7 +1142,7 @@ DWORD COpMxRomUpdate::DoMxRomLoad(UCL::Command* pCmd)
 	if ( pMxRomDevice == NULL )
 	{
 		returnVal = ERROR_INVALID_HANDLE;
-		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		ATLTRACE(_T("%s !!!ERROR!!! (%d): No MxRom device. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), returnVal, GetOpStateString(m_OpState));
 		return returnVal;
 	}
 
@@ -1151,7 +1151,7 @@ DWORD COpMxRomUpdate::DoMxRomLoad(UCL::Command* pCmd)
 	if ( fwObject.GetLastError() != ERROR_SUCCESS )
 	{
 		returnVal = fwObject.GetLastError();
-		ATLTRACE(_T("!!!ERROR!!! (%d): %s No FW component. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		ATLTRACE(_T("%s !!!ERROR!!! (%d): No FW component. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), returnVal, GetOpStateString(m_OpState));
 		return returnVal;
 	}
 
@@ -1167,14 +1167,14 @@ DWORD COpMxRomUpdate::DoMxRomLoad(UCL::Command* pCmd)
 	if(returnVal != TRUE) 
 	{
 		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, returnVal);
-		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load i.MXxx device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		ATLTRACE(_T("%s !!!ERROR!!! (%d): Failed to load i.MXxx device. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), returnVal, GetOpStateString(m_OpState));
 		return returnVal;
 	}
 
 	// Turn off the Task progress bar
 	m_pPortMgrDlg->UpdateUI(NULL);
 
-	ATLTRACE(_T("Ram kernel %s is downloaded into the device of %s.\r\n"),pCmd->GetFile(), m_pPortMgrDlg->GetPanel());
+	ATLTRACE(_T("%s Ram kernel %s is downloaded into the device.\r\n"), m_pPortMgrDlg->GetPanel(), pCmd->GetFile());
 	return ERROR_SUCCESS;
 }
 
@@ -1192,7 +1192,7 @@ DWORD COpMxRomUpdate::DoRklProgramFlash(UCL::Command* pCmd)
 	if ( pMxRomDevice == NULL )
 	{
 		returnVal = ERROR_INVALID_HANDLE;
-		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		ATLTRACE(_T("%s !!!ERROR!!! (%d): No MxRom device. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), returnVal, GetOpStateString(m_OpState));
 		return returnVal;
 	}
 
@@ -1202,7 +1202,7 @@ DWORD COpMxRomUpdate::DoRklProgramFlash(UCL::Command* pCmd)
 	{
 		returnVal = -response.ack;
 //		    taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, 0);
-		ATLTRACE(_T("!!!ERROR!!! %s Failed to SendRklCommand(0x%X, 0x%X, 0x%X, 0x%X). err: %d OpState: %s\r\n"), 
+		ATLTRACE(_T("%s !!!ERROR!!! Failed to SendRklCommand(0x%X, 0x%X, 0x%X, 0x%X). err: %d OpState: %s\r\n"), 
 			m_pPortMgrDlg->GetPanel(), RAM_KERNEL_CMD_FLASH_GET_CAPACITY, 0, 0, 0, returnVal, GetOpStateString(m_OpState));
 		return returnVal;
 	}
@@ -1214,7 +1214,7 @@ DWORD COpMxRomUpdate::DoRklProgramFlash(UCL::Command* pCmd)
 	std::ifstream file(filename, std::ios_base::binary);
 	if(!file.is_open())
 	{
-		CString msg; msg.Format(_T("!ERROR(%d): COpMxRomUpdate::DoRklProgramFlash(%s)"), ERROR_OPEN_FAILED, pCmd->ToString());
+		CString msg; msg.Format(_T("%s !ERROR(%d): COpMxRomUpdate::DoRklProgramFlash(%s)"), m_pPortMgrDlg->GetPanel(), ERROR_OPEN_FAILED, pCmd->ToString());
 		TRACE(msg);
 	}
 	else
@@ -1234,7 +1234,7 @@ DWORD COpMxRomUpdate::DoRklProgramFlash(UCL::Command* pCmd)
 		if ( fileSize > flashSize * 1024 )
 		{
 			file.close();
-			CString msg; msg.Format(_T("!ERROR(%d): COpMxRomUpdate::DoRklProgramFlash(%s) file(0x%x) will not fit on flash(0x%x)."), ERROR_BUFFER_OVERFLOW, pCmd->ToString(), fileSize, flashSize * 1024);
+			CString msg; msg.Format(_T("%s !ERROR(%d): COpMxRomUpdate::DoRklProgramFlash(%s) file(0x%x) will not fit on flash(0x%x)."), m_pPortMgrDlg->GetPanel(), ERROR_BUFFER_OVERFLOW, pCmd->ToString(), fileSize, flashSize * 1024);
 			TRACE(msg);
 			return ERROR_BUFFER_OVERFLOW;
 		}
@@ -1252,14 +1252,14 @@ DWORD COpMxRomUpdate::DoRklProgramFlash(UCL::Command* pCmd)
 		if(returnVal != TRUE) 
 		{
 			taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, returnVal);
-			ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to program i.MXxx device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+			ATLTRACE(_T("%s !!!ERROR!!! (%d): Failed to program i.MXxx device. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), returnVal, GetOpStateString(m_OpState));
 			return returnVal;
 		}
 	}
 
 	// Turn off the Task progress bar
 	m_pPortMgrDlg->UpdateUI(NULL);
-	ATLTRACE(_T("Image: %s is burned into the device of %s.\r\n"),pCmd->GetFile(), m_pPortMgrDlg->GetPanel());
+	ATLTRACE(_T("%s Image: %s is burned into the device.\r\n"), m_pPortMgrDlg->GetPanel(), pCmd->GetFile());
 	/*int len = 0, type = 0;
 	CString model = _T("");
 	pMxRomDevice->GetRKLVersion(model, len, type);

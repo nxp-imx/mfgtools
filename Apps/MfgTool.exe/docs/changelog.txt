@@ -1,6 +1,32 @@
 http://psg-host.svn-tx30.am.freescale.net/svn/psg-host/branches/dev/0004
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.003
+****************************************
+03/29/2010 - Chris Williamson
+	
+	- Added MX35 Android Update for Lab126 testing.
+	- Moved "Panel? " to the front of the TARCE statement output for better sorting in multi device debugging.
+	- Removed 3.5 sec sleep after All Operation Complete state. Hopefully device isn't caching writes.
+	- Removed sync'ing Jump2Rak() for all devices and let it happen independently.
+	- Get HAB type in GetRKLVersion(); remove ROM function GetHABType()
+	- Change MxRomDevice constructor to not depend on Bootstrap vs RamKernel modes.
+	  This allows the device to be deleted when it leaves the bus and init'd when it comes on the bus. 
+	  No more trying to keep track of the state of the device across enumerations.
+
+	Apps/MfgTool.exe/bin/profiles/BSP Firmware Updater/player.ini
+	Apps/MfgTool.exe/docs/changelog.txt
+	Apps/MfgTool.exe/OpMxRomUpdate.cpp
+	Apps/MfgTool.exe/PortMgrDlg.cpp
+	Apps/MfgTool.exe/StMfgTool.cpp
+	Apps/MfgTool.exe/version.h
+	Libs/DevSupport/DeviceClass.cpp
+	Libs/DevSupport/MxRomDevice.cpp
+	Libs/DevSupport/MxRomDevice.h
+	Libs/DevSupport/MxRomDeviceClass.cpp
+	Libs/DevSupport/VolumeDeviceClass.cpp
+
+****************************************
 RELEASE_STMFGTOOL_1.6.2.002
 ****************************************
 03/19/2010 - Starle Li, Chris Williamson
@@ -8,7 +34,7 @@ RELEASE_STMFGTOOL_1.6.2.002
 	- Updated 51 RKL MMC WinCE Update ucl.xml to Media Selection for Program Operation.
 	  The file can be treated as a templete for all other ATK-method ucl script.
 	- Fixed operation of MxRomDevice::ValidAddress().
-	- Added free build of iMXUsb.sys
+	- Added free build of iMxUsb.sys
 
 	Apps/MfgTool.exe/bin/profiles/BSP Firmware Updater/51 RKL MMC WinCE Update/ucl.xml
 	Drivers/iMX_BulkIO_Driver/bin/Debug/imxusb.inf

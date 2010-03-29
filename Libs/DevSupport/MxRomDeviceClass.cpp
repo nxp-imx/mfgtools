@@ -12,7 +12,7 @@ MxRomDeviceClass::MxRomDeviceClass()
 
 Device* MxRomDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CStdString path)
 {
-	TRACE("DeviceClass::Devices:Init i.mx device object.\r\n");
+	TRACE(_T("MxRomDeviceClass::CreateDevice(%s) i.mx device object.\r\n"), path.c_str());
 
 	MxRomDevice* pDev = new MxRomDevice(deviceClass, deviceInfoData.DevInst, path);
 
@@ -40,7 +40,7 @@ Device* MxRomDeviceClass::FindDeviceByUsbPath(CStdString pathToFind, const Devic
 	// existing application device list or new OS device list?
     switch ( devListType )
 	{
-		/*case DeviceListType_Old:
+		case DeviceListType_Old:
 		{
 			// Find the Device in our list of OLD devices.
 			std::list<Device*>::iterator device;
@@ -62,11 +62,10 @@ Device* MxRomDeviceClass::FindDeviceByUsbPath(CStdString pathToFind, const Devic
 				}
 			}
 			break;
-		}*/
+		}
 		case DeviceListType_Current:
 		{		
 			// Find the Device in our list of CURRENT devices.
-			// If we the action is remove, then just move the device from _devices list to _oldDevices list.
 			std::list<Device*>::iterator device;
 			for ( device=_devices.begin(); device != _devices.end(); ++device )
 			{
@@ -81,7 +80,7 @@ Device* MxRomDeviceClass::FindDeviceByUsbPath(CStdString pathToFind, const Devic
 						if ( devListAction == DeviceListAction_Remove )
 						{
 							WaitForSingleObject(devicesMutex, INFINITE);
-							//_oldDevices.push_back(pDevice);
+							_oldDevices.push_back(pDevice);
 							_devices.erase(device);
 							ReleaseMutex(devicesMutex);
 						}

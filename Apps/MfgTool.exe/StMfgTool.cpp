@@ -101,7 +101,7 @@ BOOL CStMfgToolApp::InitInstance()
 {
 #ifdef _DEBUG
 	afxDump.SetDepth(1);
-	//_CrtSetBreakAlloc (262);
+//	_CrtSetBreakAlloc (2685);
 #endif
 
     // If a previous instance of the application is already running,
