@@ -17,6 +17,12 @@ using DevSupport;
 using DevSupport.DeviceManager;
 using DevSupport.Api;
 
+//using DevSupport;
+//using DevSupport.Api;
+//using DevSupport.DeviceManager;
+using DevSupport.DeviceManager.UTP;
+using DevSupport.Media;
+
 namespace DeviceEnum
 {
     public partial class MainWindow : Form
@@ -67,7 +73,7 @@ namespace DeviceEnum
             // Create an instance of the DeviceManager
             try
             {
-                DeviceManager.Instance.DeviceChange += new DeviceManager.DeviceChangeEventHandler(DeviceManager_DeviceChange);
+                DeviceManager.Instance.DeviceChanged += new DeviceManager.DeviceChangedEventHandler(DeviceManager_DeviceChange);
                 // DeviceManager.Instance.DeviceChangedFiltered += new DeviceManager.DeviceChangedEventFiltered(DeviceManager_DeviceChange);
             }
             catch (Exception e)
@@ -80,14 +86,14 @@ namespace DeviceEnum
             viewUSBConnectionToolStripMenuItem.CheckState = (CheckState)formPersistence.Profile.ReadInt("ViewUSBConnectionMenuItemCheckedState", (int)CheckState.Unchecked);
         }
 
-        void DeviceManager_DeviceChange(DeviceChangeEventArgs e)
+        void DeviceManager_DeviceChange(DeviceChangedEventArgs e)
         {
             Trace.WriteLine(String.Format("*** MainWindow.DeviceManager_DeviceChange(): {0}: {1}, {2}({3})", e.Event, e.DeviceId, Thread.CurrentThread.Name, Thread.CurrentThread.GetHashCode()));
             String msg = e.Event + ": " + e.DeviceId + "\r\n"; ;
 //            String msg = e.Event + ": " + e.DeviceId + " (" + e.Device + ")\r\n"; ;
             textBoxMessages.AppendText(msg);
 
-            if (e.Device != null)
+/*            if (e.Device != null)
             {
                 switch (e.Event)
                 {
@@ -105,7 +111,7 @@ namespace DeviceEnum
                         break;
                 }
             }
-        }
+*/        }
 
         public void RemoveDeviceFromTree(String deviceDriver)
         {
@@ -156,6 +162,15 @@ namespace DeviceEnum
                     if (recClassIndex != -1)
                     {
                         deviceClassNodes[recClassIndex].Nodes.Add(deviceNode);
+                        deviceNode.EnsureVisible();
+                    }
+                }
+                else if (deviceType == typeof(MxRomDevice))
+                {
+                    int mxClassIndex = deviceClassNodes.IndexOfKey(MxRomDeviceClass.Instance.Description);
+                    if (mxClassIndex != -1)
+                    {
+                        deviceClassNodes[mxClassIndex].Nodes.Add(deviceNode);
                         deviceNode.EnsureVisible();
                     }
                 }
@@ -245,6 +260,20 @@ namespace DeviceEnum
             foreach (Device recoveryDev in recoveryDeviceClass.Devices)
             {
                 AddDeviceToTree(recoveryDev);
+            }
+
+            // display Mx ROM devices
+            MxRomDeviceClass mxRomDeviceClass = MxRomDeviceClass.Instance;
+            TreeNode mxRomDevNode = new TreeNode(mxRomDeviceClass.ToString());
+            mxRomDevNode.ImageIndex = mxRomDeviceClass.ClassIconIndex;
+            mxRomDevNode.SelectedImageIndex = mxRomDevNode.ImageIndex;
+            mxRomDevNode.Tag = mxRomDeviceClass;
+            mxRomDevNode.Name = mxRomDevNode.Text;
+            computerNode.Nodes.Add(mxRomDevNode);
+
+            foreach (MxRomDevice mxRomDev in mxRomDeviceClass.Devices)
+            {
+                AddDeviceToTree(mxRomDev);
             }
 
             // display HID devices

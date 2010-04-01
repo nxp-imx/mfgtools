@@ -738,6 +738,8 @@ namespace DevSupport.DeviceManager
                 return DeviceInstanceId.ToUpper().Contains(searchString);
         }
 
+        [Description("USB Vendor ID.")]
+        [TypeConverter(typeof(Utils.DecimalConverterEx))]
         public UInt16 Vid
         {
             get
@@ -754,6 +756,8 @@ namespace DevSupport.DeviceManager
             }
         }
 
+        [Description("USB Product ID.")]
+        [TypeConverter(typeof(Utils.DecimalConverterEx))]
         public UInt16 Pid
         {
             get

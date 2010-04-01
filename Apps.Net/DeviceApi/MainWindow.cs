@@ -31,6 +31,7 @@ namespace DeviceApi
         private List<Api> RecoveryApiList;
         private List<Api> WinUsbApiList;
         public List<Api> UtpProtocolList;
+        public List<Api> MxRomApiList;
         private String LastProtocol;
         private Dictionary<String, Dictionary<String, Api> > LastApis;
         private KeyValuePair<String, int> LastPort = new KeyValuePair<String, int>("", -1);
@@ -133,16 +134,18 @@ namespace DeviceApi
             if (CurrentDevice is Volume)
             {
                 chkUseUTP.Visible = true;
-                if (chkUseUTP.Checked == true)
-                    utpGrid.Visible = true;
-                else
-                    utpGrid.Visible = false;
+//                if (chkUseUTP.Checked == true)
+//                    detailsGrid.Visible = true;
+//                else
+//                    detailsGrid.Visible = false;
             }
             else
             {
                 chkUseUTP.Visible = false;
-                utpGrid.Visible = false;
+//                detailsGrid.Visible = false;
             }
+
+            detailsGrid.SelectedObject = CurrentDevice;
         }
 
         private void ApiListCtrl_SelectedIndexChanged(object sender, EventArgs e)
@@ -188,6 +191,7 @@ namespace DeviceApi
                 // call the Member Function
                 //
                 List<object> functionArgs = new List<object>();
+                List<bool> byRef = new List<bool>();
 
                 // Build the parameters for the Member Function call.
                 PropertyInfo[] apiProperties = CurrentApi.GetType().GetProperties();
@@ -199,8 +203,23 @@ namespace DeviceApi
                     {
                         functionArgs.Add(CurrentApi.GetType().InvokeMember(apiPropertyInfo.Name,
                             BindingFlags.GetProperty, null, CurrentApi, null));
+                        
+                        if (apiPropertyInfo.GetCustomAttributes(typeof(Api.MemberFunctionArgByRefAttribute), false) != null)
+                            byRef.Add(true);
+                        else
+                            byRef.Add(false);
                     }
                 }
+
+                ParameterModifier mods;
+                if (functionArgs.Count > 0)
+                {
+                    mods = new ParameterModifier(byRef.Count);
+                    for (int i = 0; i < byRef.Count; ++i)
+                        mods[i] = byRef[i];
+                }
+                ParameterModifier[] functionArgModifiers = { mods };
+
 
                 // call the member function.
                 object retValue = null;
@@ -210,7 +229,7 @@ namespace DeviceApi
 
                     retValue = Utp.GetType().InvokeMember(CurrentApi.ToString(),
                         BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Instance, null,
-                        Utp, functionArgs.ToArray());
+                        Utp, functionArgs.ToArray(), functionArgs.Count > 0 ? functionArgModifiers : null, null, null);
 
                     Int32 iRet = Convert.ToInt32(retValue);
                     Utils.DecimalConverterEx decConvertor = new Utils.DecimalConverterEx();
@@ -222,30 +241,33 @@ namespace DeviceApi
 
                     retValue = CurrentDevice.GetType().InvokeMember(CurrentApi.ToString(),
                         BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Instance, null,
-                        CurrentDevice, functionArgs.ToArray());
+                        CurrentDevice, functionArgs.ToArray(), functionArgs.Count > 0 ? functionArgModifiers : null, null, null);
 
-                    if (CurrentApi.Direction == Api.CommandDirection.ReadWithData)
+                    if (CurrentApi is Api.IProcessResponse)
                     {
-                        if (CurrentApi is Api.IProcessResponse)
+                        Byte[] retBytes = null;
+                        if (retValue is Byte[])
                         {
-                            Byte[] retBytes = null;
-                            if (retValue is Byte[])
-                            {
-                                retBytes = retValue as Byte[];
-                            }
-                            else if (retValue is bool)
-                            {
-                                retBytes = BitConverter.GetBytes((bool)retValue);
-                            }
-                             
-                            Api.IProcessResponse responseApi = CurrentApi as Api.IProcessResponse;
-                            result = responseApi.ProcessResponse(retBytes, 0, (UInt32)retBytes.Length);
-                            logStr = CurrentApi.FormatResponse(" ", "\r\n", true);
+                            retBytes = retValue as Byte[];
                         }
+                        else if (retValue is bool)
+                        {
+                            retBytes = BitConverter.GetBytes((bool)retValue);
+                        }
+                        else if (retValue is Int32)
+                        {
+                            retBytes = BitConverter.GetBytes((Int32)retValue);
+                        }
+                         
+                        Api.IProcessResponse responseApi = CurrentApi as Api.IProcessResponse;
+                        result = responseApi.ProcessResponse(retBytes, 0, (UInt32)retBytes.Length);
+                        logStr = CurrentApi.FormatResponse(" ", "\r\n", true);
                     }
                     else
                     {
-                        result = Convert.ToInt32(retValue);
+                        // result = Convert.ToInt32(retValue);
+                        //logStr = " " + CurrentApi.ResponseString + "\r\n";
+                        logStr = " " + retValue.ToString() + "\r\n";
                     }
                 }
             }
@@ -491,6 +513,19 @@ namespace DeviceApi
                 if (DeviceMenuStrip.Items.Contains(menuItem) == false)
                     DeviceMenuStrip.Items.Add(menuItem);
             }
+
+            // Add MTP devices
+            MxRomDeviceClass mxRomDeviceClass = MxRomDeviceClass.Instance;
+            foreach (MxRomDevice mxRomDev in mxRomDeviceClass.Devices)
+            {
+                ToolStripMenuItem menuItem = new ToolStripMenuItem(mxRomDev.ToString());
+                menuItem.Name = mxRomDev.DeviceInstanceId;
+                menuItem.ImageIndex = mxRomDev.ClassIconIndex;
+                menuItem.Tag = mxRomDev;
+
+                if (DeviceMenuStrip.Items.Contains(menuItem) == false)
+                    DeviceMenuStrip.Items.Add(menuItem);
+            }
         }
 
         private void InitApiLists()
@@ -508,6 +543,8 @@ namespace DeviceApi
             LastApis[typeof(RecoveryDevice).Name]["RecoveryApiList"] = null;
             LastApis[typeof(WinUsbDevice).Name] = new Dictionary<String, Api>();
             LastApis[typeof(WinUsbDevice).Name]["WinUsbApiList"] = null;
+            LastApis[typeof(MxRomDevice).Name] = new Dictionary<String, Api>();
+            LastApis[typeof(MxRomDevice).Name]["MxRomApiList"] = null;
 
             HidApiList = new List<Api>();
 
@@ -609,6 +646,10 @@ namespace DeviceApi
             UtpProtocolList.Add(new ScsiUtpMsg.Put(4, 0x5566, new Byte[32]));
 //            UtpProtocolList.Add(new ScsiUtpMsg.Reset(1, 1));
 
+            MxRomApiList = new List<Api>();
+            MxRomApiList.Add(new MxRomCmd.GetStatus());
+            MxRomApiList.Add(new MxRamKrnlCmd.GetVersion());
+            MxRomApiList.Add(new MxRamKrnlCmd.FlashInit());
         }
 
         private Api LoadDeviceApis(Device device)
@@ -653,6 +694,11 @@ namespace DeviceApi
             {
                 apiList = WinUsbApiList;
                 LastProtocol = "WinUsbApiList";
+            }
+            else if (device is MxRomDevice)
+            {
+                apiList = MxRomApiList;
+                LastProtocol = "MxRomApiList";
             }
             else
             {
@@ -750,12 +796,13 @@ namespace DeviceApi
             if (chkUseUTP.Checked == true)
             {
                 Utp = new UpdateTransportProtocol(CurrentDevice as Volume);
-                utpGrid.SelectedObject = Utp;
-                utpGrid.Visible = true;
+                detailsGrid.SelectedObject = Utp;
+//                detailsGrid.Visible = true;
             }
             else
             {
-                utpGrid.Visible = false;
+//                detailsGrid.Visible = false;
+                detailsGrid.SelectedObject = CurrentDevice;
                 Utp.Dispose();
                 Utp = null;
             }

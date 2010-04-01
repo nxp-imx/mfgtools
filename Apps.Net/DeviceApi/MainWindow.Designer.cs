@@ -47,10 +47,10 @@
             this.ApiListCtrl = new System.Windows.Forms.ListView();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.detailsGrid = new System.Windows.Forms.PropertyGrid();
             this.chkUseUTP = new System.Windows.Forms.CheckBox();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.LogTextBox = new System.Windows.Forms.TextBox();
-            this.utpGrid = new System.Windows.Forms.PropertyGrid();
             this.StatusStripCtrl.SuspendLayout();
             this.MainWindowMenuStrip.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -196,9 +196,15 @@
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.utpGrid);
+            this.splitContainer2.Panel2.Controls.Add(this.detailsGrid);
             this.splitContainer2.Panel2.Controls.Add(this.chkUseUTP);
             this.splitContainer2.Panel2.Controls.Add(this.SendButton);
+            // 
+            // detailsGrid
+            // 
+            resources.ApplyResources(this.detailsGrid, "detailsGrid");
+            this.detailsGrid.Name = "detailsGrid";
+            this.detailsGrid.ToolbarVisible = false;
             // 
             // chkUseUTP
             // 
@@ -226,12 +232,6 @@
             resources.ApplyResources(this.LogTextBox, "LogTextBox");
             this.LogTextBox.Name = "LogTextBox";
             this.LogTextBox.ReadOnly = true;
-            // 
-            // utpGrid
-            // 
-            resources.ApplyResources(this.utpGrid, "utpGrid");
-            this.utpGrid.Name = "utpGrid";
-            this.utpGrid.ToolbarVisible = false;
             // 
             // MainWindow
             // 
@@ -286,7 +286,7 @@
         private System.Windows.Forms.ToolStripMenuItem MainMenuItem_File_RejectAutoPlay;
         private System.Windows.Forms.ToolStripMenuItem MainMenuItem_File_TrackUsbPort;
         private System.Windows.Forms.CheckBox chkUseUTP;
-        private System.Windows.Forms.PropertyGrid utpGrid;
+        private System.Windows.Forms.PropertyGrid detailsGrid;
     }
 }
 

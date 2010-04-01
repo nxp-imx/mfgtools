@@ -26,7 +26,7 @@ namespace DevSupport.Api
             NoData = Win32.SCSI_IOCTL_DATA_UNSPECIFIED
         }
 
-        protected enum CommandType { ScsiCmd, StScsiCmd, HidBltcCmd, HidPitcCmd, StMtpCmd, UtpScsiMsg, UtpScsiApi }
+        protected enum CommandType { ScsiCmd, StScsiCmd, HidBltcCmd, HidPitcCmd, StMtpCmd, UtpScsiMsg, UtpScsiApi, MxRomApi, MxRamKrnlApi }
 
         public class MemberFunctionAttribute : Attribute
         {
@@ -36,6 +36,11 @@ namespace DevSupport.Api
         public class MemberFunctionArgAttribute : Attribute
         {
             public MemberFunctionArgAttribute() { }
+        }
+
+        public class MemberFunctionArgByRefAttribute : Attribute
+        {
+            public MemberFunctionArgByRefAttribute() { }
         }
 
         public interface IProcessResponse

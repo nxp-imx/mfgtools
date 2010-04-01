@@ -100,6 +100,8 @@
     <Compile Include="FormatBuilder.cs" />
     <Compile Include="MtpDevice.cs" />
     <Compile Include="MtpDeviceClass.cs" />
+    <Compile Include="MxRomDevice.cs" />
+    <Compile Include="MxRomDeviceClass.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -166,6 +168,10 @@
   <ItemGroup>
     <None Include="Resources\UtpScsiApi.ico" />
     <None Include="Resources\UtpScsiMsg.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\MxRamKrnlApi.ico" />
+    <Content Include="Resources\MxRomApi.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

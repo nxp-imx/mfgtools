@@ -116,7 +116,8 @@ namespace DevSupport.DeviceManager
             _DeviceClassMgrs.Add(RecoveryDeviceClass.Instance);
             _DeviceClassMgrs.Add(WinUsbDeviceClass.Instance);
             _DeviceClassMgrs.Add(HidDeviceClass.Instance);
-            if ( WpdDeviceClass.Instance.IsSupported )
+            _DeviceClassMgrs.Add(MxRomDeviceClass.Instance);
+            if (WpdDeviceClass.Instance.IsSupported)
                 _DeviceClassMgrs.Add(WpdDeviceClass.Instance);
 //            _DeviceClassMgrs.Add(ScsiDeviceClass.Instance);
 //            _DeviceClassMgrs.Add(DiskDeviceClass.Instance);
@@ -891,6 +892,8 @@ namespace DevSupport.DeviceManager
                     deviceClass = RecoveryDeviceClass.Instance;
                 else if (devClass.IsAssignableFrom(typeof(WinUsbDeviceClass)))
                     deviceClass = WinUsbDeviceClass.Instance;
+                else if (devClass.IsAssignableFrom(typeof(MxRomDeviceClass)))
+                    deviceClass = MxRomDeviceClass.Instance;
 
                 if (deviceClass == null)
                 {

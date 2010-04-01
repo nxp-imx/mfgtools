@@ -290,7 +290,6 @@ namespace DevSupport
             SecurityDelegation
         }
 
-
         [DllImport("kernel32", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetVolumeNameForVolumeMountPoint(
@@ -308,6 +307,14 @@ namespace DevSupport
             int dwCreationDisposition,
             int dwFlagsAndAttributes,
             IntPtr hTemplateFile);
+
+        [DllImport("Kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool WriteFile(SafeFileHandle hDevice, IntPtr lpBuffer, int nNumberOfBytesToWrite, out int lpNumberOfBytesWritten, IntPtr lpOverlapped);
+
+        [DllImport("Kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ReadFile(SafeFileHandle hDevice, IntPtr lpInBuffer, int nNumberOfBytesToRead, out int lpNumberOfBytesRead, IntPtr lpOverlapped);
 
         [DllImport("Kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -412,6 +419,12 @@ namespace DevSupport
         // Used by WinUsb.sys
         // {5E53D0B8-DD42-4691-B542-57EF0DE22D6F}
         internal static readonly Guid GUID_DEVINTERFACE_WINUSB_BULK_DEVICE = new Guid("5e53d0b8-dd42-4691-b542-57ef0de22d6f");
+
+        // Device Interface GUID for the MX ROM WDF USB Bulk Recovery Driver
+        // Used by imxusb.inf, imxusb.sys
+        // {00873FDF-61A8-11D1-AA5E-00C04FB1728B}
+        // DEFINE_GUID(GUID_DEVINTERFACE_MX_ROM_WDF_USB_BULK_DEVICE, 0x00873FDF, 0x61A8, 0x11D1, 0xAA, 0x5E, 0x00, 0xC0, 0x4F, 0xB1, 0x72, 0x8B);
+        internal static readonly Guid GUID_DEVINTERFACE_MX_ROM_WDF_USB_BULK_DEVICE = new Guid("00873FDF-61A8-11D1-AA5E-00C04FB1728B");
 
         [StructLayout(LayoutKind.Sequential)]
         internal struct DISK_EXTENT
