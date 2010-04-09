@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 
 #include "../../Drivers/iMX_BulkIO_Driver/sys/public.h"
-/*CLW?
+
 static BOOL SyncAllDevFlag = FALSE;
 typedef struct _ImgDownloadStatus
 {
@@ -15,7 +15,7 @@ typedef struct _ImgDownloadStatus
 } ImgDownloadStatus, * PImgDownloadStatus;
 
 static std::list<ImgDownloadStatus> ImgDwdSts;
-*/
+
 MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path)
 	: Device(deviceClass, devInst, path)
 	, _hDevice(INVALID_HANDLE_VALUE)
@@ -33,7 +33,6 @@ MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
 	int len = 0, type = 0;
 	CString model;
 
-/*CLW?
 	//We MUST check current device status, or a device will be treated as a new i.mx device 
 	//after RAM kernel is downloaded and running since both bootstrap mode and RAM kernel mode
 	//use the same USB driver under ATK mode. 
@@ -67,14 +66,12 @@ MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
 		ImgDwdSts.push_back(CurImgDwdSts);
 
 	TRACE(_T("Initialize new i.mx device of path: %s.\r\n"), CurImgDwdSts.Path);
-*/
-	if ( GetRKLVersion(model, len, type) != ERROR_SUCCESS )
-		goto Exit;
+
 	if(_MaxPacketSize.get() == 0)
 		goto Exit;
-//	_habType = GetHABType(_chipFamily);
-//	if(_habType == HabUnknown)
-//		goto Exit;
+	_habType = GetHABType(_chipFamily);
+	if(_habType == HabUnknown)
+		goto Exit;
 	if(!InitRomVersion(_chipFamily, _romVersion, _defaultAddress))
 		goto Exit;
 
@@ -153,7 +150,7 @@ MxRomDevice::ChipFamily_t MxRomDevice::GetChipFamily()
 
 	return _chipFamily;
 }
-/*CLW?
+
 //-------------------------------------------------------------------------------------		
 // Function to get HAB_TYPE value
 //
@@ -241,7 +238,7 @@ MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
 
 	return HabDisabled;
 }
-*/
+
 BOOL MxRomDevice::InitRomVersion(ChipFamily_t chipType, RomVersion& romVersion, MxAddress& defaultAddrs) const
 {
 	BOOL success = TRUE;
@@ -688,7 +685,6 @@ int MxRomDevice::GetRKLVersion(CString& fmodel, int& len, int& mxType)
 	// check if is bootstrap
 	if (res.romResponse == HabEnabled || res.romResponse == HabDisabled)
 	{
-		_habType = (HAB_t)res.romResponse;
 		len = 0;
 		TRACE("The device is running under Bootstrap mode.\r\n");
 		return RET_SUCCESS;
@@ -953,7 +949,6 @@ BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UI
 
 BOOL MxRomDevice::Jump()
 {
-/*CLW?
 	CString CurPath = _path.get();
 	std::list<ImgDownloadStatus>::iterator iter = ImgDwdSts.begin();
 	std::list<ImgDownloadStatus>::iterator iter_end = ImgDwdSts.end();
@@ -978,7 +973,7 @@ BOOL MxRomDevice::Jump()
 		else
 			Sleep(100);
 	}while(!SyncAllDevFlag);
-*/
+
 	// Send the complete command to the device 
 	if ( !Jump2Rak() )
 	{
