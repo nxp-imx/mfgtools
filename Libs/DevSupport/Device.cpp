@@ -457,9 +457,6 @@ bool Device::IsUsb()
 
 	if (_enumerator.get().CompareNoCase(_T("USB")) == 0)
 		return true;
-
-//	if (_enumerator.get().CompareNoCase(_T("ROOT")) == 0)
-//		return true;
 /*
 	if (_enumerator.get().CompareNoCase(_T("USBSTOR")) == 0)
 		return true;
