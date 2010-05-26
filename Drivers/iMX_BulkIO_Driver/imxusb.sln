@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imxusb", "sys\imxusb.vcxproj", "{88A4B471-3E9A-4111-B772-5E4C6FB5EB54}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88A4B471-3E9A-4111-B772-5E4C6FB5EB54}.Debug|Win32.ActiveCfg = Debug|Win32
+		{88A4B471-3E9A-4111-B772-5E4C6FB5EB54}.Debug|Win32.Build.0 = Debug|Win32
+		{88A4B471-3E9A-4111-B772-5E4C6FB5EB54}.Release|Win32.ActiveCfg = Release|Win32
+		{88A4B471-3E9A-4111-B772-5E4C6FB5EB54}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
