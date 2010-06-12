@@ -1231,10 +1231,12 @@ DWORD COpMxRomUpdate::DoRklProgramFlash(UCL::Command* pCmd)
 		file.seekg(0, std::ios::beg);
 
 		// will file fit?
-		if ( fileSize > flashSize * 1024 )
+		//It should be realized that flashSize is 32bit value, if NAND flash capacity is very large(>= 4GB), 
+		//then it will lead to overflow. We must use KB as a unit to compare file size and NAND flash capacity. 
+		if ( fileSize/1024 > flashSize )
 		{
 			file.close();
-			CString msg; msg.Format(_T("%s !ERROR(%d): COpMxRomUpdate::DoRklProgramFlash(%s) file(0x%x) will not fit on flash(0x%x)."), m_pPortMgrDlg->GetPanel(), ERROR_BUFFER_OVERFLOW, pCmd->ToString(), fileSize, flashSize * 1024);
+			CString msg; msg.Format(_T("%s !ERROR(%d): COpMxRomUpdate::DoRklProgramFlash(%s) file size(0x%xKB) will not fit on flash size(0x%xKB)."), m_pPortMgrDlg->GetPanel(), ERROR_BUFFER_OVERFLOW, pCmd->ToString(), fileSize/1024, flashSize);
 			TRACE(msg);
 			return ERROR_BUFFER_OVERFLOW;
 		}
