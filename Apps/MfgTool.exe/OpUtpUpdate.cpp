@@ -13,6 +13,7 @@
 #include "../../Libs/DevSupport/StFormatImage.h"
 #include "../../Libs/DevSupport/StHidApi.h"
 #include "../../Libs/DevSupport/MxRomDevice.h"
+#include "../../Libs/DevSupport/MxHidDevice.h"
 
 #include "OpUtpUpdate.h"
 
@@ -125,6 +126,7 @@ const UCL::DeviceState::DeviceState_t COpUtpUpdate::GetDeviceState()
 	switch ( (DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() )
 	{
 		case DeviceClass::DeviceTypeHid:
+		case DeviceClass::DeviceTypeMxHid:
 		case DeviceClass::DeviceTypeRecovery:
 			state = UCL::DeviceState::Recovery;
 			break;
@@ -701,6 +703,53 @@ DWORD COpUtpUpdate::DoMxRomLoad(UCL::Command* pCmd)
 	return ERROR_SUCCESS;
 }
 */
+DWORD COpUtpUpdate::DoMxHidLoad(UCL::Command* pCmd)
+{
+    DWORD ReturnVal = ERROR_SUCCESS;
+	CString taskMsg;
+
+	CString filename = m_pOpInfo->GetPath() + _T("\\") + pCmd->GetFile();
+
+	MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(m_pUSBPort->_device);
+	TRACE(("%s\r\n"),typeid(m_pUSBPort->_device).name());
+
+	if ( pMxHidDevice == NULL )
+	{
+		ReturnVal = ERROR_INVALID_HANDLE;
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxHID device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return ReturnVal;
+	}
+
+	//load firmware to _data:Firmware.nb0
+	//MxFwComponent fwComponent(filename);
+	StFwComponent fwComponent((LPCTSTR)filename);
+	if ( fwComponent.GetLastError() != ERROR_SUCCESS )
+	{
+		ReturnVal = fwComponent.GetLastError();
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No FW component. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return ReturnVal;
+	}
+
+	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, (int)fwComponent.size(), 0);       // STAGE 2 of the Load Operation
+	Device::UI_Callback callback(this, &COpUtpUpdate::OnDownloadProgress);
+
+	MxHidDevice::MemorySection loadSection = MxHidDevice::StringToMemorySection(pCmd->GetLoadSection());
+	MxHidDevice::MemorySection setSection = MxHidDevice::StringToMemorySection(pCmd->GetSetSection());
+	ReturnVal = pMxHidDevice->Download(&fwComponent, pCmd->GetAddress(), loadSection, setSection, pCmd->HasFlashHeader());
+
+	if(ReturnVal != TRUE) 
+	{
+		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, ReturnVal);
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load HID device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return !(ERROR_SUCCESS);
+	}
+
+    // Turn off the Task progress bar
+	m_pPortMgrDlg->UpdateUI(NULL);
+
+	ATLTRACE(_T("%s RecoverHidDevice - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
+	return ERROR_SUCCESS;
+}
 
 DWORD COpUtpUpdate::DoHidLoad(UCL::Command* pCmd)
 {
@@ -1085,7 +1134,12 @@ DWORD COpUtpUpdate::DoCommand(UCL::Command* pCmd)
 	}
 	else if ( pCmd->GetType() == _T("load") )
 	{
-		retValue = DoMxRomLoad(pCmd);
+        if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxRom)
+        {
+		    retValue = DoMxRomLoad(pCmd);
+        }
+        else
+            retValue = DoMxHidLoad(pCmd);
 	}
 	else if ( pCmd->GetType() == _T("jump") )
 	{
@@ -1406,24 +1460,48 @@ DWORD COpUtpUpdate::DoInit(UCL::Command* pCmd)
 {
 	DWORD returnVal = ERROR_SUCCESS;
 
-	MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
-//	TRACE(_T("%s"),m_pUSBPort->_device->name.c_str());
-	if ( pMxRomDevice == NULL )
-	{
-		returnVal = ERROR_INVALID_HANDLE;
-		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
-		return returnVal;
-	}
+    //if current device is i.MXxx device
+    if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxRom)
+    {
+    	MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+        //	TRACE(_T("%s"),m_pUSBPort->_device->name.c_str());
+    	if ( pMxRomDevice == NULL )
+    	{
+    		returnVal = ERROR_INVALID_HANDLE;
+    		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+    		return returnVal;
+    	}
 
-	CString fullFileName;
-	fullFileName.Format(_T("%s//%s"), m_pOpInfo->GetPath(), pCmd->GetFile());
+    	CString fullFileName;
+    	fullFileName.Format(_T("%s//%s"), m_pOpInfo->GetPath(), pCmd->GetFile());
 
-	if( !pMxRomDevice->InitMemoryDevice(fullFileName) ) 
-	{
-		returnVal = ERROR_INVALID_HANDLE;
-//		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, 0);
-		ATLTRACE(_T("!!!ERROR!!! %s Failed to initialize i.MXxx memory. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
-		return returnVal;
+    	if( !pMxRomDevice->InitMemoryDevice(fullFileName) ) 
+    	{
+    		returnVal = ERROR_INVALID_HANDLE;
+        //	taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, 0);
+    		ATLTRACE(_T("!!!ERROR!!! %s Failed to initialize i.MXxx memory. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+    		return returnVal;
+    	}
+    }
+    else// For MX508
+    {//HID device-Mx508
+        MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(m_pUSBPort->_device);
+    	if ( pMxHidDevice == NULL )
+    	{
+    		returnVal = ERROR_INVALID_HANDLE;
+    		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+    		return returnVal;
+    	}
+
+    	CString fullFileName;
+    	fullFileName.Format(_T("%s//%s"), m_pOpInfo->GetPath(), pCmd->GetFile());
+
+    	if( !pMxHidDevice->InitMemoryDevice(fullFileName) ) 
+    	{
+    		returnVal = ERROR_INVALID_HANDLE;
+    		ATLTRACE(_T("!!!ERROR!!! %s Failed to initialize i.MXxx memory. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+    		return returnVal;
+    	}
 	}
 
 	return returnVal;

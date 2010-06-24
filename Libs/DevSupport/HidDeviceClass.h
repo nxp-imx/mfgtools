@@ -13,6 +13,7 @@ private:
 	virtual ~HidDeviceClass(void);
 
 	size_t AddFilter(uint16_t vid, uint16_t pid);
+	size_t AddFilter(LPCTSTR Prefix, uint16_t vid, uint16_t pid);
 	size_t AddFilter(LPCTSTR vid, LPCTSTR pid, LPCTSTR instance = _T(""));
 
 private:

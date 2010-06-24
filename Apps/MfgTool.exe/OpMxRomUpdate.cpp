@@ -871,7 +871,7 @@ DWORD COpMxRomUpdate::DoCommand(UCL::Command* pCmd)
 DWORD COpMxRomUpdate::DoDrop(UCL::Command* pCmd)
 {
     // Send the command.
-	DWORD retValue;// = m_pUTP->UtpDrop(pCmd->GetBody());
+	DWORD retValue = 0;// = m_pUTP->UtpDrop(pCmd->GetBody());
 /*
     if (retValue == 0)
     {

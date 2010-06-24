@@ -202,6 +202,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MxHidDevice.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MxHidDeviceClass.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MxRomDevice.cpp"
 				>
 			</File>

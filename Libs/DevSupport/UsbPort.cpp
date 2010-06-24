@@ -260,6 +260,7 @@ CStdString usb::Port::GetDeviceDescription(void)
 					break;
 				}
 				case DeviceClass::DeviceTypeHid:
+				case DeviceClass::DeviceTypeMxHid:
 				case DeviceClass::DeviceTypeMtp:
 				case DeviceClass::DeviceTypeRecovery:
 				case DeviceClass::DeviceTypeUsbController:

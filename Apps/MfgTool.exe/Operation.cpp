@@ -86,6 +86,7 @@ const COperation::DeviceState_t COperation::GetDeviceState() const
 	switch ( (DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() )
 	{
 		case DeviceClass::DeviceTypeHid:
+		case DeviceClass::DeviceTypeMxHid:
 			devState = HID_MODE;
 			break;
 		case DeviceClass::DeviceTypeMxRom:

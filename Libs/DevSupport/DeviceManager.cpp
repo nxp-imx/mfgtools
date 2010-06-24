@@ -6,6 +6,7 @@
 #include "UsbControllerMgr.h"
 #include "UsbHubMgr.h"
 #include "MxRomDeviceClass.h"
+#include "MxHidDeviceClass.h"
 //#include "UsbDeviceMgr.h"
 
 #include <mswmdm_i.c>
@@ -37,11 +38,12 @@ DeviceManager::DeviceManager()
 	_devClasses[DeviceClass::DeviceTypeMsc]		      = new VolumeDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeMtp]		      = new MtpDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeHid]		      = new HidDeviceClass;
+	_devClasses[DeviceClass::DeviceTypeMxHid]		  = new MxHidDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeMxRom]         = new MxRomDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeUsbController] = new usb::ControllerMgr;
 	_devClasses[DeviceClass::DeviceTypeUsbHub]        = new usb::HubMgr;
 //	_devClasses[DeviceClass::DeviceTypeUsbDevice]     = new usb::DeviceMgr;
-	if ( _devClasses.size() != 7/*6*/ )
+	if ( _devClasses.size() != 8/*6*/ )
 	{
 		ATLTRACE(" *** FAILED TO CREATE ALL DEVICECLASSES.\n");
 	}

@@ -66,7 +66,8 @@ protected:
 	DWORD DoBoot(UCL::Command* pCmd);
 	DWORD DoResetToRecovery();
 	DWORD DoBurn(UCL::Command* pCmd);
-	DWORD DoHidLoad(UCL::Command* pCmd);
+	DWORD DoHidLoad(UCL::Command* pCmd);//for ST hid device    
+	DWORD DoMxHidLoad(UCL::Command* pCmd);//for MX hid device,such as mx508
 	DWORD DoInit(UCL::Command* pCmd);
 	DWORD DoMxRomLoad(UCL::Command* pCmd);
 	DWORD DoShow(UCL::Command* pCmd);

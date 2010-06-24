@@ -22,6 +22,7 @@ public:
 		DeviceTypeMsc,
 		DeviceTypeMtp,
 		DeviceTypeHid,
+		DeviceTypeMxHid,
 		DeviceTypeMxRom,
 		DeviceTypeUsbController,
 		DeviceTypeUsbHub
@@ -44,6 +45,9 @@ public:
 				break;
 			case DeviceTypeHid:
 				str = _T("Hid");
+				break;
+            case DeviceTypeMxHid:
+				str = _T("MxHid");
 				break;
 			case DeviceTypeUsbController:
 				str = _T("UsbController");
