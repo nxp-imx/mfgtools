@@ -119,6 +119,9 @@ public:
 			switch (m_pCurrentState->GetUtpMsg()->GetResponseCode())
             {
 				case ScsiUtpMsg::BUSY:
+				// The  value of m_TotalSize has been assigned when getting the file size. There is no need to reassign the value to m_TotalSize by the way.
+				// There is no need to return total file size in response packet.	
+				#if 0
 					if (m_pCurrentState->GetStateType() == State::StartState)
                     {
                         m_TotalSize = m_pCurrentState->GetUtpMsg()->GetResponseInfo();
@@ -129,7 +132,7 @@ public:
                     {
                         m_CurrentSize = min(m_TotalSize, m_TotalSize - m_pCurrentState->GetUtpMsg()->GetResponseInfo());
                     }
-                    
+                #endif    
                     pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
                     if (KeepPolling())
                         Sleep(m_pUpdateProtocol->GetBusyDelay());
@@ -315,10 +318,9 @@ public:
                 {
 					case ScsiUtpMsg::BUSY:
                         
-                        m_TotalSize = m_pCurrentState->GetUtpMsg()->GetResponseInfo();
                         m_CurrentSize = 0;
 
-                        pNextState = new BusyState(this, (size_t)m_TotalSize);
+                        pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
                         Sleep(m_pUpdateProtocol->GetBusyDelay());
                         
                         break;
@@ -345,7 +347,7 @@ public:
                 {
 					case ScsiUtpMsg::BUSY:
 
-                        m_CurrentSize = min(m_TotalSize, m_TotalSize - m_pCurrentState->GetUtpMsg()->GetResponseInfo());
+                        //m_CurrentSize = min(m_TotalSize, m_TotalSize - m_pCurrentState->GetUtpMsg()->GetResponseInfo());
 
                         pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
                         if (KeepPolling())

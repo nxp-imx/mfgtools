@@ -488,6 +488,15 @@ uint32_t Volume::SendCommand(HANDLE hDrive, StApi& api, uint8_t* additionalInfo,
 	// Sense Information
 	pRequest->PassThrough.SenseInfoOffset = offsetof (_NT_SCSI_REQUEST, SenseData);
 	pRequest->PassThrough.SenseInfoLength = sizeof (pRequest->SenseData);
+	// Handling the device has not responded situation 
+	pRequest->PassThrough.ScsiStatus = SCSISTAT_COMMAND_TERMINATED;
+	pRequest->SenseData.SenseKey == SCSI_SENSE_UNIQUE;
+	pRequest->SenseData.AdditionalSenseCodeQualifier = 0x8001; // EXIT
+	pRequest->SenseData.Information[0] = 0xff;
+	pRequest->SenseData.Information[1] = 0xff;
+	pRequest->SenseData.Information[2] = 0xff;
+	pRequest->SenseData.Information[3] = 0xff;		
+	pRequest->SenseData.AdditionalSenseCode = 0x80;  //Additional Sense Code 
 	// Timeout
 //	if (pRequest->PassThrough.Cdb[1] == 7)
 //	    pRequest->PassThrough.TimeOutValue = 120; // seconds
