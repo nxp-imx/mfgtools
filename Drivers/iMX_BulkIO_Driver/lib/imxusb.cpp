@@ -44,6 +44,9 @@ __user_code
 //#define IMX35_VIP   0x15A2
 #define IMX35_PID   0x0030
 
+#define IMX53_PID   0x004E
+
+
 //
 // i.MX type
 //
@@ -63,6 +66,7 @@ typedef enum
 	IMX_MX37,
 	IMX_MX51_TO1,
 	IMX_MX51_TO2,
+	IMX_MX53,
 	IMX_MAX,
 } IMX_T;
 
@@ -258,6 +262,8 @@ USB_OpenLocateDevice(
                        *iMXType = (int)IMX_MX51_TO2;
                    else if(pUsbDeviceDesc->idProduct == IMX35_PID)
 					   *iMXType = (int)IMX_MX35_TO2;
+                   else if(pUsbDeviceDesc->idProduct == IMX53_PID)
+					   *iMXType = (int)IMX_MX53;				   
 				   else
                        *iMXType = (int)IMX_UNKNOW;                          
                } else {

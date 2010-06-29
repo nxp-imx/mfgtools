@@ -173,6 +173,20 @@
 #define MX51_IRAM_FREE_START   0x1ffe8000
 #define MX51_IRAM_FREE_END     0x1fffffff
 
+#define MX53_SDRAM_START       0x70000000
+#define MX53_SDRAM_END         0xEFFFFFFF
+#define MX53_NFC_START         0xf7ff0000   
+#define MX53_NFC_END           0xf7ffffff        
+#define MX53_SDRAM_CTL_START   0x63fd9000 
+#define MX53_SDRAM_CTL_END     0x63fd9fff 
+#define MX53_WEIM_START        0x63fda000 
+#define MX53_WEIM_END          0x63fdafff
+#define MX53_IRAM_FREE_START   0xf8000000
+#define MX53_IRAM_FREE_END     0xf8020000
+
+#define IVT_BARKER_HEADER      0x402000D1
+#define ROM_TRANSFER_SIZE	   0x400
+
 /// <summary>
 /// A MxRomDevice device.
 /// </summary>
@@ -181,6 +195,9 @@ class MxRomDevice : public Device//, IComparable
 	friend class DeviceManager;
 
 public:
+
+	enum MemorySection { MemSectionOTH = 0x00, MemSectionAPP = 0xAA, MemSectionCSF = 0xCC, MemSectionDCD = 0xEE };
+
 	struct Response
 	{
 		unsigned int romResponse;
@@ -192,7 +209,31 @@ public:
 		};
 	};
 
-	enum MemorySection { MemSectionOTH = 0x00, MemSectionAPP = 0xAA, MemSectionCSF = 0xCC, MemSectionDCD = 0xEE };
+	typedef struct _IvtHeader
+	{
+           unsigned long IvtBarker;
+           unsigned long ImageStartAddr;// LONG(0x70004020)
+           unsigned long Reserved[3];
+           unsigned long SelfAddr;// LONG(0x70004000)
+           unsigned long Reserved2[2];
+	}IvtHeader, *PIvtHeader;
+
+	typedef struct _FlashHeader
+	{
+           unsigned long ImageStartAddr;
+           unsigned long Reserved[4];
+	}FlashHeader, *PFlashHeader;
+
+	typedef struct _ImageParameter
+	{
+        UINT PhyRAMAddr4KRL;//The physical address in RAM where an image locates. 
+        MemorySection loadSection;
+		MemorySection setSection;
+		BOOL HasFlashHeader;//Does an image have a flash header or ivt header.
+		UINT CodeOffset;//The offset in an image where the first byte of code locates, the parameter is used to 
+						//skip flash header or ivt header embedded in an image.
+	}ImageParameter, *PImageParameter;
+
 	static MemorySection StringToMemorySection(CString section)
 	{
 		if ( section.CompareNoCase(_T("DCD")) == 0 )
@@ -220,7 +261,7 @@ public:
 	int GetRKLVersion(CString& fmodel, int& len, int& mxType);
 	BOOL InitMemoryDevice(CString filename);
 	BOOL ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UINT flags, Device::UI_Callback callback);
-	BOOL DownloadImage(UINT address, MemorySection loadSection, MemorySection setSection, BOOL HasFlashHeader, const StFwComponent& fwComponent, Device::UI_Callback callbackFn);
+	BOOL DownloadImage(PImageParameter pImageParameter, const StFwComponent& fwComponent, Device::UI_Callback callbackFn);
 	BOOL Jump();
 	BOOL Reset();
 
@@ -252,7 +293,8 @@ private:
         MX32,
         MX35,
         MX37,
-        MX51
+        MX51,
+		MX53
     };
 
 	ChipFamily_t GetChipFamily();
@@ -322,6 +364,7 @@ public:
 	static MxAddress MX37Addrs;
 	static MxAddress MX51Addrs;
 	static MxAddress MX51_TO2Addrs;
+	static MxAddress MX53Addrs;
 
 	class MemoryInitCommand : public XNode
 	{

@@ -1160,9 +1160,14 @@ DWORD COpMxRomUpdate::DoMxRomLoad(UCL::Command* pCmd)
 	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, fwObject.size(), 0);       // STAGE 2 of the Load Operation
 	Device::UI_Callback callback(this, &COpMxRomUpdate::OnDownloadProgress);
 
-	MxRomDevice::MemorySection loadSection = MxRomDevice::StringToMemorySection(pCmd->GetLoadSection());
-	MxRomDevice::MemorySection setSection = MxRomDevice::StringToMemorySection(pCmd->GetSetSection());
-	returnVal = pMxRomDevice->DownloadImage(pCmd->GetAddress(), loadSection, setSection, pCmd->HasFlashHeader(), fwObject, callback);
+	MxRomDevice::ImageParameter ImageParameter;
+	ImageParameter.loadSection = MxRomDevice::StringToMemorySection(pCmd->GetLoadSection());
+	ImageParameter.setSection = MxRomDevice::StringToMemorySection(pCmd->GetSetSection());
+	ImageParameter.PhyRAMAddr4KRL = pCmd->GetAddress();
+	ImageParameter.HasFlashHeader = pCmd->HasFlashHeader();
+	ImageParameter.CodeOffset = pCmd->GetCodeOffset();
+
+	returnVal = pMxRomDevice->DownloadImage(&ImageParameter, fwObject, callback);
 
 	if(returnVal != TRUE) 
 	{

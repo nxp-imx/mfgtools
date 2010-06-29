@@ -8,7 +8,7 @@
 #include "../../Drivers/iMX_BulkIO_Driver/sys/public.h"
 
 static BOOL SyncAllDevFlag = FALSE;
-typedef struct _ImgDownloadStatus
+typedef struct _ImgDownloadStatus 
 {
 	CString Path;//The path of a device, please notice the path is fixed for a port even if the device attched to the port is different.
 	BOOL Status;// If current device has finished downloading work, then mark status flag as true, or false;
@@ -141,6 +141,10 @@ MxRomDevice::ChipFamily_t MxRomDevice::GetChipFamily()
 		{
 			_chipFamily = MX51;
 		}
+		else if ( devPath.Find(_T("VID_15A2&PID_004E")) != -1 )
+		{
+			_chipFamily = MX53;
+		}
 		else if ( devPath.Find(_T("VID_0425&PID_21FF")) != -1 )
 		{
 			_chipFamily = MX27; // can't tell MX27 from MX31 by USB IDs
@@ -161,14 +165,26 @@ MxRomDevice::ChipFamily_t MxRomDevice::GetChipFamily()
 MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
 {
 	const short header = ROM_KERNEL_CMD_WR_MEM;
-	const UINT address = chipType == MX51 ? 0x1FFEA000 : 0xFFFFFFFF;
+	UINT address;
 	const UINT data = 0;
 	const char format = 32;
 	const UINT dataSize = 0;
 	const char pointer = 0;
 
 	long command[4] = { 0 };
-
+	switch(chipType)
+	{
+		case MX51:
+			address = 0x1FFEA000;
+			break;
+		case MX53:
+			address = 0xf8000000;
+			break;
+		default:
+			address = 0xFFFFFFFF;
+			break;
+	}
+	
 	command[0] = (  ((address  & 0x00FF0000) << 8) 
 		          | ((address  & 0xFF000000) >> 8) 
 		          |  (header   & 0x0000FFFF) );
@@ -299,6 +315,11 @@ BOOL MxRomDevice::InitRomVersion(ChipFamily_t chipType, RomVersion& romVersion, 
 			// ROM Offset 0x48 = 0x20 -- TO 3.0
 			romVersion = RomVersion(2,0);
 			defaultAddrs = MX51_TO2Addrs;
+			break;
+
+		case MX53:
+			romVersion = RomVersion(1,0);
+			defaultAddrs = MX53Addrs;
 			break;
 		
 		default:
@@ -501,6 +522,18 @@ BOOL MxRomDevice::ValidAddress(const UINT address, const UINT format) const
 			}
 			break;
 
+		case MX53:
+			if ( ((topByteAddress <= MX53_SDRAM_END)        && (address >= MX53_SDRAM_START))
+                   || ((topByteAddress <= MX53_IRAM_FREE_END)   && (address >= MX53_IRAM_FREE_START))
+                   || ((topByteAddress <= MX53_NFC_END)         && (address >= MX53_NFC_START))
+                   || ((topByteAddress <= MX53_SDRAM_CTL_END)   && (address >= MX53_SDRAM_CTL_START))
+                   || ((topByteAddress <= MX53_WEIM_END)        && (address >= MX53_WEIM_START)))
+		
+			{
+				status = TRUE;
+				TRACE("Matching the MX53 address region\n");
+			}
+			break;
 		default:
 			TRACE("Invalid address.\n");
 			status = FALSE;
@@ -566,7 +599,7 @@ BOOL MxRomDevice::Jump2Rak()
 	// 2nd CHECK: For MX35, MX37 or MX51 HAB-Enabled devices
 	//				If can Read second ack AND secondACK == 0xF0F0F0F0
 	//                FAILED JUMP 2 RAM KERNEL
-	if ( (_chipFamily == MX35 || _chipFamily == MX37 || _chipFamily == MX51) && _habType == HabEnabled )
+	if ( (_chipFamily == MX35 || _chipFamily == MX37 || _chipFamily == MX51 || _chipFamily == MX53) && _habType == HabEnabled )
 	{
 		unsigned char cmdAck2[4] = { 0 };
 		if(ReadFromDevice(cmdAck2, 4))
@@ -725,16 +758,12 @@ int MxRomDevice::GetRKLVersion(CString& fmodel, int& len, int& mxType)
 	return -res.ack;
 }
 
-#define FLASH_HEADER_SIZE	0x20
-#define ROM_TRANSFER_SIZE	0x400
 
-BOOL MxRomDevice::DownloadImage(UINT address, MemorySection loadSection, MemorySection setSection, BOOL HasFlashHeader, const StFwComponent& fwComponent, Device::UI_Callback callbackFn)
+
+BOOL MxRomDevice::DownloadImage(PImageParameter pImageParameter,const StFwComponent& fwComponent, Device::UI_Callback callbackFn)
 {
 	const unsigned char* const pBuffer = fwComponent.GetDataPtr();
 	const size_t dataSize = fwComponent.size();
-
-	//Here we must transfer virtual address to physical address before downloading ram kernel.
-	int PhyRAMAddr4KRL = _defaultAddress.MemoryStart | (address & (~0xF0000000));
 
 	uint32_t byteIndex, numBytesToWrite = 0;
 	for ( byteIndex = 0; byteIndex < dataSize; byteIndex += numBytesToWrite )
@@ -742,9 +771,9 @@ BOOL MxRomDevice::DownloadImage(UINT address, MemorySection loadSection, MemoryS
 		// Get some data
 		numBytesToWrite = min(MAX_SIZE_PER_DOWNLOAD_COMMAND, dataSize - byteIndex);
 
-		if (!SendCommand2RoK(PhyRAMAddr4KRL + byteIndex, numBytesToWrite, loadSection))
+		if (!SendCommand2RoK(pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pImageParameter->loadSection))
 		{
-			TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), PhyRAMAddr4KRL + byteIndex, numBytesToWrite, loadSection);
+			TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pImageParameter->loadSection);
 			return FALSE;
 		}
 		else
@@ -759,41 +788,57 @@ BOOL MxRomDevice::DownloadImage(UINT address, MemorySection loadSection, MemoryS
 	}
 
 	// If we are downloading to DCD or CSF, we don't need to send 
-	if ( loadSection == MemSectionDCD || loadSection == MemSectionCSF )
+	if ( pImageParameter->loadSection == MemSectionDCD || pImageParameter->loadSection == MemSectionCSF )
 	{
 		return TRUE;
 	}
 
-	int FlashHdrAddr;
+	UINT FlashHdrAddr;
 	const unsigned char * pHeaderData = NULL;
 
 	//transfer length of ROM_TRANSFER_SIZE is a must to ROM code.
 	unsigned char FlashHdr[ROM_TRANSFER_SIZE] = { 0 };
 	
 	// Just use the front of the data buffer if the data includes the FlashHeader
-	if( HasFlashHeader )
+	if( pImageParameter->HasFlashHeader )
 	{
-		FlashHdrAddr = PhyRAMAddr4KRL;
+		FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL;
 		pHeaderData = pBuffer;
 	}
 	else
 	{
 		// Otherwise, create a header and append the data
-		
-		//Copy image data with an offset of FLASH_HEADER_SIZE to the temp buffer.
-		memcpy(FlashHdr + FLASH_HEADER_SIZE, pBuffer, ROM_TRANSFER_SIZE - FLASH_HEADER_SIZE);
-		
-		//We should write actual image address to the first dword of flash header.
-		((int *)FlashHdr)[0] = PhyRAMAddr4KRL;
+		if(_chipFamily == MX53)
+		{
+			PIvtHeader pIvtHeader = (PIvtHeader)FlashHdr;
 
-		FlashHdrAddr = PhyRAMAddr4KRL - FLASH_HEADER_SIZE;
+			FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL + pImageParameter->CodeOffset - sizeof(IvtHeader);
+
+			//Copy image data with an offset of ivt header size to the temp buffer.
+			memcpy(FlashHdr + sizeof(IvtHeader), pBuffer+pImageParameter->CodeOffset, ROM_TRANSFER_SIZE - sizeof(IvtHeader));
+			
+			pIvtHeader->IvtBarker = IVT_BARKER_HEADER;
+			pIvtHeader->ImageStartAddr = FlashHdrAddr+sizeof(IvtHeader);
+			pIvtHeader->SelfAddr = FlashHdrAddr;
+		}
+		else
+		{
+			PFlashHeader pFlashHeader = (PFlashHeader)FlashHdr;
+			//Copy image data with an offset of flash header size to the temp buffer.
+			memcpy(FlashHdr + sizeof(FlashHeader), pBuffer, ROM_TRANSFER_SIZE - sizeof(FlashHeader));
+			
+			//We should write actual image address to the first dword of flash header.
+			pFlashHeader->ImageStartAddr = pImageParameter->PhyRAMAddr4KRL;
+
+			FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL - sizeof(FlashHeader);
+		}
 		pHeaderData = (const unsigned char *)FlashHdr;
 	}
 
 	//Set execute address.
-	if ( !SendCommand2RoK(FlashHdrAddr, ROM_TRANSFER_SIZE, setSection) )
+	if ( !SendCommand2RoK(FlashHdrAddr, ROM_TRANSFER_SIZE, pImageParameter->setSection) )
 	{
-		TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), FlashHdrAddr, ROM_TRANSFER_SIZE, setSection);
+		TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), FlashHdrAddr, ROM_TRANSFER_SIZE, pImageParameter->setSection);
 		return FALSE;
 	}
 	else
@@ -1320,4 +1365,18 @@ MxRomDevice::MxAddress MxRomDevice::MX51_TO2Addrs(
 	/* #define MX51_INT_RAM_START	    */  0x1FFE0000,
 	/* #define MX51_INT_RAM_END		    */  0x1FFFFFFF,
 	/* #define MX51_IMAGE_START_ADDR	*/	0x90000000 + IMG_OFFSET
+	);
+
+	/************ MX53 Default Address Setting *******************************/
+MxRomDevice::MxAddress MxRomDevice::MX53Addrs(
+	MX53_SDRAM_START,
+	MX53_SDRAM_END,
+	/* #define MX51_DEF_HWC_ADDR		*/	MX53_SDRAM_START + HWC_OFFSET,
+	/* #define MX51_DEF_CSF_ADDR		*/	MX53_SDRAM_START + CSF_OFFSET,
+	/* #define MX51_DEF_RKL_ADDR		*/	MX53_SDRAM_START + EXE_OFFSET,
+	/* #define MX51_DEF_DOWNLOAD_ADDR	*/	MX53_SDRAM_START + EXE_OFFSET,
+	/* #define MX51_DEF_NOR_FLASH_ADDR	*/	0xB0000000,
+	/* #define MX51_INT_RAM_START	    */  MX53_IRAM_FREE_START,
+	/* #define MX51_INT_RAM_END		    */  MX53_IRAM_FREE_END,
+	/* #define MX51_IMAGE_START_ADDR	*/	MX53_SDRAM_START + IMG_OFFSET
 	);

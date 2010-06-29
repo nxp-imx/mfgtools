@@ -39,6 +39,26 @@ public:
 			return address; 
 		};
 
+		// [XmlAttribute("CodeOffset")]
+		unsigned int GetCodeOffset()
+		{ 
+			unsigned int CodeOffset = 0; // default to 0
+
+			CString attr = GetAttrValue(_T("CodeOffset"));
+
+			if(attr.Left(2) == _T("0x"))
+			{
+				TCHAR *p;
+				CodeOffset = _tcstoul(attr.Mid(2),&p,16);
+			}
+			else
+			{
+				CodeOffset = _tstoi64(attr);
+			}
+
+			return CodeOffset; 
+		};
+
 		// [XmlAttribute("param1")]
 		unsigned int GetParam1()
 		{ 
