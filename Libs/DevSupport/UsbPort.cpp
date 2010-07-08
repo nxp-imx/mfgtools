@@ -198,7 +198,7 @@ Device* usb::Port::FindDevice(LPCTSTR driverName)
 		{
 			if ( driverNameStr.CompareNoCase( (*device)->UsbDevice()->_driver.get() ) == 0 )
 			{
-	//			ATLTRACE2(_T("DeviceClass::AddUsbDevice()  Found existing(%d): %s\r\n"), _devices.size(), pDevice->_usbPath.get().c_str());
+				//ATLTRACE2(_T("DeviceClass::AddUsbDevice()  Found existing(%d): %s\r\n"), device.size(), pDevice->_usbPath.get().c_str());
 				pUsbDevice = (*device);
 				break;
 			}

@@ -742,6 +742,12 @@ public:
 
     int32_t UtpWrite(CString cmd, CString filename, Device::UI_Callback callback)
     {
+#define TIMETEST 1
+#ifdef TIMETEST 
+		LARGE_INTEGER liStartTime = {0}, liStopTime = {0};
+		LARGE_INTEGER liTemp = {0}, timeCount = {0};
+		QueryPerformanceFrequency(&liTemp);
+#endif
 
 /*
         // Get the data to send
@@ -761,6 +767,12 @@ public:
 		if(transaction.GetTotalSize()==0)
 			return ERROR_OPEN_FAILED;
 
+		// When the data is transfering,the app will crash if pull away the USB connection crab.
+		// Because the DEVICE_REMOVAL_EVT will come and the operation will be done "_devices.erase(device)" when the USB cable is pulled.
+		// And m_pUtpDevice will be erased too.So all operation related to m_pUtpDevice will fail.
+		// And may cause invalid addr access:Access violation reading location 0x??????????
+		// So add a judgement to check the validity of m_pUtpDevice by compare to dwUtpDeviceAddr 
+		DWORD dwUtpDeviceAddr = (DWORD)m_pUtpDevice;
         // tell the UI we are beginning a command.
 		HANDLE hCallback = m_pUtpDevice->RegisterCallback(callback);
 //        Utils.ByteFormatConverter byteConverter = new Utils.ByteFormatConverter();
@@ -771,15 +783,29 @@ public:
 
 		while (transaction.GetCurrentState()->GetStateType() != State::DoneState)
         {
+			#ifdef TIMETEST                       
+			QueryPerformanceCounter(&liStartTime);
+			#endif
+			if ((uint32_t)m_pUtpDevice != dwUtpDeviceAddr)
+				goto ERROR_NO_DEVICE;
 			m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
             
             // Update the UI
             cmdProgress.maximum = (uint32_t)transaction.GetTotalSize();
             cmdProgress.position = (uint32_t)transaction.GetCurrentSize();
 			cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
+			//Tina +
+			if ((uint32_t)m_pUtpDevice != dwUtpDeviceAddr)
+				goto ERROR_NO_DEVICE;
 			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
             transaction.Next();
+
+			#ifdef TIMETEST
+			QueryPerformanceCounter(&liStopTime);        
+			timeCount.QuadPart = ((liStopTime.QuadPart - liStartTime.QuadPart)*1000000/liTemp.QuadPart);
+			//TRACE(_T("Time Test:write request total time = %I64d us\n"), timeCount.QuadPart);  
+			#endif
         }
 
         // tell the UI we are done
@@ -787,12 +813,17 @@ public:
         cmdProgress.status = transaction.GetCurrentState()->ToString();
 		cmdProgress.error = ((DoneState*)transaction.GetCurrentState())->GetResponseInfo();
         cmdProgress.inProgress = false;
+		if (dwUtpDeviceAddr != (uint32_t)m_pUtpDevice)
+			goto ERROR_NO_DEVICE;
 		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
 		m_pUtpDevice->UnregisterCallback(hCallback);
 
 		return cmdProgress.error;
 
+	ERROR_NO_DEVICE:
+		TRACE(_T("The Device handle is destroyed.m_pUtpDevice is 0x%x, dwUtpdeviceAddr is 0x%x\r\n"),m_pUtpDevice,dwUtpDeviceAddr);
+		return ERROR_INVALID_HANDLE;
     } // UtpWrite()
 
 }; // class UpdateTransportProtocol

@@ -219,7 +219,12 @@ void COpUtpUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 
     // Just return if we are in a BAD state and we get something other than START or STOP
     if((nEventType != OPEVENT_START) && (nEventType != OPEVENT_STOP) && (m_OpState == OP_INVALID))
+	{
+		ATLTRACE(_T("%s UtpUpdate Event: %s Msg: %s DevState: %s OpState: %s\r\n"),m_pPortMgrDlg->GetPanel(), GetEventString(nEventType), dwData, UCL::DeviceState::DeviceStateToString(m_CurrentDeviceState), GetOpStateString(m_OpState));
+		ATLTRACE(_T("Just return if we are in a BAD state and we get something other than START or STOP\r\n"));
+		VERIFY(::SetEvent(m_hChangeEvent));
 		return;
+	}
 
 	switch(nEventType)
 	{
@@ -258,7 +263,7 @@ void COpUtpUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 		case OPEVENT_STOP:
 		{
 			g_StopFlagged = TRUE;
-			if ( m_OpState == WAITING_FOR_DEVICE || m_OpState == OP_COMPLETE ||
+			/*if ( m_OpState == WAITING_FOR_DEVICE || m_OpState == OP_COMPLETE ||
 				m_OpState == WAITING_FOR_UPDATER_MODE || m_OpState == WAITING_FOR_MFG_MSC_MODE ||
 				m_OpState == WAITING_FOR_SECOND_UPDATER_MODE || m_OpState == OP_INVALID )
 			{
@@ -269,14 +274,20 @@ void COpUtpUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 					taskMsg.LoadString(IDS_STOPPED_BY_USER); // "Operation stopped by user."
 					HandleError(ERROR_PROCESS_ABORTED, taskMsg, OP_INVALID);
 				}
-
 			}
 			else
 			{
 				taskMsg.LoadString(IDS_STOPPED_BY_USER); // "Operation stopped by user."
 				HandleError(ERROR_PROCESS_ABORTED, taskMsg, OP_INVALID);
+			}*/
+
+			if (m_OpState != OP_COMPLETE)
+			{
+				taskMsg.LoadString(IDS_STOPPED_BY_USER); // "Operation stopped by user."
+				HandleError(ERROR_PROCESS_ABORTED, taskMsg, OP_INVALID);
 			}
 
+			m_OpState = OP_COMPLETE;	
 			ATLTRACE(_T("STOPPING - %s \r\n"), m_pPortMgrDlg->GetPanel());
 			break;
 		}

@@ -161,6 +161,8 @@ namespace api
                 else
 					_responseStr.Format(_T("EXIT(0x8001), Response Info: %#x"), GetResponseInfo());
             }
+			else
+				_responseStr = _T("UNKNOWN");
 				
 			return CString(StApi::ResponseString());
         };
