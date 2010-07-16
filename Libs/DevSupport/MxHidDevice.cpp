@@ -14,6 +14,10 @@ extern "C" {
 #define DEVICE_TIMEOUT			INFINITE // 5000 ms
 #define DEVICE_READ_TIMEOUT   10
 
+//The WriteFileEx function is designed solely for asynchronous operation.
+//The Write Function is designed solely for synchronous operation.
+#define ASYNC_READ_WRITE 0
+
 HANDLE MxHidDevice::m_sync_event_tx = NULL;
 HANDLE MxHidDevice::m_sync_event_rx = NULL;
 
@@ -29,41 +33,10 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
     m_pReadReport = NULL;
     m_pWriteReport = NULL;
     _chipFamily = MX508;
-
-    Init();
 }
 
 MxHidDevice::~MxHidDevice()
 {
-    Close();
-    Trash();
-}
-
-int MxHidDevice::Trash()
-{
-    if( m_sync_event_tx != NULL )
-    {
-        CloseHandle(m_sync_event_tx);
-        m_sync_event_tx = NULL;
-    }
-    if( m_sync_event_rx != NULL )
-    {
-        CloseHandle(m_sync_event_rx);
-        m_sync_event_rx = NULL;
-    }
-    return ERROR_SUCCESS;
-}
-
-int MxHidDevice::Close()
-{
-    if( m_hid_drive_handle != INVALID_HANDLE_VALUE)
-    {
-        CloseHandle(m_hid_drive_handle);
-        m_hid_drive_handle = INVALID_HANDLE_VALUE;
-    }
-    FreeIoBuffers();
-
-    return ERROR_SUCCESS;
 }
 
 void MxHidDevice::FreeIoBuffers()
@@ -88,31 +61,34 @@ void MxHidDevice::FreeIoBuffers()
 int32_t MxHidDevice::AllocateIoBuffers()
 {
     // Open the device
-    /*HANDLE hHidDevice = CreateFile(_path.get(), 0, 0, NULL, OPEN_EXISTING, 0, NULL);
+    HANDLE hHidDevice = CreateFile(_path.get(), 0, 0, NULL, OPEN_EXISTING, 0, NULL);
 
     if( hHidDevice == INVALID_HANDLE_VALUE )
     {
 		int32_t error = GetLastError();
         ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().CreateFile ERROR:(%d)\r\n"), error);
         return error;
-    }*/
+    }
 
     // Get the Capabilities including the max size of the report buffers
     PHIDP_PREPARSED_DATA  PreparsedData = NULL;
-    if ( !HidD_GetPreparsedData(m_hid_drive_handle, &PreparsedData) )
+    if ( !HidD_GetPreparsedData(hHidDevice, &PreparsedData) )
     {
-        ATLTRACE2(_T(" HidDevice::AllocateIoBuffers().GetPreparsedData ERROR:(%d)\r\n"), ERROR_GEN_FAILURE);
+        CloseHandle(hHidDevice);
+        ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().GetPreparsedData ERROR:(%d)\r\n"), ERROR_GEN_FAILURE);
         return ERROR_GEN_FAILURE;
     }
 
     NTSTATUS sts = HidP_GetCaps(PreparsedData, &m_Capabilities);
 	if( sts != HIDP_STATUS_SUCCESS )
     {
+        CloseHandle(hHidDevice);
         HidD_FreePreparsedData(PreparsedData);
-        ATLTRACE2(_T(" HidDevice::AllocateIoBuffers().GetCaps ERROR:(%d)\r\n"), HIDP_STATUS_INVALID_PREPARSED_DATA);
+        ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().GetCaps ERROR:(%d)\r\n"), HIDP_STATUS_INVALID_PREPARSED_DATA);
         return HIDP_STATUS_INVALID_PREPARSED_DATA;
     }
 
+    CloseHandle(hHidDevice);
     HidD_FreePreparsedData(PreparsedData);
 
     // Allocate a Read and Write Report buffers
@@ -141,251 +117,106 @@ int32_t MxHidDevice::AllocateIoBuffers()
     return ERROR_SUCCESS;
 }
 
-/*
-HANDLE MxHidDevice::OpenSpecifiedDevice (
-        IN       HDEVINFO                    HardwareDeviceInfo,
-        IN       PSP_INTERFACE_DEVICE_DATA   DeviceInterfaceData,
-        OUT		 CString&					 devName,
-        OUT      DWORD&						 devInst,
-        rsize_t	 bufsize
-        )
+BOOL MxHidDevice::OpenUSBHandle(HANDLE* pHandle, CStdString pipePath)
 {
-    PSP_INTERFACE_DEVICE_DETAIL_DATA     functionClassDeviceData = NULL;
-    ULONG                                predictedLength = 0;
-    ULONG                                requiredLength = 0;
-    HANDLE								 hOut = INVALID_HANDLE_VALUE;
-    SP_DEVINFO_DATA						 devInfoData;
+    #if ASYNC_READ_WRITE
+	*pHandle = CreateFile(pipePath,
+		GENERIC_WRITE | GENERIC_READ,
+		FILE_SHARE_WRITE | FILE_SHARE_READ,
+		NULL,
+		OPEN_EXISTING,
+		FILE_FLAG_OVERLAPPED,
+		NULL);
+    #else
+    *pHandle = CreateFile(pipePath,
+		GENERIC_WRITE | GENERIC_READ,
+		FILE_SHARE_WRITE | FILE_SHARE_READ,
+		NULL,
+		OPEN_EXISTING,
+		0,
+		NULL);
+    #endif
 
-    //
-    // allocate a function class device data structure to receive the
-    // goods about this particular device.
-    //
-    SetupDiGetInterfaceDeviceDetail (
-        HardwareDeviceInfo,
-        DeviceInterfaceData,
-        NULL, // probing so no output buffer yet
-        0, // probing so output buffer length of zero
-        &requiredLength,
-        NULL); // not interested in the specific dev-node
+	if (*pHandle == INVALID_HANDLE_VALUE) {
+		TRACE(_T("MxHidDevice::OpenUSBHandle() Failed to open (%s) = %d"), pipePath, GetLastError());
+		return FALSE;
+	}
 
-
-    predictedLength = requiredLength;
-    // sizeof (SP_FNCLASS_DEVICE_DATA) + 512;
-
-    functionClassDeviceData = (PSP_INTERFACE_DEVICE_DETAIL_DATA) malloc (predictedLength);
-    functionClassDeviceData->cbSize = sizeof (SP_INTERFACE_DEVICE_DETAIL_DATA);
-    devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
-
-    //
-    // Retrieve the information from Plug and Play.
-    //
-    if (! SetupDiGetInterfaceDeviceDetail (
-        HardwareDeviceInfo,
-        DeviceInterfaceData,
-        functionClassDeviceData,
-        predictedLength,
-        &requiredLength,
-        &devInfoData)) 
-    {
-            free( functionClassDeviceData );
-            return INVALID_HANDLE_VALUE;
-    }
-
-    //	wcscpy_s( devName, bufsize, functionClassDeviceData->DevicePath) ;
-    CString devPath = functionClassDeviceData->DevicePath;
-
-	CStdString filter;
-	filter.Format(_T("%s#vid_%04x&pid_%04x"), _T("HID"),m_vid, m_pid);
-
-    // Is this our vid+pid?  If not, ignore it.
-	if ( (devPath.MakeUpper().Find(filter.ToUpper()) != -1))
-    {
-        devName = devPath;
-        devInst = devInfoData.DevInst;
-
-        hOut = CreateFile (
-            functionClassDeviceData->DevicePath,
-            GENERIC_READ | GENERIC_WRITE,
-            FILE_SHARE_READ | FILE_SHARE_WRITE,
-            NULL, // no SECURITY_ATTRIBUTES structure
-            OPEN_EXISTING, // No special create flags
-            0, // No special attributes
-            NULL); // No template file
-    } else {
-        TRACE(__FUNCTION__ " VID-PID does not match\n");
-    }
-
-    free( functionClassDeviceData );
-    return hOut;
-}
-
-HANDLE MxHidDevice::OpenUsbDevice( LPGUID  pGuid, CString& devpath, DWORD& outDevInst, rsize_t bufsize)
-{
-    ULONG                    NumberDevices;
-    HANDLE                   hOut = INVALID_HANDLE_VALUE;
-    HDEVINFO                 hDevInfo;
-    SP_INTERFACE_DEVICE_DATA deviceInterfaceData;
-    ULONG                    i;
-    BOOLEAN                  done;
-
-    NumberDevices = 0;
-
-    //
-    // Open a handle to the plug and play dev node.
-    // SetupDiGetClassDevs() returns a device information set that contains info on all
-    // installed devices of a specified class.
-    //
-    hDevInfo = SetupDiGetClassDevs (
-        pGuid,
-        NULL, // Define no enumerator (global)
-        NULL, // Define no
-        (DIGCF_PRESENT | // Only Devices present
-        DIGCF_INTERFACEDEVICE)); // Function class devices.
-    if (hDevInfo == INVALID_HANDLE_VALUE)
-    {
-        // Insert error handling here.
-        return INVALID_HANDLE_VALUE;
-    }
-    //
-    // Take a wild guess at the number of devices we have;
-    // Be prepared to realloc and retry if there are more than we guessed
-    //
-    NumberDevices = 4;
-    done = FALSE;
-    deviceInterfaceData.cbSize = sizeof (SP_INTERFACE_DEVICE_DATA);
-
-    i=0;
-    while (!done) {
-        NumberDevices *= 2;  // keep increasing the number of devices until we reach the limit
-        for (; i < NumberDevices; i++) {
-
-            // SetupDiEnumDeviceInterfaces() returns information about device interfaces
-            // exposed by one or more devices. Each call returns information about one interface;
-            // the routine can be called repeatedly to get information about several interfaces
-            // exposed by one or more devices.
-            if ( SetupDiEnumDeviceInterfaces (
-                hDevInfo,   // pointer to a device information set
-                NULL,       // pointer to an SP_DEVINFO_DATA, We don't care about specific PDOs
-                pGuid,      // pointer to a GUID
-                i,          //zero-based index into the list of interfaces in the device information set
-                &deviceInterfaceData)) // pointer to a caller-allocated buffer that contains a completed SP_DEVICE_INTERFACE_DATA structure
-            {
-                // open the device
-                hOut = OpenSpecifiedDevice (hDevInfo, &deviceInterfaceData, devpath, outDevInst, bufsize);
-                if ( hOut != INVALID_HANDLE_VALUE )
-                {
-                    done = TRUE;
-                    TRACE(__FUNCTION__ " SetupDiEnumDeviceInterfaces PASS. index=%d\n",i);
-                    break;
-                } else {
-                    TRACE(__FUNCTION__ " SetupDiEnumDeviceInterfaces FAILED to OPEN. index=%d\n",i);
-                }
-            }
-            else
-            {
-                // EnumDeviceInterfaces error
-                if (ERROR_NO_MORE_ITEMS == ::GetLastError())
-                {
-                    done = TRUE;
-                    TRACE(__FUNCTION__ " SetupDiEnumDeviceInterfaces FAILED to find interface. index=%d\n",i);
-                    break;
-                } else {
-                    TRACE(__FUNCTION__ " SetupDiEnumDeviceInterfaces FAILED for reason other then MAX_ITEMS. index=%d\n",i);
-                }
-            }
-        }  // end-for
-    }  // end-while
-
-    // SetupDiDestroyDeviceInfoList() destroys a device information set and frees all associated memory.
-    SetupDiDestroyDeviceInfoList (hDevInfo);
-    return hOut;
+	return TRUE;
 }
 
 
-int MxHidDevice::SetUsbDeviceId(int dwDevInst)
-{ 
-    // Get USB devnode from HID devnode.
-    DWORD usbDevInst;
-    int err = CM_Get_Parent(&usbDevInst, dwDevInst, 0);
-    if( err != ERROR_SUCCESS )
-    {
-        assert(false);
-        return err;
-    }
-
-    // Get the DeviceID string from the USB device devnode.
-    TCHAR buf[MAX_PATH];
-    err = CM_Get_Device_ID(usbDevInst, buf, sizeof(buf), 0);
-    if( err != ERROR_SUCCESS )
-    {
-        assert(false);
-        return err;
-    }
-
-    // Fixup name
-    m_usb_device_id = buf;
-    m_usb_device_id.Replace(_T('\\'), _T('#'));
-    return err;
-}
-
-BOOL MxHidDevice::GetUsbDeviceFileName( LPGUID  pGuid, CString& outNameBuf, DWORD& outDevInst, rsize_t bufsize)
-{
-    HANDLE hDev = OpenUsbDevice( pGuid, outNameBuf, outDevInst, bufsize );
-    if ( hDev == INVALID_HANDLE_VALUE )
-    {
-        return FALSE;
-    }
-    CloseHandle( hDev );
-    return TRUE;
-}
-*/
-
-int MxHidDevice::Init()
+BOOL MxHidDevice::OpenMxHidHandle()
 {
     int err = ERROR_SUCCESS;
 
-    m_hid_drive_handle = ::CreateFile(_path.get(),
-        GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL,
-        OPEN_EXISTING,
-        FILE_FLAG_OVERLAPPED,
-        NULL);
-
-    if( m_hid_drive_handle == INVALID_HANDLE_VALUE )
-    {
-        return ::GetLastError();
-    }
-
+    #if ASYNC_READ_WRITE
     // create TX and RX events
     m_sync_event_tx = ::CreateEvent( NULL, TRUE, FALSE, NULL );
     if( !m_sync_event_tx )
     {
         assert(false);
-        return ::GetLastError();
+        TRACE((__FUNCTION__ " ERROR: CreateEvent failed.ErrCode 0x%x(%d)\n"),GetLastError(),GetLastError());
+        return FALSE;
     }
     m_sync_event_rx = ::CreateEvent( NULL, TRUE, FALSE, NULL );
     if( !m_sync_event_rx )
     {
         assert(false);
-        return ::GetLastError();
+        TRACE((__FUNCTION__ " ERROR: CreateEvent failed.ErrCode 0x%x(%d)\n"),GetLastError(),GetLastError());
+        return FALSE;
     }
+    #endif
 
     memset(&m_Capabilities, 0, sizeof(m_Capabilities));
 
     err = AllocateIoBuffers();
 	if ( err != ERROR_SUCCESS )
 	{
-		TRACE(__FUNCTION__ " ERROR: AllocateIoBuffers failed.\n");
-		return err;
+		TRACE((__FUNCTION__ " ERROR: AllocateIoBuffers failed. %d\n"),err);
+		return FALSE;
 	}
 
-    return ERROR_SUCCESS;
+    // Open the device 
+    if (!OpenUSBHandle(&m_hid_drive_handle,_path.get()))
+    {
+        TRACE(__FUNCTION__ " ERROR: OpenUSBHandle failed.\n");
+		return FALSE;
+    }
+    
+    return TRUE;
+}
+
+BOOL MxHidDevice::CloseMxHidHandle()
+{
+    #if ASYNC_READ_WRITE
+    if( m_sync_event_tx != NULL )
+    {
+        CloseHandle(m_sync_event_tx);
+        m_sync_event_tx = NULL;
+    }
+    if( m_sync_event_rx != NULL )
+    {
+        CloseHandle(m_sync_event_rx);
+        m_sync_event_rx = NULL;
+    }
+    #endif
+
+    if( m_hid_drive_handle != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle(m_hid_drive_handle);
+        m_hid_drive_handle = INVALID_HANDLE_VALUE;
+    }
+
+    FreeIoBuffers();
+        
+    return TRUE;
 }
 
 
+#if ASYNC_READ_WRITE
 // Write to HID device
-int MxHidDevice::Write(UCHAR* _buf, ULONG _size)
+int MxHidDevice::Write(UCHAR * _buf,ULONG _size)
 {
     DWORD status;
 
@@ -398,20 +229,25 @@ int MxHidDevice::Write(UCHAR* _buf, ULONG _size)
 
     // Write to the device
     if( !::WriteFileEx( m_hid_drive_handle, _buf, _size, &m_overlapped, 
-        WriteCompletionRoutine ) )
+        MxHidDevice::WriteCompletionRoutine ) )
     {
+        TRACE(_T("MxHidDevice::Write()fail. Error writing to device 0x%x(%d).\r\n"), GetLastError(), GetLastError());
         return ::GetLastError();
     }
 
     // wait for completion
     if( (status = ::WaitForSingleObjectEx( m_sync_event_tx, INFINITE, TRUE )) == WAIT_TIMEOUT )
     {
+        TRACE(_T("MxHidDevice::Write()fail. WaitForSingleObjectEx TimeOut.\r\n"));
         ::CancelIo( m_hid_drive_handle );
         return WAIT_TIMEOUT;
     }
-
-    if( m_overlapped.Offset == 0 )
-        return -13 /*STERR_FAILED_TO_WRITE_FILE_DATA*/;
+	
+	if( m_overlapped.Offset == 0 )
+	{
+        TRACE(_T("MxHidDevice::Write() fail.m_overlapped.Offset is 0.\r\n"));
+        return -13 ;
+	}
     else
         return ERROR_SUCCESS;
 }
@@ -431,9 +267,8 @@ VOID MxHidDevice::WriteCompletionRoutine(
         *(BOOL *)&_lp_overlapped->Offset = _bytes_transferred;
     }
 
-    ::SetEvent( MxHidDevice::m_sync_event_tx );
+    ::SetEvent(MxHidDevice::m_sync_event_tx );
 }
-
 
 // Read from HID device
 int MxHidDevice::Read(void* _buf, UINT _size)
@@ -445,31 +280,32 @@ int MxHidDevice::Read(void* _buf, UINT _size)
     m_overlapped.OffsetHigh			= 0;
     m_overlapped.hEvent				= (PVOID)(ULONGLONG)_size;
 
-    ::ResetEvent( m_sync_event_rx );
-
-    if( m_hid_drive_handle == INVALID_HANDLE_VALUE ) {
-        return WAIT_TIMEOUT;
-    }
+    ::ResetEvent( MxHidDevice::m_sync_event_rx );
 
     //  The read command does not sleep very well right now.
-    Sleep(50); 
+    Sleep(35); 
 
     // Read from device
     if( !::ReadFileEx( m_hid_drive_handle, _buf, _size, &m_overlapped, 
-        ReadCompletionRoutine ) )
+        MxHidDevice::ReadCompletionRoutine ) )
     {
+        TRACE(_T("MxHidDevice::Read()fail. Error reading from device 0x%x(%d).\r\n"), GetLastError(), GetLastError());
         return ::GetLastError();
     }
 
     // wait for completion
-    if( (status = (::WaitForSingleObjectEx( m_sync_event_rx, DEVICE_READ_TIMEOUT, TRUE ))) == WAIT_TIMEOUT )
+    if( (status = ::WaitForSingleObjectEx( m_sync_event_rx, DEVICE_READ_TIMEOUT, TRUE )) == WAIT_TIMEOUT )
     {
+        TRACE(_T("MxHidDevice::Read()fail. WaitForSingleObjectEx TimeOut.\r\n"));
         ::CancelIo( m_hid_drive_handle );
         return WAIT_TIMEOUT;
     }
 
     if( m_overlapped.Offset == 0 )
+    {
+        TRACE(_T("MxHidDevice::Read()fail.m_overlapped.Offset is 0.\r\n"));
         return -13 /*STERR_FAILED_TO_WRITE_FILE_DATA*/;
+    }
     else
         return ERROR_SUCCESS;
 }
@@ -490,9 +326,42 @@ VOID MxHidDevice::ReadCompletionRoutine(
     }
 
     if( m_sync_event_rx != NULL) {
-        SetEvent( m_sync_event_rx );
+        ::SetEvent( m_sync_event_rx );
     }
 }
+
+#else
+
+int MxHidDevice::Write(UCHAR* _buf, ULONG _size)
+{
+	int    nBytesWrite; // for bytes actually written
+
+	if( !WriteFile(m_hid_drive_handle, _buf, _size, (PULONG) &nBytesWrite, NULL) )
+	{
+		TRACE(_T("MxHidDevice::Write() Error writing to device 0x%x(%d).\r\n"), GetLastError(), GetLastError());
+		return FALSE;
+	}
+
+    return ERROR_SUCCESS;
+}
+
+// Read from HID device
+int MxHidDevice::Read(void* _buf, UINT _size)
+{
+	int    nBytesRead; // for bytes actually read
+
+	Sleep(35);
+
+	if( !ReadFile(m_hid_drive_handle, _buf, _size, (PULONG) &nBytesRead, NULL) )
+	{
+		TRACE(_T("MxHidDevice::Read() Error reading from device 0x%x(%d).\r\n"), GetLastError(), GetLastError());
+		return GetLastError();
+	}
+
+	return ERROR_SUCCESS;
+}
+
+#endif
 
 /// <summary>
 //-------------------------------------------------------------------------------------		
@@ -582,6 +451,63 @@ BOOL MxHidDevice::WriteReg(PSDPCmd pSDPCmd)
     return TRUE;
 }
 
+BOOL MxHidDevice::ReadData(UINT address, UINT byteCount, unsigned char * pBuf)
+{
+    SDPCmd SDPCmd;
+
+    SDPCmd.command = ROM_KERNEL_CMD_RD_MEM;
+    SDPCmd.dataCount = byteCount;
+    SDPCmd.format = 32;
+    SDPCmd.data = 0;
+    SDPCmd.address = address;
+
+    //First, pack the command to a report.
+    PackSDPCmd(&SDPCmd);
+
+	//Send the report to USB HID device
+	if ( Write((unsigned char *)m_pWriteReport, m_Capabilities.OutputReportByteLength)  != ERROR_SUCCESS)
+	{
+		return FALSE;
+	}
+    
+    //It should be the fault of elvis_mcurom.elf which only returns report3
+    memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
+    //Get Report3, Device to Host:
+    //4 bytes HAB mode indicating Production/Development part
+	if ( Read( (UCHAR *)m_pReadReport, m_Capabilities.InputReportByteLength )  != ERROR_SUCCESS)
+	{
+		return FALSE;
+	}
+	if ( (*(unsigned int *)(m_pReadReport->Payload) != HabEnabled)  && 
+		 (*(unsigned int *)(m_pReadReport->Payload) != HabDisabled) ) 
+	{
+		return FALSE;	
+	}
+
+
+    UINT MaxHidTransSize = m_Capabilities.InputReportByteLength -1;
+    
+    while(byteCount > 0)
+    {
+        UINT TransSize = (byteCount > MaxHidTransSize) ? MaxHidTransSize : byteCount;
+
+        memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
+
+        if ( Read( (UCHAR *)m_pReadReport, m_Capabilities.InputReportByteLength )  != ERROR_SUCCESS)
+        {
+            return FALSE;
+        }
+
+        memcpy(pBuf, m_pReadReport->Payload, TransSize);
+        pBuf += TransSize;
+
+        byteCount -= TransSize;
+        //TRACE("Transfer Size: %d\n", TransSize);
+    }
+
+	return TRUE;
+}
+
 BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * pBuf)
 {
     SDPCmd SDPCmd;
@@ -617,26 +543,12 @@ BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * 
         pBuf += TransSize;
         //TRACE("Transfer Size: %d\n", MaxHidTransSize);
     }
-
-    //It should be the fault of elvis_mcurom.elf which only returns report3
-    memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
-    //Get Report3, Device to Host:
-    //4 bytes HAB mode indicating Production/Development part
-	if ( Read( (UCHAR *)m_pReadReport, m_Capabilities.InputReportByteLength )  != ERROR_SUCCESS)
-	{
-		return FALSE;
-	}
-	if ( (*(unsigned int *)(m_pReadReport->Payload) != HabEnabled)  && 
-		 (*(unsigned int *)(m_pReadReport->Payload) != HabDisabled) ) 
-	{
-		return FALSE;	
-	}
     
     //below function should be invoked for mx50
-	/*if ( !GetCmdAck(ROM_STATUS_ACK) )
+	if ( !GetCmdAck(ROM_STATUS_ACK) )
 	{
 		return FALSE;
-	}*/
+	}
 
 	return TRUE;
 }
@@ -678,180 +590,116 @@ BOOL MxHidDevice::Jump(UINT RAMAddress)
 	return TRUE;
 }
 
-
-// Write the data to i.MX
-#define FLASH_HEADER_SIZE	0x20
-#define ROM_TRANSFER_SIZE	0x400
-
-BOOL MxHidDevice::Download(StFwComponent *fwComponent, UINT PhyRAMAddr4KRL, MemorySection loadSection, MemorySection setSection, BOOL HasFlashHeader)
+BOOL MxHidDevice::Download(PImageParameter pImageParameter,StFwComponent *fwComponent, Device::UI_Callback callbackFn)
 {
-    //Those parameter is hard-coded for test purpose
-    //BOOL HasFlashHeader = FALSE;
-    //MemorySection loadSection = MemSectionOTH;
-    //MemorySection setSection = MemSectionAPP;
-	//int PhyRAMAddr4KRL = 0x90040000;
+    //Create device handle and report id
+    OpenMxHidHandle();
     
-    UCHAR* pBuffer = (UCHAR*)fwComponent->GetDataPtr();
+	UCHAR* pBuffer = (UCHAR*)fwComponent->GetDataPtr();
     ULONGLONG dataCount = fwComponent->size();
+    
 	DWORD byteIndex, numBytesToWrite = 0;
 	for ( byteIndex = 0; byteIndex < dataCount; byteIndex += numBytesToWrite )
 	{
 		// Get some data
 		numBytesToWrite = min(MAX_SIZE_PER_DOWNLOAD_COMMAND, dataCount - byteIndex);
 
-		if (!TransData(PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pBuffer + byteIndex))
+		if (!TransData(pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pBuffer + byteIndex))
 		{
 			TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X, 0x%X) failed.\n"), \
-                PhyRAMAddr4KRL + byteIndex, numBytesToWrite, loadSection, pBuffer + byteIndex);
-			return FALSE;
+                pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pImageParameter->loadSection, pBuffer + byteIndex);
+			goto ERR_HANDLE;
 		}
 	}
 
 	// If we are downloading to DCD or CSF, we don't need to send 
-	if ( loadSection == MemSectionDCD || loadSection == MemSectionCSF )
+	if ( pImageParameter->loadSection == MemSectionDCD || pImageParameter->loadSection == MemSectionCSF )
 	{
 		return TRUE;
 	}
 
-	int FlashHdrAddr;
+	UINT FlashHdrAddr;
 	const unsigned char * pHeaderData = NULL;
 
 	//transfer length of ROM_TRANSFER_SIZE is a must to ROM code.
 	unsigned char FlashHdr[ROM_TRANSFER_SIZE] = { 0 };
+	unsigned char Tempbuf[ROM_TRANSFER_SIZE] = { 0 };	
 	
-	// Just use the front of the data buffer if the data includes the FlashHeader
-	if( HasFlashHeader )
+	// Otherwise, create a header and append the data
+	if(_chipFamily == MX508)
 	{
-		FlashHdrAddr = PhyRAMAddr4KRL;
-		pHeaderData = pBuffer;
+		PIvtHeader pIvtHeader = (PIvtHeader)FlashHdr;
+
+		FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL + pImageParameter->CodeOffset - sizeof(IvtHeader);
+
+		//Copy image data with an offset of ivt header size to the temp buffer.
+		memcpy(FlashHdr + sizeof(IvtHeader), pBuffer+pImageParameter->CodeOffset, ROM_TRANSFER_SIZE - sizeof(IvtHeader));
+		
+		pIvtHeader->IvtBarker = IVT_BARKER_HEADER;
+		pIvtHeader->ImageStartAddr = FlashHdrAddr+sizeof(IvtHeader);
+		pIvtHeader->SelfAddr = FlashHdrAddr;
 	}
 	else
 	{
-		// Otherwise, create a header and append the data
-		
-		//Copy image data with an offset of FLASH_HEADER_SIZE to the temp buffer.
-		memcpy(FlashHdr + FLASH_HEADER_SIZE, pBuffer, ROM_TRANSFER_SIZE - FLASH_HEADER_SIZE);
+		PFlashHeader pFlashHeader = (PFlashHeader)FlashHdr;
+		//Copy image data with an offset of flash header size to the temp buffer.
+		memcpy(FlashHdr + sizeof(FlashHeader), pBuffer, ROM_TRANSFER_SIZE - sizeof(FlashHeader));
 		
 		//We should write actual image address to the first dword of flash header.
-		((int *)FlashHdr)[0] = PhyRAMAddr4KRL;
+		pFlashHeader->ImageStartAddr = pImageParameter->PhyRAMAddr4KRL;
 
-		FlashHdrAddr = PhyRAMAddr4KRL - FLASH_HEADER_SIZE;
-		pHeaderData = (const unsigned char *)FlashHdr;
+		FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL - sizeof(FlashHeader);
 	}
-    
-	//Set execute address.
+	pHeaderData = (const unsigned char *)FlashHdr;
+
 	if ( !TransData(FlashHdrAddr, ROM_TRANSFER_SIZE, pHeaderData) )
 	{
 		TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X, 0x%X) failed.\n"), \
-            FlashHdrAddr, ROM_TRANSFER_SIZE, setSection, pHeaderData);
-		return FALSE;
+            FlashHdrAddr, ROM_TRANSFER_SIZE, pImageParameter->setSection, pHeaderData);
+		goto ERR_HANDLE;
 	}
-    //return FALSE;
-    if(setSection != MemSectionAPP)
-        return TRUE;
+    
+    //Verify the data
+	if ( !ReadData(FlashHdrAddr, ROM_TRANSFER_SIZE, Tempbuf) )
+	{
+		TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X, 0x%X) failed.\n"), \
+            FlashHdrAddr, ROM_TRANSFER_SIZE, pImageParameter->setSection, pHeaderData);
+		goto ERR_HANDLE;
+	}
+
+    if(memcmp(pHeaderData, Tempbuf, ROM_TRANSFER_SIZE)!= 0 )
+	{
+		TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X, 0x%X) failed.\n"), \
+            FlashHdrAddr, ROM_TRANSFER_SIZE, pImageParameter->setSection, pHeaderData);
+		goto ERR_HANDLE;
+	}
 
     if( !Jump(FlashHdrAddr))
 	{
         TRACE(_T("DownloadImage(): Failed to jump to RAM address: 0x%x.\n"), FlashHdrAddr);
-		return FALSE;
+		goto ERR_HANDLE;
 	}
 
-	return TRUE;
+    //Clear device handle and report id
+    CloseMxHidHandle();
+
+    return TRUE;
+
+ERR_HANDLE:
+    //Clear device handle and report id
+    CloseMxHidHandle();
+    
+	return FALSE;
 }
-
-/*
-//Actually, this is the setting for i.mx51 since we simulate mx508 HID ROM on mx51.
-typedef struct 
-{
-    UINT addr;
-    UINT data;
-    UINT format;
-} stMemoryInit;
-
-static stMemoryInit mddrMx508[] = 
-{
-    {0x73fa88a0, 0x00000020, 32},
-    {0x73fa850c, 0x000020c5, 32},
-    {0x73fa8510, 0x000020c5, 32},
-    {0x73fa883c, 0x00000002, 32},
-    {0x73fa8848, 0x00000002, 32},
-    {0x73fa84b8, 0x000000e7, 32},
-    {0x73fa84bc, 0x00000045, 32},
-    {0x73fa84c0, 0x00000045, 32},
-    {0x73fa84c4, 0x00000045, 32},
-    {0x73fa84c8, 0x00000045, 32},
-    {0x73fa8820, 0x00000000, 32},
-    {0x73fa84a4, 0x00000003, 32},
-    {0x73fa84a8, 0x00000003, 32},
-    {0x73fa84ac, 0x000000e3, 32},
-    {0x73fa84b0, 0x000000e3, 32},
-    {0x73fa84b4, 0x000000e3, 32},
-    {0x73fa84cc, 0x000000e3, 32},
-    {0x73fa84d0, 0x000000e2, 32},
-    {0x83fd9000, 0x82a20000, 32},
-    {0x83fd9008, 0x82a20000, 32},
-    {0x83fd9010, 0x000ad0d0, 32},
-    {0x83fd9004, 0x333574aa, 32},
-    {0x83fd900c, 0x333574aa, 32},
-    {0x83fd9014, 0x04008008, 32},
-    {0x83fd9014, 0x0000801a, 32},
-    {0x83fd9014, 0x0000801b, 32},
-    {0x83fd9014, 0x00448019, 32},
-    {0x83fd9014, 0x07328018, 32},
-    {0x83fd9014, 0x04008008, 32},
-    {0x83fd9014, 0x00008010, 32},
-    {0x83fd9014, 0x00008010, 32},
-    {0x83fd9014, 0x06328018, 32},
-    {0x83fd9014, 0x03808019, 32},
-    {0x83fd9014, 0x00408019, 32},
-    {0x83fd9014, 0x00008000, 32},
-    {0x83fd9014, 0x0400800c, 32},
-    {0x83fd9014, 0x0000801e, 32},
-    {0x83fd9014, 0x0000801f, 32},
-    {0x83fd9014, 0x0000801d, 32},
-    {0x83fd9014, 0x0732801c, 32},
-    {0x83fd9014, 0x0400800c, 32},
-    {0x83fd9014, 0x00008014, 32},
-    {0x83fd9014, 0x00008014, 32},
-    {0x83fd9014, 0x0632801c, 32},
-    {0x83fd9014, 0x0380801d, 32},
-    {0x83fd9014, 0x0040801d, 32},
-    {0x83fd9014, 0x00008004, 32},
-    {0x83fd9000, 0xb2a20000, 32},
-    {0x83fd9008, 0xb2a20000, 32},
-    {0x83fd9010, 0x000ad6d0, 32},
-    {0x83fd9034, 0x90000000, 32},
-    {0x83fd9014, 0x00000000, 32},
-};
-
-BOOL MxHidDevice::InitMemoryDevice()
-{
-    SDPCmd SDPCmd;
-
-    SDPCmd.command = ROM_KERNEL_CMD_WR_MEM;
-    SDPCmd.dataCount = 4;
-
-    for(int i=0; i<sizeof(mddrMx508)/sizeof(stMemoryInit); i++)
-    {
-        SDPCmd.format = mddrMx508[i].format;
-        SDPCmd.data = mddrMx508[i].data;
-        SDPCmd.address = mddrMx508[i].addr;
-        if ( !WriteReg(&SDPCmd) )
-        {
-            TRACE("In InitMemoryDevice(): write memory failed\n");
-            return FALSE;
-        }
-    }
-
-	return TRUE;
-}
-*/
 
 BOOL MxHidDevice::InitMemoryDevice(CString filename)
 {
 	USES_CONVERSION;
 	SDPCmd SDPCmd;
 
+    //Create device handle and report id
+    OpenMxHidHandle();
+    
     SDPCmd.command = ROM_KERNEL_CMD_WR_MEM;
     SDPCmd.dataCount = 4;
 
@@ -880,10 +728,14 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 			if ( !WriteReg(&SDPCmd) )
             {
                 TRACE("In InitMemoryDevice(): write memory failed\n");
+                CloseMxHidHandle();
                 return FALSE;
             }
 		}
 	}
 
+    //Clear device handle and report id    
+    CloseMxHidHandle();
+    
 	return TRUE;
 }

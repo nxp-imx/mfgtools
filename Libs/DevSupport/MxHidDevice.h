@@ -41,6 +41,9 @@
 #define MAX_MODEL_LEN	128
 #define MINUM_TRANSFER_SIZE 0x20
 
+#define IVT_BARKER_HEADER      0x402000D1
+#define ROM_TRANSFER_SIZE	   0x400
+
 // Address ranges for Production parts: 
 
 /// <summary>
@@ -131,7 +134,33 @@ public:
 		};
 	};
 
+	typedef struct _IvtHeader
+	{
+           unsigned long IvtBarker;
+           unsigned long ImageStartAddr;// LONG(0x70004020)
+           unsigned long Reserved[3];
+           unsigned long SelfAddr;// LONG(0x70004000)
+           unsigned long Reserved2[2];
+	}IvtHeader, *PIvtHeader;
+
+	typedef struct _FlashHeader
+	{
+           unsigned long ImageStartAddr;
+           unsigned long Reserved[4];
+	}FlashHeader, *PFlashHeader;
+
 	enum MemorySection { MemSectionOTH = 0x00, MemSectionAPP = 0xAA, MemSectionCSF = 0xCC, MemSectionDCD = 0xEE };
+
+	typedef struct _ImageParameter
+	{
+        UINT PhyRAMAddr4KRL;//The physical address in RAM where an image locates. 
+        MemorySection loadSection;
+		MemorySection setSection;
+		BOOL HasFlashHeader;//Does an image have a flash header or ivt header.
+		UINT CodeOffset;//The offset in an image where the first byte of code locates, the parameter is used to 
+						//skip flash header or ivt header embedded in an image.
+	}ImageParameter, *PImageParameter;
+
 	static MemorySection StringToMemorySection(CString section)
 	{
 		if ( section.CompareNoCase(_T("DCD")) == 0 )
@@ -155,12 +184,10 @@ public:
 
 	MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path);
     virtual ~MxHidDevice();
-    //BOOL InitMemoryDevice();  
 	BOOL InitMemoryDevice(CString filename);
-    BOOL Download(StFwComponent *fwComponent, UINT PhyRAMAddr4KRL, MemorySection loadSection, MemorySection setSection, BOOL HasFlashHeader);
+    BOOL Download(PImageParameter pImageParameter, StFwComponent *fwComponent, Device::UI_Callback callbackFn);
 
     HANDLE	        m_hid_drive_handle;
-
 private:
     enum HAB_t
 	{
@@ -194,7 +221,9 @@ private:
     };
     #pragma pack()
 
-    int Close();
+    BOOL OpenUSBHandle(HANDLE* pHandle, CStdString pipePath);
+    BOOL OpenMxHidHandle();
+    BOOL CloseMxHidHandle();
     int Trash();
     int AllocateIoBuffers();
     void FreeIoBuffers();
@@ -203,22 +232,11 @@ private:
 	BOOL WriteMemory(UINT address, UINT data, UINT format);
 	BOOL ValidAddress(const UINT address, const UINT format) const;
     BOOL Jump(UINT RAMAddress);
+    BOOL ReadData(UINT address, UINT byteCount, unsigned char * pBuf);
 	BOOL TransData(UINT address, UINT byteCount, const unsigned char * pBuf);
 	BOOL WriteToDevice(const unsigned char *buf, UINT count);
 	BOOL ReadFromDevice(PUCHAR buf, UINT count);
 
-    /*
-    HANDLE OpenOneDevice (IN HDEVINFO HardwareDeviceInfo,
-        IN PSP_INTERFACE_DEVICE_DATA DeviceInfoData,
-        OUT CString& devName, OUT DWORD& devInst, rsize_t bufsize);
-    HANDLE OpenUsbDevice( LPGUID  pGuid, CString& outNameBuf, DWORD& outDevInst, rsize_t bufsize);
-	int SetUsbDeviceId(int dwDevInst);
-    HANDLE OpenSpecifiedDevice (IN HDEVINFO HardwareDeviceInfo,
-        IN PSP_INTERFACE_DEVICE_DATA DeviceInfoData,
-        OUT CString& devName, OUT DWORD& devInst, rsize_t bufsize);
-    BOOL GetUsbDeviceFileName( LPGUID  pGuid, CString& outNameBuf, DWORD& outDevInst, rsize_t bufsize);
-	BOOL OpenUSBHandle(HANDLE *pHandle, CString pipePath);
-	*/
     VOID PackSDPCmd(PSDPCmd pSDPCmd);
     BOOL WriteReg(PSDPCmd pSDPCmd);
     
@@ -227,7 +245,6 @@ private:
     static VOID CALLBACK ReadCompletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered,  
         LPOVERLAPPED lpOverlapped);
 
-    int Init();
     int Read(void* buf, UINT size);
     int Write(UCHAR* buf, ULONG size);
     

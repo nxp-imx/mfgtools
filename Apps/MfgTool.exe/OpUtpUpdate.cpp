@@ -744,9 +744,14 @@ DWORD COpUtpUpdate::DoMxHidLoad(UCL::Command* pCmd)
 	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, (int)fwComponent.size(), 0);       // STAGE 2 of the Load Operation
 	Device::UI_Callback callback(this, &COpUtpUpdate::OnDownloadProgress);
 
-	MxHidDevice::MemorySection loadSection = MxHidDevice::StringToMemorySection(pCmd->GetLoadSection());
-	MxHidDevice::MemorySection setSection = MxHidDevice::StringToMemorySection(pCmd->GetSetSection());
-	ReturnVal = pMxHidDevice->Download(&fwComponent, pCmd->GetAddress(), loadSection, setSection, pCmd->HasFlashHeader());
+	MxHidDevice::ImageParameter ImageParameter;
+	ImageParameter.loadSection = MxHidDevice::StringToMemorySection(pCmd->GetLoadSection());
+	ImageParameter.setSection = MxHidDevice::StringToMemorySection(pCmd->GetSetSection());
+	ImageParameter.PhyRAMAddr4KRL = pCmd->GetAddress();
+	//ImageParameter.HasFlashHeader = pCmd->HasFlashHeader();
+	ImageParameter.CodeOffset = pCmd->GetCodeOffset();
+
+    ReturnVal = pMxHidDevice->Download( &ImageParameter, &fwComponent, callback);
 
 	if(ReturnVal != TRUE) 
 	{
