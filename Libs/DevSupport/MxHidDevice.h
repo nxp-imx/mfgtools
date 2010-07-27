@@ -186,6 +186,7 @@ public:
     virtual ~MxHidDevice();
 	BOOL InitMemoryDevice(CString filename);
     BOOL Download(PImageParameter pImageParameter, StFwComponent *fwComponent, Device::UI_Callback callbackFn);
+    BOOL Jump();
 
     HANDLE	        m_hid_drive_handle;
 private:
@@ -262,5 +263,7 @@ private:
     HIDP_CAPS				m_Capabilities;
     _MX_HID_DATA_REPORT		*m_pReadReport;
     _MX_HID_DATA_REPORT		*m_pWriteReport;
+
+    UINT m_jumpAddr;
 };
 #endif //  __MXHIDDEVICE_H__

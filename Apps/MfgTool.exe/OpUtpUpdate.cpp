@@ -1159,6 +1159,8 @@ DWORD COpUtpUpdate::DoCommand(UCL::Command* pCmd)
 	}
 	else if ( pCmd->GetType() == _T("jump") )
 	{
+        if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxRom)
+        {
 		MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
 		if ( pMxRomDevice )
 		{
@@ -1169,6 +1171,20 @@ DWORD COpUtpUpdate::DoCommand(UCL::Command* pCmd)
 		}
 		else
 			retValue = ERROR_INVALID_HANDLE;
+        }
+        else if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
+        {
+            MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(m_pUSBPort->_device);
+    		if ( pMxHidDevice )
+    		{
+    			if ( (retValue = pMxHidDevice->Jump()) == TRUE )
+    				retValue = ERROR_SUCCESS;
+    			else
+    				retValue = ERROR_INVALID_HANDLE;
+    		}
+    		else
+    			retValue = ERROR_INVALID_HANDLE;
+        }       
 	}
 	else if ( pCmd->GetType() == _T("reset") )
 	{
