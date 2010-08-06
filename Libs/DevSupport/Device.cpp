@@ -341,6 +341,120 @@ CStdString Device::hub::get()
 	return _value;
 }
 
+int32_t Device::hubIndex::getmsc()
+{
+	Device* dev = dynamic_cast<Device*>(_owner);
+	ASSERT(dev);
+	DWORD bytes;
+	PUSB_NODE_CONNECTION_DRIVERKEY_NAME driverName ;
+
+	//CSingleLock sLock(&m_mutex);
+	//sLock.Lock();
+	//if(sLock.IsLocked())
+	{
+		if ( Value == 0 )
+		{
+			CStdString hubPath = dev->_hub.get();
+			if (hubPath.empty()){	
+				return Value;
+			}
+			// Open the hub.
+			DWORD error;
+			//w98 - In Windows 98 the hub path starts with \DosDevices\
+			//w98 - Replace it with \\.\ so we can use it with CreateFile.
+			hubPath.Replace(_T("\\DosDevices"), _T("\\\\."));
+			//wxp - In Windows XP the hub path may start with \??\
+			//wxp - Replace it with \\.\ so we can use it for CreateFile
+			hubPath.Replace(_T("\\??"), _T("\\\\."));
+			HANDLE hHub = CreateFile(hubPath, 0, 0, NULL, OPEN_EXISTING, 0, NULL);
+			ATLTRACE2(_T("hubIndex::getmsc() hHub is %x, hubPath is %s\r\n"), hHub, hubPath.c_str());
+			if (hHub == INVALID_HANDLE_VALUE) 
+			{
+				error = GetLastError();
+				return Value;
+			}
+
+			// See how many Ports are on the Hub
+			USB_NODE_INFORMATION NodeInformation;
+			DWORD BytesReturned;
+			BOOL Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_INFORMATION, &NodeInformation, sizeof(NodeInformation),
+												&NodeInformation, sizeof(NodeInformation),&BytesReturned, NULL);
+			if (!Success) 
+			{
+				error = GetLastError();
+				CloseHandle(hHub);
+				ATLTRACE2(_T("hubIndex::getmsc() GetErrorCode %d for IOCTL_USB_GET_NODE_INFORMATION\r\n"),error);
+				return Value;
+			}
+
+			// Loop through the Ports on the Hub any get the unique DriverKey if there is a device connected to
+			// the Port. If the DriveryKey from the hub matches the DriverKey for our device, we have our Hub Index.
+			//
+			// Port index is 1-based
+			for	(uint8_t index=1; index<=NodeInformation.u.HubInformation.HubDescriptor.bNumberOfPorts; index++) 
+			{
+				USB_NODE_CONNECTION_INFORMATION_EX ConnectionInformation;
+				ConnectionInformation.ConnectionIndex = index;
+				Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX, &ConnectionInformation, sizeof(ConnectionInformation),
+										&ConnectionInformation, sizeof(ConnectionInformation), &BytesReturned, NULL);
+				if (!Success) 
+				{
+					error = GetLastError();
+					CloseHandle(hHub);
+					ATLTRACE2(_T("hubIndex::getmsc() index %d GetErrorCode %d for IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX\r\n"),index,error);
+					return Value;
+				}
+
+				// There is a device connected to this Port
+				if ( ConnectionInformation.ConnectionStatus == DeviceConnected )
+				{
+					if(ConnectionInformation.DeviceDescriptor.idVendor != 0x066f || \
+						ConnectionInformation.DeviceDescriptor.idProduct != 0x37ff)
+						continue;
+
+					bytes = sizeof(DWORD)*2 + MAX_PATH*2;
+					driverName = (PUSB_NODE_CONNECTION_DRIVERKEY_NAME)malloc(bytes);
+					driverName->ConnectionIndex = index; 
+
+					// Get the name of the driver key of the device attached to the specified port.
+					Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_DRIVERKEY_NAME, driverName,
+											bytes, driverName, bytes, &BytesReturned, NULL);
+					
+					if (!Success) 
+					{
+						error = GetLastError();
+						/*CloseHandle(hHub);
+						free (driverName);
+						return Value;*/
+						ATLTRACE2(_T("hubIndex::getmsc() index %d GetErrorCode %d for IOCTL_USB_GET_NODE_CONNECTION_DRIVERKEY_NAME\r\n"),index,error);
+						continue;
+					}
+
+					ATLTRACE2(_T("hubIndex::getmsc() index %d driverName is %s,actualLength is 0x%x\r\n"),index, driverName->DriverKeyName,driverName->ActualLength);
+
+#if 1
+					CStdString deviceInstanceId = dev->GetDeviceInstanceId(_T(""));
+					ATLTRACE2(_T("hubIndex::getmsc() index %d deviceInstanceId is %s\r\n"),index, deviceInstanceId.c_str());
+#endif
+					// If the Driver Keys match, this is the correct Port
+					if ( dev->UsbDevice()->_driver.get().CompareNoCase((PWSTR)driverName->DriverKeyName) == 0 )
+					{			
+						Value = index;
+						free (driverName);
+						break;
+					}
+					free (driverName);
+				} // end if(connected)
+			} // end for(ports)
+
+			CloseHandle(hHub);
+			hHub = INVALID_HANDLE_VALUE;
+		}
+		//sLock.Unlock();
+	}
+	return Value;
+}
+
 /// <summary>
 /// Property: Gets the USB Hub index that the device is connected to.
 /// Hub Ports are 1-based. Zero(0) represents an INVALID_HUB_INDEX.
@@ -598,6 +712,49 @@ DWORD Device::InitDevInfo()
 	}
 
     return error;
+}
+
+CStdString Device::GetDeviceInstanceId(CStdString defaultValue)
+{
+	DWORD	dwRequiredSize = 0;
+	BOOL bResult = false;
+	PTSTR pszDeviceInstanceId = NULL;
+	DWORD dwError = 0;
+
+	/* First get the size only */
+    dwRequiredSize = 0;
+
+    bResult = gSetupApi().apiSetupDiGetDeviceInstanceId(_deviceInfoSet,&_deviceInfoData,NULL,0,&dwRequiredSize);
+	if (!bResult)
+	{
+		dwError = GetLastError();
+		if (dwError != ERROR_INSUFFICIENT_BUFFER)
+		{
+			if (dwError != ERROR_INVALID_DATA)
+			{
+				ATLTRACE(_T("SetupDiGetDeviceInstanceId fail.Error code is %d\n"),dwError);
+				throw;
+			}
+
+			return defaultValue;
+		}
+	}
+
+    pszDeviceInstanceId = (PTSTR)malloc(sizeof(TCHAR) *dwRequiredSize);
+    ASSERT(pszDeviceInstanceId!= NULL);
+
+    /* Then get the actual device instance id */
+    if (!gSetupApi().apiSetupDiGetDeviceInstanceId(_deviceInfoSet,&_deviceInfoData,pszDeviceInstanceId,dwRequiredSize,NULL))
+    {
+        dwError = GetLastError();
+		free(pszDeviceInstanceId);
+		ATLTRACE(_T("SetupDiGetDeviceInstanceId fail.Error code is %d\n"),dwError);
+		return defaultValue;
+    }
+
+	CStdString value = pszDeviceInstanceId;
+	free(pszDeviceInstanceId);
+	return value;
 }
 
 CStdString Device::GetProperty( DWORD property, CStdString defaultValue )

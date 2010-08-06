@@ -95,7 +95,7 @@ public:
 	class classDesc : public StringProperty { public: CStdString get(); }_classDesc;
 	class classIconIndex : public Int32Property { public: int32_t get(); }_classIconIndex;
 	class hub : public StringProperty { public: CStdString get(); }_hub;
-	class hubIndex : public Int32Property { public: int32_t get(); }_hubIndex;
+	class hubIndex : public Int32Property { public: int32_t get(); int32_t getmsc();}_hubIndex;
 
 protected:
     DeviceClass *_deviceClass;
@@ -114,4 +114,5 @@ private:
 	DWORD InitDevInfo();
 	CStdString GetProperty(DWORD property, CStdString defaultValue);
 	DWORD GetProperty(DWORD property, DWORD defaultValue);
+	CStdString GetDeviceInstanceId(CStdString defaultValue);
 };
