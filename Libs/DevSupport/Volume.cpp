@@ -3,6 +3,7 @@
 #include "VolumeDeviceClass.h"
 #include "KernelApi.h"
 
+#include "UpdateTransportProtocol.Api.h"
 
 Volume::Volume(DeviceClass * deviceClass, DEVINST devInst, CStdString path)
 : Device(deviceClass, devInst, path)
@@ -490,13 +491,13 @@ uint32_t Volume::SendCommand(HANDLE hDrive, StApi& api, uint8_t* additionalInfo,
 	pRequest->PassThrough.SenseInfoLength = sizeof (pRequest->SenseData);
 	// Handling the device has not responded situation 
 	pRequest->PassThrough.ScsiStatus = SCSISTAT_COMMAND_TERMINATED;
-	pRequest->SenseData.SenseKey == SCSI_SENSE_UNIQUE;
-	pRequest->SenseData.AdditionalSenseCodeQualifier = 0x8001; // EXIT
+	pRequest->SenseData.SenseKey = SCSI_SENSE_UNIQUE;
+	pRequest->SenseData.AdditionalSenseCode = (ScsiUtpMsg::EXIT && 0xFF00)>>8;			// EXIT 0x8001
+	pRequest->SenseData.AdditionalSenseCodeQualifier = (ScsiUtpMsg::EXIT && 0x00FF);	// EXIT 0x8001
 	pRequest->SenseData.Information[0] = 0xff;
 	pRequest->SenseData.Information[1] = 0xff;
 	pRequest->SenseData.Information[2] = 0xff;
 	pRequest->SenseData.Information[3] = 0xff;		
-	pRequest->SenseData.AdditionalSenseCode = 0x80;  //Additional Sense Code 
 	// Timeout
 //	if (pRequest->PassThrough.Cdb[1] == 7)
 //	    pRequest->PassThrough.TimeOutValue = 120; // seconds

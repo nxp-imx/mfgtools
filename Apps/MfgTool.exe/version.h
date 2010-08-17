@@ -5,4 +5,4 @@
 #define STMFGTOOL_STRING_VERSION "1.6.2.011\0"
 
 // used by perl script. please update this too
-// STMP_BUILD_VERSION=1.6.2.003
+// STMP_BUILD_VERSION=1.6.2.011

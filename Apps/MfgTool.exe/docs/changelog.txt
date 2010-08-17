@@ -6,7 +6,7 @@ RELEASE_STMFGTOOL_1.6.2.003
 03/29/2010 - Chris Williamson
 	
 	- Added MX35 Android Update for Lab126 testing.
-	- Moved "Panel? " to the front of the TARCE statement output for better sorting in multi device debugging.
+	- Moved "Panel? " to the front of the TRACE statement output for better sorting in multi device debugging.
 	- Removed 3.5 sec sleep after All Operation Complete state. Hopefully device isn't caching writes.
 	- Removed sync'ing Jump2Rak() for all devices and let it happen independently.
 	- Get HAB type in GetRKLVersion(); remove ROM function GetHABType()

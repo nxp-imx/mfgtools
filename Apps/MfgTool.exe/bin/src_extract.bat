@@ -25,14 +25,17 @@ xcopy /S /I Common temp\Common
 
 @echo ****************** DRIVERS ************************************************
 mkdir temp\Drivers
-xcopy /I Drivers\StRcvryDriver\bin\*.*	temp\Drivers\StRcvryDriver\bin
+xcopy /I Drivers\StRcvryDriver\bin\*.*		temp\Drivers\StRcvryDriver\bin
+xcopy /I /S Drivers\iMX_BulkIO_Driver\bin\*.*	temp\Drivers\iMX_BulkIO_Driver\bin
+mkdir temp\Drivers\iMX_BulkIO_Driver\sys
+copy Drivers\iMX_BulkIO_Driver\sys\public.h	temp\Drivers\iMX_BulkIO_Driver\sys\public.h
 
 @echo ****************** RESOURCES *****************************************
-mkdir temp\resources
-xcopy resources\closedfolder.bmp temp\resources
-xcopy resources\openfolder.bmp temp\resources
-xcopy resources\resourcefile.bmp temp\resources
-xcopy resources\freescale_logo.bmp temp\resources
+mkdir temp\Resources
+xcopy Resources\closedfolder.bmp 	temp\Resources
+xcopy Resources\openfolder.bmp 		temp\Resources
+xcopy Resources\resourcefile.bmp 	temp\Resources
+xcopy Resources\freescale_logo.bmp 	temp\Resources
 
 @echo ****************** LIBS ***************************************************
 mkdir temp\Libs
@@ -45,15 +48,7 @@ del /Q Libs\DevSupport\*.user
 del /Q Libs\DevSupport\*.ncb
 del /Q Libs\DevSupport\*.suo	
 xcopy /S /I Libs\DevSupport	temp\Libs\DevSupport
-
-mkdir temp\Libs\MXLib
-if exist  Libs\MXLib\Release rmdir /S /Q Libs\MXLib\Release
-if exist  Libs\MXLib\Debug   rmdir /S /Q Libs\MXLib\Debug
-del /Q Libs\MXLib\*.bak
-del /Q Libs\MXLib\*.user
-del /Q Libs\MXLib\*.ncb
-del /Q Libs\MXLib\*.suo	
-xcopy /S /I Libs\MXLib	temp\Libs\MXLib
+xcopy /S /I Libs\WDK		temp\Libs\WDK
 
 mkdir temp\Libs\Loki
 xcopy /S /I Libs\Loki temp\Libs\Loki
