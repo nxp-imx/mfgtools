@@ -114,8 +114,10 @@ namespace api
     {
     public:
         friend class StApiFactory;
-        static const uint8_t InfoPage_Chip = 0x01, InfoPage_PitcStatus = 0x02;
-        static const uint32_t PITC_STATUS_READY=0x00000000, PITC_STATUS_NOT_READY=0x00000001;
+        static const uint8_t InfoPage_Chip = 0x01, InfoPage_PitcStatus = 0x02, InfoPage_secConfig = 0x3;
+		static const uint32_t PITC_STATUS_READY=0x00000000, PITC_STATUS_NOT_READY=0x00000001;
+		static const uint32_t BLTC_SEC_CONFIG_DISABLE=0x00000000, BLTC_SEC_CONFIG_FAB=0x00000001,
+							  BLTC_SEC_CONFIG_ENGINEERING=0x00000002,BLTC_SEC_CONFIG_PRODUCTION=0x00000003;
 		HidInquiry(const uint8_t infoPage, const uint32_t infoParam = 0);
         virtual ~HidInquiry() {};
 
@@ -133,6 +135,7 @@ namespace api
         uint16_t GetRomVersion() const;
         uint16_t GetRomLoaderProtocolVersion() const;
         uint32_t GetPitcStatus() const;
+		uint32_t GetSecConfig() const;
 
     private:
         ParameterT<uint8_t> _infoPage;
@@ -147,8 +150,8 @@ namespace api
             void clear() { ChipId = ChipRevision = RomVersion = RomLoaderProtocolVersion = 0; };
         }_chipInfo;
         uint32_t _pitcStatus;
+		uint32_t _secConfigStatus;
     };
-
     //////////////////////////////////////////////////////////////////////
     //
     // ST_HID_BLTC_COMMAND: HidDownloadFw

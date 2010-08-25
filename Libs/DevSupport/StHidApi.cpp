@@ -1,6 +1,7 @@
 // StHidApi.cpp:
 //
 //////////////////////////////////////////////////////////////////////
+#include "stdafx.h"
 #include "StHidApi.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -17,11 +18,13 @@ StApi* HidInquiry::Create(CStdString paramStr)
 HidInquiry::HidInquiry(CStdString& paramStr)
 	: StApiT<_ST_HID_CDB::_CDBHIDINFO>(API_TYPE_BLTC, ST_READ_CMD, _T("Inquiry"))
 	, _pitcStatus(0)
+	, _secConfigStatus(0)
 {
-	// ;param: InfoPage:InfoPage_Chip, InfoPage_PitcStatus
+	// ;param: InfoPage:InfoPage_Chip, InfoPage_PitcStatus, InfoPage_secConfig
 	_params[L"InfoPage:"]                    = &_infoPage;
 	_infoPage.ValueList[InfoPage_Chip]       = L"InfoPage_Chip";
 	_infoPage.ValueList[InfoPage_PitcStatus] = L"InfoPage_PitcStatus";
+	_infoPage.ValueList[InfoPage_secConfig]  = L"InfoPage_secConfig";
 	// ;param: InfoParam:0xAABBCCDD
 	_params[L"InfoParam:"]                    = &_infoParam;
 
@@ -33,9 +36,26 @@ HidInquiry::HidInquiry(CStdString& paramStr)
 HidInquiry::HidInquiry(const uint8_t infoPage, const uint32_t infoParam)
 	: StApiT<_ST_HID_CDB::_CDBHIDINFO>(API_TYPE_BLTC, ST_READ_CMD, _T("Inquiry"))
 	, _pitcStatus(0)
+	, _secConfigStatus(0)
 {
-	_infoPage.Value = infoPage;
-	_infoParam.Value = infoParam;
+	// ;param: InfoPage:InfoPage_Chip, InfoPage_PitcStatus, InfoPage_secConfig
+	_params[L"InfoPage:"]                    = &_infoPage;
+
+	_infoPage.Desc = L"InfoPage";
+	_infoPage.ValueList[0] = L"Reserved";
+	_infoPage.ValueList[InfoPage_Chip]       = L"InfoPage_Chip";
+	_infoPage.ValueList[InfoPage_PitcStatus] = L"InfoPage_PitcStatus";
+	_infoPage.ValueList[InfoPage_secConfig]  = L"InfoPage_secConfig";
+	// ;param: InfoParam:0xAABBCCDD
+	_params[L"InfoParam:"]                    = &_infoParam;
+
+	_infoParam.ValueList[0] = L"InfoParam";
+	_infoParam.Desc = L"InfoParam";
+
+	_infoPage.Value = _infoPage.Default = infoPage;
+	_infoParam.Value = _infoParam.Default = infoParam;
+
+	PrepareCommand();
 }
 
 void HidInquiry::ParseCdb()
@@ -78,6 +98,10 @@ void HidInquiry::ProcessResponse(const uint8_t *const pData, const uint32_t star
 	{
 		_pitcStatus = *(uint32_t*)pData; 
 	}
+	else if ( _cdb.InfoPage == InfoPage_secConfig)
+	{
+		_secConfigStatus = *(uint32_t*)pData;
+	}
 }
 
 const CStdString& HidInquiry::ResponseString()
@@ -104,6 +128,27 @@ const CStdString& HidInquiry::ResponseString()
 					break;
 				default:
 					_responseStr.Format(_T("PITC Status: UNKNOWN(0x%08X)"), GetPitcStatus());
+			}
+			break;
+		}
+		case InfoPage_secConfig:
+		{
+			switch (GetSecConfig())
+			{
+				case BLTC_SEC_CONFIG_DISABLE:
+					_responseStr = _T("BLTC sec Config Status: DISABLE(0x00000000)");
+					break;
+				case BLTC_SEC_CONFIG_FAB:
+					_responseStr = _T("BLTC sec Config Status: PAB(0x00000001)");
+					break;
+				case BLTC_SEC_CONFIG_ENGINEERING:
+					_responseStr = _T("BLTC sec Config Status: ENGINEERING(0x00000001)");
+					break;
+				case BLTC_SEC_CONFIG_PRODUCTION:
+					_responseStr = _T("BLTC sec Config Status: PRODUCTION(0x00000001)");
+					break;
+				default:
+					_responseStr.Format(_T("BLTC sec Config Status: UNKNOWN(0x%08X)"), GetSecConfig());
 			}
 			break;
 		}
@@ -152,6 +197,14 @@ uint32_t HidInquiry::GetPitcStatus() const
 		return -1;
 	
 	return _pitcStatus;
+};
+
+uint32_t HidInquiry::GetSecConfig() const
+{
+	if( _cdb.InfoPage != InfoPage_secConfig )
+			return -1;
+		
+	return _secConfigStatus;
 };
 
 //////////////////////////////////////////////////////////////////////

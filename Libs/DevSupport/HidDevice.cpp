@@ -6,10 +6,25 @@ HidDevice::HidDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path
 , _status(CSW_CMD_PASSED)
 , _pReadReport(NULL)
 , _pWriteReport(NULL)
+, _chipFamily(ChipUnknown)
+, _habType(HabUnknown)
 {
     memset(&_Capabilities, 0, sizeof(_Capabilities));
 
     int32_t err = AllocateIoBuffers();
+
+	_chipFamily = GetChipFamily();
+
+	if(_chipFamily == MX28)
+	{
+		_habType = GetHABType(_chipFamily);
+		if(_habType == HabUnknown)
+			goto Exit;
+	}
+	TRACE("************The HID device is initialized**********\r\n");
+	return;
+Exit:
+	TRACE("Failed to initialize the HID device!!!\r\n");
 }
 
 HidDevice::~HidDevice(void)
@@ -545,4 +560,190 @@ uint32_t HidDevice::ResetChip()
 	api::HidDeviceReset api;
 
 	return SendCommand(api);
+}
+
+HidDevice::ChipFamily_t HidDevice::GetChipFamily()
+{
+    if ( _chipFamily == Unknown )
+    {
+		CString devPath = UsbDevice()->_path.get();
+		devPath.MakeUpper();
+
+		if ( devPath.Find(_T("VID_066F&PID_3780")) != -1 )
+		{
+			_chipFamily = MX23;
+		}
+		else if ( devPath.Find(_T("VID_15A2&PID_004F")) != -1 )
+		{
+			_chipFamily = MX28;
+		}
+    }
+
+	return _chipFamily;
+}
+
+//-------------------------------------------------------------------------------------		
+// Function to get HAB_TYPE value
+//
+// @return
+//		HabEnabled: if is prodction
+//		HabDisabled: if is development/disable
+//-------------------------------------------------------------------------------------
+HidDevice::HAB_t HidDevice::GetHABType(ChipFamily_t chipType)
+{	
+	HAB_t habType = HabUnknown;
+	
+	_ST_HID_CBW cbw = {0};
+	_ST_HID_CDB::_CDBHIDINFO _cbd;
+	uint32_t bltcStatus;
+	uint32_t errcode;
+
+	// Make sure there we have buffers and such
+    if ( _pReadReport == NULL || _pWriteReport == NULL )
+    {
+		goto EXIT;
+    }
+	
+    // Open the device
+    HANDLE hHidDevice = CreateFile(_path.get(), GENERIC_READ|GENERIC_WRITE,
+        FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+
+    if( hHidDevice == INVALID_HANDLE_VALUE )
+    {
+        ATLTRACE2(_T("-HidDevice::GetHABType() Create Device Handle fail!\r\n"));
+        goto EXIT;
+    }
+
+	//Send Command:CBW
+	uint16_t writeSize = _Capabilities.OutputReportByteLength;
+	if(writeSize < 1)
+    {
+        errcode = ERROR_BAD_LENGTH;
+        ATLTRACE2(_T(" -HidDevice::GetHABType()  ERROR:(%d)\r\n"), errcode);
+        goto EXIT;
+    }
+	
+    memset(_pWriteReport, 0x00, writeSize);
+    _pWriteReport->ReportId = HID_BLTC_REPORT_TYPE_COMMAND_OUT;
+	cbw.Tag = 0;
+	cbw.Signature = CBW_BLTC_SIGNATURE ;
+	cbw.XferLength = sizeof(bltcStatus);
+	cbw.Flags = CBW_DEVICE_TO_HOST_DIR;
+	
+	memset(&_cbd,0,sizeof(_cbd));
+	_cbd.Command = BLTC_INQUIRY;
+	_cbd.InfoPage = 0x03;//k_inquiry_page_sec_config(0x03)
+	memcpy(&cbw.Cdb,&_cbd, sizeof(_cbd));
+
+	memcpy(&_pWriteReport->Payload[0], &cbw, sizeof(cbw) /*writeSize - 1*/); // 
+
+    memset(&_fileOverlapped, 0, sizeof(_fileOverlapped));
+    _fileOverlapped.hEvent = this;
+    BOOL temp = WriteFileEx(hHidDevice, _pWriteReport, writeSize, &_fileOverlapped, HidDevice::IoCompletion);
+    if ( (errcode=GetLastError()) != ERROR_SUCCESS )
+	{
+		ATLTRACE2(_T(" -HidDevice::GetHABType()  ERROR:(%d)\r\n"), errcode);
+        goto EXIT;
+    }
+
+    errcode = ProcessTimeOut(ST_SCSI_DEFAULT_TIMEOUT);
+    if( errcode != ERROR_SUCCESS )
+    {
+   	    BOOL success = CancelIo(hHidDevice);
+		ATLTRACE2(_T(" -HidDevice::GetHABType()  ERROR:(%d)\r\n"), errcode);
+	    goto EXIT;
+    }
+
+	// Get status
+	uint16_t readSize = _Capabilities.InputReportByteLength;
+	memset(_pReadReport, 0x00, readSize);
+	memset(&_fileOverlapped, 0, sizeof(_fileOverlapped));
+	_fileOverlapped.hEvent = this;
+	temp = ReadFileEx(hHidDevice, _pReadReport, readSize, &_fileOverlapped, HidDevice::IoCompletion);
+	if ( (errcode=GetLastError()) != ERROR_SUCCESS )
+	{
+		ATLTRACE2(_T(" -HidDevice::GetHABType()  ERROR:(%d)\r\n"), errcode);
+		if ( !temp )
+			goto EXIT;
+	}
+
+	errcode = ProcessTimeOut(ST_SCSI_DEFAULT_TIMEOUT);
+	if( errcode != ERROR_SUCCESS )
+	{
+		BOOL success = CancelIo(hHidDevice);
+		ATLTRACE2(_T(" -HidDevice::GetHABType()  ERROR:(%d)\r\n"), errcode);
+		goto EXIT;
+	}
+
+	if ( _pReadReport->ReportId == HID_BLTC_REPORT_TYPE_DATA_IN)
+		habType = (HAB_t)_pReadReport->Payload[0];
+
+	//Check CSW
+	readSize = _Capabilities.InputReportByteLength;
+    memset(_pReadReport, 0x00, readSize);
+    memset(&_fileOverlapped, 0, sizeof(_fileOverlapped));
+    _fileOverlapped.hEvent = this;
+    if(!ReadFileEx(hHidDevice, _pReadReport, readSize, &_fileOverlapped, HidDevice::IoCompletion))        
+    {
+        errcode = GetLastError();
+   		ATLTRACE2(_T(" -HidDevice::GetHABType()  ERROR:(%d)\r\n"), errcode);
+        goto EXIT;
+    }
+
+    errcode = ProcessTimeOut(ST_SCSI_DEFAULT_TIMEOUT);
+    if( errcode != ERROR_SUCCESS )
+	{
+       	BOOL success = CancelIo(hHidDevice);
+   		ATLTRACE2(_T(" -HidDevice::GetHABType()  ERROR:(%d)\r\n"), errcode);
+		goto EXIT;
+	}
+
+    // check status
+    _status = ((_ST_HID_STATUS_REPORT*)_pReadReport)->Csw.Status;
+    if ( _status != ERROR_SUCCESS )
+    {
+        goto EXIT;
+    }
+	
+	CloseHandle(hHidDevice);
+	return habType;
+EXIT:
+	CloseHandle(hHidDevice);
+	return HabUnknown;
+
+//The following codes is more easy,but there is a data abort for "HidInquiry api"
+/*
+	uint8_t moreInfo = 0;
+	uint8_t InfoPage_secConfig = 0x3;
+	uint32_t infoParam = 0x0;
+	HidInquiry api(InfoPage_secConfig, infoParam);
+
+	uint32_t err;
+	CStdString _strResponse;
+	err = SendCommand(api,&moreInfo);
+	if ( err == ERROR_SUCCESS ) 
+	{
+		_strResponse = api.ResponseString().c_str();
+		if ( _strResponse.IsEmpty() )
+			_strResponse = _T("OK");
+	}
+	else
+	{
+		_strResponse.Format(_T("Error: SendCommand(%s) failed. (%d)\r\n"), api.GetName(), err);
+
+        CStdString strTemp;
+		FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, strTemp.GetBufferSetLength(MAX_PATH), MAX_PATH, NULL);
+        _strResponse.AppendFormat(_T("%s"), strTemp.c_str());		
+	}
+	ATLTRACE2(_T(" HidDevice::GetHABType() %s.\r\n"), _strResponse.c_str());
+
+	habType = (HAB_t)api.GetSecConfig();
+
+	return habType;
+*/
+}
+
+DWORD HidDevice::GetHabType()
+{
+	return _habType;
 }

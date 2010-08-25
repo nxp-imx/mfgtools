@@ -19,7 +19,7 @@ public:
 			                          DWORD dwNumberOfBytesTransfered,  // number of bytes transferred
 							          LPOVERLAPPED lpOverlapped);        // pointer to structure with I/O information
 	virtual uint32_t ResetChip();
-
+	DWORD GetHabType();
 private:
 #pragma pack(1)
     //------------------------------------------------------------------------------
@@ -106,7 +106,6 @@ private:
 
 	uint8_t _status;
 
-
     int32_t AllocateIoBuffers();
     void FreeIoBuffers();
 
@@ -115,4 +114,25 @@ private:
     bool ProcessWriteData(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo);
     bool ProcessReadStatus(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo);
     int32_t ProcessTimeOut(const int32_t timeout);
+
+	enum HAB_t
+	{
+		HabUnknown	= -1,
+		bltc_sec_config_disabled = 0,
+		bltc_sec_config_fab ,
+		bltc_sec_config_production ,
+		bltc_sec_config_engineering
+	};
+
+	enum ChipFamily_t
+	{
+		ChipUnknown = 0,
+		MX23,
+		MX28
+	};
+	
+	ChipFamily_t _chipFamily;
+	HAB_t _habType;
+	ChipFamily_t GetChipFamily();
+	HAB_t GetHABType(ChipFamily_t chipType);
 };

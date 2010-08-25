@@ -1139,7 +1139,14 @@ DWORD COpUtpUpdate::DoCommand(UCL::Command* pCmd)
 	bstr_log_text = logText.AllocSysString();
 	((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
 
-    if ( pCmd->GetType() == _T("boot") )
+	ATLTRACE(_T("-----------------------------------------------------------------\r\n"));
+    ATLTRACE(_T("%s Start <CMD/> %s.\r\n"), m_pPortMgrDlg->GetPanel(), pCmd->ToString());
+
+	if ( pCmd->GetType() == _T("verify") )
+	{
+		retValue = DoVerify(pCmd);
+	}
+    else if ( pCmd->GetType() == _T("boot") )
 	{
 		// Reset device to ROM and load file.
         retValue = DoBoot(pCmd);
@@ -1161,16 +1168,16 @@ DWORD COpUtpUpdate::DoCommand(UCL::Command* pCmd)
 	{
         if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxRom)
         {
-		MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
-		if ( pMxRomDevice )
-		{
-			if ( (retValue = pMxRomDevice->Jump()) == TRUE )
-				retValue = ERROR_SUCCESS;
-			else
-				retValue = ERROR_INVALID_HANDLE;
-		}
-		else
-			retValue = ERROR_INVALID_HANDLE;
+    		MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+    		if ( pMxRomDevice )
+    		{
+    			if ( (retValue = pMxRomDevice->Jump()) == TRUE )
+    				retValue = ERROR_SUCCESS;
+    			else
+    				retValue = ERROR_INVALID_HANDLE;
+    		}
+    		else
+    			retValue = ERROR_INVALID_HANDLE;
         }
         else if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
         {
@@ -1287,6 +1294,60 @@ DWORD COpUtpUpdate::DoCommand(UCL::Command* pCmd)
 	logText.Format(_T("%s Finished <CMD/> %s %s code=%d.\r\n"), m_pPortMgrDlg->GetPanel(), pCmd->ToString(), retValue == ERROR_SUCCESS ? _T("SUCCESS") : _T("FAIL"), retValue);
 	bstr_log_text = logText.AllocSysString();
 	((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+
+    ATLTRACE(_T("%s Finished <CMD/> %s %s code=%d.\r\n"), m_pPortMgrDlg->GetPanel(), pCmd->ToString(), retValue == ERROR_SUCCESS ? _T("SUCCESS") : _T("FAIL"), retValue);
+	ATLTRACE(_T("=================================================================\r\n"));
+	return retValue;
+}
+
+DWORD COpUtpUpdate::DoVerify(UCL::Command* pCmd)
+{
+	DWORD retValue = 0;
+	HAB_type habValue = HabUnknown;
+
+	// Get the hab value in script
+	if(memcmp(pCmd->GetBody(),_T("HabEnable"),sizeof(_T("HabEnable"))) == 0)
+		habValue = HabEnable;
+	if(memcmp(pCmd->GetBody(),_T("HabDisable"),sizeof(_T("HabDisable"))) == 0)
+		habValue = HabDisable;
+	
+	if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxRom)
+	{
+		MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+		if ( pMxRomDevice )
+		{
+			retValue = ERROR_SUCCESS;
+		}
+	}
+	if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
+	{
+		MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(m_pUSBPort->_device);
+		if ( pMxHidDevice )
+		{
+			retValue = ERROR_SUCCESS;
+		}
+	}
+	else if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeHid)
+	{
+		HidDevice* pHidDevice = dynamic_cast<HidDevice*>(m_pUSBPort->_device);
+		if ( pHidDevice )
+		{
+			if(habValue == (HAB_type)pHidDevice->GetHabType())
+				retValue = ERROR_SUCCESS;
+			else
+			{
+				retValue = ERROR_BAD_FORMAT;
+				CString errstr;
+				if ((HAB_type)pHidDevice->GetHabType() == HabDisable)
+					errstr = _T("The board is HabDisable. The firmware is mismatch.\r\n");
+				else
+					errstr = _T("The board is HabEnable. The firmware is mismatch.\r\n");
+				MessageBox(NULL,errstr,_T("ERROR"), MB_ICONEXCLAMATION ); 
+			}
+		}
+		else
+			retValue = ERROR_INVALID_HANDLE;
+	}	
 
 	return retValue;
 }
