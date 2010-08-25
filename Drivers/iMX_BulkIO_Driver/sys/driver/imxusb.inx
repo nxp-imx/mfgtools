@@ -13,6 +13,8 @@
 ;
 ;Abstract:
 ;    Installation inf for the Freescale i.MX Evaluation Boards
+;    This is a mutlios INF file. Same INF file cab be used on
+;    x86, and amd64 platforms.
 ;
 ;--*/
 
@@ -20,41 +22,46 @@
 Signature="$WINDOWS NT$"
 Class=USB
 ClassGuid={36fc9e60-c465-11cf-8056-444553540000}
-Provider=%MSFT%
-DriverVer=09/08/2009,6.1.7600.16385
-CatalogFile=KmdfSamples.cat
-
-
-; ================= Class section =====================
-
-[ClassInstall32]
-Addreg=SampleClassReg     
-
-[SampleClassReg]
-HKR,,,0,%ClassName%
-HKR,,Icon,,-5
+Provider=%MfgName%
+DriverVer=03/19/2010,6.1.7600.16385
+CatalogFile.NTx86=imxusb.cat
+CatalogFile.NTAMD64=imxusb.x64.cat
 
 [DestinationDirs]
 DefaultDestDir = 12
+CoInstaller_CopyFiles = 11
 
 ; ================= Device section =====================
 
 [Manufacturer]
-%MfgName%=Microsoft,NTx86
+%MfgName%=Freescale,NTx86,NTamd64
 
 ; For Win2K
-[Microsoft]
+[Freescale]
+%USB\VID_15A2&PID_004E.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_004E   ; Freescale i.MX53 board
+%USB\VID_15A2&PID_0041.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_0041   ; Freescale i.MX51 board
+%USB\VID_15A2&PID_0030.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_0030   ; Freescale i.MX35 board
 
 ; For XP and later
-[Microsoft.NTx86]
-%USB\VID_15A2&PID_0041.DeviceDesc%=imxusb.Dev, USB\VID_15A2&PID_0041   ; Freescale i.MX51 board
-%USB\VID_15A2&PID_0030.DeviceDesc%=imxusb.Dev, USB\VID_15A2&PID_0030   ; Freescale i.MX35 board
+[Freescale.NTx86]
+%USB\VID_15A2&PID_004E.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_004E   ; Freescale i.MX53 board
+%USB\VID_15A2&PID_0041.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_0041   ; Freescale i.MX51 board
+%USB\VID_15A2&PID_0030.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_0030   ; Freescale i.MX35 board
 
+[Freescale.NTamd64]
+%USB\VID_15A2&PID_004E.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_004E   ; Freescale i.MX53 board
+%USB\VID_15A2&PID_0041.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_0041   ; Freescale i.MX51 board
+%USB\VID_15A2&PID_0030.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_0030   ; Freescale i.MX35 board
 
-[imxusb.Dev.NT]
-CopyFiles=imxusb.Files.Ext
+[iMX_USB_Device.NT]
+CopyFiles=iMX_USB_Device.NT.Copy
 
-[imxusb.Dev.NT.Services]
+[iMX_USB_Device.NT.Copy]
+imxusb.sys
+
+;-------------- Service installation
+
+[iMX_USB_Device.NT.Services]
 Addservice = imxusb, 0x00000002, imxusb.AddService
 
 [imxusb.AddService]
@@ -62,55 +69,48 @@ DisplayName    = %imxusb.SvcDesc%
 ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
 StartType      = 3                  ; SERVICE_DEMAND_START
 ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
-ServiceBinary  = %10%\System32\Drivers\imxusb.sys
+ServiceBinary  = %12%\imxusb.sys
 AddReg         = imxusb.AddReg
-LoadOrderGroup = Base
 
 [imxusb.AddReg]
 HKR,"Parameters","MaximumTransferSize",0x10001,4194304
 HKR,"Parameters","DebugLevel",0x10001,2
 
-[imxusb.Files.Ext]
-imxusb.sys
+[iMX_USB_Device.NT.Wdf]
+KmdfService = imxusb, imxusb_wdfsect
 
-[SourceDisksNames]
-1=%Disk_Description%,,,
-
-[SourceDisksFiles]
-imxusb.sys = 1
+[imxusb_wdfsect]
+KmdfLibraryVersion = 1.9
 
 ;-------------- WDF Coinstaller installation
-[DestinationDirs]
-CoInstaller_CopyFiles = 11
 
-[imxusb.Dev.NT.CoInstallers]
+[iMX_USB_Device.NT.CoInstallers]
 AddReg=CoInstaller_AddReg
 CopyFiles=CoInstaller_CopyFiles
 
 [CoInstaller_CopyFiles]
 WdfCoInstaller01009.dll
 
-[SourceDisksFiles]
-WdfCoInstaller01009.dll=1 ; make sure the number matches with SourceDisksNames
-
 [CoInstaller_AddReg]
 HKR,,CoInstallers32,0x00010000, "WdfCoInstaller01009.dll,WdfCoInstaller"
 
-[imxusb.Dev.NT.Wdf]
-KmdfService = imxusb, imxusb_wdfsect
+[SourceDisksNames.NTx86]
+1=%Disk_Description%,,,\i386
 
-[imxusb_wdfsect]
-KmdfLibraryVersion = 1.9
+[SourceDisksNames.NTamd64]
+1=%Disk_Description%,,,\amd64
 
-;---------------------------------------------------------------;
+[SourceDisksFiles]
+imxusb.sys=1,,
+WdfCoInstaller01009.dll=1,,
 
 [Strings]
-MSFT            = "Microsoft"
 MfgName         = "Freescale"
-Disk_Description= "imxusb Installation Disk"
-imxusb.SvcDesc = "WDF USB Driver for Freescale i.MX board"
-ClassName       = "IMX USB Device"
-USB\VID_15A2&PID_0041.DeviceDesc="Freescale i.MX51 USB BulkIO USB Device"
-USB\VID_15A2&PID_0030.DeviceDesc="Freescale i.MX35 USB BulkIO USB Device"
+Disk_Description= "iMXUSB Installation Disk"
+imxusb.SvcDesc = "Freescale i.MX USB BulkIO Device Driver"
+ClassName       = "i.MX USB Device"
+USB\VID_15A2&PID_004E.DeviceDesc="Freescale i.MX53 USB BulkIO Device"
+USB\VID_15A2&PID_0041.DeviceDesc="Freescale i.MX51 USB BulkIO Device"
+USB\VID_15A2&PID_0030.DeviceDesc="Freescale i.MX35 USB BulkIO Device"
 
 
