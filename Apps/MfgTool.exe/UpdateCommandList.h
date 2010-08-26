@@ -19,6 +19,9 @@ public:
 		// [XmlAttribute("body")]
 		CString GetBody() { return CString(GetAttrValue(_T("body"))); };
 
+        // [XmlAttribute("if")]
+		CString GetIFCondition() { return CString(GetAttrValue(_T("if"))); };
+
 		// [XmlAttribute("address")]
 		unsigned int GetAddress()
 		{ 

@@ -30,6 +30,14 @@ protected:
 		HabDisable  = 0,
 		HabEnable   = 1  
 	};
+	enum HAB_status
+	{
+        HabUnknownStatus = -1,
+        HabChecked = 0,
+        NoHabCheck = 1,
+        HabDismatch = 2,
+        HabMatch =3
+	};
 	enum OpState_t{OP_INVALID = 0, WAITING_FOR_DEVICE, /*WAITING_FOR_HID_MODE, */WAITING_FOR_RECOVERY_MODE, OP_RECOVERING, WAITING_FOR_UPDATER_MODE, WAITING_FOR_MFG_MSC_MODE, WAITING_FOR_MSC_MODE, WAITING_FOR_MTP_MODE, OP_FLASHING, OP_COMPLETE, WAITING_FOR_SECOND_UPDATER_MODE};
 	OpState_t m_OpState;
 
@@ -52,6 +60,7 @@ protected:
 	CString m_sVersion;
 	DWORD	m_dwStartTime;
 	BOOL WaitForDeviceChange(int seconds);
+	DWORD CheckHabType(CString strHabType);
 
 	const UCL::DeviceState::DeviceState_t GetDeviceState();
 
@@ -67,7 +76,6 @@ protected:
 	friend UINT DoListThreadProc(LPVOID pParam);
 	
 	DWORD DoCommand(UCL::Command* pCmd);
-	DWORD DoVerify(UCL::Command* pCmd);
 	DWORD DoDrop(UCL::Command* pCmd);
 	DWORD DoFind(UCL::Command* pCmd);
 	DWORD DoBoot(UCL::Command* pCmd);
