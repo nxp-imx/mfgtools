@@ -1,6 +1,24 @@
 http://psg-host.svn-tx30.am.freescale.net/svn/psg-host/branches/dev/0004
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.012b
+****************************************
+09/03/2010 - Chris Williamson for Starle Li
+
+	- Changed MxRomDevice class to deal sync device functionality in which there are the 
+	  different requirements between i.mx51 and others.
+	  
+	  * This is a step in the right direction, but still may need some looking at the MxRomDevice()
+	    constructor. The initialization should take place for both Bootstrap and RamKernel modes.
+	  * Consider changes implemented in r374 and relates file Libs/DevSupport/MxRomDeviceClass.cpp.
+
+	Libs/DevSupport/MxRomDevice.cpp
+	Libs/DevSupport/MxRomDevice.h
+	Apps/MfgTool.exe/docs/changelog.txt
+	Apps/MfgTool.exe/version.h
+	    
+
+****************************************
 RELEASE_STMFGTOOL_1.6.2.003
 ****************************************
 03/29/2010 - Chris Williamson

@@ -301,7 +301,7 @@ private:
 
 	BOOL WriteMemory(UINT address, UINT data, UINT format);
 	BOOL ValidAddress(const UINT address, const UINT format) const;
-	HAB_t GetHABType(ChipFamily_t chipType);
+	//HAB_t GetHABType(ChipFamily_t chipType);
 	void PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsigned long addr, unsigned long param1, unsigned long param2);
 	struct Response UnPackRklResponse(unsigned char *resBuf);
 	BOOL Jump2Rak();
@@ -317,6 +317,7 @@ private:
 	HANDLE _hRead;
 	ChipFamily_t _chipFamily;
 	HAB_t _habType;
+    BOOL _SyncAllDevEnable;
 
 	enum ChannelType { ChannelType_UART = 0, ChannelType_USB };
 	typedef struct RomVersion

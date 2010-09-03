@@ -24,6 +24,7 @@ MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
 	, _chipFamily(ChipUnknown)
 	, _habType(HabUnknown)
 	, _romVersion(0,0)
+    ,_SyncAllDevEnable(FALSE)
 
 {
 	_MaxPacketSize.describe(this, _T("Max Packet Size"), _T(""));
@@ -68,9 +69,6 @@ MxRomDevice::MxRomDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
 	TRACE(_T("Initialize new i.mx device of path: %s.\r\n"), CurImgDwdSts.Path);
 
 	if(_MaxPacketSize.get() == 0)
-		goto Exit;
-	_habType = GetHABType(_chipFamily);
-	if(_habType == HabUnknown)
 		goto Exit;
 	if(!InitRomVersion(_chipFamily, _romVersion, _defaultAddress))
 		goto Exit;
@@ -140,6 +138,7 @@ MxRomDevice::ChipFamily_t MxRomDevice::GetChipFamily()
 		else if ( devPath.Find(_T("VID_15A2&PID_0041")) != -1 )
 		{
 			_chipFamily = MX51;
+            _SyncAllDevEnable = TRUE;
 		}
 		else if ( devPath.Find(_T("VID_15A2&PID_004E")) != -1 )
 		{
@@ -162,7 +161,7 @@ MxRomDevice::ChipFamily_t MxRomDevice::GetChipFamily()
 //		HabEnabled: if is prodction
 //		HabDisabled: if is development/disable
 //-------------------------------------------------------------------------------------
-MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
+/*MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
 {
 	const short header = ROM_KERNEL_CMD_WR_MEM;
 	UINT address;
@@ -253,7 +252,7 @@ MxRomDevice::HAB_t MxRomDevice::GetHABType(ChipFamily_t chipType)
 	}
 
 	return HabDisabled;
-}
+}*/
 
 BOOL MxRomDevice::InitRomVersion(ChipFamily_t chipType, RomVersion& romVersion, MxAddress& defaultAddrs) const
 {
@@ -718,6 +717,7 @@ int MxRomDevice::GetRKLVersion(CString& fmodel, int& len, int& mxType)
 	// check if is bootstrap
 	if (res.romResponse == HabEnabled || res.romResponse == HabDisabled)
 	{
+        _habType = (HAB_t)res.romResponse;
 		len = 0;
 		TRACE("The device is running under Bootstrap mode.\r\n");
 		return RET_SUCCESS;
@@ -994,30 +994,32 @@ BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UI
 
 BOOL MxRomDevice::Jump()
 {
-	CString CurPath = _path.get();
-	std::list<ImgDownloadStatus>::iterator iter = ImgDwdSts.begin();
-	std::list<ImgDownloadStatus>::iterator iter_end = ImgDwdSts.end();
+    if(_SyncAllDevEnable)
+    {
+	    CString CurPath = _path.get();
+	    std::list<ImgDownloadStatus>::iterator iter = ImgDwdSts.begin();
+	    std::list<ImgDownloadStatus>::iterator iter_end = ImgDwdSts.end();
 
-	//Current device has finished downloading work, mark status flag as true;
-	for(;iter != iter_end;++iter){
-		if(iter->Path == CurPath)
-			iter->Status = TRUE;
-	}
-
-	//Poll the status of each device till all devices have finished downloading work.
-	//In a word, we need to syncronize all the device's status in case a reset occurs 
-	//when one device is on downloading work, which will leads to transfer failure.
-	do{
-		SyncAllDevFlag = TRUE;
-		for(iter = ImgDwdSts.begin(); iter != iter_end; ++iter){
-			if(iter->Status == FALSE)
-				SyncAllDevFlag = FALSE;
-		}
-		if(SyncAllDevFlag)
-			break;
-		else
-			Sleep(100);
-	}while(!SyncAllDevFlag);
+	    //Current device has finished downloading work, mark status flag as true;
+	    for(;iter != iter_end;++iter){
+		    if(iter->Path == CurPath)
+			    iter->Status = TRUE;
+	    }
+	    //Poll the status of each device till all devices have finished downloading work.
+	    //In a word, we need to syncronize all the device's status in case a reset occurs 
+	    //when one device is on downloading work, which will leads to transfer failure.
+	    do{
+		    SyncAllDevFlag = TRUE;
+		    for(iter = ImgDwdSts.begin(); iter != iter_end; ++iter){
+			    if(iter->Status == FALSE)
+				    SyncAllDevFlag = FALSE;
+		    }
+		    if(SyncAllDevFlag)
+			    break;
+		    else
+			    Sleep(100);
+	    }while(!SyncAllDevFlag);
+    }
 
 	// Send the complete command to the device 
 	if ( !Jump2Rak() )
