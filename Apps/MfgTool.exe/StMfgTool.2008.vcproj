@@ -253,23 +253,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\OpCopy.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\OpErase.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Operation.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\OpInfo.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\OpLoader.cpp"
 				>
 			</File>
 			<File

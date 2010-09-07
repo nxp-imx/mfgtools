@@ -19,8 +19,9 @@ public:
 	enum DeviceType {
 		DeviceTypeNone=-1,
 		DeviceTypeRecovery=0,
+		DeviceTypeDisk,
 		DeviceTypeMsc,
-		DeviceTypeMtp,
+		//DeviceTypeMtp,
 		DeviceTypeHid,
 		DeviceTypeMxHid,
 		DeviceTypeMxRom,
@@ -40,9 +41,12 @@ public:
 			case DeviceTypeMsc:
 				str = _T("Msc");
 				break;
-			case DeviceTypeMtp:
-				str = _T("Mtp");
+			case DeviceTypeDisk:
+				str = _T("Disk");
 				break;
+			/*case DeviceTypeMtp:
+				str = _T("Mtp");
+				break;*/
 			case DeviceTypeHid:
 				str = _T("Hid");
 				break;
@@ -59,8 +63,10 @@ public:
 				str = _T("IMX");
 				break;
 			case DeviceTypeNone:
-			default:
 				str = _T("None");
+				break;
+			default:
+				str = _T("Unknown");
 				break;
 		}
 		return str;

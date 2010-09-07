@@ -1,22 +1,33 @@
 http://psg-host.svn-tx30.am.freescale.net/svn/psg-host/branches/dev/0004
-
 ****************************************
-RELEASE_STMFGTOOL_1.6.2.012b
+RELEASE_STMFGTOOL_1.6.2.013
 ****************************************
-09/03/2010 - Chris Williamson for Starle Li
+03/29/2010 - Starle Li
+    - Merge Chris's change into SVN to support i.mx50 under Windows 7 OS.
+    - Remove MTP device class since the functionality becomes obsolete.
+    - Remove api.ProcessResponse which is extremely time consuming during data transfer but contributing nothing necessary (found by Frank). 
+    
+    Apps/MfgTool.exe/ConfigUsbPortPage.cpp	
+    Apps/MfgTool.exe/Operation.cpp	
+    Apps/MfgTool.exe/OpLoader.cpp	
+    Apps/MfgTool.exe/OpUtpUpdate.cpp	
+    Apps/MfgTool.exe/PortMgrDlg.cpp	
+    Apps/MfgTool.exe/StMfgTool.2008.vcproj	
+    Apps/MfgTool.exe/version.h	
+    Libs/DevSupport/Device.cpp	
+    Libs/DevSupport/DeviceClass.cpp	
+    Libs/DevSupport/DeviceClass.h	
+    Libs/DevSupport/DeviceManager.cpp	
+    Libs/DevSupport/DeviceManager.h	
+    Libs/DevSupport/DevSupport.2008.vcproj	
+    Libs/DevSupport/Disk.cpp	
+    Libs/DevSupport/DiskDeviceClass.cpp	
+    Libs/DevSupport/DiskDeviceClass.h	
+    Libs/DevSupport/UsbPort.cpp	
+    Libs/DevSupport/Volume.cpp	
+    Libs/DevSupport/Volume.h	
+    Libs/DevSupport/VolumeDeviceClass.cpp	
 
-	- Changed MxRomDevice class to deal sync device functionality in which there are the 
-	  different requirements between i.mx51 and others.
-	  
-	  * This is a step in the right direction, but still may need some looking at the MxRomDevice()
-	    constructor. The initialization should take place for both Bootstrap and RamKernel modes.
-	  * Consider changes implemented in r374 and relates file Libs/DevSupport/MxRomDeviceClass.cpp.
-
-	Libs/DevSupport/MxRomDevice.cpp
-	Libs/DevSupport/MxRomDevice.h
-	Apps/MfgTool.exe/docs/changelog.txt
-	Apps/MfgTool.exe/version.h
-	    
 
 ****************************************
 RELEASE_STMFGTOOL_1.6.2.003
@@ -312,8 +323,8 @@ RELEASE_STMFGTOOL_1.6.0.003c
 ****************************************
 10/15/2009
 	- Ryan Qian: 
-	  Failed to create ‘new’ profile again, if last ‘new profile’ operation was cancelled.
-	  The button of ‘Delete’ should be disabled all the way, if there’s no any profiles available.
+	  Failed to create ‘new?profile again, if last ‘new profile?operation was cancelled.
+	  The button of ‘Delete?should be disabled all the way, if there’s no any profiles available.
 	  
 	  Switch the m_bNewProfileMode to FALSE if the Cancel button is pressed.
 	  Don't enable the Delete button unless there are profiles detected.
@@ -1292,7 +1303,7 @@ RELEASE_STMFGTOOL_1.3.01.000
 	branch merged: br_localized_mfg_tool_1.3.0.139_main_dev_0008
 
 	- Added capability to edit the media drive array via a GUI interface. It will
-	  provide Manufacturing support for “Copy Protect” and other non-standard drive 
+	  provide Manufacturing support for “Copy Protect?and other non-standard drive 
 	  array hosts. It will also allow customers to rename their firmware files to 
 	  non-standard names.
 

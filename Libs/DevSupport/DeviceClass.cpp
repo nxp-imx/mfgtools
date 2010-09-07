@@ -427,10 +427,11 @@ Device* DeviceClass::FindDeviceByUsbPath(CStdString pathToFind, const DeviceList
 					}
 				}
 
-//				ATLTRACE(_T("DeviceClass::FindDeviceByUsbPath()\n"));
+//				ATLTRACE(_T("%s::FindDeviceByUsbPath()  Enumerated device. %s\r\n"), this->ToString().c_str(), devPath.c_str());
 				pDevice = CreateDevice(this, devData, devPath);
 				if ( pDevice && pDevice->IsUsb() )
 				{
+//					ATLTRACE(_T("%s::FindDeviceByUsbPath()  Created device. %s\r\n"), this->ToString().c_str(), devPath.c_str());
 					if ( pathToFind.CompareNoCase( pDevice->_usbPath.get() ) == 0 )
 					{
 						// Found what we are looking for

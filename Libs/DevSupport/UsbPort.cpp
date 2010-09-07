@@ -116,14 +116,14 @@ int32_t usb::Port::Refresh()
 
 
 			i++;
-			ATLTRACE(_T("*** ***: usb::Port::Refresh() polling iteration: #%d: %d port:%d\n"),i,_parentHub->_index.get(), _index.get());
-			if(i==10)
+//t			ATLTRACE(_T("*** ***: usb::Port::Refresh() polling iteration: #%d: %d port:%d\n"),i,_parentHub->_index.get(), _index.get());
+			//Max 3mins are waited.
+			if(i>=180 || Success)
 				break;
 
-			if(!Success)
-				Sleep(6000);
-			else
-				break;
+			//Polling the status per second.
+			Sleep(1000);
+
 		}while(!Success);
 
 		if (!Success) 
@@ -276,7 +276,7 @@ CStdString usb::Port::GetDeviceDescription(void)
 				}
 				case DeviceClass::DeviceTypeHid:
 				case DeviceClass::DeviceTypeMxHid:
-				case DeviceClass::DeviceTypeMtp:
+				//case DeviceClass::DeviceTypeMtp:
 				case DeviceClass::DeviceTypeRecovery:
 				case DeviceClass::DeviceTypeUsbController:
 				case DeviceClass::DeviceTypeUsbHub:

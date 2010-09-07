@@ -328,15 +328,37 @@ CStdString Device::hub::get()
 {
 	Device* dev = dynamic_cast<Device*>(_owner);
 	ASSERT(dev);
-
-	if ( (dev->UsbDevice() != NULL) &&
-		 (dev->UsbDevice()->Parent() != NULL)  && 
-		 (dev->UsbDevice()->Parent()->_enumerator.get().CompareNoCase(_T("USB")) == 0) )
+	/*Device* pUsbDevice = dev->UsbDevice();
+	if( pUsbDevice != NULL)
 	{
-		_value = dev->UsbDevice()->Parent()->_path.get();
+		Device* pParent = pUsbDevice->Parent();
+		if(pParent != NULL )
+		{
+			CStdString enumerator = pParent->_enumerator.get();
+			TRACE(_T("GET 0x%x %s\r\n"), this, enumerator);
+			if(enumerator.CompareNoCase(_T("USB")) == 0)
+			{
+				_value = pParent->_path.get();
+			}
+			else
+				_value = _T("");
+		}
+	}*/
+
+	if (dev->UsbDevice() != NULL)
+	{
+		if(dev->UsbDevice()->Parent() != NULL)
+		{
+			if(dev->UsbDevice()->Parent()->_enumerator.get().CompareNoCase(_T("USB")) == 0)
+			{
+				{
+					_value = dev->UsbDevice()->Parent()->_path.get();
+				}
+			}
+			else
+				_value = _T("");
+		}
 	}
-	else
-		_value = _T("");
 
 	return _value;
 }
@@ -354,6 +376,43 @@ int32_t Device::hubIndex::getmsc()
 	{
 		if ( Value == 0 )
 		{
+			/*ATLTRACE2(_T("Device property: ENUMERATOR: %s\r\n"),(dev->GetProperty(SPDRP_ENUMERATOR_NAME, CStdString(_T("")))).c_str());
+			ATLTRACE2(_T("Device property: SPDRP_FRIENDLYNAME : %s\r\n"),(dev->GetProperty(SPDRP_FRIENDLYNAME , CStdString(_T("")))).c_str());
+			ATLTRACE2(_T("Device property: SPDRP_CLASSGUID: %s\r\n"),(dev->GetProperty(SPDRP_CLASSGUID, CStdString(_T("")))).c_str());
+			ATLTRACE2(_T("Device property: SPDRP_CLASS : %s\r\n"),(dev->GetProperty(SPDRP_CLASS , CStdString(_T(""))).c_str()));
+			ATLTRACE2(_T("Device property: SPDRP_DEVICEDESC : %s\r\n"),(dev->GetProperty(SPDRP_DEVICEDESC , CStdString(_T("")))).c_str());
+			ATLTRACE2(_T("Device property: SPDRP_DEVTYPE : %s\r\n"),(dev->GetProperty(SPDRP_DEVTYPE , CStdString(_T("")))).c_str());
+			ATLTRACE2(_T("Device property: SPDRP_DRIVER: %s\r\n"),(dev->GetProperty(SPDRP_DRIVER, CStdString(_T("")))).c_str());
+			ATLTRACE2(_T("Device property: SPDRP_HARDWAREID : %s\r\n"),(dev->GetProperty(SPDRP_HARDWAREID , CStdString(_T("")))).c_str());
+			ATLTRACE2(_T("Device property: SPDRP_LEGACYBUSTYPE : %s\r\n"),(dev->GetProperty(SPDRP_LEGACYBUSTYPE , CStdString(_T("")))).c_str());
+			ATLTRACE2(_T("Device property: SPDRP_LOCATION_INFORMATION : %s\r\n"),(dev->GetProperty(SPDRP_LOCATION_INFORMATION , CStdString(_T("")))).c_str());
+			ATLTRACE2(_T("Device property: SPDRP_LOCATION_PATHS : %s\r\n"),(dev->GetProperty(SPDRP_LOCATION_PATHS , CStdString(_T("")))).c_str());
+			ATLTRACE2(_T("Device property: SPDRP_PHYSICAL_DEVICE_OBJECT_NAME  : %s\r\n"),(dev->GetProperty(SPDRP_PHYSICAL_DEVICE_OBJECT_NAME  , CStdString(_T("")))).c_str());
+			HANDLE hDevice = CreateFile(dev->_path.get(), 0,
+			FILE_SHARE_READ | FILE_SHARE_WRITE,
+			NULL, OPEN_EXISTING, NULL, NULL);
+			DWORD dwOutBytes = 0;
+			STORAGE_PROPERTY_QUERY Query;
+
+			Query.PropertyId = StorageDeviceProperty;
+			Query.QueryType = PropertyStandardQuery;
+
+			char Buf[1024] = {0};
+			PSTORAGE_DEVICE_DESCRIPTOR pDevDesc = (PSTORAGE_DEVICE_DESCRIPTOR)Buf;
+			pDevDesc->Size = sizeof(Buf);
+
+			BOOL res = DeviceIoControl(hDevice, // device handle
+			IOCTL_STORAGE_QUERY_PROPERTY, // device property info
+			&Query, sizeof(STORAGE_PROPERTY_QUERY), // input data buffer
+			pDevDesc, pDevDesc->Size, // output data buffer
+			&dwOutBytes, // out's length
+			(LPOVERLAPPED)NULL);
+
+			CloseHandle(hDevice);
+
+			STORAGE_BUS_TYPE BusType = pDevDesc->BusType; // BusTypeUsb, Ata...*/
+
+
 			CStdString hubPath = dev->_hub.get();
 			if (hubPath.empty()){	
 				return Value;
@@ -624,6 +683,10 @@ Device* Device::Parent()
     {
         DEVINST parentDevInst = 0;
 		DWORD hr = gSetupApi().CM_Get_Parent(&parentDevInst, _deviceInfoData.DevInst, 0);
+
+//t		ATLTRACE(_T("## %s %d %d %s\r\n"), _enumerator.get().c_str(), _deviceInfoData.DevInst, parentDevInst,
+//t			this->_path.get().c_str());
+
         if (hr == 0)
         {
 			_parent = new Device(_deviceClass, parentDevInst, _T(""));
@@ -637,6 +700,8 @@ Device* Device::Parent()
 /// </summary>
 Device* Device::UsbDevice()
 {
+//t	ATLTRACE(_T("USB DEVICE 0x%x 0x%x - %s\r\n"), this,Parent(), _enumerator.get().c_str());
+	
 	if (Parent() == NULL)
 		return NULL;
 

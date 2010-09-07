@@ -1,8 +1,10 @@
+#include "stdafx.h"
 #include "DeviceManager.h"
 #include "HidDeviceClass.h"
 #include "RecoveryDeviceClass.h"
 #include "VolumeDeviceClass.h"
-#include "MtpDeviceClass.h"
+#include "DiskDeviceClass.h"
+//#include "MtpDeviceClass.h"
 #include "UsbControllerMgr.h"
 #include "UsbHubMgr.h"
 #include "MxRomDeviceClass.h"
@@ -19,10 +21,9 @@
 IMPLEMENT_DYNCREATE(DeviceManager, CWinThread)
 
 DeviceManager::DeviceManager()
-: _pWMDevMgr3(NULL)
-, _hUsbDev(NULL)
+: _hUsbDev(NULL)
 , _hUsbHub(NULL)
-, _dwWMDMNotificationCookie(-1)
+//, _dwWMDMNotificationCookie(-1)
 , _bStopped(true)
 , _hChangeEvent(NULL)
 , _hStartEvent(NULL)
@@ -35,15 +36,16 @@ DeviceManager::DeviceManager()
 
 	// Create the DeviceClasses
 	_devClasses[DeviceClass::DeviceTypeRecovery]      = new RecoveryDeviceClass;
+	_devClasses[DeviceClass::DeviceTypeDisk]		  = new DiskDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeMsc]		      = new VolumeDeviceClass;
-	_devClasses[DeviceClass::DeviceTypeMtp]		      = new MtpDeviceClass;
+	//_devClasses[DeviceClass::DeviceTypeMtp]		      = new MtpDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeHid]		      = new HidDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeMxHid]		  = new MxHidDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeMxRom]         = new MxRomDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeUsbController] = new usb::ControllerMgr;
 	_devClasses[DeviceClass::DeviceTypeUsbHub]        = new usb::HubMgr;
 //	_devClasses[DeviceClass::DeviceTypeUsbDevice]     = new usb::DeviceMgr;
-	if ( _devClasses.size() != 8/*6*/ )
+	if ( _devClasses.size() != 8 )
 	{
 		ATLTRACE(" *** FAILED TO CREATE ALL DEVICECLASSES.\n");
 	}
@@ -159,11 +161,11 @@ BOOL DeviceManager::InitInstance()
     }
     
 	// WMDM Notification
-	HRESULT hr = InitMTPDevMgr();
+	/*HRESULT hr = InitMTPDevMgr();
 	if ( _pWMDevMgr3 )
 	{
 		hr = RegisterWMDMNotification();
-	}
+	}*/
 
 	// Init all the Device Classes
 	Devices();
@@ -203,7 +205,7 @@ int DeviceManager::ExitInstance()
     // _DevChangeWnd was created in the DeviceManager thread in InitInstance().
     BOOL ret = _DevChangeWnd.DestroyWindow();
 
-    if ( _pWMDevMgr3 )
+    /*if ( _pWMDevMgr3 )
 	{
 	    UnregisterWMDMNotification();
 		_pWMDevMgr3->Release();
@@ -211,7 +213,7 @@ int DeviceManager::ExitInstance()
 	}
 
 	// Clean up the AutoPlay object
-	SetCancelAutoPlay(false);
+	SetCancelAutoPlay(false);*/
 
 	std::map<HANDLE, Observer*>::iterator callback;
 	for ( callback=_callbacks.begin(); callback!=_callbacks.end(); ++callback )
@@ -317,7 +319,7 @@ void DeviceManager::UpdateDeviceFilters(LPCTSTR usbVid, LPCTSTR usbPid)
 	(*this)[DeviceClass::DeviceTypeHid]->AddFilter(0x066f, 0x3780);
 	(*this)[DeviceClass::DeviceTypeHid]->AddFilter(usbVid, usbPid);
 	// MTP
-	(*this)[DeviceClass::DeviceTypeMtp]->AddFilter(usbVid, usbPid);
+	//(*this)[DeviceClass::DeviceTypeMtp]->AddFilter(usbVid, usbPid);
 	// MSC
 	(*this)[DeviceClass::DeviceTypeMsc]->AddFilter(0x066f, 0x0000); // stmfgmsc.sb
 	(*this)[DeviceClass::DeviceTypeMsc]->AddFilter(0x066f, 0xA000); // updater.sb
@@ -337,6 +339,10 @@ std::list<Device*> DeviceManager::Devices()
 	std::map<uint32_t, DeviceClass*>::iterator deviceClass;
 	for ( deviceClass = _devClasses.begin(); deviceClass != _devClasses.end(); ++deviceClass )
 	{
+		// skip Disk class because it will be handled by DeviceClass::DeviceTypeMsc (Volume) class
+		if ( (*deviceClass).first == DeviceClass::DeviceTypeDisk )
+			continue;
+
 		std::list<Device*> classList = (*deviceClass).second->Devices();
 		
 		std::list<Device*>::iterator device;
@@ -361,10 +367,11 @@ Device* DeviceManager::FindDevice(LPCTSTR paramStr)
 	ParameterT<uint16_t> usbPid;
 	ParameterT<int32_t> waitTimeOut;
 
-	//;param Type:Msc, Mtp, Recovery, Hid
+	//;param Type:Msc, Disk,  Recovery, Hid
 	deviceType.ValueList[DeviceClass::DeviceTypeRecovery]		= L"Recovery";
 	deviceType.ValueList[DeviceClass::DeviceTypeMsc]			= L"Msc";
-	deviceType.ValueList[DeviceClass::DeviceTypeMtp]			= L"Mtp";
+	deviceType.ValueList[DeviceClass::DeviceTypeDisk]			= L"Disk";
+	//deviceType.ValueList[DeviceClass::DeviceTypeMtp]			= L"Mtp";
 	deviceType.ValueList[DeviceClass::DeviceTypeHid]			= L"Hid";
 
 	localParams[L"Type:"]		= &deviceType;
@@ -488,6 +495,7 @@ BOOL DeviceManager::DevChangeWnd::OnDeviceChange(UINT nEventType,DWORD_PTR dwDat
 					if(((PDEV_BROADCAST_DEVICEINTERFACE)lpdb)->dbcc_classguid == GUID_DEVINTERFACE_USB_DEVICE) 
 					{
 						MsgStr = (LPCTSTR)((PDEV_BROADCAST_DEVICEINTERFACE)lpdb)->dbcc_name;
+//t						ATLTRACE(_T("DeviceManager::DevChangeWnd::OnDeviceChange() - DEVICE_ARRIVAL_EVT.\n"));
 						event = DEVICE_ARRIVAL_EVT;
 					}
 					else if(((PDEV_BROADCAST_DEVICEINTERFACE)lpdb)->dbcc_classguid == GUID_DEVINTERFACE_USB_HUB) 
@@ -499,8 +507,9 @@ BOOL DeviceManager::DevChangeWnd::OnDeviceChange(UINT nEventType,DWORD_PTR dwDat
 				else if(lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME) 
 				{
 					MsgStr = DrivesFromMask( ((PDEV_BROADCAST_VOLUME)lpdb)->dbcv_unitmask );
+//t					ATLTRACE(_T("DeviceManager::DevChangeWnd::OnDeviceChange() - VOLUME_ARRIVAL_EVT.\n"));
 					event = VOLUME_ARRIVAL_EVT;
-//t					ATLTRACE(_T("DeviceManager::DevChangeWnd::OnDeviceChange() - VOLUME_ARRIVAL_EVT(%s)\n"), MsgStr.c_str());
+//t					ATLTRACE(_T("DeviceMa nager::DevChangeWnd::OnDeviceChange() - VOLUME_ARRIVAL_EVT(%s)\n"), MsgStr.c_str());
 				}
 				break;
 			case DBT_DEVICEREMOVECOMPLETE:
@@ -509,6 +518,7 @@ BOOL DeviceManager::DevChangeWnd::OnDeviceChange(UINT nEventType,DWORD_PTR dwDat
 					if(((PDEV_BROADCAST_DEVICEINTERFACE)lpdb)->dbcc_classguid == GUID_DEVINTERFACE_USB_DEVICE) 
 					{
 						MsgStr = (LPCTSTR)((PDEV_BROADCAST_DEVICEINTERFACE)lpdb)->dbcc_name;
+//t						ATLTRACE(_T("DeviceManager::DevChangeWnd::OnDeviceChange() - DEVICE_REMOVAL_EVT.\n"));
 						event = DEVICE_REMOVAL_EVT;
 					}
 					else if(((PDEV_BROADCAST_DEVICEINTERFACE)lpdb)->dbcc_classguid == GUID_DEVINTERFACE_USB_HUB) 
@@ -520,6 +530,7 @@ BOOL DeviceManager::DevChangeWnd::OnDeviceChange(UINT nEventType,DWORD_PTR dwDat
 				else if(lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME) 
 				{
 					MsgStr = DrivesFromMask( ((PDEV_BROADCAST_VOLUME)lpdb)->dbcv_unitmask );
+//t					ATLTRACE(_T("DeviceManager::DevChangeWnd::OnDeviceChange() - VOLUME_REMOVAL_EVT.\n"));
 					event = VOLUME_REMOVAL_EVT;
 //t					ATLTRACE(_T("DeviceManager::DevChangeWnd::OnDeviceChange() - VOLUME_REMOVAL_EVT(%s)\n"), MsgStr.c_str());
 				}
@@ -575,6 +586,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 	{
 		case DEVICE_ARRIVAL_EVT:
 		{
+//t			ATLTRACE(_T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT(%s)\n"), msg.c_str());
 			DeviceClass::NotifyStruct nsInfo = AddUsbDevice(msg);
 			if ( nsInfo.Device )
 			{
@@ -601,7 +613,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 			for ( msgLetterIndex = 0; msgLetterIndex < msg.GetLength(); ++msgLetterIndex )
 			{
 				driveLetterStr = msg.GetAt(msgLetterIndex);
-				
+//t				ATLTRACE(_T("msgLetterIndex = 0x%x\n"), msgLetterIndex);
 				DeviceClass::NotifyStruct nsInfo = (*this)[DeviceClass::DeviceTypeMsc]->AddUsbDevice(driveLetterStr);
 				if ( nsInfo.Device )
 				{
@@ -727,6 +739,7 @@ void DeviceManager::Notify(const DeviceClass::NotifyStruct& nsInfo)
 		{
 			if ( pWatcher->NotifyFn(nsInfo) == retUnregisterCallback )
 			{
+//t				ATLTRACE(_T("DeviceManager::Notify() - Notified Port %d, Hub %s\n"), pWatcher->HubIndex, pWatcher->Hub.c_str());
 				eraseCallbackList.push_back((*callback).first);
 			}
 		}
@@ -750,7 +763,8 @@ DeviceClass::NotifyStruct DeviceManager::AddUsbDevice(LPCTSTR path)
 	for ( deviceClass = _devClasses.begin(); deviceClass != _devClasses.end(); ++deviceClass )
 	{
 		// don't look for USB arrival in MSC class, wait for Volume arrival.
-		if ( (*deviceClass).second->GetDeviceType() != DeviceClass::DeviceTypeMsc )
+		if ( (*deviceClass).second->GetDeviceType() != DeviceClass::DeviceTypeMsc && 
+			 (*deviceClass).second->GetDeviceType() != DeviceClass::DeviceTypeDisk )
 		{
 			nsInfo = (*deviceClass).second->AddUsbDevice(path);
 			if ( nsInfo.Device )
@@ -781,7 +795,7 @@ DeviceClass::NotifyStruct DeviceManager::RemoveUsbDevice(LPCTSTR path)
 	return nsInfo;
 }
 
-STDMETHODIMP DeviceManager::CWMDMNotification::WMDMMessage(DWORD  dwMessageType, LPCWSTR  pwszCanonicalName)
+/*STDMETHODIMP DeviceManager::CWMDMNotification::WMDMMessage(DWORD  dwMessageType, LPCWSTR  pwszCanonicalName)
 {
 	CString MsgStr = pwszCanonicalName;
 	DevChangeEvent DevChangeEvent;
@@ -906,7 +920,7 @@ HRESULT DeviceManager::InitMTPDevMgr()
 
 	ATLTRACE(_T("   -DeviceManager::InitMTPDevMgr() : result=0x%x\n"), hr);
     return hr;
-}
+}*/
 STDMETHODIMP DeviceManager::CQueryCancelAutoplay::AllowAutoPlay(LPCTSTR pszPath,
     DWORD dwContentType, LPCWSTR pszLabel, DWORD dwSerialNumber)
 {
@@ -1032,7 +1046,7 @@ HRESULT DeviceManager::CQueryCancelAutoplay::Unregister()
 ///////////////////////////////////////////////////////////////////////////////
 // CWMDMNotification
 //
-STDMETHODIMP DeviceManager::CWMDMNotification::QueryInterface(REFIID riid, void** ppv)
+/*STDMETHODIMP DeviceManager::CWMDMNotification::QueryInterface(REFIID riid, void** ppv)
 {
     IUnknown* punk = NULL;
     HRESULT hr = S_OK;
@@ -1075,7 +1089,7 @@ STDMETHODIMP_(ULONG) DeviceManager::CWMDMNotification::Release()
     }
 
     return cRef;
-}
+}*/
 
 ///////////////////////////////////////////////////////////////////////////////
 // CQueryCancelAutoplay

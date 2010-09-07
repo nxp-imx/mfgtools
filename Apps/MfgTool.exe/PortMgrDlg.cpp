@@ -248,9 +248,9 @@ INT_PTR CPortMgrDlg::CreateOps(void)
 		COpInfo* pOpInfo = m_p_ops->GetNext(pos);
 		if ( pOpInfo->IsEnabled() && pOpInfo->GetStatus() == OPINFO_OK ) {
 			switch ( pOpInfo->GetType() ) {
-				case COperation::COPY_OP:
+				/*case COperation::COPY_OP:
 					m_op_list.AddTail( pOp = new COpCopy(this, m_p_usb_port, pOpInfo) );
-					if (!pOp->CreateThread(/*CREATE_SUSPENDED*/)) {
+					if (!pOp->CreateThread()) {
 						delete pOp;
 						ATLTRACE("Error: Panel %c - CreateOps() - failed to create a COPY operation.\n", _T('A')+m_port_display_index);
 						return false;
@@ -260,7 +260,7 @@ INT_PTR CPortMgrDlg::CreateOps(void)
 					break;
 				case COperation::LOADER_OP:
 					m_op_list.AddTail( pOp = new COpLoader(this, m_p_usb_port, pOpInfo) );
-					if (!pOp->CreateThread(/*CREATE_SUSPENDED*/)) {
+					if (!pOp->CreateThread()) {
 						delete pOp;
 						ATLTRACE("Error: Panel %c - CreateOps() - failed to create a LOAD operation.\n", _T('A')+m_port_display_index);
 						return false;
@@ -270,7 +270,7 @@ INT_PTR CPortMgrDlg::CreateOps(void)
 					break;
 				case COperation::ERASE_OP:
 					m_op_list.AddTail( pOp = new COpErase(this, m_p_usb_port, pOpInfo) );
-					if (!pOp->CreateThread(/*CREATE_SUSPENDED*/)) {
+					if (!pOp->CreateThread()) {
 						delete pOp;
 						ATLTRACE("Error: Panel %c - CreateOps() - failed to create an ERASE operation.\n", _T('A')+m_port_display_index);
 						return false;
@@ -278,26 +278,17 @@ INT_PTR CPortMgrDlg::CreateOps(void)
 					m_duration += pOp->GetDuration();
 					ATLTRACE("Panel %c - CreateOps() - created an ERASE operation(%#x, %d).\n", _T('A')+m_port_display_index, pOp->m_nThreadID, pOp->m_nThreadID);
 					break;
-				case COperation::REGISTRY_OP:
-					m_op_list.AddTail( pOp = new COpRegistry(this, m_p_usb_port, pOpInfo) );
-					if (!pOp->CreateThread(/*CREATE_SUSPENDED*/)) {
-						delete pOp;
-						ATLTRACE("Error: Panel %c - CreateOps() - failed to create a REGISTRY operation.\n", _T('A')+m_port_display_index);
-						return false;
-					}
-					m_duration += pOp->GetDuration();
-					ATLTRACE("Panel %c - CreateOps() - created a SCRUB operation(%#x, %d).\n", _T('A')+m_port_display_index, pOp->m_nThreadID, pOp->m_nThreadID);
-					break;
+
 				case COperation::UPDATE_OP:
 					m_op_list.AddTail( pOp = new COpUpdater(this, m_p_usb_port, pOpInfo) );
-					if (!pOp->CreateThread(/*CREATE_SUSPENDED*/)) {
+					if (!pOp->CreateThread()) {
 						delete pOp;
 						ATLTRACE("Error: Panel %c - CreateOps() - failed to create an UPDATE operation.\n", _T('A')+m_port_display_index);
 						return false;
 					}
 					m_duration += pOp->GetDuration();
 					ATLTRACE("Panel %c - CreateOps() - created an UPDATE operation(%#x, %d).\n", _T('A')+m_port_display_index, pOp->m_nThreadID, pOp->m_nThreadID);
-					break;
+					break;*/
 				case COperation::OTP_OP:
 					m_op_list.AddTail( pOp = new COpOTP(this, m_p_usb_port, pOpInfo) );
 					if (!pOp->CreateThread(/*CREATE_SUSPENDED*/)) {
@@ -307,6 +298,16 @@ INT_PTR CPortMgrDlg::CreateOps(void)
 					}
 					m_duration += pOp->GetDuration();
 					ATLTRACE("Panel %c - CreateOps() - created an OTP operation(%#x, %d).\n", _T('A')+m_port_display_index, pOp->m_nThreadID, pOp->m_nThreadID);
+					break;
+				case COperation::REGISTRY_OP:
+					m_op_list.AddTail( pOp = new COpRegistry(this, m_p_usb_port, pOpInfo) );
+					if (!pOp->CreateThread()) {
+						delete pOp;
+						ATLTRACE("Error: Panel %c - CreateOps() - failed to create a REGISTRY operation.\n", _T('A')+m_port_display_index);
+						return false;
+					}
+					m_duration += pOp->GetDuration();
+					ATLTRACE("Panel %c - CreateOps() - created a SCRUB operation(%#x, %d).\n", _T('A')+m_port_display_index, pOp->m_nThreadID, pOp->m_nThreadID);
 					break;
 				case COperation::UTP_UPDATE_OP:
 					m_op_list.AddTail( pOp = new COpUtpUpdate(this, m_p_usb_port, pOpInfo) );

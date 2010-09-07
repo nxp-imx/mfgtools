@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Device.h"
-//#include "DiskDeviceClass.h"
+#include "Disk.h"
 #include "StApi.h"
 
 class UpdateTransportProtocol;
 
+#define MAX_SCSI_DATA_TRANSFER_SIZE 0x10000
 /// <summary>
 /// A volume device.
 /// </summary>
@@ -18,14 +19,13 @@ public:
 	Volume(DeviceClass * deviceClass, DEVINST devInst, CStdString path);
 	virtual ~Volume(void);
 
-//	SENSE_DATA _scsiSenseData; //TODO: move this?
-//	uint8_t _scsiSenseStatus; //TODO: move this?
 	uint32_t m_BytesWritten;
 	uint32_t m_BytesRead;
+	uint8_t *m_pBuffer;
 	bool IsUsb();
-//	Device* UsbDevice();
-//	bool ValidateUsbIds();
-//	std::list<Device*>& Disks();
+	virtual Device* UsbDevice();
+	bool ValidateUsbIds();
+	Disk* StorageDisk();
 //	std::list<Device*>& RemovableDevices();
 	int32_t CompareTo(Device* device);
 	bool SelfTest(bool eject = true);
@@ -43,7 +43,7 @@ public:
 	// PROPERTIES
 	class volumeName : public StringProperty { public: CStdString get(); }_volumeName;
 	class logicalDrive : public StringProperty { public: CStdString get(); }_logicalDrive;
-	class friendlyName : public StringProperty { public: CStdString get(); }_friendlyName;
+	class friendlyName : public Device::friendlyName { public: CStdString get(); }_friendlyName;
 	class diskNumber : public Int32Property { public: diskNumber(int32_t val):Int32Property(val){}; int32_t get(); }_diskNumber;
 
 //private:
@@ -67,7 +67,7 @@ private:
 	HANDLE _hEvent;
 //	std::vector<uint32_t> _diskNumbers;
 // 	DiskDeviceClass _disksClass;
-//	std::list<Device*> _disks;
+	Disk* _Disk;
 //	std::list<Device*> _removableDevices;
 	void Trash();
 //	std::vector<uint32_t>& DiskNumbers();

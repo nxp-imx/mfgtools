@@ -182,9 +182,9 @@ const UCL::DeviceState::DeviceState_t COpUtpUpdate::GetDeviceState()
 			}
 			break;
 		}
-		case DeviceClass::DeviceTypeMtp:
+		/*case DeviceClass::DeviceTypeMtp:
 			state = UCL::DeviceState::UserMtp;
-			break;
+			break;*/
 		case DeviceClass::DeviceTypeNone:
 			state = UCL::DeviceState::Disconnected;
 			break;

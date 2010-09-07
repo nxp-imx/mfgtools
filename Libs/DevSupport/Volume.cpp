@@ -2,12 +2,14 @@
 #include "Volume.h"
 #include "VolumeDeviceClass.h"
 #include "KernelApi.h"
+#include "DeviceManager.h"
 
 #include "UpdateTransportProtocol.Api.h"
 
 Volume::Volume(DeviceClass * deviceClass, DEVINST devInst, CStdString path)
 : Device(deviceClass, devInst, path)
 , _diskNumber(-1)
+, _Disk(NULL)
 {
 	Trash();
 	
@@ -16,13 +18,15 @@ Volume::Volume(DeviceClass * deviceClass, DEVINST devInst, CStdString path)
 	_friendlyName.describe(this, _T("Friendly Name"), _T(""));
 	_diskNumber.describe(this, _T("Physical Disk Number"), _T(""));
 
+	_diskNumber.get();
+
     _hEvent = CreateEvent( 
 		NULL,    // default security attribute 
         TRUE,    // manual-reset event 
         FALSE,    // initial state = not-signaled 
 		_logicalDrive.get().GetBuffer());   // unnamed event object 
 
-	int num = _diskNumber.get();
+	m_pBuffer = (uint8_t *)malloc(sizeof(_NT_SCSI_REQUEST) + MAX_SCSI_DATA_TRANSFER_SIZE);
 }
 
 Volume::~Volume(void)
@@ -33,6 +37,7 @@ Volume::~Volume(void)
 		_hEvent = NULL;
 	}
 	Trash();
+	free(m_pBuffer);
 }
 
 void Volume::Trash()
@@ -92,27 +97,15 @@ CStdString Volume::friendlyName::get()
 	if ( _value.IsEmpty() )
 	{
 		// get the friendly name from the Device object as a default
-		Device* dev = dynamic_cast<Device*>(_owner);
-		ASSERT(dev);
-
-		_value = dev->_friendlyName.get();
-		
-		// now try and get the friendly name from our parent USBSTOR node
-		if ( dev->Parent() )
-		{
-			_value = dev->Parent()->_friendlyName.get();
-		}
-/*
 		Volume* vol = dynamic_cast<Volume*>(_owner);
 		ASSERT(vol);
 
-		if (!vol->Disks().empty())
+		// now try and get the friendly name from our parent USBSTOR node
+		if ( vol->StorageDisk() )
 		{
-			std::list<Device*>::iterator disk = vol->Disks().begin();
-			
-			_value = (*disk)->_friendlyName.get();
+			_value = vol->StorageDisk()->_friendlyName.get();
 		}
-*/	}
+	}
 	return _value;
 }
 
@@ -188,69 +181,43 @@ bool Volume::IsUsb()
 /// <summary>
 /// Gets the device connected to the USB bus.
 /// </summary>
-/*
 Device* Volume::UsbDevice()
 {
-//	return Device::UsbDevice();
-	if (!Disks().empty())
-    {
-		std::list<Device*>::iterator disk;
-		for(disk = Disks().begin(); disk != Disks().end(); ++disk)
-        {
-			// return the 1st USBDevice
-			return (*disk)->UsbDevice();
-        }
-    }
-    return NULL;
+	return StorageDisk() ? StorageDisk()->UsbDevice() : NULL;
 }
-*/
+
 /// <summary>
 /// Returns true if the USB IDs match the filter string.
 /// </summary>
-/*
+
 bool Volume::ValidateUsbIds()
 {
-	if (!Disks().empty())
-    {
-		std::list<Device*>::iterator disk;
-		for(disk = Disks().begin(); disk != Disks().end(); ++disk)
-        {
-			// get the filters for the DiskDeviceClass
-			// from the VolumeDeviceClass
-			if ( !_deviceClass->GetFilters().empty() )
-				_disksClass.SetFilters(_deviceClass->GetFilters());
-			
-			if ((*disk)->ValidateUsbIds())
-                return true;
-        }
-    }
-    return false;
+	return StorageDisk() ? StorageDisk()->ValidateUsbIds(): false;
 }
-*/
+
 /// <summary>
-/// Gets a list of underlying disks for this volume.
+/// Gets a the underlying disk for this volume.
 /// </summary>
-/*
-std::list<Device*>& Volume::Disks()
+Disk* Volume::StorageDisk()
 {
-    if (_disks.empty())
-    {
-		if (!DiskNumbers().empty())
-        {
-			// foreach (int index in DiskNumbers)
-			std::vector<uint32_t>::iterator index;
-			for(index=DiskNumbers().begin(); index != DiskNumbers().end(); ++index)
-            {
-				if ( *index < _disksClass.Devices().size() )
-                {
-					_disks.push_back(_disksClass.Devices()[*index]);
-                }
-            }
-        }
-    }
-    return _disks;
+	if ( _Disk == NULL )
+	{
+		std::list<Device*> disks = gDeviceManager::Instance()[DeviceClass::DeviceTypeDisk]->Refresh();
+		std::list<Device*>::iterator device;
+		for(device = disks.begin(); device !=disks.end(); ++device)
+		{
+			Disk* pDisk = dynamic_cast<Disk*>(*device);
+
+			if ( pDisk->_driveNumber.get() == _diskNumber.get() )
+			{
+				_Disk = pDisk;
+				break;
+			}
+		}
+	}
+	return _Disk;
 }
-*/
+
 /*
 std::vector<uint32_t>& Volume::DiskNumbers()
 {
@@ -442,31 +409,20 @@ int32_t Volume::WaitForCmdToFinish()
 
 uint32_t Volume::SendCommand(HANDLE hDrive, StApi& api, uint8_t* additionalInfo, NotifyStruct& nsInfo)
 {
-	// If it is not a SCSI Api, return error.
-//	if ( api.GetType() != API_TYPE_ST_SCSI && api.GetType() != API_TYPE_SCSI )
-//		return ERROR_INVALID_PARAMETER;
-
-    // reset our sense data holder in case we need to 
-	// save off fresh data
-//	memset(&_scsiSenseData, 0, sizeof(_scsiSenseData));
 	
 	// init parameter if it is used
 	if (additionalInfo)
 		*additionalInfo = SCSISTAT_GOOD;
 
-	// make sure the command itself is ready
-	api.PrepareCommand();
-
 	// Allocate the SCSI request
 	DWORD totalSize = sizeof(_NT_SCSI_REQUEST) + api.GetTransferSize();
-	_NT_SCSI_REQUEST* pRequest = (_NT_SCSI_REQUEST*)malloc(totalSize);
+	_NT_SCSI_REQUEST* pRequest = (_NT_SCSI_REQUEST*)m_pBuffer;
     if ( pRequest == NULL )
     {
         nsInfo.inProgress = false;
         Notify(nsInfo);
         return ERROR_NOT_ENOUGH_MEMORY;
     }
-	memset (pRequest, 0, totalSize);
 
 	//
 	// Set up structure for DeviceIoControl
@@ -504,11 +460,13 @@ uint32_t Volume::SendCommand(HANDLE hDrive, StApi& api, uint8_t* additionalInfo,
 //	else
 		pRequest->PassThrough.TimeOutValue = api.GetTimeout(); // seconds
 
-	ResetEvent(_hEvent);
+	//This is a sync transfer, no need to wait an event.
+	/*ResetEvent(_hEvent);
 	memset(&_overLapped, 0, sizeof(_overLapped));
-    _overLapped.hEvent = _hEvent;
+    _overLapped.hEvent = _hEvent;*/
 
 	// Sending command
+	//unsigned int start= ::GetCurrentTime();
 	uint32_t err = ERROR_SUCCESS;
 	DWORD dwBytesReturned;
 	BOOL bResult = ::DeviceIoControl (
@@ -519,28 +477,36 @@ uint32_t Volume::SendCommand(HANDLE hDrive, StApi& api, uint8_t* additionalInfo,
 		pRequest,
 		totalSize,
 		&dwBytesReturned,
-		&_overLapped);
+		NULL);
+//		&_overLapped);
+	
 
 	if (!bResult)
 		err = GetLastError();
+
+	/*unsigned int end= ::GetCurrentTime();
+	ATLTRACE(_T("start %d end %d delta %d\r\n"), start, end, end-start);
+	
 	else
 		if ( (err = WaitForCmdToFinish()) == ERROR_SUCCESS )
 		{
+			//Below code only forms some useless information in which each data is printed to a response string but really time consuming.
 			api.ProcessResponse(pRequest->DataBuffer, 0, api.GetTransferSize());
 		}
+	
+	api.ProcessResponse(pRequest->DataBuffer, 0, api.GetTransferSize());
 
-    // Update the UI
+	ATLTRACE(_T("WaitForCmdToFinish time: %d\r\n"),::GetCurrentTime() - end);
+    //It is not a good way to update the UI here since this function is really critical to performance.
+	//Please leave UI work to outside function.
     nsInfo.position = api.GetTransferSize();
-    Notify(nsInfo);
+    Notify(nsInfo);*/
 
     api.ScsiSenseStatus = pRequest->PassThrough.ScsiStatus;
 	api.ScsiSenseData = pRequest->SenseData;
 
 	if (additionalInfo)
         *additionalInfo = api.ScsiSenseStatus;
-
-	if ( pRequest != NULL )
-		free(pRequest); 
 
     return err;
 }

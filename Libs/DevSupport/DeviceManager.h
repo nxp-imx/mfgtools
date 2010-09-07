@@ -83,8 +83,9 @@ public:
                          HUB_ARRIVAL_EVT, HUB_REMOVAL_EVT,
 						 DEVICE_ARRIVAL_EVT, DEVICE_REMOVAL_EVT, 
 						 VOLUME_ARRIVAL_EVT, VOLUME_REMOVAL_EVT,
-                         WMDM_DEVICE_ARRIVAL_EVT, WMDM_DEVICE_REMOVAL_EVT,
-                         WMDM_MEDIA_ARRIVAL_EVT, WMDM_MEDIA_REMOVAL_EVT};
+                         /*WMDM_DEVICE_ARRIVAL_EVT, WMDM_DEVICE_REMOVAL_EVT,
+                         WMDM_MEDIA_ARRIVAL_EVT, WMDM_MEDIA_REMOVAL_EVT*/
+						};
 	
 	static CString EventToString(int evnt)
 	{
@@ -113,7 +114,7 @@ public:
 			case VOLUME_REMOVAL_EVT:
 				str = _T("VOLUME_REMOVAL_EVT");
 				break;
-			case WMDM_DEVICE_ARRIVAL_EVT:
+			/*case WMDM_DEVICE_ARRIVAL_EVT:
 				str = _T("WMDM_DEVICE_ARRIVAL_EVT");
 				break;
 			case WMDM_DEVICE_REMOVAL_EVT:
@@ -124,7 +125,7 @@ public:
 				break;
 			case WMDM_MEDIA_REMOVAL_EVT:
 				str = _T("WMDM_MEDIA_REMOVAL_EVT");
-				break;
+				break;*/
 			case UNKNOWN_EVT:
 			default:
 				str = _T("UNKNOWN_EVT");
@@ -203,7 +204,7 @@ public:
 	Device* FindDevice(LPCTSTR paramStr);
 
     //! \note Gets the IWMDeviceManager3.
-	IWMDeviceManager3* GetWmdmDeviceManager() const { return _pWMDevMgr3; }; 
+	//IWMDeviceManager3* GetWmdmDeviceManager() const { return _pWMDevMgr3; }; 
 
 	//! \brief Calls CQueryCancelAutoplay::SetCancelAutoPlay(bool rejectAutoPlay, LPCTSTR driveList)
     //! \note Runs in the context of the Client thread.
@@ -271,13 +272,13 @@ private:
 	HDEVNOTIFY _hUsbHub;
 
 	// WMDM Support
-	DWORD _dwWMDMNotificationCookie;
-//	CComPtr<IComponentAuthenticate>/*IComponentAuthenticate**/ _pICompAuth;
+	/*DWORD _dwWMDMNotificationCookie;
+//	CComPtr<IComponentAuthenticate> _pICompAuth;
 	IWMDeviceManager3* _pWMDevMgr3;
     HRESULT RegisterWMDMNotification();
 	HRESULT UnregisterWMDMNotification();
-	HRESULT InitMTPDevMgr();
-	class CWMDMNotification : public IWMDMNotification
+	HRESULT InitMTPDevMgr();*/
+	/*class CWMDMNotification : public IWMDMNotification
 	{
     public:
 		// IUnknown interface
@@ -290,7 +291,7 @@ private:
 		~CWMDMNotification() { };
 	private:
         ULONG _cRef;
-	} _IWMDMCallbackObject;
+	} _IWMDMCallbackObject;*/
 
 	// AutoPlay support
 	class CQueryCancelAutoplay : public IQueryCancelAutoPlay

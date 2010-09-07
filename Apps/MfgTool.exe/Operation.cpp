@@ -124,9 +124,9 @@ const COperation::DeviceState_t COperation::GetDeviceState() const
 			}
 			break;
 		}
-		case DeviceClass::DeviceTypeMtp:
+		/*case DeviceClass::DeviceTypeMtp:
 			devState = MTP_MODE;
-			break;
+			break;*/
 		case DeviceClass::DeviceTypeNone:
 			devState = DISCONNECTED;
 			break;

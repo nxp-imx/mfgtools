@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\;..\;$(WMSDK)\WMDM\inc"
+				AdditionalIncludeDirectories="..\..\;..\;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -72,9 +72,9 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="true"
-				AdditionalDependencies="mssachlp.lib hid.lib"
+				AdditionalDependencies="hid.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;../WDK/wxp/i386"
+				AdditionalLibraryDirectories="../WDK/wxp/i386"
 				IgnoreAllDefaultLibraries="false"
 			/>
 			<Tool
@@ -140,9 +140,9 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="mssachlp.lib hid.lib"
+				AdditionalDependencies=" hid.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="&quot;$(WMSDK)\WMDM\lib&quot;;../WDK/wxp/i386"
+				AdditionalLibraryDirectories="../WDK/wxp/i386"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -182,6 +182,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Disk.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DiskDeviceClass.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\HidDevice.cpp"
 				>
 			</File>
@@ -191,14 +199,6 @@
 			</File>
 			<File
 				RelativePath=".\KernelApi.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MtpDevice.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MtpDeviceClass.cpp"
 				>
 			</File>
 			<File
@@ -324,6 +324,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Disk.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DiskDeviceClass.h"
+				>
+			</File>
+			<File
 				RelativePath=".\HidDevice.h"
 				>
 			</File>
@@ -337,14 +345,6 @@
 			</File>
 			<File
 				RelativePath=".\iMX\MemoryInit.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MtpDevice.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MtpDeviceClass.h"
 				>
 			</File>
 			<File

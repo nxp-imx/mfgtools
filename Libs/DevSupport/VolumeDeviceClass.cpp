@@ -172,8 +172,8 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 	{
 		nsInfo.Device = pDevice;
 		nsInfo.Type = _deviceClassType;
-		nsInfo.HubIndex = pDevice->_hubIndex.getmsc();
-		nsInfo.Hub = pDevice->_hub.get();
+		nsInfo.HubIndex = ((Volume*)pDevice)->StorageDisk()->_hubIndex.getmsc();
+		nsInfo.Hub = ((Volume*)pDevice)->StorageDisk()->_hub.get();
 
 		RefreshPort(nsInfo.Hub, nsInfo.HubIndex);
 

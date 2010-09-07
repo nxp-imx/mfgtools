@@ -373,7 +373,7 @@ BOOL CConfigUSBPortPage::SetPortItemText(HTREEITEM _hti, PortNodeInfo* _pInfo)
 						}
 						case DeviceClass::DeviceTypeHid:
                         case DeviceClass::DeviceTypeMxHid:
-						case DeviceClass::DeviceTypeMtp:
+						//case DeviceClass::DeviceTypeMtp:
 						case DeviceClass::DeviceTypeRecovery:
 						case DeviceClass::DeviceTypeUsbController:
 						case DeviceClass::DeviceTypeUsbHub:

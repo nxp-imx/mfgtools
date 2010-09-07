@@ -7,7 +7,7 @@
 #include "OpLoader.h"
 
 #include "../../Libs/DevSupport/StPitc.h"
-#include "../../Libs/DevSupport/MtpDevice.h"
+//#include "../../Libs/DevSupport/MtpDevice.h"
 #include "../../Libs/DevSupport/RecoveryDevice.h"
 
 #ifdef _DEBUG
@@ -500,7 +500,7 @@ CString COpLoader::MakeLogString() const
 {
 	CString logStr = _T("");
 
-	MtpDevice* pMtpDevice = dynamic_cast<MtpDevice*>(m_pUSBPort->_device);
+	/*MtpDevice* pMtpDevice = dynamic_cast<MtpDevice*>(m_pUSBPort->_device);
 
 	if ( pMtpDevice == NULL )
 	{
@@ -508,7 +508,7 @@ CString COpLoader::MakeLogString() const
 		return logStr;
 	}
 
-	logStr.Format(_T("UPDATE ver(%s) %s\\%s %s : "), m_sVersion, m_pProfile->GetUsbVid(), m_pProfile->GetUsbPid(), GetDeviceSerialNumber(pMtpDevice));
+	logStr.Format(_T("UPDATE ver(%s) %s\\%s %s : "), m_sVersion, m_pProfile->GetUsbVid(), m_pProfile->GetUsbPid(), GetDeviceSerialNumber(pMtpDevice));*/
 
 	return logStr;
 }

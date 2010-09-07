@@ -653,16 +653,17 @@ public:
 		Device::NotifyStruct cmdProgress(_T("UtpCommand"), Device::NotifyStruct::dataDir_ToDevice, 0);
 		cmdProgress.status.Format(_T("UtpCommand(%s) tag:%d"), cmd, transaction.GetTag());
 		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
+		cmdProgress.maximum = (uint32_t)transaction.GetTotalSize();
 
 		while (transaction.GetCurrentState()->GetStateType() != State::DoneState)
         {
 			m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
 
             // Update the UI
-			cmdProgress.maximum = (uint32_t)transaction.GetTotalSize();
+
             cmdProgress.position = (uint32_t)transaction.GetCurrentSize();
 //            cmdProgress.status = transaction.GetCurrentState()->ToString() + _T(" // pos:") + transaction.GetCurrentSize().ToString("#,#0");
-			cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
+			//cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
 			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
             transaction.Next();
