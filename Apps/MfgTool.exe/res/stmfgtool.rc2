@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "version.h"
+#include "gitversion.h"
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -37,12 +38,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Freescale Semiconductor, Inc."
             VALUE "FileDescription", "i.MX Manufacturing Tool"
-            VALUE "FileVersion", STMFGTOOL_STRING_VERSION
+            VALUE "FileVersion", STMFGTOOL_STRING_VERSION GIT_VERSION
             VALUE "InternalName", "MfgTool.exe"
-            VALUE "LegalCopyright", "Copyright (c) 2009, Freescale Semiconductor, Inc. \nAll Rights Reserved"
+            VALUE "LegalCopyright", "Copyright (c) 2009-2010, Freescale Semiconductor, Inc. \nAll Rights Reserved"
             VALUE "OriginalFilename", "MfgTool.exe"
             VALUE "ProductName", "i.MX Manufacturing Tool"
-            VALUE "ProductVersion", STMFGTOOL_STRING_VERSION
+            VALUE "ProductVersion", STMFGTOOL_STRING_VERSION GIT_VERSION
         END
     END
     BLOCK "VarFileInfo"
