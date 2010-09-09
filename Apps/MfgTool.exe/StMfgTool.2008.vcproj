@@ -114,6 +114,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="call  $(SolutionDir)/createversion.bat $(SolutionDir)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
