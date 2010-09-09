@@ -328,22 +328,8 @@ CStdString Device::hub::get()
 {
 	Device* dev = dynamic_cast<Device*>(_owner);
 	ASSERT(dev);
-	/*Device* pUsbDevice = dev->UsbDevice();
-	if( pUsbDevice != NULL)
-	{
-		Device* pParent = pUsbDevice->Parent();
-		if(pParent != NULL )
-		{
-			CStdString enumerator = pParent->_enumerator.get();
-			TRACE(_T("GET 0x%x %s\r\n"), this, enumerator);
-			if(enumerator.CompareNoCase(_T("USB")) == 0)
-			{
-				_value = pParent->_path.get();
-			}
-			else
-				_value = _T("");
-		}
-	}*/
+
+	_value = _T("");
 
 	if (dev->UsbDevice() != NULL)
 	{
@@ -351,12 +337,8 @@ CStdString Device::hub::get()
 		{
 			if(dev->UsbDevice()->Parent()->_enumerator.get().CompareNoCase(_T("USB")) == 0)
 			{
-				{
-					_value = dev->UsbDevice()->Parent()->_path.get();
-				}
+				_value = dev->UsbDevice()->Parent()->_path.get();
 			}
-			else
-				_value = _T("");
 		}
 	}
 

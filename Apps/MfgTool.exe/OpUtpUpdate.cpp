@@ -381,8 +381,8 @@ void COpUtpUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 				// Signal anyone waiting on a device change to go see what changed.
 				if ( m_hChangeEvent != INVALID_HANDLE_VALUE )
 				{
-					VERIFY(::SetEvent(m_hChangeEvent));
 					ATLTRACE(_T("%s UtpUpdate Event: %s Msg: %s DevState: %s OpState: %s SET_EVENT\r\n"),m_pPortMgrDlg->GetPanel(), GetEventString(nEventType), dwData, UCL::DeviceState::DeviceStateToString(m_CurrentDeviceState), GetOpStateString(m_OpState));
+					VERIFY(::SetEvent(m_hChangeEvent));
 				}
 			}
 			else

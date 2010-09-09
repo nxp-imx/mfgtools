@@ -210,10 +210,10 @@ int DeviceManager::ExitInstance()
 	    UnregisterWMDMNotification();
 		_pWMDevMgr3->Release();
 		_pWMDevMgr3 = NULL;
-	}
+	}*/
 
 	// Clean up the AutoPlay object
-	SetCancelAutoPlay(false);*/
+	SetCancelAutoPlay(false);
 
 	std::map<HANDLE, Observer*>::iterator callback;
 	for ( callback=_callbacks.begin(); callback!=_callbacks.end(); ++callback )

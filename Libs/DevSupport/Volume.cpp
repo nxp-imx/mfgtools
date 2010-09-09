@@ -502,7 +502,10 @@ uint32_t Volume::SendCommand(HANDLE hDrive, StApi& api, uint8_t* additionalInfo,
     nsInfo.position = api.GetTransferSize();
     Notify(nsInfo);*/
 
-    api.ScsiSenseStatus = pRequest->PassThrough.ScsiStatus;
+	if ( !api.IsWriteCmd() )
+		api.ProcessResponse(pRequest->DataBuffer, 0, api.GetTransferSize());
+
+	api.ScsiSenseStatus = pRequest->PassThrough.ScsiStatus;
 	api.ScsiSenseData = pRequest->SenseData;
 
 	if (additionalInfo)
