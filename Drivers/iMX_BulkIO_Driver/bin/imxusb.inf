@@ -23,7 +23,7 @@ Signature="$WINDOWS NT$"
 Class=USB
 ClassGuid={36fc9e60-c465-11cf-8056-444553540000}
 Provider=%MfgName%
-DriverVer=08/24/2010,6.1.7600.16385
+DriverVer=09/07/2010,6.1.7600.16385
 CatalogFile.ntx86=imxusb.cat
 CatalogFile.ntamd64=imxusb.x64.cat
 
@@ -47,11 +47,13 @@ CoInstaller_CopyFiles = 11
 %MfgName%=iMX_ModelSection,nt,ntamd64
 
 [iMX_ModelSection.nt]
+%USB\VID_15A2&PID_003A.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_003A   ; Freescale i.MX25 board
 %USB\VID_15A2&PID_0030.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_0030   ; Freescale i.MX35 board
 %USB\VID_15A2&PID_0041.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_0041   ; Freescale i.MX51 board
 %USB\VID_15A2&PID_004E.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_004E   ; Freescale i.MX53 board
 
 [iMX_ModelSection.ntamd64]
+%USB\VID_15A2&PID_003A.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_003A   ; Freescale i.MX25 board
 %USB\VID_15A2&PID_0030.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_0030   ; Freescale i.MX35 board
 %USB\VID_15A2&PID_0041.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_0041   ; Freescale i.MX51 board
 %USB\VID_15A2&PID_004E.DeviceDesc%=iMX_USB_Device, USB\VID_15A2&PID_004E   ; Freescale i.MX53 board
@@ -115,6 +117,7 @@ WdfCoInstaller01009.dll
 MfgName          = "Freescale"
 Disk_Description = "iMXUSB Installation Disk"
 imxusb.SvcDesc   = "Freescale i.MX USB BulkIO Device Driver"
+USB\VID_15A2&PID_003A.DeviceDesc="Freescale i.MX25 USB BulkIO Device"
 USB\VID_15A2&PID_0030.DeviceDesc="Freescale i.MX35 USB BulkIO Device"
 USB\VID_15A2&PID_0041.DeviceDesc="Freescale i.MX51 USB BulkIO Device"
 USB\VID_15A2&PID_004E.DeviceDesc="Freescale i.MX53 USB BulkIO Device"
