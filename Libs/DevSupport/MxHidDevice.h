@@ -22,8 +22,11 @@
 #define ROM_KERNEL_CMD_DCD_WRITE 0x0A0A
 #define ROM_KERNEL_CMD_JUMP_ADDR 0x0B0B
 
+#define MAX_DCD_WRITE_REG_CNT    85
 #define ROM_WRITE_ACK   0x128A8A12
 #define ROM_STATUS_ACK  0x88888888
+#define ROM_JUMP_STATUS_ACK  0x00bbcb90
+
 #define ROM_STATUS_ACK2 0xF0F0F0F0
 
 #define SDP_CMD_SIZE    16      
@@ -43,6 +46,17 @@
 
 #define IVT_BARKER_HEADER      0x402000D1
 #define ROM_TRANSFER_SIZE	   0x400
+
+//DCD binary data format:
+//4 bytes for format	4 bytes for register1 address	4 bytes for register1 value to set
+//4 bytes for format	4 bytes for register2 address	4 bytes for register2 value to set
+//...
+typedef struct 
+{
+    UINT format;
+    UINT addr;
+    UINT data;
+} stMemoryInit;
 
 // Address ranges for Production parts: 
 
@@ -240,7 +254,11 @@ private:
 
     VOID PackSDPCmd(PSDPCmd pSDPCmd);
     BOOL WriteReg(PSDPCmd pSDPCmd);
-    
+	BOOL MxHidDevice::SendCmd(PSDPCmd pSDPCmd);
+	BOOL MxHidDevice::SendData(const unsigned char * DataBuf, UINT ByteCnt);
+	BOOL MxHidDevice::GetHABType();
+	BOOL MxHidDevice::GetDevAck(UINT RequiredCmdAck);    
+	BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount);
     static VOID CALLBACK WriteCompletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered,  
         LPOVERLAPPED lpOverlapped);       
     static VOID CALLBACK ReadCompletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered,  

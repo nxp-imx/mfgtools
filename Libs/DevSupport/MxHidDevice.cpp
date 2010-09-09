@@ -13,7 +13,7 @@ extern "C" {
 
 #define DEVICE_TIMEOUT			INFINITE // 5000 ms
 #define DEVICE_READ_TIMEOUT   10
-
+#define DCD_WRITE
 //The WriteFileEx function is designed solely for asynchronous operation.
 //The Write Function is designed solely for synchronous operation.
 #define ASYNC_READ_WRITE 0
@@ -399,7 +399,35 @@ VOID MxHidDevice::PackSDPCmd(PSDPCmd pSDPCmd)
 
 }
 
-BOOL MxHidDevice::GetCmdAck(UINT RequiredCmdAck)
+//Report1 
+BOOL MxHidDevice::SendCmd(PSDPCmd pSDPCmd)
+{
+	//First, pack the command to a report.
+	PackSDPCmd(pSDPCmd);
+
+	//Send the report to USB HID device
+	if ( Write((unsigned char *)m_pWriteReport, m_Capabilities.OutputReportByteLength) != ERROR_SUCCESS)
+	{
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+//Report 2
+BOOL MxHidDevice::SendData(const unsigned char * DataBuf, UINT ByteCnt)
+{
+	memcpy(m_pWriteReport->Payload, DataBuf, ByteCnt);
+
+	m_pWriteReport->ReportId = REPORT_ID_DATA;
+	if (Write((unsigned char *)m_pWriteReport, m_Capabilities.OutputReportByteLength) != ERROR_SUCCESS)
+		return FALSE;	
+
+	return TRUE;
+}
+
+//Report3, Device to Host
+BOOL MxHidDevice::GetHABType()
 {
     memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
 
@@ -415,6 +443,12 @@ BOOL MxHidDevice::GetCmdAck(UINT RequiredCmdAck)
 		return FALSE;	
 	}
 
+	return TRUE;
+}
+
+//Report4, Device to Host
+BOOL MxHidDevice::GetDevAck(UINT RequiredCmdAck)
+{
     memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
 
     //Get Report4, Device to Host:
@@ -432,16 +466,21 @@ BOOL MxHidDevice::GetCmdAck(UINT RequiredCmdAck)
     return TRUE;
 }
 
+BOOL MxHidDevice::GetCmdAck(UINT RequiredCmdAck)
+{
+	if(!GetHABType())
+		return FALSE;
+
+	if(!GetDevAck(RequiredCmdAck))
+		return FALSE;
+
+    return TRUE;
+}
+
 BOOL MxHidDevice::WriteReg(PSDPCmd pSDPCmd)
 {
-    //First, pack the command to a report.
-    PackSDPCmd(pSDPCmd);
-
-	//Send the report to USB HID device
-	if ( Write((unsigned char *)m_pWriteReport, m_Capabilities.OutputReportByteLength) != ERROR_SUCCESS)
-	{
+	if(!SendCmd(pSDPCmd))
 		return FALSE;
-	}
 
 	if ( !GetCmdAck(ROM_WRITE_ACK) )
 	{
@@ -461,29 +500,11 @@ BOOL MxHidDevice::ReadData(UINT address, UINT byteCount, unsigned char * pBuf)
     SDPCmd.data = 0;
     SDPCmd.address = address;
 
-    //First, pack the command to a report.
-    PackSDPCmd(&SDPCmd);
-
-	//Send the report to USB HID device
-	if ( Write((unsigned char *)m_pWriteReport, m_Capabilities.OutputReportByteLength)  != ERROR_SUCCESS)
-	{
+	if(!SendCmd(&SDPCmd))
 		return FALSE;
-	}
-    
-    //It should be the fault of elvis_mcurom.elf which only returns report3
-    memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
-    //Get Report3, Device to Host:
-    //4 bytes HAB mode indicating Production/Development part
-	if ( Read( (UCHAR *)m_pReadReport, m_Capabilities.InputReportByteLength )  != ERROR_SUCCESS)
-	{
-		return FALSE;
-	}
-	if ( (*(unsigned int *)(m_pReadReport->Payload) != HabEnabled)  && 
-		 (*(unsigned int *)(m_pReadReport->Payload) != HabDisabled) ) 
-	{
-		return FALSE;	
-	}
 
+	if(!GetHABType())
+		return FALSE;
 
     UINT MaxHidTransSize = m_Capabilities.InputReportByteLength -1;
     
@@ -518,27 +539,21 @@ BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * 
     SDPCmd.data = 0;
     SDPCmd.address = address;
 
-    //First, pack the command to a report.
-    PackSDPCmd(&SDPCmd);
-
-	//Send the report to USB HID device
-	if ( Write((unsigned char *)m_pWriteReport, m_Capabilities.OutputReportByteLength)  != ERROR_SUCCESS)
-	{
+	if(!SendCmd(&SDPCmd))
 		return FALSE;
-	}
+    
+    Sleep(10);
 
-    m_pWriteReport->ReportId = REPORT_ID_DATA;
     UINT MaxHidTransSize = m_Capabilities.OutputReportByteLength -1;
     UINT TransSize;
-
+    
     while(byteCount > 0)
     {
         TransSize = (byteCount > MaxHidTransSize) ? MaxHidTransSize : byteCount;
 
-        memcpy(m_pWriteReport->Payload, pBuf, TransSize);
+		if(!SendData(pBuf, TransSize))
+			return FALSE;
 
-        if (Write((unsigned char *)m_pWriteReport, m_Capabilities.OutputReportByteLength) != ERROR_SUCCESS)
-            return FALSE;
         byteCount -= TransSize;
         pBuf += TransSize;
         //TRACE("Transfer Size: %d\n", MaxHidTransSize);
@@ -563,28 +578,11 @@ BOOL MxHidDevice::Jump(UINT RAMAddress)
     SDPCmd.data = 0;
     SDPCmd.address = RAMAddress;
 
-	//Send write Command to USB
-    //First, pack the command to a report.
-    PackSDPCmd(&SDPCmd);
-
-	//Send the report to USB HID device
-	if ( Write((unsigned char *)m_pWriteReport, m_Capabilities.OutputReportByteLength) != ERROR_SUCCESS )
-	{
+	if(!SendCmd(&SDPCmd))
 		return FALSE;
-	}
 
-    memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
-    //Get Report3, Device to Host:
-    //4 bytes HAB mode indicating Production/Development part
-	if ( Read( (UCHAR *)m_pReadReport, m_Capabilities.InputReportByteLength )  != ERROR_SUCCESS)
-	{
+	if(!GetHABType())
 		return FALSE;
-	}
-	if ( (*(unsigned int *)(m_pReadReport->Payload) != HabEnabled)  && 
-		 (*(unsigned int *)(m_pReadReport->Payload) != HabDisabled) ) 
-	{
-		return FALSE;	
-	}
 
 	TRACE("*********Jump to Ramkernel successfully!**********\r\n");
 	return TRUE;
@@ -716,6 +714,45 @@ ERR_HANDLE:
 	return FALSE;
 }
 
+BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount)
+{
+	SDPCmd SDPCmd;
+    SDPCmd.command = ROM_KERNEL_CMD_DCD_WRITE;
+    SDPCmd.format = 0;
+    SDPCmd.data = 0;
+    SDPCmd.address = 0;
+
+	//Must reverse uint32 endian to adopt the requirement of ROM
+	for(UINT i=0; i<RegCount*sizeof(stMemoryInit); i+=4)
+	{
+		UINT TempData = ((DataBuf[i]<<24) | (DataBuf[i+1]<<16) | (DataBuf[i+2] << 8) | (DataBuf[i+3]));
+		((PUINT)DataBuf)[i/4] = TempData;
+	}
+
+    while(RegCount)
+    {
+		SDPCmd.dataCount = (RegCount > MAX_DCD_WRITE_REG_CNT) ? MAX_DCD_WRITE_REG_CNT : RegCount;
+		RegCount -= SDPCmd.dataCount;
+		UINT ByteCnt = SDPCmd.dataCount*sizeof(stMemoryInit);
+
+		if(!SendCmd(&SDPCmd))
+			return FALSE;
+
+		if(!SendData(DataBuf, ByteCnt))
+			return FALSE;
+
+		if (!GetCmdAck(ROM_WRITE_ACK) )
+		{
+			return FALSE;
+		}
+
+		DataBuf += ByteCnt;
+    }
+
+	return TRUE;
+}
+
+#ifndef DCD_WRITE
 BOOL MxHidDevice::InitMemoryDevice(CString filename)
 {
 	USES_CONVERSION;
@@ -763,3 +800,58 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
     
 	return TRUE;
 }
+
+#else
+
+BOOL MxHidDevice::InitMemoryDevice(CString filename)
+{
+	USES_CONVERSION;
+	SDPCmd SDPCmd;
+
+    //Create device handle and report id
+    OpenMxHidHandle();
+    
+    SDPCmd.command = ROM_KERNEL_CMD_WR_MEM;
+    SDPCmd.dataCount = 4;
+
+	CFile scriptFile;
+	CFileException fileException;
+	if( !scriptFile.Open(filename, CFile::modeRead | CFile::shareDenyNone, &fileException) )
+	{
+		TRACE( _T("Can't open file %s, error = %u\n"), filename, fileException.m_cause );
+	}
+
+	CStringT<char,StrTraitMFC<char> > cmdString;
+	scriptFile.Read(cmdString.GetBufferSetLength(scriptFile.GetLength()), scriptFile.GetLength());
+	cmdString.ReleaseBuffer();
+
+	XNode script;
+	if ( script.Load(A2T(cmdString)) != NULL )
+	{
+		XNodes cmds = script.GetChilds(_T("CMD"));
+		XNodes::iterator cmd = cmds.begin();
+		//There are no more than 200 regs to be written.
+		stMemoryInit * pMemPara = (stMemoryInit * )malloc(0x1000);
+		UINT RegCount = 0;
+		for ( ; cmd != cmds.end(); ++cmd, RegCount++)
+		{
+			MemoryInitCommand* pCmd = (MemoryInitCommand*)(*cmd);
+            pMemPara[RegCount].format = pCmd->GetFormat();
+            pMemPara[RegCount].addr = pCmd->GetAddress();
+            pMemPara[RegCount].data = pCmd->GetData();
+		}
+		if ( !DCDWrite((PUCHAR)pMemPara,RegCount) )
+		{
+			TRACE(_T("Failed to initialize memory!\r\n"));
+			free(pMemPara);
+			return FALSE;
+		}
+		free(pMemPara);
+	}
+
+    //Clear device handle and report id    
+    CloseMxHidHandle();
+    
+	return TRUE;
+}
+#endif
