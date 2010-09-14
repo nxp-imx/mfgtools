@@ -142,6 +142,7 @@ MxRomDevice::ChipFamily_t MxRomDevice::GetChipFamily()
 		}
 		else if ( devPath.Find(_T("VID_15A2&PID_004E")) != -1 )
 		{
+			_SyncAllDevEnable = TRUE;
 			_chipFamily = MX53;
 		}
 		else if ( devPath.Find(_T("VID_0425&PID_21FF")) != -1 )
