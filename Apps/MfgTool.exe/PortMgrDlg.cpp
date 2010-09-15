@@ -652,10 +652,10 @@ LRESULT CPortMgrDlg::OnMsgStateChange(WPARAM _event_type, LPARAM _msg_string)
 	return true;
 }
 
-bool CPortMgrDlg::OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo)
+BOOL CPortMgrDlg::OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo)
 {
 	ATLTRACE(_T("%s PortMgr DevChange Event: %s DevType: %s OpMgr Mode: %s\r\n"),GetPanel(), DeviceManager::EventToString(nsInfo.Event), DeviceClass::DeviceTypeToString(nsInfo.Type).c_str(), OpModeToString(m_mode));
-	bool ret = TRUE;
+	BOOL ret = TRUE;
 
 	switch(nsInfo.Event)
 	{

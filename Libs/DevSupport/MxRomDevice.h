@@ -17,7 +17,7 @@
 //#define ROM_KERNEL_WF_FT_DCD 0xEE
 //#define ROM_KERNEL_WF_FT_APP 0xAA
 //#define ROM_KERNEL_WF_FT_OTH 0x0
-#define MAX_SIZE_PER_FLASH_COMMAND 0x200000
+#define MAX_SIZE_PER_FLASH_COMMAND 0x400000
 #define MAX_SIZE_PER_DOWNLOAD_COMMAND 0x200000
 #define ROM_KERNEL_CMD_RD_MEM 0x0101
 #define ROM_KERNEL_CMD_WR_MEM 0x0202
@@ -303,6 +303,7 @@ private:
 	BOOL ValidAddress(const UINT address, const UINT format) const;
 	//HAB_t GetHABType(ChipFamily_t chipType);
 	void PackRklCommand(unsigned char *cmd, unsigned short cmdId, unsigned long addr, unsigned long param1, unsigned long param2);
+	CString CommandToString(unsigned char *cmd, int size);
 	struct Response UnPackRklResponse(unsigned char *resBuf);
 	BOOL Jump2Rak();
 	BOOL SendCommand2RoK(UINT address, UINT byteCount, UCHAR type);

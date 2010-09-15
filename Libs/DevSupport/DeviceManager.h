@@ -72,8 +72,8 @@ class DeviceManager : public CWinThread
 
 public:
 	//! \brief Callback function typedef. i.e. void OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo)
-	typedef Loki::Functor<bool, LOKI_TYPELIST_1(const DeviceClass::NotifyStruct&), Loki::ClassLevelLockable> DeviceChangeCallback;
-	static const bool retUnregisterCallback = true;
+	typedef Loki::Functor<BOOL, LOKI_TYPELIST_1(const DeviceClass::NotifyStruct&), Loki::ClassLevelLockable> DeviceChangeCallback;
+	static const BOOL retUnregisterCallback = TRUE;
 
     //! \brief Device event types determined in DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM msg).
     //! \see DeviceClass::NotifyStruct::Event

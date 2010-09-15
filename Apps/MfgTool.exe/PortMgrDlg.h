@@ -84,7 +84,7 @@ protected:
 	afx_msg LRESULT OnInitDialog(UINT wParam, LONG lParam);
 	afx_msg void OnTimer( UINT_PTR nIDEvent );
 	afx_msg LRESULT OnMsgStateChange(WPARAM _event_type, LPARAM _msg_string);
-	bool OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo); // may replace OnMsgStateChange??
+	BOOL OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo); // may replace OnMsgStateChange??
 	HANDLE m_hDevChangeCallback;
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	CSize CalcDynamicLayout(int nLength, DWORD dwMode);

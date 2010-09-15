@@ -1,5 +1,23 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
 
+****************************************
+RELEASE_STMFGTOOL_1.6.2.016a
+****************************************
+09/15/2010 - Chris Williamson
+	- Bug fix in MxRomDevice::ProgramFlash(): address argument for RKLCommand is sector address, not byte address.
+	- Change MAX_SIZE_PER_FLASH_COMMAND from 0x200000 to 0x400000
+
+	Libs/DevSupport/MxRomDevice.cpp
+	Libs/DevSupport/MxRomDevice.h
+	Apps\MfgTool.exe\docs\changelog.txt
+	
+	- Line ending change.
+	Apps\MfgTool.exe\OpUtpUpdate.cpp
+	
+	- Fix compiler warning about converting bool to BOOL.
+	Apps\MfgTool.exe\PortMgrDlg.cpp
+	Apps\MfgTool.exe\PortMgrDlg.h
+	Libs\DevSupport\DeviceManager.h
 
 ****************************************
 RELEASE_STMFGTOOL_1.6.2.016
@@ -17,8 +35,6 @@ RELEASE_STMFGTOOL_1.6.2.015
 	- Add i.mx53 sync device functionality
 
 	Libs/DevSupport/MxRomDevice.cpp
-
-
 
 ****************************************
 RELEASE_STMFGTOOL_1.6.2.014
@@ -93,6 +109,48 @@ RELEASE_STMFGTOOL_1.6.2.012b
 	Apps/MfgTool.exe/docs/changelog.txt
 	Apps/MfgTool.exe/version.h
 	    
+
+****************************************
+RELEASE_STMFGTOOL_1.6.2.005 - UI simplification, MxRomDevice::ProgramFlash() bug fixes.
+****************************************
+03/29/2010 - Chris Williamson
+	
+	- Bug fix in MxRomDevice::ProgramFlash(): address argument for RKLCommand is sector address, not byte address.
+	- Change MAX_SIZE_PER_FLASH_COMMAND from 0x200000 to 0x400000
+
+	- Remove below information in player.ini:
+	  USB_VID=0x15A2
+	  USB_PID=0x0041
+	  SCSI_MFG=Freescale
+	  SCSI_PRODUCT=i.mx51
+	  VOLUME_LABEL=
+	  VERSION=1
+	- Add a filter to recognize the USB device we need by checking PID/VID value in ucl.xml. This will provide 
+	  separation iMX device types. Ie. a MX35 will not be programmed with MX51 data.
+	- Fix the extra blank line generation in the player.ini file produced after running the tool.
+	- For UTP_UPDATE and RKL_UPDATE Edit Dialog, remove all but step3.
+	- Totally remove GUI method when creating a new operation.
+
+	Apps/MfgTool.exe/ConfigPlayerListCtrl.cpp
+	Apps/MfgTool.exe/ConfigPlayerProfilePage.cpp
+	Apps/MfgTool.exe/ConfigPlayerProfilePage.h
+	Apps/MfgTool.exe/DriveEditDlg.h
+	Apps/MfgTool.exe/MainFrm.cpp
+	Apps/MfgTool.exe/OpInfo.cpp
+	Apps/MfgTool.exe/OpInfo.h
+	Apps/MfgTool.exe/OpMxRomUpdate.cpp
+	Apps/MfgTool.exe/OpUclDlg.cpp
+	Apps/MfgTool.exe/OpUclDlg.h
+	Apps/MfgTool.exe/OpUtpUpdate.cpp
+	Apps/MfgTool.exe/PlayerProfile.cpp
+	Apps/MfgTool.exe/PlayerProfile.h
+	Apps/MfgTool.exe/PortMgrDlg.cpp
+	Apps/MfgTool.exe/resource.h
+	Apps/MfgTool.exe/StMfgTool.2008.vcproj
+	Apps/MfgTool.exe/StMfgTool.rc
+	Apps/MfgTool.exe/version.h
+	Libs/DevSupport/MxRomDevice.cpp
+	Libs/DevSupport/MxRomDevice.h
 
 ****************************************
 RELEASE_STMFGTOOL_1.6.2.003
@@ -388,8 +446,8 @@ RELEASE_STMFGTOOL_1.6.0.003c
 ****************************************
 10/15/2009
 	- Ryan Qian: 
-	  Failed to create ‘new?profile again, if last ‘new profile?operation was cancelled.
-	  The button of ‘Delete?should be disabled all the way, if there’s no any profiles available.
+	  Failed to create ‘new’ profile again, if last ‘new profile’ operation was cancelled.
+	  The button of ‘Delete’ should be disabled all the way, if there’s no any profiles available.
 	  
 	  Switch the m_bNewProfileMode to FALSE if the Cancel button is pressed.
 	  Don't enable the Delete button unless there are profiles detected.
@@ -1368,7 +1426,7 @@ RELEASE_STMFGTOOL_1.3.01.000
 	branch merged: br_localized_mfg_tool_1.3.0.139_main_dev_0008
 
 	- Added capability to edit the media drive array via a GUI interface. It will
-	  provide Manufacturing support for “Copy Protect?and other non-standard drive 
+	  provide Manufacturing support for “Copy Protect” and other non-standard drive 
 	  array hosts. It will also allow customers to rename their firmware files to 
 	  non-standard names.
 
