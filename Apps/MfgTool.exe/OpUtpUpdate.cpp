@@ -451,7 +451,8 @@ BOOL COpUtpUpdate::WaitForDeviceChange(int seconds)
             // Otherwise, dispatch the message.
             DispatchMessage(&msg); 
         } // End of PeekMessage while loop.
-        retValue = FALSE;
+        //retValue = FALSE;
+		retValue = TRUE;
     }
     else
     {

@@ -441,9 +441,10 @@ int32_t Device::hubIndex::getmsc()
 				if (!Success) 
 				{
 					error = GetLastError();
-					CloseHandle(hHub);
+					//CloseHandle(hHub);
 					ATLTRACE2(_T("hubIndex::getmsc() index %d GetErrorCode %d for IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX\r\n"),index,error);
-					return Value;
+					//return Value;
+					continue;
 				}
 
 				// There is a device connected to this Port
