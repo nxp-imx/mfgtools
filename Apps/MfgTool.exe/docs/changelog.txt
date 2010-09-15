@@ -1,6 +1,17 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.016c
+****************************************
+09/15/2010 - Chris Williamson
+	
+	- Add a filter to recognize the USB device we need by checking PID/VID value in ucl.xml. This will 
+          provide separation iMX device types. Ie. a MX35 will not be programmed with MX51 data.
+
+	Apps\MfgTool.exe\OpMxRomUpdate.cpp
+	Apps\MfgTool.exe\OpUtpUpdate.cpp
+
+****************************************
 RELEASE_STMFGTOOL_1.6.2.016b
 ****************************************
 09/15/2010 - Chris Williamson

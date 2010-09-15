@@ -121,6 +121,7 @@ BOOL COpUtpUpdate::InitInstance(void)
 
 const UCL::DeviceState::DeviceState_t COpUtpUpdate::GetDeviceState()
 {
+	CString csVidPid, devPath;
 	UCL::DeviceState::DeviceState_t state = UCL::DeviceState::Unknown;
 
 	switch ( (DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() )
@@ -128,20 +129,55 @@ const UCL::DeviceState::DeviceState_t COpUtpUpdate::GetDeviceState()
 		case DeviceClass::DeviceTypeHid:
 		case DeviceClass::DeviceTypeMxHid:
 		case DeviceClass::DeviceTypeRecovery:
-			state = UCL::DeviceState::Recovery;
+		{
+			devPath = m_pUSBPort->GetUsbDevicePath(); devPath.MakeUpper();
+
+			if ( m_DeviceStates[UCL::DeviceState::Recovery] == NULL )
+			{
+				state = UCL::DeviceState::ConnectedUnknown;
+				break;
+			}
+
+			csVidPid.Format(_T("Vid_%s&Pid_%s"), m_DeviceStates[UCL::DeviceState::Recovery]->GetVid(), m_DeviceStates[UCL::DeviceState::Recovery]->GetPid());
+			csVidPid.MakeUpper();
+
+			if ( devPath.Find(csVidPid) != -1 )
+				state = UCL::DeviceState::Recovery;
+			else
+				state = UCL::DeviceState::ConnectedUnknown;
+			
 			break;
+		}
 		case DeviceClass::DeviceTypeMxRom:
 		{
-			MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
-			
-			int len = 0, type = 0;
-			CString model;
-			if ( pMxRomDevice->GetRKLVersion(model, len, type) == ERROR_SUCCESS )
+			devPath = m_pUSBPort->GetUsbDevicePath(); devPath.MakeUpper();
+
+			if ( m_DeviceStates[UCL::DeviceState::BootStrap] == NULL )
 			{
-				if ( len == 0 && type == 0 )
-					state = UCL::DeviceState::BootStrap;
-				else
-					state = UCL::DeviceState::RamKernel;
+				state = UCL::DeviceState::ConnectedUnknown;
+				break;
+			}
+			
+			csVidPid.Format(_T("Vid_%s&Pid_%s"), m_DeviceStates[UCL::DeviceState::BootStrap]->GetVid(), m_DeviceStates[UCL::DeviceState::BootStrap]->GetPid());
+			csVidPid.MakeUpper();
+
+			if ( devPath.Find(csVidPid) != -1 )
+			{
+				MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+			
+				int len = 0, type = 0;
+				CString model = _T("");
+				if ( pMxRomDevice->GetRKLVersion(model, len, type) == ERROR_SUCCESS )
+				{
+					if ( len == 0 && type == 0 )
+						state = UCL::DeviceState::BootStrap;
+					else
+						state = UCL::DeviceState::RamKernel;
+				}
+			}
+			else
+			{
+				state = UCL::DeviceState::ConnectedUnknown;
 			}
 			break;
 		}
@@ -152,7 +188,8 @@ const UCL::DeviceState::DeviceState_t COpUtpUpdate::GetDeviceState()
 
 			CString csVidPid;
 			// Check for USER MSC mode
-			if ( m_DeviceStates.find(UCL::DeviceState::UserMsc) != m_DeviceStates.end() )
+			if ( m_DeviceStates.find(UCL::DeviceState::UserMsc) != m_DeviceStates.end() && 
+				 m_DeviceStates[UCL::DeviceState::UserMsc] != NULL)
 			{
 				csVidPid.Format(_T("Vid_%s&Pid_%s"), m_DeviceStates[UCL::DeviceState::UserMsc]->GetVid(), m_DeviceStates[UCL::DeviceState::UserMsc]->GetPid());
 				csVidPid.MakeUpper();
@@ -165,7 +202,8 @@ const UCL::DeviceState::DeviceState_t COpUtpUpdate::GetDeviceState()
 			if ( state != UCL::DeviceState::UserMsc )
 			{
 				// Check for UPDATER mode
-				if ( m_DeviceStates.find(UCL::DeviceState::Updater) != m_DeviceStates.end() )
+				if ( m_DeviceStates.find(UCL::DeviceState::Updater) != m_DeviceStates.end() &&
+					 m_DeviceStates[UCL::DeviceState::Updater] != NULL )
 				{
 					csVidPid.Format(_T("Vid_%s&Pid_%s"), m_DeviceStates[UCL::DeviceState::Updater]->GetVid(), m_DeviceStates[UCL::DeviceState::Updater]->GetPid());
 					csVidPid.MakeUpper();
@@ -183,8 +221,29 @@ const UCL::DeviceState::DeviceState_t COpUtpUpdate::GetDeviceState()
 			break;
 		}
 		/*case DeviceClass::DeviceTypeMtp:
-			state = UCL::DeviceState::UserMtp;
-			break;*/
+		{
+			devPath = m_pUSBPort->GetUsbDevicePath(); devPath.MakeUpper();
+
+			if ( m_DeviceStates[UCL::DeviceState::UserMtp] == NULL )
+			{
+				state = UCL::DeviceState::ConnectedUnknown;
+				break;
+			}
+
+			csVidPid.Format(_T("Vid_%s&Pid_%s"), m_DeviceStates[UCL::DeviceState::UserMtp]->GetVid(), m_DeviceStates[UCL::DeviceState::UserMtp]->GetPid());
+			csVidPid.MakeUpper();
+
+			if ( devPath.Find(csVidPid) != -1 )
+			{
+				state = UCL::DeviceState::UserMtp;
+			}
+			else
+			{
+				state = UCL::DeviceState::ConnectedUnknown;
+			}
+
+			break;
+		}*/
 		case DeviceClass::DeviceTypeNone:
 			state = UCL::DeviceState::Disconnected;
 			break;

@@ -87,22 +87,41 @@ BOOL COpMxRomUpdate::InitInstance(void)
 
 const UCL::DeviceState::DeviceState_t COpMxRomUpdate::GetDeviceState()
 {
+	CString csVidPid, devPath;
 	UCL::DeviceState::DeviceState_t state = UCL::DeviceState::Unknown;
 
 	switch ( (DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() )
 	{
 		case DeviceClass::DeviceTypeMxRom:
 		{
-			MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
-			
-			int len = 0, type = 0;
-			CString model = _T("");
-			if ( pMxRomDevice->GetRKLVersion(model, len, type) == ERROR_SUCCESS )
+			devPath = m_pUSBPort->GetUsbDevicePath(); devPath.MakeUpper();
+
+			if ( m_DeviceStates[UCL::DeviceState::BootStrap] == NULL )
 			{
-				if ( len == 0 && type == 0 )
-					state = UCL::DeviceState::BootStrap;
-				else
-					state = UCL::DeviceState::RamKernel;
+				state = UCL::DeviceState::ConnectedUnknown;
+				break;
+			}
+
+			csVidPid.Format(_T("Vid_%s&Pid_%s"), m_DeviceStates[UCL::DeviceState::BootStrap]->GetVid(), m_DeviceStates[UCL::DeviceState::BootStrap]->GetPid());
+			csVidPid.MakeUpper();
+
+			if ( devPath.Find(csVidPid) != -1 )
+			{
+				MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+			
+				int len = 0, type = 0;
+				CString model = _T("");
+				if ( pMxRomDevice->GetRKLVersion(model, len, type) == ERROR_SUCCESS )
+				{
+					if ( len == 0 && type == 0 )
+						state = UCL::DeviceState::BootStrap;
+					else
+						state = UCL::DeviceState::RamKernel;
+				}
+			}
+			else
+			{
+				state = UCL::DeviceState::ConnectedUnknown;
 			}
 			break;
 		}
