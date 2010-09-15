@@ -691,39 +691,22 @@ INT_PTR COpInfo::ReplaceIniLine(LPCTSTR _section, LPCTSTR _string, INT_PTR _line
         csSection.Append(csArray.GetAt(i));
         csSection.AppendChar(_T('\0'));
     }
+    csSection.AppendChar(_T('\0'));
     // write out the ini file section
 	WritePrivateProfileSection(_section, csSection, m_p_profile->m_cs_ini_file);
     
     return index;
 }
 
-DWORD COpInfo::WriteIniSection(LPCTSTR _section, LPCTSTR _old_section)
+DWORD COpInfo::WriteIniSection(LPCTSTR _section)
 {
     CString csSectionNames;
     CString csSection, csTemp;
 	TCHAR drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT]; 
 
-	if( m_e_type == COperation::UTP_UPDATE_OP ||
-		m_e_type == COperation::MX_UPDATE_OP)
-	{
-		csSection.AppendFormat(_T("UCL_INSTALL_SECTION"));
-		csSection.AppendChar(_T('\0'));
-		// delete the section
-		WritePrivateProfileString(_section,csSection, NULL, m_p_profile->m_cs_ini_file);
-		// write out the ini file section
-		WritePrivateProfileString(_section,csSection, m_UclInstallSection, m_p_profile->m_cs_ini_file);
-
-		return 0;
-	}
-
 	// delete the section
-    WritePrivateProfileSection(_section, NULL, m_p_profile->m_cs_ini_file);
+//    WritePrivateProfileSection(_section, NULL, m_p_profile->m_cs_ini_file);
 
-	// delete the old section
-    if ( _old_section ) {
-        WritePrivateProfileSection(_old_section, NULL, m_p_profile->m_cs_ini_file);
-    }
-	
 	switch ( m_e_type ) {
 		case COperation::UPDATE_OP:
 //			if( UseFat32() ) {
@@ -768,7 +751,7 @@ DWORD COpInfo::WriteIniSection(LPCTSTR _section, LPCTSTR _old_section)
 			break;
 		case COperation::UTP_UPDATE_OP:
 		case COperation::MX_UPDATE_OP:
-			csSection.AppendFormat(_T("UCL_INSTALL_SECTION=%s\r\n"), m_UclInstallSection);
+			csSection.AppendFormat(_T("UCL_INSTALL_SECTION=%s"), m_UclInstallSection);
 			csSection.AppendChar(_T('\0'));
 			break;
 		case COperation::ERASE_OP:
@@ -783,32 +766,9 @@ DWORD COpInfo::WriteIniSection(LPCTSTR _section, LPCTSTR _old_section)
 				break;
 
 	} // end switch(type)
-/*
-	// open or create the .ini file
-	CString str;
-    str.Format(_T("\r\n\r\n[%s]\r\n"), _section);
-	CFile file(m_p_profile->m_cs_ini_file, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeReadWrite | CFile::shareDenyWrite);
-    file.SeekToEnd();
-    file.Seek( -1, CFile::current );
-    BOOL b_more_white_space = TRUE;
-    while ( b_more_white_space ) {
-        file.Read(&char_buf, 1);
-        switch (char_buf) {
-            case '\r':
-            case '\n':
-            case '\t':
-            case ' ':
-                file.Seek( -2, CFile::current );
-                break;
-            default:
-                b_more_white_space = FALSE;
-        }
-    };
-    USES_CONVERSION;
-	file.Write(W2A(str), str.GetLength());
-    file.Close();
-*/
+
 	// write out the ini file section
+    csSection.AppendChar(_T('\0'));
     WritePrivateProfileSection(_section, csSection, m_p_profile->m_cs_ini_file);
 
     return 0;

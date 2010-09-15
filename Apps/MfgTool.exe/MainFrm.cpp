@@ -400,7 +400,7 @@ void CMainFrame::OnOptionsConfigurationMenu()
 		// save current profile selection from DlgBar
 		// Remove and re-populate Profile selection combobox (profiles may have beed added/removed)
 		// Try to select previously selected profile.
-		CString csCurrentProfile = m_DlgBar.WhatProfile();
+		CString csCurrentProfile;// = m_DlgBar.WhatProfile();
 		m_DlgBar.ClearProfiles();
 		m_DlgBar.SetProfiles();
 

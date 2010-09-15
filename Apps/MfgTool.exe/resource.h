@@ -39,11 +39,12 @@
 #define IDR_BOUND_LANG_RESOURCE_COUNT   152
 #define IDD_REGCHECK_DLG                153
 #define IDR_BOUND_RESOURCE_TABLE        153
-#define IDD_UTPUPDATEOPDLG              154
 #define IDR_BOUND_RESOURCE_TABLE_LEN    154
 #define IDR_USE_LOCAL_RESOURCES         155
 #define IDD_MXUPDATEOPDLG               155
 #define IDR_DEFAULT_DIALOG              156
+#define IDD_UTPUPDATEOPDLG              156
+#define IDD_CONF_PROFILE_DLG2           157
 #define IDR_STMP3REC_SYS                160
 #define IDR_STMP3REC_INF                161
 #define IDR_STMP3REC_CAT                162

@@ -17,6 +17,7 @@
 
 #include "../../Libs/DevSupport/UsbHubMgr.h"
 #include "../../Libs/DevSupport/DeviceManager.h"
+#include "../../Libs/WinSupport/visvaledit.h"
 
 #define PROGRESS_RGB_BLUE	RGB(9,106,204)
 #define PROGRESS_RGB_GREEN	RGB(78,217,11)

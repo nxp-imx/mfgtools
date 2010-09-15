@@ -2,6 +2,7 @@
 #include "../../Libs/DevSupport/StMedia.h"
 #include "opinfo.h"
 #include "../../Libs/Winsupport/dropedit.h"
+#include "../../Libs/WinSupport/visvaledit.h"
 
 // CDriveEditDlg dialog
 

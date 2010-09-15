@@ -43,6 +43,7 @@ friend class CLoadFileOpDlg;
 friend class COpUpdateDlg;
 friend class COpOTPDlg;
 friend class COpUtpUpdateDlg;
+friend class COpUclDlg;
 //friend class COpMxRomUpdateDlg;
 private:
 	static const PTCHAR OptionsCmdStrings[];
@@ -71,7 +72,6 @@ private:
 	BOOL m_b_new_op;
 	CString m_cs_NewName;
 	CString m_cs_new_ini_section;
-//	CString m_cs_original_name;
 	int m_update_boot_fname_list_index;
 	int m_ucl_fname_list_index;
 	int m_rkl_fname_list_index;
@@ -133,7 +133,7 @@ public:
 
 protected:
     INT_PTR ReplaceIniLine(LPCTSTR _section, LPCTSTR _string, INT_PTR _line);
-    DWORD WriteIniSection(LPCTSTR _section, LPCTSTR _old_section = NULL);
+    DWORD WriteIniSection(LPCTSTR _section);
 	DWORD ValidateFileList(CFileList * _pFileList);
 	DWORD EnumerateFolderFiles(CFileList * p_FileList);
 

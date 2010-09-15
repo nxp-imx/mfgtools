@@ -8,8 +8,9 @@
 #include "CopyOpDlg.h"
 #include "LoadFileOpDlg.h"
 #include "OpOTPDlg.h"
-#include "OpUtpUpdateDlg.h"
-#include "OpMxRomUpdateDlg.h"
+//#include "OpUtpUpdateDlg.h"
+//#include "OpMxRomUpdateDlg.h"
+#include "OpUclDlg.h"
 #include "ConfigUSBPortPage.h"
 #include "StMfgTool.h"
 #include "DefaultProfile.h"
@@ -22,13 +23,10 @@ IMPLEMENT_DYNAMIC(CConfigPlayerProfilePage, CPropertyPage)
 
 CConfigPlayerProfilePage::CConfigPlayerProfilePage(CWnd * cParent /*=NULL*/)
 	: CPropertyPage(CConfigPlayerProfilePage::IDD)
-	, m_b_use_volume_label(FALSE)
 	, m_cs_old_player_profile(_T(""))
-	, m_pNewPlayerProfile(NULL)
 	, m_hi_ok(0)
 	, m_hi_warning(0)
 	, m_hi_error(0)
-	, m_bNewProfileMode(FALSE)
 {
 	m_p_player_profile = NULL; //new CPlayerProfile;
 }
@@ -40,39 +38,21 @@ CConfigPlayerProfilePage::~CConfigPlayerProfilePage()
 	{
 		m_ProfileList.RemoveAll();
 	}
-
-	if ( m_DeleteList.GetCount() )
-	{
-		m_DeleteList.RemoveAll();
-	}
 }
 
 void CConfigPlayerProfilePage::DoDataExchange(CDataExchange* pDX)
 {
 	CPropertyPage::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_PLAYER_PROFILE_COMBO, m_cb_player_profile_ctrl);
-	DDX_Control(pDX, IDC_PLAYER_PROFILE_EDIT, m_vve_player_profile_ctrl);
-	DDX_Control(pDX, IDC_USB_VID_TEXT, m_usb_vid_ctrl);
-	DDX_Control(pDX, IDC_USB_PID_TEXT, m_usb_pid_ctrl);
-	DDX_Control(pDX, IDC_SCSI_MFG_TEXT, m_scsi_mfg_ctrl);
-	DDX_Control(pDX, IDC_VOLUME_LABEL_TEXT, m_volume_label_ctrl);
-	DDX_Control(pDX, IDC_SCSI_PRODUCT_TEXT, m_scsi_product_ctrl);
 	DDX_Control(pDX, IDC_OPERATIONS_LIST, m_operations_ctrl);
 	DDX_Control(pDX, IDC_STATUS_ICON, m_status_icon_ctrl);
 	DDX_Control(pDX, IDC_STATUS_TEXT, m_status_ctrl);
-	DDX_Control(pDX, IDC_NEW, m_new_ctrl);
-	DDX_Control(pDX, IDC_DELETE, m_delete_ctrl);
-	DDX_Control(pDX, IDC_VOLUME_LABEL_CHECK, m_volume_label_check_ctrl);
 }
 
 
 BEGIN_MESSAGE_MAP(CConfigPlayerProfilePage, CPropertyPage)
-	ON_BN_CLICKED(IDC_NEW, OnBnClickedNewSave)
-	ON_BN_CLICKED(IDC_DELETE, OnBnClickedDelete)
 	ON_MESSAGE(WM_UPDATE_STATUS, OnUpdateStatus)
 	ON_CBN_SELCHANGE(IDC_PLAYER_PROFILE_COMBO, OnCbnSelchangeProductDescCombo)
-	ON_BN_CLICKED(IDC_VOLUME_LABEL_CHECK, OnBnClickedVolumeLabelCheck)
-	ON_MESSAGE(UWM_VVE_VALIDITY_CHANGED, OnValidChanged)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_OPERATIONS_LIST, OnLvnItemChangedOperationsList)
     ON_NOTIFY(NM_KILLFOCUS, IDC_OPERATIONS_LIST, OnNMKillfocusOperationsList)
     ON_NOTIFY(NM_SETFOCUS, IDC_OPERATIONS_LIST, OnNMSetfocusOperationsList)
@@ -107,61 +87,13 @@ BOOL CConfigPlayerProfilePage::OnInitDialog()
 	m_hi_error = ::LoadIcon(NULL, IDI_ERROR);
 
 	Localize();
-///////////////////////////////////////////////////
-	m_vve_player_profile_ctrl.SetValidCharSet(CVisValidEdit::SET_DIRPATH);
-	m_vve_player_profile_ctrl.SetTextLenMinMax(1,128);
-	m_vve_player_profile_ctrl.SetEnableLengthCheck();
-	m_vve_player_profile_ctrl.SetMyControlID(0x01);
-
-	m_usb_vid_ctrl.SetValidCharSet(CVisValidEdit::SET_HEXADECIMAL);
-	m_usb_vid_ctrl.SetTextLenMinMax(4, 4);
-	m_usb_vid_ctrl.SetEnableLengthCheck();
-	m_usb_vid_ctrl.SetMyControlID(0x02);
-	m_usb_vid_ctrl.SetReadOnly(FALSE);
-
-	m_usb_pid_ctrl.SetValidCharSet(CVisValidEdit::SET_HEXADECIMAL);
-	m_usb_pid_ctrl.SetTextLenMinMax(4, 4);
-	m_usb_pid_ctrl.SetEnableLengthCheck();
-	m_usb_pid_ctrl.SetMyControlID(0x04);
-	m_usb_pid_ctrl.SetReadOnly(FALSE);
-
-	m_scsi_mfg_ctrl.SetValidCharSet(CVisValidEdit::SET_ALLCHAR);
-	m_scsi_mfg_ctrl.SetTextLenMinMax(1, 8);
-	m_scsi_mfg_ctrl.SetEnableLengthCheck();
-	m_scsi_mfg_ctrl.SetMyControlID(0x08);
-	m_scsi_mfg_ctrl.SetReadOnly(FALSE);
-
-	m_scsi_product_ctrl.SetValidCharSet(CVisValidEdit::SET_ALLCHAR);
-	m_scsi_product_ctrl.SetTextLenMinMax(1, 16);
-	m_scsi_product_ctrl.SetEnableLengthCheck();
-	m_scsi_product_ctrl.SetMyControlID(0x10);
-	m_scsi_product_ctrl.SetReadOnly(FALSE);
-
-	m_volume_label_ctrl.SetValidCharSet(CVisValidEdit::SET_DIRPATH);
-	m_volume_label_ctrl.SetTextLenMinMax(0, 11);
-	m_volume_label_ctrl.SetEnableLengthCheck();
-//	m_volume_label_ctrl.SetEmptyValid();
-	m_volume_label_ctrl.SetMyControlID(0x20);
-	m_volume_label_ctrl.SetReadOnly(FALSE);
-
-///////////////////////////////////////////////////
-	// BEGIN REAL WORK
 
     // fill combo with profile directories
 	if ( m_ProfileList.GetCount() == 0 ) {
-        m_delete_ctrl.EnableWindow(FALSE);
 		m_operations_ctrl.EnableWindow(FALSE);
-		m_vve_player_profile_ctrl.EnableWindow(FALSE);
-		m_usb_vid_ctrl.EnableWindow(FALSE);
-		m_usb_pid_ctrl.EnableWindow(FALSE);
-		m_scsi_mfg_ctrl.EnableWindow(FALSE);
-		m_scsi_product_ctrl.EnableWindow(FALSE);
-		m_volume_label_check_ctrl.EnableWindow(FALSE);
-		m_volume_label_ctrl.EnableWindow(FALSE);
 	}
     else {
 		CString csProfileName;
-        m_delete_ctrl.EnableWindow(TRUE);
 
 		InitProfileListCombo();
 
@@ -186,8 +118,6 @@ BOOL CConfigPlayerProfilePage::OnInitDialog()
         InitListCtrl(m_operations_ctrl);
 
 		m_cs_cur_player_profile = m_cs_old_player_profile = m_p_player_profile->GetName();
-
-		m_vve_player_profile_ctrl.SetWindowText(m_cs_cur_player_profile);
     }
 
 
@@ -215,19 +145,6 @@ void CConfigPlayerProfilePage::InitProfileListCombo()
 //
 void CConfigPlayerProfilePage::OnOK()
 {
-
-	// save current profile changes
-	if (!SaveProfileStrings(m_p_player_profile))
-	{
-		if ( m_pNewPlayerProfile )
-		{
-			delete m_pNewPlayerProfile;
-			m_pNewPlayerProfile = NULL;
-		}
-		m_bNewProfileMode = FALSE;
-		return;
-	}
-
 	// validate each profile
 	for (int i = 0; i < m_ProfileList.GetCount(); ++i )
 	{
@@ -238,64 +155,28 @@ void CConfigPlayerProfilePage::OnOK()
 		}
 
 		pProfile->Validate();
-		if ( !pProfile->IsValid() )
+		if ( pProfile->IsValid() )
 		{
-			// select the offending profile
-			m_cb_player_profile_ctrl.SelectString(-1, pProfile->m_cs_name);
-			OnUpdateStatus(0,0);
-			return;
+			SaveProfile(pProfile);
 		}
-	}
-
-	// Delete any profiles on the delete list
-	while ( m_DeleteList.GetCount() )
-	{
-	    SHFILEOPSTRUCT FileOp;
-	    CString csDirToDelete;
-
-		CPlayerProfile *pProfile = m_DeleteList.Get(0);
-		m_DeleteList.Remove(0);
-
-		csDirToDelete = pProfile->GetProfilePath();
-		delete pProfile;
-	    csDirToDelete.AppendChar(_T('\0'));
-	    FileOp.hwnd = this->m_hWnd;
-	    FileOp.wFunc = FO_DELETE;
-	    FileOp.pFrom = csDirToDelete;
-	    FileOp.pTo = NULL;
-	    FileOp.fFlags = FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_SILENT;
-	    int err;
-    		
-	    // delete the profiles\<player_profile> directory
-	    err = SHFileOperation( &FileOp );
 	}
 
 	// if we have no players null the current selection in the registry
 	if (m_ProfileList.GetCount() == 0)
-	    AfxGetApp()->WriteProfileString(_T("Player Profile"), _T("Player Description"), _T(""));
-
-	// Commit the profiles on the active list
-	int i = 0;
-	while ( i < m_ProfileList.GetCount() )
 	{
-		CPlayerProfile *pProfile = m_ProfileList.Get(i++);
-		if (pProfile)
-			SaveProfile(pProfile);
+	    AfxGetApp()->WriteProfileString(_T("Player Profile"), _T("Player Description"), _T(""));
+	}
+	else
+	{
+		// make this the last saved profile in the registry
+		AfxGetApp()->WriteProfileString(_T("Player Profile"), _T("Player Description"), m_p_player_profile->GetName());
 	}
 
 	CPropertyPage::OnOK();
-
 }
 
 void CConfigPlayerProfilePage::OnCancel()
 {
-	if (m_bNewProfileMode && m_pNewPlayerProfile)
-	{
-		delete m_pNewPlayerProfile;
-		m_pNewPlayerProfile = NULL;
-		m_bNewProfileMode = FALSE;
-	}
-
 	InitProfileList(); // re-initialize from registry
 	CPropertyPage::OnCancel();
 }
@@ -367,180 +248,14 @@ LPCTSTR CConfigPlayerProfilePage::GetListProfileName(int _index)
 		return NULL;
 }
 
-void CConfigPlayerProfilePage::OnBnClickedNewSave()
-{
-	CString resStr;
-
-	if ( m_ProfileList.GetCount() == 0 )
-	{
-        m_delete_ctrl.EnableWindow(FALSE);
-		m_operations_ctrl.EnableWindow(TRUE);
-		m_vve_player_profile_ctrl.EnableWindow(TRUE);
-		m_usb_vid_ctrl.EnableWindow(TRUE);
-		m_usb_pid_ctrl.EnableWindow(TRUE);
-		m_scsi_mfg_ctrl.EnableWindow(TRUE);
-		m_scsi_product_ctrl.EnableWindow(TRUE);
-		m_volume_label_check_ctrl.EnableWindow(TRUE);
-		m_volume_label_ctrl.EnableWindow(TRUE);
-	}
-
-	if( !m_bNewProfileMode )
-	{
-		// create a new profile
-		// hide combo box and show profile name edit control
-		// clear other edit fields and ops list
-		// enable Delete button if not already enabled
-		// tag the profile as new, and add to profile list
-		// remove all ops from the list and disable it
-		m_bNewProfileMode = TRUE;
-
-		m_operations_ctrl.RemoveAllGroups();
-		m_operations_ctrl.EnableWindow(FALSE);
-		((CPropertySheet*)GetParent())->GetDlgItem(IDOK)->EnableWindow(FALSE);
-
-		m_pNewPlayerProfile = new CPlayerProfile();
-		m_pNewPlayerProfile->Init(NULL);
-
-		resStr.LoadString(IDS_SAVE);
-		m_new_ctrl.SetWindowText( resStr );
-
-//		m_vve_player_profile_ctrl.SetWindowText(m_pNewPlayerProfile->m_cs_name);
-
-		m_cb_player_profile_ctrl.AddString(L" ");
-		m_cb_player_profile_ctrl.SelectString(0, L" ");
-		m_cb_player_profile_ctrl.EnableWindow(FALSE);
-
-		LoadControlsFromProfile(m_pNewPlayerProfile);
-	}
-	else
-	{
-		// save a new profile
-		// the profile was tagged as new when created with no name
-		// validate the profile
-		// add to profile list
-		// enable the combobox list and hide the name edit ctrl
-		// select the new profile
-
-		if (!SaveProfileStrings(m_pNewPlayerProfile))
-			return;
-
-		m_pNewPlayerProfile->Validate();
-		if( m_vve_player_profile_ctrl.IsValid() )
-		{
-			m_ProfileList.Add(m_pNewPlayerProfile);
-
-			m_cb_player_profile_ctrl.EnableWindow(TRUE);
-			m_cb_player_profile_ctrl.DeleteString(m_cb_player_profile_ctrl.SelectString(0, L" "));
-			m_cb_player_profile_ctrl.AddString(m_pNewPlayerProfile->m_cs_name);
-
-			m_cs_cur_player_profile = m_pNewPlayerProfile->m_cs_name;
-			m_p_player_profile = m_pNewPlayerProfile;
-			m_cb_player_profile_ctrl.SelectString(0, m_pNewPlayerProfile->m_cs_name);
-			OnCbnSelchangeProductDescCombo();
-
-			resStr.LoadString(IDS_NEW);
-			m_new_ctrl.SetWindowText( resStr );
-
-			m_operations_ctrl.EnableWindow(TRUE);
-			if ( m_ProfileList.GetCount() == 1 ) // first added?
-			{
-		        InitListCtrl(m_operations_ctrl);
-			}
-
-			m_bNewProfileMode = FALSE;
-			((CPropertySheet*)GetParent())->GetDlgItem(IDOK)->EnableWindow(TRUE);
-		}
-		else
-		{
-			OnUpdateStatus(0,0);
-		}
-	}
-}
-
-
-
-void CConfigPlayerProfilePage::OnBnClickedDelete()
-{
-	// delete a profile
-	CString resStr, resTitleStr;
-    resStr.Format(IDS_DELETE_CONFIRM_MSG, m_p_player_profile->m_cs_name);
-	resTitleStr.LoadString(IDS_DELETE_CONFIRM_TITLE);
-	int iCurrentIndex = m_cb_player_profile_ctrl.GetCurSel();
-
-	if ( IDCANCEL == MessageBox(resStr, resTitleStr, MB_OKCANCEL | MB_ICONQUESTION | MB_DEFBUTTON1) )
-	{
-		return;
-	}
-    else
-	{
-		if ( m_bNewProfileMode )
-		{	// abandon new profile
-			delete m_pNewPlayerProfile;
-			m_pNewPlayerProfile = NULL;
-
-			resStr.LoadString(IDS_NEW);
-			m_new_ctrl.SetWindowText( resStr );
-
-			m_cb_player_profile_ctrl.SetCurSel(0);
-			OnCbnSelchangeProductDescCombo();
-
-			m_bNewProfileMode = FALSE;
-
-			return;
-		}
-
-		// take the profile out of the active list and put it in the delete list
-		CPlayerProfile *pProfile = m_ProfileList.Get(iCurrentIndex);
-
-		m_ProfileList.Remove(iCurrentIndex);
-
-		m_DeleteList.Add(pProfile);
-	}
-
-	m_cb_player_profile_ctrl.DeleteString(iCurrentIndex);
-	
-	if ( m_cb_player_profile_ctrl.GetCount() == 0 )
-	{
-        m_delete_ctrl.EnableWindow(FALSE);
-
-		// no profiles left to show, so clear all the controls
-	    // make this the last saved profile in the registry
-		m_cs_cur_player_profile.Empty();
-        OnCbnSelchangeProductDescCombo();
-		LoadControlsFromProfile(m_p_player_profile);
-		OnUpdateStatus(0,0);
-    }
-    else
-	{
-        m_delete_ctrl.EnableWindow(TRUE);
-
-		if ( iCurrentIndex > 0 )
-			m_cb_player_profile_ctrl.SetCurSel( iCurrentIndex -1 );
-		else
-			m_cb_player_profile_ctrl.SetCurSel( 0 );
-
-		OnCbnSelchangeProductDescCombo();
-		LoadControlsFromProfile(m_p_player_profile);
-		OnUpdateStatus(0,0);
-    }
-}
-
 void CConfigPlayerProfilePage::OnCbnSelchangeProductDescCombo()
 {
-	// save any changes to current profile
-	if (!SaveProfileStrings(m_p_player_profile))
-	{
-		m_cb_player_profile_ctrl.SelectString(-1, m_cs_cur_player_profile);
-	}
-	else
-	{
-		CString profile_name;
-		m_cb_player_profile_ctrl.GetWindowText(profile_name);
-		m_cs_cur_player_profile = profile_name;
-		m_p_player_profile = m_ProfileList.Find(profile_name);
-		LoadControlsFromProfile(m_p_player_profile);
-		OnUpdateStatus(0,0);
-	}
+	CString profile_name;
+	m_cb_player_profile_ctrl.GetWindowText(profile_name);
+	m_cs_cur_player_profile = profile_name;
+	m_p_player_profile = m_ProfileList.Find(profile_name);
+	LoadControlsFromProfile(m_p_player_profile);
+	OnUpdateStatus(0,0);
 }
 
 DWORD CConfigPlayerProfilePage::InitProfileList(void)
@@ -628,7 +343,6 @@ void CConfigPlayerProfilePage::SetDefaultProfile()
 	pDefaultProfile->m_cs_ini_file			= _T("");
 	pDefaultProfile->m_cs_volume_label		= DEFAULT_PROFILE_LABEL;
 	pDefaultProfile->m_b_use_volume_label	= DEFAULT_PROFILE_USE_LABEL;
-//	pDefaultProfile->m_cs_original_name		= _T("");
 	pDefaultProfile->m_edit_mode			= FALSE;
 	pDefaultProfile->m_iSelectedUpdate		= 0;
 	pDefaultProfile->m_bNew					= FALSE;
@@ -808,36 +522,6 @@ DWORD CConfigPlayerProfilePage::LoadControlsFromProfile(CPlayerProfile * _pProfi
 	if( !_pProfile )
 		return 0;
 
-	if( _pProfile->m_bLockedProfile )
-	{
-		m_usb_vid_ctrl.EnableWindow(FALSE);
-		m_usb_pid_ctrl.EnableWindow(FALSE);
-		m_scsi_mfg_ctrl.EnableWindow(FALSE);
-		m_scsi_product_ctrl.EnableWindow(FALSE);
-		m_volume_label_ctrl.EnableWindow(FALSE);
-		m_volume_label_check_ctrl.EnableWindow(FALSE);
-        m_delete_ctrl.EnableWindow(FALSE);
-		m_new_ctrl.EnableWindow(FALSE);
-		m_vve_player_profile_ctrl.EnableWindow(FALSE);
-	}
-
-	m_vve_player_profile_ctrl.SetWindowText(_pProfile->GetName());
-	m_usb_vid_ctrl.SetWindowText(_pProfile->m_cs_usb_vid);
-	m_usb_pid_ctrl.SetWindowText(_pProfile->m_cs_usb_pid);
-	m_scsi_mfg_ctrl.SetWindowText(_pProfile->m_cs_scsi_mfg);
-	m_scsi_product_ctrl.SetWindowText(_pProfile->m_cs_scsi_product);
-	m_volume_label_ctrl.SetWindowText(_pProfile->m_cs_volume_label);
-	if ( ( _pProfile->m_cs_volume_label.IsEmpty() || _pProfile->m_cs_volume_label.GetLength() > 11 ) )
-	{
-		m_volume_label_check_ctrl.SetCheck(_pProfile->m_b_use_volume_label);
-		m_volume_label_check_ctrl.EnableWindow(FALSE);
-        m_volume_label_ctrl.EnableWindow(FALSE);
-	}
-    else {
-        m_volume_label_ctrl.EnableWindow(TRUE);
-		m_volume_label_check_ctrl.EnableWindow(!_pProfile->m_cs_volume_label.IsEmpty());
-		m_volume_label_check_ctrl.SetCheck(_pProfile->m_b_use_volume_label);
-	}
 	// fill the operations list control
     InsertOpsList(_pProfile);
 
@@ -981,50 +665,6 @@ DWORD CConfigPlayerProfilePage::InsertOpsList(CPlayerProfile * _pProfile)
 	return iItem;
 }
 
-BOOL CConfigPlayerProfilePage::SaveProfileStrings(CPlayerProfile *_pProfile)
-{
-	CString cs_temp;
-	BOOL b_temp;
-
-	if (!_pProfile || (m_p_player_profile && m_p_player_profile->m_bLockedProfile) )
-		return FALSE;
-
-	m_usb_vid_ctrl.GetWindowText(cs_temp);
-	_pProfile->SetUsbVid (cs_temp);
-
-	m_usb_pid_ctrl.GetWindowText(cs_temp);
-	_pProfile->SetUsbPid (cs_temp);
-
-	m_scsi_mfg_ctrl.GetWindowText(cs_temp);
-	_pProfile->SetScsiMfg (cs_temp);
-
-	m_scsi_product_ctrl.GetWindowText(cs_temp);
-	_pProfile->SetScsiProduct(cs_temp);
-
-	m_volume_label_ctrl.GetWindowText(cs_temp);
-	_pProfile->SetVolumeLabel(cs_temp);
-
-	b_temp = m_volume_label_check_ctrl.GetCheck();
-	_pProfile->SetUseVolume(b_temp);
-
-//	if (m_bNewProfileMode)
-//	{
-		m_vve_player_profile_ctrl.GetWindowText(cs_temp);
-
-	    if ( cs_temp.IsEmpty() ) {
-		    CString resStr, resTitleStr;
-			resStr.LoadString(IDS_CFG_PROFILE_INVALID_DESC_MSG);
-			resTitleStr.LoadString(IDS_ERROR);
-		    MessageBox(resStr, resTitleStr, MB_OK | MB_ICONERROR);
-			return FALSE;
-		}
-
-		_pProfile->SetName(cs_temp);
-//	}
-
-	return TRUE;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // OnLvnItemChangedOperationsList
 //
@@ -1088,162 +728,18 @@ LRESULT CConfigPlayerProfilePage::OnUpdateStatus(WPARAM _wparam, LPARAM _p_op_in
 	return 0;
 }
 
-
-void CConfigPlayerProfilePage::OnBnClickedVolumeLabelCheck()
-{
-	CString cs_temp;
-	m_volume_label_ctrl.GetWindowText(cs_temp);
-	if ( m_p_player_profile )
-	    m_p_player_profile->m_b_use_volume_label = m_volume_label_check_ctrl.GetCheck();
-}
-
-//validation has changed 
-//wParam - pointer to a notification message structure MNHDR (code contains enumerated value of current error brush see VVEbrush)
-//lParam - The new valid state. 0 = Invalid, other = Valid
-LRESULT CConfigPlayerProfilePage::OnValidChanged(WPARAM wParam, LPARAM lParam)
-{
-/*    ASSERT(m_p_player_profile->m_edit_mode != PROFILE_MODE_READ_ONLY); */
-    LPNMHDR pNM = (LPNMHDR) wParam;
-    CString cs_temp;
-	BOOL changed = FALSE;
-//	CVisValidEdit::VVEbrush iBrush = (CVisValidEdit::VVEbrush)pNM->code ;
-
-	if (!m_p_player_profile)
-	{
-		return 0;
-	}
-	INT_PTR ctrl_id = GetDlgItem((int)pNM->idFrom)->GetDlgCtrlID();
-	switch ( ctrl_id )
-    {
-        case IDC_PLAYER_PROFILE_EDIT:
-            changed = TRUE;
-            break;
-        case IDC_USB_VID_TEXT:
-            m_usb_vid_ctrl.GetWindowText(cs_temp);
-            if ( cs_temp.Compare( m_p_player_profile->m_cs_usb_vid ) != 0 ) {
-                m_p_player_profile->m_cs_usb_vid = cs_temp;
-                changed = TRUE;
-            }
-            break;
-        case IDC_USB_PID_TEXT:
-            m_usb_pid_ctrl.GetWindowText(cs_temp);
-            if ( cs_temp.Compare( m_p_player_profile->m_cs_usb_pid ) != 0 ) {
-                m_p_player_profile->m_cs_usb_pid = cs_temp;
-                changed = TRUE;
-            }
-            break;
-        case IDC_SCSI_MFG_TEXT:
-            m_scsi_mfg_ctrl.GetWindowText(cs_temp);
-            if ( cs_temp.Compare( m_p_player_profile->m_cs_scsi_mfg ) != 0 ) {
-                m_p_player_profile->m_cs_scsi_mfg = cs_temp;
-                changed = TRUE;
-            }
-            break;
-        case IDC_SCSI_PRODUCT_TEXT:
-            m_scsi_product_ctrl.GetWindowText(cs_temp);
-            if ( cs_temp.Compare( m_p_player_profile->m_cs_scsi_product ) != 0 ) {
-				m_p_player_profile->m_cs_scsi_product = cs_temp;
-                changed = TRUE;
-            }
-            break;
-        case IDC_VOLUME_LABEL_TEXT:
-            m_volume_label_ctrl.GetWindowText(cs_temp);
-            if ( cs_temp.Compare( m_p_player_profile->m_cs_volume_label ) != 0 ) {
-				m_p_player_profile->m_cs_volume_label = cs_temp;
-                changed = TRUE;
-
-                if ( m_p_player_profile->m_cs_volume_label.IsEmpty() ) {
-		            m_p_player_profile->m_b_use_volume_label = FALSE;
-                    m_volume_label_check_ctrl.SetCheck(m_p_player_profile->m_b_use_volume_label);
-		            m_volume_label_check_ctrl.EnableWindow(FALSE);
-	            }
-                else {
-                    m_volume_label_ctrl.EnableWindow(TRUE);
-		            m_volume_label_check_ctrl.EnableWindow(!m_p_player_profile->m_cs_volume_label.IsEmpty());
-		            m_volume_label_check_ctrl.SetCheck(m_p_player_profile->m_b_use_volume_label);
-	            }
-            }
-            break;
-        default:
-            break;
-    }
-    if ( changed && m_p_player_profile ) {
-        m_p_player_profile->Validate();
-		if( !m_vve_player_profile_ctrl.IsValid() ) {
-            m_p_player_profile->m_status = PROFILE_ERROR;
-			m_p_player_profile->m_error_msg.LoadString(IDS_CFG_PROFILE_INVALID_DESC);
-		}
-//		LoadControlsFromProfile();
-        OnUpdateStatus(0,0);
-    }
-	return 0;
-}
-
 DWORD CConfigPlayerProfilePage::SaveProfile(CPlayerProfile *_pProfile)
 {
     CString cs_temp, cs_temp_path;
-    BOOL b_temp;
 
 	if( _pProfile->m_bLockedProfile )
 		return 1;
 
-	if( _pProfile->IsNew() )
-	{
-		// create profile folder
-		if ( !CreateDirectory(_pProfile->GetProfilePath(), NULL) )
-		{
-            DWORD err = GetLastError();
-            ATLTRACE(_T("ERROR: SaveProfile() - Could not create profile directory %s.(%d)\n"), _pProfile->GetName(), err);
-            return err;
-        }
-
-		// create player.ini
-		CFile file(_pProfile->m_cs_ini_file, CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyWrite);
-	    file.Close();
-
-		_pProfile->m_cs_original_name = _pProfile->m_cs_name;
-
-		_pProfile->m_bNew = FALSE;
-
-	}
-
-    // see if _new_name directory already exists
-    if ( _pProfile->m_cs_name.CompareNoCase(_pProfile->m_cs_original_name) != 0 ) {
-        // the name has changed, so we need to rename the directory
-        // we better check if there is already a directory with the new name
-        // and let the user choose what to do.
-        if ( _taccess(_pProfile->m_cs_name, 0) != ERROR_SUCCESS )
-		{
-            _pProfile->RenameProfile(_pProfile->m_cs_name, TRUE);
-	    }
-    }
-
 	cs_temp.Format(L"%d", MIN_PROFILE_VERSION);
 	_pProfile->SetIniField( CPlayerProfile::VERSION, cs_temp.GetBuffer());
 
-	cs_temp = _pProfile->GetUsbVid();
-	_pProfile->SetIniField( CPlayerProfile::USB_VID, cs_temp.GetBuffer());
-
-	cs_temp = _pProfile->GetUsbPid();
-    _pProfile->SetIniField( CPlayerProfile::USB_PID, cs_temp.GetBuffer());
-
-	cs_temp = _pProfile->GetScsiMfg();
-    _pProfile->SetIniField( CPlayerProfile::SCSI_MFG, cs_temp.GetBuffer());
-
-	cs_temp = _pProfile->GetScsiProduct();
-    _pProfile->SetIniField( CPlayerProfile::SCSI_PRODUCT, cs_temp.GetBuffer());
-
-	cs_temp = _pProfile->GetVolumeLabel();
-    _pProfile->SetIniField( CPlayerProfile::VOLUME_LABEL, cs_temp.GetBuffer());
-
-	b_temp = _pProfile->UseVolumeLabel();
-    _pProfile->SetIniField( CPlayerProfile::USE_VOLUME_LABEL, &b_temp);
-
 	cs_temp = _pProfile->GetName();
     _pProfile->SetIniField( CPlayerProfile::PLAYER, cs_temp.GetBuffer());
-
-	// Remove any deleted ops
-	_pProfile->RemoveDeletedOps();
 
 	// save all operations for this profile
 	COpInfo* pOpInfo;
@@ -1253,130 +749,16 @@ DWORD CConfigPlayerProfilePage::SaveProfile(CPlayerProfile *_pProfile)
 		pOpInfo = _pProfile->m_p_op_info_list.GetNext(pos);
 		if (pOpInfo)
 		{
-		    // see if _new_name directory already exists
-			if ( !pOpInfo->m_cs_NewName.IsEmpty() && 
-				pOpInfo->m_cs_ini_section.CompareNoCase(pOpInfo->m_cs_NewName) != 0 )
-		    {
-		        // the name has changed, so we need to rename the directory
-		        // we better check if there is already a directory with the new name
-		        // and let the user choose what to do.
-				cs_temp_path = pOpInfo->m_cs_path.Left(pOpInfo->m_cs_path.ReverseFind(_T('\\'))+1) + pOpInfo->m_cs_NewName;
-		        if ( _taccess(cs_temp_path, 0) == ERROR_SUCCESS )
-		        {
-				    // the directory already exists, so ask the user what to do.
-				    CString resStr, resTitleStr, resFmtStr;
-
-					resFmtStr.LoadString(IDS_OP_ALREADY_EXISTS);
-					resStr.Format(resFmtStr, pOpInfo->m_cs_NewName, cs_temp_path);
-					resTitleStr.LoadString(IDS_CONFIRM_OVERWRITE);
-
-				    if ( IDCANCEL == MessageBox(resStr, resTitleStr, MB_OKCANCEL | MB_ICONQUESTION | MB_DEFBUTTON2) )
-					{
-					    return 0;
-				    }
-				    else
-						CreateOperationFolder(pOpInfo, TRUE); // overwrite existing directory
-		        }
-				else // the new directory does not exist so just rename it
-		            CreateOperationFolder(pOpInfo);
-		    }
-
 			// fix up the player.ini file
 			pOpInfo->m_cs_cmd_line.Format(_T("%s=%s,%d,%d"), pOpInfo->m_cs_desc, pOpInfo->m_cs_ini_section, pOpInfo->m_timeout, pOpInfo->m_b_enabled);
 			pOpInfo->ReplaceIniLine(_T("OPERATIONS"), pOpInfo->m_cs_cmd_line, pOpInfo->m_index);
 			pOpInfo->WriteIniSection(pOpInfo->m_cs_ini_section);
-
-		    // now copy/delete the files
-
-			PerformFileOps(pOpInfo, &pOpInfo->m_FileList, pOpInfo->m_cs_path, CFileList::DELETE_FROM_TARGET);
-			PerformFileOps(pOpInfo, &pOpInfo->m_FileList, pOpInfo->m_cs_path, CFileList::CREATE_DIR);
-			PerformFileOps(pOpInfo, &pOpInfo->m_FileList, pOpInfo->m_cs_path, CFileList::COPY_TO_TARGET);
 		}
 	}
 
 	return 1;
 }
 
-
-void CConfigPlayerProfilePage::PerformFileOps(COpInfo * _pOpInfo, CFileList * _pFileList, CString _destFolder, CFileList::FileListAction _action)
-{
-	CFileList::PFILEITEM pItem;
-	SHFILEOPSTRUCT FileOp;
-
-	FileOp.hwnd = GetSafeHwnd();
-	FileOp.hNameMappings = NULL;
-    FileOp.lpszProgressTitle = NULL;
-
-	for (int i = 0; i < _pFileList->GetCount(); ++i)
-	{
-		pItem = _pFileList->GetAt(i);
-
-		if (pItem->m_action == CFileList::EXISTS_IN_TARGET && !pItem->m_pSubFolderList)
-			continue; // skip - no changes
-
-		if (pItem->m_pSubFolderList) // we have a folder/sublist
-		{
-			CString newFolder = _destFolder + _T("\\") + pItem->m_csFileName;
-			if (_action == CFileList::CREATE_DIR)
-			{
-				// create the folder now
-				if (!CreateDirectory(newFolder, NULL))
-					ATLTRACE(_T("PerformFileOps() CreateDirectory() error(%d)\n"), GetLastError());
-				else		// change to EXISTS_IN_TARGET
-					pItem->m_action = pItem->m_currentAction = CFileList::EXISTS_IN_TARGET;
-			}
-			PerformFileOps(_pOpInfo, pItem->m_pSubFolderList, newFolder, _action);
-		}
-
-		if (pItem->m_action == _action)
-		{
-			switch (_action)
-			{
-			case CFileList::DELETE_FROM_TARGET:
-				{
-				BOOL bDeleteFile = TRUE;
-				// Need to check if any other drive references the same file.
-				// If not, delete it from the folder.
-				for( unsigned int drvIndex = 0; drvIndex < (unsigned int)_pOpInfo->m_drive_array.Size(); ++drvIndex )
-					if( pItem->m_csFilePathName.CompareNoCase(_pOpInfo->m_drive_array[drvIndex].Name) == 0)
-						bDeleteFile = FALSE;
-				
-				if( bDeleteFile )
-				{
-					// Delete file
-					//it wants an additional NULL at the end
-					pItem->m_csFilePathName.AppendChar(_T('\0'));
-					FileOp.wFunc = FO_DELETE;
-					FileOp.pFrom = pItem->m_csFilePathName;
-				    FileOp.pTo = NULL;
-					FileOp.fFlags = FOF_NOCONFIRMATION | FOF_SILENT;
-					if ( SHFileOperation(&FileOp) != ERROR_SUCCESS )
-					{
-						ATLTRACE(_T("PerformFileOps() - Could not delete %s. (%d)\n"), pItem->m_csFilePathName, GetLastError());
-					}
-				}
-				break;
-				}
-
-			case CFileList::COPY_TO_TARGET:
-				FileOp.wFunc = FO_COPY;
-				pItem->m_csFilePathName.AppendChar(_T('\0'));
-				FileOp.pFrom = pItem->m_csFilePathName;
-		        FileOp.pTo = _destFolder;
-				FileOp.fFlags = 0;
-				FileOp.fFlags = FOF_NOCONFIRMATION | FOF_SILENT;
-
-				if ( SHFileOperation(&FileOp) != ERROR_SUCCESS )
-				{	
-					ATLTRACE(_T("PerformFileOps() - Could not copy %s. (%d)\n"), pItem->m_csFilePathName, GetLastError());
-				}
-				else
-					pItem->m_action = pItem->m_currentAction = CFileList::EXISTS_IN_TARGET;
-				break;
-			}
-		}
-	}
-}
 
 int CConfigPlayerProfilePage::CheckPath(CString sPath)
 {
@@ -1392,52 +774,6 @@ int CConfigPlayerProfilePage::CheckPath(CString sPath)
 		return PATH_IS_FOLDER;
 	
 	return PATH_IS_FILE;
-}
-
-DWORD CConfigPlayerProfilePage::CreateOperationFolder(COpInfo* pOpInfo, BOOL _overwrite)
-{
-    CString cs_new_path = pOpInfo->m_cs_path.Left(pOpInfo->m_cs_path.ReverseFind(_T('\\'))+1) + pOpInfo->m_cs_NewName;
-
-    SHFILEOPSTRUCT FileOp;
-	CString cs_from, new_cmd_line;
-    DWORD err = ERROR_SUCCESS;
-	FileOp.hwnd = GetSafeHwnd();
-    FileOp.hNameMappings = NULL;
-    FileOp.lpszProgressTitle = NULL;
-	CWaitCursor wait;
-
-    if ( _overwrite )
-    {
-        cs_from = pOpInfo->m_cs_path;
-		cs_from.AppendChar(_T('\0'));
-		FileOp.wFunc = FO_RENAME;
-		FileOp.pFrom = cs_from;
-		FileOp.pTo = cs_new_path;
-		FileOp.fFlags = FOF_NOCONFIRMATION;
-		if ( SHFileOperation( &FileOp ) != ERROR_SUCCESS )
-        {
-            err = GetLastError();
-            ATLTRACE(_T("ERROR: CreateOperationFolder() - Could not rename %s. (%d)\n"), cs_from, err);
-            return err;
-        }
-    }
-	else
-	{
-		if ( !CreateDirectory(cs_new_path, NULL) )
-		{
-            err = GetLastError();
-            ATLTRACE(_T("ERROR: CreateOperationFolder() - Could not create directory %s.(%d)\n"), cs_new_path, err);
-            return err;
-        }
-	}
-
-    
-    // save the new member variables
-    pOpInfo->m_cs_path = cs_new_path;
-    pOpInfo->m_cs_ini_section = pOpInfo->m_cs_NewName;
-	pOpInfo->m_cs_cmd_line = new_cmd_line;
-    
-    return ERROR_SUCCESS;
 }
 
 void CConfigPlayerProfilePage::InitListCtrl(CConfigPlayerListCtrl& list)
@@ -1523,9 +859,6 @@ void CConfigPlayerProfilePage::OnLvnKeydownOperationsList(NMHDR *pNMHDR, LRESULT
 
     switch ( pLVKeyDow->wVKey )
 	{
-	case VK_DELETE:
-		OpWorkerRemove();
-		break;
 	case VK_SPACE:
 		OpWorkerEnable();
 		*pResult = 1; // disable default handler gong through all 3 states of enable bitmap
@@ -1593,68 +926,6 @@ DWORD CConfigPlayerProfilePage::OpWorkerEnable(void)
 	return checked;
 }
 
-DWORD CConfigPlayerProfilePage::OpWorkerNew(COperation::OpTypes _opType)
-{
-	INT_PTR ret = IDCANCEL;
-	int index = m_operations_ctrl.GetItemCount();
-	COpInfo *pInfo = m_p_player_profile->AddOperation();
-
-	pInfo->m_e_type = _opType;
-	pInfo->m_b_new_op = TRUE;
-
-	if (_opType == COperation::COPY_OP)
-	{
-		CCopyOpDlg *pOpEditor = new CCopyOpDlg(this, pInfo);
-	    ret = pOpEditor->DoModal();
-	    delete pOpEditor;
-	}
-	else if ( _opType == COperation::LOADER_OP)
-	{
-		CLoadFileOpDlg *pOpEditor = new CLoadFileOpDlg(this, pInfo);
-	    ret = pOpEditor->DoModal();
-	    delete pOpEditor;
-	}
-	else if (_opType == COperation::UPDATE_OP)
-	{
-		COpUpdateDlg *pOpEditor = new COpUpdateDlg(this, pInfo);
-	    ret = pOpEditor->DoModal();
-	    delete pOpEditor;
-	}
-	else if (_opType == COperation::OTP_OP)
-	{
-		COpOTPDlg *pOpEditor = new COpOTPDlg(this, pInfo);
-	    ret = pOpEditor->DoModal();
-	    delete pOpEditor;
-	}
-	else if (_opType == COperation::UTP_UPDATE_OP || _opType == COperation::MX_UPDATE_OP)
-	{
-		COpUtpUpdateDlg *pOpEditor = new COpUtpUpdateDlg(this, pInfo);
-	    ret = pOpEditor->DoModal();
-	    delete pOpEditor;
-	}
-//	else if (_opType == COperation::MX_UPDATE_OP)
-//	{
-//		COpMxRomUpdateDlg *pOpEditor = new COpMxRomUpdateDlg(this, pInfo);
-//	    ret = pOpEditor->DoModal();
-//	    delete pOpEditor;
-//	}
-
-    if (ret == IDOK)
-	{
-	    pInfo->Validate();
-		InsertOpsList(m_p_player_profile);
-		m_operations_ctrl.SetItemData(index, (DWORD_PTR)pInfo);
-	    m_operations_ctrl.SetItemState( index, LVIS_SELECTED | LVIS_FOCUSED , LVIS_SELECTED | LVIS_FOCUSED);
-	}
-	else
-	{
-		pInfo->m_cs_path.Empty();
-		m_p_player_profile->RemoveOperation(index);
-	}
-
-	return m_operations_ctrl.GetItemCount();
-}
-
 DWORD CConfigPlayerProfilePage::OpWorkerEdit()
 {
 	INT_PTR ret;
@@ -1693,7 +964,7 @@ DWORD CConfigPlayerProfilePage::OpWorkerEdit()
 	}
 	else if (pOpInfo->GetType() == COperation::UTP_UPDATE_OP || pOpInfo->GetType() == COperation::MX_UPDATE_OP)
 	{
-		COpUtpUpdateDlg *pOpEditor = new COpUtpUpdateDlg(this, pOpInfo);
+		COpUclDlg *pOpEditor = new COpUclDlg(this, pOpInfo); //new COpUtpUpdateDlg(this, pOpInfo);
 	    ret = pOpEditor->DoModal();
 	    delete pOpEditor;
 	}
@@ -1707,28 +978,6 @@ DWORD CConfigPlayerProfilePage::OpWorkerEdit()
 //    pInfo->Validate();
     InsertOpsList(m_p_player_profile);
     m_p_player_profile->Validate();
-
-	return m_operations_ctrl.GetItemCount();
-}
-
-DWORD CConfigPlayerProfilePage::OpWorkerRemove(void)
-{
-    POSITION pos = m_operations_ctrl.GetFirstSelectedItemPosition();
-    if (pos == NULL)
-        return -1;
-	int index = m_operations_ctrl.GetNextSelectedItem(pos);
-	COpInfo * pInfo = (COpInfo*)m_operations_ctrl.GetItemData(index);
-	
-	CString resStr, resTitleStr;
-	resStr.Format(IDS_CFG_PROFILE_DELETE_CONFIRM, pInfo->GetDesc(), pInfo->GetIniSection());
-	resTitleStr.LoadString(IDS_CFG_PROFILE_DELETE_TITLE);
-	if ( IDCANCEL == MessageBox(resStr, resTitleStr, MB_OKCANCEL | MB_ICONQUESTION | MB_DEFBUTTON2) ) {
-		return -1;
-	}
-
-	m_p_player_profile->RemoveOperation(index);
-    m_p_player_profile->Validate();
-	InsertOpsList(m_p_player_profile);
 
 	return m_operations_ctrl.GetItemCount();
 }
@@ -1852,29 +1101,8 @@ void CConfigPlayerProfilePage::OnListCtrlContextMenu(UINT nID)
 	case IDM_ENABLED:
 		OpWorkerEnable();
 		break;
-	case IDM_NEW_COPY_OP:
-		OpWorkerNew(COperation::COPY_OP);
-		break;
-	case IDM_NEW_LOAD_OP:
-	    OpWorkerNew(COperation::LOADER_OP);
-		break;
-	case IDM_NEW_UPDATE_OP:
-	    OpWorkerNew(COperation::UPDATE_OP);
-		break;
-	case IDM_NEW_OTP_OP:
-	    OpWorkerNew(COperation::OTP_OP);
-		break;
-	case IDM_NEW_UTP_UPDATE_OP:
-		OpWorkerNew(COperation::UTP_UPDATE_OP);
-		break;
-	case IDM_NEW_MX_UPDATE_OP:
-		OpWorkerNew(COperation::MX_UPDATE_OP);
-		break;
 	case IDM_ST_EDIT:
         OpWorkerEdit();
-		break;
-	case IDM_ST_DELETE:
-		OpWorkerRemove();
 		break;
 	case IDM_ST_MOVE_UP:
         OpWorkerMove(TRUE);

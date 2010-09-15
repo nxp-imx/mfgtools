@@ -154,9 +154,9 @@ DWORD CPlayerProfile::Init( LPCTSTR _name /* = NULL */)
 	{
 		m_status = PROFILE_ERROR;
 		m_error_msg.LoadStringW(IDS_INVALID_PLAYER_PROFILE);
-		//return (m_status);
+		return (m_status);
 	}
-
+/*
 	ret = GetPrivateProfileString(_T("PROFILE"), _T("USB_VID"), _T(""), csTemp.GetBufferSetLength(_MAX_PATH), _MAX_PATH, m_cs_ini_file);
     csTemp.ReleaseBuffer();
 	if ( ret != 6 ) {
@@ -215,7 +215,7 @@ DWORD CPlayerProfile::Init( LPCTSTR _name /* = NULL */)
 			m_error_msg.LoadString(IDS_PROFILE_WRN_INVALID_VOLUME_LABLE);
     }
 	m_b_use_volume_label &= ( !m_cs_volume_label.IsEmpty() && m_cs_volume_label.GetLength() <= 11 );
-
+*/
 	// remove any operations if there are any
 	while (!m_p_op_info_list.IsEmpty()) {
 		delete m_p_op_info_list.RemoveTail();
@@ -254,8 +254,6 @@ DWORD CPlayerProfile::Init( LPCTSTR _name /* = NULL */)
 		    m_error_msg.LoadString(IDS_PROFILE_WRN_INVALID_OPERATION);
         }
 	}
-
-	m_cs_original_name = m_cs_name; 
 
 	return m_status;
 }
@@ -340,7 +338,8 @@ DWORD CPlayerProfile::SetIniField(DWORD _field, LPVOID _value)
         cs_temp = (LPCTSTR)_value;
         WritePrivateProfileString(_T("PROFILE"), _T("PLAYER"), cs_temp, m_cs_ini_file);
         break;
-    case USB_VID:
+/*
+	case USB_VID:
         m_cs_usb_vid = (LPCTSTR)_value;
 	    cs_temp.Format(_T("0x%s"), m_cs_usb_vid);
 	    WritePrivateProfileString(_T("PROFILE"), _T("USB_VID"), cs_temp, m_cs_ini_file);
@@ -378,7 +377,8 @@ DWORD CPlayerProfile::SetIniField(DWORD _field, LPVOID _value)
 		    m_error_msg.Format(IDS_PROFILE_ERR_WRITE_FAILURE, m_cs_ini_file);
 	    }
         break;
-    }
+*/
+	}
 
 	//Init(m_cs_name);
 	return m_status;
@@ -436,56 +436,10 @@ INT_PTR CPlayerProfile::RemoveOperation(INT_PTR _index)
 	return m_p_op_info_list.GetCount();
 }
 
-DWORD CPlayerProfile::RenameProfile(CString _new_name, BOOL _overwrite)
-{
-    SHFILEOPSTRUCT FileOp;
-	CString cs_from, cs_to;
-    DWORD err = ERROR_SUCCESS;
-	FileOp.hwnd = theApp.GetMainWnd()->GetSafeHwnd();
-    FileOp.hNameMappings = NULL;
-    FileOp.lpszProgressTitle = NULL;
-	CWaitCursor wait;
-
-    cs_to.Format(_T("%s%s"), m_cs_profile_root, _new_name);
-
-    if ( _overwrite && _taccess(cs_to, 0) == 0 ) {
-        cs_from = cs_to;
-		cs_from.AppendChar(_T('\0'));
-		FileOp.wFunc = FO_DELETE;
-		FileOp.pFrom = cs_from;
-		FileOp.pTo = NULL;
-		FileOp.fFlags = FOF_NOCONFIRMATION;
-		if ( SHFileOperation( &FileOp ) != ERROR_SUCCESS ) {
-            err = GetLastError();
-            ATLTRACE(_T("ERROR: RenameProfile() - Could not delete %s. (%d)\n"), cs_from, err);
-            return err;
-        }
-    }
-    // rename the profile folder
-    cs_from = m_cs_profile_root + m_cs_original_name;
-	cs_from.AppendChar(_T('\0'));
-	FileOp.wFunc = FO_RENAME;
-	FileOp.pFrom = cs_from;
-	FileOp.pTo = cs_to;
-	FileOp.fFlags = FOF_NOCONFIRMATION;
-	if ( SHFileOperation( &FileOp ) != ERROR_SUCCESS ) {
-        err = GetLastError();
-        ATLTRACE(_T("ERROR: RenameProfile() - Could not rename %s to %s. (%d)\n"), cs_from, cs_to, err);
-        return err;
-    }
-
-    err = Init( _new_name );
- 
-    // update the PLAYER field in the ini file
-    WritePrivateProfileString(_T("PROFILE"), _T("PLAYER"), _new_name, m_cs_ini_file);
-
-    return err;
-  }
-
 DWORD CPlayerProfile::Validate(void)
 {
 	CString csHexChars, csIllegalChars;
-	int i;
+//	int i;
 	csHexChars = _T("abcdefABCDEF0123456789");
 	csIllegalChars = _T("<>:\"/\\|*?");
 	// init return values
@@ -515,30 +469,10 @@ DWORD CPlayerProfile::Validate(void)
 	}
 	else
 	{
-		// Does the name already exist?  Prompt user if so.
-	    if ( m_cs_name.CompareNoCase(m_cs_original_name) != 0 )
-		{
-		    // the name has changed, so we need to rename the directory
-			// we better check if there is already a directory with the new name
-	        // and let the user choose what to do.
-		    CString cs_temp_path = m_cs_profile_root + m_cs_name;
-			if ( _taccess(cs_temp_path, 0) == ERROR_SUCCESS ) {
-				// the directory already exists, so ask the user what to do.
-			    CString resStr;
-			    resStr.Format(IDS_CFG_PROFILE_EXISTS_MSG, m_cs_name, cs_temp_path);
-			    if ( IDOK != AfxMessageBox(resStr, MB_OKCANCEL | MB_ICONQUESTION | MB_DEFBUTTON2) )
-				{
-		 			m_status = PROFILE_ERROR;
-					m_error_msg = _T("");
-					return 0;
-			    }
-		    }
-	    }
-
 		m_cs_profile_path = m_cs_profile_root + m_cs_name;
 		m_cs_ini_file = m_cs_profile_path + _T("\\player.ini");
 	}
-
+/*
 	// USB Vendor ID:
 	if ( m_cs_usb_vid.GetLength() != 4 ) {
 		if (m_status < PROFILE_ERROR) {
@@ -593,7 +527,7 @@ DWORD CPlayerProfile::Validate(void)
 		}
 	}
 	m_b_use_volume_label &= ( !m_cs_volume_label.IsEmpty() && m_cs_volume_label.GetLength() <= 11 );
-
+*/
 	// Operations:
 	int num_ops = 0, num_valid_ops = 0;
 	COpInfo* p_info;

@@ -283,6 +283,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OpUclDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OpUpdateDlg.cpp"
 				>
 			</File>
@@ -425,23 +429,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\OpCopy.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OpErase.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Operation.h"
 				>
 			</File>
 			<File
 				RelativePath=".\OpInfo.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OpLoader.h"
 				>
 			</File>
 			<File
@@ -462,6 +454,10 @@
 			</File>
 			<File
 				RelativePath=".\OpRegistry.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OpUclDlg.h"
 				>
 			</File>
 			<File

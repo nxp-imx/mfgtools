@@ -1,6 +1,40 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.016b
+****************************************
+09/15/2010 - Chris Williamson
+	- Remove below information in player.ini (Requires VERSION=2 in [PROFILE] section.)
+	  USB_VID=
+	  USB_PID=
+	  SCSI_MFG=
+	  SCSI_PRODUCT=
+	  VOLUME_LABEL=
+
+	- Fix the extra blank line generation in the player.ini file produced after running the tool.
+	- For UTP_UPDATE and RKL_UPDATE Edit Dialog, remove all but step3.
+	- Totally remove GUI method when creating a new operation.
+
+	Apps/MfgTool.exe/ConfigPlayerListCtrl.cpp
+	Apps/MfgTool.exe/ConfigPlayerProfilePage.cpp
+	Apps/MfgTool.exe/ConfigPlayerProfilePage.h
+	Apps/MfgTool.exe/DriveEditDlg.h
+	Apps/MfgTool.exe/MainFrm.cpp
+	Apps/MfgTool.exe/OpInfo.cpp
+	Apps/MfgTool.exe/OpInfo.h
+	Apps/MfgTool.exe/OpUclDlg.cpp
+	Apps/MfgTool.exe/OpUclDlg.h
+	Apps/MfgTool.exe/PlayerProfile.cpp
+	Apps/MfgTool.exe/PlayerProfile.h
+	Apps/MfgTool.exe/PortMgrDlg.cpp
+	Apps/MfgTool.exe/resource.h
+	Apps/MfgTool.exe/StMfgTool.2008.vcproj
+	Apps/MfgTool.exe/StMfgTool.rc
+	Apps/MfgTool.exe/version.h
+	Apps\MfgTool.exe\docs\changelog.txt
+	Apps\MfgTool.exe\docs\i.MX Manufacturing Application User's Manual.doc
+
+****************************************
 RELEASE_STMFGTOOL_1.6.2.016a
 ****************************************
 09/15/2010 - Chris Williamson

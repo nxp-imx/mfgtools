@@ -4,7 +4,7 @@
 #include "Operation.h"
 #include "OpInfo.h"
 
-#define MIN_PROFILE_VERSION		1
+#define MIN_PROFILE_VERSION		2
 
 #define OPINFO_OK 0
 #define OPINFO_ERROR 1
@@ -59,7 +59,6 @@ protected:
 	CString m_cs_ini_file;
 	CString m_cs_volume_label;
 	BOOL m_b_use_volume_label;
-	CString m_cs_original_name;
 	DWORD m_edit_mode;
 	int m_iSelectedUpdate;
 	BOOL m_bNew;
@@ -77,7 +76,6 @@ protected:
 public:
 	DWORD Init( LPCTSTR _name = NULL);
 	LPCTSTR GetName(void) { return m_cs_name; }; 
-	LPCTSTR GetOriginalName(void) { return m_cs_original_name; };
 	BOOL IsValid(void) { return m_status < PROFILE_ERROR; };
 	BOOL IsNew(void) { return m_bNew; };
 	void GetStatus (DWORD& _dwStatus, CString& _csErrMsg){ _dwStatus = m_status; _csErrMsg = m_error_msg; };

@@ -577,10 +577,10 @@ void CConfigPlayerListCtrl::OnContextMenu(CWnd* pWnd, CPoint point)
     }
 
 	CMenu cntxtMenu;
-	CMenu cntxtSubMenu;
+//	CMenu cntxtSubMenu;
 	CString resStr, resStr2;
 
-	cntxtSubMenu.CreatePopupMenu();
+/*	cntxtSubMenu.CreatePopupMenu();
 
 	resStr.LoadString(IDS_OPERATION_UPDATE);
 	cntxtSubMenu.AppendMenu(MF_STRING | MF_ENABLED , IDM_NEW_UPDATE_OP , resStr);
@@ -602,21 +602,21 @@ void CConfigPlayerListCtrl::OnContextMenu(CWnd* pWnd, CPoint point)
     mii.wID = IDM_ST_NEW;
 	mii.hSubMenu = cntxtSubMenu.GetSafeHmenu();
 	mii.dwTypeData = (LPWSTR)resStr2.GetString();
-
+*/
 
 	cntxtMenu.CreatePopupMenu();
 
 	resStr.LoadString(IDS_MENU_ENABLE);
 	cntxtMenu.AppendMenu(MF_STRING | bCanBeEnabled ? MF_ENABLED : (MF_GRAYED | MF_DISABLED), IDM_ENABLED , resStr);
     if (pInfo) cntxtMenu.CheckMenuItem(IDM_ENABLED, pInfo->IsEnabled() ? MF_CHECKED : MF_UNCHECKED);
-	cntxtMenu.AppendMenu(MF_SEPARATOR , MF_SEPARATOR   ,	_T("") );
+//	cntxtMenu.AppendMenu(MF_SEPARATOR , MF_SEPARATOR   ,	_T("") );
 
-	cntxtMenu.InsertMenuItem( 1, &mii, TRUE);
+//	cntxtMenu.InsertMenuItem( 1, &mii, TRUE);
 
 	resStr.LoadString(IDS_MENU_EDIT);
 	cntxtMenu.AppendMenu(MF_STRING | (bCanEdit ? MF_ENABLED : (MF_GRAYED | MF_DISABLED)), IDM_ST_EDIT, resStr);
-	resStr.LoadString(IDS_MENU_DELETE);
-	cntxtMenu.AppendMenu(MF_STRING | (bCanEdit ? MF_ENABLED : (MF_GRAYED | MF_DISABLED)), IDM_ST_DELETE, resStr);
+//	resStr.LoadString(IDS_MENU_DELETE);
+//	cntxtMenu.AppendMenu(MF_STRING | (bCanEdit ? MF_ENABLED : (MF_GRAYED | MF_DISABLED)), IDM_ST_DELETE, resStr);
 	cntxtMenu.AppendMenu(MF_SEPARATOR , MF_SEPARATOR   ,	_T("") );
 	resStr.LoadString(IDS_MENU_MOVE_UP);
 	cntxtMenu.AppendMenu(MF_STRING | (bCanMoveUp ? MF_ENABLED : (MF_GRAYED | MF_DISABLED)), IDM_ST_MOVE_UP, resStr);
