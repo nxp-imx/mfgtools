@@ -1,4 +1,13 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
+****************************************
+RELEASE_STMFGTOOL_1.6.2.015
+****************************************
+09/15/2010 - Starle Li
+	- Add i.mx53 sync device functionality
+
+	Libs/DevSupport/MxRomDevice.cpp
+
+
 
 ****************************************
 RELEASE_STMFGTOOL_1.6.2.014
