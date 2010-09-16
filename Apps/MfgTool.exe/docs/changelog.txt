@@ -1,4 +1,15 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
+
+
+****************************************
+RELEASE_STMFGTOOL_1.6.2.016
+****************************************
+09/09/2010 - Starle Li
+	- fix the issue that a device can't be recognized when a device transforms from USB HID mode to USB MSC mode
+
+	Libs\DevSupport\Device.cpp
+	Apps\MfgTool.exe\OpUtpUpdate.cpp
+
 ****************************************
 RELEASE_STMFGTOOL_1.6.2.015
 ****************************************
