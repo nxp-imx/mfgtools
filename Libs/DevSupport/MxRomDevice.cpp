@@ -883,8 +883,7 @@ BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UI
 
 	// Set UI
 
-	uint32_t byteIndex, sectorAddress = 0, numBytesToWrite = 0;
-
+	uint32_t byteIndex, numBytesToWrite = 0;
 	for ( byteIndex = 0; byteIndex < dataSize; byteIndex += numBytesToWrite )
 	{
 		// reset buffer
@@ -911,12 +910,11 @@ BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UI
 		//
 		// Program the flash
 		//
-		sectorAddress = (address + byteIndex)/512;
 		// TRACE(_T("ProgramFlash(): SendRklCommand(cmd:0x%X, addr:0x%X, size:0x%X, flags:0x%X)\n"), cmdID, sectorAddress, numBytesToWrite, flags);
-		struct Response res = SendRklCommand(cmdID, sectorAddress, numBytesToWrite, flags);
+		struct Response res = SendRklCommand(cmdID, address + byteIndex, numBytesToWrite, flags);
 		if ( res.ack != RET_SUCCESS )
 		{
-			TRACE(_T("ProgramFlash(): SendRklCommand(cmd:0x%X, addr:0x%X, size:0x%X, flags:0x%X) failed.\n"), cmdID, sectorAddress, numBytesToWrite, flags);
+			TRACE(_T("ProgramFlash(): SendRklCommand(cmd:0x%X, addr:0x%X, size:0x%X, flags:0x%X) failed.\n"), cmdID, address + byteIndex, numBytesToWrite, flags);
 			delete[] pBuffer;
 			return FALSE;
 		}
@@ -924,7 +922,7 @@ BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UI
 		// write data to device
 		if(!TransData(numBytesToWrite, pBuffer))
 		{
-			TRACE(_T("ProgramFlash(): TransData(size:0x%X, addr:0x%X) failed.\n"), numBytesToWrite, sectorAddress);
+			TRACE(_T("ProgramFlash(): TransData(size:0x%X, addr:0x%X) failed.\n"), numBytesToWrite, address + byteIndex);
 			delete[] pBuffer;
 			return FALSE;
 		}

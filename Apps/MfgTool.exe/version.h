@@ -4,5 +4,6 @@
 #define STMFGTOOL_REVISION      018
 #define STMFGTOOL_STRING_VERSION "1.6.2.018"
 
+
 // used by perl script. please update this too
 // STMP_BUILD_VERSION=1.6.2.018

@@ -1,6 +1,21 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.017
+****************************************
+09/17/2010 - Chris Williamson
+
+	- Revert changes from RELEASE_STMFGTOOL_1.6.2.016a until they can be tested further.
+
+	- REVERT: Bug fix in MxRomDevice::ProgramFlash(): address argument for RKLCommand is sector address, not byte address.
+	- REVERT: Change MAX_SIZE_PER_FLASH_COMMAND from 0x200000 to 0x400000
+
+	Libs/DevSupport/MxRomDevice.cpp
+	Libs/DevSupport/MxRomDevice.h
+	Apps/MfgTool.exe/docs/changelog.txt
+	Apps/MfgTool.exe/version.h
+	
+****************************************
 RELEASE_STMFGTOOL_1.6.2.016c
 ****************************************
 09/15/2010 - Chris Williamson
