@@ -296,11 +296,12 @@ public:
 			else
 			{
 				// get the length of the file
-				file.seekg(0, std::ios::end);
-				size_t fileSize = file.tellg();
-				file.seekg(0, std::ios::beg);
 
-				m_LParam = m_TotalSize = fileSize;
+				WIN32_FILE_ATTRIBUTE_DATA FileAttrData;
+				if( !GetFileAttributesEx(filename, GetFileExInfoStandard,&FileAttrData) )
+					return;
+
+				m_LParam = m_TotalSize = FileAttrData.nFileSizeLow;
 
 				m_pCurrentState = new StartState(this);				
 			}
@@ -743,27 +744,26 @@ public:
 
     int32_t UtpWrite(CString cmd, CString filename, Device::UI_Callback callback)
     {
-#define TIMETEST 1
+#define TIMETEST 0
 #ifdef TIMETEST 
 		LARGE_INTEGER liStartTime = {0}, liStopTime = {0};
 		LARGE_INTEGER liTemp = {0}, timeCount = {0};
 		QueryPerformanceFrequency(&liTemp);
 #endif
+		//If @FILESIZE is found in a command body, then it indicates the macro ($FILESIZE) must be replaced by a real value of the size of the file to be sent. 
+		if ( cmd.Find(_T("@FILESIZE")) != -1 )
+		{
+			// get the length of the file
+			WIN32_FILE_ATTRIBUTE_DATA FileAttrData;
+			if( !GetFileAttributesEx(filename, GetFileExInfoStandard,&FileAttrData) )
+				return ERROR_OPEN_FAILED;
 
-/*
-        // Get the data to send
-        Byte[] data = null;
-        try
-        {
-            data = File.ReadAllBytes(filename);
-        }
-        catch (Exception e)
-        {
-            Int32 retVal = Marshal.GetHRForException(e);
-            Debug.WriteLine(String.Format("!ERROR: UpdateTransportProtocol.UtpWrite({0}, {1}), tag:{2} - {3}", cmd, filename, TransactionTag, e.Message));
-            return retVal;
-        }
-*/
+			CString sfileSize;
+			sfileSize.Format(_T("%d"), FileAttrData.nFileSizeLow);
+
+			cmd.Replace(_T("@FILESIZE"), sfileSize);
+		}
+
         WriteTransaction transaction(this, cmd, filename);
 		if(transaction.GetTotalSize()==0)
 			return ERROR_OPEN_FAILED;

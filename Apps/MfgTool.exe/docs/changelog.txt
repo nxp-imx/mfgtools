@@ -1,6 +1,17 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.019
+****************************************
+09/29/2010 - Starle Li
+
+	- Replace macro @FILESIZE in a command body with a real value of the size of the file to be sent
+
+	Libs\DevSupport\UpdateTransportProtocol.h
+	Apps/MfgTool.exe/docs/changelog.txt
+	Apps/MfgTool.exe/version.h
+
+****************************************
 RELEASE_STMFGTOOL_1.6.2.017
 ****************************************
 09/17/2010 - Chris Williamson
@@ -506,8 +517,8 @@ RELEASE_STMFGTOOL_1.6.0.003c
 ****************************************
 10/15/2009
 	- Ryan Qian: 
-	  Failed to create ‘new’ profile again, if last ‘new profile’ operation was cancelled.
-	  The button of ‘Delete’ should be disabled all the way, if there’s no any profiles available.
+	  Failed to create ‘new?profile again, if last ‘new profile?operation was cancelled.
+	  The button of ‘Delete?should be disabled all the way, if there’s no any profiles available.
 	  
 	  Switch the m_bNewProfileMode to FALSE if the Cancel button is pressed.
 	  Don't enable the Delete button unless there are profiles detected.
@@ -1486,7 +1497,7 @@ RELEASE_STMFGTOOL_1.3.01.000
 	branch merged: br_localized_mfg_tool_1.3.0.139_main_dev_0008
 
 	- Added capability to edit the media drive array via a GUI interface. It will
-	  provide Manufacturing support for “Copy Protect” and other non-standard drive 
+	  provide Manufacturing support for “Copy Protect?and other non-standard drive 
 	  array hosts. It will also allow customers to rename their firmware files to 
 	  non-standard names.
 
