@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
+ * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
+ * Freescale Semiconductor, Inc.
+ *
+ */
 #if !defined(AFX_FileDropListCtrl_H__55F59001_AD5F_11D3_9DA4_0008C711C6B6__INCLUDED_)
 #define AFX_FileDropListCtrl_H__55F59001_AD5F_11D3_9DA4_0008C711C6B6__INCLUDED_
 

@@ -29,6 +29,13 @@ Revision History:
     11/18/97 : created
 
 --*/
+/*
+ * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
+ * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
+ * Freescale Semiconductor, Inc.
+ *
+ */
 #ifndef UMSSGUID_INC
 #define UMSSGUID_INC
 

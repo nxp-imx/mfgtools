@@ -1,4 +1,11 @@
 ﻿/*
+ * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
+ * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
+ * Freescale Semiconductor, Inc.
+ *
+ */
+/*
  * Please leave this Copyright notice in your code if you use it
  * Written by Decebal Mihailescu [http://www.codeproject.com/script/articles/list_articles.asp?userid=634640]
  */

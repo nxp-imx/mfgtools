@@ -8,11 +8,13 @@ Copyright (c) Microsoft Corporation.  All rights reserved.
     PURPOSE.
 --*/
 
-/*---------------------------------------------------------------------------
-* Copyright (C) 2009, Freescale Semiconductor, Inc. All Rights Reserved.
-* THIS SOURCE CODE, AND ITS USE AND DISTRIBUTION, IS SUBJECT TO THE TERMS
-* AND CONDITIONS OF THE APPLICABLE LICENSE AGREEMENT 
-*--------------------------------------------------------------------------*/
+/*
+ * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
+ * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
+ * Freescale Semiconductor, Inc.
+ *
+ */
 
 //---------------------------------------------------------------------------
 // Module Name:

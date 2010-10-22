@@ -29,6 +29,13 @@ Revision History:
     06/30/00: MRB  Added bulk-only support to USB mass storage sample
 
 --*/
+/*
+ * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
+ * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
+ * Freescale Semiconductor, Inc.
+ *
+ */
 
 #include "wdm.h"
 #include "stdarg.h"

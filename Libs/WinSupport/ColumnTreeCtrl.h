@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
+ * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
+ * Freescale Semiconductor, Inc.
+ *
+ */
 /*********************************************************************
 * Multi-Column Tree View, version 1.4 (July 7, 2005)
 * Copyright (C) 2003-2005 Michal Mecinski.

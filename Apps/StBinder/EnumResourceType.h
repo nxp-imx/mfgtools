@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
+ * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
+ * Freescale Semiconductor, Inc.
+ *
+ */
 #pragma once
 
 typedef HRESULT (CALLBACK FAR * LPFN_ENUM_NAMERESTYPE_CALLBACK)(PVOID pCallerClass, HMODULE _hModule, CString& _resName, int _iResId, WORD& _langId);

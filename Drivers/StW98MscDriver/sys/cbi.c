@@ -29,6 +29,13 @@ Revision History:
     06/30/00: MRB  Split out CBI-specific code into this module.
 
 --*/
+/*
+ * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
+ * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
+ * Freescale Semiconductor, Inc.
+ *
+ */
 
 #ifdef SUPPORT_CBI
 
