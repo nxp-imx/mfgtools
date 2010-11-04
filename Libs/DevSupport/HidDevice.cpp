@@ -19,19 +19,10 @@ HidDevice::HidDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString path
     memset(&_Capabilities, 0, sizeof(_Capabilities));
 
     int32_t err = AllocateIoBuffers();
-
-	_chipFamily = GetChipFamily();
-
-	if(_chipFamily == MX28)
+	if (err != ERROR_SUCCESS)
 	{
-		_habType = GetHABType(_chipFamily);
-		if(_habType == HabUnknown)
-			goto Exit;
-	}
-	TRACE("************The HID device is initialized**********\r\n");
-	return;
-Exit:
-	TRACE("Failed to initialize the HID device!!!\r\n");
+        TRACE("HidDevice::InitHidDevie() AllocateIoBuffers fail!\r\n");
+    }
 }
 
 HidDevice::~HidDevice(void)
@@ -65,7 +56,7 @@ int32_t HidDevice::AllocateIoBuffers()
     if( hHidDevice == INVALID_HANDLE_VALUE )
     {
 		int32_t error = GetLastError();
-//t        ATLTRACE2(_T(" HidDevice::AllocateIoBuffers().CreateFile ERROR:(%d)\r\n"), error);
+        ATLTRACE2(_T(" HidDevice::AllocateIoBuffers().CreateFile ERROR:(%d)\r\n"), error);
         return error;
     }
 
@@ -752,5 +743,13 @@ EXIT:
 
 DWORD HidDevice::GetHabType()
 {
+    _chipFamily = GetChipFamily();
+
+	if(_chipFamily == MX28)
+	{
+        if(_habType == HabUnknown)
+		    _habType = GetHABType(_chipFamily);
+	}
+
 	return _habType;
 }

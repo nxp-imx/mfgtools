@@ -78,6 +78,7 @@ protected:
 	std::map<UCL::DeviceState::DeviceState_t, UCL::DeviceDesc*> m_DeviceStates;
     HANDLE m_hChangeEvent;
 	BOOL m_bProcessingList;
+	HAB_status m_habStatus;
 
 	CWinThread* m_p_do_list_thread;
 	friend UINT DoListThreadProc(LPVOID pParam);

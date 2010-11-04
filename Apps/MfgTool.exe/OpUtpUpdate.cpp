@@ -97,6 +97,8 @@ COpUtpUpdate::COpUtpUpdate(CPortMgrDlg *pPortMgrDlg, usb::Port *pUSBPort, COpInf
 		}
 		m_DeviceStates = m_UclNode.GetConfiguration()->GetDeviceStates();
 	}
+
+	m_habStatus = NoHabCheck;
 }
 
 COpUtpUpdate::~COpUtpUpdate(void)
@@ -836,7 +838,6 @@ DWORD COpUtpUpdate::DoMxHidLoad(UCL::Command* pCmd)
 
 DWORD COpUtpUpdate::CheckHabType(CString strHabType)
 {
-	static HAB_status ReturnVal = NoHabCheck;
 	HAB_type habValue = HabUnknown;
 
     if(memcmp(strHabType,_T(""),sizeof(_T("")))==0)
@@ -847,42 +848,45 @@ DWORD COpUtpUpdate::CheckHabType(CString strHabType)
 		HidDevice* pHidDevice = dynamic_cast<HidDevice*>(m_pUSBPort->_device);
 		if ( pHidDevice )
 		{
-			habValue = (HAB_type)pHidDevice->GetHabType();
+			if(pHidDevice->GetHabType() >= 1)
+                habValue = HabEnable;
+            else
+                habValue = (HAB_type)pHidDevice->GetHabType();
             switch(habValue)
             {
                 case HabDisable:
                     if (memcmp(strHabType,_T("HabDisable"),sizeof(_T("HabDisable")))==0)
-                        ReturnVal = HabMatch;
+                        m_habStatus = HabMatch;
                     else
                     {
-                        if (ReturnVal == HabUnknownStatus)
-                            ReturnVal = HabDismatch;
-                        else if (ReturnVal == HabMatch)
-                            ReturnVal = HabChecked;
+                        if (m_habStatus == HabUnknownStatus)
+                            m_habStatus = HabDismatch;
+                        else if (m_habStatus == HabMatch)
+                            m_habStatus = HabChecked;
 						else
-							ReturnVal = HabUnknownStatus;
+							m_habStatus = HabUnknownStatus;
                     }
                     break;
                 case HabEnable:
                     if (memcmp(strHabType,_T("HabEnable"),sizeof(_T("HabEnable")))==0)
-                        ReturnVal = HabMatch;
+                        m_habStatus = HabMatch;
                     else
                     {
-                        if (ReturnVal == HabUnknownStatus)
-                            ReturnVal = HabDismatch;
-                        else if (ReturnVal == HabMatch)
-                            ReturnVal = HabChecked;
+                        if (m_habStatus == HabUnknownStatus)
+                            m_habStatus = HabDismatch;
+                        else if (m_habStatus == HabMatch)
+                            m_habStatus = HabChecked;
 						else
-							ReturnVal = HabUnknownStatus;
+							m_habStatus = HabUnknownStatus;
                     }
                     break;
                 default:
-                    ReturnVal = HabDismatch;
-                    return ReturnVal;
+                    m_habStatus = HabDismatch;
+                    return m_habStatus;
             }
 		}
 		else
-			ReturnVal = HabDismatch;
+			m_habStatus = HabDismatch;
 	}
 	else if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxRom)
 	{
@@ -901,7 +905,7 @@ DWORD COpUtpUpdate::CheckHabType(CString strHabType)
 		}
 	}
 
-	return ReturnVal;
+	return m_habStatus;
 }
 
 DWORD COpUtpUpdate::DoHidLoad(UCL::Command* pCmd)
