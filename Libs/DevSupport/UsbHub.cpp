@@ -128,7 +128,7 @@ int32_t usb::Hub::RefreshPort(const int32_t portNumber)
 			pPort = dynamic_cast<usb::Port*>(*port);
 			rc = pPort->Refresh();
 			if (rc != ERROR_SUCCESS)
-				break;
+				continue;
 		} // end for(ports)
 	}
 	else

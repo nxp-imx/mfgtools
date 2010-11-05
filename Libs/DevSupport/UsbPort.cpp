@@ -116,24 +116,11 @@ int32_t usb::Port::Refresh()
 		PUSB_NODE_CONNECTION_DRIVERKEY_NAME driverName = (PUSB_NODE_CONNECTION_DRIVERKEY_NAME)malloc(bytes);
 		driverName->ConnectionIndex = _index.get(); 
 		DWORD i=0;
-		do{
-			// Get the name of the driver key of the device attached to the specified port.
-			Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_DRIVERKEY_NAME, driverName,
-									bytes, driverName, bytes, &BytesReturned, NULL);
-
-
-			i++;
-//t			ATLTRACE(_T("*** ***: usb::Port::Refresh() polling iteration: #%d: %d port:%d\n"),i,_parentHub->_index.get(), _index.get());
-			//Max 3mins are waited.
-			if(i>=180 || Success)
-				break;
-
-			//Polling the status per second.
-			Sleep(1000);
-
-		}while(!Success);
-
-		if (!Success) 
+        
+		// Get the name of the driver key of the device attached to the specified port.
+		Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_DRIVERKEY_NAME, driverName,
+								bytes, driverName, bytes, &BytesReturned, NULL);
+        if (!Success) 
 		{
 			error = GetLastError();
 			CloseHandle(hHub);
