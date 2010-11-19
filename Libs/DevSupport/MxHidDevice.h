@@ -53,6 +53,7 @@
 
 #define IVT_BARKER_HEADER      0x402000D1
 #define ROM_TRANSFER_SIZE	   0x400
+#define IVT_OFFSET             0x400
 
 //DCD binary data format:
 //4 bytes for format	4 bytes for register1 address	4 bytes for register1 value to set
@@ -159,7 +160,8 @@ public:
 	{
            unsigned long IvtBarker;
            unsigned long ImageStartAddr;// LONG(0x70004020)
-           unsigned long Reserved[3];
+           unsigned long Reserved[2];
+		   unsigned long BootData;
            unsigned long SelfAddr;// LONG(0x70004000)
            unsigned long Reserved2[2];
 	}IvtHeader, *PIvtHeader;
@@ -207,7 +209,8 @@ public:
     virtual ~MxHidDevice();
 	BOOL InitMemoryDevice(CString filename);
     BOOL Download(PImageParameter pImageParameter, StFwComponent *fwComponent, Device::UI_Callback callbackFn);
-    BOOL Jump();
+	BOOL RunPlugIn(CString fwFilename);
+	BOOL Jump();
 
     HANDLE	        m_hid_drive_handle;
 private:
@@ -221,7 +224,7 @@ private:
     enum ChipFamily_t
     {
         ChipUnknown = 0,
-        MX508
+        MX50
     };
     
 	enum ChannelType { ChannelType_UART = 0, ChannelType_USB };
@@ -273,6 +276,8 @@ private:
 
     int Read(void* buf, UINT size);
     int Write(UCHAR* buf, ULONG size);
+
+	BOOL AddIvtHdr(UINT32 ImageStartAddr);
     
 	ChipFamily_t _chipFamily;
 	HAB_t _habType;

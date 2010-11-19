@@ -1570,6 +1570,10 @@ DWORD COpUtpUpdate::DoBoot(UCL::Command* pCmd)
 	{
 		retValue = DoMxRomLoad(pCmd);
 	}
+    else if ((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
+    {
+        retValue = DoPlugin(pCmd);
+    }
 	else
 	{//HID device
 		retValue = DoHidLoad(pCmd);
@@ -1689,6 +1693,39 @@ DWORD COpUtpUpdate::DoInit(UCL::Command* pCmd)
     	fullFileName.Format(_T("%s//%s"), m_pOpInfo->GetPath(), pCmd->GetFile());
 
     	if( !pMxHidDevice->InitMemoryDevice(fullFileName) ) 
+    	{
+    		returnVal = ERROR_INVALID_HANDLE;
+    		ATLTRACE(_T("!!!ERROR!!! %s Failed to initialize i.MXxx memory. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+    		return returnVal;
+    	}
+	}
+
+	return returnVal;
+}
+
+DWORD COpUtpUpdate::DoPlugin(UCL::Command* pCmd)
+{
+	DWORD returnVal = ERROR_SUCCESS;
+
+    //if current device is i.MXxx device
+    if((DeviceClass::DeviceType)m_pUSBPort->GetDeviceType() == DeviceClass::DeviceTypeMxRom)
+    {
+    	return returnVal;
+    }
+    else// For MX508
+    {//HID device-Mx508
+        MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(m_pUSBPort->_device);
+    	if ( pMxHidDevice == NULL )
+    	{
+    		returnVal = ERROR_INVALID_HANDLE;
+    		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+    		return returnVal;
+    	}
+
+    	CString fullFileName;
+    	fullFileName.Format(_T("%s//%s"), m_pOpInfo->GetPath(), pCmd->GetFile());
+
+    	if( !pMxHidDevice->RunPlugIn(fullFileName) ) 
     	{
     		returnVal = ERROR_INVALID_HANDLE;
     		ATLTRACE(_T("!!!ERROR!!! %s Failed to initialize i.MXxx memory. OpState: %s\r\n"), m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));

@@ -39,7 +39,7 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CStdString 
     m_sync_event_rx = NULL;
     m_pReadReport = NULL;
     m_pWriteReport = NULL;
-    _chipFamily = MX508;
+    _chipFamily = MX50;
 }
 
 MxHidDevice::~MxHidDevice()
@@ -590,7 +590,7 @@ BOOL MxHidDevice::Jump(UINT RAMAddress)
 
 	if(!GetHABType())
 		return FALSE;
-
+	
 	TRACE("*********Jump to Ramkernel successfully!**********\r\n");
 	return TRUE;
 }
@@ -644,69 +644,17 @@ BOOL MxHidDevice::Download(PImageParameter pImageParameter,StFwComponent *fwComp
 
     if( pImageParameter->setSection == MemSectionAPP)
     {
-    	UINT FlashHdrAddr;
-    	const unsigned char * pHeaderData = NULL;
-
-    	//transfer length of ROM_TRANSFER_SIZE is a must to ROM code.
-    	unsigned char FlashHdr[ROM_TRANSFER_SIZE] = { 0 };
-    	unsigned char Tempbuf[ROM_TRANSFER_SIZE] = { 0 };	
-    	
-    	// Otherwise, create a header and append the data
-    	if(_chipFamily == MX508)
+    	UINT32 ImageStartAddr = 0;
+    	if(_chipFamily == MX50)
     	{
-    		PIvtHeader pIvtHeader = (PIvtHeader)FlashHdr;
-
-    		FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL + pImageParameter->CodeOffset - sizeof(IvtHeader);
-
-    		//Copy image data with an offset of ivt header size to the temp buffer.
-    		memcpy(FlashHdr + sizeof(IvtHeader), pBuffer+pImageParameter->CodeOffset, ROM_TRANSFER_SIZE - sizeof(IvtHeader));
-    		
-    		pIvtHeader->IvtBarker = IVT_BARKER_HEADER;
-    		pIvtHeader->ImageStartAddr = FlashHdrAddr+sizeof(IvtHeader);
-    		pIvtHeader->SelfAddr = FlashHdrAddr;
-    	}
-    	else
-    	{
-    		PFlashHeader pFlashHeader = (PFlashHeader)FlashHdr;
-    		//Copy image data with an offset of flash header size to the temp buffer.
-    		memcpy(FlashHdr + sizeof(FlashHeader), pBuffer, ROM_TRANSFER_SIZE - sizeof(FlashHeader));
-    		
-    		//We should write actual image address to the first dword of flash header.
-    		pFlashHeader->ImageStartAddr = pImageParameter->PhyRAMAddr4KRL;
-
-    		FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL - sizeof(FlashHeader);
-    	}
-    	pHeaderData = (const unsigned char *)FlashHdr;
-
-    	if ( !TransData(FlashHdrAddr, ROM_TRANSFER_SIZE, pHeaderData) )
-    	{
-    		TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X, 0x%X) failed.\n"), \
-                FlashHdrAddr, ROM_TRANSFER_SIZE, pImageParameter->setSection, pHeaderData);
-    		goto ERR_HANDLE;
-    	}
-        
-        //Verify the data
-    	if ( !ReadData(FlashHdrAddr, ROM_TRANSFER_SIZE, Tempbuf) )
-    	{
-    		TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X, 0x%X) failed.\n"), \
-                FlashHdrAddr, ROM_TRANSFER_SIZE, pImageParameter->setSection, pHeaderData);
-    		goto ERR_HANDLE;
+    		ImageStartAddr = pImageParameter->PhyRAMAddr4KRL + pImageParameter->CodeOffset;
     	}
 
-        if(memcmp(pHeaderData, Tempbuf, ROM_TRANSFER_SIZE)!= 0 )
-    	{
-    		TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X, 0x%X) failed.\n"), \
-                FlashHdrAddr, ROM_TRANSFER_SIZE, pImageParameter->setSection, pHeaderData);
-    		goto ERR_HANDLE;
-    	}
-
-        /*if( !Jump(FlashHdrAddr))
-        	{
-                TRACE(_T("DownloadImage(): Failed to jump to RAM address: 0x%x.\n"), FlashHdrAddr);
-        		goto ERR_HANDLE;
-        	}*/
-        // Set Jump Addr
-        m_jumpAddr = FlashHdrAddr;
+        if(!AddIvtHdr(ImageStartAddr))
+        {
+            TRACE(_T("DownloadImage(): AddHdr(0x%x) failed.\n"),ImageStartAddr);
+            goto ERR_HANDLE;    
+        }
     }
 
     //Clear device handle and report id
@@ -862,3 +810,158 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 	return TRUE;
 }
 #endif
+
+BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
+{
+	UINT FlashHdrAddr;
+
+	//transfer length of ROM_TRANSFER_SIZE is a must to ROM code.
+	unsigned char FlashHdr[ROM_TRANSFER_SIZE] = { 0 };	
+
+	// Otherwise, create a header and append the data
+	if(_chipFamily == MX50)
+	{
+    	PIvtHeader pIvtHeader = (PIvtHeader)FlashHdr;
+
+    	FlashHdrAddr = ImageStartAddr - sizeof(IvtHeader);
+
+        //Read the data first
+    	if ( !ReadData(FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr) )
+    	{
+    		TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X) failed.\n"), \
+                FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
+    		return FALSE;
+    	}
+    	//Add IVT header to the image.
+        //Clean the IVT header region
+        ZeroMemory(FlashHdr, sizeof(IvtHeader));
+        
+        //Fill IVT header parameter
+    	pIvtHeader->IvtBarker = IVT_BARKER_HEADER;
+    	pIvtHeader->ImageStartAddr = ImageStartAddr;
+    	pIvtHeader->SelfAddr = FlashHdrAddr;
+	}
+    
+    //Send the IVT header to destiny address
+	if ( !TransData(FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr) )
+	{
+		TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X) failed.\n"), \
+            FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
+		return FALSE;
+	}
+    
+    //Verify the data
+   	unsigned char Tempbuf[ROM_TRANSFER_SIZE] = { 0 };
+    if ( !ReadData(FlashHdrAddr, ROM_TRANSFER_SIZE, Tempbuf) )
+	{
+		TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X) failed.\n"), \
+            FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
+		return FALSE;
+	}
+
+    if(memcmp(FlashHdr, Tempbuf, ROM_TRANSFER_SIZE)!= 0 )
+	{
+		TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X) failed.\n"), \
+            FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
+		return FALSE;
+	}
+
+    m_jumpAddr = FlashHdrAddr;
+    
+	return TRUE;
+}
+
+BOOL MxHidDevice::RunPlugIn(CString fwFilename)
+{
+    CFile fwFile;
+	UCHAR* pDataBuf = NULL;
+	ULONGLONG fwSize = 0;
+	DWORD * pPlugIn = NULL;
+	DWORD PlugInDataOffset= 0,ImgIVTOffset= 0,BootDataImgAddrIndex= 0,PhyRAMAddr4KRL= 0;
+    DWORD PlugInAddr = 0;
+	PIvtHeader pIVT = NULL,pIVT2 = NULL;
+
+    //Create device handle and report id
+    OpenMxHidHandle();
+
+    if ( fwFile.Open(fwFilename, CFile::modeRead | CFile::shareDenyWrite) == 0 )
+    {
+        TRACE(_T("Firmware file %s failed to open.errcode is %d\n"), fwFilename,GetLastError());
+        goto ERR_HANDLE;
+    }
+
+    fwSize = fwFile.GetLength();
+    pDataBuf = (UCHAR*)malloc((size_t)fwSize);
+    fwFile.Read(pDataBuf, (UINT)fwSize);
+    fwFile.Close();
+    
+	//Search for IVT
+    pPlugIn = (DWORD *)pDataBuf;
+    while(pPlugIn[ImgIVTOffset/sizeof(DWORD)] != IVT_BARKER_HEADER || ImgIVTOffset >= fwSize)
+		ImgIVTOffset+= 0x100;
+	
+	if(ImgIVTOffset >= fwSize)
+		goto ERR_HANDLE;
+
+	pIVT = (PIvtHeader) (pPlugIn + ImgIVTOffset/sizeof(DWORD));
+	DWORD IVT2Offset = ImgIVTOffset + sizeof(IvtHeader);
+
+	while(pPlugIn[IVT2Offset/sizeof(DWORD)] != IVT_BARKER_HEADER || IVT2Offset >= fwSize)
+		IVT2Offset+= sizeof(DWORD);
+	
+	if(IVT2Offset >= fwSize)
+		goto ERR_HANDLE;
+  
+    //---------------------------------------------------------
+    //Run plugin in Iram
+    PlugInAddr = pIVT->ImageStartAddr;
+	PlugInDataOffset = pIVT->ImageStartAddr - pIVT->SelfAddr;
+	if (!TransData(PlugInAddr, 0x1000, (PUCHAR)((DWORD)pIVT + PlugInDataOffset)))
+	{
+		TRACE(_T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"), \
+			PlugInAddr, 0x1000, ((DWORD)pIVT + PlugInDataOffset));
+		goto ERR_HANDLE;
+	}
+
+	if(!AddIvtHdr(PlugInAddr))
+	{
+        TRACE(_T("RunPlugIn(): Failed to addhdr to RAM address: 0x%x.\n"), PlugInAddr);
+		goto ERR_HANDLE;
+	}
+    
+    if( !Jump(m_jumpAddr))
+	{
+        TRACE(_T("RunPlugIn(): Failed to jump to RAM address: 0x%x.\n"), m_jumpAddr);
+		goto ERR_HANDLE;
+	}
+
+    //---------------------------------------------------------
+    //Download eboot to ram
+    pIVT2 = (PIvtHeader)(pPlugIn + IVT2Offset/sizeof(DWORD));
+    BootDataImgAddrIndex = (DWORD *)pIVT2 - pPlugIn;
+	BootDataImgAddrIndex += (pIVT2->BootData - pIVT2->SelfAddr)/sizeof(DWORD);
+	PhyRAMAddr4KRL = pPlugIn[BootDataImgAddrIndex] + IVT_OFFSET - ImgIVTOffset;
+    if (!TransData(PhyRAMAddr4KRL, fwSize, (PUCHAR)((DWORD)pDataBuf)))
+	{
+		TRACE(_T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"), \
+			PhyRAMAddr4KRL, fwSize, pDataBuf);
+		goto ERR_HANDLE;
+	}
+    
+    DWORD ImgStartAddr = pIVT2->ImageStartAddr;
+	if(!AddIvtHdr(ImgStartAddr))
+	{
+        TRACE(_T("RunPlugIn(): Failed to addhdr to RAM address: 0x%x.\n"), ImgStartAddr);
+		goto ERR_HANDLE;
+	}
+
+    //Clear device handle and report id    
+    CloseMxHidHandle();
+    return TRUE;
+
+ERR_HANDLE:
+    //Clear device handle and report id    
+    CloseMxHidHandle();
+    return FALSE;
+}
+

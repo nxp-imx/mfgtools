@@ -94,5 +94,6 @@ protected:
 	DWORD DoInit(UCL::Command* pCmd);
 	DWORD DoMxRomLoad(UCL::Command* pCmd);
 	DWORD DoShow(UCL::Command* pCmd);
+	DWORD DoPlugin(UCL::Command* pCmd);
 
 };
