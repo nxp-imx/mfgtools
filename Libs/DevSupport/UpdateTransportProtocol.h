@@ -581,7 +581,7 @@ public:
     {
         m_pUtpDevice = pDevice;
 		m_MaxPacketSize = Volume::MaxTransferSizeInBytes;
-		m_MaxPollBusy = 3;
+		m_MaxPollBusy = 3000;
 		m_Disposed = false;
 		m_BusyDelay = 250;
 
