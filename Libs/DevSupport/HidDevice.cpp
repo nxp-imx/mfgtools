@@ -56,7 +56,7 @@ int32_t HidDevice::AllocateIoBuffers()
     if( hHidDevice == INVALID_HANDLE_VALUE )
     {
 		int32_t error = GetLastError();
-        ATLTRACE2(_T(" HidDevice::AllocateIoBuffers().CreateFile ERROR:(%d)\r\n"), error);
+//t        ATLTRACE2(_T(" HidDevice::AllocateIoBuffers().CreateFile ERROR:(%d)\r\n"), error);
         return error;
     }
 
