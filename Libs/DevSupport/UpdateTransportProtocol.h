@@ -38,12 +38,9 @@ private:
 	bool m_Disposed;
     ///     The version of the device implemented UTP Protocol.
     int32_t m_UtpVersion;
-    ///     The time in miliseconds to delay between utpBusy messages.
-    int32_t m_BusyDelay;
 
 public:
     static uint32_t g_TransactionTag;
-	uint32_t GetBusyDelay() { return m_BusyDelay; };
 	uint32_t GetMaxPollBusy() { return m_MaxPollBusy; };
 	int64_t GetMaxPacketSize() { return m_MaxPacketSize; };
     typedef enum { PowerDown, ChipReset, ResetToRecovery, ResetToUpdater } ResetType;
@@ -93,6 +90,7 @@ public:
 		void IncrementBusyCount() { ++m_BusyCount; };
 		void ClearBusyCount() { m_BusyCount = 0; };
 		uint32_t GetBusyCount() { return m_BusyCount; };
+		uint32_t GetBusyDelay() { return m_BusyDelay; };
 
 	protected:
 		State* m_pCurrentState;
@@ -103,6 +101,8 @@ public:
         int64_t m_TotalSize;
         int64_t m_CurrentSize;
 		int64_t m_LParam;
+		///     The time in miliseconds to delay between utpBusy messages.
+		int32_t m_BusyDelay;
     };
 
     class CommandTransaction : public Transaction
@@ -111,6 +111,7 @@ public:
 		CommandTransaction(UpdateTransportProtocol* pUtpInstance, CString command)
             : Transaction(pUtpInstance, command)
         {
+			m_BusyDelay = 250;
             m_pCurrentState = new StartState(this);
         }
 
@@ -126,9 +127,6 @@ public:
 			switch (m_pCurrentState->GetUtpMsg()->GetResponseCode())
             {
 				case ScsiUtpMsg::BUSY:
-				// The  value of m_TotalSize has been assigned when getting the file size. There is no need to reassign the value to m_TotalSize by the way.
-				// There is no need to return total file size in response packet.	
-				#if 0
 					if (m_pCurrentState->GetStateType() == State::StartState)
                     {
                         m_TotalSize = m_pCurrentState->GetUtpMsg()->GetResponseInfo();
@@ -138,11 +136,10 @@ public:
                     else
                     {
                         m_CurrentSize = min(m_TotalSize, m_TotalSize - m_pCurrentState->GetUtpMsg()->GetResponseInfo());
-                    }
-                #endif    
+                    }   
                     pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
                     if (KeepPolling())
-                        Sleep(m_pUpdateProtocol->GetBusyDelay());
+                        Sleep(GetBusyDelay());
                     else
 					{
 						delete pNextState; pNextState = NULL;
@@ -187,6 +184,7 @@ public:
         ReadTransaction(UpdateTransportProtocol* pUtpInstance, CString command)
             : Transaction(pUtpInstance, command)
         {
+			m_BusyDelay = 2;
             m_pCurrentState = new StartState(this);
         }
 
@@ -228,7 +226,7 @@ public:
 					case ScsiUtpMsg::BUSY:
                         pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
                         if (KeepPolling())
-                            Sleep(m_pUpdateProtocol->GetBusyDelay());
+                            Sleep(GetBusyDelay());
                         else
 						{
 							delete pNextState;
@@ -293,6 +291,7 @@ public:
         WriteTransaction(UpdateTransportProtocol* pUtpInstance, CString command, CString filename)
             : Transaction(pUtpInstance, command)
         {
+			m_BusyDelay = 2;
 			// open the file for binary reading
 			file.open(filename, std::ios_base::binary);
 			if(!file.is_open())
@@ -325,11 +324,10 @@ public:
 				switch (m_pCurrentState->GetUtpMsg()->GetResponseCode())
                 {
 					case ScsiUtpMsg::BUSY:
-                        
                         m_CurrentSize = 0;
 
                         pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
-                        Sleep(m_pUpdateProtocol->GetBusyDelay());
+                        Sleep(GetBusyDelay());
                         
                         break;
                     
@@ -354,12 +352,9 @@ public:
                 switch (m_pCurrentState->GetUtpMsg()->GetResponseCode())
                 {
 					case ScsiUtpMsg::BUSY:
-
-                        //m_CurrentSize = min(m_TotalSize, m_TotalSize - m_pCurrentState->GetUtpMsg()->GetResponseInfo());
-
                         pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
                         if (KeepPolling())
-                            Sleep(m_pUpdateProtocol->GetBusyDelay());
+                            Sleep(GetBusyDelay());
                         else
 						{
 							delete pNextState;
@@ -583,7 +578,6 @@ public:
 		m_MaxPacketSize = Volume::MaxTransferSizeInBytes;
 		m_MaxPollBusy = 3;
 		m_Disposed = false;
-		m_BusyDelay = 250;
 
 		// Dummy info
 		Device::NotifyStruct dummyInfo(_T("Not used"), Device::NotifyStruct::dataDir_Off, 0);
