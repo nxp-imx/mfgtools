@@ -455,8 +455,8 @@ uint32_t Volume::SendCommand(HANDLE hDrive, StApi& api, uint8_t* additionalInfo,
 	// Handling the device has not responded situation 
 	pRequest->PassThrough.ScsiStatus = SCSISTAT_COMMAND_TERMINATED;
 	pRequest->SenseData.SenseKey = SCSI_SENSE_UNIQUE;
-	pRequest->SenseData.AdditionalSenseCode = (ScsiUtpMsg::EXIT && 0xFF00)>>8;			// EXIT 0x8001
-	pRequest->SenseData.AdditionalSenseCodeQualifier = (ScsiUtpMsg::EXIT && 0x00FF);	// EXIT 0x8001
+	pRequest->SenseData.AdditionalSenseCode = (ScsiUtpMsg::EXIT & 0xFF00)>>8;			// EXIT 0x8001
+	pRequest->SenseData.AdditionalSenseCodeQualifier = (ScsiUtpMsg::EXIT & 0x00FF);	// EXIT 0x8001
 	pRequest->SenseData.Information[0] = 0xff;
 	pRequest->SenseData.Information[1] = 0xff;
 	pRequest->SenseData.Information[2] = 0xff;
