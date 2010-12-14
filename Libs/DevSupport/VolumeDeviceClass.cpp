@@ -174,8 +174,8 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 			}
 		} // end for(all Volumes in system)
 	}
-	
-	if ( pDevice )
+
+	if ( pDevice && pDevice->UsbDevice() )
 	{
 		nsInfo.Device = pDevice;
 		nsInfo.Type = _deviceClassType;
