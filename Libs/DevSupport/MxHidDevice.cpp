@@ -12,9 +12,9 @@
 #include <setupapi.h>
 #include <initguid.h>
 extern "C" {
-#include "Libs/WDK/hidsdi.h"
+#include <hidsdi.h>
 }
-#include "Libs/WDK/hidclass.h"
+#include <hidclass.h>
 #include "Device.h"
 #include "MxHidDevice.h"
 
@@ -62,41 +62,97 @@ void MxHidDevice::FreeIoBuffers()
 
 }
 
+typedef UINT (CALLBACK* LPFNDLLFUNC1)(HANDLE, PVOID);
+typedef UINT (CALLBACK* LPFNDLLFUNC2)(PVOID);
 // Modiifes m_Capabilities member variable
 // Modiifes m_pReadReport member variable
 // Modiifes m_pWriteReport member variable
 int32_t MxHidDevice::AllocateIoBuffers()
 {
-    // Open the device
+    int32_t error = ERROR_SUCCESS;
+
+	// Open the device
     HANDLE hHidDevice = CreateFile(_path.get(), 0, 0, NULL, OPEN_EXISTING, 0, NULL);
 
     if( hHidDevice == INVALID_HANDLE_VALUE )
     {
-		int32_t error = GetLastError();
-        ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().CreateFile ERROR:(%d)\r\n"), error);
+		error = GetLastError();
+//t        ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().CreateFile ERROR:(%d)\r\n"), error);
         return error;
     }
 
     // Get the Capabilities including the max size of the report buffers
+    HINSTANCE hHidDll = LoadLibrary(_T("hid.dll"));
+    if (hHidDll == NULL)
+    {
+		error = GetLastError();
+        CloseHandle(hHidDevice);
+        ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().LoadLibrary(hid.dll) ERROR:(%d)\r\n"), error);
+        return error;
+    }
+
     PHIDP_PREPARSED_DATA  PreparsedData = NULL;
-    if ( !HidD_GetPreparsedData(hHidDevice, &PreparsedData) )
+    LPFNDLLFUNC1 lpfnDllFunc1 = (LPFNDLLFUNC1)GetProcAddress(hHidDll, "HidD_GetPreparsedData");
+    if (!lpfnDllFunc1)
     {
+        // handle the error
+		error = GetLastError();
         CloseHandle(hHidDevice);
-        ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().GetPreparsedData ERROR:(%d)\r\n"), ERROR_GEN_FAILURE);
-        return ERROR_GEN_FAILURE;
+        FreeLibrary(hHidDll);       
+        ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().GetProcAddress(HidD_GetPreparsedData) ERROR:(%d)\r\n"), error);
+        return error;
     }
 
-    NTSTATUS sts = HidP_GetCaps(PreparsedData, &m_Capabilities);
-	if( sts != HIDP_STATUS_SUCCESS )
+	LPFNDLLFUNC2 lpfnDllFunc2 = (LPFNDLLFUNC2)GetProcAddress(hHidDll, "HidD_FreePreparsedData");
+    if (!lpfnDllFunc2)
     {
+        // handle the error
+		error = GetLastError();
         CloseHandle(hHidDevice);
-        HidD_FreePreparsedData(PreparsedData);
-        ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().GetCaps ERROR:(%d)\r\n"), HIDP_STATUS_INVALID_PREPARSED_DATA);
-        return HIDP_STATUS_INVALID_PREPARSED_DATA;
+        FreeLibrary(hHidDll);       
+        ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().GetProcAddress(HidD_FreePreparsedData) ERROR:(%d)\r\n"), error);
+        return error;
     }
 
+	// if ( !HidD_GetPreparsedData(hHidDevice, &PreparsedData) )
+	if ( !lpfnDllFunc1(hHidDevice, &PreparsedData) )
+    {
+		error = GetLastError();
+        CloseHandle(hHidDevice);
+        FreeLibrary(hHidDll);       
+        ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().HidD_GetPreparsedData ERROR:(%d)\r\n"), error);
+		return error != ERROR_SUCCESS ? error : ERROR_GEN_FAILURE;
+    }
+
+    lpfnDllFunc1 = (LPFNDLLFUNC1)GetProcAddress(hHidDll, "HidP_GetCaps");
+    if (!lpfnDllFunc1)
+    {
+        // handle the error
+		error = GetLastError();
+        CloseHandle(hHidDevice);
+		// HidD_FreePreparsedData(PreparsedData);
+		lpfnDllFunc2(PreparsedData);
+        FreeLibrary(hHidDll);       
+        ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().GetProcAddress(HidP_GetCaps) ERROR:(%d)\r\n"), error);
+        return error;
+    }
+    else 
+	{
+		// if ( HidP_GetCaps(PreparsedData, &m_Capabilities) != HIDP_STATUS_SUCCESS )
+		if ( lpfnDllFunc1(PreparsedData, &m_Capabilities) != HIDP_STATUS_SUCCESS )
+		{
+			CloseHandle(hHidDevice);
+			// HidD_FreePreparsedData(PreparsedData);
+			lpfnDllFunc2(PreparsedData);
+			FreeLibrary(hHidDll);       
+			ATLTRACE2(_T(" MxHidDevice::AllocateIoBuffers().GetCaps ERROR:(%d)\r\n"), HIDP_STATUS_INVALID_PREPARSED_DATA);
+			return HIDP_STATUS_INVALID_PREPARSED_DATA;
+		}
+	}
+	// HidD_FreePreparsedData(PreparsedData);
+	lpfnDllFunc2(PreparsedData);
+	FreeLibrary(hHidDll);       
     CloseHandle(hHidDevice);
-    HidD_FreePreparsedData(PreparsedData);
 
     // Allocate a Read and Write Report buffers
     FreeIoBuffers();
@@ -626,7 +682,7 @@ BOOL MxHidDevice::Download(PImageParameter pImageParameter,StFwComponent *fwComp
 	for ( byteIndex = 0; byteIndex < dataCount; byteIndex += numBytesToWrite )
 	{
 		// Get some data
-		numBytesToWrite = min(MAX_SIZE_PER_DOWNLOAD_COMMAND, dataCount - byteIndex);
+		numBytesToWrite = (DWORD)min(MAX_SIZE_PER_DOWNLOAD_COMMAND, dataCount - byteIndex);
 
 		if (!TransData(pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pBuffer + byteIndex))
 		{
@@ -777,7 +833,7 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 	}
 
 	CStringT<char,StrTraitMFC<char> > cmdString;
-	scriptFile.Read(cmdString.GetBufferSetLength(scriptFile.GetLength()), scriptFile.GetLength());
+	scriptFile.Read(cmdString.GetBufferSetLength((int)scriptFile.GetLength()), (unsigned int)scriptFile.GetLength());
 	cmdString.ReleaseBuffer();
 
 	XNode script;
@@ -941,7 +997,7 @@ BOOL MxHidDevice::RunPlugIn(CString fwFilename)
     BootDataImgAddrIndex = (DWORD *)pIVT2 - pPlugIn;
 	BootDataImgAddrIndex += (pIVT2->BootData - pIVT2->SelfAddr)/sizeof(DWORD);
 	PhyRAMAddr4KRL = pPlugIn[BootDataImgAddrIndex] + IVT_OFFSET - ImgIVTOffset;
-    if (!TransData(PhyRAMAddr4KRL, fwSize, (PUCHAR)((DWORD)pDataBuf)))
+    if (!TransData(PhyRAMAddr4KRL, (unsigned int)fwSize, (PUCHAR)((DWORD)pDataBuf)))
 	{
 		TRACE(_T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"), \
 			PhyRAMAddr4KRL, fwSize, pDataBuf);

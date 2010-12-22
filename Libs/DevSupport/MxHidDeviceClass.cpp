@@ -12,9 +12,9 @@
 #include <setupapi.h>
 #include <initguid.h>
 extern "C" {
-#include "Libs/WDK/hidsdi.h"
+#include <hidsdi.h>
 }
-#include "Libs/WDK/hidclass.h"
+#include <hidclass.h>
 #include "DeviceClass.h"
 #include "MxHidDevice.h"
 #include "MxHidDeviceClass.h"

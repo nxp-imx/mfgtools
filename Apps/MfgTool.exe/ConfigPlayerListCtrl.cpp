@@ -12,7 +12,6 @@
 #include "ConfigPlayerListCtrl.h"
 #include "PlayerProfile.h"
 #include "OpInfo.h"
-#include "../../Libs/WinSupport/VisValEdit.h"
 
 // CConfigPlayerOpInfoListCtrl
 

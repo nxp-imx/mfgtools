@@ -11,7 +11,7 @@
 #include "Observer.h"
 #include "StFwComponent.h"
 
-#include "Common/StdString.h"
+#include "Libs/Public/StdString.h"
 #include "Common/StdInt.h"
 
 class RecoveryDevice : public Device

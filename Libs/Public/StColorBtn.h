@@ -4,6 +4,10 @@
  * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
  * Freescale Semiconductor, Inc.
  *
+ *	Based on CColorBox original work by PEK found here: 
+ *     http://www.codeproject.com/KB/buttons/colorbox.aspx.
+ *
+ *	2010-12-22 : Renamed and modified to support text.
  */
 #if !defined(AFX_COLORBOX_H__1F411462_E4B2_11D8_B14D_002018574596__INCLUDED_)
 #define AFX_COLORBOX_H__1F411462_E4B2_11D8_B14D_002018574596__INCLUDED_
@@ -15,7 +19,7 @@
 //
 
 /*
-	CStColorBtn is a very simple button that shows a color and
+	CColorBox is a very simple button that shows a color and
 	let the user change the color by clicking on it.
 
     It's not more complicated than that :-).

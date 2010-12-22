@@ -24,13 +24,13 @@
 	#include "Common/StdInt.h"
 	#include <Wtypes.h>
 	#define _NTSCSI_USER_MODE_     // to keep srb.h from being included
-	#include "Libs/WDK/scsi.h"
+	#include <scsi.h>
 	#include <ntddscsi.h>
 #endif	 // WIN32
 
 #include <map>
 #include <assert.h>
-#include "Common/StdString.h"
+#include "Libs/Public/StdString.h"
 #include "StMedia.h"
 #include "StVersionInfo.h"
 #include "ParameterT.h"

@@ -7,12 +7,12 @@
  */
 #pragma once
 
-#include "Common/StdString.h"
+#include "Libs/Public/StdString.h"
 #include <setupapi.h>
 #include <cfgmgr32.h>
 #include <initguid.h>
 #include <devguid.h>
-#include "Libs/WDK/usbiodef.h"
+#include <usbiodef.h>
 
 class SetupApi
 {

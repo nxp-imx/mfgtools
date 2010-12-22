@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../../Libs/WinSupport/XMLite.h"
+#include "Libs/Public/XMLite.h"
 
 #define OP_UPDATE_INCOMPLETE	-1L
 
@@ -43,7 +43,7 @@ public:
 			}
 			else
 			{
-				address = _tstoi64(attr);
+				address = (unsigned int)_tstoi64(attr);
 			}
 
 			return address; 
@@ -63,7 +63,7 @@ public:
 			}
 			else
 			{
-				CodeOffset = _tstoi64(attr);
+				CodeOffset = (unsigned int)_tstoi64(attr);
 			}
 
 			return CodeOffset; 
@@ -91,7 +91,7 @@ public:
 			}
 			else
 			{
-				param = _tstoi64(attr);
+				param = (unsigned int)_tstoi64(attr);
 			}
 
 			return param; 
@@ -119,7 +119,7 @@ public:
 			}
 			else
 			{
-				param = _tstoi64(attr);
+				param = (unsigned int)_tstoi64(attr);
 			}
 
 			return param; 

@@ -337,7 +337,7 @@ namespace media
 
 #include "StBase.h"
 #include "StFwComponent.h"
-#include "Common\\StdString.h"
+#include "Libs/Public/StdString.h"
 
 #define DRIVE_TAG_STMPSYS_S         0x00
 #define DRIVE_TAG_USBMSC_S          0x01

@@ -18,7 +18,7 @@
 #include "LogMgrDlg.h"
 #include "MainFrm.h"
 
-#include "../../Libs/WinSupport/VersionInfo.h"
+#include "Libs/Public/VersionInfo.h"
 
 //#define SERIALIZE_HID TRUE					// undefined version requires 1 device per USB controller
 
@@ -73,9 +73,7 @@ protected:
 	BOOL IsRecoveryDriverInstalled();
 	LPVOID StLoadStmp3RecResource(USHORT resID, PDWORD pdwSize, BOOL& isLocal);
 	BOOL StWriteStmp3RecResource(LPVOID _pPtr, ULONG _dwSize, LPTSTR _pathName);
-    BOOL InstallRecoveryDriver();
-
-
+//    BOOL InstallRecoveryDriver();
 };
 
 extern CStMfgToolApp theApp;

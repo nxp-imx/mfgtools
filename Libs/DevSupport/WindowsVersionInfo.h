@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "Common/StdString.h"
+#include "Libs/Public/StdString.h"
 
 // WindowsVersionInfo
 #define BUFSIZE 80

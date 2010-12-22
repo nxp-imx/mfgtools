@@ -7,8 +7,6 @@
  */
 #pragma once
 #include "OpInfo.h"
-#include "../../Libs/WinSupport/visvaledit.h"
-#include "../../Libs/WinSupport/dropedit.h"
 #include "UpdateCommandList.h"
 
 // COpUclDlg dialog

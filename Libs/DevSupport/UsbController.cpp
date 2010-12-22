@@ -10,7 +10,7 @@
 #include "DeviceManager.h"
 
 #pragma warning( disable : 4200 )
-#include "Libs/WDK/usbioctl.h"
+#include <usbioctl.h>
 #pragma warning( default : 4200 )
 
 usb::Controller::Controller(DeviceClass * deviceClass, DEVINST devInst, CStdString path)

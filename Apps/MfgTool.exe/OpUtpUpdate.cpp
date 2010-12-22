@@ -12,7 +12,7 @@
 #include "StMfgTool.h"
 #include "PortMgrDlg.h"
 #include "stmsg.h"
-#include "DefaultProfile.h"
+//#include "DefaultProfile.h"
 
 #include "../../Libs/DevSupport/StPitc.h"
 #include "../../Libs/DevSupport/RecoveryDevice.h"
@@ -34,7 +34,7 @@ using namespace MSXML2;
 
 extern BOOL g_TestLoop;
 extern HANDLE g_HIDMutex;
-extern BOOL g_StopFlagged;  // need a global to reflect the STOP state and break out of request for HID mutex
+BOOL g_StopFlagged;  // need a global to reflect the STOP state and break out of request for HID mutex
 
 IMPLEMENT_DYNCREATE(COpUtpUpdate, COperation)
 
@@ -84,7 +84,7 @@ COpUtpUpdate::COpUtpUpdate(CPortMgrDlg *pPortMgrDlg, usb::Port *pUSBPort, COpInf
 	}
 
 	CStringT<char,StrTraitMFC<char> > uclString;
-	commandFile.Read(uclString.GetBufferSetLength(commandFile.GetLength()), commandFile.GetLength());
+	commandFile.Read(uclString.GetBufferSetLength((int)commandFile.GetLength()), (unsigned int)commandFile.GetLength());
 	uclString.ReleaseBuffer();
 
 	if ( m_UclNode.Load(A2T(uclString)) != NULL )

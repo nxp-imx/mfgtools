@@ -1,6 +1,17 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.025
+****************************************
+12/22/2010 - Chris Williamson
+
+	- Removed code that was no longer being used.
+    - Moved code obtained from public domain into Libs/Public
+    - Removed Libs/WinSupport from MfgTool solution
+    - Removed Libs/OtpAccessPitc from MfgTool solution
+    - Removed Freescale copyright from public domain files.
+
+****************************************
 RELEASE_STMFGTOOL_1.6.2.019
 ****************************************
 09/29/2010 - Starle Li

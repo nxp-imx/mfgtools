@@ -1744,19 +1744,19 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 // STMPRECVRESTYPE
 //
 
-IDR_STMP3REC_SYS        STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3rec.sys"
-IDR_STMP3REC_INF        STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3rec.inf"
-IDR_STMP3REC_CAT        STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3rec.cat"
-IDR_STMP3RECX64_SYS     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3recx64.sys"
-IDR_STMP3RECX64_INF     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3recx64.inf"
-IDR_STMP3RECX64_CAT     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3recx64.cat"
+//IDR_STMP3REC_SYS        STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3rec.sys"
+//IDR_STMP3REC_INF        STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3rec.inf"
+//IDR_STMP3REC_CAT        STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3rec.cat"
+//IDR_STMP3RECX64_SYS     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3recx64.sys"
+//IDR_STMP3RECX64_INF     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3recx64.inf"
+//IDR_STMP3RECX64_CAT     STMPRECVRESTYPE         "..\\..\\Drivers\\StRcvryDriver\\bin\\stmp3recx64.cat"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-IDB_COMPANY_BMP         BITMAP                  "..\\..\\Resources\\freescale_logo.bmp"
+IDB_COMPANY_BMP         BITMAP                  "res/freescale_logo.bmp"
 #endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1775,11 +1775,11 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Bitmap
 //
 
-IDB_USB_STATE           BITMAP                  "res\\checks.bmp"
-IDB_OP_STATE            BITMAP                  "res\\tree_sta.bmp"
-IDB_CLOSED_FOLDER       BITMAP                  "..\\..\\resources\\closedfolder.BMP"
-IDB_FIRMWARE_FILE       BITMAP                  "..\\..\\resources\\resourcefile.bmp"
-IDB_OPEN_FOLDER         BITMAP                  "..\\..\\resources\\openfolder.bmp"
+IDB_USB_STATE           BITMAP                  "res/checks.bmp"
+IDB_OP_STATE            BITMAP                  "res/tree_sta.bmp"
+//IDB_CLOSED_FOLDER       BITMAP                  "..\\..\\resources\\closedfolder.BMP"
+//IDB_FIRMWARE_FILE       BITMAP                  "..\\..\\resources\\resourcefile.bmp"
+//IDB_OPEN_FOLDER         BITMAP                  "..\\..\\resources\\openfolder.bmp"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -1840,7 +1840,7 @@ BEGIN
     POPUP "&Options"
     BEGIN
         MENUITEM "&Configuration...",           ID_OPTIONS_CONFIGURATION
-        MENUITEM "Clean &Registry...",          ID_OPTIONS_CLEAN_REGISTRY
+//        MENUITEM "Clean &Registry...",          ID_OPTIONS_CLEAN_REGISTRY
     END
     POPUP "&Help"
     BEGIN

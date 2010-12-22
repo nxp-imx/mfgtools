@@ -10,7 +10,6 @@
 #include "resource.h"
 #include "PlayerProfile.h"
 #include "CProfileList.h"
-//#include "../../Libs/WinSupport/visvaledit.h"
 #include "ConfigPlayerListCtrl.h"
 
 #define COL_OP_TYPE		0
@@ -18,6 +17,9 @@
 #define COL_OP_DETAIL	2
 #define COL_OP_OPTIONS	3
 
+#define RGBDEF_VALID			RGB(192,255,192) //green
+#define RGBDEF_INVALID			RGB(252,132,132) //red
+#define RGBDEF_INCOMPLETE		RGB(255,255,128) //yellow
 
 
 // CConfigPlayerProfilePage dialog
@@ -69,8 +71,8 @@ protected:
     DWORD InsertOpsList(CPlayerProfile * _pProfile);
 	void InitProfileListCombo();
 //	void PerformFileOps(COpInfo * _pOpInfo, CFileList * _pFileList, CString _destFolder, CFileList::FileListAction _action);
-	int CheckPath(CString sPath);
-	void SetDefaultProfile(void);
+//	int CheckPath(CString sPath);
+//	void SetDefaultProfile(void);
 public:
 	DWORD InitProfileList(void);
 	CPlayerProfile* InitProfile(LPCTSTR _name = NULL);

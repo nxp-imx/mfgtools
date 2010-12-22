@@ -7,8 +7,8 @@
  */
 #pragma once
 
-#include "../../Common/StdString.h"
-#include "../../Common/StdInt.h"
+#include "Libs/Public/StdString.h"
+#include "Common/StdInt.h"
 
 #include "StFormatInfo.h"
 

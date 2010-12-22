@@ -72,9 +72,8 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="true"
-				AdditionalDependencies="hid.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="../WDK/wxp/i386"
+				AdditionalLibraryDirectories=""
 				IgnoreAllDefaultLibraries="false"
 			/>
 			<Tool
@@ -140,9 +139,8 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies=" hid.lib"
 				OutputFile="$(OutDir)/DevSupport.lib"
-				AdditionalLibraryDirectories="../WDK/wxp/i386"
+				AdditionalLibraryDirectories=""
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -471,10 +469,6 @@
 				RelativePath="..\..\Common\StdInt.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\Common\StdString.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Loki"
@@ -533,6 +527,14 @@
 			</File>
 			<File
 				RelativePath="..\Loki\TypeTraits.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Public"
+			>
+			<File
+				RelativePath="..\Public\StdString.h"
 				>
 			</File>
 		</Filter>

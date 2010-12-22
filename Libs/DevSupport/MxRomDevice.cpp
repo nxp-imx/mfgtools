@@ -9,10 +9,10 @@
 #include "stdafx.h"
 #include "MxRomDevice.h"
 #include "DeviceManager.h"
-#include "Libs/WDK/usb100.h"
+#include <usb100.h>
 #include <sys/stat.h>
 
-#include "../../Drivers/iMX_BulkIO_Driver/sys/public.h"
+#include "Drivers/iMX_BulkIO_Driver/sys/public.h"
 
 static BOOL SyncAllDevFlag = FALSE;
 typedef struct _ImgDownloadStatus 
@@ -349,7 +349,7 @@ BOOL MxRomDevice::InitMemoryDevice(CString filename)
 	}
 
 	CStringT<char,StrTraitMFC<char> > cmdString;
-	scriptFile.Read(cmdString.GetBufferSetLength(scriptFile.GetLength()), scriptFile.GetLength());
+	scriptFile.Read(cmdString.GetBufferSetLength((int)scriptFile.GetLength()), (unsigned int)scriptFile.GetLength());
 	cmdString.ReleaseBuffer();
 
 	

@@ -8,7 +8,7 @@
 #include "stdafx.h"
 #include "HidDeviceClass.h"
 #include "HidDevice.h"
-#include "Libs/WDK/hidclass.h"
+#include <hidclass.h>
 
 HidDeviceClass::HidDeviceClass(void)
 : DeviceClass(&GUID_DEVINTERFACE_HID, &GUID_DEVCLASS_HIDCLASS, _T("HID"), DeviceTypeHid)

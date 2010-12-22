@@ -12,12 +12,12 @@
 #include <shlwapi.h>
 #include "StMfgTool.h"
 #include "MainFrm.h"
-#include "DefaultProfile.h"
-#include "StSplashWnd.h"
-#include "../../Libs/DevSupport/DeviceManager.h"
+//#include "DefaultProfile.h"
+#include "Common/StSplashWnd.h"
+#include "Libs/DevSupport/DeviceManager.h"
 
-#include "../../Common/updater_res.h"
-#include "../../Common/updater_restypes.h"
+#include "Common/updater_res.h"
+#include "Common/updater_restypes.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -248,10 +248,10 @@ BOOL CStMfgToolApp::InitInstance()
 
 	// If the recovery driver is not installed try to load it from resource
     // as it may have been bound to the executable.
-    if (!IsRecoveryDriverInstalled())
-    {
-        InstallRecoveryDriver();
-    }
+//    if (!IsRecoveryDriverInstalled())
+//    {
+//        InstallRecoveryDriver();
+//    }
 
 	g_HIDMutex = CreateMutex(NULL, FALSE, NULL);
 
@@ -460,7 +460,7 @@ BOOL CStMfgToolApp::IsRecoveryDriverInstalled()
 }
 
 
-
+/*
 BOOL CStMfgToolApp::InstallRecoveryDriver()
 {
         LPVOID pPtr = NULL;
@@ -507,18 +507,18 @@ BOOL CStMfgToolApp::InstallRecoveryDriver()
         }
         else
         {
-/*
-            PVOID x64BitRedirector = NULL;
-    		LPFN_WOW64DISABLEWOW64FSREDIRECTION fnWow64DisableWow64FsRedirection = (LPFN_WOW64DISABLEWOW64FSREDIRECTION)GetProcAddress(
-				GetModuleHandle(L"kernel32"),"Wow64DisableWow64FsRedirection");
-    		LPFN_WOW64REVERTWOW64FSREDIRECTION fnWow64RevertWow64FsRedirection = (LPFN_WOW64REVERTWOW64FSREDIRECTION)GetProcAddress(
-				GetModuleHandle(L"kernel32"),"Wow64RevertWow64FsRedirection");
 
-    	    if (fnWow64DisableWow64FsRedirection && fnWow64RevertWow64FsRedirection)
-	    	{
-		    	fnWow64DisableWow64FsRedirection(&x64BitRedirector);
-            }
-*/
+////            PVOID x64BitRedirector = NULL;
+////    		LPFN_WOW64DISABLEWOW64FSREDIRECTION fnWow64DisableWow64FsRedirection = (LPFN_WOW64DISABLEWOW64FSREDIRECTION)GetProcAddress(
+////				GetModuleHandle(L"kernel32"),"Wow64DisableWow64FsRedirection");
+////    		LPFN_WOW64REVERTWOW64FSREDIRECTION fnWow64RevertWow64FsRedirection = (LPFN_WOW64REVERTWOW64FSREDIRECTION)GetProcAddress(
+////				GetModuleHandle(L"kernel32"),"Wow64RevertWow64FsRedirection");
+////
+////    	    if (fnWow64DisableWow64FsRedirection && fnWow64RevertWow64FsRedirection)
+////	    	{
+////		    	fnWow64DisableWow64FsRedirection(&x64BitRedirector);
+////            }
+
             GetEnvironmentVariable(L"TEMP", szTempDir, MAX_PATH);
 
 //            wcscat_s(szPath, MAX_PATH, L"\\System32\\Drivers\\stmp3recx64.sys");
@@ -531,11 +531,11 @@ BOOL CStMfgToolApp::InstallRecoveryDriver()
 			if( IsLocal )
 				free( pPtr );
 
-/*   	    if (fnWow64DisableWow64FsRedirection && fnWow64RevertWow64FsRedirection)
-            {
-		    	fnWow64RevertWow64FsRedirection(x64BitRedirector);
-            }
-*/
+////   	    if (fnWow64DisableWow64FsRedirection && fnWow64RevertWow64FsRedirection)
+////            {
+////		    	fnWow64RevertWow64FsRedirection(x64BitRedirector);
+////            }
+
             wsprintf(szPath, L"%s\\%s", szTempDir, L"StMp3Recx64.cat");
 
             pPtr = StLoadStmp3RecResource(IDR_STMP3RECX64_CAT, &dwSize, IsLocal);
@@ -568,7 +568,7 @@ BOOL CStMfgToolApp::InstallRecoveryDriver()
 
         return status;
 }
-
+*/
 
 
 

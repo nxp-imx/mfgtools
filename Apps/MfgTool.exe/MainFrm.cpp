@@ -13,13 +13,12 @@
 #include "StMfgTool.h"
 #include "MainFrm.h"
 #include "stmsg.h"
-#include "defaultprofile.h"
-#include "..\\..\\Libs\\WinSupport\\StSplashWnd.h"
+//#include "defaultprofile.h"
 #ifdef RESTRICTED_PC_IDS
 extern TCHAR g_ThisPCId[];
 #endif
 
-#include "../../Libs/DevSupport/WindowsVersionInfo.h"
+#include "Libs/DevSupport/WindowsVersionInfo.h"
 
 HANDLE g_ConfigActiveEvent;
 extern HANDLE g_HIDMutex;
@@ -44,7 +43,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
 	ON_BN_CLICKED(ID_START_STOP_TOGGLE, OnBnClickedStartStopToggle)     // user pressed the start/stop button
 	ON_COMMAND(ID_OPTIONS_CONFIGURATION, OnOptionsConfigurationMenu)	// user selected the Configuration menu
-	ON_COMMAND(ID_OPTIONS_CLEAN_REGISTRY, OnOptionsCleanRegistryMenu)	// user selected the Clean Registry menu
+//	ON_COMMAND(ID_OPTIONS_CLEAN_REGISTRY, OnOptionsCleanRegistryMenu)	// user selected the Clean Registry menu
 	ON_UPDATE_COMMAND_UI(ID_START_STOP_TOGGLE, OnUpdateStartStopToggle) // gray out the start button
 //	ON_UPDATE_COMMAND_UI(IDCANCEL, OnUpdateExit)						// gray out the exit button
 	ON_WM_DESTROY()
@@ -70,7 +69,7 @@ CMainFrame::CMainFrame()
 : m_start(STOPPED)
 , m_bFirstTime(TRUE)
 , m_p_config_mgr(NULL)
-, m_pRegScrubDlg(NULL)
+//, m_pRegScrubDlg(NULL)
 , m_p_unsafe_window_closer_thread(NULL)
 , m_p_event_logger(NULL)
 {
@@ -82,8 +81,8 @@ CMainFrame::CMainFrame()
 
 CMainFrame::~CMainFrame()
 {
-	if(m_pRegScrubDlg)
-		delete m_pRegScrubDlg;
+//	if(m_pRegScrubDlg)
+//		delete m_pRegScrubDlg;
 }
 
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
@@ -132,22 +131,22 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      // fail to create
 	}
 
-	CRegCheckDlg *pRegCheckDlg = new CRegCheckDlg(m_p_config_mgr);;
-	if ( pRegCheckDlg == NULL ) {
-		TRACE0("Failed to get the RegCheckDlg\n");
-		return -1;      // fail to create
-	}
-	else
-		pRegCheckDlg->DoModal();
-	delete(pRegCheckDlg);
-	pRegCheckDlg = NULL;
+//	CRegCheckDlg *pRegCheckDlg = new CRegCheckDlg(m_p_config_mgr);;
+//	if ( pRegCheckDlg == NULL ) {
+//		TRACE0("Failed to get the RegCheckDlg\n");
+//		return -1;      // fail to create
+//	}
+//	else
+//		pRegCheckDlg->DoModal();
+//	delete(pRegCheckDlg);
+//	pRegCheckDlg = NULL;
 
 	// create RegScrub
-	m_pRegScrubDlg = new CRegScrubDlg();;
-	if ( m_pRegScrubDlg == NULL ) {
-		TRACE0("Failed to get the RegScrubDlg\n");
-		return -1;      // fail to create
-	}
+//	m_pRegScrubDlg = new CRegScrubDlg();;
+//	if ( m_pRegScrubDlg == NULL ) {
+//		TRACE0("Failed to get the RegScrubDlg\n");
+//		return -1;      // fail to create
+//	}
 
 	// turn on/off the AutoPlay rejection mechanism
 	bool rejectAutoPlay = m_p_config_mgr->GetAutoPlayEnabled() == TRUE;
@@ -225,17 +224,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
-BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) 
-{
-	// Route messages to the splash screen while it is visible
-    if (CStSplashWnd::PreTranslateAppMessage(pMsg)) 
-	{
-		return TRUE;
-	}
-	
-	return CFrameWnd::PreTranslateMessage(pMsg);
-}
-
 void CMainFrame::OnBnClickedStartStopToggle()
 {
 	HWND hwnd; CPortMgrDlg* dlg;
@@ -248,7 +236,7 @@ void CMainFrame::OnBnClickedStartStopToggle()
 			// don't let the user change the configuration while we are running
 			m_DlgBar.Start(m_p_config_mgr->GetPlayerProfileName());
 			mmenu->EnableMenuItem(ID_OPTIONS_CONFIGURATION, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-			mmenu->EnableMenuItem(ID_OPTIONS_CLEAN_REGISTRY, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+//			mmenu->EnableMenuItem(ID_OPTIONS_CLEAN_REGISTRY, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 			mmenu->EnableMenuItem(ID_APP_EXIT, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 
 			// make this the last saved profile in the registry
@@ -293,8 +281,8 @@ void CMainFrame::OnBnClickedStartStopToggle()
 			// allow the user change the configuration since we are not running
 			m_DlgBar.Idle();
 			mmenu->EnableMenuItem(ID_OPTIONS_CONFIGURATION, MF_BYCOMMAND | MF_ENABLED);
-			if( !IsPlatformVista() )
-				mmenu->EnableMenuItem(ID_OPTIONS_CLEAN_REGISTRY, MF_BYCOMMAND | MF_ENABLED);
+//			if( !IsPlatformVista() )
+//				mmenu->EnableMenuItem(ID_OPTIONS_CLEAN_REGISTRY, MF_BYCOMMAND | MF_ENABLED);
 			mmenu->EnableMenuItem(ID_APP_EXIT, MF_BYCOMMAND | MF_ENABLED);
 
 			break;
@@ -373,7 +361,7 @@ void CMainFrame::OnUpdateStartStopToggle(CCmdUI *pCmdUI)
 	}
 }
 
-
+/*
 // this launches the clean registry dialog when someone
 // clicks the Clean Registry Menu Item
 void CMainFrame::OnOptionsCleanRegistryMenu()
@@ -391,7 +379,7 @@ void CMainFrame::OnOptionsCleanRegistryMenu()
 	}
 
 }
-
+*/
 
 // this launches the configuration dialog when someone
 // clicks the Configuration Menu Item
@@ -626,8 +614,8 @@ void CMainFrame::ActivateFrame(int nCmdShow)
 	int curPos= 0;
 
 	CMenu* mmenu = GetMenu();
-	if( IsPlatformVista() )
-		mmenu->EnableMenuItem(ID_OPTIONS_CLEAN_REGISTRY, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+//	if( IsPlatformVista() )
+//		mmenu->EnableMenuItem(ID_OPTIONS_CLEAN_REGISTRY, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 	// turn off the logger for now
 //	mmenu->EnableMenuItem(ID_VIEW_LOG, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 
@@ -910,8 +898,8 @@ LRESULT CMainFrame::OnIsStopped(WPARAM _wparam, LPARAM _lparam)
 		m_start = STOPPED;
 		m_DlgBar.Idle();
 		mmenu->EnableMenuItem(ID_OPTIONS_CONFIGURATION, MF_BYCOMMAND | MF_ENABLED);
-		if( !IsPlatformVista() )
-			mmenu->EnableMenuItem(ID_OPTIONS_CLEAN_REGISTRY, MF_BYCOMMAND | MF_ENABLED);
+//		if( !IsPlatformVista() )
+//			mmenu->EnableMenuItem(ID_OPTIONS_CLEAN_REGISTRY, MF_BYCOMMAND | MF_ENABLED);
 		mmenu->EnableMenuItem(ID_APP_EXIT, MF_BYCOMMAND | MF_ENABLED);
 		LogRunComplete();
 	}

@@ -8,7 +8,6 @@
 #pragma once
 #include "../../Libs/DevSupport/DeviceManager.h"
 #include "../../Libs/DevSupport/UsbController.h"
-#include "../../Libs\Winsupport\ColorStaticST.h"
 
 #define DEFAULT_PORTS	4
 #define MAX_PORTS		16
@@ -67,7 +66,7 @@ protected:
 	UINT_PTR m_stale;
 	HANDLE m_hDeviceManagerCallback;
 	BOOL m_bPortsChanged;
-	CColorStaticST  m_hub_required_ctrl;
+//	CColorStaticST  m_hub_required_ctrl;
 	CFont			m_hub_required_font;
 	BOOL m_bFoundSecondaryController;
 

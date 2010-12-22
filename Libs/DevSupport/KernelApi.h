@@ -6,7 +6,7 @@
  *
  */
 #pragma once
-#include "Common/StdString.h"
+#include "Libs/Public/StdString.h"
 
 // Why do we have to go through this? A: Macro expansion rules. ( clw: I guess? )
 // Note: these MACROS are also defined in SetupApi.h. We might have to do something about that.

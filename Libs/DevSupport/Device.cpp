@@ -8,7 +8,7 @@
 #include "stdafx.h"
 #include "Device.h"
 #pragma warning( disable : 4200 )
-#include "Libs/WDK/usbioctl.h"
+#include <usbioctl.h>
 #pragma warning( default : 4200 )
 
 CMutex Device::m_mutex(FALSE, _T("Device.SendCommand"));

@@ -11,10 +11,10 @@
 
 #include "PortMgrDlg.h"
 #include "ConfigMgrSheet.h"
-#include "RegScrubDlg.h"
+//#include "RegScrubDlg.h"
 #include "EventLogger.h"
 #include "StDialogBar.h"
-#include "RegCheckDlg.h"
+//#include "RegCheckDlg.h"
 
 class CMainFrame : public CFrameWnd
 {
@@ -27,8 +27,6 @@ public:
 	typedef CTypedPtrArray<CObArray, CPortMgrDlg*>  CPortMgrDlgArray;
 	CWinThread* m_p_unsafe_window_closer_thread;
 	HANDLE m_hEventKill;
-
-   	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 	void LogTimeStamp();
 	void LogRunComplete();
@@ -54,7 +52,7 @@ protected:
 	afx_msg void OnClose();
 	afx_msg void OnBnClickedStartStopToggle();
 	afx_msg void OnOptionsConfigurationMenu();
-	afx_msg void OnOptionsCleanRegistryMenu();
+//	afx_msg void OnOptionsCleanRegistryMenu();
 	afx_msg void OnUpdateOptionsConfiguration(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateExit(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateStartStopToggle(CCmdUI *pCmdUI);
@@ -80,7 +78,7 @@ protected:
 	CStatusBar   m_wndStatusBar;
 	e_START_STATE m_start;
 
-	CRegScrubDlg *m_pRegScrubDlg;
+//	CRegScrubDlg *m_pRegScrubDlg;
     CEventLogger *m_p_event_logger;     // used for update operation logging.
 
 

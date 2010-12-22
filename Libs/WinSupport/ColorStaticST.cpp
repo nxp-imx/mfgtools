@@ -1,12 +1,17 @@
-/*
- * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
- * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
- * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
- * Freescale Semiconductor, Inc.
- *
- */
-// ColorStaticST.cpp : implementation file
-//
+/* ColorStaticST.cpp : implementation file
+
+Calabro, Davide. "Colored Static Controls - CodeGuru." 
+	CodeGuru : Colored Static Controls. 
+	1 Feb. 1999. Web. 20 Dec. 2010. 
+	<http://www.codeguru.com/cpp/controls/staticctrl/article.php/c2909/>.
+
+
+You are encouraged to use this class everywhere you want; 
+there is no fee required for CColorStaticST. 
+Freely add modifications and/or fix bugs, 
+but please, send any of these to SoftechSoftware mailto:davide_calabro@yahoo.com!
+
+*/
 
 #include "stdafx.h"
 #include "ColorStaticST.h"

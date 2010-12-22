@@ -9,7 +9,7 @@
 #define   __MXHIDDEVICE_H__
 #pragma once
 //#include "MxFwComponent.h"
-#include "../../Libs/WinSupport/XMLite.h"
+#include "Libs/Public/XMLite.h"
 
 // Code from AtkHostApiClass.h
 // Could be moved to SDP protocol or MxRomApi or something like that.
@@ -91,7 +91,7 @@ public:
 			}
 			else
 			{
-				addr = _tstoi64(attr);
+				addr = (unsigned int)_tstoi64(attr);
 			}
 
 			return addr; 
@@ -111,7 +111,7 @@ public:
 			}
 			else
 			{
-				data = _tstoi64(attr);
+				data = (unsigned int)_tstoi64(attr);
 			}
 
 			return data; 
@@ -127,11 +127,11 @@ public:
 			if(attr.Left(2) == _T("0x"))
 			{
 				TCHAR *p;
-				format = _tcstoul(attr.Mid(2),&p,16);
+				format = (unsigned char)_tcstoul(attr.Mid(2),&p,16);
 			}
 			else
 			{
-				format = _tstoi64(attr);
+				format = (unsigned char)_tstoi64(attr);
 			}
 
 			return format; 

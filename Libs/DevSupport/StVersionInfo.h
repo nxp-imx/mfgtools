@@ -16,7 +16,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "Common/StdString.h"
+#include "Libs/Public/StdString.h"
 #include "Common/StdInt.h"
 
 struct StVersionInfo

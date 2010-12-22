@@ -2,16 +2,10 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MfgTool", "StMfgTool.2008.vcproj", "{6A0D966B-4479-402B-9C8B-CF403C22BF98}"
 	ProjectSection(ProjectDependencies) = postProject
-		{D81FA22E-0003-4E18-AD6E-6971258BE80B} = {D81FA22E-0003-4E18-AD6E-6971258BE80B}
 		{8B1FD486-E75E-48AD-9C43-374330BC6D8D} = {8B1FD486-E75E-48AD-9C43-374330BC6D8D}
-		{FB60A1A0-B4A1-4E91-927F-45C8428AF703} = {FB60A1A0-B4A1-4E91-927F-45C8428AF703}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DevSupport", "..\..\Libs\DevSupport\DevSupport.2008.vcproj", "{8B1FD486-E75E-48AD-9C43-374330BC6D8D}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinSupport", "..\..\Libs\WinSupport\WinSupport.2008.vcproj", "{FB60A1A0-B4A1-4E91-927F-45C8428AF703}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OtpAccessPitc", "..\..\Libs\OtpAccessPitc\OtpAccessPitc.2008.vcproj", "{D81FA22E-0003-4E18-AD6E-6971258BE80B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,14 +21,6 @@ Global
 		{8B1FD486-E75E-48AD-9C43-374330BC6D8D}.Debug|Win32.Build.0 = Debug|Win32
 		{8B1FD486-E75E-48AD-9C43-374330BC6D8D}.Release|Win32.ActiveCfg = Release|Win32
 		{8B1FD486-E75E-48AD-9C43-374330BC6D8D}.Release|Win32.Build.0 = Release|Win32
-		{FB60A1A0-B4A1-4E91-927F-45C8428AF703}.Debug|Win32.ActiveCfg = Debug|Win32
-		{FB60A1A0-B4A1-4E91-927F-45C8428AF703}.Debug|Win32.Build.0 = Debug|Win32
-		{FB60A1A0-B4A1-4E91-927F-45C8428AF703}.Release|Win32.ActiveCfg = Release|Win32
-		{FB60A1A0-B4A1-4E91-927F-45C8428AF703}.Release|Win32.Build.0 = Release|Win32
-		{D81FA22E-0003-4E18-AD6E-6971258BE80B}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D81FA22E-0003-4E18-AD6E-6971258BE80B}.Debug|Win32.Build.0 = Debug|Win32
-		{D81FA22E-0003-4E18-AD6E-6971258BE80B}.Release|Win32.ActiveCfg = Release|Win32
-		{D81FA22E-0003-4E18-AD6E-6971258BE80B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

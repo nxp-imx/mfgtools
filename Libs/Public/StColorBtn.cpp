@@ -4,7 +4,12 @@
  * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
  * Freescale Semiconductor, Inc.
  *
+ *	Based on CColorBox original work by PEK found here: 
+ *     http://www.codeproject.com/KB/buttons/colorbox.aspx.
+ *
+ *	2010-12-22 : Renamed and modified to support text.
  */
+
 // ColorBox.cpp : implementation file
 //
 

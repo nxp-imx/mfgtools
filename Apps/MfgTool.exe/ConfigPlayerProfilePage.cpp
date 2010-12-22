@@ -11,18 +11,11 @@
 #include "stdafx.h"
 #include "ConfigPlayerProfilePage.h"
 #include "PlayerProfile.h"
-#include "OpUpdateDlg.h"
-#include "CopyOpDlg.h"
-#include "LoadFileOpDlg.h"
-#include "OpOTPDlg.h"
-//#include "OpUtpUpdateDlg.h"
-//#include "OpMxRomUpdateDlg.h"
 #include "OpUclDlg.h"
 #include "ConfigUSBPortPage.h"
 #include "StMfgTool.h"
-#include "DefaultProfile.h"
+//#include "DefaultProfile.h"
 #include "resource.h"
-#include "../../Common/updater_res.h"
 
 // CConfigPlayerProfilePage dialog
 IMPLEMENT_DYNAMIC(CConfigPlayerProfilePage, CPropertyPage)
@@ -334,7 +327,7 @@ DWORD CConfigPlayerProfilePage::InitProfileList(void)
 
 	return m_ProfileList.GetCount();
 }
-
+/*
 void CConfigPlayerProfilePage::SetDefaultProfile()
 {
 #ifdef LOCKED_DEFAULT_PROFILE
@@ -523,7 +516,7 @@ void CConfigPlayerProfilePage::SetDefaultProfile()
 	m_ProfileList.Add(pDefaultProfile);
 #endif
 }
-
+*/
 DWORD CConfigPlayerProfilePage::LoadControlsFromProfile(CPlayerProfile * _pProfile)
 {
 	if( !_pProfile )
@@ -766,7 +759,7 @@ DWORD CConfigPlayerProfilePage::SaveProfile(CPlayerProfile *_pProfile)
 	return 1;
 }
 
-
+/*
 int CConfigPlayerProfilePage::CheckPath(CString sPath)
 {
 	DWORD dwAttr = GetFileAttributes(sPath);
@@ -782,7 +775,7 @@ int CConfigPlayerProfilePage::CheckPath(CString sPath)
 	
 	return PATH_IS_FILE;
 }
-
+*/
 void CConfigPlayerProfilePage::InitListCtrl(CConfigPlayerListCtrl& list)
 {
 	CRect rect;
@@ -944,7 +937,7 @@ DWORD CConfigPlayerProfilePage::OpWorkerEdit()
 	
 	pOpInfo->m_cs_NewName.Empty();
 //	pOpInfo->m_cs_new_ini_section.Empty();
-
+/*
 	if (pOpInfo->GetType() == COperation::COPY_OP)
 	{
 		CCopyOpDlg *pOpEditor = new CCopyOpDlg(this, pOpInfo);
@@ -969,7 +962,8 @@ DWORD CConfigPlayerProfilePage::OpWorkerEdit()
 	    ret = pOpEditor->DoModal();
 	    delete pOpEditor;
 	}
-	else if (pOpInfo->GetType() == COperation::UTP_UPDATE_OP || pOpInfo->GetType() == COperation::MX_UPDATE_OP)
+	else 
+*/	if (pOpInfo->GetType() == COperation::UTP_UPDATE_OP || pOpInfo->GetType() == COperation::MX_UPDATE_OP)
 	{
 		COpUclDlg *pOpEditor = new COpUclDlg(this, pOpInfo); //new COpUtpUpdateDlg(this, pOpInfo);
 	    ret = pOpEditor->DoModal();

@@ -69,7 +69,7 @@ void COpUclDlg::LoadCommandLists(LPCTSTR filename)
 	if( commandFile.Open(filename, CFile::modeRead, &fileException) )
 	{
 		CStringT<char,StrTraitMFC<char> > uclString;
-		commandFile.Read(uclString.GetBufferSetLength(commandFile.GetLength()), commandFile.GetLength());
+		commandFile.Read(uclString.GetBufferSetLength((int)commandFile.GetLength()), (unsigned int)commandFile.GetLength());
 		uclString.ReleaseBuffer();
 
 		if ( m_UclNode.Load(A2T(uclString)) != NULL )

@@ -12,19 +12,12 @@
 #include "StMfgTool.h"
 #include "MainFrm.h"
 #include "PortMgrDlg.h"
-#include "OpCopy.h"
-#include "OpRegistry.h"
 #include "OpMonitor.h"
-#include "OpUpdater.h"
 #include "OpUtpUpdate.h"
 #include "OpMxRomUpdate.h"
-#include "OpErase.h"
-#include "OpLoader.h"
-#include "OpOTP.h"
 
-#include "../../Libs/DevSupport/UsbHubMgr.h"
-#include "../../Libs/DevSupport/DeviceManager.h"
-#include "../../Libs/WinSupport/visvaledit.h"
+#include "Libs/DevSupport/UsbHubMgr.h"
+#include "Libs/DevSupport/DeviceManager.h"
 
 #define PROGRESS_RGB_BLUE	RGB(9,106,204)
 #define PROGRESS_RGB_GREEN	RGB(78,217,11)
@@ -296,10 +289,10 @@ INT_PTR CPortMgrDlg::CreateOps(void)
 					}
 					m_duration += pOp->GetDuration();
 					ATLTRACE("Panel %c - CreateOps() - created an UPDATE operation(%#x, %d).\n", _T('A')+m_port_display_index, pOp->m_nThreadID, pOp->m_nThreadID);
-					break;*/
+					break;
 				case COperation::OTP_OP:
 					m_op_list.AddTail( pOp = new COpOTP(this, m_p_usb_port, pOpInfo) );
-					if (!pOp->CreateThread(/*CREATE_SUSPENDED*/)) {
+					if (!pOp->CreateThread()) {
 						delete pOp;
 						ATLTRACE("Error: Panel %c - CreateOps() - failed to create an OTP operation.\n", _T('A')+m_port_display_index);
 						return false;
@@ -317,7 +310,7 @@ INT_PTR CPortMgrDlg::CreateOps(void)
 					m_duration += pOp->GetDuration();
 					ATLTRACE("Panel %c - CreateOps() - created a SCRUB operation(%#x, %d).\n", _T('A')+m_port_display_index, pOp->m_nThreadID, pOp->m_nThreadID);
 					break;
-				case COperation::UTP_UPDATE_OP:
+*/				case COperation::UTP_UPDATE_OP:
 					m_op_list.AddTail( pOp = new COpUtpUpdate(this, m_p_usb_port, pOpInfo) );
 					if (!pOp->CreateThread(/*CREATE_SUSPENDED*/)) {
 						delete pOp;

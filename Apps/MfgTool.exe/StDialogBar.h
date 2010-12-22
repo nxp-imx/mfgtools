@@ -7,8 +7,7 @@
  */
 #pragma once
 #include "afxext.h"
-#include "StColorBtn.h"
-#include "../../libs/winsupport/ColorStaticST.h"
+#include "Libs/Public/StColorBtn.h"
 #include "ConfigMgrSheet.h"
 
 class CStDialogBar :
@@ -45,7 +44,7 @@ private:
 	CFont			m_StartStopFont;
 	CFont			m_StoppingFont;
 
-	CColorStaticST	m_StatusText;
+	CStatic			m_StatusText;
 
 	CTime			m_StartCTime;
 	BOOL			m_TimerActive;
@@ -62,4 +61,5 @@ private:
 
 public:
 	afx_msg void OnCbnSelchangeStatusProfileCombo();
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 };

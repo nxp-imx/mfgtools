@@ -176,7 +176,7 @@ BOOL CConfigUSBPortPage::OnInitDialog()
 
 	csText.LoadStringW(IDS_CFG_USBPORT_MAX_PORTS);
 	GetDlgItem(IDC_USBPORTS_PORTS_ENABLED_TEXT)->SetWindowTextW(csText);
-
+/*
 	// Set no hub warning text.
     csText.LoadStringW(IDS_HUB_REQUIRED);
    	SetDlgItemText(IDC_HUB_REQUIRED, csText);
@@ -199,7 +199,7 @@ BOOL CConfigUSBPortPage::OnInitDialog()
     m_hub_required_ctrl.ShowWindow(SW_HIDE);
     // Start text blinking
    	m_hub_required_ctrl.StartTextBlink(TRUE, CColorStaticST::ST_FLS_FAST);
-
+*/
 	DoTreeOperation(OP_INIT_TREE);
 	
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -539,10 +539,11 @@ void CConfigUSBPortPage::DoTreeOperation(CConfigUSBPortPage::e_TREE_OP _op_type)
 
 			// if we found no external hub, display required text
 #ifdef SERIALIZE_HID
-			if ( m_bFoundSecondaryController )
+/*			if ( m_bFoundSecondaryController )
 			    m_hub_required_ctrl.ShowWindow(SW_HIDE);
 			else
 			    m_hub_required_ctrl.ShowWindow(SW_SHOW);
+*/
 #endif
 
 			if ( m_num_enabled_ports == m_MaxEnabledPorts )

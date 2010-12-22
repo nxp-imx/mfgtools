@@ -35,9 +35,39 @@ CStDialogBar::~CStDialogBar(void)
 
 BEGIN_MESSAGE_MAP(CStDialogBar, CDialogBar)
 	ON_WM_TIMER()
+	ON_WM_CTLCOLOR()
 	ON_CBN_SELCHANGE(IDC_STATUS_PROFILE_COMBO, &CStDialogBar::OnCbnSelchangeStatusProfileCombo)
 	ON_CBN_SELCHANGE(IDC_STATUS_MULTI_COMBO_PROFILE, &CStDialogBar::OnCbnSelchangeStatusProfileCombo)
 END_MESSAGE_MAP()
+
+// This OnCtlColor handler will change the color of a static control
+// with the ID of IDC_STATUS_STATUS.
+HBRUSH CStDialogBar::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+   // Call the base class implementation first! Otherwise, it may
+   // undo what we're trying to accomplish here.
+   HBRUSH hbr = CDialogBar::OnCtlColor(pDC, pWnd, nCtlColor);
+
+   // Are we painting the IDC_STATUS_STATUS control? We can use
+   // CWnd::GetDlgCtrlID() to perform the most efficient test.
+   if (pWnd->GetDlgCtrlID() == IDC_STATUS_STATUS)
+   {
+		if( m_p_config_mgr->IsPlayerProfileValid() &&
+			m_p_config_mgr->GetNumEnabledPorts()   &&
+			m_p_config_mgr->GetNumEnabledOps())
+		{
+			// Set the text color to red
+			pDC->SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
+		}
+		else
+		{
+			pDC->SetTextColor(RGB(200,0,0));
+		}
+   }
+
+   // Return handle to our CBrush object
+   return hbr;
+}
 
 void CStDialogBar::SetDisplay(CConfigMgrSheet *_p_config_mgr)
 {
@@ -316,7 +346,7 @@ void CStDialogBar::SetProfileStatus()
 			m_p_config_mgr->GetNumEnabledPorts()   &&
 			m_p_config_mgr->GetNumEnabledOps())
 		{
-			m_StatusText.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
+//			m_StatusText.SendMessage(WM_CTLCOLOR_REFLECT, SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
 			resStr.LoadStringW(IDS_OK);
 			GetDlgItem(IDC_STATUS_STATUS)->SetWindowTextW(resStr);
 
@@ -326,7 +356,7 @@ void CStDialogBar::SetProfileStatus()
 		}
 		else
 		{
-			m_StatusText.SetTextColor(RGB(200,0,0));
+//			m_StatusText.SetTextColor(RGB(200,0,0));
 			if( !m_p_config_mgr->IsPlayerProfileValid() )
 			{
 				resStr.LoadStringW(IDS_INVALID_PLAYER_PROFILE);

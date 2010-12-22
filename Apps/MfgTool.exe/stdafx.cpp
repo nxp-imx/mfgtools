@@ -11,12 +11,10 @@
 
 #include "stdafx.h"
 
-//	#pragma message("  Automatically linking with DevSupport & WinSupport librarys")
+//	#pragma message("  Automatically linking with DevSupport library")
 //#ifdef _DEBUG
 //	#pragma comment( lib, "../../Libs/DevSupport/Debug/DevSupport.lib" ) 
-//	#pragma comment( lib, "../../Libs/WinSupport/Debug/WinSupport.lib" ) 
 //#else
 //	#pragma comment( lib, "../../Libs/DevSupport/Release/DevSupport.lib" ) 
-//	#pragma comment( lib, "../../Libs/WinSupport/Release/WinSupport.lib" ) 
 //#endif
 

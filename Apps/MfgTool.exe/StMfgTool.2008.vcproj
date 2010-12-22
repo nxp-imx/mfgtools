@@ -27,7 +27,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="call  $(SolutionDir)/createversion.bat $(SolutionDir)"
+				CommandLine="if exist createversion.bat call  $(SolutionDir)/createversion.bat $(SolutionDir)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -71,7 +71,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="setupapi.lib Version.lib UxTheme.lib OtpAccess.lib OtpAccess.res"
+				AdditionalDependencies="setupapi.lib UxTheme.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../Libs/OtpAccessPitc/bin/Debug"
 				DelayLoadDLLs="UxTheme.dll"
@@ -114,7 +114,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="call  $(SolutionDir)/createversion.bat $(SolutionDir)"
+				CommandLine="if exist createversion.bat call  $(SolutionDir)/createversion.bat $(SolutionDir)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -155,7 +155,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="setupapi.lib Version.lib UxTheme.lib OtpAccess.lib OtpAccess.res"
+				AdditionalDependencies="setupapi.lib UxTheme.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../Libs/OtpAccessPitc/bin"
 				DelayLoadDLLs="UxTheme.dll"
@@ -219,15 +219,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CopyOpDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CProfileList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DriveEditDlg.cpp"
 				>
 			</File>
 			<File
@@ -235,15 +227,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FileDropListCtrl.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\FileList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LoadFileOpDlg.cpp"
 				>
 			</File>
 			<File
@@ -271,35 +255,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\OpOTP.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\OpOTPDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\OpRegistry.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\OpUclDlg.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\OpUpdateDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\OpUpdater.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\OpUtpUpdate.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\OpUtpUpdateDlg.cpp"
 				>
 			</File>
 			<File
@@ -308,18 +268,6 @@
 			</File>
 			<File
 				RelativePath=".\PortMgrDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RegCheckDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RegScrubDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\StColorBtn.cpp"
 				>
 			</File>
 			<File
@@ -347,15 +295,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\StGrpTreeCtrl.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\StMfgTool.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TreeDroptarget.cpp"
 				>
 			</File>
 		</Filter>
@@ -385,19 +325,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CopyOpDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CProfileList.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DefaultProfile.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DriveEditDlg.h"
 				>
 			</File>
 			<File
@@ -405,15 +333,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FileDropListCtrl.h"
-				>
-			</File>
-			<File
 				RelativePath=".\FileList.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LoadFileOpDlg.h"
 				>
 			</File>
 			<File
@@ -422,10 +342,6 @@
 			</File>
 			<File
 				RelativePath=".\MainFrm.h"
-				>
-			</File>
-			<File
-				RelativePath=".\mm_callback.h"
 				>
 			</File>
 			<File
@@ -445,35 +361,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\OpOTP.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OpOTPDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OpRegistry.h"
-				>
-			</File>
-			<File
 				RelativePath=".\OpUclDlg.h"
 				>
 			</File>
 			<File
-				RelativePath=".\OpUpdateDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OpUpdater.h"
-				>
-			</File>
-			<File
 				RelativePath=".\OpUtpUpdate.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OpUtpUpdateDlg.h"
 				>
 			</File>
 			<File
@@ -485,19 +377,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\RegCheckDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RegScrubDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\StColorBtn.h"
 				>
 			</File>
 			<File
@@ -509,19 +389,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\StGrpTreeCtrl.h"
-				>
-			</File>
-			<File
 				RelativePath=".\StMfgTool.h"
 				>
 			</File>
 			<File
 				RelativePath=".\stmsg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TreeDroptarget.h"
 				>
 			</File>
 			<File
@@ -535,27 +407,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\res\checks.bmp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Resources\closedfolder.BMP"
-				>
-			</File>
-			<File
 				RelativePath="..\..\Resources\freescale_logo.bmp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Resources\openfolder.bmp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Resources\resourcefile.bmp"
-				>
-			</File>
-			<File
-				RelativePath=".\res\StMfgTool.ico"
 				>
 			</File>
 			<File
@@ -571,47 +423,47 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Drivers\StRcvryDriver\bin\stmp3rec.cat"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Drivers\StRcvryDriver\bin\StMp3Rec.inf"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Drivers\StRcvryDriver\bin\StMp3Rec.sys"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Drivers\StRcvryDriver\bin\stmp3recx64.cat"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Drivers\StRcvryDriver\bin\StMp3Recx64.inf"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Drivers\StRcvryDriver\bin\StMp3Recx64.sys"
-				>
-			</File>
-			<File
 				RelativePath=".\res\tree_sta.bmp"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="support"
+			Name="Public"
 			>
 			<File
-				RelativePath="..\..\Libs\WinSupport\ColorListbox.h"
+				RelativePath="..\..\Libs\Public\StColorBtn.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Libs\WinSupport\VersionInfo.h"
+				RelativePath="..\..\Libs\Public\StColorBtn.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Libs\WinSupport\VisValEdit.h"
+				RelativePath="..\..\Libs\Public\VersionInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Libs\Public\VersionInfo.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Libs\Public\XMLite.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Libs\Public\XMLite.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Common"
+			>
+			<File
+				RelativePath="..\..\Common\StSplashWnd.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Common\StSplashWnd.h"
 				>
 			</File>
 		</Filter>
