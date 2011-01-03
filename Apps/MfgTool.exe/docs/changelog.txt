@@ -5,7 +5,7 @@ RELEASE_STMFGTOOL_1.6.2.025
 ****************************************
 12/22/2010 - Chris Williamson
 
-	- Removed code that was no longer being used.
+    - Removed code that was no longer being used.
     - Moved code obtained from public domain into Libs/Public
     - Removed Libs/WinSupport from MfgTool solution
     - Removed Libs/OtpAccessPitc from MfgTool solution
