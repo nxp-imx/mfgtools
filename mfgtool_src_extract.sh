@@ -102,7 +102,7 @@ function copy_drivers_files() {
 function copy_resources_files() {
 
 	mkdir -p ${RELEASE_DIR}/Resources
-	for file in closedfolder.bmp openfolder.bmp resourcefile.bmp freescale_logo.bmp ; do
+	for file in closedfolder.BMP openfolder.bmp resourcefile.bmp freescale_logo.bmp ; do
 		cp Resources/${file} ${RELEASE_DIR}/Resources/${file}
 		if [ $? -ne 0 ] ; then
 			myecho "${FUNCNAME}: error: could not copy ${file}" ${LOG}
