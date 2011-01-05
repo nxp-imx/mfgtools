@@ -159,12 +159,19 @@ public:
 	typedef struct _IvtHeader
 	{
            unsigned long IvtBarker;
-           unsigned long ImageStartAddr;// LONG(0x70004020)
+           unsigned long ImageStartAddr;
            unsigned long Reserved[2];
 		   unsigned long BootData;
-           unsigned long SelfAddr;// LONG(0x70004000)
+           unsigned long SelfAddr;
            unsigned long Reserved2[2];
 	}IvtHeader, *PIvtHeader;
+
+	typedef struct _BootData
+	{
+           unsigned long ImageStartAddr;
+           unsigned long ImageSize;
+		   unsigned long PluginFlag;
+	}BootData, *PBootData;
 
 	typedef struct _FlashHeader
 	{
