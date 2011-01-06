@@ -256,10 +256,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\StMtpApi.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\StPitc.cpp"
 				>
 			</File>
@@ -407,10 +403,6 @@
 			</File>
 			<File
 				RelativePath=".\StMedia.h"
-				>
-			</File>
-			<File
-				RelativePath=".\StMtpApi.h"
 				>
 			</File>
 			<File

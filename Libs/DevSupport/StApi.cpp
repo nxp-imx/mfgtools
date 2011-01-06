@@ -10,7 +10,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "stdafx.h"
 #include "StHidApi.h"
-#include "StMtpApi.h"
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -86,13 +85,6 @@ StApiFactory::StApiFactory()
 	RegisterApi(L"HidPitcInquiry", HidPitcInquiry::Create);
 	RegisterApi(L"HidPitcRead", HidPitcRead::Create);
 	RegisterApi(L"HidPitcWrite", HidPitcWrite::Create);
-	RegisterApi(L"MtpEraseBootmanager", MtpEraseBootmanager::Create);
-	RegisterApi(L"MtpDeviceReset", MtpDeviceReset::Create);
-	RegisterApi(L"MtpResetToRecovery", MtpResetToRecovery::Create);
-	RegisterApi(L"MtpResetToUpdater", MtpResetToUpdater::Create);
-	RegisterApi(L"MtpGetDriveVersion", MtpGetDriveVersion::Create);
-	RegisterApi(L"MtpSetUpdateFlag", MtpSetUpdateFlag::Create);
-	RegisterApi(L"MtpSwitchToMsc", MtpSwitchToMsc::Create);
 /*	RegisterApi(L"HidInquiry", HidInquiry::Create);
 	RegisterApi(L"HidInquiry", HidInquiry::Create);
 	RegisterApi(L"HidInquiry", HidInquiry::Create);

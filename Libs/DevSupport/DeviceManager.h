@@ -5,53 +5,6 @@
  * Freescale Semiconductor, Inc.
  *
  */
-////////////////////////////////////////////////////////////////////////////////
-//! \addtogroup gDeviceManager
-//! @{
-//
-// Copyright (c) 2006 SigmaTel, Inc.
-//
-//! \file DeviceManager.h
-//! \brief Global class instance for device enumeration.
-//!
-//! Detailed description here.
-//!
-//! \see Loki::SingletonHolder
-////////////////////////////////////////////////////////////////////////////////
-
-/*============================================================================
-  ____________________________________________________________________________
-                                ______________________________________________
-   SSSS  GGGGG  TTTTT  L                                        SigmaTel, Inc.
-  S      G        T    L                              1601 S. Mopac Expressway
-   SSS   G  GG    T    L                                             Suite 100
-      S  G   G    T    L                              Austin, Texas 78746-7010
-  SSSS   GGGGG    T    LLLLL    ______________________________________________
-  ____________________________________________________________________________
-
-  Copyright(C) 2006, SigmaTel, Inc.
-  All Rights Reserved.
-
-  This program code listing is proprietary to SigmaTel and may not be copied,
-  distributed, or used without a license to do so.  Such license may have
-  Limited or Restricted Rights. Please refer to the license for further
-  clarification.
-  ____________________________________________________________________________
-
-  Notice: The program contained in this listing is a proprietary trade
-  secret of SigmaTel, Austin, Texas, and is copyrighted
-  under the United States Copyright Act of 1976 as an unpublished work,
-  pursuant to Section 104 and Section 408 of Title XVII of the United
-  States code. Unauthorized copying, adaption, distribution, use, or
-  display is prohibited by this law.
-  ____________________________________________________________________________
-  ____________________________________________________________________________
-
-  Revision History
-  Date      Who  Comment
-  ________  ___  _____________________________________________________________
-  07/21/06  clw  initial version
-============================================================================*/
 #pragma once
 #include "stdafx.h"
 #include "Device.h"

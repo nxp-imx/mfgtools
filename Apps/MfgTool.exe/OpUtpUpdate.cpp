@@ -16,7 +16,6 @@
 
 #include "../../Libs/DevSupport/StPitc.h"
 #include "../../Libs/DevSupport/RecoveryDevice.h"
-#include "../../Libs/DevSupport/StMtpApi.h"
 #include "../../Libs/DevSupport/StFormatImage.h"
 #include "../../Libs/DevSupport/StHidApi.h"
 #include "../../Libs/DevSupport/MxRomDevice.h"
