@@ -11,7 +11,6 @@
 #include "stdafx.h"
 #include "ConfigPlayerProfilePage.h"
 #include "PlayerProfile.h"
-#include "OpUclDlg.h"
 #include "ConfigUSBPortPage.h"
 #include "StMfgTool.h"
 //#include "DefaultProfile.h"
@@ -28,6 +27,7 @@ CConfigPlayerProfilePage::CConfigPlayerProfilePage(CWnd * cParent /*=NULL*/)
 	, m_hi_warning(0)
 	, m_hi_error(0)
 {
+	m_comboOptionItem = NULL;
 	m_p_player_profile = NULL; //new CPlayerProfile;
 }
 
@@ -846,6 +846,17 @@ void CConfigPlayerProfilePage::OnNMClickOperationsList(NMHDR *pNMHDR, LRESULT *p
 		*pResult = 1;
 	}
 
+	if (lvhti.iSubItem == COL_OP_OPTIONS)
+	{
+		POSITION pos = m_operations_ctrl.GetFirstSelectedItemPosition();
+		if (pos == NULL)
+			return;
+		int index = m_operations_ctrl.GetNextSelectedItem(pos);
+		COpInfo * pOpInfo = (COpInfo*)m_operations_ctrl.GetItemData(index);
+		m_comboOptionItem = m_operations_ctrl.ComboOptionItem(lvhti.iItem, lvhti.iSubItem, pOpInfo);
+		*pResult = 0;
+	}
+
 //    if (lvhti.flags & LVHT_ONITEMLABEL  && 
 //        lvhti.iItem == m_operations_ctrl.GetItemCount()-1 ){
 //            OpWorkerNew();
@@ -928,7 +939,7 @@ DWORD CConfigPlayerProfilePage::OpWorkerEnable(void)
 
 DWORD CConfigPlayerProfilePage::OpWorkerEdit()
 {
-	INT_PTR ret;
+	//INT_PTR ret;
     POSITION pos = m_operations_ctrl.GetFirstSelectedItemPosition();
     if (pos == NULL)
         return -1;
@@ -963,12 +974,12 @@ DWORD CConfigPlayerProfilePage::OpWorkerEdit()
 	    delete pOpEditor;
 	}
 	else 
-*/	if (pOpInfo->GetType() == COperation::UTP_UPDATE_OP || pOpInfo->GetType() == COperation::MX_UPDATE_OP)
+	if (pOpInfo->GetType() == COperation::UTP_UPDATE_OP || pOpInfo->GetType() == COperation::MX_UPDATE_OP)
 	{
 		COpUclDlg *pOpEditor = new COpUclDlg(this, pOpInfo); //new COpUtpUpdateDlg(this, pOpInfo);
 	    ret = pOpEditor->DoModal();
 	    delete pOpEditor;
-	}
+	}*/
 //	else if (pOpInfo->GetType() == COperation::MX_UPDATE_OP)
 //	{
 //		COpMxRomUpdateDlg *pOpEditor = new COpMxRomUpdateDlg(this, pOpInfo);
@@ -1102,9 +1113,9 @@ void CConfigPlayerProfilePage::OnListCtrlContextMenu(UINT nID)
 	case IDM_ENABLED:
 		OpWorkerEnable();
 		break;
-	case IDM_ST_EDIT:
+	/*case IDM_ST_EDIT:
         OpWorkerEdit();
-		break;
+		break;*/
 	case IDM_ST_MOVE_UP:
         OpWorkerMove(TRUE);
 		break;

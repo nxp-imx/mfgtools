@@ -55,6 +55,7 @@ protected:
 	HICON m_hi_ok;
 	HICON m_hi_warning;
 	HICON m_hi_error;
+	CComboBox * m_comboOptionItem;
 
 	virtual BOOL OnInitDialog();
 	DWORD LoadControlsFromProfile(CPlayerProfile * _pProfile);
