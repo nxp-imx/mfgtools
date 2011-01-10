@@ -42,9 +42,11 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_SIZE()
 	ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
 	ON_BN_CLICKED(ID_START_STOP_TOGGLE, OnBnClickedStartStopToggle)     // user pressed the start/stop button
+	ON_BN_CLICKED(ID_AUTO_SCAN, OnBnClickedAutoScan)                    // user pressed the Scan button
 	ON_COMMAND(ID_OPTIONS_CONFIGURATION, OnOptionsConfigurationMenu)	// user selected the Configuration menu
 //	ON_COMMAND(ID_OPTIONS_CLEAN_REGISTRY, OnOptionsCleanRegistryMenu)	// user selected the Clean Registry menu
 	ON_UPDATE_COMMAND_UI(ID_START_STOP_TOGGLE, OnUpdateStartStopToggle) // gray out the start button
+	ON_UPDATE_COMMAND_UI(ID_AUTO_SCAN, OnUpdateAutoScan)                // gray out the scan button
 //	ON_UPDATE_COMMAND_UI(IDCANCEL, OnUpdateExit)						// gray out the exit button
 	ON_WM_DESTROY()
 //	ON_COMMAND(ID_VIEW_LOG, OnViewLog)
@@ -224,6 +226,112 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
+void CMainFrame::OnBnClickedAutoScan()
+{	
+	// Re-write the profiles if there are the i.mx devices
+	BOOL bPortsScan = FALSE;
+	UINT uEnablePorts = 0;
+	usb::Port*	pPortMappings[MAX_PORTS] = {NULL};
+	uint8_t portIndex;
+	CString label; 
+
+	// Get the list of the USB Hubs
+	std::list<Device*> HubList = gDeviceManager::Instance()[DeviceClass::DeviceTypeUsbHub]->Devices();
+	std::list<Device*>::iterator hub;
+	for ( hub = HubList.begin(); hub != HubList.end(); ++hub )
+	{		
+		// cast our Device* to a usb::Hub*
+		usb::Hub* pHub = dynamic_cast<usb::Hub*>(*hub);
+		for ( portIndex = 1; portIndex <= pHub->GetNumPorts(); ++portIndex )
+		{
+			usb::Port* pPort = pHub->Port(portIndex);
+			if ( pPort->_device != NULL )
+			{
+				switch( pPort->_device->GetDeviceType() )
+				{
+					case DeviceClass::DeviceTypeMsc:
+						break;
+					case DeviceClass::DeviceTypeHid:
+                    case DeviceClass::DeviceTypeMxHid:
+					case DeviceClass::DeviceTypeMxRom:
+						label.Format(_T("%s"),pPort->_device->_description.get().c_str());
+						bPortsScan = TRUE;
+						pPortMappings[uEnablePorts] = pPort;
+						uEnablePorts ++;
+						break;
+				}
+				
+			}
+		}
+	}
+
+	if( bPortsScan )
+	{
+		UINT uPorts = m_p_config_mgr->GetMaxPorts();
+		// Destroy all the PortMgrDlg windows
+		for (UINT i = 0; i < uPorts; ++i)
+		{
+			for (HWND hWndChild = ::GetTopWindow(m_hWnd); hWndChild != NULL;
+				hWndChild = ::GetNextWindow(hWndChild, GW_HWNDNEXT))
+			{
+				CWnd* pWnd = CWnd::FromHandlePermanent(hWndChild);
+
+				if (pWnd->IsKindOf( RUNTIME_CLASS( CPortMgrDlg ) ) ){
+					pWnd->DestroyWindow();
+					break;
+				}
+			}
+		}
+		m_port_dlg_array.RemoveAll();
+
+		UINT testCount = 0;
+		//AfxGetApp()->WriteProfileInt(_T("Options"), _T("MaxUSBPorts"), m_MaxEnabledPorts);
+		AfxGetApp()->WriteProfileInt(_T("Options"), _T("EnabledPorts"), uEnablePorts);
+
+		// write out new port info
+		for( int i = 0; i < MAX_PORTS; ++i )
+		{
+			CString csPanel;
+
+			csPanel.Format(L"Panel %C", 'A' + i);
+			if( pPortMappings[i] )
+			{
+				AfxGetApp()->WriteProfileString(csPanel, _T("Hub Name"), pPortMappings[i]->GetName());
+				AfxGetApp()->WriteProfileInt(csPanel, _T("Hub Index"), (int)pPortMappings[i]->GetIndex());
+				++testCount;
+			}
+			else
+			{
+				AfxGetApp()->WriteProfileString(csPanel, _T("Hub Name"), L"");
+				AfxGetApp()->WriteProfileInt(csPanel, _T("Hub Index"), (int)-1);
+			}
+		}
+		ASSERT(testCount <= uEnablePorts);
+
+		m_DlgBar.SetEnabledPorts(uEnablePorts);
+		m_DlgBar.SetProfileStatus();
+
+		// Re-create the Port Dialogs
+		for ( UINT i=0; i<m_p_config_mgr->GetMaxPorts(); ++i ) {
+			CPortMgrDlg * new_port_dlg = new CPortMgrDlg(this, i);
+			if (new_port_dlg && new_port_dlg->Create(this, IDD_PORT_DLG,
+				CBRS_LEFT|CBRS_TOOLTIPS|CBRS_FLYBY|CBRS_BORDER_ANY, AFX_IDW_CONTROLBAR_FIRST + 1 + i)) 
+			{
+					m_port_dlg_array.Add(new_port_dlg);
+			}
+			else {
+				TRACE1("Failed to create Port %d DlgBar\n", i+1);
+				return;      // fail to create
+			}
+		}
+			
+		theApp.WriteProfileInt(_T("Options"), _T("Refresh"), 0x0000);
+
+		// This resizes appropriately and displays the window
+		ActivateFrame();
+	}
+}
+
 void CMainFrame::OnBnClickedStartStopToggle()
 {
 	HWND hwnd; CPortMgrDlg* dlg;
@@ -329,6 +437,13 @@ void CMainFrame::OnUpdateExit(CCmdUI *pCmdUI)
 
 }
 
+void CMainFrame::OnUpdateAutoScan(CCmdUI *pCmdUI)
+{
+	if (m_start == RUNNING)
+		pCmdUI->Enable(FALSE);
+	else
+		pCmdUI->Enable(TRUE);
+}
 
 // gray out the Start button if there is no valid Player 
 // Profile or no assigned Port Dlgs

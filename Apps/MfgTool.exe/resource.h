@@ -614,6 +614,7 @@
 #define ID_VIEW_S                       32774
 #define ID_OPTIONS_CLEAN_REGISTRY       32775
 #define ID_POPUP_SHOW_DETAILS           32776
+#define ID_AUTO_SCAN                    32777
 #define IDM_ST_NEW                      32780
 #define IDM_ST_EDIT                     32781
 #define IDM_ST_DELETE                   32782

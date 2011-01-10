@@ -25,6 +25,7 @@ public:
 	UINT GetMaxPorts(void) { return m_MaxEnabledPorts; };
 	void SetStale(UINT_PTR _missed_msg);
 	INT_PTR GetNumEnabledPorts(void) { return m_num_enabled_ports; };
+	void SetNumEnabledPorts(INT_PTR iNumEnabledPorts) {m_num_enabled_ports = iNumEnabledPorts;};
 	INT_PTR AddRef(void) { if (m_num_enabled_ports == m_MaxEnabledPorts) return 0; else return ++m_num_enabled_ports; };
 	INT_PTR Release(void) { ASSERT(m_num_enabled_ports);  return --m_num_enabled_ports; };
 // Dialog Data

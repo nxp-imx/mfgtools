@@ -39,6 +39,7 @@ public:
 	CPlayerProfile* GetPlayerProfile(void) { return m_player_profile_page.GetProfile(); };
 	UINT GetMaxPorts(void) { return m_usb_port_page.GetMaxPorts(); };
 	INT_PTR GetNumEnabledPorts(void) { return m_usb_port_page.GetNumEnabledPorts(); };
+	void SetNumEnabledPorts(INT_PTR iNumEnabledPorts) { m_usb_port_page.SetNumEnabledPorts(iNumEnabledPorts); };
 	INT_PTR AddRefPort(void) { return m_usb_port_page.AddRef(); };
 	INT_PTR ReleasePort(void) { return m_usb_port_page.Release(); };
 	void SetUSBPageStale(UINT_PTR _missed_msg) { m_usb_port_page.SetStale(_missed_msg); };

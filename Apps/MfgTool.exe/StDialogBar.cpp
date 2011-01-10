@@ -331,6 +331,11 @@ void CStDialogBar::SelectProfile(CString _csProfile)
 	SetProfileStatus();
 }
 
+void CStDialogBar::SetEnabledPorts(INT_PTR iNumEnabledPorts)
+{
+	m_p_config_mgr->SetNumEnabledPorts(iNumEnabledPorts);
+}
+
 void CStDialogBar::SetProfileStatus()
 {
 	CString csVersion, resStr;
