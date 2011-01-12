@@ -137,6 +137,7 @@ public:
 //	int GetRklFilenameIndex(void) { return m_rkl_fname_list_index; };
 	CString GetOTPRegisterValue(void) { return m_csOTPValue; };
 	CString GetUclInstallSection() { return m_UclInstallSection; };
+	void SetUclInstallSection(CString csSection) { m_UclInstallSection = csSection; };
 
 protected:
     INT_PTR ReplaceIniLine(LPCTSTR _section, LPCTSTR _string, INT_PTR _line);

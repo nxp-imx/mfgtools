@@ -79,17 +79,22 @@ public:
 	BOOL	DeleteItem(int nItem);
 	CString GetItemToolTipText(int nItem, int nSubItem);
 
+	CComboBox * ComboOptionItem( int nItem,  int nSubItem, COpInfo * pOpInfo);
+	COpInfo * m_pOpInfo;
+
 protected:
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnNMCustomDraw(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult);
 	virtual afx_msg BOOL OnToolTipText(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 	virtual BOOL OnToolHitTest(CPoint point, TOOLINFO * pTI) const;
     afx_msg void OnDestroy();
     int GetColumns(void);
     void UpdateSubItem(int nItem, int nSubItem);
+	void LoadCommandLists(CComboBox * pOptionList,COpInfo* pOpInfo);
 public:
 //    afx_msg int OnCharToItem(UINT nChar, CListBox* pListBox, UINT nIndex);
     afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
@@ -97,3 +102,43 @@ public:
 };
 
 
+/////////////////////////////////////////////////////////////////////////////
+// CComboOptionItem window
+class CComboOptionItem : public CComboBox
+{
+// Construction
+public:
+	CComboOptionItem( int nItem, int nSubItem);
+
+// Attributes
+public:
+
+// Operations
+public:
+
+// Overrides
+	// ClassWizard generated virtual function overrides
+	//{{AFX_VIRTUAL(CComboOptionItem)
+	public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	//}}AFX_VIRTUAL
+
+// Implementation
+public:
+	virtual ~CComboOptionItem();
+
+	// Generated message map functions
+protected:
+	int m_nSubItem;
+	int m_nItem;
+	BOOL m_bVK_ESCAPE;
+	//{{AFX_MSG(CComboOptionItem)
+	afx_msg void OnNcDestroy();
+	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnKillFocus(CWnd* pNewWnd);
+	afx_msg void OnCloseup();
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	//}}AFX_MSG
+
+	DECLARE_MESSAGE_MAP()
+};

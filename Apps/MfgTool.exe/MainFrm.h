@@ -51,11 +51,13 @@ protected:
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnClose();
 	afx_msg void OnBnClickedStartStopToggle();
+	afx_msg void OnBnClickedAutoScan();
 	afx_msg void OnOptionsConfigurationMenu();
 //	afx_msg void OnOptionsCleanRegistryMenu();
 	afx_msg void OnUpdateOptionsConfiguration(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateExit(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateStartStopToggle(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateAutoScan(CCmdUI *pCmdUI);
     afx_msg LRESULT OnLogEvent(WPARAM _event_type, LPARAM _event_data);
     afx_msg LRESULT OnLogOpEvent(WPARAM _event_type, LPARAM _event_data);
 	afx_msg LRESULT OnStatusUpdate(WPARAM _status, LPARAM _elapsedTime);

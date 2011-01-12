@@ -953,7 +953,7 @@ BOOL MxHidDevice::RunPlugIn(CString fwFilename)
     
 	//Search for IVT
     pPlugIn = (DWORD *)pDataBuf;
-    while(pPlugIn[ImgIVTOffset/sizeof(DWORD)] != IVT_BARKER_HEADER || ImgIVTOffset >= fwSize)
+    while(pPlugIn[ImgIVTOffset/sizeof(DWORD)] != IVT_BARKER_HEADER && ImgIVTOffset <= fwSize)
 		ImgIVTOffset+= 0x100;
 	
 	if(ImgIVTOffset >= fwSize)
@@ -962,7 +962,7 @@ BOOL MxHidDevice::RunPlugIn(CString fwFilename)
 	pIVT = (PIvtHeader) (pPlugIn + ImgIVTOffset/sizeof(DWORD));
 	DWORD IVT2Offset = ImgIVTOffset + sizeof(IvtHeader);
 
-	while(pPlugIn[IVT2Offset/sizeof(DWORD)] != IVT_BARKER_HEADER || IVT2Offset >= fwSize)
+	while(pPlugIn[IVT2Offset/sizeof(DWORD)] != IVT_BARKER_HEADER && IVT2Offset <= fwSize)
 		IVT2Offset+= sizeof(DWORD);
 	
 	if(IVT2Offset >= fwSize)

@@ -30,6 +30,7 @@ public:
 	CString WhatProfile(void);
 	void ClearProfiles();
 	void SetProfiles(void);
+	void SetEnabledPorts(INT_PTR iNumEnabledPorts);
 
 	CStColorBtn		m_StartStopBtn;
 	ULONG			m_SuccessfulOps;

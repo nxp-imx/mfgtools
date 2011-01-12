@@ -255,10 +255,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\OpUclDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\OpUtpUpdate.cpp"
 				>
 			</File>
@@ -358,10 +354,6 @@
 			</File>
 			<File
 				RelativePath=".\OpMxRomUpdate.h"
-				>
-			</File>
-			<File
-				RelativePath=".\OpUclDlg.h"
 				>
 			</File>
 			<File

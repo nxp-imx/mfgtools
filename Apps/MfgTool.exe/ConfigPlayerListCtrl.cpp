@@ -10,8 +10,8 @@
 
 #include "stdafx.h"
 #include "ConfigPlayerListCtrl.h"
-#include "PlayerProfile.h"
-#include "OpInfo.h"
+#include "UpdateCommandList.h"
+#include "ConfigPlayerProfilePage.h"
 
 // CConfigPlayerOpInfoListCtrl
 
@@ -33,6 +33,7 @@ BEGIN_MESSAGE_MAP(CConfigPlayerListCtrl, CListCtrl)
 	ON_WM_RBUTTONDOWN()
 	ON_WM_HSCROLL()
 	ON_WM_VSCROLL()
+	ON_NOTIFY_REFLECT(LVN_ENDLABELEDIT, OnEndlabeledit)
 	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnNMCustomDraw)
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFF, OnToolTipText)
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTA, 0, 0xFFFF, OnToolTipText)
@@ -619,8 +620,8 @@ void CConfigPlayerListCtrl::OnContextMenu(CWnd* pWnd, CPoint point)
 
 //	cntxtMenu.InsertMenuItem( 1, &mii, TRUE);
 
-	resStr.LoadString(IDS_MENU_EDIT);
-	cntxtMenu.AppendMenu(MF_STRING | (bCanEdit ? MF_ENABLED : (MF_GRAYED | MF_DISABLED)), IDM_ST_EDIT, resStr);
+//	resStr.LoadString(IDS_MENU_EDIT);
+//	cntxtMenu.AppendMenu(MF_STRING | (bCanEdit ? MF_ENABLED : (MF_GRAYED | MF_DISABLED)), IDM_ST_EDIT, resStr);
 //	resStr.LoadString(IDS_MENU_DELETE);
 //	cntxtMenu.AppendMenu(MF_STRING | (bCanEdit ? MF_ENABLED : (MF_GRAYED | MF_DISABLED)), IDM_ST_DELETE, resStr);
 	cntxtMenu.AppendMenu(MF_SEPARATOR , MF_SEPARATOR   ,	_T("") );
@@ -631,3 +632,217 @@ void CConfigPlayerListCtrl::OnContextMenu(CWnd* pWnd, CPoint point)
 	selection = cntxtMenu.TrackPopupMenu(TPM_LEFTALIGN, point.x+10, point.y, GetParent(), NULL); 
 	cntxtMenu.DestroyMenu();
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// CComboOptionItem
+CComboBox * CConfigPlayerListCtrl::ComboOptionItem(int nItem, int nSubItem, COpInfo * pOpInfo)
+{
+	CString strFind = GetItemText(nItem, nSubItem);
+
+	//basic code start
+	CRect rect;
+	int offset = 0;
+	// Make sure that the item is visible
+	if( !EnsureVisible(nItem, TRUE)) 
+		return NULL;
+
+	GetSubItemRect(nItem, nSubItem, LVIR_BOUNDS, rect);
+	// Now scroll if we need to expose the column
+	CRect rcClient;
+	GetClientRect(rcClient);
+	if( offset + rect.left < 0 || offset + rect.left > rcClient.right )
+	{
+		CSize size;
+		size.cx = offset + rect.left;
+		size.cy = 0;
+		Scroll(size);
+		rect.left -= size.cx;
+	}
+	
+	rect.left += offset;	
+	rect.right = rect.left + GetColumnWidth(nSubItem);
+	if(rect.right > rcClient.right) 
+	   rect.right = rcClient.right;
+	//basic code end
+
+	rect.bottom += 100 * rect.Height();//dropdown area
+	
+	DWORD dwStyle =  WS_CHILD|WS_VISIBLE|WS_VSCROLL|CBS_DROPDOWNLIST;
+	CComboBox * pComboOptionItem = new CComboOptionItem(nItem, nSubItem);
+	pComboOptionItem->Create(dwStyle, rect, this, NULL);
+	pComboOptionItem->ModifyStyleEx(0,WS_EX_CLIENTEDGE);
+	
+	LoadCommandLists(pComboOptionItem, pOpInfo);
+
+	pComboOptionItem->ShowDropDown();
+	pComboOptionItem->SelectString(-1, strFind.GetBuffer(1));
+
+	m_pOpInfo = pOpInfo;
+	// The returned pointer should not be saved
+	return pComboOptionItem;
+}
+
+void CConfigPlayerListCtrl::LoadCommandLists(CComboBox * pOptionList,COpInfo* pOpInfo)
+{
+    USES_CONVERSION;
+
+	CFile commandFile;
+	CFileException fileException;
+	UCL	  uclNode;
+	LPCTSTR filename = pOpInfo->GetUclPathname();
+
+	pOptionList->ResetContent();
+
+	if( commandFile.Open(filename, CFile::modeRead, &fileException) )
+	{
+		CStringT<char,StrTraitMFC<char> > uclString;
+		commandFile.Read(uclString.GetBufferSetLength((int)commandFile.GetLength()), (UINT)commandFile.GetLength());
+		uclString.ReleaseBuffer();
+
+		if ( uclNode.Load(A2T(uclString)) != NULL )
+		{
+			UCL::CommandLists lists = uclNode.GetCommandLists();
+
+			UCL::CommandLists::iterator it = lists.begin();
+			for( ; it != lists.end(); ++(it))
+			{
+				int index = pOptionList->AddString(CString((*it)->GetName()));
+				pOptionList->SetItemDataPtr(index, (*it));
+			}
+
+			if ( pOptionList->SelectString(0, pOpInfo->GetUclInstallSection()) == CB_ERR )
+				pOptionList->SetCurSel(0);
+		}
+		else
+		{
+			TRACE( _T("Can't parse ucl.xml file.\n"));
+		}
+	}
+	else
+	{
+		TRACE( _T("Can't open file %s, error = %u\n"), pOpInfo->GetUclPathname(), fileException.m_cause );
+	}
+}
+
+void CConfigPlayerListCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+	LV_DISPINFO *plvDispInfo = (LV_DISPINFO*)pNMHDR;
+ 	LV_ITEM *plvItem = &plvDispInfo->item;
+
+	if( plvItem->iItem != -1 &&  // valid item
+		plvItem->pszText )		// valid text
+	{
+		SetItemText( plvItem->iItem, plvItem->iSubItem, plvItem->pszText ,-1 , RGBDEF_VALID);
+		m_pOpInfo->SetUclInstallSection(plvItem->pszText);
+	}
+
+	*pResult = 0;
+}
+
+CComboOptionItem::CComboOptionItem( int nItem, int nSubItem)
+{
+	m_nItem		= nItem;
+	m_nSubItem	= nSubItem;
+
+	m_bVK_ESCAPE = FALSE;
+}
+
+CComboOptionItem::~CComboOptionItem()
+{
+}
+
+BEGIN_MESSAGE_MAP(CComboOptionItem, CComboBox)
+	//{{AFX_MSG_MAP(CComboOptionItem)
+	ON_WM_NCDESTROY()
+	ON_WM_CHAR()
+	ON_WM_KILLFOCUS()
+	ON_CONTROL_REFLECT(CBN_CLOSEUP, OnCloseup)
+	ON_WM_CREATE()
+	//}}AFX_MSG_MAP
+END_MESSAGE_MAP()
+
+/////////////////////////////////////////////////////////////////////////////
+// CComboOptionItem message handlers
+BOOL CComboOptionItem::PreTranslateMessage(MSG* pMsg) 
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if( pMsg->message == WM_KEYDOWN )	
+	{		
+		if(pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)	
+		{
+			::TranslateMessage(pMsg);
+			::DispatchMessage(pMsg);			
+			return 1;
+		}	
+	}	
+	
+	return CComboBox::PreTranslateMessage(pMsg);
+}
+
+void CComboOptionItem::OnNcDestroy() 
+{
+	CComboBox::OnNcDestroy();
+	
+	// TODO: Add your message handler code here
+	delete this;	
+}
+
+void CComboOptionItem::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags) 
+{
+	// TODO: Add your message handler code here and/or call default
+	if(nChar == VK_ESCAPE || nChar == VK_RETURN)	
+	{		
+		if( nChar == VK_ESCAPE)
+			m_bVK_ESCAPE = 1;
+		GetParent()->SetFocus();		
+		return;	
+	}	
+	
+	CComboBox::OnChar(nChar, nRepCnt, nFlags);
+}
+
+void CComboOptionItem::OnKillFocus(CWnd* pNewWnd) 
+{
+	int nIndex = GetCurSel();
+
+	CComboBox::OnKillFocus(pNewWnd);
+
+	CString str;	
+	GetWindowText(str);
+	// Send Notification to parent of ListView ctrl	
+	LV_DISPINFO lvDispinfo;
+	lvDispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
+	lvDispinfo.hdr.idFrom = GetDlgCtrlID();//that's us
+	lvDispinfo.hdr.code = LVN_ENDLABELEDIT;
+	lvDispinfo.item.mask = LVIF_TEXT | LVIF_PARAM;	
+	lvDispinfo.item.iItem = m_nItem;
+	lvDispinfo.item.iSubItem = m_nSubItem;
+	lvDispinfo.item.pszText = m_bVK_ESCAPE ? NULL : LPTSTR((LPCTSTR)str);
+	lvDispinfo.item.cchTextMax = str.GetLength();
+	lvDispinfo.item.lParam = GetItemData(GetCurSel());
+	if(nIndex!=CB_ERR)
+		GetParent()->GetParent()->SendMessage(
+			WM_NOTIFY,
+			GetParent()->GetDlgCtrlID(),
+			(LPARAM)&lvDispinfo);
+	PostMessage(WM_CLOSE);
+}
+
+void CComboOptionItem::OnCloseup() 
+{
+	GetParent()->SetFocus();	
+}
+
+int CComboOptionItem::OnCreate(LPCREATESTRUCT lpCreateStruct) 
+{
+	if (CComboBox::OnCreate(lpCreateStruct) == -1)
+		return -1;
+	
+	CFont* font = GetParent()->GetFont();	
+	SetFont(font);
+
+	SetFocus();	
+	
+	return 0;
+}
+
