@@ -1,8 +1,6 @@
 #!/bin/bash 
 
 SELF=`basename $0`
-RELEASE_DIR=temp.Linux
-
 
 function do_version() {
 
@@ -23,7 +21,8 @@ function do_version() {
 
 
 VERSION=`do_version`
-LOG=mfgtool_${VERSION}.log
+LOG=mfgtool.v${VERSION}.log
+RELEASE_DIR=mfgtool.v${VERSION}.SRC
 
 
 function myecho() {
@@ -71,95 +70,117 @@ function clean_up() {
 
 function copy_apps_files() {
 
-	mkdir -p ${RELEASE_DIR}/Apps
-	cp -rpa Apps/MfgTool.exe ${RELEASE_DIR}/Apps/
-	if [ $? -ne 0 ] ; then
-		myecho "${FUNCNAME}: error: could not copy files" ${LOG} 
-		exit
-	fi
+	mkdir -p ${RELEASE_DIR}/Apps/MfgTool.exe
+#	FILE_LIST={ls ./Apps/MfgTool.exe --ignore='Release' --ignore='Debug'}
+#	for file in ${FILE_LIST} ; do
+#		cp -rpa Apps/MfgTool.exe/${file} ./${RELEASE_DIR}/Apps/MfgTool.exe
+#	done
+	cp -d --preserve=all Apps/MfgTool.exe/* ${RELEASE_DIR}/Apps/MfgTool.exe
+#	cpret=$?
+#	if [ $cpret -ne 0 ] ; then
+#		echo $cpret
+#		myecho "${FUNCNAME}: error: could not copy files" ${LOG} 
+#		exit
+#	fi
+	clean_up_by_extension ${RELEASE_DIR}/Apps/MfgTool.exe "aps bak bat user ncb suo log"
+	
+	mkdir ${RELEASE_DIR}/Apps/MfgTool.exe/res
+	cp -d --preserve=all Apps/MfgTool.exe/res/* ${RELEASE_DIR}/Apps/MfgTool.exe/res/
+
+	mkdir ${RELEASE_DIR}/Apps/MfgTool.exe/docs
+#	DOCS_LIST="'Build Requirements.pdf' changelog.txt"
+	cp -d --preserve=all Apps/MfgTool.exe/docs/"Build Requirements.pdf" ${RELEASE_DIR}/Apps/MfgTool.exe/docs
+	cp -d --preserve=all Apps/MfgTool.exe/docs/changelog.txt ${RELEASE_DIR}/Apps/MfgTool.exe/docs
+#	for file in ${DOCS_LIST} ; do
+#		if [ $? -ne 0 ] ; then
+#			myecho "${FUNCNAME}: error: could not copy $file" ${LOG}
+#		fi
+#	done
+	
+#	local LICENSE_LIST="EULA Third' 'Party' 'Components.txt"
+#	for file in ${LICENSE_LIST} ; do
+#		cp -d --preserve=all Apps/MfgTool.exe/docs/${file} ${RELEASE_DIR}/${file}
+#		if [ $? -ne 0 ] ; then
+#			myecho "${FUNCNAME}: error: could not copy $file" ${LOG}
+#		fi
+#	done
+	cp -d --preserve=all Apps/MfgTool.exe/docs/EULA ${RELEASE_DIR}
+	cp -d --preserve=all Apps/MfgTool.exe/docs/"Third Party Components.txt" ${RELEASE_DIR}
+
 	return
 }
 
 function copy_common_files() {
 	
-	DELETE_LIST="scsidefs.h wnaspi32.h"
+#	DELETE_LIST="scsidefs.h wnaspi32.h"
 	cp -rpa Common ${RELEASE_DIR}/
-	for file in ${DELETE_LIST} ; do
-		rm ${RELEASE_DIR}/Common/${file}
-		if [ $? -ne 0 ] ; then
-			myecho "${FUNCNAME}: error: could not delete $file" ${LOG}
-		fi
-	done
+#	for file in ${DELETE_LIST} ; do
+#		rm ${RELEASE_DIR}/Common/${file}
+#		if [ $? -ne 0 ] ; then
+#			myecho "${FUNCNAME}: error: could not delete $file" ${LOG}
+#		fi
+#	done
 	return
 }
 
 function copy_drivers_files() {
 
+	mkdir -p ${RELEASE_DIR}/Drivers/iMX_BulkIO_Driver/sys
+
+	cp -rpa Drivers/iMX_BulkIO_Driver/sys/public.h ${RELEASE_DIR}/Drivers/iMX_BulkIO_Driver/sys
+	if [ $? -ne 0 ] ; then
+		myecho "${FUNCNAME}: error: could not copy Drivers/iMX_BulkIO_Driver/sys/public.h" ${LOG}
+	fi
 	return
 	
-}
-
-function copy_resources_files() {
-
-	mkdir -p ${RELEASE_DIR}/Resources
-	for file in closedfolder.BMP openfolder.bmp resourcefile.bmp freescale_logo.bmp ; do
-		cp Resources/${file} ${RELEASE_DIR}/Resources/${file}
-		if [ $? -ne 0 ] ; then
-			myecho "${FUNCNAME}: error: could not copy ${file}" ${LOG}
-			exit
-		fi
-	done	
 }
 
 function copy_libs_files() {
 
 	# DevSupport
-	mkdir -p ${RELEASE_DIR}/Libs/{,DevSupport}
-	remove_stuff Libs/ "Release Debug"
+	mkdir -p ${RELEASE_DIR}/Libs/DevSupport
 
-	clean_up_by_extension Libs/DevSupport "bak user ncb suo"
-
-	cp -rpa Libs/DevSupport/[A-z]* ${RELEASE_DIR}/Libs/DevSupport
-	if [ $? -ne 0 ] ; then
-		myecho "${FUNCNAME}: error: could not copy DevSupport"
-		exit
-	fi
+#	FILE_LIST={ls ./Libs/DevSupport --ignore='Release' --ignore='Debug'}
+#	for file in ${FILE_LIST} ; do
+#		cp -rpa Libs/DevSupport/${file} ./${RELEASE_DIR}/Libs/DevSupport
+#	done
+	cp -d --preserve=all Libs/DevSupport/* ${RELEASE_DIR}/Libs/DevSupport
+#	cpret=$?
+#	if [ $cpret -ne 0 ] ; then
+#		echo $cpret
+#		myecho "${FUNCNAME}: error: could not copy DevSupport" ${LOG} 
+#		exit
+#	fi
+	clean_up_by_extension ${RELEASE_DIR}/Libs/DevSupport "aps bak bat user ncb suo log"
 
 	# Loki
 	mkdir -p ${RELEASE_DIR}/Libs/Loki
 	cp -rpa Libs/Loki/[A-z]* ${RELEASE_DIR}/Libs/Loki
 
-	# WinSupport
-	mkdir -p ${RELEASE_DIR}/Libs/WinSupport
-	remove_stuff Libs/WinSupport "Release Debug"	
-	clean_up_by_extension Libs/WinSupport "bak user ncb suo"
+	# Public
+	mkdir -p ${RELEASE_DIR}/Libs/Public
+	cp -rpa Libs/Public/[A-z]* ${RELEASE_DIR}/Libs/Public
 
-	cp -rpa Libs/WinSupport/* ${RELEASE_DIR}/Libs/WinSupport
-
-	# Remainder
-	mkdir -p ${RELEASE_DIR}/Libs/OtpAccessPitc/bin/Debug
-	cp Libs/OtpAccessPitc/StOtpAccessPitc.h ${RELEASE_DIR}/Libs/OtpAccessPitc/StOtpAccessPitc.h
-	cp Libs/OtpAccessPitc/bin/OtpAccess.* ${RELEASE_DIR}/Libs/OtpAccessPitc/bin
-	cp Libs/OtpAccessPitc/bin/Debug/OtpAccess.* ${RELEASE_DIR}/Libs/OtpAccessPitc/bin/Debug
-
-	mkdir -p ${RELEASE_DIR}/Libs/OtpAccessPitc/bin/VS2005{,/Debug}
-	cp Libs/OtpAccessPitc/bin/VS2005/OtpAccess.* ${RELEASE_DIR}/Libs/OtpAccessPitc/bin/VS2005
-	cp Libs/OtpAccessPitc/bin/VS2005/Debug/OtpAccess.* \
-		${RELEASE_DIR}/Libs/OtpAccessPitc/bin/VS2005/Debug
-	
 	return
 }
 
-
 # the real stuff is here
+rm -f ${LOG}
 myecho "status: preparing release package version ${VERSION}" ${LOG}
-myecho "status: clean up" ${LOG}
-clean_up
+myecho "status: remove existing release directory ${RELEASE_DIR}" ${LOG}
+rm -rf ${RELEASE_DIR}
 
-myecho "status: copy files" ${LOG}
-for foo in apps common drivers resources libs ; do
+for foo in apps common drivers libs ; do
 	myecho "status: running copy_${foo}_files" ${LOG}
 	copy_${foo}_files
+done
+
+LICENSE_LIST="COPYING.CPOL COPYING.MIT"
+for file in ${LICENSE_LIST} ; do
+	cp -d --preserve=all ${file} ${RELEASE_DIR}/${file}
+	if [ $? -ne 0 ] ; then
+		myecho "${FUNCNAME}: error: could not copy $file" ${LOG}
+	fi
 done
 
 

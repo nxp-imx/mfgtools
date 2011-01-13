@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * Copyright (C) 2009-2011, Freescale Semiconductor, Inc. All Rights Reserved.
  * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
  * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
  * Freescale Semiconductor, Inc.
@@ -207,8 +207,11 @@ LRESULT CPortMgrDlg::OnInitDialog(UINT wParam, LONG lParam)
 	}
 
 //	m_port_progress_ctrl.SubclassDlgItem(IDC_PORT_PROGRESS, this);
-	if ( gWinVersionInfo().IsWinXPSP1() || gWinVersionInfo().IsWinXPSP2() )
+	if ( gWinVersionInfo().IsWinXPSP1() || gWinVersionInfo().IsWinXPSP2() || gWinVersionInfo().IsWinXPSP3() ||
+		 gWinVersionInfo().IsVista() || gWinVersionInfo().IsWin7() )
+	{
 		SetWindowTheme (m_port_progress_ctrl.GetSafeHwnd(), TEXT (" "), TEXT (" "));
+	}
 
 	return bRet;
 }
@@ -902,36 +905,19 @@ void CPortMgrDlg::OnNcPaint()
     // get window DC that is clipped to the non-client area
     CWindowDC dc(this);
 	dc.SetBkColor(RGBDEF_INCOMPLETE);
-//void CSizingControlBarCF::NcPaintGripper(CDC* pDC, CRect rcClient)
-//{
-//    if (!HasGripper())
-//        return;
 
     // compute the caption rectangle
-    BOOL bHorz = FALSE; //IsHorzDocked();
     CRect rcGrip; GetClientRect(&rcGrip);
-//    CRect rcBtn = m_biHide.GetRect();
-    if (bHorz)
-    {   // right side gripper
-        rcGrip.left -= 12 + 1;
-        rcGrip.right = rcGrip.left + 11;
-//        rcGrip.top = rcBtn.bottom + 3;
-    }
-    else
-    {   // gripper at top
-        rcGrip.top -= 12 + 1;
-        rcGrip.bottom = rcGrip.top + 11;
-//clw        rcGrip.right = rcBtn.left - 3;
-    }
-    rcGrip.InflateRect(bHorz ? 1 : 0, bHorz ? 0 : 1);
+
+    // gripper at top
+    rcGrip.top -= 12 + 1;
+    rcGrip.bottom = rcGrip.top + 11;
+    rcGrip.InflateRect(0, 1);
 
     // draw the caption background
-    //CBrush br;
-    COLORREF clrCptn = 1/*m_bActive*/ ?
-        ::GetSysColor(COLOR_ACTIVECAPTION) :
-        ::GetSysColor(COLOR_INACTIVECAPTION);
+    COLORREF clrCptn = ::GetSysColor(COLOR_ACTIVECAPTION);
 
-    // query gradient info (usually TRUE for Win98/Win2k)
+    // get gradient info
     BOOL bGradient = FALSE;
     ::SystemParametersInfo(SPI_GETGRADIENTCAPTIONS, 0, &bGradient, 0);
     
@@ -941,9 +927,7 @@ void CPortMgrDlg::OnNcPaint()
     {
         // gradient from left to right or from bottom to top
         // get second gradient color (the right end)
-        COLORREF clrCptnRight =1/* m_bActive*/ ?
-            ::GetSysColor(COLOR_GRADIENTACTIVECAPTION) :
-            ::GetSysColor(COLOR_GRADIENTINACTIVECAPTION);
+        COLORREF clrCptnRight = ::GetSysColor(COLOR_GRADIENTACTIVECAPTION);
 
         // this will make 2^6 = 64 fountain steps
         int nShift = 6;
@@ -963,24 +947,12 @@ void CPortMgrDlg::OnNcPaint()
 
             // then paint with the resulting color
             CRect r2 = rcGrip;
-            if (bHorz)
-            {
-                r2.bottom = rcGrip.bottom - 
-                    ((i * rcGrip.Height()) >> nShift);
-                r2.top = rcGrip.bottom - 
-                    (((i + 1) * rcGrip.Height()) >> nShift);
-                if (r2.Height() > 0)
-                    dc.FillSolidRect(r2, cr);
-            }
-            else
-            {
-                r2.left = rcGrip.left + 
-                    ((i * rcGrip.Width()) >> nShift);
-                r2.right = rcGrip.left + 
-                    (((i + 1) * rcGrip.Width()) >> nShift);
-                if (r2.Width() > 0)
-                    dc.FillSolidRect(r2, cr);
-            }
+            r2.left = rcGrip.left + 
+                ((i * rcGrip.Width()) >> nShift);
+            r2.right = rcGrip.left + 
+                (((i + 1) * rcGrip.Width()) >> nShift);
+            if (r2.Width() > 0)
+                dc.FillSolidRect(r2, cr);
         }
     }
 }

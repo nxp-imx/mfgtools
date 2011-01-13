@@ -40,7 +40,7 @@ BEGIN
             VALUE "FileDescription", "i.MX Manufacturing Tool"
             VALUE "FileVersion", STMFGTOOL_STRING_VERSION GIT_VERSION
             VALUE "InternalName", "MfgTool.exe"
-            VALUE "LegalCopyright", "Copyright (c) 2009-2010, Freescale Semiconductor, Inc. \nAll Rights Reserved"
+            VALUE "LegalCopyright", "Copyright (c) 2009-2011, Freescale Semiconductor, Inc. \nAll Rights Reserved"
             VALUE "OriginalFilename", "MfgTool.exe"
             VALUE "ProductName", "i.MX Manufacturing Tool"
             VALUE "ProductVersion", STMFGTOOL_STRING_VERSION GIT_VERSION

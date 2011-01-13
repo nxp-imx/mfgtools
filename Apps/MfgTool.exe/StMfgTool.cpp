@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * Copyright (C) 2009-2011, Freescale Semiconductor, Inc. All Rights Reserved.
  * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
  * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
  * Freescale Semiconductor, Inc.
@@ -349,7 +349,7 @@ void CStMfgToolApp::OnAppAbout()
 	{
 		desc_text = _T("i.MX Manufacturing Tool");
 		version_text = _T("Version resource not found");
-		copyright_text = _T("Copyright (c) 2009-2010, Freescale Semiconductor, Inc.\nAll Rights Reserved");
+		copyright_text = _T("Copyright (c) 2009-2011, Freescale Semiconductor, Inc.\nAll Rights Reserved");
 	}
 	
 	CStSplashWnd::ShowSplashScreen(5000, IDB_COMPANY_BMP, desc_text, version_text, copyright_text, m_pMainWnd);

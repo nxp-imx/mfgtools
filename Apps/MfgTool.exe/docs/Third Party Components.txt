@@ -1,0 +1,7 @@
+Package                                 License                                     Code Download URL                                    Modified?   
+---------------                         -------                                     --------------------------                           ------------
+Libs/Public/XMLite.cpp/h                The Code Project Open License (CPOL)        http://www.codeproject.com/KB/recipes/xmlite.aspx    Yes
+Libs/Public/StColorBtn.cpp/h            Public Domain                               http://www.codeproject.com/KB/buttons/colorbox.aspx  Yes
+Libs/Public/VersionInfo.cpp/h           Non-standard Open Source License            http://www.naughter.com/versioninfo.html             No
+Libs/Public/StdString.h                 Public Domain                               http://www.codeproject.com/KB/string/stdstring.aspx  No
+Libs/Loki/*                             MIT License                                 http://sourceforge.net/projects/loki-lib/            No

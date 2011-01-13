@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * Copyright (C) 2009-2011, Freescale Semiconductor, Inc. All Rights Reserved.
  * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
  * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
  * Freescale Semiconductor, Inc.
@@ -8,5 +8,5 @@
 
 #define STMFGTOOL_MAJOR_VERSION 6
 #define STMFGTOOL_MINOR_VERSION 2
-#define STMFGTOOL_REVISION      028
-#define STMFGTOOL_STRING_VERSION "1.6.2.028"
+#define STMFGTOOL_REVISION      029
+#define STMFGTOOL_STRING_VERSION "1.6.2.029"

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, Freescale Semiconductor, Inc. All Rights Reserved.
+ * Copyright (C) 2009-2011, Freescale Semiconductor, Inc. All Rights Reserved.
  * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
  * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
  * Freescale Semiconductor, Inc.
@@ -10,7 +10,7 @@
 #include "Libs/Public/StdString.h"
 
 // WindowsVersionInfo
-#define BUFSIZE 80
+#define BUFSIZE 256
 
 class WindowsVersionInfo
 {
@@ -24,6 +24,9 @@ class WindowsVersionInfo
 	bool IsWmp10() { return m_bMTPSupported; };
 	bool IsWinXPSP1() { return (m_osvi.dwMajorVersion == 5 && m_osvi.dwMinorVersion >= 1 && m_osvi.wServicePackMajor == 1); };
 	bool IsWinXPSP2() { return (m_osvi.dwMajorVersion == 5 && m_osvi.dwMinorVersion >= 1 && m_osvi.wServicePackMajor == 2); };
+	bool IsWinXPSP3() { return (m_osvi.dwMajorVersion == 5 && m_osvi.dwMinorVersion >= 1 && m_osvi.wServicePackMajor == 3); };
+	bool IsVista()    { return (m_osvi.dwMajorVersion == 6 && m_osvi.dwMinorVersion >= 0 /*&& m_osvi.wServicePackMajor == 3*/); };
+	bool IsWin7()     { return (m_osvi.dwMajorVersion == 6 && m_osvi.dwMinorVersion >= 1 /*&& m_osvi.wServicePackMajor == 3*/); };
 
 	CStdString GetDescription() { return m_desc; };
 	WindowsVersionInfo()
@@ -52,6 +55,12 @@ class WindowsVersionInfo
 				m_family = WIN_NT;
 
 				// Test for the specific product family.
+				if ( m_osvi.dwMajorVersion == 6 && m_osvi.dwMinorVersion == 1 )
+					m_desc = _T("Microsoft Windows 7 Family,\r\n");
+
+				if ( m_osvi.dwMajorVersion == 6 && m_osvi.dwMinorVersion == 0 )
+					m_desc = _T("Microsoft Windows Vista Family,\r\n");
+
 				if ( m_osvi.dwMajorVersion == 5 && m_osvi.dwMinorVersion == 2 )
 					m_desc = _T("Microsoft Windows Server 2003 Family,\r\n");
 

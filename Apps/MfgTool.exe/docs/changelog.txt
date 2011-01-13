@@ -1,6 +1,70 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.029
+****************************************
+01/13/2010 - Chris Williamson
+
+    - Updated copyright dates to 2009-2011.
+    - Updated source extraction script.
+    - Added COPYING.CPOL and COPYING.MIT licenses.
+    - Added Apps/MfgTool.exe/docs/Third Party Components.txt
+    
+    - Updated WindowsVersionInfo to recognize XPSP3, Vista, and Windows 7.
+    - Updated PortMgrDlg to disable themes on overall progressbar for Windows >= XPSP1.
+      PortMgrDlg overall progress bar color reflects working(BLUE), error(FULL + RED), 
+      success(FULL + GREEEN) for XPSP3 and Win7.
+
+	Apps\MfgTool.exe\PortMgrDlg.cpp
+	Libs\DevSupport\WindowsVersionInfo.h
+
+****************************************
+RELEASE_STMFGTOOL_1.6.2.028
+****************************************
+01/09/2011 - Tina Zhu
+
+    - Auto Scan the connected devices
+
+	Apps\MfgTool.exe\ConfigMgrSheet.h
+	Apps\MfgTool.exe\ConfigUsbPortPage.h
+	Apps\MfgTool.exe\MainFrm.cpp
+	Apps\MfgTool.exe\MainFrm.h
+	Apps\MfgTool.exe\StDialogBar.cpp
+	Apps\MfgTool.exe\StDialogBar.h
+	Apps\MfgTool.exe\StMfgTool.rc
+	Apps\MfgTool.exe\resource.h
+	Apps\MfgTool.exe\version.h
+
+****************************************
+RELEASE_STMFGTOOL_1.6.2.027
+****************************************
+01/09/2011 - Tina Zhu
+
+    - Easy Option check feature for mfgtool UI
+
+	Apps\MfgTool.exe\ConfigPlayerListCtrl.cpp
+	Apps\MfgTool.exe\ConfigPlayerListCtrl.h
+	Apps\MfgTool.exe\ConfigPlayerProfilePage.cpp
+	Apps\MfgTool.exe\ConfigPlayerProfilePage.h
+	Apps\MfgTool.exe\OpInfo.h
+	Apps\MfgTool.exe\StMfgTool.2008.vcproj
+	Apps\MfgTool.exe\version.h
+
+****************************************
+RELEASE_STMFGTOOL_1.6.2.026
+****************************************
+01/05/2011 - Starle Li
+
+    - Support a new way of initialization of memory by extracting DCD data in an image file.
+
+	Apps\MfgTool.exe\OpUtpUpdate.cpp
+	Apps\MfgTool.exe\version.h
+	Libs\DevSupport\MxHidDevice.cpp
+	Libs\DevSupport\MxHidDevice.h
+	Libs\DevSupport\MxRomDevice.cpp
+	Libs\DevSupport\MxRomDevice.h
+
+****************************************
 RELEASE_STMFGTOOL_1.6.2.025
 ****************************************
 12/22/2010 - Chris Williamson
