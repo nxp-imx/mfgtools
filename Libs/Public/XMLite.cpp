@@ -9,6 +9,11 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+/*
+ * 2010-12-22 : Added UNICODE support and compiles on VS2008. (Chris.Williamson@freescale.com)
+ *
+ */
+
 #include "stdafx.h"
 #include "XMLite.h"
 #include <iostream>

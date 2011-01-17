@@ -1,6 +1,26 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
 
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.030
+****************************************
+01/14/2010 - Chris Williamson
+
+    - Marked changes from original file.
+      Libs/Public/XMLLite.cpp.
+      
+    - Renamed documentaion files so they have no spaces. 
+      For easier extraction with BASH script.
+      Apps\MfgTool.exe\docs\Build_Requirements.pdf
+	  Apps\MfgTool.exe\docs\Third_Party_Components.txt
+	  
+	- Updated source extraction script.
+      mfgtool_src_extract.sh
+      
+    - Added Drivers\iMX_BulkIO_Driver\sys/driver_ioctl.h
+    - Removed Drivers\iMX_BulkIO_Driver\sys/public.h
+
+
+****************************************
 RELEASE_STMFGTOOL_1.6.2.029
 ****************************************
 01/13/2010 - Chris Williamson

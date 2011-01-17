@@ -12,7 +12,7 @@
 #include <usb100.h>
 #include <sys/stat.h>
 
-#include "Drivers/iMX_BulkIO_Driver/sys/public.h"
+#include "Drivers/iMX_BulkIO_Driver/sys/driver_ioctl.h"
 
 static BOOL SyncAllDevFlag = FALSE;
 typedef struct _ImgDownloadStatus 
