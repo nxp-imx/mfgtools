@@ -199,6 +199,9 @@
 #define IVT_BARKER_HEADER      0x402000D1
 #define ROM_TRANSFER_SIZE	   0x400
 #define IVT_OFFSET             0x400
+#define FLASH_HEADER_BARKER    0xB1
+#define DCD_BARKER_CODE        0xB17219E9
+#define FLASH_HEADER_OFFSET    0x400
 
 /// <summary>
 /// A MxRomDevice device.
@@ -246,10 +249,20 @@ public:
 		unsigned long Data;
 	}DCD_Data, *PDCD_Data;
 
+	typedef struct _MX51DCDData
+	{
+		unsigned long DataWidth;
+		unsigned long Address;
+		unsigned long Data;
+	}MX51DCD_Data, *PMX51DCD_Data;
+
 	typedef struct _FlashHeader
 	{
            unsigned long ImageStartAddr;
-           unsigned long Reserved[4];
+           unsigned long FlashHdrBarker;
+		   unsigned long CSFAddress;
+		   unsigned long DCDPtrAddress;
+		   unsigned long reserved;
 	}FlashHeader, *PFlashHeader;
 
 	typedef struct _ImageParameter
@@ -353,6 +366,7 @@ private:
 	BOOL TransData(UINT byteCount, const unsigned char * pBuf);
 	BOOL ReadData(UINT address, UINT byteCount, unsigned char * pBuf);
 	BOOL AddIvtHdr(UINT32 ImageStartAddr, MemorySection Section);
+	BOOL AddFlashHdr(UINT32 ImageStartAddr, MemorySection Section);
 	BOOL WriteToDevice(const unsigned char *buf, UINT count);
 	BOOL ReadFromDevice(PUCHAR buf, UINT count);
 	BOOL DeviceIoControl(DWORD controlCode, PVOID pRequest = NULL);
@@ -365,6 +379,7 @@ private:
 	HAB_t _habType;
     BOOL _SyncAllDevEnable;
 	UINT m_jumpAddr;
+	UINT m_FlashHdrAddr;
 	UCHAR m_SDPCmdBuf[SDP_CMD_SIZE];
 
 	enum ChannelType { ChannelType_UART = 0, ChannelType_USB };

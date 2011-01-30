@@ -1,4 +1,13 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
+****************************************
+RELEASE_STMFGTOOL_1.6.2.031
+****************************************
+01/30/2010 - Starle Li
+
+    - Support i.MX51 flash header DCD mode memory initialization. 
+    - Fix a bug which causes i.mx51 fails to jump to ram kernel.
+	mfgtools\Libs\DevSupport\MxRomDevice.cpp
+	mfgtools\Libs\DevSupport\MxRomDevice.h
 
 ****************************************
 RELEASE_STMFGTOOL_1.6.2.030

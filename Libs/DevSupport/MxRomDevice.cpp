@@ -397,13 +397,14 @@ BOOL MxRomDevice::Reset()
 BOOL MxRomDevice::WriteMemory(UINT address, UINT data, UINT format)
 {
 	BOOL status = FALSE;
-
+	
 	const short header = ROM_KERNEL_CMD_WR_MEM;
 	const UINT dataSize = 0;
 	const char pointer = 0;
 
 	long command[4] = { 0 };
-
+	
+	TRACE("WriteMemory(): address=0x%x, data=0x%x, format=0x%x.\r\n", address, data, format);
 	command[0] = (  ((address  & 0x00FF0000) << 8) 
 		          | ((address  & 0xFF000000) >> 8) 
 		          |  (header   & 0x0000FFFF) );
@@ -550,78 +551,6 @@ BOOL MxRomDevice::ValidAddress(const UINT address, const UINT format) const
 	return status;
 }
 
-BOOL MxRomDevice::Jump2Rak()
-{
-	BOOL status = FALSE;
-	
-	//Sleep(5000);
-	const short header = ROM_KERNEL_CMD_GET_STAT;
-	const UINT address = 0;
-	const UINT data = 0;
-	const char format = 0;
-	const UINT dataSize = 0;
-	const char pointer = 0;
-
-	long command[4] = { 0 };
-
-	command[0] = (  ((address  & 0x00FF0000) << 8) 
-		          | ((address  & 0xFF000000) >> 8) 
-		          |  (header   & 0x0000FFFF) );
-
-	command[1] = (   (dataSize & 0xFF000000)
-		          | ((format   & 0x000000FF) << 16)
-		          | ((address  & 0x000000FF) <<  8)
-		          | ((address  & 0x0000FF00) >>  8 ));
-
-	command[2] = (   (data     & 0xFF000000)
-		          | ((dataSize & 0x000000FF) << 16)
-		          |  (dataSize & 0x0000FF00)
-		          | ((dataSize & 0x00FF0000) >> 16));
-
-	command[3] = (  ((pointer  & 0x000000FF) << 24)
-		          | ((data     & 0x00FF0000) >> 16) 
-		          |  (data     & 0x0000FF00)
-		          | ((data     & 0x000000FF) << 16));
-
-	//Send write Command to USB
-	if ( !WriteToDevice((unsigned char *)command, 16) )
-	{
-		return FALSE;
-	}
-
-	//read the ACK
-	unsigned char cmdAck[4] = { 0 };
-	if(!ReadFromDevice(cmdAck, 4))
-	{
-		return FALSE;
-	}
-
-	// 1st CHECK: If first ACK == 0x88888888 then 1st check is successful.
-	// TRACE(">> Jump2 Ramkernel result: 0x%x\n", *(unsigned int *)cmdAck);
-	if (*(unsigned int *)cmdAck != ROM_STATUS_ACK)
-	{
-		return FALSE;
-	}
-
-	// 2nd CHECK: For MX35, MX37 or MX51 HAB-Enabled devices
-	//				If can Read second ack AND secondACK == 0xF0F0F0F0
-	//                FAILED JUMP 2 RAM KERNEL
-	if ( (_chipFamily == MX35 || _chipFamily == MX37 || _chipFamily == MX51 || _chipFamily == MX53) && _habType == HabEnabled )
-	{
-		unsigned char cmdAck2[4] = { 0 };
-		if(ReadFromDevice(cmdAck2, 4))
-		{
-			// TRACE(">> Jump2 Ramkernel result(2): 0x%x\n", *(unsigned int *)cmdAck2);
-			if (*(unsigned int *)cmdAck2 == ROM_STATUS_ACK2)
-			{
-				return FALSE;
-			}
-		}
-	}
-
-	TRACE("*********Jump to Ramkernel successfully!**********\r\n");
-	return TRUE;
-}
 
 //-------------------------------------------------------------------------------------		
 // Function to pack the command request
@@ -895,6 +824,260 @@ BOOL MxRomDevice::IsBootStrapMode()
 	return FALSE;
 }
 
+
+inline DWORD EndianSwap(DWORD x)
+{
+    return (x>>24) | 
+        ((x<<8) & 0x00FF0000) |
+        ((x>>8) & 0x0000FF00) |
+        (x<<24);
+}
+
+BOOL MxRomDevice::RunPlugIn(CString fwFilename)
+{
+    CFile fwFile;
+	UCHAR* pDataBuf = NULL;
+	ULONGLONG fwSize = 0;
+	DWORD * pPlugIn = NULL;
+	DWORD PlugInDataOffset= 0,ImgIVTOffset= 0,BootDataImgAddrIndex= 0,PhyRAMAddr4KRL= 0;
+    DWORD PlugInAddr = 0;
+	PIvtHeader pIVT = NULL,pIVT2 = NULL;
+	ImageParameter ImageParameter;
+
+	//Get data from the image file
+    if ( fwFile.Open(fwFilename, CFile::modeRead | CFile::shareDenyWrite) == 0 )
+    {
+        TRACE(_T("Firmware file %s failed to open.errcode is %d\n"), fwFilename,GetLastError());
+        return FALSE;
+    }
+
+    fwSize = fwFile.GetLength();
+    pDataBuf = (UCHAR*)malloc((size_t)fwSize);
+    fwFile.Read(pDataBuf, (UINT)fwSize);
+    fwFile.Close();
+    
+	//Search for IVT
+    pPlugIn = (DWORD *)pDataBuf;
+
+	if(_chipFamily != MX53)
+	{
+		//Search for flash header
+		PFlashHeader pFlashHdr = NULL;
+
+		//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
+		while(ImgIVTOffset < fwSize && pPlugIn[ImgIVTOffset/sizeof(DWORD)] != DCD_BARKER_CODE)
+			ImgIVTOffset+= 0x4;
+		
+		if(ImgIVTOffset >= fwSize)
+			return FALSE;
+
+		//There are 2 dword data between DCD barker and the end of flash header.
+		ImgIVTOffset -= (sizeof(FlashHeader) + 8);
+		pPlugIn += ImgIVTOffset/sizeof(DWORD);
+
+		pFlashHdr = (PFlashHeader)pPlugIn;
+
+		DWORD * pDCDRegion = (DWORD *)pFlashHdr + (sizeof(FlashHeader) + 8)/sizeof(DWORD);
+
+		//The first 2 32bits data in DCD region is used to give some info about DCD data.
+		
+		//The first 2 32bits data in DCD region should be excluded in the DCD data count.
+		DWORD DCDDataCount = (*(pDCDRegion+1))/sizeof(MX51DCD_Data);
+
+		//The DCD data starts from the thrid 32 bits data in DCD region
+		PMX51DCD_Data pMX51DCD_Data = PMX51DCD_Data(pDCDRegion + 2);
+
+		for (DWORD i=0; i < DCDDataCount; i++)
+		{			
+			if ( !WriteMemory(pMX51DCD_Data->Address, pMX51DCD_Data->Data, pMX51DCD_Data->DataWidth<<3) )
+			{
+				TRACE("DCD data: write memory failed\n");
+				return FALSE;
+			}
+			pMX51DCD_Data ++;
+		}
+
+		// set the communication mode through write memory interace
+		if ( !WriteMemory(_defaultAddress.MemoryStart, ChannelType_USB, 32) )
+		{
+			TRACE(CString("Write channel type to memory failed!\n"));
+			return FALSE;
+		}
+
+		//---------------------------------------------------------
+		//Download eboot to ram
+		ImageParameter.PhyRAMAddr4KRL = *(pDCDRegion-1) + FLASH_HEADER_OFFSET - ImgIVTOffset;
+		ImageParameter.CodeOffset = pFlashHdr->ImageStartAddr - ImageParameter.PhyRAMAddr4KRL;
+	}
+	else
+	{
+		//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
+		while(ImgIVTOffset < fwSize && pPlugIn[ImgIVTOffset/sizeof(DWORD)] != IVT_BARKER_HEADER)
+			ImgIVTOffset+= 0x100;
+		
+		if(ImgIVTOffset >= fwSize)
+			return FALSE;
+
+		pPlugIn += ImgIVTOffset/sizeof(DWORD);
+
+		pIVT = (PIvtHeader) pPlugIn;
+		//Now we have to judge DCD way or plugin way used in the image
+		//The method is to check plugin flag in boot data region
+		// IVT boot data format
+		//   0x00    IMAGE START ADDR
+		//   0x04    IMAGE SIZE
+		//   0x08    PLUGIN FLAG
+		PBootData pPluginDataBuf = (PBootData)(pPlugIn + (pIVT->BootData - pIVT->SelfAddr)/sizeof(DWORD));
+		if(pPluginDataBuf->PluginFlag)
+		{
+			//Plugin mode
+			DWORD IVT2Offset = sizeof(IvtHeader);
+
+			while((IVT2Offset + ImgIVTOffset) < fwSize && pPlugIn[IVT2Offset/sizeof(DWORD)] != IVT_BARKER_HEADER )
+				IVT2Offset+= sizeof(DWORD);
+			
+			if((IVT2Offset + ImgIVTOffset) >= fwSize)
+				return FALSE;
+		  
+			//---------------------------------------------------------
+			//Run plugin in IRAM
+
+			//Download plugin data into IRAM.
+			PlugInAddr = pIVT->ImageStartAddr;
+			PlugInDataOffset = pIVT->ImageStartAddr - pIVT->SelfAddr;
+			if (!SendCommand2RoK(PlugInAddr, 0x1000, MemSectionOTH))
+			{
+				return FALSE;
+			}
+			if (!TransData(0x1000, (PUCHAR)((DWORD)pIVT + PlugInDataOffset)))
+			{
+				TRACE(_T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"), \
+					PlugInAddr, 0x1000, ((DWORD)pIVT + PlugInDataOffset));
+				return FALSE;
+			}
+
+			m_jumpAddr = PlugInAddr;
+			if( !Jump())
+			{
+				TRACE(_T("RunPlugIn(): Failed to jump to RAM address: 0x%x.\n"), m_jumpAddr);
+				return FALSE;
+			}
+
+			//---------------------------------------------------------
+			//Download eboot to ram
+			pIVT2 = (PIvtHeader)(pPlugIn + IVT2Offset/sizeof(DWORD));
+
+			//IVTOffset indicates the offset used by ROM, entirely different with ImgIVTOffset.
+			DWORD IVTOffset = pIVT->SelfAddr - pPluginDataBuf->ImageStartAddr;
+
+			PBootData pBootDataBuf = (PBootData)(pPlugIn + (pIVT2->BootData - pIVT->SelfAddr)/sizeof(DWORD));
+
+			ImageParameter.PhyRAMAddr4KRL = pBootDataBuf->ImageStartAddr + IVTOffset - ImgIVTOffset;
+			ImageParameter.CodeOffset = pIVT2->ImageStartAddr - ImageParameter.PhyRAMAddr4KRL;
+		}
+		else
+		{
+			//DCD mode
+			DWORD * pDCDRegion = pPlugIn + (pIVT->DCDAddress - pIVT->SelfAddr)/sizeof(DWORD);
+			//DCD_BE  0xD2020840              ;DCD_HEADR Tag=0xd2, len=64*8+4+4, ver= 0x40    
+			//DCD_BE  0xCC020404              ;write dcd cmd headr Tag=0xcc, len=64*8+4, param=4
+			//Here use big endian format, so it must be converted here.
+			//The first 2 32bits data in DCD region is used to give some info about DCD data.
+			if(0xd2 != EndianSwap(*pDCDRegion)>>24)
+			{
+				TRACE(CString("DCD header tag doesn't match!\n"));
+				return FALSE;
+			}
+			
+			//The first 2 32bits data in DCD region should be excluded in the DCD data count.
+			DWORD DCDDataCount = (((EndianSwap(*pDCDRegion) & 0x00FFFF00)>>8) - 8)/sizeof(DCD_Data);
+
+			//The DCD data starts from the thrid 32 bits data in DCD region
+			PDCD_Data pDCDData = PDCD_Data(pDCDRegion + 2);
+
+			for (DWORD i=0; i < DCDDataCount; i++)
+			{
+				
+				if ( !WriteMemory(EndianSwap(pDCDData->Address), EndianSwap(pDCDData->Data), 32) )
+				{
+					TRACE("DCD data: write memory failed\n");
+					return FALSE;
+				}
+				pDCDData ++;
+			}
+
+			// set the communication mode through write memory interace
+			if ( !WriteMemory(_defaultAddress.MemoryStart, ChannelType_USB, 32) )
+			{
+				TRACE(CString("Write channel type to memory failed!\n"));
+				return FALSE;
+			}
+
+			//---------------------------------------------------------
+			//Download eboot to ram
+			ImageParameter.PhyRAMAddr4KRL = pIVT->SelfAddr - ImgIVTOffset;
+			ImageParameter.CodeOffset = pIVT->ImageStartAddr - ImageParameter.PhyRAMAddr4KRL;
+		}
+	}
+	ImageParameter.HasFlashHeader = FALSE;
+	ImageParameter.loadSection = MemSectionOTH;
+	ImageParameter.setSection = MemSectionAPP;
+	return DownloadImage(&ImageParameter, pDataBuf, (DWORD)fwSize);
+}
+
+BOOL MxRomDevice::DownloadImage(PImageParameter pImageParameter,const unsigned char* const pBuffer, const size_t dataSize)
+{
+	uint32_t byteIndex, numBytesToWrite = 0;
+	for ( byteIndex = 0; byteIndex < dataSize; byteIndex += numBytesToWrite )
+	{
+		// Get some data
+		numBytesToWrite = min(MAX_SIZE_PER_DOWNLOAD_COMMAND, dataSize - byteIndex);
+
+		if (!SendCommand2RoK(pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pImageParameter->loadSection))
+		{
+			TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pImageParameter->loadSection);
+			return FALSE;
+		}
+		else
+		{
+			//Sleep(10);
+			if(!TransData(numBytesToWrite, pBuffer + byteIndex))
+			{
+				TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X) failed.\n"), numBytesToWrite, pBuffer + byteIndex);
+				return FALSE;
+			}
+		}
+	}
+
+	if(pImageParameter->setSection == MemSectionAPP)
+	{
+		//If setSection is APP attribute, then it means a entry point to RAM kernel is specified.
+		m_jumpAddr = pImageParameter->PhyRAMAddr4KRL + pImageParameter->CodeOffset;
+
+		//Never transfer the flash header to RAM now if you still have other image to transfer since 
+		//ROM will jump out ot data transfer loop once APP attribute is received.
+		if( pImageParameter->HasFlashHeader )
+		{
+			m_FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL;
+		}
+		else
+		{
+			// Otherwise, create a header and append the data
+			m_FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL - sizeof(FlashHeader);
+		}
+	}
+
+	return TRUE;
+}
+
+BOOL MxRomDevice::DownloadImage(PImageParameter pImageParameter,const StFwComponent& fwComponent, Device::UI_Callback callbackFn)
+{
+	const unsigned char* const pBuffer = fwComponent.GetDataPtr();
+	const size_t dataSize = fwComponent.size();
+
+	return DownloadImage(pImageParameter, pBuffer, dataSize);
+}
+
 BOOL MxRomDevice::AddIvtHdr(UINT32 ImageStartAddr, MemorySection Section)
 {
 	UINT FlashHdrAddr;
@@ -935,275 +1118,172 @@ BOOL MxRomDevice::AddIvtHdr(UINT32 ImageStartAddr, MemorySection Section)
 	return TRUE;
 }
 
-inline DWORD EndianSwap(DWORD x)
+BOOL MxRomDevice::AddFlashHdr(UINT32 ImageStartAddr, MemorySection Section)
 {
-    return (x>>24) | 
-        ((x<<8) & 0x00FF0000) |
-        ((x>>8) & 0x0000FF00) |
-        (x<<24);
-}
-
-BOOL MxRomDevice::RunPlugIn(CString fwFilename)
-{
-    CFile fwFile;
-	UCHAR* pDataBuf = NULL;
-	ULONGLONG fwSize = 0;
-	DWORD * pPlugIn = NULL;
-	DWORD PlugInDataOffset= 0,ImgIVTOffset= 0,BootDataImgAddrIndex= 0,PhyRAMAddr4KRL= 0;
-    DWORD PlugInAddr = 0;
-	PIvtHeader pIVT = NULL,pIVT2 = NULL;
-	ImageParameter ImageParameter;
-
-	//Get data from the image file
-    if ( fwFile.Open(fwFilename, CFile::modeRead | CFile::shareDenyWrite) == 0 )
-    {
-        TRACE(_T("Firmware file %s failed to open.errcode is %d\n"), fwFilename,GetLastError());
-        return FALSE;
-    }
-
-    fwSize = fwFile.GetLength();
-    pDataBuf = (UCHAR*)malloc((size_t)fwSize);
-    fwFile.Read(pDataBuf, (UINT)fwSize);
-    fwFile.Close();
-    
-	//Search for IVT
-    pPlugIn = (DWORD *)pDataBuf;
-
-	//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
-    while(ImgIVTOffset < fwSize && pPlugIn[ImgIVTOffset/sizeof(DWORD)] != IVT_BARKER_HEADER)
-		ImgIVTOffset+= 0x100;
-	
-	if(ImgIVTOffset >= fwSize)
-		return FALSE;
-
-	pPlugIn += ImgIVTOffset/sizeof(DWORD);
-
-	pIVT = (PIvtHeader) pPlugIn;
-	//Now we have to judge DCD way or plugin way used in the image
-	//The method is to check plugin flag in boot data region
-    // IVT boot data format
-    //   0x00    IMAGE START ADDR
-    //   0x04    IMAGE SIZE
-    //   0x08    PLUGIN FLAG
-	PBootData pPluginDataBuf = (PBootData)(pPlugIn + (pIVT->BootData - pIVT->SelfAddr)/sizeof(DWORD));
-	if(pPluginDataBuf->PluginFlag)
-	{
-		//Plugin mode
-		DWORD IVT2Offset = sizeof(IvtHeader);
-
-		while((IVT2Offset + ImgIVTOffset) < fwSize && pPlugIn[IVT2Offset/sizeof(DWORD)] != IVT_BARKER_HEADER )
-			IVT2Offset+= sizeof(DWORD);
-		
-		if((IVT2Offset + ImgIVTOffset) >= fwSize)
-			return FALSE;
-	  
-		//---------------------------------------------------------
-		//Run plugin in IRAM
-
-		//Download plugin data into IRAM.
-		PlugInAddr = pIVT->ImageStartAddr;
-		PlugInDataOffset = pIVT->ImageStartAddr - pIVT->SelfAddr;
-		if (!SendCommand2RoK(PlugInAddr, 0x1000, MemSectionOTH))
-		{
-			return FALSE;
-		}
-		if (!TransData(0x1000, (PUCHAR)((DWORD)pIVT + PlugInDataOffset)))
-		{
-			TRACE(_T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"), \
-				PlugInAddr, 0x1000, ((DWORD)pIVT + PlugInDataOffset));
-			return FALSE;
-		}
-
-		m_jumpAddr = PlugInAddr;
-		if( !Jump())
-		{
-			TRACE(_T("RunPlugIn(): Failed to jump to RAM address: 0x%x.\n"), m_jumpAddr);
-			return FALSE;
-		}
-
-		//---------------------------------------------------------
-		//Download eboot to ram
-		pIVT2 = (PIvtHeader)(pPlugIn + IVT2Offset/sizeof(DWORD));
-		/*BootDataImgAddrIndex = (DWORD *)pIVT2 - pPlugIn;
-		BootDataImgAddrIndex += (pIVT2->BootData - pIVT2->SelfAddr)/sizeof(DWORD);
-		PhyRAMAddr4KRL = pPlugIn[BootDataImgAddrIndex] + IVT_OFFSET - ImgIVTOffset;
-		if (!SendCommand2RoK(PhyRAMAddr4KRL, fwSize, MemSectionOTH))
-		{
-			return FALSE;
-		}
-		if (!TransData(fwSize, (PUCHAR)((DWORD)pDataBuf)))
-		{
-			TRACE(_T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"), \
-				PhyRAMAddr4KRL, fwSize, pDataBuf);
-			return FALSE;
-		}
-	    
-		DWORD ImgStartAddr = pIVT2->ImageStartAddr;
-		if(!AddIvtHdr(ImgStartAddr, MemSectionAPP))
-		{
-			TRACE(_T("RunPlugIn(): Failed to addhdr to RAM address: 0x%x.\n"), ImgStartAddr);
-			return FALSE;
-		}*/
-		//IVTOffset indicates the offset used by ROM, entirely different with ImgIVTOffset.
-		DWORD IVTOffset = pIVT->SelfAddr - pPluginDataBuf->ImageStartAddr;
-
-		PBootData pBootDataBuf = (PBootData)(pPlugIn + (pIVT2->BootData - pIVT->SelfAddr)/sizeof(DWORD));
-
-		ImageParameter.PhyRAMAddr4KRL = pBootDataBuf->ImageStartAddr + IVTOffset - ImgIVTOffset;
-		ImageParameter.CodeOffset = pIVT2->ImageStartAddr - ImageParameter.PhyRAMAddr4KRL;
-	}
-	else
-	{
-		//DCD mode
-		DWORD * pDCDRegion = pPlugIn + (pIVT->DCDAddress - pIVT->SelfAddr)/sizeof(DWORD);
-		//DCD_BE  0xD2020840              ;DCD_HEADR Tag=0xd2, len=64*8+4+4, ver= 0x40    
-		//DCD_BE  0xCC020404              ;write dcd cmd headr Tag=0xcc, len=64*8+4, param=4
-		//Here use big endian format, so it must be converted here.
-		//The first 2 32bits data in DCD region is used to give some info about DCD data.
-		if(0xd2 != EndianSwap(*pDCDRegion)>>24)
-		{
-			TRACE(CString("DCD header tag doesn't match!\n"));
-			return FALSE;
-		}
-		
-		//The first 2 32bits data in DCD region should be excluded in the DCD data count.
-		DWORD DCDDataCount = (((EndianSwap(*pDCDRegion) & 0x00FFFF00)>>8) - 8)/sizeof(DCD_Data);
-
-		//The DCD data starts from the thrid 32 bits data in DCD region
-		PDCD_Data pDCDData = PDCD_Data(pDCDRegion + 2);
-
-		for (DWORD i=0; i < DCDDataCount; i++)
-		{
-			
-			if ( !WriteMemory(EndianSwap(pDCDData->Address), EndianSwap(pDCDData->Data), 32) )
-			{
-				TRACE("DCD data: write memory failed\n");
-				return FALSE;
-			}
-			pDCDData ++;
-		}
-
-		// set the communication mode through write memory interace
-		if ( !WriteMemory(_defaultAddress.MemoryStart, ChannelType_USB, 32) )
-		{
-			TRACE(CString("Write channel type to memory failed!\n"));
-			return FALSE;
-		}
-
-		//---------------------------------------------------------
-		//Download eboot to ram
-		ImageParameter.PhyRAMAddr4KRL = pIVT->SelfAddr - ImgIVTOffset;
-		ImageParameter.CodeOffset = pIVT->ImageStartAddr - ImageParameter.PhyRAMAddr4KRL;
-	}	
-	ImageParameter.HasFlashHeader = FALSE;
-	ImageParameter.loadSection = MemSectionOTH;
-	ImageParameter.setSection = MemSectionAPP;
-	return DownloadImage(&ImageParameter, pDataBuf, (DWORD)fwSize);
-}
-
-BOOL MxRomDevice::DownloadImage(PImageParameter pImageParameter,const unsigned char* const pBuffer, const size_t dataSize)
-{
-	uint32_t byteIndex, numBytesToWrite = 0;
-	for ( byteIndex = 0; byteIndex < dataSize; byteIndex += numBytesToWrite )
-	{
-		// Get some data
-		numBytesToWrite = min(MAX_SIZE_PER_DOWNLOAD_COMMAND, dataSize - byteIndex);
-
-		if (!SendCommand2RoK(pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pImageParameter->loadSection))
-		{
-			TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pImageParameter->loadSection);
-			return FALSE;
-		}
-		else
-		{
-			//Sleep(10);
-			if(!TransData(numBytesToWrite, pBuffer + byteIndex))
-			{
-				TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X) failed.\n"), numBytesToWrite, pBuffer + byteIndex);
-				return FALSE;
-			}
-		}
-	}
-
-	if(pImageParameter->setSection == MemSectionAPP)
-	{
-		m_jumpAddr = pImageParameter->PhyRAMAddr4KRL + pImageParameter->CodeOffset;
-		return TRUE;
-	}
-
-	// If we are downloading to DCD or CSF, we don't need to send 
-	if ( pImageParameter->loadSection == MemSectionDCD || pImageParameter->loadSection == MemSectionCSF )
-	{
-		return TRUE;
-	}
-
-	UINT FlashHdrAddr;
-	const unsigned char * pHeaderData = NULL;
-
 	//transfer length of ROM_TRANSFER_SIZE is a must to ROM code.
 	unsigned char FlashHdr[ROM_TRANSFER_SIZE] = { 0 };
-	
-	// Just use the front of the data buffer if the data includes the FlashHeader
-	if( pImageParameter->HasFlashHeader )
+
+	PFlashHeader pFlashHeader = (PFlashHeader)FlashHdr;
+
+	//UINT FlashHdrAddr = ImageStartAddr - sizeof(IvtHeader);
+
+	//Read the data first
+	if ( !ReadData(m_FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr) )
 	{
-		FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL;
-		pHeaderData = pBuffer;
-	}
-	else
-	{
-		// Otherwise, create a header and append the data
-		if(_chipFamily == MX53)
-		{
-			PIvtHeader pIvtHeader = (PIvtHeader)FlashHdr;
-
-			FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL + pImageParameter->CodeOffset - sizeof(IvtHeader);
-
-			//Copy image data with an offset of ivt header size to the temp buffer.
-			memcpy(FlashHdr + sizeof(IvtHeader), pBuffer+pImageParameter->CodeOffset, ROM_TRANSFER_SIZE - sizeof(IvtHeader));
-			
-			pIvtHeader->IvtBarker = IVT_BARKER_HEADER;
-			pIvtHeader->ImageStartAddr = FlashHdrAddr+sizeof(IvtHeader);
-			pIvtHeader->SelfAddr = FlashHdrAddr;
-		}
-		else
-		{
-			PFlashHeader pFlashHeader = (PFlashHeader)FlashHdr;
-			//Copy image data with an offset of flash header size to the temp buffer.
-			memcpy(FlashHdr + sizeof(FlashHeader), pBuffer, ROM_TRANSFER_SIZE - sizeof(FlashHeader));
-			
-			//We should write actual image address to the first dword of flash header.
-			pFlashHeader->ImageStartAddr = pImageParameter->PhyRAMAddr4KRL;
-
-			FlashHdrAddr = pImageParameter->PhyRAMAddr4KRL - sizeof(FlashHeader);
-		}
-		pHeaderData = (const unsigned char *)FlashHdr;
-	}
-
-	//Set execute address.
-	if ( !SendCommand2RoK(FlashHdrAddr, ROM_TRANSFER_SIZE, pImageParameter->setSection) )
-	{
-		TRACE(_T("DownloadImage(): SendCommand2RoK(0x%X, 0x%X, 0x%X) failed.\n"), FlashHdrAddr, ROM_TRANSFER_SIZE, pImageParameter->setSection);
+		TRACE(_T("ReadData(0x%X, 0x%X, 0x%X) failed.\n"), m_FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
 		return FALSE;
 	}
-	else
-	{
-		//Sleep(10);
-		if(!TransData(ROM_TRANSFER_SIZE, pHeaderData))
-		{
-			TRACE(_T("DownloadImage(): TransData(0x%X, 0x%X) failed.\n"), ROM_TRANSFER_SIZE, pHeaderData);
-			return FALSE;
-		}
-	}
+    //Clean the IVT header region
+    ZeroMemory(FlashHdr, sizeof(FlashHeader));
 
+	//We should write actual image address to the first dword of flash header.
+	pFlashHeader->ImageStartAddr = m_FlashHdrAddr + sizeof(FlashHeader);
+    
+    
+	//Send the flash header to destiny address
+	if (!SendCommand2RoK(m_FlashHdrAddr, ROM_TRANSFER_SIZE, Section))
+	{
+		return FALSE;
+	}
+	if ( !TransData(ROM_TRANSFER_SIZE, FlashHdr) )
+	{
+		return FALSE;
+	}
+   
 	return TRUE;
 }
 
-BOOL MxRomDevice::DownloadImage(PImageParameter pImageParameter,const StFwComponent& fwComponent, Device::UI_Callback callbackFn)
+BOOL MxRomDevice::Jump2Rak()
 {
-	const unsigned char* const pBuffer = fwComponent.GetDataPtr();
-	const size_t dataSize = fwComponent.size();
+	BOOL status = FALSE;
+	
+	//Sleep(5000);
+	const short header = ROM_KERNEL_CMD_GET_STAT;
+	const UINT address = 0;
+	const UINT data = 0;
+	const char format = 0;
+	const UINT dataSize = 0;
+	const char pointer = 0;
 
-	return DownloadImage(pImageParameter, pBuffer, dataSize);
+	long command[4] = { 0 };
+
+	command[0] = (  ((address  & 0x00FF0000) << 8) 
+		          | ((address  & 0xFF000000) >> 8) 
+		          |  (header   & 0x0000FFFF) );
+
+	command[1] = (   (dataSize & 0xFF000000)
+		          | ((format   & 0x000000FF) << 16)
+		          | ((address  & 0x000000FF) <<  8)
+		          | ((address  & 0x0000FF00) >>  8 ));
+
+	command[2] = (   (data     & 0xFF000000)
+		          | ((dataSize & 0x000000FF) << 16)
+		          |  (dataSize & 0x0000FF00)
+		          | ((dataSize & 0x00FF0000) >> 16));
+
+	command[3] = (  ((pointer  & 0x000000FF) << 24)
+		          | ((data     & 0x00FF0000) >> 16) 
+		          |  (data     & 0x0000FF00)
+		          | ((data     & 0x000000FF) << 16));
+
+	//Send write Command to USB
+	if ( !WriteToDevice((unsigned char *)command, 16) )
+	{
+		return FALSE;
+	}
+
+	//read the ACK
+	unsigned char cmdAck[4] = { 0 };
+	if(!ReadFromDevice(cmdAck, 4))
+	{
+		return FALSE;
+	}
+
+	// 1st CHECK: If first ACK == 0x88888888 then 1st check is successful.
+	// TRACE(">> Jump2 Ramkernel result: 0x%x\n", *(unsigned int *)cmdAck);
+	if (*(unsigned int *)cmdAck != ROM_STATUS_ACK)
+	{
+		return FALSE;
+	}
+
+	// 2nd CHECK: For MX35, MX37 or MX51 HAB-Enabled devices
+	//				If can Read second ack AND secondACK == 0xF0F0F0F0
+	//                FAILED JUMP 2 RAM KERNEL
+	if ( (_chipFamily == MX35 || _chipFamily == MX37 || _chipFamily == MX51 || _chipFamily == MX53) && _habType == HabEnabled )
+	{
+		unsigned char cmdAck2[4] = { 0 };
+		if(ReadFromDevice(cmdAck2, 4))
+		{
+			// TRACE(">> Jump2 Ramkernel result(2): 0x%x\n", *(unsigned int *)cmdAck2);
+			if (*(unsigned int *)cmdAck2 == ROM_STATUS_ACK2)
+			{
+				return FALSE;
+			}
+		}
+	}
+
+	TRACE("*********Jump to Ramkernel successfully!**********\r\n");
+	return TRUE;
+}
+
+BOOL MxRomDevice::Jump()
+{
+    if(_SyncAllDevEnable)
+    {
+	    CString CurPath = _path.get();
+	    std::list<ImgDownloadStatus>::iterator iter = ImgDwdSts.begin();
+	    std::list<ImgDownloadStatus>::iterator iter_end = ImgDwdSts.end();
+
+	    //Current device has finished downloading work, mark status flag as true;
+	    for(;iter != iter_end;++iter){
+		    if(iter->Path == CurPath)
+			    iter->Status = TRUE;
+	    }
+	    //Poll the status of each device till all devices have finished downloading work.
+	    //In a word, we need to syncronize all the device's status in case a reset occurs 
+	    //when one device is on downloading work, which will leads to transfer failure.
+	    do{
+		    SyncAllDevFlag = TRUE;
+		    for(iter = ImgDwdSts.begin(); iter != iter_end; ++iter){
+			    if(iter->Status == FALSE)
+				    SyncAllDevFlag = FALSE;
+		    }
+		    if(SyncAllDevFlag)
+			    break;
+		    else
+			    Sleep(100);
+	    }while(!SyncAllDevFlag);
+    }
+
+	if(_chipFamily == MX53)
+	{
+		//MX53 uses IVT header.
+		if(!AddIvtHdr(m_jumpAddr,MemSectionAPP))
+		{
+			TRACE(_T("RunPlugIn(): Failed to add IVT header to RAM address: 0x%x.\n"), m_jumpAddr);
+			return FALSE;
+		}
+	}
+	else
+	{
+		//MX51, 35, 25 use flash header
+		if(!AddFlashHdr(m_jumpAddr,MemSectionAPP))
+		{
+			TRACE(_T("RunPlugIn(): Failed to add flash header to RAM address: 0x%x.\n"), m_jumpAddr);
+			return FALSE;
+		}
+	}
+
+	// Send the complete command to the device 
+	if ( !Jump2Rak() )
+	{
+		TRACE(_T("Jump(): Jump2Rak() failed.\n"));
+		return FALSE;
+	}
+	
+	TRACE("Jump to Ramkernel Address 0x%x successfully!\r\n", m_jumpAddr);
+
+	return TRUE;
 }
 
 BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UINT flags, Device::UI_Callback callback)
@@ -1341,55 +1421,6 @@ BOOL MxRomDevice::ProgramFlash(std::ifstream& file, UINT address, UINT cmdID, UI
 	delete[] pBuffer;
 
 	// Finish UI
-
-	return TRUE;
-}
-
-BOOL MxRomDevice::Jump()
-{
-    if(_SyncAllDevEnable)
-    {
-	    CString CurPath = _path.get();
-	    std::list<ImgDownloadStatus>::iterator iter = ImgDwdSts.begin();
-	    std::list<ImgDownloadStatus>::iterator iter_end = ImgDwdSts.end();
-
-	    //Current device has finished downloading work, mark status flag as true;
-	    for(;iter != iter_end;++iter){
-		    if(iter->Path == CurPath)
-			    iter->Status = TRUE;
-	    }
-	    //Poll the status of each device till all devices have finished downloading work.
-	    //In a word, we need to syncronize all the device's status in case a reset occurs 
-	    //when one device is on downloading work, which will leads to transfer failure.
-	    do{
-		    SyncAllDevFlag = TRUE;
-		    for(iter = ImgDwdSts.begin(); iter != iter_end; ++iter){
-			    if(iter->Status == FALSE)
-				    SyncAllDevFlag = FALSE;
-		    }
-		    if(SyncAllDevFlag)
-			    break;
-		    else
-			    Sleep(100);
-	    }while(!SyncAllDevFlag);
-    }
-	if(_chipFamily == MX53)
-	{
-		if(!AddIvtHdr(m_jumpAddr,MemSectionAPP))
-		{
-			TRACE(_T("RunPlugIn(): Failed to addhdr to RAM address: 0x%x.\n"), m_jumpAddr);
-			return FALSE;
-		}
-	}
-
-	// Send the complete command to the device 
-	if ( !Jump2Rak() )
-	{
-		TRACE(_T("Jump(): Jump2Rak() failed.\n"));
-		return FALSE;
-	}
-	
-	TRACE("Jump to Ramkernel Address 0x%x successfully!\r\n", m_jumpAddr);
 
 	return TRUE;
 }
