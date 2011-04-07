@@ -608,6 +608,7 @@
 #define IDR_OTPACCESS3700_RESID         6010
 #define IDR_OTPACCESS3770_RESID         6011
 #define IDR_OTPACCESS3780_RESID         6012
+#define IDS_AUTO_SCAN			        6013
 #define ID_OPTIONS_CONFIGURATION        32771
 #define ID_START_STOP_TOGGLE            32772
 #define ID_VIEW_LOG                     32773

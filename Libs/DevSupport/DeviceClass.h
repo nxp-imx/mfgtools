@@ -33,7 +33,8 @@ public:
 		DeviceTypeMxHid,
 		DeviceTypeMxRom,
 		DeviceTypeUsbController,
-		DeviceTypeUsbHub
+		DeviceTypeUsbHub,
+		DeviceTypeCst
 //		DeviceTypeUsbDevice
 	};
 
@@ -68,6 +69,9 @@ public:
 				break;
 			case DeviceTypeMxRom:
 				str = _T("IMX");
+				break;
+			case DeviceTypeCst:
+				str = _T("CustomerDevice");
 				break;
 			case DeviceTypeNone:
 				str = _T("None");
@@ -132,4 +136,7 @@ public:
 	virtual NotifyStruct AddUsbDevice(LPCTSTR path);
 	virtual NotifyStruct RemoveUsbDevice(LPCTSTR path);
 	virtual CStdString ToString() = 0;// { return _T("RecoveryDeviceClass"); }
+	USHORT m_msc_vid;
+	USHORT m_msc_pid;
+	void SetMSCVidPid(USHORT vid, USHORT pid);
 };

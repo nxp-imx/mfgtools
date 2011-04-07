@@ -146,6 +146,11 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 			else
 			{
 //				ATLTRACE(_T("VolumeDeviceClass::FindDeviceByUsbPath()\n"));
+				/*if (devPath.Find(_T("ide")) != -1)
+				{
+					index++;
+					continue;
+				}*/
 				pDevice = CreateDevice(this, devData, devPath);
 				if ( pDevice && pDevice->IsUsb() )
 				{
@@ -179,7 +184,7 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 	{
 		nsInfo.Device = pDevice;
 		nsInfo.Type = _deviceClassType;
-		nsInfo.HubIndex = ((Volume*)pDevice)->StorageDisk()->_hubIndex.getmsc();
+		nsInfo.HubIndex = ((Volume*)pDevice)->StorageDisk()->_hubIndex.getmsc(m_msc_vid, m_msc_pid);
 		nsInfo.Hub = ((Volume*)pDevice)->StorageDisk()->_hub.get();
 
 		RefreshPort(nsInfo.Hub, nsInfo.HubIndex);
@@ -299,4 +304,3 @@ std::list<Device*>& VolumeDeviceClass::Refresh()
 */
 	return _devices;
 }
-

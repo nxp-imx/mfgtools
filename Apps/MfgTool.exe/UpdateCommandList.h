@@ -312,7 +312,7 @@ public:
 	class DeviceState : public XNode
 	{
 	public:
-		typedef enum DeviceState_t { Unknown, Recovery, BootStrap, Updater, RamKernel, UserMtp, UserMsc, User, ConnectedUnknown, Disconnected };
+		typedef enum DeviceState_t { Unknown, Recovery, BootStrap, Updater, Finished, RamKernel, UserMtp, UserMsc, User, ConnectedUnknown, Disconnected };
 		
 		static CString DeviceStateToString(DeviceState_t state)
 		{
@@ -327,6 +327,9 @@ public:
 					break;
 				case Updater:
 					str = _T("Updater");
+					break;
+				case Finished:
+					str = _T("Finished");
 					break;
 				case RamKernel:
 					str = _T("RamKernel");
@@ -364,6 +367,8 @@ public:
 				state = BootStrap;
 			else if ( stateString == _T("Updater") )
 				state = Updater;
+			else if ( stateString == _T("Finished") )
+				state = Finished;
 			else if ( stateString == _T("RamKernel") )
 				state = RamKernel;
 			else if ( stateString == _T("UserMtp") )

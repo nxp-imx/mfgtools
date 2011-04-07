@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\;..\;$(WMSDK)\WMDM\inc"
+				AdditionalIncludeDirectories="..\..\;..\;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="0"
 				TreatWChar_tAsBuiltInType="true"
@@ -167,6 +167,10 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath=".\CustomerDeviceClass.cpp"
+				>
+			</File>
 			<File
 				RelativePath=".\Device.cpp"
 				>
@@ -305,6 +309,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\CustomerDeviceClass.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Device.h"
 				>

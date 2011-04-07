@@ -133,6 +133,8 @@ void CStDialogBar::SetDisplay(CConfigMgrSheet *_p_config_mgr)
 	GetDlgItem(IDC_STATUS_FAILED_UPDATES_TEXT)->SetWindowTextW(resStr);
 	resStr.LoadStringW(IDS_STATUS_FAILURE_RATE_TEXT);
 	GetDlgItem(IDC_STATUS_FAILURE_RATE_TEXT)->SetWindowTextW(resStr);
+	resStr.LoadStringW(IDS_AUTO_SCAN);
+	GetDlgItem(ID_AUTO_SCAN)->SetWindowTextW(resStr);
 
 	m_StartStopBtn.SubclassDlgItem(ID_START_STOP_TOGGLE, this); 
 
@@ -352,8 +354,8 @@ void CStDialogBar::SetProfileStatus()
 			m_p_config_mgr->GetNumEnabledOps())
 		{
 //			m_StatusText.SendMessage(WM_CTLCOLOR_REFLECT, SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
-			resStr.LoadStringW(IDS_OK);
-			GetDlgItem(IDC_STATUS_STATUS)->SetWindowTextW(resStr);
+			//resStr.LoadStringW(IDS_OK);
+			//GetDlgItem(IDC_STATUS_STATUS)->SetWindowTextW(resStr);
 
 			csVersion = (m_p_config_mgr->GetPlayerProfile())->GetProductVersion();
 			GetDlgItem(IDC_STATUS_FW_VER)->SetWindowTextW(csVersion);

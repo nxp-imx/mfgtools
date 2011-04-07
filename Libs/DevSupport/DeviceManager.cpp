@@ -16,6 +16,7 @@
 #include "UsbHubMgr.h"
 #include "MxRomDeviceClass.h"
 #include "MxHidDeviceClass.h"
+#include "CustomerDeviceClass.h"
 //#include "UsbDeviceMgr.h"
 
 #include <mswmdm_i.c>
@@ -51,8 +52,9 @@ DeviceManager::DeviceManager()
 	_devClasses[DeviceClass::DeviceTypeMxRom]         = new MxRomDeviceClass;
 	_devClasses[DeviceClass::DeviceTypeUsbController] = new usb::ControllerMgr;
 	_devClasses[DeviceClass::DeviceTypeUsbHub]        = new usb::HubMgr;
+	_devClasses[DeviceClass::DeviceTypeCst]        = new CustomerDeviceClass;
 //	_devClasses[DeviceClass::DeviceTypeUsbDevice]     = new usb::DeviceMgr;
-	if ( _devClasses.size() != 8 )
+	if ( _devClasses.size() != 9 )
 	{
 		ATLTRACE(" *** FAILED TO CREATE ALL DEVICECLASSES.\n");
 	}
@@ -347,7 +349,7 @@ std::list<Device*> DeviceManager::Devices()
 	for ( deviceClass = _devClasses.begin(); deviceClass != _devClasses.end(); ++deviceClass )
 	{
 		// skip Disk class because it will be handled by DeviceClass::DeviceTypeMsc (Volume) class
-		if ( (*deviceClass).first == DeviceClass::DeviceTypeDisk )
+		if ( (*deviceClass).first == DeviceClass::DeviceTypeDisk /*|| (*deviceClass).first == DeviceClass::DeviceTypeMsc*/)
 			continue;
 
 		std::list<Device*> classList = (*deviceClass).second->Devices();
@@ -588,7 +590,15 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
     }
 
 //	DeviceClass::NotifyStruct nsInfo = {0};
+	TRACE(_T("Thread ID: %d: Find event: %d for device: %s \n"),::GetCurrentThreadId(), eventType, msg.c_str());
 	
+	//Skip MSC device message if there is no MSC device required.
+	if(VOLUME_ARRIVAL_EVT == eventType || VOLUME_REMOVAL_EVT == eventType)
+	{
+		if(gDeviceManager::Instance()[DeviceClass::DeviceTypeMsc]->m_msc_vid == 0x00 && 
+			gDeviceManager::Instance()[DeviceClass::DeviceTypeMsc]->m_msc_pid == 0x00)
+			return;
+	}
 	switch ( eventType )
 	{
 		case DEVICE_ARRIVAL_EVT:
@@ -607,6 +617,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 			DeviceClass::NotifyStruct nsInfo = RemoveUsbDevice(msg);
 			if ( nsInfo.Device )
 			{
+				TRACE(_T("Thread ID: %d: Find DEVICE_REMOVAL_EVT for device: %s \n"), ::GetCurrentThreadId(), msg.c_str());
 				nsInfo.Event = DEVICE_REMOVAL_EVT;
 				Notify(nsInfo);
 			}
@@ -650,6 +661,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 		}
 		case HUB_ARRIVAL_EVT:
 		{
+			TRACE(_T("Thread ID: %d: Find HUB_ARRIVAL_EVT for device: %s \n"), ::GetCurrentThreadId(), msg.c_str());
 			DeviceClass::NotifyStruct nsInfo = (*this)[DeviceClass::DeviceTypeUsbHub]->AddUsbDevice(msg);
 			if ( nsInfo.Device )
 			{
@@ -668,6 +680,11 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 			}
 			break;
 		}
+		case UNKNOWN_EVT:
+		{
+			break;
+		}
+		
 		default:
 		{
 			assert(0);
@@ -690,7 +707,8 @@ void DeviceManager::Notify(const DeviceClass::NotifyStruct& nsInfo)
 
 	Observer* pWatcher;
 	std::map<HANDLE, Observer*>::iterator callback;
-	for ( callback=_callbacks.begin(); callback!=_callbacks.end(); ++callback )
+	std::map<HANDLE, Observer*> localCallbacks = _callbacks;
+	for ( callback=localCallbacks.begin(); callback!=localCallbacks.end(); ++callback )
 	{
 		bool doNotify = false;
 		
@@ -715,6 +733,7 @@ void DeviceManager::Notify(const DeviceClass::NotifyStruct& nsInfo)
 				usb::HubMgr* pHubMgr = dynamic_cast<usb::HubMgr*>(gDeviceManager::Instance()[DeviceClass::DeviceTypeUsbHub]);
 				if ( pHubMgr->FindHubByPath(pWatcher->Hub) == NULL )
 				{
+					ATLTRACE(_T("*** WARNING: DeviceManager::Notify() - Hub(%s) is no longer present\n"), pWatcher->Hub.c_str());
 					doNotify = true;
 				}
 				// else if our port changed, do the notify
@@ -722,7 +741,7 @@ void DeviceManager::Notify(const DeviceClass::NotifyStruct& nsInfo)
 				{
 					if ( pWatcher->Hub.CompareNoCase(nsInfo.Hub) == 0 )
 					{
-						 doNotify = true;
+						doNotify = true;
 					}
 				}			
 //				int32_t hubIndex = pWatcher->HubIndex;
@@ -744,21 +763,20 @@ void DeviceManager::Notify(const DeviceClass::NotifyStruct& nsInfo)
 		}
 		if ( doNotify )
 		{
+			CStdString hub = pWatcher->Hub;
+			int32_t hubIndex = pWatcher->HubIndex;
+
+			//ATLTRACE(_T("DeviceManager::Notify() - Do callback for Port %d, Hub %s\n"), pWatcher->HubIndex, pWatcher->Hub.c_str());
 			if ( pWatcher->NotifyFn(nsInfo) == retUnregisterCallback )
 			{
-//t				ATLTRACE(_T("DeviceManager::Notify() - Notified Port %d, Hub %s\n"), pWatcher->HubIndex, pWatcher->Hub.c_str());
-				eraseCallbackList.push_back((*callback).first);
+				ATLTRACE(_T("*** WARNING: DeviceManager::Notify() - Callback for Port %d, Hub %s is no longer valid.\n"), hubIndex, hub.c_str());
+				// Client that called hCallback = gDeviceManager::Instance().Register(callback)
+				// should call (or have called) gDeviceManager::Instance().Unregister(hCallback) 
 			}
 		}
 	
 	} // end for ( all registered callbacks )
 
-	while ( !eraseCallbackList.empty() )
-	{
-		HANDLE hCallback = eraseCallbackList.back();
-		Unregister(hCallback);
-		eraseCallbackList.pop_back();
-	}
 };
 
 // Runs in the context of the DeviceManager thread

@@ -152,7 +152,7 @@ LRESULT CPortMgrDlg::OnInitDialog(UINT wParam, LONG lParam)
 /*
 	// Create a DeviceManager::DeviceChangeCallback to objectize the 
 	// callback member function. In this example, the Functor 'cmd'
-	// is created to objectize CDeviceApiDlg::OnDeviceChangeNotify().
+	// is created to objectize CPortMgrDlg::OnDeviceChangeNotify().
 	DeviceManager::DeviceChangeCallback cmd(this, &CPortMgrDlg::OnDeviceChangeNotify);
 	//
 	// Create an Observer object, fill in the desired criteria, and
@@ -399,7 +399,10 @@ void CPortMgrDlg::UpdateUI(LPCTSTR _status, int _opDelta/*=0*/, int _taskRange/*
 	//
 	// Update the Port Drive Letters
 	//
-	m_port_drive_ctrl.SetWindowText(m_p_usb_port->GetDriveLetters());
+	if(m_p_usb_port)
+		m_port_drive_ctrl.SetWindowText(m_p_usb_port->GetDriveLetters());
+	else
+		m_port_drive_ctrl.SetWindowText(_T(""));
 
 }
 
@@ -702,13 +705,6 @@ BOOL CPortMgrDlg::OnDeviceChangeNotify(const DeviceClass::NotifyStruct& nsInfo)
 			break;
 		case DeviceManager::HUB_ARRIVAL_EVT:
 		case DeviceManager::HUB_REMOVAL_EVT:
-			// BAD BAD BAD BAD BAD
-			// should have gotten a stop msg before we get this message
-			ASSERT ( m_start == FALSE );
-			// I REALLY don't want to get here. I think we should be getting an 
-			// PD_EVNT_CONFIG_CHANGE msg instead, and make sure that we have a port
-			// before we (re)Create the ops.
-			
 			// see if we are still assigned
 			// if this changed we better tell the ops
 			if ( FindDlgPort() == NULL )
@@ -750,7 +746,7 @@ void CPortMgrDlg::SetUsbPort(usb::Port* _port)
 		AfxGetApp()->WriteProfileString(m_label, _T("Hub Name"), m_usb_hub_name);
 		AfxGetApp()->WriteProfileInt(m_label, _T("Hub Index"), (int)m_usb_hub_index);
 		
-		// register for device chnage callbacks on this hub/port
+		// register for device change callbacks on this hub/port
 		//
 		// First unregister if we are already registered
 		if ( m_hDevChangeCallback )
@@ -760,7 +756,7 @@ void CPortMgrDlg::SetUsbPort(usb::Port* _port)
 		}
 		// Create a DeviceManager::DeviceChangeCallback to objectize the 
 		// callback member function. In this example, the Functor 'cmd'
-		// is created to objectize CDeviceApiDlg::OnDeviceChangeNotify().
+		// is created to objectize CPortMgrDlg::OnDeviceChangeNotify().
 		DeviceManager::DeviceChangeCallback cmd(this, &CPortMgrDlg::OnDeviceChangeNotify);
 		//
 		// Create an Observer object, fill in the desired criteria, and
@@ -824,11 +820,11 @@ void CPortMgrDlg::SetUsbPort(usb::Port* _port)
 		AfxGetApp()->WriteProfileString(m_label, _T("Hub Name"), m_usb_hub_name);
 		AfxGetApp()->WriteProfileInt(m_label, _T("Hub Index"), (int)m_usb_hub_index);
 		// Unregister with gDeviceManager for callbacks on this port
-///c		if ( m_hDevChangeCallback )
-///c		{
-///c			gDeviceManager::Instance().Unregister(m_hDevChangeCallback);
-///c			m_hDevChangeCallback = NULL;
-///c		}
+		if ( m_hDevChangeCallback )
+		{
+			gDeviceManager::Instance().Unregister(m_hDevChangeCallback);
+			m_hDevChangeCallback = NULL;
+		}
 		// update my gui
 		panel_text.Format(IDS_PORTMGRDLG_PANEL_TEXT, _T('A')+m_port_display_index);
 		m_port_group_ctrl.SetWindowText(panel_text);
@@ -840,7 +836,7 @@ void CPortMgrDlg::SetUsbPort(usb::Port* _port)
 		m_port_progress_ctrl.EnableWindow(FALSE);
 
 		if ( m_p_monitor_op ) {
-			ASSERT ( m_p_monitor_op == m_p_curr_op );
+			//ASSERT ( m_p_monitor_op == m_p_curr_op );
             m_p_monitor_op->PostThreadMessage(WM_MSG_OPEVENT, COperation::OPEVENT_KILL, 0);
 			m_p_monitor_op = m_p_curr_op = NULL;
 		}

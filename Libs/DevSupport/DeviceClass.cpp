@@ -570,3 +570,10 @@ int32_t DeviceClass::ClearPort(const CStdString hubPath, const int32_t hubIndex)
 	}
 
 }
+
+
+void DeviceClass::SetMSCVidPid(USHORT vid, USHORT pid)
+{
+	m_msc_vid = vid;
+	m_msc_pid = pid;
+}

@@ -352,7 +352,7 @@ CStdString Device::hub::get()
 	return _value;
 }
 
-int32_t Device::hubIndex::getmsc()
+int32_t Device::hubIndex::getmsc(USHORT vid, USHORT pid)
 {
 	Device* dev = dynamic_cast<Device*>(_owner);
 	ASSERT(dev);
@@ -457,8 +457,8 @@ int32_t Device::hubIndex::getmsc()
 				// There is a device connected to this Port
 				if ( ConnectionInformation.ConnectionStatus == DeviceConnected )
 				{
-					if(ConnectionInformation.DeviceDescriptor.idVendor != 0x066f || \
-						ConnectionInformation.DeviceDescriptor.idProduct != 0x37ff)
+					if(ConnectionInformation.DeviceDescriptor.idVendor != vid || \
+						ConnectionInformation.DeviceDescriptor.idProduct != pid)
 						continue;
 
 					bytes = sizeof(DWORD)*2 + MAX_PATH*2;

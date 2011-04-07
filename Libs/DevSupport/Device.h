@@ -102,7 +102,7 @@ public:
 	class classDesc : public StringProperty { public: CStdString get(); }_classDesc;
 	class classIconIndex : public Int32Property { public: int32_t get(); }_classIconIndex;
 	class hub : public StringProperty { public: CStdString get(); }_hub;
-	class hubIndex : public Int32Property { public: int32_t get(); int32_t getmsc();}_hubIndex;
+	class hubIndex : public Int32Property { public: int32_t get(); int32_t getmsc(USHORT vid, USHORT pid);}_hubIndex;
 
 protected:
     DeviceClass *_deviceClass;

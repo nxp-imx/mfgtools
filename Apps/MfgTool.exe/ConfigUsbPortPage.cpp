@@ -160,7 +160,7 @@ BOOL CConfigUSBPortPage::OnInitDialog()
 
 	// Create a DeviceManager::DeviceChangeCallback to objectize the 
 	// callback member function. In this example, the Functor 'cmd'
-	// is created to objectize CDeviceApiDlg::OnDeviceChangeNotify().
+	// is created to objectize CConfigUSBPortPage::OnDeviceChangeNotify().
 	DeviceManager::DeviceChangeCallback cmd(this, &CConfigUSBPortPage::OnDeviceChangeNotify);
 	//
     // Register with DeviceManager to call us back for any device change (default parameters).

@@ -1,5 +1,34 @@
 http://sw-git01-tx30.am.freescale.net/cgi-bin/gitweb.cgi?p=mfgtools.git;a=summary
 ****************************************
+RELEASE_STMFGTOOL_1.6.2.032
+****************************************
+04/12/2010 - Starle Li
+
+    - Fix mfgtool crashing issue when plug-in/out USB hub. 
+    - Add mass storage device vid/pid checking machanism using ucl information.
+    - Improve stability by fixing some issues which cause Mfgtool crashes in some cases.
+	Apps\MfgTool.exe\OpUtpUpdate.cpp
+	Apps\MfgTool.exe\PortMgrDlg.cpp
+	Apps\MfgTool.exe\docs\changelog.txt
+	Apps\MfgTool.exe\version.h
+	Apps\MfgTool.exe\ConfigUsbPortPage.cpp
+	Apps\MfgTool.exe\ConfigUsbPortPage.h
+	Apps\MfgTool.exe\StDialogBar.cpp
+	Apps\MfgTool.exe\StMfgTool.rc
+	Apps\MfgTool.exe\UpdateCommandList.h
+	Apps\MfgTool.exe\resource.h
+	Libs\DevSupport\Device.cpp
+	Libs\DevSupport\Device.h
+	Libs\DevSupport\DeviceClass.cpp
+	Libs\DevSupport\DeviceClass.h
+	Libs\DevSupport\DeviceManager.cpp
+	Libs\DevSupport\VolumeDeviceClass.cpp
+	Libs\DevSupport\DevSupport.2008.vcproj
+	Libs\DevSupport\DeviceManager.cpp
+	Libs\DevSupport\HidDevice.cpp
+	Libs\DevSupport\MxHidDevice.cpp
+	Libs\DevSupport\VolumeDeviceClass.cpp
+****************************************
 RELEASE_STMFGTOOL_1.6.2.031
 ****************************************
 01/30/2010 - Starle Li

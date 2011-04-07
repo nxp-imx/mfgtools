@@ -72,7 +72,8 @@ int32_t MxHidDevice::AllocateIoBuffers()
     int32_t error = ERROR_SUCCESS;
 
 	// Open the device
-    HANDLE hHidDevice = CreateFile(_path.get(), 0, 0, NULL, OPEN_EXISTING, 0, NULL);
+    HANDLE hHidDevice = CreateFile(_path.get(), GENERIC_READ|GENERIC_WRITE,
+        FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 
     if( hHidDevice == INVALID_HANDLE_VALUE )
     {
