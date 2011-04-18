@@ -53,6 +53,23 @@ COpUtpUpdate::COpUtpUpdate(CPortMgrDlg *pPortMgrDlg, usb::Port *pUSBPort, COpInf
 
 	m_pProfile = m_pOpInfo->GetProfile();
 
+/*
+	reset
+	recover
+	erase
+	allocate
+	get_sizes
+	write/verify drives * num_drives
+*/
+//	m_iDuration = 5 + (int)m_pOpInfo->GetDriveArray().Size();
+/*
+	init janus
+	init store
+*/
+//	if (m_pOpInfo->GetDriveArray().GetNumDrivesByType(media::DriveType_HiddenData) &&
+//		m_pOpInfo->IsWinCE() == FALSE )
+//		m_iDuration += 2;
+
 	m_sDescription.LoadString(IDS_OPUPDATER_UPDATING);
 //	m_sVersion = GetProjectVersion();
 
@@ -85,11 +102,6 @@ COpUtpUpdate::COpUtpUpdate(CPortMgrDlg *pPortMgrDlg, usb::Port *pUSBPort, COpInf
 			TCHAR *p;
 			gDeviceManager::Instance()[DeviceClass::DeviceTypeMsc]->SetMSCVidPid((USHORT)_tcstoul(m_DeviceStates[UCL::DeviceState::Updater]->GetVid(),&p,16),
 				(USHORT)_tcstoul(m_DeviceStates[UCL::DeviceState::Updater]->GetPid(),&p,16));
-		}
-		else
-		{
-			//Set an invalid value
-			gDeviceManager::Instance()[DeviceClass::DeviceTypeMsc]->SetMSCVidPid(0x00, 0x00);
 		}
 		if( m_DeviceStates.find(UCL::DeviceState::Finished) != m_DeviceStates.end() )
 		{
@@ -230,6 +242,30 @@ const UCL::DeviceState::DeviceState_t COpUtpUpdate::GetDeviceState()
 			}
 			break;
 		}
+		/*case DeviceClass::DeviceTypeMtp:
+		{
+			devPath = m_pUSBPort->GetUsbDevicePath(); devPath.MakeUpper();
+
+			if ( m_DeviceStates[UCL::DeviceState::UserMtp] == NULL )
+			{
+				state = UCL::DeviceState::ConnectedUnknown;
+				break;
+			}
+
+			csVidPid.Format(_T("Vid_%s&Pid_%s"), m_DeviceStates[UCL::DeviceState::UserMtp]->GetVid(), m_DeviceStates[UCL::DeviceState::UserMtp]->GetPid());
+			csVidPid.MakeUpper();
+
+			if ( devPath.Find(csVidPid) != -1 )
+			{
+				state = UCL::DeviceState::UserMtp;
+			}
+			else
+			{
+				state = UCL::DeviceState::ConnectedUnknown;
+			}
+
+			break;
+		}*/
 		case DeviceClass::DeviceTypeCst:
 			state = UCL::DeviceState::Finished;
 			break;
@@ -240,7 +276,7 @@ const UCL::DeviceState::DeviceState_t COpUtpUpdate::GetDeviceState()
 			state = UCL::DeviceState::ConnectedUnknown;
 			break;
 	}
-	ATLTRACE(_T("%s device state is changed to  %d \r\n"),m_pPortMgrDlg->GetPanel(), state);
+
 	return state;
 }
 
@@ -266,18 +302,19 @@ void COpUtpUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 //	ATLTRACE(_T("%s Updater Event: %s Msg: %s DevState: %s OpState: %s\r\n"),m_pPortMgrDlg->GetPanel(), GetEventString(nEventType), dwData, GetDeviceStateString(GetDeviceState()), GetOpStateString(m_OpState));
 
     // Just return if we are in a BAD state and we get something other than START or STOP
-    /*if((nEventType != OPEVENT_START) && (nEventType != OPEVENT_STOP) && (m_OpState == OP_INVALID))
+    if((nEventType != OPEVENT_START) && (nEventType != OPEVENT_STOP) && (m_OpState == OP_INVALID))
 	{
 		ATLTRACE(_T("%s UtpUpdate Event: %s Msg: %s DevState: %s OpState: %s\r\n"),m_pPortMgrDlg->GetPanel(), GetEventString(nEventType), dwData, UCL::DeviceState::DeviceStateToString(m_CurrentDeviceState), GetOpStateString(m_OpState));
 		ATLTRACE(_T("Just return if we are in a BAD state and we get something other than START or STOP\r\n"));
 		VERIFY(::SetEvent(m_hChangeEvent));
 		return;
-	}*/
+	}
 
 	switch(nEventType)
 	{
 		case OPEVENT_START:
 		{
+
 			int iTPriority = GetThreadPriority();
 			int iPPriority = GetPriorityClass(GetCurrentProcess());
 			ATLTRACE(_T("%s Process-Thread priority: 0x%04x-%d \r\n"),m_pPortMgrDlg->GetPanel(), iPPriority, iTPriority);
@@ -310,6 +347,23 @@ void COpUtpUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 		case OPEVENT_STOP:
 		{
 			g_StopFlagged = TRUE;
+			/*if ( m_OpState == WAITING_FOR_DEVICE || m_OpState == OP_COMPLETE ||
+				m_OpState == WAITING_FOR_UPDATER_MODE || m_OpState == WAITING_FOR_MFG_MSC_MODE ||
+				m_OpState == WAITING_FOR_SECOND_UPDATER_MODE || m_OpState == OP_INVALID )
+			{
+				if (m_OpState != OP_COMPLETE)
+//					HandleError(ERROR_SUCCESS, NULL, OP_COMPLETE);
+//				else
+				{
+					taskMsg.LoadString(IDS_STOPPED_BY_USER); // "Operation stopped by user."
+					HandleError(ERROR_PROCESS_ABORTED, taskMsg, OP_INVALID);
+				}
+			}
+			else
+			{
+				taskMsg.LoadString(IDS_STOPPED_BY_USER); // "Operation stopped by user."
+				HandleError(ERROR_PROCESS_ABORTED, taskMsg, OP_INVALID);
+			}*/
 
 			if (m_OpState != OP_COMPLETE)
 			{
@@ -372,11 +426,19 @@ void COpUtpUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 					else if (m_CurrentDeviceState == UCL::DeviceState::ConnectedUnknown)
 						m_pPortMgrDlg->UpdateUI(_T("Unrecognized device."));
 				}
+//                if (CurrentDevice != null)
+//                    CurrentDevice.SendCommandProgress += new Device.SendCommandProgressHandler(CurrentDevice_SendCommandProgress);
             }
             else
             {
                 if (nEventType == OPEVENT_DEVICE_REMOVAL || nEventType == OPEVENT_VOLUME_REMOVAL)
                 {
+///                    if (m_pCurrentDevice != NULL)
+///                    {
+///                        CurrentDevice.SendCommandProgress -= CurrentDevice_SendCommandProgress;
+///                        CurrentDevice.Dispose();
+///                        CurrentDevice = null;
+///                    }
                     if (/*CurrentUpdateAction == UpdateAction.Working &&*/ m_pUTP != NULL) // ugly
                     {
                         delete m_pUTP;
@@ -384,6 +446,17 @@ void COpUtpUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
                     }
 
                     m_CurrentDeviceState = UCL::DeviceState::Disconnected;
+///                    DeviceDescStatusLabel.Text = DeviceState.Disconnected.ToString();
+
+///                    if (CurrentUpdateAction == UpdateAction.Ready)
+///                        CurrentUpdateAction = UpdateAction.NotStarted;
+/*
+                    if (CurrentUpdateAction == UpdateAction.Ready)
+                    {
+                        CurrentUpdateAction = UpdateAction.NotStarted;
+                        UpdateStatus();
+                    }
+*/
                 }
             }
 
@@ -400,6 +473,7 @@ void COpUtpUpdate::OnMsgStateChange(WPARAM nEventType, LPARAM dwData)
 			{
 				ATLTRACE(_T("%s UtpUpdate Event: %s Msg: %s DevState: %s OpState: %s NO SET_EVENT!!!\r\n"),m_pPortMgrDlg->GetPanel(), GetEventString(nEventType), dwData, UCL::DeviceState::DeviceStateToString(m_CurrentDeviceState), GetOpStateString(m_OpState));
 			}
+///            UpdateStatus();
             
 			break;
 		}
@@ -564,10 +638,167 @@ void COpUtpUpdate::HandleError(DWORD _error, LPCTSTR _errorMsg, OpState_t _nextS
 		else
 			m_pPortMgrDlg->SendMessage(WM_MSG_PD_EVENT, CPortMgrDlg::PD_EVNT_OP_COMPLETE, OPSTATUS_ERROR);
 
-		//m_OpState = OP_INVALID;
+		m_OpState = OP_INVALID;
 	}
 }
 
+//// ResetToRecovery()
+//
+// ResetToRecovery() is STAGE 1 of the Update Operation
+// Valid OpStates are WAITING_FOR_DEVICE, 
+//
+// changes member variable m_OpState
+//
+////
+/*
+DWORD COpUtpUpdate::ResetToRecovery()
+{
+	DWORD error;
+	CString taskMsg;
+
+	// No Task progress bar but bump the Operation progress bar
+	taskMsg.LoadString(IDS_OPUPDATER_RESETTING_DEVICE); // "Resetting device..."
+	m_pPortMgrDlg->UpdateUI(taskMsg, ProgressDelta(1)); // STAGE 1 of the Update Operation
+
+	error = m_pUSBPort->_device->ResetToRecovery();
+	if ( error != ERROR_SUCCESS )
+	{
+		error = m_pUSBPort->_device->OldResetToRecovery();
+	}
+
+	if ( error == ERROR_SUCCESS )
+	{
+		ATLTRACE(_T("%s ResetToRecovery - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
+	}
+	else
+	{
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s ResetToRecovery - FAILED.\r\n"), error, m_pPortMgrDlg->GetPanel());
+	}
+
+	return error;
+}
+*/
+//// RecoverDevice()
+//
+// RecoverDevice() is STAGE 2 of the Update Operation
+// Valid OpStates are WAITING_FOR_RECOVERY_MODE and WAITING_FOR_DEVICE
+//
+// changes member variable m_OpState
+//
+////
+/*
+DWORD COpUtpUpdate::RecoverDevice()
+{
+	DWORD error;
+	CString taskMsg;
+	Device::UI_Callback callback(this, &COpUtpUpdate::OnDownloadProgress);
+
+	taskMsg.LoadString(IDS_OPUPDATER_LOADING_USBMSC);
+	m_pPortMgrDlg->UpdateUI(taskMsg, ProgressDelta(2));
+	
+	RecoveryDevice* pRecoveryDevice = dynamic_cast<RecoveryDevice*>(m_pUSBPort->_device);
+	
+	if ( pRecoveryDevice == NULL )
+	{
+		error = ERROR_INVALID_HANDLE;
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s RecoverDevice() - No device.\r\n"), error, m_pPortMgrDlg->GetPanel());
+		return error;
+	}
+
+	CString recoveryFirmwareFilename = m_pOpInfo->GetPath();
+	recoveryFirmwareFilename.AppendFormat(_T("\\%s"), STATIC_ID_FW_FILENAME);
+	if ( m_pOpInfo->UseMultipleStaticIdFw() )
+	{
+		recoveryFirmwareFilename.AppendFormat(_T("%c"), m_pPortMgrDlg->GetPanelIndex()+1);
+	}
+	recoveryFirmwareFilename.Append(STATIC_ID_FW_EXTENSION);
+
+	StFwComponent fwObject(recoveryFirmwareFilename);
+
+	// Set up the Task progress bar and bump the Operation progress bar
+	taskMsg.Format(IDS_OPUPDATER_LOADING_FILE, fwObject.GetShortFileName().c_str());		// "Loading <filename> ..."
+	m_pPortMgrDlg->UpdateUI(taskMsg, ProgressDelta(2), (int)fwObject.size());               // STAGE 2 of the Update Operation
+
+	if ( (error = fwObject.GetLastError()) != ERROR_SUCCESS )
+	{
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s RecoverDevice() - Firmware object error.\r\n"), error, m_pPortMgrDlg->GetPanel());
+		return error;
+	}
+
+	//
+	// Do the Download
+	//
+	error = pRecoveryDevice->Download(fwObject, callback);
+	if(error != ERROR_SUCCESS) 
+	{
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s RecoverDevice() - Failed during Download().\r\n"), error, m_pPortMgrDlg->GetPanel());
+		return error;
+	}
+
+	// Turn off the Task progress bar
+	m_pPortMgrDlg->UpdateUI(NULL);
+
+	ATLTRACE(_T("%s RecoverDevice - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
+	return ERROR_SUCCESS;
+}
+*/
+//// RecoverhidDevice()
+//
+// RecoverHidDevice() is STAGE 2 of the Update Operation
+// Valid OpStates are WAITING_FOR_RECOVERY_MODE and WAITING_FOR_DEVICE
+//
+// changes member variable m_OpState
+//
+////
+/*
+DWORD COpUtpUpdate::DoMxRomLoad(UCL::Command* pCmd)
+{
+
+	DWORD returnVal = ERROR_SUCCESS;
+	CString taskMsg;
+
+///	taskMsg.LoadString(IDS_OPLOADER_LOAD_STARTED);
+///	m_pPortMgrDlg->UpdateUI(taskMsg, ProgressDelta(2));
+
+	MxRomDevice* pMxRomDevice = dynamic_cast<MxRomDevice*>(m_pUSBPort->_device);
+//	TRACE(_T("%s"),m_pUSBPort->_device->name.c_str());
+	if ( pMxRomDevice == NULL )
+	{
+		returnVal = ERROR_INVALID_HANDLE;
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No MxRom device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	CString fileName = m_pOpInfo->GetPath() + _T("\\") + pCmd->GetFile();
+	StFwComponent fwObject((LPCTSTR)fileName);
+	if ( fwObject.GetLastError() != ERROR_SUCCESS )
+	{
+		returnVal = fwObject.GetLastError();
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No FW component. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	// Set up the Task progress bar and bump the Operation progress bar
+///	taskMsg.Format(IDS_OPUPDATER_LOADING_FILE, myNewFwCommandSupport.GetFwComponent().GetShortFileName().c_str());   // "Loading <filename> ..."
+	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, fwObject.size(), 0);       // STAGE 2 of the Load Operation
+	Device::UI_Callback callback(this, &COpUtpUpdate::OnDownloadProgress);
+
+	returnVal = pMxRomDevice->DownloadImage(pCmd->GetAddress(), MxRomDevice::MemSectionOTH, MxRomDevice::MemSectionAPP, fwObject, callback);
+
+	if(returnVal != ERROR_SUCCESS) 
+	{
+		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, returnVal);
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load i.MXxx device. OpState: %s\r\n"), returnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return returnVal;
+	}
+
+	// Turn off the Task progress bar
+	m_pPortMgrDlg->UpdateUI(NULL);
+
+	ATLTRACE(_T("%s Recover i.MXDevice - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
+	return ERROR_SUCCESS;
+}
+*/
 DWORD COpUtpUpdate::DoMxHidLoad(UCL::Command* pCmd)
 {
     DWORD ReturnVal = ERROR_SUCCESS;
@@ -760,6 +991,124 @@ DWORD COpUtpUpdate::DoHidLoad(UCL::Command* pCmd)
 	return ERROR_SUCCESS;
 }
 
+//// InitOtpRegs()
+//
+// InitOtpRegs() is STAGE 2 of the Update Operation
+// Valid OpStates are WAITING_FOR_RECOVERY_MODE and WAITING_FOR_DEVICE
+//
+// changes member variable m_OpState
+//
+////
+/*
+DWORD COpUtpUpdate::InitOtpRegs()
+{
+
+	DWORD ReturnVal = ERROR_SUCCESS;
+	CString taskMsg;
+#ifdef DEBUGOTPINIT
+BSTR bstr_log_text;
+CString _logText;
+#endif
+
+	taskMsg.LoadString(IDS_OPLOADER_LOAD_STARTED);
+	m_pPortMgrDlg->UpdateUI(taskMsg, ProgressDelta(2));
+
+	HidDevice* pHidDevice = dynamic_cast<HidDevice*>(m_pUSBPort->_device);
+
+	if ( pHidDevice == NULL )
+	{
+#ifdef DEBUGOTPINIT
+_logText.Format(_T("%s OtpInit - pHiddevice is NULL\r\n"), m_pPortMgrDlg->GetPanel());
+bstr_log_text = _logText.AllocSysString();
+((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+#endif
+		ReturnVal = ERROR_INVALID_HANDLE;
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s No HID device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return ReturnVal;
+	}
+
+	CString fileName = //m_pOpInfo->GetDriveArray().GetDrive(media::DriveTag_Updater).Name;
+					m_pOpInfo->GetPath() + _T("\\OtpInit.sb");
+	StFwComponent::LoadFlag lflag = m_pOpInfo->GetProfile()->m_bLockedProfile ? 
+			StFwComponent::LoadFlag_ResourceOnly :
+			StFwComponent::LoadFlag_FileFirst; 
+
+	StPitc OtpInitPitc(pHidDevice, (LPCTSTR)fileName, lflag);
+
+	if ( OtpInitPitc.GetFwComponent().GetLastError() != ERROR_SUCCESS )
+	{
+#ifdef DEBUGOTPINIT
+_logText.Format(_T("%s OtpInit ERROR - GetFwComponent() rc: %x\r\n"), m_pPortMgrDlg->GetPanel(), OtpInitPitc.GetFwComponent().GetLastError());
+bstr_log_text = _logText.AllocSysString();
+((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+#endif
+		// Turn off the Task progress bar
+		m_pPortMgrDlg->UpdateUI(NULL);
+		ReturnVal = ERROR_SUCCESS; //OtpInitPitc.GetFwComponent().GetLastError();
+		ATLTRACE(_T("!!!WARNING!!! (%d): %s No OtpInit FW component. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return ReturnVal;
+	}
+#ifdef DEBUGOTPINIT
+_logText.Format(_T("%s OtpInit downloading\r\n"), m_pPortMgrDlg->GetPanel());
+bstr_log_text = _logText.AllocSysString();
+((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+#endif
+
+	// Set up the Task progress bar and bump the Operation progress bar
+	taskMsg.Format(IDS_OPUPDATER_LOADING_FILE, OtpInitPitc.GetFwComponent().GetShortFileName().c_str());   // "Loading <filename> ..."
+	m_pPortMgrDlg->UpdateUI(taskMsg, ProgressDelta(2), (int)OtpInitPitc.GetFwComponent().size(), 0);       // STAGE 2 of the Update Operation
+
+	Device::UI_Callback callback(this, &COpUtpUpdate::OnDownloadProgress);
+	ReturnVal = OtpInitPitc.DownloadPitc(callback);
+
+	if(ReturnVal != ERROR_SUCCESS) 
+	{
+#ifdef DEBUGOTPINIT
+_logText.Format(_T("%s OtpInit ERROR - DownLoadPitc() rc: %x\r\n"), m_pPortMgrDlg->GetPanel(), ReturnVal);
+bstr_log_text = _logText.AllocSysString();
+((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+#endif
+		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, ReturnVal);
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load HID device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return ReturnVal;
+	}
+
+#ifdef DEBUGOTPINIT
+_logText.Format(_T("%s OtpInit SendCommand()\r\n"), m_pPortMgrDlg->GetPanel());
+bstr_log_text = _logText.AllocSysString();
+((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+#endif
+
+	HidPitcWrite apiOtpInit(0,0,0,NULL,0); // address, length, lock, pData, sizeof(pData)
+	ReturnVal = OtpInitPitc.SendPitcCommand(apiOtpInit);
+
+	if(ReturnVal != ERROR_SUCCESS) 
+	{
+#ifdef DEBUGOTPINIT
+_logText.Format(_T("%s OtpInit ERROR - SendCommand() rc: %x\r\n"), m_pPortMgrDlg->GetPanel(), ReturnVal);
+bstr_log_text = _logText.AllocSysString();
+((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+ASSERT(FALSE);
+#endif
+
+		taskMsg.Format(IDS_OPLOADER_LOAD_ERROR, ReturnVal);
+		ATLTRACE(_T("!!!ERROR!!! (%d): %s Failed to load HID device. OpState: %s\r\n"), ReturnVal, m_pPortMgrDlg->GetPanel(), GetOpStateString(m_OpState));
+		return ReturnVal;
+	}
+
+	// Turn off the Task progress bar
+	m_pPortMgrDlg->UpdateUI(NULL);
+
+	ATLTRACE(_T("%s InitOtpRegs - SUCCESS.\r\n"),m_pPortMgrDlg->GetPanel());
+
+#ifdef DEBUGOTPINIT
+_logText.Format(_T("%s OtpInit Complete\r\n"), m_pPortMgrDlg->GetPanel(), ReturnVal);
+bstr_log_text = _logText.AllocSysString();
+((CMainFrame*)theApp.GetMainWnd())->PostMessage(WM_MSG_LOG_OP_EVENT, CEventLogger::LOGEVENT_APPEND, (LPARAM)bstr_log_text);
+#endif
+	return ERROR_SUCCESS;
+}
+*/
 CString COpUtpUpdate::GetProjectVersion()
 {
 	CString versionStr = _T("");
@@ -877,8 +1226,6 @@ UINT DoListThreadProc( LPVOID pParam )
 		pOperation->HandleError(-65535, msg, COpUtpUpdate::OP_INVALID);
 		return -65535;
 	}
-
-	pOperation->m_OpState = COpUtpUpdate::OP_READY;
 
 	logText.Format(_T("%s Start processing %s <LIST/>.\r\n"), pOperation->m_pPortMgrDlg->GetPanel(), pOperation->m_pOpInfo->GetUclInstallSection());
 	bstr_log_text = logText.AllocSysString();
@@ -1473,6 +1820,37 @@ DWORD COpUtpUpdate::DoMxRomLoad(UCL::Command* pCmd)
 	return ERROR_SUCCESS;
 }
 
+/*
+DWORD COpUtpUpdate::DoLoad(CString filename)
+{
+    DWORD retValue = 0;
+
+	if ( m_CurrentDeviceState == UCL::DeviceState::Recovery )
+    {
+///        SetText(OutputWindow, String.Format("Loading {0}.\r\n", filename), "add");
+///
+///        // register for the progress events
+///        CurrentDevice.SendCommandProgress += new Device.SendCommandProgressHandler(CurrentDevice_SendCommandProgress);
+
+        if (((IRecoverable)CurrentDevice).LoadRecoveryDevice(filename) != Win32.ERROR_SUCCESS)
+        {
+            SetText(OutputWindow, CurrentDevice.ErrorString + "\r\n", "add");
+            retValue = -65536;
+        }
+
+        // unregister for the progress events
+        CurrentDevice.SendCommandProgress -= CurrentDevice_SendCommandProgress;
+    }
+    else
+    {
+        SetText(OutputWindow, String.Format("ERROR: Device {0} is not in the correct mode for loading {1}.\r\n", CurrentDevice, filename), "add");
+        retValue = -65536;
+    }
+
+//            SetText(OutputWindow, String.Format("DONE Loading {0}.\r\n", filename), "add");
+    return retValue;
+}
+*/
 DWORD COpUtpUpdate::DoShow(UCL::Command* pCmd)
 {
     DWORD retValue = 0;

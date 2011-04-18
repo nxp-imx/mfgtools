@@ -331,7 +331,8 @@ uint32_t HidDevice::SendCommand(StApi& api, uint8_t* additionalInfo)
         }
     }
 
-    if(!ProcessReadStatus(hHidDevice, api, nsInfo)) //CSW_REPORT
+	//To workaround Huawei E587 project issue.
+    /*if(!ProcessReadStatus(hHidDevice, api, nsInfo)) //CSW_REPORT
     {
         CloseHandle(hHidDevice);
 
@@ -343,7 +344,7 @@ uint32_t HidDevice::SendCommand(StApi& api, uint8_t* additionalInfo)
 
 		ATLTRACE2(_T("-HidDevice::SendCommand(%s)  ERROR:(%d)\r\n"), api.GetName(), nsInfo.error);
         return nsInfo.error;
-    }	
+    }*/	
 
     CloseHandle(hHidDevice);
 

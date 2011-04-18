@@ -349,7 +349,8 @@ std::list<Device*> DeviceManager::Devices()
 	for ( deviceClass = _devClasses.begin(); deviceClass != _devClasses.end(); ++deviceClass )
 	{
 		// skip Disk class because it will be handled by DeviceClass::DeviceTypeMsc (Volume) class
-		if ( (*deviceClass).first == DeviceClass::DeviceTypeDisk /*|| (*deviceClass).first == DeviceClass::DeviceTypeMsc*/)
+		//Skip MSC class since there is no MSC device needed to deal now.
+		if ( (*deviceClass).first == DeviceClass::DeviceTypeDisk || (*deviceClass).first == DeviceClass::DeviceTypeMsc)
 			continue;
 
 		std::list<Device*> classList = (*deviceClass).second->Devices();
@@ -591,14 +592,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 
 //	DeviceClass::NotifyStruct nsInfo = {0};
 	TRACE(_T("Thread ID: %d: Find event: %d for device: %s \n"),::GetCurrentThreadId(), eventType, msg.c_str());
-	
-	//Skip MSC device message if there is no MSC device required.
-	if(VOLUME_ARRIVAL_EVT == eventType || VOLUME_REMOVAL_EVT == eventType)
-	{
-		if(gDeviceManager::Instance()[DeviceClass::DeviceTypeMsc]->m_msc_vid == 0x00 && 
-			gDeviceManager::Instance()[DeviceClass::DeviceTypeMsc]->m_msc_pid == 0x00)
-			return;
-	}
+
 	switch ( eventType )
 	{
 		case DEVICE_ARRIVAL_EVT:
@@ -623,7 +617,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 			}
 			break;
 		}
-		case VOLUME_ARRIVAL_EVT:
+		/*case VOLUME_ARRIVAL_EVT:
 		{
 //t			ATLTRACE(_T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT(%s)\n"), msg.c_str());
 			int msgLetterIndex;
@@ -658,7 +652,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 				}
 			}
 			break;
-		}
+		}*/
 		case HUB_ARRIVAL_EVT:
 		{
 			TRACE(_T("Thread ID: %d: Find HUB_ARRIVAL_EVT for device: %s \n"), ::GetCurrentThreadId(), msg.c_str());
@@ -675,19 +669,16 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 			DeviceClass::NotifyStruct nsInfo = (*this)[DeviceClass::DeviceTypeUsbHub]->RemoveUsbDevice(msg);
 			if ( nsInfo.Device )
 			{
+				//TRACE(_T("HUB_REMOVAL_EVT %d\n"), ::GetCurrentThreadId());
 				nsInfo.Event = HUB_REMOVAL_EVT;
 				Notify(nsInfo);
+				//TRACE(_T("HUB_REMOVAL_EVT done %d\n"), ::GetCurrentThreadId());
 			}
 			break;
 		}
-		case UNKNOWN_EVT:
-		{
-			break;
-		}
-		
 		default:
 		{
-			assert(0);
+			//assert(0);
 		}
 	} // end switch (eventType)
 }
@@ -766,7 +757,7 @@ void DeviceManager::Notify(const DeviceClass::NotifyStruct& nsInfo)
 			CStdString hub = pWatcher->Hub;
 			int32_t hubIndex = pWatcher->HubIndex;
 
-			//ATLTRACE(_T("DeviceManager::Notify() - Do callback for Port %d, Hub %s\n"), pWatcher->HubIndex, pWatcher->Hub.c_str());
+			ATLTRACE(_T("DeviceManager::Notify() - Do callback for Port %d, Hub %s\n"), pWatcher->HubIndex, pWatcher->Hub.c_str());
 			if ( pWatcher->NotifyFn(nsInfo) == retUnregisterCallback )
 			{
 				ATLTRACE(_T("*** WARNING: DeviceManager::Notify() - Callback for Port %d, Hub %s is no longer valid.\n"), hubIndex, hub.c_str());

@@ -9,7 +9,7 @@
 #include "../../Libs/DevSupport/DeviceManager.h"
 #include "../../Libs/DevSupport/UsbController.h"
 
-#define DEFAULT_PORTS	4
+#define DEFAULT_PORTS	8
 #define MAX_PORTS		16
 
 // CConfigUSBPortPage dialog

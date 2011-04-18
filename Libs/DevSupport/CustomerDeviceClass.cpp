@@ -9,9 +9,8 @@
 #include "CustomerDeviceClass.h"
 
 CustomerDeviceClass::CustomerDeviceClass(void)
-: DeviceClass(&GUID_DEVINTERFACE_CUSTOMER_DEV, NULL, NULL, DeviceTypeCst)
+: DeviceClass(&GUID_DEVINTERFACE_HUAWEI_E587, NULL, NULL, DeviceTypeCst)
 {
-	AddFilter(0x00,0x00);
 }
 
 CustomerDeviceClass::~CustomerDeviceClass(void)

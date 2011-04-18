@@ -12,10 +12,11 @@
 //  Define the customer class guid *OUTSIDE* the #ifndef/#endif to allow
 //  multiple includes with precompiled headers.
 //
-DEFINE_GUID( GUID_DEVINTERFACE_CUSTOMER_DEV, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, \
+//\\?\USB#Vid_12d1&Pid_1c22#0123456789ABCDEF#{a5dcbf10-6530-11d2-901f-00c04fb951ed} 
+DEFINE_GUID( GUID_DEVINTERFACE_HUAWEI_E587, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, \
              0xC0, 0x4F, 0xB9, 0x51, 0xED);
 // Obsolete GUID naming convention.
-#define GUID_CLASS_INPUT GUID_DEVINTERFACE_CUSTOMER_DEV
+#define GUID_CLASS_INPUT GUID_DEVINTERFACE_HUAWEI_E587
 
 class CustomerDeviceClass : public DeviceClass
 {
