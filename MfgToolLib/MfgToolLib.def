@@ -1,0 +1,25 @@
+; MfgToolLib.def : Declares the module parameters for the DLL.
+
+LIBRARY      "MfgToolLib"
+
+EXPORTS
+    ; Explicit exports can go here
+    MfgLib_SetProfileName                @1
+    MfgLib_SetListName                   @2
+    MfgLib_SetUCLFile                    @3
+    MfgLib_SetMaxBoardNumber             @4
+    MfgLib_InitializeOperation           @5
+    MfgLib_UninitializeOperation         @6
+    MfgLib_StartOperation                @7
+    MfgLib_StopOperation                 @8
+    MfgLib_GetOperationInformation       @9
+    MfgLib_GetPhaseInformation           @10
+    MfgLib_GetTotalCommandNumbers        @11
+    MfgLib_GetLibraryVersion             @12
+    MfgLib_RegisterCallbackFunction      @13
+    MfgLib_UnregisterCallbackFunction    @14
+    MfgLib_Initialize                    @15
+    MfgLib_Uninitialize                  @16
+    MfgLib_CreateInstanceHandle          @17
+    MfgLib_DestoryInstanceHandle         @18
+    MfgLib_SetUCLKeyWord                 @19
