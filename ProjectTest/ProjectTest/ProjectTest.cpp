@@ -3,19 +3,32 @@
 
 #include "stdafx.h"
 #include "ProjectTest.h"
+#include "sched.h"
+#include "semaphore.h"
+#include "pthread.h"
 
+
+#include <assert.h>
 #define MAX_LOADSTRING 100
 
 // Global Variables:
 HINSTANCE hInst;								// current instance
 TCHAR szTitle[MAX_LOADSTRING];					// The title bar text
 TCHAR szWindowClass[MAX_LOADSTRING];			// the main window class name
-
+static int washere = 0;
 // Forward declarations of functions included in this code module:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
+
+
+
+void * func(void * arg)
+{
+	washere = 1;
+	return 0;
+}
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -96,6 +109,22 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    HWND hWnd;
+	
+
+   pthread_t t;
+
+   assert(pthread_create(&t, NULL, func, NULL) == 0);
+
+   /* A dirty hack, but we cannot rely on pthread_join in this
+   primitive test. */
+   Sleep(2000);
+
+   assert(washere == 1);
+
+  
+
+
+
 
    hInst = hInstance; // Store instance handle in our global variable
 
