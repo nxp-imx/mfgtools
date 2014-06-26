@@ -159,6 +159,8 @@
     <ClCompile Include="XMLite.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="MfgToolLib.def" />
     <None Include="res\MfgToolLib.rc2" />
   </ItemGroup>
@@ -188,7 +190,10 @@
     <ClInclude Include="MxRomDeviceClass.h" />
     <ClInclude Include="ParameterT.h" />
     <ClInclude Include="Property.h" />
+    <ClInclude Include="pthread.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="sched.h" />
+    <ClInclude Include="semaphore.h" />
     <ClInclude Include="SetupApi.h" />
     <ClInclude Include="StApi.h" />
     <ClInclude Include="StApiFactory.h" />

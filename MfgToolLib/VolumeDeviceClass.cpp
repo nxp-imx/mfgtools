@@ -163,7 +163,7 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 			GetDevInfoSet();
 			for (int index=0; ; ++index)
 			{
-				devPath.Empty();
+				devPath.IsEmpty();
 				error = EnumDeviceInterfaceDetails(index, devPath, &devData);
 			//	if ( error != ERROR_SUCCESS )
 			//	{	// No match

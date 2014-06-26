@@ -128,6 +128,8 @@
     <None Include="res\MfgToolLib.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="ClassDiagram.cd" />
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CallbackDef.h">
@@ -272,6 +274,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sched.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="semaphore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

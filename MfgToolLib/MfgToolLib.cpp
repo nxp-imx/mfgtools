@@ -33,6 +33,9 @@
 //HANDLE g_hDevCanDeleteEvts[MAX_BOARD_NUMBERS];
 CString g_strVersion;
 
+// handle interthread messages
+std::queue<thread_msg> msg_queue;
+
 //
 //TODO: If this DLL is dynamically linked against the MFC DLLs,
 //		any functions exported from this DLL which call into

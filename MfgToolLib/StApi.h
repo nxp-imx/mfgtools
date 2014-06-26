@@ -273,7 +273,7 @@ namespace api
 		// Used mainly for UI support. Most applications
 		// should provide all necessary Parameters and/or Data
 		// at construction time.
-		const LPCTSTR GetName() const { return (LPCTSTR)_apiName; };
+		const LPCTSTR GetName() const { return _apiName; };
 		const UCHAR GetType() const { return _type; };
 		const bool HasParameters() const { return _params.size() > 0; };
 		Parameter::ParamMap& GetParameters() { return _params; };

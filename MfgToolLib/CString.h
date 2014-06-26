@@ -23,29 +23,34 @@ public: CTString() : tstring() { }
 		CTString(std::size_t n, T c) : tstring(n, c) { }
 	
 	
-		operator const T * () { return c_str(); }
+		operator const T * () { return c_str(); }\
+		operator const T * () const{ return c_str(); }
 		operator T * () { return c_str(); }
 		operator T * () const { return c_str(); }
 
 		
-		void Format(const T *, ...);//////
-		void AppendFormat(const T *, ...);//////
+		void Format(const T *, ...);
+		void AppendFormat(const T *, ...);
 		T * GetBufferSetLength(int length);
-		void TrimLeft();/////
-		void TrimRight();/////
-		void TrimLeft(const T *);//////
-		void TrimRight(const T *);//////
+		void TrimLeft();
+		void TrimRight();
+		void TrimLeft(T chr);
+		void TrimRight(T chr);
+		void TrimLeft(const T * chr );
+		void TrimRight(const T * chr );
 		const bool IsEmpty() { return empty(); }
 		int GetLength() { return this->length(); }
-		T * GetBuffer() { return c_str(); }
-		int CompareNoCase(const T* str) { return _tcsnicmp(c_str(), str, lenght()); }
-		int Find(T ch) const;////
-		int Find(const T * lpszSub) const;////
-		int Find(T ch, int nStart) const;////
-		int Find(const T * pstr, int nStart) const;////
-		int Replace(T chOld, T chNew);////
-		int Replace(const T * lpszOld, const T * lpszNew);////
-
+		const T * GetBuffer() { return c_str(); }
+		int CompareNoCase(const T* str) { return _tcsnicmp(c_str(), str, length()); }
+		int Find(T ch) const {return find(ch);};
+		int Find(const T * lpszSub) const{ return find(lpszSub); }
+		int Find(T ch, int nStart) const{ return find(ch, nStart); }
+		int Find(const T * pstr, int nStart) const { return find(pstr, nStart); }
+		int Replace(T chOld, T chNew);
+		int Replace(const T * lpszOld, const T * lpszNew);
+		int Compare(LPCTSTR lpsz) const;///
+		int CompareNoCase(LPCTSTR lpsz) const;///
+		void MakeUpper();
 };
 
 

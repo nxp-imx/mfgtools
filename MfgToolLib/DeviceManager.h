@@ -19,7 +19,7 @@
 class CMyExceptionHandler;
 
 class DeviceManager//:CWinThread
-{
+{	
 
 public:
 	DeviceManager(INSTANCE_HANDLE handle=NULL);
@@ -46,16 +46,16 @@ public:
     {
 		HWND	m_wnd;
     public:
-		create();
-        afx_msg BOOL OnDeviceChange(UINT nEventType,DWORD_PTR dwData);
+		void create();
+        BOOL OnDeviceChange(UINT nEventType,DWORD_PTR dwData);
 		CString DrivesFromMask(ULONG UnitMask);
-		destroy();
-		static MessageProc()
+		void destroy();
+		static void MessageProc();
         
     };
 	DevChangeWnd _DevChangeWnd;
 	
-	virtual afx_msg void OnMsgDeviceEvent(WPARAM eventType, LPARAM desc);
+	void OnMsgDeviceEvent(WPARAM eventType, LPARAM desc);
 	
 	
 	// Used by ~DeviceManager() to tell if DeviceManager::ExitInstance() was called.

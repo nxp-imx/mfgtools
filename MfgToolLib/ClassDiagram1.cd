@@ -1,0 +1,1698 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CFile" Collapsed="true">
+    <Position X="115.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CFile.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CCmdOpreation" Collapsed="true">
+    <Position X="113.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CEAQBQAAAQiAKgAYGkAAEAAJEgQEEQRoCmA6AACACCA=</HashCode>
+      <FileName>CmdOperation.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CTString&lt;T&gt;" Collapsed="true">
+    <Position X="14.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AARAEEIAAQAAAAAABAAAAAAAAAgIAIAAAAAICAAABCA=</HashCode>
+      <FileName>CString.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CTString" Collapsed="true">
+    <Position X="124" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AARAEEIAAQAAAAAABAAAAAAAAAgIAIAAAAAICAAABCA=</HashCode>
+      <FileName>CString.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Device" Collapsed="true">
+    <Position X="20" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EEgBBAAA0AICBhgECBABQgARCIAFABgAABQBAQgAgAA=</HashCode>
+      <FileName>Device.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DeviceClass" Collapsed="true">
+    <Position X="35.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CIAIUAEAAoBAAAVAQJAQAAAAQBAUAAAoARAgAAAAAAA=</HashCode>
+      <FileName>DeviceClass.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DeviceManager" Collapsed="true">
+    <Position X="113.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AoAAAAQAEAAKoAAAAKIAAAABEAAEEgRAAAEAAAjABAA=</HashCode>
+      <FileName>DeviceManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Disk" Collapsed="true">
+    <Position X="15.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Disk.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiskDeviceClass" Collapsed="true">
+    <Position X="29" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAACABAAgAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DiskDeviceClass.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMyExceptionHandler" Collapsed="true">
+    <Position X="120.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAIAIAAAIAAAAAAAAAAAABQAAAAAAACAAAg=</HashCode>
+      <FileName>ExceptionHandle.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HidDevice" Collapsed="true">
+    <Position X="17.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AMlsAAAQBBAADAECEEBQAAChAAAAAJECCiAAAAAAAIE=</HashCode>
+      <FileName>HidDevice.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HidDeviceClass" Collapsed="true">
+    <Position X="31.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAACAAAAEAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>HidDeviceClass.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KernelApi" Collapsed="true">
+    <Position X="115.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAEAAAAAAQAAAAICAAAAAAIAAAQA=</HashCode>
+      <FileName>KernelApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMfgLogMgr" Collapsed="true">
+    <Position X="117" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAACAAAACAAAAgAAIAAAAAAA=</HashCode>
+      <FileName>LogMgr.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMfgToolLibApp" Collapsed="true">
+    <Position X="118.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAASAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CCommandList" Collapsed="true">
+    <Position X="50.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAABAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CUclXml" Collapsed="true">
+    <Position X="45.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COpState" Collapsed="true">
+    <Position X="122.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAEAAAgIAAAAIAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COpCommand" Collapsed="true">
+    <Position X="8.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIQAAJBAAIAACACAAAgAAAAAAgABAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COpCmd_Find" Collapsed="true">
+    <Position X="3" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAACAAAAAAQAAAAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COpCmd_Boot" Collapsed="true">
+    <Position X="5.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AISAAABCAAAAAAABAAAAAAAEAAAAAAAAAAAAAAAAQCA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COpCmd_Init" Collapsed="true">
+    <Position X="7.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAABCAAAAAAABAAAAAAAEAAAAAAAAAAAAAAEAYCA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COpCmd_Load" Collapsed="true">
+    <Position X="9.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IIBAACBCAQAAgAABAABABgAEAAAAAEACACAAAAAAACE=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COpCmd_Jump" Collapsed="true">
+    <Position X="12" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="COpCmd_Push" Collapsed="true">
+    <Position X="14.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAABCAACABAABAAAAAAAEAAAAAAAQAAAAAAAAAGA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MxHidDevice" Collapsed="true">
+    <Position X="22.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIBQACBpABBgACUAAQgAAxAAgAIIAAIAEECAECyBA=</HashCode>
+      <FileName>MxHidDevice.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MxHidDeviceClass" Collapsed="true">
+    <Position X="35.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAAEAIAAAAAAAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>MxHidDeviceClass.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MxRomDevice" Collapsed="true">
+    <Position X="24.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MxRomDevice.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MxRomDeviceClass" Collapsed="true">
+    <Position X="42.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAQAAAAAAEAAAAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>MxRomDeviceClass.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SetupApi" Collapsed="true">
+    <Position X="122.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CBQAAAQgChhAAACBAFEAgAADAIIBAQgAxEAClaCQoYA=</HashCode>
+      <FileName>SetupApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StFwComponent" Collapsed="true">
+    <Position X="113.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>TEIAgCCQFCAAAAUBAIDGhAABQAAAAEACABAMggJAEAg=</HashCode>
+      <FileName>StFwComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StPitc" Collapsed="true">
+    <Position X="115.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAIAAAAAAAAAhAAAAAAABIAEAQAAAAAAAAQAIAAA=</HashCode>
+      <FileName>StPitc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UpdateTransportProtocol" Collapsed="true">
+    <Position X="117" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BCBAAAKAACEUAAAgAACAAAIAAEAAABIAAIgAAAAAAAA=</HashCode>
+      <FileName>UpdateTransportProtocol.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Volume" Collapsed="true">
+    <Position X="20" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAQAAEAAAAAAAFACAAAgAAACAEAAAgQCAIAQCAACAA=</HashCode>
+      <FileName>Volume.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VolumeDeviceClass" Collapsed="true">
+    <Position X="33.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAEAAEAAgDAAAAGAAAAAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>VolumeDeviceClass.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WindowsVersionInfo" Collapsed="true">
+    <Position X="118.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAaAgAgAQACgAAMAAAAUAAYAAAAAAAgIAIAIgAAAA=</HashCode>
+      <FileName>WindowsVersionInfo.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PThreadCleanup" Collapsed="true">
+    <Position X="120.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAIAAAgAAEAACAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ptw32_exception" Collapsed="true">
+    <Position X="3.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ptw32_exception_cancel" Collapsed="true">
+    <Position X="2.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ptw32_exception_exit" Collapsed="true">
+    <Position X="4.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="usb::ControllerClass" Collapsed="true">
+    <Position X="38" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAAEAAAAAAAAAIAAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>ControllerClass.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="usb::HubClass" Collapsed="true">
+    <Position X="40.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAABEAABAAAEAAAAAAAAAAAAAAAIAAAAAAACAAA=</HashCode>
+      <FileName>HubClass.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="usb::Controller" Collapsed="true">
+    <Position X="26.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAgIQAAAAIAAAAAAEAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UsbController.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="usb::Hub" Collapsed="true">
+    <Position X="13.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>UsbHub.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="usb::index" Collapsed="true">
+    <Position X="11" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UsbHub.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="usb::Port" Collapsed="true">
+    <Position X="4.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEACAAAAAAZAQACwIAQgikAACQAAgAgAAIAAAABABAI=</HashCode>
+      <FileName>UsbPort.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="property::Parameter" Collapsed="true">
+    <Position X="2.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABgEAAAAAAAAAEEAAAAAAAAAAAQAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>ParameterT.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="property::ParameterT&lt;T&gt;" Collapsed="true">
+    <Position X="2.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAgEEAAAAIAAAAAAAAAEAAAAgAAAAAAA=</HashCode>
+      <FileName>ParameterT.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="property::Property" Collapsed="true">
+    <Position X="23.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAoAAASAAAAAAEACAAACAAAAAEAADIAAAAAwAAAAA=</HashCode>
+      <FileName>Property.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="property::GuidProperty" Collapsed="true">
+    <Position X="6.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AJAACAAAAAAAAAAECAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Property.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="property::StringProperty" Collapsed="true">
+    <Position X="8.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAACAAAAAAAAAAEAAQAQAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Property.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="property::Int32Property" Collapsed="true">
+    <Position X="11" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAgAEIAABQAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Property.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StApi" Collapsed="true">
+    <Position X="59.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IgjAAADAAAABAhQABINAgBAACoYAAYFIMAAAwwIAhIA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StApiT&lt;T&gt;" Collapsed="true">
+    <Position X="59.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAIAAAABAAAAAAQAAEAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetProtocolVersion" Collapsed="true">
+    <Position X="21" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAiAAAAAAAAAAEAAAEAAAAAEAAAAAAAgACAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetChipMajorRevId" Collapsed="true">
+    <Position X="30" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABACAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAiAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetChipPartRevId" Collapsed="true">
+    <Position X="36.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAQAAAAAAAAAAAAAAAIAEgAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetROMRevId" Collapsed="true">
+    <Position X="52.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAIAQAAAAAAAAAAAAAgAAAAAAgAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetStatus" Collapsed="true">
+    <Position X="54.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAACAAEAAAACAAAAAAAAgAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetLogicalMediaInfo" Collapsed="true">
+    <Position X="61.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAFACAAAAAAJAQJIABAQAAAQAAAAAAIUAARgAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetLogicalDriveInfo" Collapsed="true">
+    <Position X="66" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>JCIAEACAAAAAAIAAJIAAIQCAAEAIAIEAIABAQgAABAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StSetLogicalDriveInfo" Collapsed="true">
+    <Position X="72.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAACA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetLogicalTable" Collapsed="true">
+    <Position X="79.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEACAAAAAAAAEAIAAAAACAAAAAIAAAAAAAgIAQAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StAllocateLogicalMedia" Collapsed="true">
+    <Position X="84" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAKAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StEraseLogicalMedia" Collapsed="true">
+    <Position X="90.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAEAAAAAAAAIAAAAAAAAAAABAAEAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StEraseLogicalMediaAsync" Collapsed="true">
+    <Position X="97.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StReadLogicalDriveSector" Collapsed="true">
+    <Position X="102" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAgAAAAIIAAAAAAEIACYAAAAAAAgAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StWriteLogicalDriveSector" Collapsed="true">
+    <Position X="108.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAABAAAEAAAIIAAAAAAEIACAIAQAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StEraseLogicalDrive" Collapsed="true">
+    <Position X="7.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAABAAAAAIAAAAAAAGAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StFilterPing" Collapsed="true">
+    <Position X="14.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAgABACA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StChipReset" Collapsed="true">
+    <Position X="23.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetChipSerialNumberInfo" Collapsed="true">
+    <Position X="39" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAECAAAAAAAAAAoAAAwAAAAAAABAAIAAAQgAAEAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetPhysicalMediaInfo" Collapsed="true">
+    <Position X="57" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQQAAAAAgAAAAAgAAEAAAAAAAAAogAAAggAgABAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StReadPhysicalMediaSector" Collapsed="true">
+    <Position X="63.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAECAAAAAAAEAAIIAAAAAAAIACIAAAAAAAgAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StResetToRecovery" Collapsed="true">
+    <Position X="68.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAABAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StInitializeJanus" Collapsed="true">
+    <Position X="75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetJanusStatus" Collapsed="true">
+    <Position X="81.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAEAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAgAAAIA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StInitializeDataStore" Collapsed="true">
+    <Position X="86.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAQAIAAAAAAACAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StResetToUpdater" Collapsed="true">
+    <Position X="93" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StGetDeviceProperties" Collapsed="true">
+    <Position X="104.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAABAgAAACIAIBAAAAEAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StSetUpdateFlag" Collapsed="true">
+    <Position X="111" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StScsiInquiry" Collapsed="true">
+    <Position X="9.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABCAAAAAAAAAAAAAAAAAAAIAAAAIAAgAABAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StScsiStartStopUnit" Collapsed="true">
+    <Position X="16.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StReadCapacity" Collapsed="true">
+    <Position X="25.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAgAAAAAAAAAAAAAAAQAAAAAAAIAgAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StRead" Collapsed="true">
+    <Position X="32.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAAAIIAAAAAAAIICIAAAAAQAgAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StWrite" Collapsed="true">
+    <Position X="41.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgCAAAAAAAAACIIAAAAAAAIACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StModeSense10" Collapsed="true">
+    <Position X="59.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAACAAAEAAAAACAAAIAAAAAAAgAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::StApiFactory" Collapsed="true">
+    <Position X="124" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAAAAAACAAAAAAAAAAgBAAAAgA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::HidInquiry" Collapsed="true">
+    <Position X="70.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QBAEAACIACAIhABgAICAhCACAAAIEMAYAAQAAgIgAAA=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::HidDownloadFw" Collapsed="true">
+    <Position X="77.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACBAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAEAAA=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::HidBltcRequestSense" Collapsed="true">
+    <Position X="88.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAACAAAACAAAAEAAAAAAAAAAAAMAAAAAAggAAAAA=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::HidDeviceReset" Collapsed="true">
+    <Position X="95.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAABAAAAAAAAAAAAEAAAAAAAAAABAA=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::HidDevicePowerDown" Collapsed="true">
+    <Position X="99.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAACAAAAAAAAAAAAIAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::HidTestUnitReady" Collapsed="true">
+    <Position X="106.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAgAAAAAAAAAAAAAEAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::HidPitcRequestSense" Collapsed="true">
+    <Position X="12" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAABAAEAAAAAAAAAAAAMAAAAAAggAAAAA=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::HidPitcInquiry" Collapsed="true">
+    <Position X="18.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAEAAEhSJgIIABAAAAAAAAAcAIQIABIpQAAJA=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::HidPitcRead" Collapsed="true">
+    <Position X="27.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAACCAEAAAAAAAIAAAAAAAAAAAMAABAAAAkAAAAA=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::HidPitcWrite" Collapsed="true">
+    <Position X="34.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAgAAAAAAAIAAAAAAAAAAAEAABAgAAEAAAAA=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::ScsiUtpMsg" Collapsed="true">
+    <Position X="47" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAEACAAAAwAIAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>UpdateTransportProtocol.Api.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::Poll" Collapsed="true">
+    <Position X="43.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UpdateTransportProtocol.Api.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::Exec" Collapsed="true">
+    <Position X="45.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAIAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>UpdateTransportProtocol.Api.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::Get" Collapsed="true">
+    <Position X="48" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UpdateTransportProtocol.Api.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="api::Put" Collapsed="true">
+    <Position X="50.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>UpdateTransportProtocol.Api.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="media::LogicalDrive" Collapsed="true">
+    <Position X="117" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAABAAAAAMgAAAAAAAAgAQQCAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>StMedia.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="media::LogicalDriveArray" Collapsed="true">
+    <Position X="118.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAgAIAAAAABBAAABEIAAAYAAAAAAhAAAA=</HashCode>
+      <FileName>StMedia.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="__unnamed_struct_0001_1" Collapsed="true">
+    <Position X="7.5" Y="29.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CallbackDef.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_0001_2" Collapsed="true">
+    <Position X="3.5" Y="29.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CallbackDef.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_tagCfgParam" Collapsed="true">
+    <Position X="30.5" Y="27.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_PortDevInfo" Collapsed="true">
+    <Position X="30.5" Y="22.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QCAAAAAAAAAAAAAACAAAAAAEAAAAAAAAAAAABAIAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_t_lib_vars" Collapsed="true">
+    <Position X="30.5" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAACAAAAAAAAAAAAAQAhAAAAQAAAgCAAACACCQACA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_Device_Change_Notify" Collapsed="true">
+    <Position X="27.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CCAAAAAAAAAAAAgAAAAAAAoAAgAAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_Operate_Result" Collapsed="true">
+    <Position X="26.5" Y="22.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAADEAAAAgAAAAAIAAAAAABAQAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_Operation_Information" Collapsed="true">
+    <Position X="22.5" Y="24.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAACAAAAAAAAAgAAAAAAAoAAAAAAAACAAAABAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_Operations_Information" Collapsed="true">
+    <Position X="26.5" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_Phase_Information" Collapsed="true">
+    <Position X="26.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAQAACAAABAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_Phases_Information" Collapsed="true">
+    <Position X="11.5" Y="24.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_0025_1" Collapsed="true">
+    <Position X="7.5" Y="24.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAACAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>MxHidDevice.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="StVersionInfo" Collapsed="true">
+    <Position X="113.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>YEAAggAgiAACQAAAAIAARQAAAAAAAAAEAAAwAAAAAAI=</HashCode>
+      <FileName>StVersionInfo.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_ui_update_info" Collapsed="true">
+    <Position X="3.5" Y="24.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAEAACAAAAAgg4AAEAAQAAAAAAAAAAAFAAAAAgAA=</HashCode>
+      <FileName>UpdateUIInfo.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_tagXmlEntity" Collapsed="true">
+    <Position X="7.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAAIAAAAAAEAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_tagXMLEntitys" Collapsed="true">
+    <Position X="3.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAFAABAAAAAAAAAQAAAAQAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_tagParseInfo" Collapsed="true">
+    <Position X="18.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAhACAAAAAAJAAAQAAAAABAAAAgAAIAIAAg=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_tagDispOption" Collapsed="true">
+    <Position X="14.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAASAAAAEAAAAgAAAAAAAAAAAAAAIAAAAAgAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_tagXMLAttr" Collapsed="true">
+    <Position X="7.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAEACAAAAAAACAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_tagXMLNode" Collapsed="true">
+    <Position X="48" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>SBAAgMAgAAACCIBKQAuJgAEAEAMNAjBAAAggACOAABA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="_tagXMLDocument" Collapsed="true">
+    <Position X="48" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAgAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="timespec" Collapsed="true">
+    <Position X="115.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAQAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_0162_2" Collapsed="true">
+    <Position X="0.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="pthread_once_t_" Collapsed="true">
+    <Position X="22.5" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAUAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ptw32_cleanup_t" Collapsed="true">
+    <Position X="122.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAACAAAAABAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="sched_param" Collapsed="true">
+    <Position X="124" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>sched.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="api::_ALLOCATE_MEDIA_CMD_ENTRY" Collapsed="true">
+    <Position X="113.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAAAIAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="api::__unnamed_struct_0033_4" Collapsed="true">
+    <Position X="15.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEACCAAEAAAAgAAAAAAAAAAAAAAAAAAAgAAAAEAQ=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="api::_MODESENSE10DATA" Collapsed="true">
+    <Position X="115.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="media::MediaAllocationEntry" Collapsed="true">
+    <Position X="118.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAEggAAAAAAAgAAAAAAAAAAAAQAAAAIAAAA=</HashCode>
+      <FileName>StMedia.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="media::HiddenDataDriveFormat" Collapsed="true">
+    <Position X="117" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAgAIAAAAAAAAAAAQAAAAAAACABAAAA=</HashCode>
+      <FileName>StMedia.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="media::MxImageObject" Collapsed="true">
+    <Position X="120.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>StMedia.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Typedef Name="LPFNDLLFUNC1" Collapsed="true">
+    <Position X="115.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>HidDevice.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPFNDLLFUNC2" Collapsed="true">
+    <Position X="117" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>HidDevice.cpp</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="HANDLE_CALLBACK" Collapsed="true">
+    <Position X="122.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CallbackDef.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="DeviceChangeCallbackStruct" Collapsed="true">
+    <Position X="7.5" Y="31.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CallbackDef.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="OperateResultUpdateStruct" Collapsed="true">
+    <Position X="3.5" Y="31.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CallbackDef.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="CString" Collapsed="true">
+    <Position X="17.5" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CString.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="CAnsiString" Collapsed="true">
+    <Position X="14.5" Y="21.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CString.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="DEVICES_ARRAY" Collapsed="true">
+    <Position X="118.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Device.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="DEV_CLASS_ARRAY" Collapsed="true">
+    <Position X="117" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DeviceClass.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPCTSTR" Collapsed="true">
+    <Position X="113.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>lnx_def.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPTSTR" Collapsed="true">
+    <Position X="120.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>lnx_def.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPOLESTR" Collapsed="true">
+    <Position X="118.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>lnx_def.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="CFG_PARAMETER" Collapsed="true">
+    <Position X="30.5" Y="29.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="OP_STATE_ARRAY" Collapsed="true">
+    <Position X="117" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="OP_COMMAND_ARRAY" Collapsed="true">
+    <Position X="115.25" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="StateCommansMap_t" Collapsed="true">
+    <Position X="113.5" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="PORT_DEV_INFO" Collapsed="true">
+    <Position X="30.5" Y="24.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="MFGLIB_VARS" Collapsed="true">
+    <Position X="30.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="PINTERNALCALLBACK" Collapsed="true">
+    <Position X="113.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="CHAR_t" Collapsed="true">
+    <Position X="115.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="BYTE_t" Collapsed="true">
+    <Position X="113.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="INSTANCE_HANDLE" Collapsed="true">
+    <Position X="124" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="MX_DEVICE_CHANGE_EVENT" Collapsed="true">
+    <Position X="30.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="MX_DEVICE_STATE" Collapsed="true">
+    <Position X="26.5" Y="29.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="MX_DEVICE_TYPE" Collapsed="true">
+    <Position X="15.5" Y="25.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="CALLBACK_TYPE" Collapsed="true">
+    <Position X="11.5" Y="29.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="DEVICE_CHANGE_NOTIFY" Collapsed="true">
+    <Position X="30.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="OPERATE_RESULT" Collapsed="true">
+    <Position X="26.5" Y="24.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="OPERATION_INFOMATION" Collapsed="true">
+    <Position X="22.5" Y="26.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="OPERATIONS_INFORMATION" Collapsed="true">
+    <Position X="26.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="PHASE_INFORMATION" Collapsed="true">
+    <Position X="26.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="PHASES_INFORMATION" Collapsed="true">
+    <Position X="11.5" Y="22.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="PCALLBACK_OPERATE_RESULT" Collapsed="true">
+    <Position X="122.25" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="PCALLBACK_DEVICE_CHANGE" Collapsed="true">
+    <Position X="120.5" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="FslMemoryInit" Collapsed="true">
+    <Position X="7.5" Y="26.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MxHidDevice.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="StdStringArray" Collapsed="true">
+    <Position X="115.25" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ParameterT.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="api::PHYSICAL_MEDIA_INFO" Collapsed="true">
+    <Position X="18.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="api::P_PHYSICAL_MEDIA_INFO" Collapsed="true">
+    <Position X="12.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="media::MediaAllocationTable" Collapsed="true">
+    <Position X="124" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StMedia.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="UI_UPDATE_INFORMATION" Collapsed="true">
+    <Position X="3.5" Y="26.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UpdateUIInfo.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="otstringstream" Collapsed="true">
+    <Position X="118.75" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="XAttr" Collapsed="true">
+    <Position X="10.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPXAttr" Collapsed="true">
+    <Position X="7.5" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="XAttrs" Collapsed="true">
+    <Position X="118.75" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="XNode" Collapsed="true">
+    <Position X="48" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPXNode" Collapsed="true">
+    <Position X="45" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="XNodes" Collapsed="true">
+    <Position X="120.5" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPXNodes" Collapsed="true">
+    <Position X="122.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="XDoc" Collapsed="true">
+    <Position X="48" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPXDoc" Collapsed="true">
+    <Position X="45" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="XENTITY" Collapsed="true">
+    <Position X="10.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPXENTITY" Collapsed="true">
+    <Position X="7.5" Y="21.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="XENTITYS" Collapsed="true">
+    <Position X="0.5" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPXENTITYS" Collapsed="true">
+    <Position X="3.5" Y="21.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="PCODE" Collapsed="true">
+    <Position X="18.5" Y="24.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="PARSEINFO" Collapsed="true">
+    <Position X="19.5" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPPARSEINFO" Collapsed="true">
+    <Position X="18.5" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="DISP_OPT" Collapsed="true">
+    <Position X="16.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="LPDISP_OPT" Collapsed="true">
+    <Position X="14.5" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="NODE_TYPE" Collapsed="true">
+    <Position X="22.5" Y="21.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="DWORD_PTR" Collapsed="true">
+    <Position X="120.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ULONG_PTR" Collapsed="true">
+    <Position X="117" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptw32_handle_t" Collapsed="true">
+    <Position X="3.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_t" Collapsed="true">
+    <Position X="3.5" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_attr_t" Collapsed="true">
+    <Position X="115.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_once_t" Collapsed="true">
+    <Position X="22.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_key_t" Collapsed="true">
+    <Position X="124" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_mutex_t" Collapsed="true">
+    <Position X="113.5" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_mutexattr_t" Collapsed="true">
+    <Position X="115.25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_cond_t" Collapsed="true">
+    <Position X="120.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_condattr_t" Collapsed="true">
+    <Position X="122.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_rwlock_t" Collapsed="true">
+    <Position X="117" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_rwlockattr_t" Collapsed="true">
+    <Position X="118.75" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_spinlock_t" Collapsed="true">
+    <Position X="120.5" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_barrier_t" Collapsed="true">
+    <Position X="117" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pthread_barrierattr_t" Collapsed="true">
+    <Position X="118.75" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptw32_cleanup_callback_t" Collapsed="true">
+    <Position X="122.25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="pid_t" Collapsed="true">
+    <Position X="124" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>sched.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="mode_t" Collapsed="true">
+    <Position X="113.5" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>semaphore.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="sem_t" Collapsed="true">
+    <Position X="124" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>semaphore.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Enum Name="_Device_Change_Event" Collapsed="true">
+    <Position X="30.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAAAAAAAAAIAICAAAAAAAgAAAAAAIA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="_Device_State" Collapsed="true">
+    <Position X="26.5" Y="27.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAAAAAAAAAAAAAAACAAEAAAAAAAAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="_Device_Type" Collapsed="true">
+    <Position X="15.5" Y="27.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAAgAIAAAAAAAAAAAAAAIhAAA=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="_Callback_Type" Collapsed="true">
+    <Position X="11.5" Y="27.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>MfgToolLib_Export.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_0053_1" Collapsed="true">
+    <Position X="18.5" Y="22.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAgAAAAAAAEAAAEAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_0053_2" Collapsed="true">
+    <Position X="22.5" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAAEAIAAAAAAAAAQAAE=</HashCode>
+      <FileName>XMLite.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_0162_1" Collapsed="true">
+    <Position X="113.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_0162_3" Collapsed="true">
+    <Position X="115.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABYAAAAgABAAAAAAAQAAAAAABBAAQAAAQMAgCAAAEAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_0162_4" Collapsed="true">
+    <Position X="117" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAgAQAEAQAAAAAAAAAAAEiAAAAAQAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ptw32_features" Collapsed="true">
+    <Position X="120.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>pthread.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_0163_1" Collapsed="true">
+    <Position X="118.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAAAACAgAAIAIAAAAAAA=</HashCode>
+      <FileName>sched.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="api::_API_TYPE" Collapsed="true">
+    <Position X="120.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAQAAAAAAQAgAAAAAAAgAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="api::_DDI_COMMAND_SET" Collapsed="true">
+    <Position X="124" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AUDUABCMJAAAgAAAACAABBEAAAAAAAAAE4IARCIIAEA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="api::_ROM_REVISION_TYPE" Collapsed="true">
+    <Position X="122.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="api::_LOGICAL_MEDIA_INFO" Collapsed="true">
+    <Position X="117" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAQEACAAgABGAAAAAAABABAAAAAAAQAwAABAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="api::_LOGICAL_DRIVE_INFO" Collapsed="true">
+    <Position X="115.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAQAAAIABCACACAAgAAAQAAIAABAAAAARgA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="api::_PROTOCOL_VERSIONS" Collapsed="true">
+    <Position X="120.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAgAAAEAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="api::_SERIAL_NO_INFO" Collapsed="true">
+    <Position X="124" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAIAAA=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="api::_DEVICE_PROPERTIES_TYPE" Collapsed="true">
+    <Position X="113.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>StApi.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="api::_BLTC_SENSE_CODE" Collapsed="true">
+    <Position X="122.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAACAAAAAAAAAAAAABAAAAgIAQAAAAE=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="api::_PITC_SENSE_CODE" Collapsed="true">
+    <Position X="118.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgEAAAAAAAAgAEQAAhAAAAAgABAASAAAAACACAAAA=</HashCode>
+      <FileName>StHidApi.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="media::PhysicalMediaType" Collapsed="true">
+    <Position X="118.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAAAEAAAAAAgEAABAAAgAAAAA=</HashCode>
+      <FileName>StMedia.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="media::LogicalDriveType" Collapsed="true">
+    <Position X="117" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAEAAEQAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>StMedia.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="media::LogicalDriveTag" Collapsed="true">
+    <Position X="115.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAgAACACEAAAAJAAICcIEAIIAAAIgAIAAAAAAAAAGCg=</HashCode>
+      <FileName>StMedia.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="media::LogicalDriveFlag" Collapsed="true">
+    <Position X="113.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAgCAAAgAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StMedia.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

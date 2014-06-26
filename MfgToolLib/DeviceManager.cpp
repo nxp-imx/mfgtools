@@ -354,8 +354,8 @@ int DeviceManager::ExitInstance()
 }
 
 //BEGIN_MESSAGE_MAP(DeviceManager::DevChangeWnd, CWnd)
-    ON_WM_DEVICECHANGE()
-END_MESSAGE_MAP()
+    //ON_WM_DEVICECHANGE()
+//END_MESSAGE_MAP()
 
 BOOL DeviceManager::DevChangeWnd::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 {
