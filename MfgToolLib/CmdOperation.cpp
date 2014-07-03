@@ -106,6 +106,12 @@ DWORD CCmdOpreation::Open()
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 
+	if (InitEvent(&RunFlag) != 0)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create RunFlag error\n"));
+		return MFGLIB_ERROR_NO_MEMORY;
+	}
+
 	m_bKilled = FALSE;
 	m_bRun = FALSE;
 	m_bDeviceOn = FALSE;
@@ -123,18 +129,23 @@ DWORD CCmdOpreation::Open()
 		_sCB.cmdOpIndex = m_WndIndex;
 		m_hDeviceChangeCallback = g_pDeviceManager->RegisterCallback(&_sCB);
 	}
+	sem_init(ev_semaphore, NULL, 0);
 
 	if (pthread_create(m_pThread, NULL, CmdListThreadProc,this) != 0)
 	{
-		::WaitForSingleObject(m_hThreadStartEvent, INFINITE);
-	}
-	::CloseHandle(m_hThreadStartEvent);
-	m_hThreadStartEvent = NULL;
 
-	((MFGLIB_VARS *)m_pLibHandle)->g_CmdOpThreadID[m_WndIndex] = this->m_nThreadID;
+		WaitOnEvent(&m_hThreadStartEvent);
+	}
+	if (DestroyEvent(&m_hThreadStartEvent) != 0){
+		std::cerr << "failed to delete event" << std::endl;
+	}
+	
+
+	((MFGLIB_VARS *)m_pLibHandle)->g_CmdOpThreadID[m_WndIndex] = *m_pThread;
 
 	// Resume CmdList thread
-	m_pThread->ResumeThread();
+	SetEvent(&RunFlag);
+	//m_pThread->ResumeThread();
 
 	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CCmdOpreation[%d]-[Device:%p] thread is Running"), m_WndIndex, m_p_usb_port->GetDevice());
 
@@ -144,21 +155,21 @@ DWORD CCmdOpreation::Open()
 void CCmdOpreation::Close()
 {
 	//End CmdListThreadProc
-	SetEvent(m_hKillEvent);
-	WaitForSingleObject(m_pThread->m_hThread, INFINITE);
+	SetEvent(&m_hKillEvent);
+	WaitForSingleObject(m_pThread->m_hThread, INFINITE); 
 
-	::CloseHandle(m_hKillEvent);
-	m_hKillEvent = NULL;
-	::CloseHandle(m_hDeviceArriveEvent);
-	m_hDeviceArriveEvent = NULL;
-	::CloseHandle(m_hDeviceRemoveEvent);
-	m_hDeviceRemoveEvent = NULL;
-	::CloseHandle(m_hRunEvent);
-	m_hRunEvent = NULL;
-	::CloseHandle(m_hStopEvent);
-	m_hStopEvent = NULL;
-	::CloseHandle(m_hDevCanDeleteEvent);
-	m_hDevCanDeleteEvent = NULL;
+	DestroyEvent(&m_hKillEvent);
+	//m_hKillEvent = NULL;
+	DestroyEvent(&m_hDeviceArriveEvent);
+	//m_hDeviceArriveEvent = NULL;
+	DestroyEvent(&m_hDeviceRemoveEvent);
+	//m_hDeviceRemoveEvent = NULL;
+	DestroyEvent(&m_hRunEvent);
+	//m_hRunEvent = NULL;
+	DestroyEvent(&m_hStopEvent);
+	//m_hStopEvent = NULL;
+	DestroyEvent(&m_hDevCanDeleteEvent);
+	//m_hDevCanDeleteEvent = NULL;
 	((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[m_WndIndex] = NULL;
 
 	if(m_hDeviceChangeCallback != NULL)
@@ -232,21 +243,20 @@ void CCmdOpreation::SetUsbPort(usb::Port* _port)
 
 BOOL CCmdOpreation::InitInstance()
 {
-	m_pThread = AfxBeginThread(CmdListThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
-	SetEvent(m_hThreadStartEvent);
-
+	//m_pThread = AfxBeginThread(CmdListThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+	SetEvent(&m_hThreadStartEvent);
 	return TRUE;
 }
 
 BOOL CCmdOpreation::OnStart()
 {
-	if(m_hRunEvent && !m_bRun)
+	if((EINVAL!=pthread_mutex_trylock(&m_hRunEvent.mutex)) && !m_bRun)
     {
 		if(m_pUTP != NULL)
 		{
 			m_pUTP->m_bShouldStop = FALSE;
 		}
-        SetEvent(m_hRunEvent);
+        SetEvent(&m_hRunEvent);
         return TRUE;
     }
     else
@@ -258,13 +268,13 @@ BOOL CCmdOpreation::OnStart()
 
 BOOL CCmdOpreation::OnStop()
 {
-	if(m_hStopEvent && m_bRun)
+	if((EINVAL!=pthread_mutex_trylock(&m_hStopEvent.mutex)) && m_bRun)
     {
 		if(m_pUTP != NULL)
 		{
 			m_pUTP->m_bShouldStop = TRUE;
 		}
-        SetEvent(m_hStopEvent);
+        SetEvent(&m_hStopEvent);
         return TRUE;
     }
     else
@@ -276,10 +286,10 @@ BOOL CCmdOpreation::OnStop()
 
 BOOL CCmdOpreation::OnDeviceArrive()
 {
-	if(m_hDeviceArriveEvent)
+	if(EINVAL!=pthread_mutex_trylock(&m_hDeviceArriveEvent.mutex))
     {
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceArriveEvent."), m_WndIndex);
-        SetEvent(m_hDeviceArriveEvent);
+        SetEvent(&m_hDeviceArriveEvent);
         return TRUE;
     }
     else
@@ -291,10 +301,10 @@ BOOL CCmdOpreation::OnDeviceArrive()
 
 BOOL CCmdOpreation::OnDeviceRemove()
 {
-	if(m_hDeviceRemoveEvent)
+	if(EINVAL!=pthread_mutex_trylock(&m_hDeviceRemoveEvent.mutex))
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceRemoveEvent."), m_WndIndex);
-        SetEvent(m_hDeviceRemoveEvent);
+        SetEvent(&m_hDeviceRemoveEvent);
         return TRUE;
     }
     else
@@ -351,7 +361,7 @@ DWORD CCmdOpreation::UpdateUI(UI_UPDATE_INFORMATION* _uiInfo,DWORD dwStateIndex)
 DWORD CCmdOpreation::WaitforEvents(DWORD dwTimeOut)
 {
     DWORD dwRet = 0;
-    HANDLE waitHandles[6] = { 
+    myevent waitHandles[6] = { 
 				m_hKillEvent, 
 				m_hDeviceArriveEvent,
 				m_hDeviceRemoveEvent,
@@ -359,8 +369,8 @@ DWORD CCmdOpreation::WaitforEvents(DWORD dwTimeOut)
 				m_hStopEvent,
 				m_hOneCmdCompleteEvent
 	};
-
-	DWORD dwResult = ::WaitForMultipleObjects(6, &waitHandles[0], FALSE, dwTimeOut);
+	sem_timedwait(ev_semaphore);
+	DWORD dwResult = ::WaitForMultipleObjects(6, &waitHandles[0], FALSE, dwTimeOut);//////////////////////////////
 	switch(dwResult)
 	{
 	case WAIT_OBJECT_0:  // stop command execution thread
@@ -427,6 +437,11 @@ void* CmdListThreadProc(void* pParam)
 	DWORD dwStateIndex = 0;
 	CString chip;
 
+
+	if (!pOperation->InitInstance()){
+
+	}
+
 	while(!pOperation->m_bKilled)
 	{
 		bStateCmdFinished = FALSE;
@@ -441,7 +456,7 @@ void* CmdListThreadProc(void* pParam)
         			delete pOperation->m_pUTP;
         			pOperation->m_pUTP = NULL;
         		}
-    			SetEvent(pOperation->m_hDevCanDeleteEvent);
+    			SetEvent(&pOperation->m_hDevCanDeleteEvent);
 				dwTimeout = INFINITE;
 				break;
 			}
@@ -751,7 +766,7 @@ void CCmdOpreation::ExecuteUIUpdate(UI_UPDATE_INFORMATION *pInfo)
 		for(cbIt=m_callbacks2.begin(); cbIt!=m_callbacks2.end(); cbIt++)
 		{
 			pCallback = (*cbIt).second;
-			if(pInfo->OperationID == pCallback->OperationID)
+			if(pthread_equal(pInfo->OperationID,pCallback->OperationID))
 			{
 				pCallback->pfunc(&m_uiInfo);
 			}

@@ -68,11 +68,6 @@ struct thread_msg{
 
 };
 
-struct myevent {
-	pthread_mutex_t mutex;
-	pthread_cond_t cond;
-	bool triggered;
-};
 
 
 

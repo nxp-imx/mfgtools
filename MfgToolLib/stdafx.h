@@ -112,9 +112,16 @@
 
 
 ///////////////////////////////////////////////////// my defines
+struct myevent {
+	pthread_mutex_t mutex;
+	pthread_cond_t cond;
+	bool* triggered;
+};
+
 int InitEvent(myevent *Ev);
-void SetEvent(myevent *Ev);
+void SetEvent(myevent *Ev,sem_t*sem_att=NULL);
 void ClearEvent(myevent *Ev);
 void WaitOnEvent(myevent *Ev);
-
+bool CheckEvent(myevent *Ev);
+int DestroyEvent(myevent * Ev);
 

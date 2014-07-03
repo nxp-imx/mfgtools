@@ -12,7 +12,7 @@
 
 typedef struct _ui_update_info
 {
-	DWORD OperationID;
+	pthread_t OperationID;
 	BOOL bUpdateDescription;
 	TCHAR strDescription[MAX_CHAR_NUMBERS];
 	BOOL bUpdateCommandsProgress;

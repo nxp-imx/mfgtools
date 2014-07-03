@@ -20,6 +20,6 @@ typedef struct
 
 typedef struct
 {
-	DWORD OperationID;
+	pthread_t OperationID;
 	PCALLBACK_OPERATE_RESULT pfunc;
 }OperateResultUpdateStruct;

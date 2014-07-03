@@ -254,7 +254,7 @@ typedef struct _t_lib_vars
 	CFG_PARAMETER g_CfgParam;
 	int g_iMaxBoardNum;
 	CCmdOpreation *g_CmdOperationArray[MAX_BOARD_NUMBERS];
-	DWORD g_CmdOpThreadID[MAX_BOARD_NUMBERS];
+	pthread_t g_CmdOpThreadID[MAX_BOARD_NUMBERS];
 	myevent* g_hDevCanDeleteEvts[MAX_BOARD_NUMBERS];
 	OP_STATE_ARRAY g_OpStates;
 	StateCommansMap_t g_StateCommands;

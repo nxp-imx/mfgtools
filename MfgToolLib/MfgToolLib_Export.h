@@ -109,7 +109,7 @@ typedef enum _Callback_Type
 
 typedef struct _Device_Change_Notify
 {
-	DWORD OperationID;
+	pthread_t OperationID;
     BYTE_t Hub[MAX_CHAR_NUMBERS];
     int HubIndex;
 	int PortIndex;
@@ -124,7 +124,7 @@ typedef struct _Device_Change_Notify
 #define COMMAND_STATUS_EXECUTE_RUNNING				3
 typedef struct _Operate_Result
 {
-	DWORD OperationID;
+	pthread_t OperationID;
 	BYTE_t cmdInfo[MAX_CHAR_NUMBERS];
 	int cmdIndex;
 	int cmdStatus;

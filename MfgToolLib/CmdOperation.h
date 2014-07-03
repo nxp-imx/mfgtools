@@ -68,6 +68,8 @@ public:
 	myevent m_hRunEvent;
 	myevent m_hStopEvent;
 	myevent m_hOneCmdCompleteEvent;
+	myevent RunFlag;
+	sem_t *ev_semaphore;
 	BOOL m_bKilled;
 	BOOL m_bRun;
 	BOOL m_bDeviceOn;
