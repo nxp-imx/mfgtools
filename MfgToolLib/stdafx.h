@@ -111,4 +111,10 @@
 
 
 
+///////////////////////////////////////////////////// my defines
+int InitEvent(myevent *Ev);
+void SetEvent(myevent *Ev);
+void ClearEvent(myevent *Ev);
+void WaitOnEvent(myevent *Ev);
+
 

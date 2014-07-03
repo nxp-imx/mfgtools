@@ -20,11 +20,12 @@ extern DEV_CLASS_ARRAY g_devClasses;
 //only for debug
 extern LARGE_INTEGER g_t1, g_t2, g_t3, g_tc;
 
-UINT CmdListThreadProc(LPVOID pParam);
+void *CmdListThreadProc(void * pParam);
+
 
 CCmdOpreation::CCmdOpreation(INSTANCE_HANDLE handle, int WndIndex)
 {
-	m_bAutoDelete = FALSE; //Don't destroy the object at thread termination
+	//m_bAutoDelete = FALSE; //Don't destroy the object at thread termination
 	m_WndIndex = WndIndex;
 	m_p_usb_port = NULL;
 	m_usb_port_index = 0;
@@ -34,8 +35,8 @@ CCmdOpreation::CCmdOpreation(INSTANCE_HANDLE handle, int WndIndex)
 
 	m_hDeviceChangeCallback = NULL;
 
-	m_hMutex_cb = ::CreateMutex(NULL, FALSE, NULL);
-	m_hMutex_cb2 = ::CreateMutex(NULL, FALSE, NULL);
+	pthread_mutex_init(&m_hMutex_cb,NULL);// = ::CreateMutex(NULL, FALSE, NULL);
+	pthread_mutex_init(&m_hMutex_cb2, NULL);// = ::CreateMutex(NULL, FALSE, NULL);
 }
 
 CCmdOpreation::~CCmdOpreation()
@@ -51,55 +52,55 @@ CCmdOpreation::~CCmdOpreation()
 }
 
 DWORD CCmdOpreation::Open()
-{
-	m_hKillEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-	if(m_hKillEvent == NULL)
+{ /// changing function from  windows events to pthread conditions  as such the errors and structure change
+	//m_hKillEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+	if(InitEvent(&m_hKillEvent)!=0)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hKillEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 
-	m_hDeviceArriveEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(m_hDeviceArriveEvent == NULL)
+	//m_hDeviceArriveEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+    if(InitEvent(&m_hDeviceArriveEvent) != 0)
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDeviceArriveEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
     }
-	m_hDeviceRemoveEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(m_hDeviceRemoveEvent == NULL)
+	//m_hDeviceRemoveEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+    if(InitEvent(&m_hDeviceRemoveEvent) != 0)
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDeviceRemoveEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
     }
-	m_hRunEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(m_hRunEvent == NULL)
+	//m_hRunEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+    if(InitEvent(&m_hRunEvent) != 0)
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hRunEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
     }
-	m_hStopEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(m_hStopEvent == NULL)
+	//m_hStopEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+    if(InitEvent(&m_hStopEvent) != 0)
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hStopEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
     }
-	m_hOneCmdCompleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(m_hOneCmdCompleteEvent == NULL)
+	//m_hOneCmdCompleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+    if(InitEvent(&m_hOneCmdCompleteEvent) != 0)
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hOneCmdCompleteEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
     }
 
-	m_hDevCanDeleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-	if(m_hDevCanDeleteEvent == NULL)
+	//m_hDevCanDeleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+	if(InitEvent(&m_hDevCanDeleteEvent) != 0)
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDevCanDeleteEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
     }
-	((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[m_WndIndex] = m_hDevCanDeleteEvent;
+	((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[m_WndIndex] = &m_hDevCanDeleteEvent;
 
-	m_hThreadStartEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(m_hThreadStartEvent == NULL)
+	//m_hThreadStartEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+    if(InitEvent(&m_hThreadStartEvent) != 0)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hThreadStartEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
@@ -123,7 +124,7 @@ DWORD CCmdOpreation::Open()
 		m_hDeviceChangeCallback = g_pDeviceManager->RegisterCallback(&_sCB);
 	}
 
-	if( CreateThread() != 0 )
+	if (pthread_create(m_pThread, NULL, CmdListThreadProc,this) != 0)
 	{
 		::WaitForSingleObject(m_hThreadStartEvent, INFINITE);
 	}
@@ -412,7 +413,7 @@ DWORD CCmdOpreation::WaitforEvents(DWORD dwTimeOut)
     return dwRet;
 }
 
-UINT CmdListThreadProc(LPVOID pParam)
+void* CmdListThreadProc(void* pParam)
 {
 	CCmdOpreation* pOperation = (CCmdOpreation*)pParam;
 

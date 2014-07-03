@@ -188,3 +188,15 @@ void CTString::MakeUpper(){
 		this->[i] = _totupper(this->[i]);
 	}
 }
+
+template<class T>
+void ReleaseBuffer(int nlength = -1){
+	if (nlength == -1){
+		this->assign(this->c_str()); // essentially resizing the string as needed
+		return;
+	}
+	else{
+		this->resize(nlength);
+		return;
+	}
+}

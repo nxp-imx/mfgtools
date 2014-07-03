@@ -134,7 +134,35 @@ void DeviceManager::SetSelfThreadRunStatus(BOOL bRunning)
 	m_bSelfThreadRunning = bRunning;
 	SetEvent(_hStartEvent);
 }
+void DeviceManager::DevChangeWnd::DeviceChangeProc(){
 
+	MSG messages;
+	wchar_t *pString = reinterpret_cast<wchar_t * > (lpParam);
+	WNDCLASSEX wc;
+	wc.hInstance = inj_hModule;
+	wc.lpszClassName = (LPCWSTR)L"InjectedDLLWindowClass";
+	wc.lpfnWndProc = DLLWindowProc;
+	wc.style = CS_DBLCLKS;
+	wc.cbSize = sizeof (WNDCLASSEX);
+	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.lpszMenuName = NULL;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
+	if (!RegisterClassEx(&wc))
+		return 0;
+	prnt_hWnd = FindWindow(L"Window Injected Into ClassName", L"Window Injected Into Caption");
+	HWND hwnd = CreateWindowEx(0, L"InjectedDLLWindowClass", pString, WS_EX_PALETTEWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 400, 300, prnt_hWnd, hMenu, inj_hModule, NULL);
+	ShowWindow(hwnd, SW_SHOWNORMAL);
+	while (GetMessage(&messages, NULL, 0, 0))
+	{
+		TranslateMessage(&messages);
+		DispatchMessage(&messages);
+	}
+	return 1;
+}
 //when CreateThread, this function will be executed
 BOOL DeviceManager::InitInstance()
 {
@@ -148,6 +176,8 @@ BOOL DeviceManager::InitInstance()
 	g_devClasses[DeviceClass::DeviceTypeUsbHub] = NULL;
 
 	// Create a hidden window and register it to receive WM_DEVICECHANGE messages
+
+
 	if( _DevChangeWnd.CreateEx(WS_EX_TOPMOST, _T("STATIC"), _T("DeviceChangeWnd"), 0, CRect(0,0,5,5), NULL, 0) )
 	{	//Create DevChangeWnd successfully
 		DEV_BROADCAST_DEVICEINTERFACE broadcastInterface;
@@ -595,7 +625,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 					if(bExceptionExist)
 					{
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceArriveBeforVolumeRemove Exception occurs"));
-						WaitForSingleObject(m_pExpectionHandler->m_hMapMsgMutex, INFINITE);
+						pthread_mutex_lock(m_pExpectionHandler->m_hMapMsgMutex);
 						mapMsg[msg] = 1;
 						ReleaseMutex(m_pExpectionHandler->m_hMapMsgMutex);
 						BSTR bstr_msg = msg.AllocSysString();

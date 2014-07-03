@@ -164,9 +164,9 @@ DWORD usb::Port::Refresh()
             }
 
             if ( _connectionInfo.Speed == UsbFullSpeed )
-                _name.Append(_T(" <Full speed (v1.1)>"));
+                _name.AppendFormat(_T(" <Full speed (v1.1)>"));
             if ( _connectionInfo.Speed == UsbHighSpeed )
-                _name.Append(_T(" <High speed (v2.0)>"));
+                _name.AppendFormat(_T(" <High speed (v2.0)>"));
         }
 
         free (driverName);

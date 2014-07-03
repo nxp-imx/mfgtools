@@ -28,7 +28,7 @@ public:
 
 public:
 	HANDLE _hStartEvent;
-	HANDLE m_hMapMsgMutex;
+	pthread_mutex_t *m_hMapMsgMutex;
 	DWORD Open();
 	void Close();
 	virtual BOOL InitInstance();

@@ -18,6 +18,10 @@
 
 #define MAX_CNT_KEYWORD         10
 
+
+
+
+
 class CCmdOpreation //: public CWinThread
 {
 public:
@@ -57,13 +61,13 @@ public:
 
 	pthread_t * m_pThread;//////////////////////
 	int m_WndIndex;
-	HANDLE m_hKillEvent;
-	HANDLE m_hDeviceArriveEvent;
-	HANDLE m_hDeviceRemoveEvent;
-	HANDLE m_hThreadStartEvent;
-	HANDLE m_hRunEvent;
-	HANDLE m_hStopEvent;
-	HANDLE m_hOneCmdCompleteEvent;
+	myevent m_hKillEvent;
+	myevent m_hDeviceArriveEvent;
+	myevent m_hDeviceRemoveEvent;
+	myevent m_hThreadStartEvent;
+	myevent m_hRunEvent;
+	myevent m_hStopEvent;
+	myevent m_hOneCmdCompleteEvent;
 	BOOL m_bKilled;
 	BOOL m_bRun;
 	BOOL m_bDeviceOn;
@@ -73,7 +77,7 @@ public:
 	UpdateTransportProtocol* m_pUTP;
 	HANDLE_CALLBACK m_hDeviceChangeCallback;
 
-	HANDLE m_hDevCanDeleteEvent;
+	myevent m_hDevCanDeleteEvent;
     OPERATE_RESULT m_uiInfo;
 	MX_DEVICE_STATE m_currentState;
 	DWORD m_dwCmdIndex;
@@ -81,8 +85,8 @@ public:
 
 	virtual int ExitInstance();
 public:
-	HANDLE m_hMutex_cb;
-	HANDLE m_hMutex_cb2;
+	pthread_mutex_t m_hMutex_cb;
+	pthread_mutex_t m_hMutex_cb2;
 	std::map<int, DeviceChangeCallbackStruct*> m_callbacks;
 	std::map<int, OperateResultUpdateStruct*> m_callbacks2;
 	void mRegisterUIDevChangeCallback(DeviceChangeCallbackStruct *pCB);

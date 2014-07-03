@@ -81,7 +81,7 @@ DWORD usb::Controller::Initialize()
         return errorCode;
     }
 
-	rootHubFilename.Append(&unicodeName.Name[0]);
+	rootHubFilename.append(&unicodeName.Name[0]);
 
     // save the Root Hub Filename to our member variable
     _rootHubFilename.put(rootHubFilename);

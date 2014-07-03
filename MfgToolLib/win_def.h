@@ -68,6 +68,14 @@ struct thread_msg{
 
 };
 
+struct myevent {
+	pthread_mutex_t mutex;
+	pthread_cond_t cond;
+	bool triggered;
+};
+
+
+
 //std::string str_format(const std::string fmt_str, ...);
 
 

@@ -44,11 +44,14 @@ public:
 	
 	class DevChangeWnd 
     {
-		HWND	m_wnd;
+		pthread_t	m_wnd;
+		HINSTANCE  hModule;          //Injected Modules Handle
     public:
 		void create();
+		void DeviceChangeProc();
         BOOL OnDeviceChange(UINT nEventType,DWORD_PTR dwData);
 		CString DrivesFromMask(ULONG UnitMask);
+		LRESULT CALLBACK DLLWindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 		void destroy();
 		static void MessageProc();
         

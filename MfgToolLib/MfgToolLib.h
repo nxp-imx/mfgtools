@@ -32,6 +32,8 @@
 // See MfgToolLib.cpp for the implementation of this class
 //
 
+HINSTANCE dll_module;
+
 class CMfgToolLibApp //: public CWinApp
 {
 public:
@@ -253,7 +255,7 @@ typedef struct _t_lib_vars
 	int g_iMaxBoardNum;
 	CCmdOpreation *g_CmdOperationArray[MAX_BOARD_NUMBERS];
 	DWORD g_CmdOpThreadID[MAX_BOARD_NUMBERS];
-	HANDLE g_hDevCanDeleteEvts[MAX_BOARD_NUMBERS];
+	myevent* g_hDevCanDeleteEvts[MAX_BOARD_NUMBERS];
 	OP_STATE_ARRAY g_OpStates;
 	StateCommansMap_t g_StateCommands;
 	PORT_DEV_INFO g_PortDevInfoArray[MAX_BOARD_NUMBERS];
@@ -316,7 +318,7 @@ DWORD GetCurrentDeviceDesc(MFGLIB_VARS *pLibVars, int DeviceIndex, TCHAR* desc, 
 BOOL FindLibraryHandle(MFGLIB_VARS *pLibVars);
 int FindOperationIndex(MFGLIB_VARS *pLibVars, DWORD operationID);
 CString ReplaceKeywords(CString str);
-
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved);
 
 
 

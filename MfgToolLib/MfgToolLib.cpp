@@ -106,7 +106,7 @@ HANDLE g_hOneInstance;
 
 BOOL CMfgToolLibApp::InitInstance()
 {
-	CWinApp::InitInstance();
+	//CWinApp::InitInstance();
 
 	TCHAR _path[MAX_PATH] = {0};
 	::GetModuleFileName(AfxGetStaticModuleState()->m_hCurrentInstanceHandle, _path, MAX_PATH);
@@ -2676,4 +2676,13 @@ CString ReplaceKeywords(CString str)
 		str.Replace(key, value);		
 	}
 	return str;
+}
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+{
+	if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
+		dll_module = hModule;
+		//CreateThread(0, NULL, ThreadProc, (LPVOID)L"Window Title", NULL, NULL);
+	}
+	return TRUE;
 }

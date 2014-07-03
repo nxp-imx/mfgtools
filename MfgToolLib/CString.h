@@ -27,7 +27,7 @@ public: CTString() : tstring() { }
 		operator const T * () const{ return c_str(); }
 		operator T * () { return c_str(); }
 		operator T * () const { return c_str(); }
-
+		
 		
 		void Format(const T *, ...);
 		void AppendFormat(const T *, ...);
@@ -38,9 +38,11 @@ public: CTString() : tstring() { }
 		void TrimRight(T chr);
 		void TrimLeft(const T * chr );
 		void TrimRight(const T * chr );
+		void Empty(){ clear(); return; }
 		const bool IsEmpty() { return empty(); }
 		int GetLength() { return this->length(); }
 		const T * GetBuffer() { return c_str(); }
+		void ReleaseBuffer(int nlength = -1);
 		int CompareNoCase(const T* str) { return _tcsnicmp(c_str(), str, length()); }
 		int Find(T ch) const {return find(ch);};
 		int Find(const T * lpszSub) const{ return find(lpszSub); }
