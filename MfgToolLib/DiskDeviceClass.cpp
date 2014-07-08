@@ -119,10 +119,10 @@ std::list<Device*>& DiskDeviceClass::Refresh()
 		Device* pDevice = CreateDevice(this, (*enumDevData).second, (*enumDevData).first);
 		if ( pDevice && pDevice->IsUsb() )
 		{
-			WaitForSingleObject(devicesMutex, INFINITE);
+			pthread_mutex_lock(devicesMutex);// , INFINITE);
 			pDevice->_hubIndex.get();
 			_devices.push_back(pDevice);
-			ReleaseMutex(devicesMutex);
+			pthread_mutex_unlock(devicesMutex);
 		}
 	}
 

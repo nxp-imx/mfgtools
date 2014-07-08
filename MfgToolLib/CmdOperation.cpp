@@ -97,7 +97,7 @@ DWORD CCmdOpreation::Open()
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDevCanDeleteEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
     }
-	((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[m_WndIndex] = &m_hDevCanDeleteEvent;
+	((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[m_WndIndex] = m_hDevCanDeleteEvent;
 
 	//m_hThreadStartEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
     if(InitEvent(&m_hThreadStartEvent) != 0)
@@ -111,7 +111,7 @@ DWORD CCmdOpreation::Open()
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create RunFlag error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-
+	
 	m_bKilled = FALSE;
 	m_bRun = FALSE;
 	m_bDeviceOn = FALSE;
@@ -131,17 +131,17 @@ DWORD CCmdOpreation::Open()
 	}
 	sem_init(ev_semaphore, NULL, 0);
 
-	if (pthread_create(m_pThread, NULL, CmdListThreadProc,this) != 0)
+	if (pthread_create(&m_pThread, NULL, CmdListThreadProc,this) != 0)
 	{
 
-		WaitOnEvent(&m_hThreadStartEvent);
+		WaitOnEvent(m_hThreadStartEvent);
 	}
-	if (DestroyEvent(&m_hThreadStartEvent) != 0){
+	if (DestroyEvent(m_hThreadStartEvent) != 0){
 		std::cerr << "failed to delete event" << std::endl;
 	}
 	
 
-	((MFGLIB_VARS *)m_pLibHandle)->g_CmdOpThreadID[m_WndIndex] = *m_pThread;
+	((MFGLIB_VARS *)m_pLibHandle)->g_CmdOpThreadID[m_WndIndex] = m_pThread;
 
 	// Resume CmdList thread
 	SetEvent(&RunFlag);
@@ -156,19 +156,19 @@ void CCmdOpreation::Close()
 {
 	//End CmdListThreadProc
 	SetEvent(&m_hKillEvent);
-	WaitForSingleObject(m_pThread->m_hThread, INFINITE); 
+	pthread_join(m_pThread,NULL);
 
-	DestroyEvent(&m_hKillEvent);
+	DestroyEvent(m_hKillEvent);
 	//m_hKillEvent = NULL;
-	DestroyEvent(&m_hDeviceArriveEvent);
+	DestroyEvent(m_hDeviceArriveEvent);
 	//m_hDeviceArriveEvent = NULL;
-	DestroyEvent(&m_hDeviceRemoveEvent);
+	DestroyEvent(m_hDeviceRemoveEvent);
 	//m_hDeviceRemoveEvent = NULL;
-	DestroyEvent(&m_hRunEvent);
+	DestroyEvent(m_hRunEvent);
 	//m_hRunEvent = NULL;
-	DestroyEvent(&m_hStopEvent);
+	DestroyEvent(m_hStopEvent);
 	//m_hStopEvent = NULL;
-	DestroyEvent(&m_hDevCanDeleteEvent);
+	DestroyEvent(m_hDevCanDeleteEvent);
 	//m_hDevCanDeleteEvent = NULL;
 	((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[m_WndIndex] = NULL;
 
@@ -250,7 +250,7 @@ BOOL CCmdOpreation::InitInstance()
 
 BOOL CCmdOpreation::OnStart()
 {
-	if((EINVAL!=pthread_mutex_trylock(&m_hRunEvent.mutex)) && !m_bRun)
+	if(NULL!=(*m_hRunEvent).mutex && !m_bRun)
     {
 		if(m_pUTP != NULL)
 		{
@@ -268,7 +268,7 @@ BOOL CCmdOpreation::OnStart()
 
 BOOL CCmdOpreation::OnStop()
 {
-	if((EINVAL!=pthread_mutex_trylock(&m_hStopEvent.mutex)) && m_bRun)
+	if (NULL != (*m_hStopEvent).mutex && m_bRun)
     {
 		if(m_pUTP != NULL)
 		{
@@ -286,7 +286,7 @@ BOOL CCmdOpreation::OnStop()
 
 BOOL CCmdOpreation::OnDeviceArrive()
 {
-	if(EINVAL!=pthread_mutex_trylock(&m_hDeviceArriveEvent.mutex))
+	if (NULL != (*m_hDeviceArriveEvent).mutex)
     {
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceArriveEvent."), m_WndIndex);
         SetEvent(&m_hDeviceArriveEvent);
@@ -301,7 +301,7 @@ BOOL CCmdOpreation::OnDeviceArrive()
 
 BOOL CCmdOpreation::OnDeviceRemove()
 {
-	if(EINVAL!=pthread_mutex_trylock(&m_hDeviceRemoveEvent.mutex))
+	if (NULL != (*m_hDeviceRemoveEvent).mutex)
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceRemoveEvent."), m_WndIndex);
         SetEvent(&m_hDeviceRemoveEvent);
@@ -317,7 +317,7 @@ BOOL CCmdOpreation::OnDeviceRemove()
 int CCmdOpreation::ExitInstance()
 {
 	// TODO: Add your specialized code here and/or call the base class
-	return CWinThread::ExitInstance();
+	return 0;// CWinThread::ExitInstance();
 }
 
 BOOL CCmdOpreation::CanRun()
@@ -358,10 +358,17 @@ DWORD CCmdOpreation::UpdateUI(UI_UPDATE_INFORMATION* _uiInfo,DWORD dwStateIndex)
 
 
 
-DWORD CCmdOpreation::WaitforEvents(DWORD dwTimeOut)
+DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 {
     DWORD dwRet = 0;
-    myevent waitHandles[6] = { 
+	struct timespec timeToWait;
+	struct timeval now;
+	
+	gettimeofday(&now);
+	timeToWait.tv_sec = now.tv_sec+dwTimeOut;
+	timeToWait.tv_nsec = now.tv_usec * 1000;
+	
+    myevent *waitHandles[6] = { 
 				m_hKillEvent, 
 				m_hDeviceArriveEvent,
 				m_hDeviceRemoveEvent,
@@ -369,15 +376,20 @@ DWORD CCmdOpreation::WaitforEvents(DWORD dwTimeOut)
 				m_hStopEvent,
 				m_hOneCmdCompleteEvent
 	};
-	sem_timedwait(ev_semaphore);
-	DWORD dwResult = ::WaitForMultipleObjects(6, &waitHandles[0], FALSE, dwTimeOut);//////////////////////////////
+	int dwResult;
+	if (-1 == sem_timedwait(ev_semaphore, &timeToWait)){
+		dwResult = 6;
+	}
+	else{
+		int dwResult = CheckArrayOfEvents(waitHandles, 6);
+	}//DWORD dwResult = ::WaitForMultipleObjects(6, &waitHandles[0], FALSE, dwTimeOut);//////////////////////////////
 	switch(dwResult)
 	{
-	case WAIT_OBJECT_0:  // stop command execution thread
+	case 0:  // stop command execution thread
 		m_bKilled = TRUE;
 		dwRet = 0;
 		break;
-	case WAIT_OBJECT_0+1: // device arrive
+	case 1: // device arrive
 		TRACE(_T("WaitforEvents device arrive1\r\n"));
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--WaitforEvents device arrive1"), m_WndIndex);
 		//bDeviceChange = TRUE;
@@ -386,7 +398,7 @@ DWORD CCmdOpreation::WaitforEvents(DWORD dwTimeOut)
 		m_bDeviceOn = TRUE;
 		dwRet = 1;
 		break;
-	case WAIT_OBJECT_0+2: // device remove
+	case 2: // device remove
 		TRACE(_T("CmdListThreadProc device remove1\r\n"));
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--WaitforEvents device remove1"), m_WndIndex);
 		//bDeviceChange = TRUE;
@@ -401,23 +413,24 @@ DWORD CCmdOpreation::WaitforEvents(DWORD dwTimeOut)
 		//SetEvent(pOperation->m_hDevCanDeleteEvent);
 		dwRet = 2;
 		break;
-	case WAIT_OBJECT_0+3: // press the Start button
+	case 3: // press the Start button
 		m_bRun = TRUE;
 		dwRet = 3;
 		break;
-	case WAIT_OBJECT_0+4: // press the Stop button
+	case 4: // press the Stop button
 		m_bRun = FALSE;
 		dwRet = 4;
 		break;
-	case WAIT_OBJECT_0+5: // one command execution finished
+	case 5: // one command execution finished
 		//pOperation->m_CmdIndex++;
 		dwRet = 5;
 		break;
-	case WAIT_TIMEOUT: // no any event, time out
+	case 6: // no any event, time out
 		//dwTimeout = INFINITE;
 		dwRet = 6;
 		break;
 	default:
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_WARNING, _T("CmdOpreation[%d]--WaitForEvent wrong code"), m_WndIndex);
 		break;
 	}
     return dwRet;
@@ -428,7 +441,7 @@ void* CmdListThreadProc(void* pParam)
 	CCmdOpreation* pOperation = (CCmdOpreation*)pParam;
 
 	BOOL bStateCmdFinished = FALSE;
-	DWORD dwTimeout = INFINITE;
+	time_t dwTimeout = INFINITE;
 	Device* pDevice = NULL;
 	MX_DEVICE_STATE currentState = MX_DISCONNECTED;
 	DWORD dwError = MFGLIB_ERROR_SUCCESS;
@@ -441,6 +454,9 @@ void* CmdListThreadProc(void* pParam)
 	if (!pOperation->InitInstance()){
 
 	}
+
+	WaitOnEvent(pOperation->RunFlag);
+
 
 	while(!pOperation->m_bKilled)
 	{
@@ -559,36 +575,35 @@ void* CmdListThreadProc(void* pParam)
 			}
 		}while(pOperation->CanRun() && !bStateCmdFinished && ((dwError == MFGLIB_ERROR_SUCCESS) || (dwError == MFGLIB_ERROR_SKIP)));
 	}
-
 	return 0;
 }
 
 void CCmdOpreation::mRegisterUIDevChangeCallback(DeviceChangeCallbackStruct *pCB)
 {
-	WaitForSingleObject(m_hMutex_cb, INFINITE);
+	pthread_mutex_lock(&m_hMutex_cb);
 	m_callbacks[m_WndIndex] = pCB;
-	ReleaseMutex(m_hMutex_cb);
+	pthread_mutex_unlock(&m_hMutex_cb);
 }
 
 void CCmdOpreation::mUnregisterUIDevChangeCallback()
 {
-	WaitForSingleObject(m_hMutex_cb, INFINITE);
+	pthread_mutex_lock(&m_hMutex_cb);
 	m_callbacks.erase(m_WndIndex);
-	ReleaseMutex(m_hMutex_cb);
+	pthread_mutex_unlock(&m_hMutex_cb);
 }
 
 void CCmdOpreation::mRegisterUIInfoUpdateCallback(OperateResultUpdateStruct *pCB)
 {
-	WaitForSingleObject(m_hMutex_cb2, INFINITE);
+	pthread_mutex_lock(&m_hMutex_cb2);
 	m_callbacks2[m_WndIndex] = pCB;
-	ReleaseMutex(m_hMutex_cb2);
+	pthread_mutex_unlock(&m_hMutex_cb2);
 }
 
 void CCmdOpreation::mUnregisterUIInfoUpdateCallback()
 {
-		WaitForSingleObject(m_hMutex_cb2, INFINITE);
+		pthread_mutex_lock(&m_hMutex_cb2);
 		m_callbacks2.erase(m_WndIndex);
-		ReleaseMutex(m_hMutex_cb2);
+		pthread_mutex_unlock(&m_hMutex_cb2);
 }
 
 void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
@@ -667,7 +682,7 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 
 	if( (pnsinfo->Event != DeviceManager::HUB_ARRIVAL_EVT) && (pnsinfo->Event != DeviceManager::HUB_REMOVAL_EVT) )
 	{
-		WaitForSingleObject(m_hMutex_cb, INFINITE);
+		pthread_mutex_lock(&m_hMutex_cb);
 		if( !m_callbacks.empty() )
 		{
 			for(; cbIt!=m_callbacks.end(); cbIt++)
@@ -675,7 +690,7 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 				(*cbIt).second->pfunc(&m_ni);
 			}
 		}
-		ReleaseMutex(m_hMutex_cb);
+		pthread_mutex_unlock(&m_hMutex_cb);
 	}
 
 	switch(pnsinfo->Event)
@@ -760,7 +775,7 @@ void CCmdOpreation::ExecuteUIUpdate(UI_UPDATE_INFORMATION *pInfo)
 	}
 	m_uiInfo.OperationID = pInfo->OperationID;
 
-	WaitForSingleObject(m_hMutex_cb2, INFINITE);
+	pthread_mutex_lock(&m_hMutex_cb2);
 	if( !m_callbacks2.empty() )
 	{
 		for(cbIt=m_callbacks2.begin(); cbIt!=m_callbacks2.end(); cbIt++)
@@ -772,5 +787,5 @@ void CCmdOpreation::ExecuteUIUpdate(UI_UPDATE_INFORMATION *pInfo)
 			}
 		}
 	}
-	ReleaseMutex(m_hMutex_cb2);
+	pthread_mutex_unlock(&m_hMutex_cb2);
 }

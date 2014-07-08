@@ -18,6 +18,8 @@
 #include "sched.h"
 #include "semaphore.h"
 #include "pthread.h"
+#include <limits>
+#include <time.h>
 
 #include "CString.h"
 #ifdef DEBUG
@@ -67,10 +69,11 @@ struct thread_msg{
 	
 
 };
-
-
-
-
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#define DELTA_EPOCH_IN_MICROSECS  116444736000000000Ui64 // CORRECT
+#else
+#define DELTA_EPOCH_IN_MICROSECS  116444736000000000ULL // CORRECT
+#endif
 //std::string str_format(const std::string fmt_str, ...);
 
 

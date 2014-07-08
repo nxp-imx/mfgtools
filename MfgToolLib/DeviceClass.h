@@ -89,7 +89,7 @@ public:
 	HDEVINFO _deviceInfoSet;
 	DEVICES_ARRAY _devices;
 	DEVICES_ARRAY _oldDevices;
-	HANDLE devicesMutex;
+	pthread_mutex_t *devicesMutex=NULL;
 
 	USHORT m_msc_vid;
 	USHORT m_msc_pid;

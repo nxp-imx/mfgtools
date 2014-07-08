@@ -593,7 +593,7 @@ void HidPitcInquiry::ProcessResponse(const UCHAR *const pData, const UINT start,
 	        _pitcInfo.Version.SetRevision(Swap2(pData + sizeof(_pitcInfo.Id) + sizeof(USHORT) + sizeof(USHORT)));
             break;
         case InfoPage_PitcSense:
-            _pitcSenseInfo = *(wchar_t*)pData;
+            _pitcSenseInfo = (wchar_t*)pData;
             break;
         case InfoPage_OtpReg:
             _otpRegInfo.Address  = Swap4(pData);

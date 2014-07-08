@@ -32,7 +32,7 @@ DeviceClass::DeviceClass(LPCGUID iFaceGuid, LPCGUID devGuid, LPCTSTR enumerator,
 	_classDevGuid.describe(this, _T("Device Class GUID"), _T("Describes the device class."));
 	_enumerator.describe(this, _T("Enumerator"), _T(""));
 
-	devicesMutex = CreateMutex(NULL, FALSE, NULL);
+	pthread_mutex_init(devicesMutex,NULL);// = CreateMutex(NULL, FALSE, NULL);
 	if(devicesMutex == NULL)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("create DeviceClass::devicesMutex failed"));
@@ -45,7 +45,7 @@ DeviceClass::DeviceClass(LPCGUID iFaceGuid, LPCGUID devGuid, LPCTSTR enumerator,
 
 DeviceClass::~DeviceClass()
 {
-	WaitForSingleObject(devicesMutex, INFINITE);
+	pthread_mutex_lock(devicesMutex);// , INFINITE);
 	//delete all devices that are created
 	while ( _devices.size() > 0 )
     {
@@ -59,8 +59,8 @@ DeviceClass::~DeviceClass()
         _oldDevices.pop_back();
         delete dev;
     }
-	ReleaseMutex(devicesMutex);
-    CloseHandle(devicesMutex);
+	pthread_mutex_unlock(devicesMutex);
+    pthread_mutex_destroy(devicesMutex);
 
 	if ( _deviceInfoSet != INVALID_HANDLE_VALUE )
     {
@@ -326,10 +326,10 @@ Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListTyp
 						if( devInstPathToFind.CompareNoCase( pDevice->UsbDevice()->_deviceInstanceID.get() ) == 0 )
 						{
 							// Found what we are looking for
-							WaitForSingleObject(devicesMutex, INFINITE);
+							pthread_mutex_lock(devicesMutex);// , INFINITE);
 							DWORD portindex = pDevice->_hubIndex.get();
 							_devices.push_back(pDevice);
-							ReleaseMutex(devicesMutex);
+							pthread_mutex_unlock(devicesMutex);
 							LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceClass::FindDeviceByUsbPath--DeviceListType_New, Find the device, Port: %d"), portindex);
 							break;
 						}

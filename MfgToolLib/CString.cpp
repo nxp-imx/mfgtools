@@ -200,3 +200,23 @@ void ReleaseBuffer(int nlength = -1){
 		return;
 	}
 }
+
+template<class T>
+CTString<T> CTString::Mid(int nFirst) const{
+	return	this->substr(nFirst,this->length()-nFirst));
+}
+
+template<class T>
+CTString<T> CTString::Mid(int nFirst, int nCount) const{
+	return this->substr(nFirst, nCount);
+}
+
+template<class T>
+CTString<T> CTString::Left(int nCount) const{
+	return this->substr(0, nCount);
+}
+
+template<class T>
+CTString<T> CTString::Right(int nCount) const{
+	return this->substr(nCount,this->length()=(this->length()-nCount));
+}

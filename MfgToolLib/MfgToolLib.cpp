@@ -863,7 +863,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	int pos = pLibVars->g_strUclFilename.ReverseFind(_T('\\'));
 	pLibVars->g_strPath = pLibVars->g_strUclFilename.Left(pos+1);  //+1 for add '\' at the last
 
-	CStringT<char,StrTraitMFC<char> > uclString;
+	CAnsiString uclString;
 	CFile UclXmlFile;
 	if(!UclXmlFile.Open(pLibVars->g_strUclFilename, CFile::modeReadWrite, NULL))
 	{
@@ -2339,10 +2339,10 @@ void DeinitCmdOperation(MFGLIB_VARS *pLibVars, int WndIndex)
 	if(pLibVars->g_CmdOperationArray[WndIndex] != NULL)
 	{
 		pLibVars->g_CmdOperationArray[WndIndex]->Close();
-		::PostThreadMessage(pLibVars->g_CmdOperationArray[WndIndex]->m_nThreadID, WM_QUIT, 0, 0);
+		//::PostThreadMessage(pLibVars->g_CmdOperationArray[WndIndex]->m_nThreadID, WM_QUIT, 0, 0);
 		// Wait for the CCmdOpreation thread to die before returning
-		WaitForSingleObject(pLibVars->g_CmdOperationArray[WndIndex]->m_hThread, INFINITE);
-		pLibVars->g_CmdOperationArray[WndIndex]->m_hThread = NULL;
+		WaitOnEvent(&pLibVars->g_CmdOperationArray[WndIndex]->thread_dead); //, INFINITE);
+		DestroyEvent(&pLibVars->g_CmdOperationArray[WndIndex]->thread_dead);// = NULL;
 
 		delete pLibVars->g_CmdOperationArray[WndIndex];
 		pLibVars->g_CmdOperationArray[WndIndex] = NULL;

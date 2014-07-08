@@ -287,7 +287,8 @@ DWORD SetupApi::apiCM_Get_Device_ID(
     error = CM_Get_Device_ID_Size(&BufferLen, dnDevInst, 0);
     if ( error != CR_SUCCESS )
     {
-        ATLTRACE(_T("*** ASSERTION FAILED: Line %d of file %s\n"), __LINE__, __TFILE__);
+		std::cerr << "*** ASSERTION FAILED: Line " << __LINE__ << " of file " << __TFILE__ << std::endl;
+       // ATLTRACE(_T("*** ASSERTION FAILED: Line %d of file %s\n"), __LINE__, __TFILE__);
         throw;
     }
 
@@ -302,7 +303,8 @@ DWORD SetupApi::apiCM_Get_Device_ID(
     error = CM_Get_Device_IDW(dnDevInst, Buffer, BufferLen, 0);
     if ( error != CR_SUCCESS )
     {
-        ATLTRACE(_T("*** ASSERTION FAILED: Line %d of file %s\n"), __LINE__, __TFILE__);
+		std::cerr << "*** ASSERTION FAILED: Line " << __LINE__ << " of file " << __TFILE__ << std::endl;
+        //ATLTRACE(_T("*** ASSERTION FAILED: Line %d of file %s\n"), __LINE__, __TFILE__);
         throw;
     }
     

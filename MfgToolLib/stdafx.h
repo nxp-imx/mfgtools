@@ -113,15 +113,30 @@
 
 ///////////////////////////////////////////////////// my defines
 struct myevent {
-	pthread_mutex_t mutex;
-	pthread_cond_t cond;
-	bool* triggered;
+	pthread_mutex_t *mutex=NULL;
+	pthread_cond_t *cond=NULL;
+	bool triggered=false;
 };
+#ifdef INFINITE
+#undef INFINITE
+#endif
+#define INFINITE (time_t)std::numeric_limits<time_t>::max;  //redefine infinite for time_t  types
 
-int InitEvent(myevent *Ev);
+#ifndef __LINUX__
+int gettimeofday(struct timeval * tv);
+
+
+
+#endif
+
+
+
+
+int InitEvent(myevent **Ev);
 void SetEvent(myevent *Ev,sem_t*sem_att=NULL);
 void ClearEvent(myevent *Ev);
 void WaitOnEvent(myevent *Ev);
 bool CheckEvent(myevent *Ev);
 int DestroyEvent(myevent * Ev);
+int CheckArrayOfEvents(myevent* container[], int length);
 

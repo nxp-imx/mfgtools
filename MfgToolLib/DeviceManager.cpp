@@ -755,11 +755,11 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 					TRACE(_T("Device manager wait for end\r\n"));
 					//int index = dwResult - WAIT_OBJECT_0;
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent()-DEVICE_REMOVAL_EVT, hDevCanDeleteEvent has been set"));
-					WaitForSingleObject(g_devClasses[class_type]->devicesMutex, INFINITE);
+					pthread_mutex_lock(g_devClasses[class_type]->devicesMutex);// , INFINITE);
 					delete (*deviceIt);
 					g_devClasses[class_type]->_devices.erase(deviceIt);
 					//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT Device Object[0x%X] has been delete"), (*deviceIt));
-					ReleaseMutex(g_devClasses[class_type]->devicesMutex);
+					pthread_mutex_unlock(g_devClasses[class_type]->devicesMutex);
 				}
 			}
 			break;
@@ -838,7 +838,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 				DWORD dwResult = WaitForSingleObject(((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[nsInfo.Device->GetDeviceWndIndex()], INFINITE);
 				TRACE(_T("Device manager wait for end\r\n"));
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent()-VOLUME_REMOVAL_EVT, hDevCanDeleteEvent has been set"));
-				WaitForSingleObject(g_devClasses[DeviceClass::DeviceTypeMsc]->devicesMutex, INFINITE);
+				pthread_mutex_lock(g_devClasses[DeviceClass::DeviceTypeMsc]->devicesMutex);// , INFINITE);
 				//find the corresponding disk device
 				std::list<Device*>::iterator diskIt;
 				for(diskIt=g_devClasses[DeviceClass::DeviceTypeDisk]->_devices.begin(); diskIt!=g_devClasses[DeviceClass::DeviceTypeDisk]->_devices.end(); ++diskIt)
@@ -853,7 +853,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 				g_devClasses[DeviceClass::DeviceTypeDisk]->_devices.erase(diskIt);
 				delete (*deviceIt);
 				g_devClasses[DeviceClass::DeviceTypeMsc]->_devices.erase(deviceIt);
-				ReleaseMutex(g_devClasses[DeviceClass::DeviceTypeMsc]->devicesMutex);
+				pthread_mutex_unlock(g_devClasses[DeviceClass::DeviceTypeMsc]->devicesMutex);
 			}
 			break;
 		} //end case VOLUME_REMOVAL_EVT

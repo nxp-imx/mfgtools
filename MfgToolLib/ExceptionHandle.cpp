@@ -14,7 +14,7 @@
 
 CMyExceptionHandler::CMyExceptionHandler()
 {
-	m_bAutoDelete = FALSE; //Don't destroy the object at thread termination
+	//m_bAutoDelete = FALSE; //Don't destroy the object at thread termination
 }
 
 CMyExceptionHandler::~CMyExceptionHandler()
@@ -23,13 +23,13 @@ CMyExceptionHandler::~CMyExceptionHandler()
 
 DWORD CMyExceptionHandler::Open()
 {
-	_hStartEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL); //Auto reset, nosignal
-	if( _hStartEvent == NULL )
+	//_hStartEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL); //Auto reset, nosignal
+	if( InitEvent(&_hStartEvent) != 0 )
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CMyExceptionHandler::Open()--Create _hStartEvent failed"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	m_hMapMsgMutex = ::CreateMutex(NULL, FALSE, NULL);
+	pthread_mutex_init(&m_hMapMsgMutex,NULL);// = ::CreateMutex(NULL, FALSE, NULL);
 	if( m_hMapMsgMutex == NULL )
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CMyExceptionHandler::Open()--Create m_hMapMsgMutex failed"));
@@ -37,23 +37,23 @@ DWORD CMyExceptionHandler::Open()
 	}
 
 	DWORD dwErrCode = ERROR_SUCCESS;
-	if( CreateThread() != 0 ) //create CMyExceptionHandler thread successfully
+	if (pthread_create(&Exception_thread, NULL, CmdListThreadProc, this) != 0) //create CMyExceptionHandler thread successfully
 	{
-		::WaitForSingleObject(_hStartEvent, INFINITE);
+		WaitOnEvent(_hStartEvent);
 	}
 	else //create DeviceManager thread failed
 	{
 		dwErrCode = GetLastError();
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CMyExceptionHandler::Open()--Create CMyExceptionHandler thread failed(error: %d)"), dwErrCode);
-		::CloseHandle(m_hMapMsgMutex);
-		::CloseHandle(_hStartEvent);
+		pthread_mutex_destroy(&m_hMapMsgMutex);
+		DestroyEvent(_hStartEvent);
 		return MFGLIB_ERROR_THREAD_CREATE_FAILED;
 	}
 
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CMyExceptionHandler thread is running"));
 
 	// clean up
-	::CloseHandle(_hStartEvent);
+	DestroyEvent(_hStartEvent);
 	_hStartEvent = NULL;
 
 	return MFGLIB_ERROR_SUCCESS;
@@ -64,13 +64,13 @@ void CMyExceptionHandler::Close()
 	// Post a KILL event to kill Exception Handler thread
 	PostThreadMessage(WM_MSG_EXCEPTION_EVENT, KillExceptionHandlerThread, 0);
 	// Wait for the Exception Handler thread to die before returning
-	WaitForSingleObject(m_hThread, INFINITE);
+	pthread_join(Exception_thread,NULL);//WaitForSingleObject(m_hThread, INFINITE);
 	
-	::CloseHandle(m_hMapMsgMutex);
+	pthread_mutex_destroy(&m_hMapMsgMutex);
 	m_hMapMsgMutex = NULL;
 	
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Exception Handler thread is closed"));
-	m_hThread = NULL;
+	//m_hThread = NULL;
 }
 
 BOOL CMyExceptionHandler::InitInstance()
@@ -101,7 +101,7 @@ void CMyExceptionHandler::OnMsgExceptionEvent(WPARAM ExceptionType, LPARAM desc)
 
 		Sleep(50);
 
-		WaitForSingleObject(m_hMapMsgMutex, INFINITE);
+		pthread_mutex_lock(&m_hMapMsgMutex);// , INFINITE);
 		std::map<CString, int>::iterator it = g_pDeviceManager->mapMsg.find(msg);
 		if(it == g_pDeviceManager->mapMsg.end())
 		{

@@ -100,7 +100,8 @@ StApi* StApiFactory::CreateApi(CString name, CString paramStr)
 	if ( i == _callbacks.end() )
 	{
 		// not found
-		ATLTRACE(_T("*** ASSERTION FAILED: Line %d of file %s\n"), __LINE__, __TFILE__);
+		std::cerr << "*** ASSERTION FAILED: Line " << __LINE__ << " of file " << __TFILE__ << std::endl;
+		//ATLTRACE(_T("*** ASSERTION FAILED: Line %d of file %s\n"), __LINE__, __TFILE__);
 		throw std::runtime_error("Unknown API name.");
 	}
 	// Invoke the creation function

@@ -27,6 +27,7 @@ public: CTString() : tstring() { }
 		operator const T * () const{ return c_str(); }
 		operator T * () { return c_str(); }
 		operator T * () const { return c_str(); }
+		void operator=(T * buff){	this->assign(buff);return;}
 		
 		
 		void Format(const T *, ...);
@@ -53,6 +54,10 @@ public: CTString() : tstring() { }
 		int Compare(LPCTSTR lpsz) const;///
 		int CompareNoCase(LPCTSTR lpsz) const;///
 		void MakeUpper();
+		CTString<T> Mid(int nFirst) const;
+		CTString<T> Mid(int nFirst, int nCount) const;
+		CTString<T> Left(int nCount) const;
+		CTString<T> Right(int nCount) const;
 };
 
 

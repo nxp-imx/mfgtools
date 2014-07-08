@@ -59,16 +59,17 @@ public:
 
 	MX_DEVICE_STATE GetDeviceState();
 
-	pthread_t * m_pThread;//////////////////////
+	pthread_t  m_pThread;//////////////////////
 	int m_WndIndex;
-	myevent m_hKillEvent;
-	myevent m_hDeviceArriveEvent;
-	myevent m_hDeviceRemoveEvent;
-	myevent m_hThreadStartEvent;
-	myevent m_hRunEvent;
-	myevent m_hStopEvent;
-	myevent m_hOneCmdCompleteEvent;
-	myevent RunFlag;
+	myevent *m_hKillEvent;
+	myevent *m_hDeviceArriveEvent;
+	myevent *m_hDeviceRemoveEvent;
+	myevent *m_hThreadStartEvent;
+	myevent *m_hRunEvent;
+	myevent *m_hStopEvent;
+	myevent *m_hOneCmdCompleteEvent;
+	myevent *RunFlag;
+	myevent *m_hDevCanDeleteEvent;
 	sem_t *ev_semaphore;
 	BOOL m_bKilled;
 	BOOL m_bRun;
@@ -79,7 +80,7 @@ public:
 	UpdateTransportProtocol* m_pUTP;
 	HANDLE_CALLBACK m_hDeviceChangeCallback;
 
-	myevent m_hDevCanDeleteEvent;
+	
     OPERATE_RESULT m_uiInfo;
 	MX_DEVICE_STATE m_currentState;
 	DWORD m_dwCmdIndex;
@@ -98,7 +99,7 @@ public:
 	void OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo);
 	DEVICE_CHANGE_NOTIFY m_ni;
 	void ExecuteUIUpdate(UI_UPDATE_INFORMATION *pInfo);
-	DWORD WaitforEvents(DWORD dwTimeout);
+	DWORD WaitforEvents(time_t dwTimeout);
 	BOOL CanRun(void);
 	DWORD UpdateUI(UI_UPDATE_INFORMATION* _uiInfo,DWORD dwStateIndex);
 };

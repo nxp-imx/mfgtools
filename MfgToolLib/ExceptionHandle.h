@@ -27,8 +27,11 @@ public:
 	} Except_Kind_t;
 
 public:
-	HANDLE _hStartEvent;
-	pthread_mutex_t *m_hMapMsgMutex;
+	pthread_t Exception_thread;
+	myevent* _hStartEvent;
+	myevent * thread_dead;
+	pthread_mutex_t m_hMapMsgMutex;
+
 	DWORD Open();
 	void Close();
 	virtual BOOL InitInstance();

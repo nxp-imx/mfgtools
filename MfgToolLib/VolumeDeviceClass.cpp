@@ -191,10 +191,10 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 							{
 								// found the new volume
 								// so add it to our vector
-								WaitForSingleObject(devicesMutex, INFINITE);
+								pthread_mutex_lock(devicesMutex);//, INFINITE);
 								pDevice->_hubIndex.get();
 								_devices.push_back(pDevice);
-								ReleaseMutex(devicesMutex);
+								pthread_mutex_unlock(devicesMutex);
 								//TraceStr.Format(_T("VolumeDeviceClass::AddUsbDevice()  Created new(%d) - %s:\r\n"), _devices.size(), msgLetter.c_str());
 								break;
 							}
