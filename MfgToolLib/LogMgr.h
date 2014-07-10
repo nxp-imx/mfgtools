@@ -36,7 +36,7 @@ public:
 	DWORD WriteToLogFile(CString& strMsg);
 
 private:
-    CStdioFile m_file; 
+    FILE * m_file; 
 };
 
 

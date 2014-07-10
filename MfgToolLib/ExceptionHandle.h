@@ -32,6 +32,7 @@ public:
 	myevent * thread_dead;
 	pthread_mutex_t m_hMapMsgMutex;
 
+	std::queue<thread_msg> t_msgQ;
 	DWORD Open();
 	void Close();
 	virtual BOOL InitInstance();

@@ -8,8 +8,19 @@ int InitEvent(myevent **Ev){
 	int ret = 0;
 	*Ev = new myevent();
 	ret += pthread_mutex_init((*Ev)->mutex, 0);
-	if (ret != 0)return ret;
+	if (ret != 0){
+		pthread_mutex_destroy((*Ev)->mutex);
+		delete *Ev;
+		*Ev = 0;
+		return ret;
+	}
 	ret += pthread_cond_init((*Ev)->cond, 0);
+	if (ret != 0){
+		pthread_mutex_destroy((*Ev)->mutex);
+		pthread_cond_destroy((*Ev)->cond);
+		delete *Ev;
+		*Ev = 0;
+	}
 	return ret;
 }
 void SetEvent(myevent *Ev, sem_t*sem_att) {

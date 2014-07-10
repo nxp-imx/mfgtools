@@ -59,12 +59,12 @@ public:
 	DevChangeWnd _DevChangeWnd;
 	
 	void OnMsgDeviceEvent(WPARAM eventType, LPARAM desc);
-	
+	pthread_t m_hThread;
 	
 	// Used by ~DeviceManager() to tell if DeviceManager::ExitInstance() was called.
 	BOOL _bStopped;
 	// Used by Open() to syncronize DeviceManager thread start.
-	HANDLE _hStartEvent;
+	myevent * _hStartEvent;
 	// Message Support
 	HDEVNOTIFY _hUsbDev;
 	HDEVNOTIFY _hUsbHub;
@@ -83,7 +83,7 @@ public:
 
 	BOOL m_bHasConnected[MAX_BOARD_NUMBERS];
 
-	HANDLE m_hMutex_cb;
+	pthread_mutex_t m_hMutex_cb;
 	std::map<HANDLE_CALLBACK, CBStruct*> m_callbacks;
 	HANDLE_CALLBACK RegisterCallback(CBStruct *pCB);
 	void UnregisterCallback(HANDLE_CALLBACK hCallback);

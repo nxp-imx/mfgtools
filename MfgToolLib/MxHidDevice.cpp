@@ -16,6 +16,7 @@
 #include "Device.h"
 #include "MfgToolLib_Export.h"
 #include "MfgToolLib.h"
+#include <sys/stat.h>
 
 #include "MxHidDevice.h"
 
@@ -287,15 +288,16 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
     SDPCmd.command = ROM_KERNEL_CMD_WR_MEM;
     SDPCmd.dataCount = 4;
 
-	CFile scriptFile;
-	if( !scriptFile.Open(filename, CFile::modeRead | CFile::shareDenyNone, NULL) )
+	FILE * scriptFile = _tfopen(filename, _T("r"));
+	if( scriptFile==NULL )
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't open file %s."), filename);
 		return FALSE;
 	}
-
+	struct _stat64i32 FileLen;
+	_tstat(filename, &FileLen);
 	CAnsiString cmdString;
-	scriptFile.Read(cmdString.GetBufferSetLength((int)scriptFile.GetLength()), (unsigned int)scriptFile.GetLength());
+	std::fread(cmdString.GetBufferSetLength(FileLen.st_size),sizeof(char), (unsigned int)FileLen.st_size,scriptFile);
 	cmdString.ReleaseBuffer();
 
 	XNode script;
@@ -311,7 +313,7 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
             SDPCmd.address = pCmd->GetAddress();
 			if ( !WriteReg(&SDPCmd) )
             {
-                TRACE("In InitMemoryDevice(): write memory failed\n");
+                TRACE(_T("In InitMemoryDevice(): write memory failed\n"));
                 CloseMxHidHandle();
                 return FALSE;
             }

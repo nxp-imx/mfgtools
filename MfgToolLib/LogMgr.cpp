@@ -21,61 +21,71 @@ CMfgLogMgr::CMfgLogMgr()
 	int pos = filename.ReverseFind(_T('\\'));
 	filename = filename.Left(pos+1);	//+1 for add '\' at the last
     filename += LOG_FILE_NAME;
-
-	BOOL bret = m_file.Open(filename, CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone | CFile::osWriteThrough | CFile::typeText);
-	if(!bret)
+	m_file = _tfopen(filename, _T("r+"));
+	struct _stat64i32 FileLen;
+	_tstat(filename, &FileLen);
+	//BOOL bret = m_file.Open(filename, CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone | CFile::osWriteThrough | CFile::typeText);
+	if(m_file==NULL)
 	{
 		throw 1;
 	}
-    if (m_file.m_hFile != CFile::hFileNull)
-        m_file.SeekToEnd();
+    if (m_file!=NULL)
+        std::fseek(m_file,FileLen.st_size,SEEK_SET);
 
 	CString strDllVersion = _T("");
 	strDllVersion += g_strVersion;
 	strDllVersion += _T("\n");
 	WriteToLogFile(strDllVersion);
 
-	CTime time = CTime::GetCurrentTime();
+	time_t timer;
+	time(&timer);// = CTime::GetCurrentTime();
 	CString cstr_time = _T("");
-    cstr_time += time.Format("%#c");
+    cstr_time.AppendFormat(_T("%s"),ctime(&timer));
 	cstr_time += _T("   Start new logging\n");
 	WriteToLogFile(cstr_time);
 }
 
 CMfgLogMgr::CMfgLogMgr(CString strFilename)
 {
-	BOOL bret = m_file.Open(strFilename, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeReadWrite | CFile::shareDenyNone | CFile::osWriteThrough | CFile::typeText);
-	if(!bret)
+	m_file = _tfopen(strFilename, _T("a+"));
+	struct _stat64i32 FileLen;
+	_tstat(strFilename, &FileLen);
+	//BOOL bret = m_file.Open(strFilename, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeReadWrite | CFile::shareDenyNone | CFile::osWriteThrough | CFile::typeText);
+	if(m_file==NULL)
 	{
 		throw 1;
 	}
-    if (m_file.m_hFile != CFile::hFileNull)
-        m_file.SeekToEnd();
+	if (m_file != NULL)
+		std::fseek(m_file, FileLen.st_size, SEEK_SET);
 
-    CTime time = CTime::GetCurrentTime();
-    CString cstr_time = _T("");
-    cstr_time += time.Format("%#c");
+	CString strDllVersion = _T("");
+	strDllVersion += g_strVersion;
+	strDllVersion += _T("\n");// added to this function to presumably add logging of version  similar to function above
+	WriteToLogFile(strDllVersion);
+
+	time_t timer;
+	time(&timer);// = CTime::GetCurrentTime();
+	CString cstr_time = _T("");
+	cstr_time.AppendFormat(_T("%s"), ctime(&timer));
 	cstr_time += _T("   Start new logging\n");
-
-    //PrintLog(0,0,cstr_time.GetBuffer());
-    //cstr_time.ReleaseBuffer();
 	WriteToLogFile(cstr_time);
 }
 
 CMfgLogMgr::~CMfgLogMgr()
 {
-    if (m_file.m_hFile != CFile::hFileNull)
+    if (m_file!=NULL)
 	{
-        m_file.Close();
+        std::fclose(m_file);
+		m_file = NULL;
 	}
 }
 
 DWORD CMfgLogMgr::WriteToLogFile(CString& strMsg)
 {
-	if (m_file.m_hFile != CFile::hFileNull)
+	if (m_file != NULL)
     {
-		m_file.WriteString(strMsg);
-        m_file.Flush();
+		_fputts(strMsg, m_file);
+		std::fflush(m_file);
 		return WRITE_SUCCESS;
 	}
 	else
@@ -98,10 +108,10 @@ void CMfgLogMgr::PrintLog(DWORD moduleID, DWORD levelID, const TCHAR * format, .
 
     CString str;
     str.Format(_T("ModuleID[%d] LevelID[%d]: %s\n"),moduleID, levelID, buffer);
-    if (m_file.m_hFile != CFile::hFileNull)
+	if (m_file != NULL)
     {
-		m_file.WriteString(str);
-        m_file.Flush();
+		_fputts(str,m_file);
+		std::fflush(m_file);
 	}
     
     free(buffer);

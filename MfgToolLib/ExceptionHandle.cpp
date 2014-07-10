@@ -21,6 +21,18 @@ CMyExceptionHandler::~CMyExceptionHandler()
 {
 }
 
+void* ExceptionHandlerThreadProc(void* pParam)
+{	
+	CMyExceptionHandler* pExceptionHandler = (CMyExceptionHandler*)pParam;
+
+	///t_msgQ
+	/// check and dispatch messages  assigned with semafore dispatch to  OnMsgExceptionEvent
+
+
+	return 0;
+
+
+}
 DWORD CMyExceptionHandler::Open()
 {
 	//_hStartEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL); //Auto reset, nosignal
@@ -37,7 +49,7 @@ DWORD CMyExceptionHandler::Open()
 	}
 
 	DWORD dwErrCode = ERROR_SUCCESS;
-	if (pthread_create(&Exception_thread, NULL, CmdListThreadProc, this) != 0) //create CMyExceptionHandler thread successfully
+	if (pthread_create(&Exception_thread, NULL, ExceptionHandlerThreadProc, this) != 0) //create CMyExceptionHandler thread successfully
 	{
 		WaitOnEvent(_hStartEvent);
 	}
@@ -62,7 +74,7 @@ DWORD CMyExceptionHandler::Open()
 void CMyExceptionHandler::Close()
 {
 	// Post a KILL event to kill Exception Handler thread
-	PostThreadMessage(WM_MSG_EXCEPTION_EVENT, KillExceptionHandlerThread, 0);
+	//PostThreadMessage(WM_MSG_EXCEPTION_EVENT, KillExceptionHandlerThread, 0);
 	// Wait for the Exception Handler thread to die before returning
 	pthread_join(Exception_thread,NULL);//WaitForSingleObject(m_hThread, INFINITE);
 	
@@ -116,15 +128,15 @@ void CMyExceptionHandler::OnMsgExceptionEvent(WPARAM ExceptionType, LPARAM desc)
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceArriveBeforVolumeRemove exception handling"));
 			g_pDeviceManager->mapMsg.erase(it);
 			ReleaseMutex(m_hMapMsgMutex);
-			bstr_msg = msg.AllocSysString();
-			g_pDeviceManager->PostThreadMessage(WM_MSG_DEV_EVENT, (WPARAM)(DeviceManager::DEVICE_ARRIVAL_EVT), (LPARAM)bstr_msg);
+			//bstr_msg = msg.AllocSysString();
+			//g_pDeviceManager->PostThreadMessage(WM_MSG_DEV_EVENT, (WPARAM)(DeviceManager::DEVICE_ARRIVAL_EVT), (LPARAM)bstr_msg);
 			break;
 		case DeviceArriveButEnumFailed:
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceArriveButEnumFailed exception handling"));
 			g_pDeviceManager->mapMsg.erase(it);
 			ReleaseMutex(m_hMapMsgMutex);
-			bstr_msg = msg.AllocSysString();
-			g_pDeviceManager->PostThreadMessage(WM_MSG_DEV_EVENT, (WPARAM)(DeviceManager::DEVICE_ARRIVAL_EVT), (LPARAM)bstr_msg);
+			//bstr_msg = msg.AllocSysString();
+			//g_pDeviceManager->PostThreadMessage(WM_MSG_DEV_EVENT, (WPARAM)(DeviceManager::DEVICE_ARRIVAL_EVT), (LPARAM)bstr_msg);
 			break;
 		default:
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Unknown exception type"));

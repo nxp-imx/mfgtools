@@ -32,7 +32,7 @@
 // See MfgToolLib.cpp for the implementation of this class
 //
 
-HINSTANCE dll_module;
+extern HINSTANCE dll_module;
 
 class CMfgToolLibApp //: public CWinApp
 {
@@ -316,7 +316,7 @@ void UnregisterUIDevChangeCallback(MFGLIB_VARS *pLibVars, int DeviceIndex);
 void gOnDeviceChangeNotify(INSTANCE_HANDLE handle, DeviceClass::NotifyStruct *pNsInfo);
 DWORD GetCurrentDeviceDesc(MFGLIB_VARS *pLibVars, int DeviceIndex, TCHAR* desc, int maxSize);
 BOOL FindLibraryHandle(MFGLIB_VARS *pLibVars);
-int FindOperationIndex(MFGLIB_VARS *pLibVars, DWORD operationID);
+int FindOperationIndex(MFGLIB_VARS *pLibVars, pthread_t operationID);
 CString ReplaceKeywords(CString str);
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved);
 

@@ -14,7 +14,7 @@ typedef void *HANDLE_CALLBACK;
 
 typedef struct 
 {
-	DWORD OperationID;
+	pthread_t OperationID;
 	PCALLBACK_DEVICE_CHANGE pfunc;
 }DeviceChangeCallbackStruct;
 

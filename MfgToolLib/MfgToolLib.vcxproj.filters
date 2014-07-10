@@ -114,12 +114,6 @@
     <ClCompile Include="XMLite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CString.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MfgToolLib.def">
@@ -271,9 +265,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lnx_def.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pthread.h">

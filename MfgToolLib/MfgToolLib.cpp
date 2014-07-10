@@ -29,6 +29,8 @@
 //#define new DEBUG_NEW
 #endif
 
+HINSTANCE dll_module;
+
 
 //HANDLE g_hDevCanDeleteEvts[MAX_BOARD_NUMBERS];
 CString g_strVersion;
@@ -109,7 +111,7 @@ BOOL CMfgToolLibApp::InitInstance()
 	//CWinApp::InitInstance();
 
 	TCHAR _path[MAX_PATH] = {0};
-	::GetModuleFileName(AfxGetStaticModuleState()->m_hCurrentInstanceHandle, _path, MAX_PATH);
+	//::GetModuleFileName(AfxGetStaticModuleState()->m_hCurrentInstanceHandle, _path, MAX_PATH);
 
 	theApp.m_strDllFullPath = _path;
 	int pos = theApp.m_strDllFullPath.ReverseFind(_T('\\'));
@@ -286,12 +288,13 @@ DWORD MfgLib_SetUCLFile(INSTANCE_HANDLE handle, BYTE_t *strName)
 
 	pLibVars->g_strUclFilename = theApp.m_strDllFullPath + _T("Profiles") + _T("\\") + pLibVars->g_CfgParam.chip + _T("\\") + _T("OS Firmware") + _T("\\") + strName;
 	//Open Ucl.xml
-	CFile UclXmlFile;
-	if( !UclXmlFile.Open(pLibVars->g_strUclFilename, CFile::modeReadWrite, NULL) )
+	FILE * UclXmlFile = _tfopen(pLibVars->g_strUclFilename, _T("r+"));
+	if( UclXmlFile==NULL)
     {
 		return MFGLIB_ERROR_FILE_NOT_EXIST;
     }
-	UclXmlFile.Close();
+	std::fclose(UclXmlFile);
+	
 
 	return MFGLIB_ERROR_SUCCESS;
 }
@@ -398,7 +401,7 @@ DWORD MfgLib_UninitializeOperation(INSTANCE_HANDLE handle)
 	return MFGLIB_ERROR_SUCCESS;
 }
 
-DWORD MfgLib_StartOperation(INSTANCE_HANDLE handle, DWORD OperationID)
+DWORD MfgLib_StartOperation(INSTANCE_HANDLE handle, pthread_t OperationID)
 {
 	MFGLIB_VARS *pLibVars = (MFGLIB_VARS *)handle;
 	if(NULL == pLibVars)
@@ -455,7 +458,7 @@ DWORD MfgLib_StartOperation(INSTANCE_HANDLE handle, DWORD OperationID)
 	return MFGLIB_ERROR_SUCCESS;
 }
 
-DWORD MfgLib_StopOperation(INSTANCE_HANDLE handle, DWORD OperationID)
+DWORD MfgLib_StopOperation(INSTANCE_HANDLE handle, pthread_t OperationID)
 {
 	MFGLIB_VARS *pLibVars = (MFGLIB_VARS *)handle;
 	if(NULL == pLibVars)
@@ -864,12 +867,14 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	pLibVars->g_strPath = pLibVars->g_strUclFilename.Left(pos+1);  //+1 for add '\' at the last
 
 	CAnsiString uclString;
-	CFile UclXmlFile;
-	if(!UclXmlFile.Open(pLibVars->g_strUclFilename, CFile::modeReadWrite, NULL))
+	FILE* UclXmlFile = _tfopen(pLibVars->g_strUclFilename, _T("r+"));
+	struct _stat64i32 FileLen;
+	_tstat(pLibVars->g_strUclFilename, &FileLen);
+	if(UclXmlFile==NULL)
 	{
 		return MFGLIB_ERROR_FILE_OPEN_FAILED;
 	}
-	UclXmlFile.Read(uclString.GetBufferSetLength((int)UclXmlFile.GetLength()), (unsigned int)UclXmlFile.GetLength());
+	std::fread(uclString.GetBufferSetLength((int)FileLen.st_size),sizeof(char), (unsigned int)FileLen.st_size,UclXmlFile);
 	uclString.ReleaseBuffer();
 	// Load xml file content
 	pLibVars->g_pXmlHandler->Load(A2T(uclString));
@@ -1371,21 +1376,23 @@ UINT COpCmd_Boot::SetFileMapping(CString &strFile)
 	}
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
 
-	CFile fwFile;
-	if ( fwFile.Open(m_FileName, CFile::modeRead | CFile::shareDenyWrite) == FALSE )
+	FILE* fwFile=_tfopen(m_FileName,_T("r+")); //// need to deny write to other processes
+	struct _stat64i32 FileLen;
+	_tstat(m_FileName, &FileLen);
+	if ( fwFile==NULL )
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file %s failed to open.errcode is %d"), m_FileName,GetLastError());
         return MFGLIB_ERROR_FILE_NOT_EXIST;
     }
-	m_qwFileSize = fwFile.GetLength();
+	m_qwFileSize = FileLen.st_size;
 	m_pDataBuf = (UCHAR*)VirtualAlloc(NULL, (size_t)m_qwFileSize, MEM_COMMIT, PAGE_READWRITE);
 	if(m_pDataBuf == NULL)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file[%s] data buffer alloc failed"), m_FileName);
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	fwFile.Read(m_pDataBuf, (UINT)m_qwFileSize);
-	fwFile.Close();
+	std::fread(m_pDataBuf,sizeof(*m_pDataBuf), (UINT)m_qwFileSize,fwFile);
+	std::fclose(fwFile);
 
 	return MFGLIB_ERROR_SUCCESS;
 }
@@ -1533,13 +1540,15 @@ UINT COpCmd_Init::SetFileMapping(CString &strFile)
 	}
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
 
-	CFile fwFile;
-	if ( fwFile.Open(m_FileName, CFile::modeRead | CFile::shareDenyWrite) == FALSE )
+	FILE* fwFile=_tfopen(m_FileName,_T("r"));
+	struct _stat64i32 FileLen;
+	_tstat(m_FileName, &FileLen);
+	if ( fwFile==NULL )
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command--file %s failed to open.errcode is %d."), m_FileName,GetLastError());
         return MFGLIB_ERROR_FILE_NOT_EXIST;
     }
-	m_qwFileSize = fwFile.GetLength();
+	m_qwFileSize = FileLen.st_size;
 	//m_pDataBuf = (UCHAR*)malloc((size_t)m_qwFileSize);
 	m_pDataBuf = (UCHAR*)VirtualAlloc(NULL, (size_t)m_qwFileSize, MEM_COMMIT, PAGE_READWRITE);
 	if(m_pDataBuf == NULL)
@@ -1547,8 +1556,8 @@ UINT COpCmd_Init::SetFileMapping(CString &strFile)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command--file[%s] data buffer alloc failed."), m_FileName);
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	fwFile.Read(m_pDataBuf, (UINT)m_qwFileSize);
-	fwFile.Close();
+	std::fread(m_pDataBuf, sizeof(char),(UINT)m_qwFileSize,fwFile);
+	std::fclose(fwFile);
 
 	return MFGLIB_ERROR_SUCCESS;
 }
@@ -1760,13 +1769,15 @@ UINT COpCmd_Load::SetFileMapping(CString &strFile)
 	}
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
 
-	CFile fwFile;
-	if ( fwFile.Open(m_FileName, CFile::modeReadWrite) == FALSE )
+	FILE* fwFile=_tfopen(m_FileName,_T("r+"));
+	struct _stat64i32 FileLen;
+	_tstat(m_FileName, &FileLen);
+	if ( fwFile==NULL )
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file %s failed to open.errcode is %d"), m_FileName,GetLastError());
         return MFGLIB_ERROR_FILE_NOT_EXIST;
     }
-	m_qwFileSize = fwFile.GetLength();
+	m_qwFileSize = FileLen.st_size;
 	m_pDataBuf = (UCHAR*)VirtualAlloc(NULL, (size_t)m_qwFileSize, MEM_COMMIT, PAGE_READWRITE);
 	//m_pDataBuf = (UCHAR*)malloc((size_t)m_qwFileSize);
 	if(m_pDataBuf == NULL)
@@ -1774,8 +1785,8 @@ UINT COpCmd_Load::SetFileMapping(CString &strFile)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file[%s] data buffer alloc failed"), m_FileName);
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	fwFile.Read(m_pDataBuf, (UINT)m_qwFileSize);
-	fwFile.Close();
+	std::fread(m_pDataBuf,sizeof(char), (UINT)m_qwFileSize,fwFile);
+	std::fclose(fwFile);
 
 //	DWORD dwOldProtect;
 //	BOOL bFlag = VirtualProtect(m_pDataBuf, (size_t)m_qwFileSize, PAGE_READONLY, &dwOldProtect);
@@ -1932,8 +1943,10 @@ UINT COpCmd_Push::SetFileMapping(CString &strFile)
 	}
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
 
-	CFile fwFile;
-	if ( fwFile.Open(m_FileName, CFile::modeRead | CFile::shareDenyWrite) == FALSE )
+	FILE* fwFile=_tfopen(m_FileName,_T("r"));
+	struct _stat64i32 FileLen;
+	_tstat(m_FileName, &FileLen);
+	if ( fwFile==NULL )
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Push command--file %s failed to open.errcode is %d"), m_FileName,GetLastError());
         return MFGLIB_ERROR_FILE_NOT_EXIST;
@@ -2341,8 +2354,7 @@ void DeinitCmdOperation(MFGLIB_VARS *pLibVars, int WndIndex)
 		pLibVars->g_CmdOperationArray[WndIndex]->Close();
 		//::PostThreadMessage(pLibVars->g_CmdOperationArray[WndIndex]->m_nThreadID, WM_QUIT, 0, 0);
 		// Wait for the CCmdOpreation thread to die before returning
-		WaitOnEvent(&pLibVars->g_CmdOperationArray[WndIndex]->thread_dead); //, INFINITE);
-		DestroyEvent(&pLibVars->g_CmdOperationArray[WndIndex]->thread_dead);// = NULL;
+		
 
 		delete pLibVars->g_CmdOperationArray[WndIndex];
 		pLibVars->g_CmdOperationArray[WndIndex] = NULL;
@@ -2640,13 +2652,13 @@ PORT_ID FindPortLogicalID(USB_PORT_NODE *pPortNode)
 	return 0;
 }
 */
-int FindOperationIndex(MFGLIB_VARS *pLibVars, DWORD operationID)
+int FindOperationIndex(MFGLIB_VARS *pLibVars, pthread_t operationID)
 {
 	int iret = -1;
 
 	for(int i=0; i<pLibVars->g_iMaxBoardNum; i++)
 	{
-		if(pLibVars->g_CmdOpThreadID[i] == operationID)
+		if(pthread_equal(pLibVars->g_CmdOpThreadID[i],operationID))
 		{
 			iret = i;
 			break;

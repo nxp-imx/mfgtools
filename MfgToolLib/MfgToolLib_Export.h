@@ -136,7 +136,7 @@ typedef struct _Operate_Result
 
 typedef struct _Operation_Information
 {
-	DWORD OperationID;
+	pthread_t OperationID;
 	BOOL bConnected;
 	BYTE_t HubName[MAX_CHAR_NUMBERS];
 	int HubIndex;

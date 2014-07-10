@@ -469,7 +469,7 @@ INT32 HidDevice::ProcessTimeOut(const INT32 timeout)
     bool done = false;
     while( !done )
     {
-        waitResult = MsgWaitForMultipleObjectsEx(1, &waitHandles[0], INFINITE, QS_ALLINPUT, MWMO_ALERTABLE);
+        waitResult = MsgWaitForMultipleObjectsEx(1, &waitHandles[0], 0xFFFFFFFFFF, QS_ALLINPUT, MWMO_ALERTABLE);
         switch (waitResult)
         {
             case WAIT_OBJECT_0:

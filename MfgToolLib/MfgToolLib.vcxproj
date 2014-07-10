@@ -82,6 +82,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>C:\Users\B48406\Desktop\mfgtools\Apps\CrossPlatform\Pthread-win32\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pthreadVC2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,10 +121,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CFile.cpp" />
     <ClCompile Include="CmdOperation.cpp" />
     <ClCompile Include="ControllerClass.cpp" />
-    <ClCompile Include="CString.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="DeviceClass.cpp" />
     <ClCompile Include="DeviceManager.cpp" />
@@ -166,7 +166,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CallbackDef.h" />
-    <ClInclude Include="CFile.h" />
     <ClInclude Include="CmdOperation.h" />
     <ClInclude Include="ControllerClass.h" />
     <ClInclude Include="CString.h" />
