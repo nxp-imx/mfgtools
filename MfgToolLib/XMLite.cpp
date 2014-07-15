@@ -310,9 +310,7 @@ void _SetString( LPTSTR psz, LPTSTR end, CString* ps, bool trim = FALSE, int esc
     }
     else
     {
-        LPTSTR pss = ps->GetBufferSetLength(len*sizeof(TCHAR) + 1 );
-        memcpy( pss, psz, len*sizeof(TCHAR) );
-        pss[len] = _T('\0');
+		ps->assign(psz, len);
     }
 }
 

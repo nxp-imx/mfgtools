@@ -24,6 +24,7 @@ CMyExceptionHandler::~CMyExceptionHandler()
 void* ExceptionHandlerThreadProc(void* pParam)
 {	
 	CMyExceptionHandler* pExceptionHandler = (CMyExceptionHandler*)pParam;
+	pExceptionHandler->InitInstance();
 
 	///t_msgQ
 	/// check and dispatch messages  assigned with semafore dispatch to  OnMsgExceptionEvent
@@ -49,7 +50,7 @@ DWORD CMyExceptionHandler::Open()
 	}
 
 	DWORD dwErrCode = ERROR_SUCCESS;
-	if (pthread_create(&Exception_thread, NULL, ExceptionHandlerThreadProc, this) != 0) //create CMyExceptionHandler thread successfully
+	if (pthread_create(&Exception_thread, NULL, ExceptionHandlerThreadProc, this) == 0) //create CMyExceptionHandler thread successfully
 	{
 		WaitOnEvent(_hStartEvent);
 	}

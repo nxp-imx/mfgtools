@@ -1,5 +1,5 @@
 //#define CString std::string
-#include <windows.h>
+#include <Windows.h>
 #include <tchar.h>
 #include <string>
 #include <string.h>
@@ -20,6 +20,7 @@
 #include "pthread.h"
 #include <limits>
 #include <time.h>
+#include <cstdio>
 
 #include "CString.h"
 #ifdef DEBUG

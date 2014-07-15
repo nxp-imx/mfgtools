@@ -19,7 +19,7 @@ public: CTString() : tstring() { }
 		CTString(const tstring& s) : tstring(s) { }
 		CTString(const tstring& s, std::size_t n) : tstring(s, n) { }
 		CTString(const T * s, std::size_t n) : tstring(s, n) { }
-		CTString(const T * s) : tstring(s) { }
+		CTString(const T * s) : tstring(s?s:(const T *)_T("")) { }
 		CTString(std::size_t n, T c) : tstring(n, c) { }
 	
 	
@@ -44,12 +44,24 @@ public: CTString() : tstring() { }
 		T GetAt(int nIndex) const{ return at(nIndex);}
 
 		void Format(const T *fmt, ...){
-			T *ret;
+			size_t buffLen = 512;
+			T *ret = new T[buffLen];
 			va_list ap;
-
+			int i = 0;
+			bool cond = true;
 			va_start(ap, fmt);
-			//vasprintf(&ret, fmt, ap);
-			va_end(ap);
+			int actual = _vsntprintf(ret, buffLen, fmt, ap);
+			do{
+				if (actual == -1){
+					delete ret;
+					ret = new T[buffLen*(i + 2)];
+					actual = _vsntprintf(ret, actual, fmt, ap);
+				}
+				else{
+					cond = false;
+				}
+			} while (i < 10 && cond);
+				va_end(ap);
 
 			CTString<T> str(ret);
 			this->assign(str);
@@ -62,11 +74,23 @@ public: CTString() : tstring() { }
 
 		void AppendFormat(const T *fmt, ...){
 
-			T *ret;
+			size_t buffLen = 512;
+			T *ret = new T[buffLen];
 			va_list ap;
-
+			int i = 0;
+			bool cond = true;
 			va_start(ap, fmt);
-			//vasprintf(&ret, fmt, ap);
+			int actual = _vsntprintf(ret, buffLen, fmt, ap);
+			do{
+				if (actual == -1){
+					delete ret;
+					ret = new T[buffLen*(i+2)];
+					actual=_vsntprintf(ret, actual, fmt, ap);
+				}
+				else{
+					cond = false;
+				}
+			} while (i < 10 && cond);
 			va_end(ap);
 
 			CTString<T>  str(ret);
@@ -89,9 +113,10 @@ public: CTString() : tstring() { }
 		void TrimLeft(){
 			if (empty())
 				return;
-			while (*this->begin()  == _T('\t') || 
-				*this->begin() == _T('\n') || *this->begin() == _T('\r')){
+			while (*this->begin()  == _T('\t') || *this->begin() == _T('\n') || *this->begin() == _T('\r')){
 				this->erase(this->begin());
+				if (empty())
+					return;
 			}
 			return;
 		}
@@ -100,8 +125,10 @@ public: CTString() : tstring() { }
 		void TrimRight(){
 			if (empty())
 				return;
-			while (*this->end() == _T('\t') || *this->end() == _T('\n') || *this->end() == _T('\r')){
-				this->erase(this->end());
+			while (this->back() == _T('\t') || this->back() == _T('\n') || this->back() == _T('\r')){
+				this->erase(this->length()-1);
+				if (empty())
+					return;
 			}
 			return;
 		}
@@ -110,14 +137,18 @@ public: CTString() : tstring() { }
 		void TrimLeft(T  chr){
 			while (this->at(this->begin()) == chr){
 				this->erase(this->begin());
+				if (empty())
+					return;
 			}
 			return;
 		}
 
 		
 		void TrimRight(T  chr){
-			while (this->at(this->end()) == chr){
-				this->erase(this->end());
+			while (this->back() == chr){
+				this->erase(this->length()-1);
+				if (empty())
+					return;
 			}
 			return;
 		}
@@ -179,8 +210,8 @@ public: CTString() : tstring() { }
 			while (found){
 				pos = this->find(lpszOld);
 				if (pos != -1){
-					this->erase(pos, pos + _tcslen(lpszOld));
-					this->insert(pos + 1, lpszNew);
+					this->erase(pos, _tcslen(lpszOld));
+					this->insert(pos, lpszNew);
 					count++;
 				}
 				else{
@@ -196,7 +227,7 @@ public: CTString() : tstring() { }
 
 		
 		void MakeUpper(){
-			for (int i = 0; i < length(); i++){
+			for (unsigned int i = 0; i < length(); i++){
 				at(i) = _totupper(at(i));
 			}
 		}

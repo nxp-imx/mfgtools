@@ -60,10 +60,11 @@ DeviceManager::~DeviceManager()
 }
 
 void* DevManagerThreadProc(void* pParam){
-
-
-
-
+	DeviceManager* pDevManage = (DeviceManager*)pParam;
+	
+	pDevManage->InitInstance();
+	pDevManage->m_bSelfThreadRunning = true;
+	SetEvent(pDevManage->_hStartEvent);
 	return 0;
 
 
@@ -90,17 +91,19 @@ DWORD DeviceManager::Open()
 	
 	// Create the user-interface thread supporting messaging
 	DWORD dwErrCode = ERROR_SUCCESS;
-	if (pthread_create(&m_hThread,NULL,DevManagerThreadProc,this)!=0) //create DeviceManager thread successfully
+	int result = pthread_create(&m_hThread, NULL, DevManagerThreadProc, this);
+	if (result==0) //create DeviceManager thread successfully
 	{
 		WaitOnEvent(_hStartEvent);
 		// Set flag to running. Flag set to stopped in constructor and in Close()
 		if(m_bSelfThreadRunning)
-		{
+		{	
+
 			_bStopped = FALSE;
 		}
 		else
 		{
-			::CloseHandle(_hStartEvent);
+			DestroyEvent(_hStartEvent);
 			_hStartEvent = NULL;
 			return MFGLIB_ERROR_DEV_MANAGER_RUN_FAILED;
 		}
@@ -115,7 +118,7 @@ DWORD DeviceManager::Open()
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Device Manager thread is running"));
 	
 	// clean up
-	::CloseHandle(_hStartEvent);
+	DestroyEvent(_hStartEvent);
 	_hStartEvent = NULL;
 
 	return MFGLIB_ERROR_SUCCESS;
@@ -347,7 +350,7 @@ BOOL DeviceManager::InitInstance()
 	// resume DeviceManager::Open() function
 //	m_bSelfThreadRunning = TRUE;
 //	SetEvent(_hStartEvent);
-	SetSelfThreadRunStatus(TRUE);
+	//SetSelfThreadRunStatus(TRUE);
 
 	return TRUE;
 }

@@ -31,6 +31,7 @@ DeviceClass::DeviceClass(LPCGUID iFaceGuid, LPCGUID devGuid, LPCTSTR enumerator,
 	_classIfaceGuid.describe(this, _T("Device Interface GUID"), _T("Describes the device class interface."));
 	_classDevGuid.describe(this, _T("Device Class GUID"), _T("Describes the device class."));
 	_enumerator.describe(this, _T("Enumerator"), _T(""));
+	devicesMutex = new pthread_mutex_t;
 
 	pthread_mutex_init(devicesMutex,NULL);// = CreateMutex(NULL, FALSE, NULL);
 	if(devicesMutex == NULL)

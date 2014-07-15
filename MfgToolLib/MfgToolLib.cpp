@@ -861,23 +861,31 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	}
 
 	//for use atl convert macro, A2T
-	USES_CONVERSION;
+	//USES_CONVERSION;
 	//read Ucl.xml
+	pLibVars->g_strUclFilename = L"C:\\Users\\B48406\\Downloads\\mfgtools\\Profiles\\Linux\\OS Firmware\\ucl2.xml";
 	int pos = pLibVars->g_strUclFilename.ReverseFind(_T('\\'));
 	pLibVars->g_strPath = pLibVars->g_strUclFilename.Left(pos+1);  //+1 for add '\' at the last
 
+	
 	CAnsiString uclString;
-	FILE* UclXmlFile = _tfopen(pLibVars->g_strUclFilename, _T("r+"));
-	struct _stat64i32 FileLen;
-	_tstat(pLibVars->g_strUclFilename, &FileLen);
+	FILE* UclXmlFile = _tfopen(pLibVars->g_strUclFilename, _T("r"));
+	
 	if(UclXmlFile==NULL)
-	{
+	{	
+		CString test= _tcserror(errno);
 		return MFGLIB_ERROR_FILE_OPEN_FAILED;
 	}
+	struct _stat64i32 FileLen;
+	_tstat(pLibVars->g_strUclFilename, &FileLen);
 	std::fread(uclString.GetBufferSetLength((int)FileLen.st_size),sizeof(char), (unsigned int)FileLen.st_size,UclXmlFile);
 	uclString.ReleaseBuffer();
 	// Load xml file content
-	pLibVars->g_pXmlHandler->Load(A2T(uclString));
+	
+	int len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, uclString, -1, NULL, 0);
+	LPTSTR buff = new TCHAR[len+1];
+	MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, uclString, -1, buff, len);
+	pLibVars->g_pXmlHandler->Load(buff);
 
 	DWORD retVal = MFGLIB_ERROR_SUCCESS;
 	LPXNode pCfg = pLibVars->g_pXmlHandler->GetChild(_T("CFG"));

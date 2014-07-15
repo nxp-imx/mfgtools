@@ -9,6 +9,9 @@
 #pragma once
 
 #define USE_UNICODE
+#include "pthread.h"
+#include "semaphore.h"
+#include "sched.h"
 
 /************************************************************
 * Error Code
@@ -182,8 +185,8 @@ DWORD MfgLib_SetUCLFile(INSTANCE_HANDLE handle, BYTE_t *strName);
 DWORD MfgLib_SetMaxBoardNumber(INSTANCE_HANDLE handle, int boardNum);
 DWORD MfgLib_InitializeOperation(INSTANCE_HANDLE handle);
 DWORD MfgLib_UninitializeOperation(INSTANCE_HANDLE handle);
-DWORD MfgLib_StartOperation(INSTANCE_HANDLE handle, DWORD OperationID);
-DWORD MfgLib_StopOperation(INSTANCE_HANDLE handle, DWORD OperationID);
+DWORD MfgLib_StartOperation(INSTANCE_HANDLE handle, pthread_t OperationID);
+DWORD MfgLib_StopOperation(INSTANCE_HANDLE handle, pthread_t OperationID);
 DWORD MfgLib_GetOperationInformation(INSTANCE_HANDLE handle, OPERATIONS_INFORMATION *pOperationsInfo);
 DWORD MfgLib_GetPhaseInformation(INSTANCE_HANDLE handle, PHASES_INFORMATION *pPhasesInfo);
 DWORD MfgLib_GetTotalCommandNumbers(INSTANCE_HANDLE handle, UINT *Number);

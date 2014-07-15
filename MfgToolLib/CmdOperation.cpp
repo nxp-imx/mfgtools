@@ -129,6 +129,7 @@ DWORD CCmdOpreation::Open()
 		_sCB.cmdOpIndex = m_WndIndex;
 		m_hDeviceChangeCallback = g_pDeviceManager->RegisterCallback(&_sCB);
 	}
+	ev_semaphore = new sem_t;
 	sem_init(ev_semaphore, NULL, 0);
 
 	if (pthread_create(&m_pThread, NULL, CmdListThreadProc,this) != 0)

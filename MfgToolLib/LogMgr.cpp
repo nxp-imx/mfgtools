@@ -40,7 +40,7 @@ CMfgLogMgr::CMfgLogMgr()
 	time_t timer;
 	time(&timer);// = CTime::GetCurrentTime();
 	CString cstr_time = _T("");
-    cstr_time.AppendFormat(_T("%s"),ctime(&timer));
+	cstr_time.AppendFormat(_T("%s"), _tctime(&timer));
 	cstr_time += _T("   Start new logging\n");
 	WriteToLogFile(cstr_time);
 }
