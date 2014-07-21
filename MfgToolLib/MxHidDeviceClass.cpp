@@ -7,15 +7,15 @@
  */
 
 #include "stdafx.h"
-#include <Assert.h>
-#include <cfgmgr32.h>
-#include <basetyps.h>
-#include <setupapi.h>
-#include <initguid.h>
-extern "C" {
-#include <hidsdi.h>
-}
-#include <hidclass.h>
+//#include <Assert.h>
+//#include <cfgmgr32.h>
+//#include <basetyps.h>
+//#include <setupapi.h>
+//#include <initguid.h>
+//extern "C" {
+//#include <hidsdi.h>
+//}
+//#include <hidclass.h>
 #include "DeviceClass.h"
 #include "MxHidDevice.h"
 #include "MxHidDeviceClass.h"
@@ -23,7 +23,7 @@ extern "C" {
 #include "MfgToolLib.h"
 
 MxHidDeviceClass::MxHidDeviceClass(INSTANCE_HANDLE handle)
-: DeviceClass(&GUID_DEVINTERFACE_HID, &GUID_DEVCLASS_HIDCLASS, _T("MXHID"), DeviceTypeMxHid, handle)
+: DeviceClass(NULL,NULL,_T("MXHID"),DeviceTypeMxHid,handle)//&GUID_DEVINTERFACE_HID, &GUID_DEVCLASS_HIDCLASS, _T("MXHID"), DeviceTypeMxHid, handle)
 {
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("new MxHidDeviceClass"));
 }

@@ -9,9 +9,8 @@
 #pragma once
 
 #define USE_UNICODE
-#include "pthread.h"
-#include "semaphore.h"
-#include "sched.h"
+
+#include "stdafx.h"
 
 /************************************************************
 * Error Code
@@ -54,7 +53,7 @@
 /************************************************************
 * Type definition
 ************************************************************/
-#ifdef  USE_UNICODE
+#if 0
 typedef wchar_t CHAR_t;
 typedef wchar_t BYTE_t;
 #else

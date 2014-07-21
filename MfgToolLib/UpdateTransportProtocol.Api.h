@@ -12,7 +12,7 @@
 
 namespace api
 {
-	//typedef CStringT<char,StrTraitMFC<char> > CAnsiString;
+	//typedef CStringT<char,StrTraitMFC<char> > CString;
 
 	class ScsiUtpMsg : public StApiT<_ST_SCSI_CDB::_CDBUTP16> // ScsiApi
     {
@@ -205,7 +205,7 @@ namespace api
 					break;
 			}
 
-			retStr.Format(_T("Poll(tag:%d, lParam:%s)"), _cdb.Tag, lparam);
+			retStr.Format(_T("Poll(tag:%d, lParam:%s)"), _cdb.Tag, lparam.c_str());
 
 			return retStr;
         }
@@ -219,16 +219,16 @@ namespace api
     class Exec : public ScsiUtpMsg
     {
 	private:
-		CAnsiString m_UtpCommand;
+		CString m_UtpCommand;
 
 	public:
         // Constructor
         Exec(UINT tag, __int64 lParam, CString utpCommand)
 			: ScsiUtpMsg(ScsiUtpMsg::Exec, ST_WRITE_CMD_PLUS_DATA, 0, tag, lParam)
         {
-            USES_CONVERSION;
+            //USES_CONVERSION;
 
-			m_UtpCommand = T2A(utpCommand);
+			m_UtpCommand = utpCommand;
 
 			if (m_UtpCommand.IsEmpty())
             {
@@ -244,7 +244,7 @@ namespace api
                 _xferLength = (UINT)m_UtpCommand.GetLength();
                 _sendDataPtr = (UCHAR*)malloc(_xferLength);
 
-				memcpy_s(_sendDataPtr, _xferLength, m_UtpCommand.GetBuffer(), _xferLength);
+				memcpy(_sendDataPtr, m_UtpCommand.GetBuffer(), _xferLength);
             }
         }
 
@@ -252,11 +252,11 @@ namespace api
 
 		CString ToString()
         {
-            USES_CONVERSION;
+//            USES_CONVERSION;
 
 			CString str;
 			str.Format(_T("Exec(tag:%d, lParam:%#08x, cmd:"), _cdb.Tag, _cdb.LParam);
-			str += CString(A2T(m_UtpCommand)) + _T(")");
+			str += CString((m_UtpCommand)) + _T(")");
 
 			return str;
         }

@@ -12,7 +12,7 @@
 #include "stdafx.h"
 #include "MfgToolLib.h"
 #include "LogMgr.h"
-#include "WindowsVersionInfo.h"
+//#include "WindowsVersionInfo.h"
 #include "DeviceManager.h"
 #include "UsbHub.h"
 #include "HubClass.h"
@@ -131,6 +131,7 @@ BOOL CMfgToolLibApp::InitInstance()
 DWORD MfgLib_Initialize()
 {
 	// Only an instance
+#if 0
 	g_hOneInstance = ::CreateMutex(NULL, FALSE, UNIQE_NAME);
 	if(g_hOneInstance == NULL)
 	{
@@ -140,18 +141,19 @@ DWORD MfgLib_Initialize()
 	{
 		return MFGLIB_ERROR_ALREADY_INITIALIZED;
 	}
-
+#endif
 	return MFGLIB_ERROR_SUCCESS;
 }
 
 DWORD MfgLib_Uninitialize()
 {
+#if 0
 	if(g_hOneInstance != NULL)
 	{
 		CloseHandle(g_hOneInstance);
 		g_hOneInstance = NULL;
 	}
-
+#endif
 	return MFGLIB_ERROR_SUCCESS;
 }
 
@@ -239,7 +241,7 @@ DWORD MfgLib_SetProfileName(INSTANCE_HANDLE handle, BYTE_t *strName)
 		return MFGLIB_ERROR_INVALID_PARAM;
 	}
 
-	pLibVars->g_CfgParam.chip = strName;
+	pLibVars->g_CfgParam.chip = (char *)strName;
 	pLibVars->g_strUclFilename = theApp.m_strDllFullPath + _T("Profiles") + _T("\\") + pLibVars->g_CfgParam.chip + _T("\\") + _T("OS Firmware") + _T("\\") + DEFAULT_UCL_XML_FILE_NAME;
 
 	return MFGLIB_ERROR_SUCCESS;
@@ -263,7 +265,7 @@ DWORD MfgLib_SetListName(INSTANCE_HANDLE handle, BYTE_t *strName)
 		return MFGLIB_ERROR_INVALID_PARAM;
 	}
 
-	pLibVars->g_CfgParam.list = strName;
+	pLibVars->g_CfgParam.list = (char *) strName;
 
 	return MFGLIB_ERROR_SUCCESS;
 }
@@ -285,8 +287,25 @@ DWORD MfgLib_SetUCLFile(INSTANCE_HANDLE handle, BYTE_t *strName)
 	{
 		return MFGLIB_ERROR_INVALID_PARAM;
 	}
-
+/*
 	pLibVars->g_strUclFilename = theApp.m_strDllFullPath + _T("Profiles") + _T("\\") + pLibVars->g_CfgParam.chip + _T("\\") + _T("OS Firmware") + _T("\\") + strName;
+*/	
+	pLibVars->g_strUclFilename.assign(theApp.m_strDllFullPath);
+	pLibVars->g_strUclFilename.append(_T("Profiles"));
+	pLibVars->g_strUclFilename.append(_T("\\"));
+	pLibVars->g_strUclFilename.append(pLibVars->g_CfgParam.chip);
+	pLibVars->g_strUclFilename.append(_T("\\"));
+	pLibVars->g_strUclFilename.append(_T("OS Firmware"));
+	pLibVars->g_strUclFilename.append(_T("\\"));
+	pLibVars->g_strUclFilename.append((const char *)strName);
+
+
+
+
+
+
+
+
 	//Open Ucl.xml
 	FILE * UclXmlFile = _tfopen(pLibVars->g_strUclFilename, _T("r+"));
 	if( UclXmlFile==NULL)
@@ -545,11 +564,11 @@ DWORD MfgLib_GetOperationInformation(INSTANCE_HANDLE handle, OPERATIONS_INFORMAT
 
 		pInfo->bConnected = pLibVars->g_PortDevInfoArray[i].m_bConnected;
 		pInfo->PortIndex = pLibVars->g_PortDevInfoArray[i].portIndex;
-		_tcscpy(pInfo->HubName, pLibVars->g_PortDevInfoArray[i].hubPath.GetBuffer());
+		_tcscpy((char *)pInfo->HubName, pLibVars->g_PortDevInfoArray[i].hubPath.GetBuffer());
 		pLibVars->g_PortDevInfoArray[i].hubPath.ReleaseBuffer();
 		//_tcscpy(pInfo->DeviceDesc, g_PortDevInfoArray[i].DeviceDesc.GetBuffer());
 		//g_PortDevInfoArray[i].DeviceDesc.ReleaseBuffer();
-		GetCurrentDeviceDesc(pLibVars, i, pInfo->DeviceDesc, MAX_CHAR_NUMBERS);
+		GetCurrentDeviceDesc(pLibVars, i,(char *) pInfo->DeviceDesc, MAX_CHAR_NUMBERS);
 		pInfo->HubIndex = pLibVars->g_PortDevInfoArray[i].hubIndex;
 		if(pInfo->bConnected)
 		{
@@ -605,7 +624,7 @@ DWORD MfgLib_GetPhaseInformation(INSTANCE_HANDLE handle, PHASES_INFORMATION *pPh
 	for(int i=0; i<(int)(pOpStates->size()); i++)
 	{
 		pPhase = pOpStates->at(i);
-		_tcscpy(pInfo->szName, pPhase->strStateName.GetBuffer());
+		_tcscpy((char *)pInfo->szName, pPhase->strStateName.GetBuffer());
 		pPhase->strStateName.ReleaseBuffer();
 		//pInfo->relativedState = pPhase->opState;
 		pInfo->index = (int)(pPhase->opState);
@@ -751,7 +770,7 @@ DWORD MfgLib_GetLibraryVersion(BYTE_t* version, int maxSize)
 	{
 		return MFGLIB_ERROR_SIZE_IS_SMALL;
 	}
-	_tcscpy(version, strTemp.GetBuffer());
+	_tcscpy((char *)version, strTemp.GetBuffer());
 	strTemp.ReleaseBuffer();
 
 	return MFGLIB_ERROR_SUCCESS;
@@ -798,7 +817,7 @@ void DeinitLogManager()
 	}
 }
 
-void LogMsg(DWORD moduleID, DWORD levelID, const wchar_t * format, ... )
+void LogMsg(DWORD moduleID, DWORD levelID, const TCHAR * format, ... )
 {
 	TCHAR* buffer;
     va_list args;
@@ -807,7 +826,7 @@ void LogMsg(DWORD moduleID, DWORD levelID, const wchar_t * format, ... )
     va_start(args, format);
     len = _vsctprintf(format, args)+1;
     buffer = (TCHAR*)malloc(len*sizeof(TCHAR));
-    std::vswprintf(buffer,len, format, args);
+    std::vsnprintf(buffer,len, format, args);
     va_end(args);
 
     CString str;
@@ -863,7 +882,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	//for use atl convert macro, A2T
 	//USES_CONVERSION;
 	//read Ucl.xml
-	pLibVars->g_strUclFilename = L"C:\\Users\\B48406\\Downloads\\mfgtools\\Profiles\\Linux\\OS Firmware\\ucl2.xml";
+	pLibVars->g_strUclFilename = "C:\\Users\\B48406\\Downloads\\mfgtools\\Profiles\\Linux\\OS Firmware\\ucl2.xml";
 	int pos = pLibVars->g_strUclFilename.ReverseFind(_T('\\'));
 	pLibVars->g_strPath = pLibVars->g_strUclFilename.Left(pos+1);  //+1 for add '\' at the last
 
@@ -881,12 +900,16 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	std::fread(uclString.GetBufferSetLength((int)FileLen.st_size),sizeof(char), (unsigned int)FileLen.st_size,UclXmlFile);
 	uclString.ReleaseBuffer();
 	// Load xml file content
+#ifdef __linux__	
+	pLibVars->g_pXmlHandler->Load(uclString);
 	
+#else
+
 	int len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, uclString, -1, NULL, 0);
 	LPTSTR buff = new TCHAR[len+1];
 	MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, uclString, -1, buff, len);
 	pLibVars->g_pXmlHandler->Load(buff);
-
+#endif
 	DWORD retVal = MFGLIB_ERROR_SUCCESS;
 	LPXNode pCfg = pLibVars->g_pXmlHandler->GetChild(_T("CFG"));
 	if(pCfg == NULL)
@@ -941,7 +964,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 		}
 		else
 		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Error: Invalid state name: %s"), strTemp);
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Error: Invalid state name: %s"), strTemp.c_str());
 			pState->opState = MX_DISCONNECTED;
 			ReleaseUclCommands(pLibVars);
 			return MFGLIB_ERROR_INVALID_STATE_NAME;
@@ -1004,7 +1027,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 		}
 		else
 		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Error: Invalid device name: %s"), strTemp);
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Error: Invalid device name: %s"), strTemp.c_str());
 			pState->opDeviceType = DEV_UNKNOWN;
 			ReleaseUclCommands(pLibVars);
 			return MFGLIB_ERROR_INVALID_DEV_NAME;
@@ -1033,7 +1056,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	CCommandList* pCmdList = pLibVars->g_pXmlHandler->GetCmdListNode(pLibVars->g_CfgParam.list);
 	if(pCmdList == NULL)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Error: Can't find the specified list(%s) in the xml file"), pLibVars->g_CfgParam.list);
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Error: Can't find the specified list(%s) in the xml file"), pLibVars->g_CfgParam.list.c_str());
 		ReleaseUclCommands(pLibVars);
 		return MFGLIB_ERROR_XML_NO_MATCHED_LIST;
 	}
@@ -1043,7 +1066,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	XNodes nodes = pCmdList->GetChilds(_T("CMD"));
 	if(nodes.empty())
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Error: Can't find any command in the specified list(%s) in the xml file"), pLibVars->g_CfgParam.list);
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Error: Can't find any command in the specified list(%s) in the xml file"), pLibVars->g_CfgParam.list.c_str());
 		ReleaseUclCommands(pLibVars);
 		return MFGLIB_ERROR_XML_NO_CMDS_IN_LIST;
 	}
@@ -1383,42 +1406,73 @@ UINT COpCmd_Boot::SetFileMapping(CString &strFile)
 		strFile.Replace(_T('/'), _T('\\'));
 	}
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
-
+#ifndef __linux__
 	FILE* fwFile=_tfopen(m_FileName,_T("r+")); //// need to deny write to other processes
 	struct _stat64i32 FileLen;
 	_tstat(m_FileName, &FileLen);
 	if ( fwFile==NULL )
     {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file %s failed to open.errcode is %d"), m_FileName,GetLastError());
+        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file %s failed to open.errcode is %d"), m_FileName.c_str(),GetLastError());
         return MFGLIB_ERROR_FILE_NOT_EXIST;
     }
 	m_qwFileSize = FileLen.st_size;
 	m_pDataBuf = (UCHAR*)VirtualAlloc(NULL, (size_t)m_qwFileSize, MEM_COMMIT, PAGE_READWRITE);
-	if(m_pDataBuf == NULL)
-	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file[%s] data buffer alloc failed"), m_FileName);
-		return MFGLIB_ERROR_NO_MEMORY;
-	}
+
+	 if(m_pDataBuf == NULL)
+         {
+                 LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file[%s] data buffer      alloc failed"), m_FileName);
+                 return MFGLIB_ERROR_NO_MEMORY;
+         }
+
 	std::fread(m_pDataBuf,sizeof(*m_pDataBuf), (UINT)m_qwFileSize,fwFile);
 	std::fclose(fwFile);
-
-	return MFGLIB_ERROR_SUCCESS;
+#else
+	int fwFile=open(m_FileName,O_RDONLY); //// need to deny write to other processes
+	struct _stat64i32 FileLen;
+	_tstat(m_FileName, &FileLen);
+	if ( fwFile==-1 )
+    {
+        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file %s failed to open.errcode is %d"), m_FileName.c_str(),GetLastError());
+        return MFGLIB_ERROR_FILE_NOT_EXIST;
+    }
+	m_qwFileSize = FileLen.st_size;
+	m_pDataBuf= (UCHAR *)mmap(NULL, FileLen.st_size, PROT_READ,  MAP_PRIVATE, fwFile,0);
+	
+	if(m_pDataBuf == MAP_FAILED)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file[%s] data buffer alloc failed"), m_FileName.c_str());
+		return MFGLIB_ERROR_NO_MEMORY;
+	}
+	if(close(fwFile)!=0){		
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file[%s] failed to close"), m_FileName.c_str());
+	    return MFGLIB_ERROR_NO_MEMORY;
+	}
+#endif
+		return MFGLIB_ERROR_SUCCESS;
 }
 
 void COpCmd_Boot::CloseFileMapping()
 {
+#ifndef __linux__
 	if(m_pDataBuf)
 	{
 		VirtualFree(m_pDataBuf, 0, MEM_RELEASE);
 		m_pDataBuf = NULL;
 	}
+#else
+	if(m_pDataBuf!=MAP_FAILED){
+	    if(	munmap(m_pDataBuf,m_qwFileSize)!=0)
+		perror(" couldnt unmap");
+	    m_pDataBuf=NULL;
+	}
+#endif
 }
 
 UINT COpCmd_Boot::ExecuteCommand(int index)
 {
 	CString strMsg;
-	strMsg.Format(_T("ExecuteCommand--Boot[WndIndex:%d], File is %s"), index, m_FileName);
-	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg);
+	strMsg.Format(_T("ExecuteCommand--Boot[WndIndex:%d], File is %s"), index, m_FileName.c_str());
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg.c_str());
 
 	UI_UPDATE_INFORMATION _uiInfo;
 	_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
@@ -1448,7 +1502,7 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString().c_str(), m_FileName.c_str());
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1465,7 +1519,7 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString().c_str(), m_FileName.c_str());
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1487,7 +1541,7 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString().c_str(), m_FileName.c_str());
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1506,7 +1560,7 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString().c_str(), m_FileName.c_str());
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1547,13 +1601,13 @@ UINT COpCmd_Init::SetFileMapping(CString &strFile)
 		strFile.Replace(_T('/'), _T('\\'));
 	}
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
-
+#ifndef __linux__
 	FILE* fwFile=_tfopen(m_FileName,_T("r"));
 	struct _stat64i32 FileLen;
 	_tstat(m_FileName, &FileLen);
 	if ( fwFile==NULL )
     {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command--file %s failed to open.errcode is %d."), m_FileName,GetLastError());
+        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
         return MFGLIB_ERROR_FILE_NOT_EXIST;
     }
 	m_qwFileSize = FileLen.st_size;
@@ -1566,24 +1620,63 @@ UINT COpCmd_Init::SetFileMapping(CString &strFile)
 	}
 	std::fread(m_pDataBuf, sizeof(char),(UINT)m_qwFileSize,fwFile);
 	std::fclose(fwFile);
+#else
+
+	int fwFile=open(m_FileName,O_RDONLY);
+	struct _stat64i32 FileLen;
+	_tstat(m_FileName, &FileLen);
+	if ( fwFile==-1 )
+    {
+        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
+        return MFGLIB_ERROR_FILE_NOT_EXIST;
+    }
+	m_qwFileSize = FileLen.st_size;
+	//m_pDataBuf = (UCHAR*)malloc((size_t)m_qwFileSize);
+	m_pDataBuf = (UCHAR*)mmap(NULL, FileLen.st_size, PROT_READ,  MAP_PRIVATE, fwFile,0);
+	if(m_pDataBuf == MAP_FAILED)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command--file[%s] data buffer alloc failed."), m_FileName.c_str());
+		return MFGLIB_ERROR_NO_MEMORY;
+	}
+	
+	if(close(fwFile)!=0){		
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command-- file[%s] failed to close"), m_FileName.c_str());
+		return MFGLIB_ERROR_NO_MEMORY;
+	}
+
+
+
+
+#endif
+
 
 	return MFGLIB_ERROR_SUCCESS;
 }
 
 void COpCmd_Init::CloseFileMapping()
 {
+
+#ifndef __linux__
 	if(m_pDataBuf)
 	{
 		VirtualFree(m_pDataBuf, 0, MEM_RELEASE);
 		m_pDataBuf = NULL;
 	}
+#else
+	if(m_pDataBuf!=MAP_FAILED){
+	    if(	munmap(m_pDataBuf,m_qwFileSize)!=0)
+		perror(" couldnt unmap");
+	    m_pDataBuf=NULL;
+	}
+#endif
+
 }
 
 UINT COpCmd_Init::ExecuteCommand(int index)
 {
 	CString strMsg;
-	strMsg.Format(_T("ExecuteCommand--Init[WndIndex:%d], File is %s"), index, m_FileName);
-	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg);
+	strMsg.Format(_T("ExecuteCommand--Init[WndIndex:%d], File is %s"), index, m_FileName.c_str());
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg.c_str());
 
 	UI_UPDATE_INFORMATION _uiInfo;
 	_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
@@ -1613,7 +1706,7 @@ UINT COpCmd_Init::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Init\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Init\" body=\"%s\" error, file=\"%s\""), GetBodyString().c_str(), m_FileName.c_str());
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1630,7 +1723,7 @@ UINT COpCmd_Init::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Init\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Init\" body=\"%s\" error, file=\"%s\""), GetBodyString().c_str(), m_FileName.c_str());
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1668,8 +1761,8 @@ COpCmd_Load::~COpCmd_Load()
 UINT COpCmd_Load::ExecuteCommand(int index)
 {
 	CString strMsg;
-	strMsg.Format(_T("ExecuteCommand--Load[WndIndex:%d], File is %s, address is 0x%X"), index, m_FileName, m_address);
-	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg);
+	strMsg.Format(_T("ExecuteCommand--Load[WndIndex:%d], File is %s, address is 0x%X"), index, m_FileName.c_str(), m_address);
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg.c_str());
 
 	UI_UPDATE_INFORMATION _uiInfo;
 	_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
@@ -1699,7 +1792,7 @@ UINT COpCmd_Load::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Load\" error, file=\"%s\""), m_FileName);
+			strDesc.Format(_T("\"Load\" error, file=\"%s\""), m_FileName.c_str());
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1748,7 +1841,7 @@ UINT COpCmd_Load::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Load\" error, file=\"%s\""), m_FileName);
+			strDesc.Format(_T("\"Load\" error, file=\"%s\""), m_FileName.c_str());
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1776,43 +1869,72 @@ UINT COpCmd_Load::SetFileMapping(CString &strFile)
 		strFile.Replace(_T('/'), _T('\\'));
 	}
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
-
-	FILE* fwFile=_tfopen(m_FileName,_T("r+"));
+#ifndef __linux__	
+	FILE* fwFile=_tfopen(m_FileName,_T("r"));
 	struct _stat64i32 FileLen;
 	_tstat(m_FileName, &FileLen);
 	if ( fwFile==NULL )
     {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file %s failed to open.errcode is %d"), m_FileName,GetLastError());
+        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
         return MFGLIB_ERROR_FILE_NOT_EXIST;
     }
 	m_qwFileSize = FileLen.st_size;
-	m_pDataBuf = (UCHAR*)VirtualAlloc(NULL, (size_t)m_qwFileSize, MEM_COMMIT, PAGE_READWRITE);
 	//m_pDataBuf = (UCHAR*)malloc((size_t)m_qwFileSize);
+	m_pDataBuf = (UCHAR*)VirtualAlloc(NULL, (size_t)m_qwFileSize, MEM_COMMIT, PAGE_READWRITE);
 	if(m_pDataBuf == NULL)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file[%s] data buffer alloc failed"), m_FileName);
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file[%s] data buffer alloc failed."), m_FileName);
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	std::fread(m_pDataBuf,sizeof(char), (UINT)m_qwFileSize,fwFile);
+	std::fread(m_pDataBuf, sizeof(char),(UINT)m_qwFileSize,fwFile);
 	std::fclose(fwFile);
+#else
 
-//	DWORD dwOldProtect;
-//	BOOL bFlag = VirtualProtect(m_pDataBuf, (size_t)m_qwFileSize, PAGE_READONLY, &dwOldProtect);
-//	if(!bFlag)
-//	{
-//		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Change the page protect attribute failed!\n"));
-//	}
+	int fwFile=open(m_FileName,O_RDONLY);
+	struct _stat64i32 FileLen;
+	_tstat(m_FileName, &FileLen);
+	if ( fwFile==-1 )
+    {
+        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
+        return MFGLIB_ERROR_FILE_NOT_EXIST;
+    }
+	m_qwFileSize = FileLen.st_size;
+	//m_pDataBuf = (UCHAR*)malloc((size_t)m_qwFileSize);
+	m_pDataBuf = (UCHAR*)mmap(NULL, FileLen.st_size, PROT_READ,  MAP_PRIVATE, fwFile,0);
+	if(m_pDataBuf == MAP_FAILED)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file[%s] data buffer alloc failed."), m_FileName.c_str());
+		return MFGLIB_ERROR_NO_MEMORY;
+	}
+	
+	if(close(fwFile)!=0){		
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command-- file[%s] failed to close"), m_FileName.c_str());
+		return MFGLIB_ERROR_NO_MEMORY;
+	}
 
+
+
+
+#endif
 	return 0;
 }
 
 void COpCmd_Load::CloseFileMapping()
 {
+
+#ifndef __linux__
 	if(m_pDataBuf)
 	{
 		VirtualFree(m_pDataBuf, 0, MEM_RELEASE);
 		m_pDataBuf = NULL;
 	}
+#else
+	if(m_pDataBuf!=MAP_FAILED){
+	    if(	munmap(m_pDataBuf,m_qwFileSize)!=0)
+		perror(" couldnt unmap");
+	    m_pDataBuf=NULL;
+	}
+#endif
 }
 
 DWORD COpCmd_Load::GetFileDataSize()
@@ -1858,7 +1980,7 @@ UINT COpCmd_Jump::ExecuteCommand(int index)
 {
 	CString strMsg;
 	strMsg.Format(_T("ExecuteCommand--Jump[WndIndex:%d]"), index);
-	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg);
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg.c_str());
 
 	UI_UPDATE_INFORMATION _uiInfo;
 	_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
@@ -1956,7 +2078,7 @@ UINT COpCmd_Push::SetFileMapping(CString &strFile)
 	_tstat(m_FileName, &FileLen);
 	if ( fwFile==NULL )
     {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Push command--file %s failed to open.errcode is %d"), m_FileName,GetLastError());
+        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Push command--file %s failed to open.errcode is %d"), m_FileName.c_str(),GetLastError());
         return MFGLIB_ERROR_FILE_NOT_EXIST;
     }
 
@@ -1970,8 +2092,8 @@ void COpCmd_Push::CloseFileMapping()
 UINT COpCmd_Push::ExecuteCommand(int index)
 {
 	CString strMsg;
-	strMsg.Format(_T("ExecuteCommand--Push[WndIndex:%d], Body is %s"), index, m_bodyString);
-	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg);
+	strMsg.Format(_T("ExecuteCommand--Push[WndIndex:%d], Body is %s"), index, m_bodyString.c_str());
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg.c_str());
 
 	UI_UPDATE_INFORMATION _uiInfo;
 	_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
@@ -2104,7 +2226,7 @@ UINT COpCmd_Push::ExecuteCommand(int index)
 				_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 				_uiInfo.bUpdateDescription = TRUE;
 				CString strDesc;
-				strDesc.Format(_T("\"Push\" error, file=\"%s\""), m_FileName);
+				strDesc.Format(_T("\"Push\" error, file=\"%s\""), m_FileName.c_str());
 				_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 				strDesc.ReleaseBuffer();
 				((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -2151,7 +2273,7 @@ UINT COpCmd_Push::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Push\" error, file=\"%s\""), m_FileName);
+			strDesc.Format(_T("\"Push\" error, file=\"%s\""), m_FileName.c_str());
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -2697,7 +2819,7 @@ CString ReplaceKeywords(CString str)
 	}
 	return str;
 }
-
+#if 0
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
 	if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
@@ -2706,3 +2828,4 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	}
 	return TRUE;
 }
+#endif

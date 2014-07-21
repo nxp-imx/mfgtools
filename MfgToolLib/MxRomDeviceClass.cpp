@@ -16,7 +16,7 @@
 /// Initializes a new instance of the MxRomDeviceClass class.
 /// </summary>
 MxRomDeviceClass::MxRomDeviceClass(INSTANCE_HANDLE handle)
-: DeviceClass(&GUID_DEVINTERFACE_MX_ROM_WDF_USB_BULK_DEVICE, NULL, NULL, DeviceTypeMxRom, handle)
+: DeviceClass(NULL,NULL,NULL,DeviceTypeMxRom,handle)//&GUID_DEVINTERFACE_MX_ROM_WDF_USB_BULK_DEVICE, NULL, NULL, DeviceTypeMxRom, handle)
 {
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("new MxRomDeviceClass"));
 }

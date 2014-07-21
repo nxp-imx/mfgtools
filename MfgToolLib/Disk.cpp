@@ -34,7 +34,7 @@ int Disk::driveNumber::get()
 	{
 		Disk* disk = dynamic_cast<Disk*>(_owner);
 		ASSERT(disk);
-
+#if 0
 		//only used in Windows NT and above
 		HANDLE hFile = CreateFile(disk->_path.get().GetBuffer(), 0, 0, NULL, OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL, NULL);
 		disk->_path.get().ReleaseBuffer();
@@ -51,8 +51,8 @@ int Disk::driveNumber::get()
 		{
 			// do nothing here on purpose
 			DWORD error = GetLastError();
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("***DeviceIoControl Error: %d, Drive: %s\n"), error, disk->_path.get());
-            return Value;
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("***DeviceIoControl Error: %d, Drive: %s\n"), error, disk->_path.get());     
+       return Value;
 		}
 		CloseHandle(hFile);
 
@@ -61,6 +61,7 @@ int Disk::driveNumber::get()
 			Value = driveNumber.DeviceNumber;
 		}
     }
-	
+#endif	
+	    }
 	return Value;
 }

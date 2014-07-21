@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "SetupApi.h"
+//#include "SetupApi.h"
 #include "Property.h"
 #include "Device.h"
 #include "MfgToolLib_Export.h"
@@ -33,7 +33,7 @@ public:
 	typedef struct NotifyStruct
 	{
 		int cmdOpIndex;    // specify which CmdOperation
-		Device* Device;
+		Device* pDevice;
 		DEV_CLASS_TYPE Type;
 		CString Hub;
 		DWORD HubIndex;		//specify which hub

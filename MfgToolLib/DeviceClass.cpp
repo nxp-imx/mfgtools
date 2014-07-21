@@ -46,7 +46,9 @@ DeviceClass::DeviceClass(LPCGUID iFaceGuid, LPCGUID devGuid, LPCTSTR enumerator,
 
 DeviceClass::~DeviceClass()
 {
+#if 0
 	pthread_mutex_lock(devicesMutex);// , INFINITE);
+
 	//delete all devices that are created
 	while ( _devices.size() > 0 )
     {
@@ -70,11 +72,12 @@ DeviceClass::~DeviceClass()
     }
 
 	_propertyList.clear();
+#endif
 }
 
 HDEVINFO DeviceClass::GetDevInfoSet()
 {
-	// reset the list if it exists
+#if 0	// reset the list if it exists
     if( _deviceInfoSet != INVALID_HANDLE_VALUE )
     {
         gSetupApi().SetupDiDestroyDeviceInfoList(_deviceInfoSet);
@@ -109,22 +112,25 @@ HDEVINFO DeviceClass::GetDevInfoSet()
 		_deviceInfoSet = gSetupApi().apiSetupDiGetClassDevs(pGuid, enumerator.IsEmpty() ? NULL : enumerator.GetBuffer(), 0, flags);
 		enumerator.ReleaseBuffer();
     }
-    
+#endif
     return _deviceInfoSet;
 }
 
 void DeviceClass::DestroyDevInfoSet()
 {
+#if 0
 	if( _deviceInfoSet != INVALID_HANDLE_VALUE )
 	{
 		gSetupApi().SetupDiDestroyDeviceInfoList(_deviceInfoSet);
         _deviceInfoSet = INVALID_HANDLE_VALUE;
 		//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("DeviceClass::GetDevInfoSet--DestroyDevInfoSet()"));
 	}
+#endif
 }
 
 DWORD DeviceClass::EnumDeviceInterfaceDetails(DWORD index, CString& devPath, PSP_DEVINFO_DATA pDevData)
 {
+#if 0 
 	DWORD error;
 	SP_DEVICE_INTERFACE_DATA interfaceData;
 	interfaceData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
@@ -154,13 +160,14 @@ DWORD DeviceClass::EnumDeviceInterfaceDetails(DWORD index, CString& devPath, PSP
     }
 	devPath = (PTSTR)detailData->DevicePath;
     free(detailData);
-	
+	#endif
 	return ERROR_SUCCESS;
 }
 
 //Enum all devices according to GUID
 DEVICES_ARRAY& DeviceClass::Devices()
 {
+#if 0
 	if( _devices.empty() )
 	{
 		DWORD error;
@@ -212,12 +219,13 @@ DEVICES_ARRAY& DeviceClass::Devices()
 		}
 		DestroyDevInfoSet();
 	}
-	
+	#endif
 	return _devices;
 }
 
 CString DeviceClass::classDesc::get()
 {
+#if 0
     DWORD error;
     if( _value.IsEmpty() )
     {
@@ -231,6 +239,7 @@ CString DeviceClass::classDesc::get()
         else
             error = GetLastError();
     }
+#endif
     return _value;
 }
 
@@ -242,7 +251,8 @@ Device* DeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA devi
 }
 
 Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListType devListType, const DeviceListAction devListAction )
-{
+{ 
+#if 0
 	if (pathToFind.IsEmpty())
     {
         return NULL;
@@ -349,7 +359,7 @@ Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListTyp
 	}
 
 	return pDevice;
-
+#endif
 #if 0
 	if (pathToFind.IsEmpty())
     {
@@ -477,11 +487,15 @@ Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListTyp
 
 	return pDevice;
 #endif
+
 }
 
 DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
 {
+
+
 	NotifyStruct nsInfo = {0};
+#if 0
 	Device * pDevice = NULL;
 	CString pathToFind = path + 4;
 
@@ -524,7 +538,7 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
 	{
 		nsInfo.Device = pDevice;
         nsInfo.Type = _deviceClassType;
-		nsInfo.DriverLetter = _T('');
+		nsInfo.DriverLetter = _T('\0');
         nsInfo.PortIndex = pDevice->_hubIndex.get();
         nsInfo.Hub = pDevice->_hub.get(); 
 		// Find our Hub in gDeviceManager's list of [Hub].Devices()
@@ -543,13 +557,15 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
 			nsInfo.Device = NULL;
 		}
 	}
-
+#endif
 	return nsInfo;
 }
 
 DeviceClass::NotifyStruct DeviceClass::RemoveUsbDevice(LPCTSTR path)
 {
+
 	NotifyStruct nsInfo = {0};
+#if 0
 	CString trimmedPath = path + 4;
 
 	// see if it is in our list of Devices
@@ -558,7 +574,7 @@ DeviceClass::NotifyStruct DeviceClass::RemoveUsbDevice(LPCTSTR path)
 	{
 		nsInfo.Device = pDevice;
         nsInfo.Type = _deviceClassType;
-		nsInfo.DriverLetter = _T('');
+		nsInfo.DriverLetter = _T('\0');
 		nsInfo.PortIndex = pDevice->_hubIndex.get();
         nsInfo.Hub = pDevice->_hub.get();
 		// Find our Hub in gDeviceManager's list of [Hub].Devices()
@@ -570,7 +586,7 @@ DeviceClass::NotifyStruct DeviceClass::RemoveUsbDevice(LPCTSTR path)
 		}
 		ClearPort(nsInfo.Hub, nsInfo.PortIndex);
 	}
-	
+#endif	
 	return nsInfo;
 }
 

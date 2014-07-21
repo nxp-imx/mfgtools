@@ -18,7 +18,7 @@
 extern DEV_CLASS_ARRAY g_devClasses;
 
 //only for debug
-extern LARGE_INTEGER g_t1, g_t2, g_t3, g_tc;
+//extern LARGE_INTEGER g_t1, g_t2, g_t3, g_tc;
 
 void *CmdListThreadProc(void * pParam);
 
@@ -47,8 +47,8 @@ CCmdOpreation::~CCmdOpreation()
 		m_pUTP = NULL;
 	}
 
-	::CloseHandle(m_hMutex_cb);
-	::CloseHandle(m_hMutex_cb2);
+	pthread_mutex_destroy(&m_hMutex_cb);
+	pthread_mutex_destroy(&m_hMutex_cb2);
 }
 
 DWORD CCmdOpreation::Open()
@@ -145,7 +145,7 @@ DWORD CCmdOpreation::Open()
 	((MFGLIB_VARS *)m_pLibHandle)->g_CmdOpThreadID[m_WndIndex] = m_pThread;
 
 	// Resume CmdList thread
-	SetEvent(&RunFlag);
+	SetEvent(RunFlag);
 	//m_pThread->ResumeThread();
 
 	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CCmdOpreation[%d]-[Device:%p] thread is Running"), m_WndIndex, m_p_usb_port->GetDevice());
@@ -156,7 +156,7 @@ DWORD CCmdOpreation::Open()
 void CCmdOpreation::Close()
 {
 	//End CmdListThreadProc
-	SetEvent(&m_hKillEvent);
+	SetEvent(m_hKillEvent);
 	pthread_join(m_pThread,NULL);
 
 	DestroyEvent(m_hKillEvent);
@@ -245,7 +245,7 @@ void CCmdOpreation::SetUsbPort(usb::Port* _port)
 BOOL CCmdOpreation::InitInstance()
 {
 	//m_pThread = AfxBeginThread(CmdListThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
-	SetEvent(&m_hThreadStartEvent);
+	SetEvent(m_hThreadStartEvent);
 	return TRUE;
 }
 
@@ -257,7 +257,7 @@ BOOL CCmdOpreation::OnStart()
 		{
 			m_pUTP->m_bShouldStop = FALSE;
 		}
-        SetEvent(&m_hRunEvent);
+        SetEvent(m_hRunEvent);
         return TRUE;
     }
     else
@@ -275,7 +275,7 @@ BOOL CCmdOpreation::OnStop()
 		{
 			m_pUTP->m_bShouldStop = TRUE;
 		}
-        SetEvent(&m_hStopEvent);
+        SetEvent(m_hStopEvent);
         return TRUE;
     }
     else
@@ -290,7 +290,7 @@ BOOL CCmdOpreation::OnDeviceArrive()
 	if (NULL != (*m_hDeviceArriveEvent).mutex)
     {
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceArriveEvent."), m_WndIndex);
-        SetEvent(&m_hDeviceArriveEvent);
+        SetEvent(m_hDeviceArriveEvent);
         return TRUE;
     }
     else
@@ -305,7 +305,7 @@ BOOL CCmdOpreation::OnDeviceRemove()
 	if (NULL != (*m_hDeviceRemoveEvent).mutex)
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceRemoveEvent."), m_WndIndex);
-        SetEvent(&m_hDeviceRemoveEvent);
+        SetEvent(m_hDeviceRemoveEvent);
         return TRUE;
     }
     else
@@ -473,7 +473,7 @@ void* CmdListThreadProc(void* pParam)
         			delete pOperation->m_pUTP;
         			pOperation->m_pUTP = NULL;
         		}
-    			SetEvent(&pOperation->m_hDevCanDeleteEvent);
+    			SetEvent(pOperation->m_hDevCanDeleteEvent);
 				dwTimeout = INFINITE;
 				break;
 			}
@@ -617,22 +617,22 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 	{
 	case DeviceManager::DEVICE_ARRIVAL_EVT:
 		m_ni.Event = MX_DEVICE_ARRIVAL_EVT;
-		strDesc = pnsinfo->Device->_description.get();
-		_tcscpy(m_ni.DeviceDesc, strDesc.GetBuffer());
+		strDesc = pnsinfo->pDevice->_description.get();
+		_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
 		strDesc.ReleaseBuffer();
 		break;
 	case DeviceManager::DEVICE_REMOVAL_EVT:
 		m_ni.Event = MX_DEVICE_REMOVAL_EVT;
-		strDesc = pnsinfo->Device->_description.get();
-		_tcscpy(m_ni.DeviceDesc, strDesc.GetBuffer());
+		strDesc = pnsinfo->pDevice->_description.get();
+		_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
 		strDesc.ReleaseBuffer();
 		break;
 	case DeviceManager::VOLUME_ARRIVAL_EVT:
 		m_ni.Event = MX_VOLUME_ARRIVAL_EVT;
 		m_ni.DriverLetter = pnsinfo->DriverLetter;
-		//strDesc = ((Volume*)(pnsinfo->Device))->_friendlyName.get();
+		//strDesc = ((Volume*)(pnsinfo->pDevice))->_friendlyName.get();
 		strDesc = _T("USB Mass Storage Devcie");
-		_tcscpy(m_ni.DeviceDesc, strDesc.GetBuffer());
+		_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
 		strDesc.ReleaseBuffer();
 		//QueryPerformanceFrequency(&g_tc);
 		//QueryPerformanceCounter(&g_t1);
@@ -647,10 +647,10 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 		break;
 	case DeviceManager::VOLUME_REMOVAL_EVT:
 		m_ni.Event = MX_VOLUME_REMOVAL_EVT;
-		m_ni.DriverLetter = _T('');
-		//m_ni.DeviceDesc = ((Volume*)(pnsinfo->Device))->_friendlyName.get();
+		m_ni.DriverLetter = _T(' ');
+		//m_ni.DeviceDesc = ((Volume*)(pnsinfo->pDevice))->_friendlyName.get();
 		strDesc = _T("USB Mass Storage Device");
-		_tcscpy(m_ni.DeviceDesc, strDesc.GetBuffer());
+		_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
 		strDesc.ReleaseBuffer();
 		break;
 	case DeviceManager::HUB_ARRIVAL_EVT:
@@ -660,7 +660,7 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 		m_ni.Event = MX_HUB_REMOVAL_EVT;
 		break;
 	}
-	_tcscpy(m_ni.Hub, pnsinfo->Hub.GetBuffer());
+	_tcscpy((TCHAR *)m_ni.Hub, pnsinfo->Hub.GetBuffer());
 	pnsinfo->Hub.ReleaseBuffer();
 	m_ni.HubIndex = pnsinfo->HubIndex;
 	m_ni.PortIndex = pnsinfo->PortIndex;
@@ -675,7 +675,7 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 	{
 		((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[m_WndIndex].m_bConnected = FALSE;
 	}
-	((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[m_WndIndex].DeviceDesc = m_ni.DeviceDesc;
+	((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[m_WndIndex].DeviceDesc = (TCHAR*)m_ni.DeviceDesc;
 
 	m_usb_hub_name = pnsinfo->Hub;
 	m_usb_port_index = pnsinfo->PortIndex;
@@ -761,7 +761,7 @@ void CCmdOpreation::ExecuteUIUpdate(UI_UPDATE_INFORMATION *pInfo)
 	}
 	if(pInfo->bUpdateDescription)
 	{
-		_tcscpy(m_uiInfo.cmdInfo, pInfo->strDescription);
+		_tcscpy((TCHAR *)m_uiInfo.cmdInfo, pInfo->strDescription);
 	}
 	m_uiInfo.bProgressWithinCommand = pInfo->bUpdateProgressInCommand;
 	if(m_uiInfo.bProgressWithinCommand)

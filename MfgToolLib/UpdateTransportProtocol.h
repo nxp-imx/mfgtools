@@ -13,7 +13,16 @@
 #include "UpdateTransportProtocol.Api.h"
 
 //only for debug
-extern LARGE_INTEGER g_t1, g_t2, g_t3, g_tc;
+//extern LARGE_INTEGER g_t1, g_t2, g_t3, g_tc;
+#if 0
+#ifndef max
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
+
+#ifndef min
+#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#endif
+#endif
 
 #define MIN_DATA_PROGRESS_BAR_CHANGE (6*1024*1024) //When a file is transferred, data transfer progress bar will be 
                                                  //Updated once defined data quantity is reached.
@@ -135,11 +144,11 @@ public:
 						}
 						else
 						{
-							m_CurrentSize = min(m_TotalSize, m_TotalSize - m_pCurrentState->GetUtpMsg()->GetResponseInfo());
+							m_CurrentSize = std::min(m_TotalSize, m_TotalSize - m_pCurrentState->GetUtpMsg()->GetResponseInfo());
 						}   
 						pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
 						if (KeepPolling())
-							Sleep(GetBusyDelay());
+							sleep(GetBusyDelay());
 						else
 						{
 							delete pNextState; pNextState = NULL;
@@ -156,9 +165,9 @@ public:
 	//                        String msg = String.Format("In: {0}, Sent: {1}\r\n Response: {2}\r\n Moving to: {3}");
 						CString msg;
 						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
-							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()),
-							State::StateToString(m_pCurrentState->GetStateType()),
-							m_pCurrentState->GetUtpMsg()->ToString()); 
+							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()).c_str(),
+							State::StateToString(m_pCurrentState->GetStateType()).c_str(),
+							m_pCurrentState->GetUtpMsg()->ToString().c_str()); 
 	//                        InvalidTransactionStateException e = new InvalidTransactionStateException(msg2);
 	//                        throw e;
 						pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
@@ -213,9 +222,9 @@ public:
 //                            throw new Exception("Illegal Response Code for this transaction.");
                         CString msg;
 						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
-							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()),
-							State::StateToString(m_pCurrentState->GetStateType()),
-							m_pCurrentState->GetUtpMsg()->ToString());
+							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()).c_str(),
+							State::StateToString(m_pCurrentState->GetStateType()).c_str(),
+							m_pCurrentState->GetUtpMsg()->ToString().c_str());
                         pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
                         break;
                 }
@@ -227,7 +236,7 @@ public:
 					case ScsiUtpMsg::BUSY:
                         pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
                         if (KeepPolling())
-                            Sleep(GetBusyDelay());
+                            sleep(GetBusyDelay());
                         else
 						{
 							delete pNextState;
@@ -246,9 +255,9 @@ public:
                     default:
 						CString msg;
 						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
-							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()),
-							State::StateToString(m_pCurrentState->GetStateType()),
-							m_pCurrentState->GetUtpMsg()->ToString());
+							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()).c_str(),
+							State::StateToString(m_pCurrentState->GetStateType()).c_str(),
+							m_pCurrentState->GetUtpMsg()->ToString().c_str());
                         pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
                         break;
                 }
@@ -292,9 +301,10 @@ public:
         WriteTransaction(UpdateTransportProtocol* pUtpInstance, CString command, CString filename)
             : Transaction(pUtpInstance, command)
         {
+#if 0
 			m_BusyDelay = 2;
 			// open the file for binary reading
-			file.open(filename, std::ios_base::binary, _SH_DENYNO);
+			file.open(filename, std::ios_base::binary, NULL);
 			if(!file.is_open())
 			{
 				CString msg; msg.Format(_T("!ERROR(%d): UpdateTransportProtocol.UtpWrite(%s, %s), tag:%d"), ERROR_OPEN_FAILED, command, filename, g_TransactionTag);
@@ -303,15 +313,16 @@ public:
 			else
 			{
 				// get the length of the file
-
+#if 0
 				WIN32_FILE_ATTRIBUTE_DATA FileAttrData;
 				if( !GetFileAttributesEx(filename, GetFileExInfoStandard,&FileAttrData) )
 					return;
 
 				m_LParam = m_TotalSize = FileAttrData.nFileSizeLow;
 
-				m_pCurrentState = new StartState(this);				
+#endif				m_pCurrentState = new StartState(this);				
 			}
+#endif
         }
 
         __int64 GetPacketCount() { return m_CurrentSize/m_pUpdateProtocol->GetMaxPacketSize(); };
@@ -328,7 +339,7 @@ public:
                         m_CurrentSize = 0;
 
                         pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
-                        Sleep(GetBusyDelay());
+                        sleep(GetBusyDelay());
                         
                         break;
                     
@@ -341,9 +352,9 @@ public:
                     default:
 						CString msg;
 						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
-							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()),
-							State::StateToString(m_pCurrentState->GetStateType()),
-							m_pCurrentState->GetUtpMsg()->ToString());
+							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()).c_str(),
+							State::StateToString(m_pCurrentState->GetStateType()).c_str(),
+							m_pCurrentState->GetUtpMsg()->ToString().c_str());
                         pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
                         break;
                 }
@@ -355,7 +366,7 @@ public:
 					case ScsiUtpMsg::BUSY:
                         pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
                         if (KeepPolling())
-                            Sleep(GetBusyDelay());
+                            sleep(GetBusyDelay());
                         else
 						{
 							delete pNextState;
@@ -375,9 +386,9 @@ public:
                     default:
 						CString msg;
 						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
-						ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()),
-						State::StateToString(m_pCurrentState->GetStateType()),
-						m_pCurrentState->GetUtpMsg()->ToString());
+						ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()).c_str(),
+						State::StateToString(m_pCurrentState->GetStateType()).c_str(),
+						m_pCurrentState->GetUtpMsg()->ToString().c_str());
                         pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
                         break;
                 }
@@ -461,7 +472,7 @@ public:
         CString ToString()
         {
             CString str;
-			str.Format(_T("   StartState - %s // %s"), m_pMsg->ToString(), m_pMsg->GetResponseString());
+			str.Format(_T("   StartState - %s // %s"), m_pMsg->ToString().c_str(), m_pMsg->GetResponseString().c_str());
 			return str;
         }
     };
@@ -492,7 +503,7 @@ public:
         CString ToString()
         {
             CString str;
-			str.Format(_T("   BusyState - %s busyCount:%d // %s"), m_pMsg->ToString(), m_pTransaction->GetBusyCount(), m_pMsg->GetResponseString());
+			str.Format(_T("   BusyState - %s busyCount:%d // %s"), m_pMsg->ToString().c_str(), m_pTransaction->GetBusyCount(), m_pMsg->GetResponseString().c_str());
 			return str;
         }
     };
@@ -519,7 +530,7 @@ public:
         CString ToString()
         {
             CString str;
-			str.Format(_T("   DoneState - tag:%d // %s"), m_Tag, m_ResponseString);
+			str.Format(_T("   DoneState - tag:%d // %s"), m_Tag, m_ResponseString.c_str());
 			return str;
         }
     };
@@ -531,7 +542,7 @@ public:
 			: State(pTransaction, State::GetDataState)
         {
             // How much data to get?
-            __int64 numBytesToRead = min(pTransaction->GetProtocol()->GetMaxPacketSize(), pTransaction->GetTotalSize() - pTransaction->GetCurrentSize());
+            __int64 numBytesToRead = std::min(pTransaction->GetProtocol()->GetMaxPacketSize(), pTransaction->GetTotalSize() - pTransaction->GetCurrentSize());
 
 			m_pMsg = new api::Get(pTransaction->GetTag(), pTransaction->GetPacketCount(), numBytesToRead);
         }
@@ -539,7 +550,7 @@ public:
         CString ToString()
         {
 			CString str;
-			str.Format(_T("   GetDataState - %s // %s"), m_pMsg->ToString(), m_pMsg->GetResponseString());
+			str.Format(_T("   GetDataState - %s // %s"), m_pMsg->ToString().c_str(), m_pMsg->GetResponseString().c_str());
 			return str;
         }
     };
@@ -556,7 +567,7 @@ public:
 //                Array.Copy(transaction.Data, transaction.CurrentSize, buffer, 0, buffer.LongLength);
 
             // Get some data to put.
-            __int64 numBytesToWrite = min(pTransaction->GetProtocol()->GetMaxPacketSize(), pTransaction->GetTotalSize() - pTransaction->GetCurrentSize());
+            __int64 numBytesToWrite = std::min(pTransaction->GetProtocol()->GetMaxPacketSize(), pTransaction->GetTotalSize() - pTransaction->GetCurrentSize());
 
 			// Send it.
 			m_pMsg = new api::Put(pTransaction->GetTag(), pTransaction->GetPacketCount(), pTransaction->GetData(numBytesToWrite));
@@ -566,7 +577,7 @@ public:
         CString ToString()
         {
 			CString str;
-            str.Format(_T("   PutDataState - %s // %s"), m_pMsg->ToString(), m_pMsg->GetResponseString());
+            str.Format(_T("   PutDataState - %s // %s"), m_pMsg->ToString().c_str(), m_pMsg->GetResponseString().c_str());
 			return str;
         }
     };
@@ -617,7 +628,7 @@ private:
 			//double d1 = (double)(g_t2.QuadPart-g_t1.QuadPart) / (double)g_tc.QuadPart;
 			//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Volume Unlock times(%f)"), d1);
         }
-        CloseHandle(m_hDevice);
+       // CloseHandle(m_hDevice);
         m_Disposed = true;
     }
 
@@ -628,7 +639,7 @@ public:
 
 		// tell the UI we are beginning a command.
 		Device::NotifyStruct cmdProgress(_T("UtpDrop"), Device::NotifyStruct::dataDir_ToDevice, 0);
-		msg.Format(_T("UtpDrop(%s)"), cmd);
+		msg.Format(_T("UtpDrop(%s)"), cmd.c_str());
 		cmdProgress.status = msg;
 //        ((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
@@ -646,7 +657,7 @@ public:
         }
 
         // tell the UI we are done
-		msg.Format(_T("   DoneState - tag:%d // %s"), modeMsg.GetTag(), modeMsg.GetResponseString());
+		msg.Format(_T("   DoneState - tag:%d // %s"), modeMsg.GetTag(), modeMsg.GetResponseString().c_str());
 		cmdProgress.status = msg;
 		cmdProgress.error = modeMsg.GetResponseInfo();
 		cmdProgress.inProgress = false;
@@ -661,7 +672,7 @@ public:
 
         // tell the UI we are beginning a command.
 		Device::NotifyStruct cmdProgress(_T("UtpCommand"), Device::NotifyStruct::dataDir_ToDevice, 0);
-		cmdProgress.status.Format(_T("UtpCommand(%s) tag:%d"), cmd, transaction.GetTag());
+		cmdProgress.status.Format(_T("UtpCommand(%s) tag:%d"), cmd.c_str(), transaction.GetTag());
 //		if(m_pUtpDevice != NULL)
 //			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 //		else
@@ -708,7 +719,7 @@ public:
         // tell the UI we are beginning a command.
 //		HANDLE hCallback = m_pUtpDevice->RegisterCallback(callback);
 		Device::NotifyStruct cmdProgress(_T("UtpRead"), Device::NotifyStruct::dataDir_FromDevice, 0);
-        cmdProgress.status.Format(_T("UtpRead(%s, %s) tag:%d"), cmd, filename, transaction.GetTag());
+        cmdProgress.status.Format(_T("UtpRead(%s, %s) tag:%d"), cmd.c_str(), filename.c_str(), transaction.GetTag());
 //		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
 
@@ -721,7 +732,7 @@ public:
             // Update the UI
             cmdProgress.maximum = (UINT)transaction.GetTotalSize();
             cmdProgress.position = (UINT)transaction.GetCurrentSize();
-            cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
+            cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString().c_str(), transaction.GetCurrentSize());
 //			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 			((Volume*)m_pUtpDevice)->NotifyUpdateUI(cmdOpIndex, cmdProgress.position, cmdProgress.maximum);
 
@@ -738,8 +749,8 @@ public:
 
 //		m_pUtpDevice->UnregisterCallback(hCallback);
 #ifdef WINVER
-		USES_CONVERSION;
-		CAnsiString afilename=T2A(filename.c_str());
+		//USES_CONVERSION;
+		CString afilename=(filename.c_str());
 #else
 #define afilename filename
 #endif
@@ -751,7 +762,7 @@ public:
 		if ( myFile==NULL )
 		{
 			CString msg;
-			msg.Format(_T("!ERROR(%d): UpdateTransportProtocol.UtpRead(%s, %s), tag:%d"), strerror(errno), cmd, filename, g_TransactionTag);
+			msg.Format(_T("!ERROR(%d): UpdateTransportProtocol.UtpRead(%s, %s), tag:%d"), strerror(errno), cmd.c_str(), filename.c_str(), g_TransactionTag);
 			TRACE(msg);
 			return errno;
 		}
@@ -774,6 +785,7 @@ public:
 //    int UtpWrite(CString cmd, CString filename, Device::UI_Callback callback)
 	int UtpWrite(CString cmd, CString filename, int cmdOpIndex)
     {
+#if 0
 //#define TIMETEST
 #ifdef TIMETEST 
 		LARGE_INTEGER liStartTime = {0}, liStopTime = {0};
@@ -786,8 +798,8 @@ public:
 		if ( cmd.Find(_T("@FILESIZE")) != -1 )
 		{
 			// get the length of the file
-			WIN32_FILE_ATTRIBUTE_DATA FileAttrData;
-			if( !GetFileAttributesEx(filename, GetFileExInfoStandard,&FileAttrData) )
+
+			WIN32_FILE_ATTRIBUTE_DATA FileAttrData;			if( !GetFileAttributesEx(filename, GetFileExInfoStandard,&FileAttrData) )
 				return ERROR_OPEN_FAILED;
 
 			CString sfileSize;
@@ -912,6 +924,7 @@ public:
 	ERROR_NO_DEVICE:
 		TRACE(_T("The Device handle is destroyed.m_pUtpDevice is 0x%x, dwUtpdeviceAddr is 0x%x\r\n"),m_pUtpDevice,dwUtpDeviceAddr);
 		return ERROR_INVALID_HANDLE;
+#endif    
     } // UtpWrite()
 
 }; // class UpdateTransportProtocol

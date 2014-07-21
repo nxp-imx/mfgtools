@@ -155,8 +155,8 @@ typedef struct _tagXMLNode
 
     // Load/Save XML
     virtual LPTSTR  Load( LPCTSTR pszXml, LPPARSEINFO pi = &piDefault );
-    CString GetXML( LPDISP_OPT opt = &optDefault );
-    CString GetText( LPDISP_OPT opt = &optDefault );
+    CString& GetXML( LPDISP_OPT opt = &optDefault );
+    CString& GetText( LPDISP_OPT opt = &optDefault );
 
     // internal load functions
     LPTSTR  LoadAttributes( LPCTSTR pszAttrs, LPPARSEINFO pi = &piDefault );

@@ -13,8 +13,10 @@
 /// <summary>
 /// Initializes a new instance of the DiskDeviceClass class.
 /// </summary>
+#define GUID_DEVINTERFACE_DISK  GUID
+#define GUID_DEVCLASS_DISKDRIVE  GUID
 DiskDeviceClass::DiskDeviceClass(INSTANCE_HANDLE handle)
-: DeviceClass(&GUID_DEVINTERFACE_DISK, &GUID_DEVCLASS_DISKDRIVE, _T(""), DeviceTypeDisk, handle)
+: DeviceClass(NULL,NULL,_T(""),DeviceTypeDisk,handle)//&GUID_DEVINTERFACE_DISK, &GUID_DEVCLASS_DISKDRIVE, _T(""), DeviceTypeDisk, handle)
 {
 	//The system-supplied storage class drivers register an instance of GUID_DEVINTERFACE_DISK for a hard disk storage device. 
 }

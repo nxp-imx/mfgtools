@@ -15,7 +15,7 @@
 struct StVersionInfo
 {
 	StVersionInfo(USHORT major=0, USHORT minor=0, USHORT rev=0);
-    StVersionInfo(LPCSTR pVersionString);
+        StVersionInfo(LPCSTR pVersionString);
 	virtual ~StVersionInfo()
 	{
 	}

@@ -7,7 +7,7 @@
  */
 #pragma once
 #include "DeviceClass.h"
-#include "StdInt.h"
+//#include "StdInt.h"
 //extern "C" {
 //#include <hidsdi.h>
 //}

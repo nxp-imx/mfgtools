@@ -16,7 +16,7 @@
 	#ifdef MACOSX
 		#include "stscsi_mac.h"
 	#else
-		#include "stscsi_macos9.h"
+		//#include "stscsi_macos9.h"
 	#endif	 // MACOSX
 //	typedef void *PDISK_GEOMETRY;
 //	typedef void *PDRIVE_LAYOUT_INFORMATION;
@@ -309,7 +309,7 @@ namespace api
 		{
 			int colonPos, endPos;
 			colonPos = paramStr.Find(L':');
-			if ( (endPos = paramStr.FindOneOf(L",\r\n\0")) == -1 )
+			if ( (endPos = paramStr.FindOneOf(",\r\n\0")) == -1 )
 				endPos = paramStr.GetLength();
 			CString valueStr = paramStr.Mid(colonPos+1, endPos-(colonPos+1));
 			// prepare string for next call
@@ -411,7 +411,7 @@ namespace api
 				}
 				_str.AppendFormat(_T("(%02X)"), key);
 			}
-			CString& ToString() { return _str; };
+			CString ToString() { return _str; };
 		private:
 			CString _str;
 		};
@@ -457,7 +457,7 @@ namespace api
 			msg.AppendFormat(_T("   Valid: %s\r\n"), ScsiSenseData.Valid ? _T("true") : _T("false"));
 			msg.AppendFormat(_T("   SegmentNumber: 0x%02X\r\n"), ScsiSenseData.SegmentNumber);
 			SenseKey key(ScsiSenseData.SenseKey);
-			msg.AppendFormat(_T("   SenseKey: %s\r\n"), key.ToString());
+			msg.AppendFormat(_T("   SenseKey: %s\r\n"), key.ToString().c_str());
 			msg.AppendFormat(_T("   IncorrectLength: %s\r\n"), ScsiSenseData.IncorrectLength ? _T("true") : _T("false"));
 			msg.AppendFormat(_T("   EndOfMedia: %s\r\n"), ScsiSenseData.EndOfMedia ? _T("true") : _T("false"));
 			msg.AppendFormat(_T("   FileMark: %s\r\n"), ScsiSenseData.FileMark ? _T("true") : _T("false"));
@@ -723,8 +723,8 @@ namespace api
 		StGetLogicalMediaInfo(UCHAR typeInfo, UINT responseSize=0)
 			: StApiT<_ST_SCSI_CDB::_CDB16>(API_TYPE_ST_SCSI, ST_READ_CMD, _T("GetLogicalMediaInfo"))
 		{
-			_params[L"Info Type"] = &_typeInfo;
-			_params[L"Response Size"] = &_responseSize;
+			_params["Info Type"] = &_typeInfo;
+			_params["Response Size"] = &_responseSize;
 
 			_typeInfo.Value = typeInfo;
 			_responseSize.Value = responseSize;
@@ -735,21 +735,21 @@ namespace api
 
 		void InitInfoTypes()
 		{
-			_typeInfo.ValueList[MediaInfoNumberOfDrives]			= L"NumberOfDrives";
-			_typeInfo.ValueList[MediaInfoSizeInBytes]				= L"SizeInBytes";
-			_typeInfo.ValueList[MediaInfoAllocationUnitSizeInBytes] = L"AllocationUnitSizeInBytes";
-			_typeInfo.ValueList[MediaInfoIsInitialized]				= L"IsInitialized";
-			_typeInfo.ValueList[MediaInfoMediaState]				= L"MediaState";
-			_typeInfo.ValueList[MediaInfoIsWriteProtected]			= L"IsWriteProtected";
-			_typeInfo.ValueList[MediaInfoPhysicalMediaType]			= L"PhysicalMediaType";
-			_typeInfo.ValueList[MediaInfoSizeOfSerialNumberInBytes] = L"SizeOfSerialNumberInBytes";
-			_typeInfo.ValueList[MediaInfoSerialNumber]				= L"SerialNumber";
-			_typeInfo.ValueList[MediaInfoIsSystemMedia]				= L"IsSystemMedia";
-			_typeInfo.ValueList[MediaInfoIsMediaPresent]			= L"IsMediaPresent";
-			_typeInfo.ValueList[MediaInfoNandPageSizeInBytes]		= L"NandPageSizeInBytes";
-			_typeInfo.ValueList[MediaInfoNandMfgId]					= L"NandMfgId";
-			_typeInfo.ValueList[MediaInfoNandIdDetails]				= L"NandIdDetails";
-			_typeInfo.ValueList[MediaInfoNandChipEnables]			= L"NandChipEnables";
+			_typeInfo.ValueList[MediaInfoNumberOfDrives]			= "NumberOfDrives";
+			_typeInfo.ValueList[MediaInfoSizeInBytes]				= "SizeInBytes";
+			_typeInfo.ValueList[MediaInfoAllocationUnitSizeInBytes] = "AllocationUnitSizeInBytes";
+			_typeInfo.ValueList[MediaInfoIsInitialized]				= "IsInitialized";
+			_typeInfo.ValueList[MediaInfoMediaState]				= "MediaState";
+			_typeInfo.ValueList[MediaInfoIsWriteProtected]			= "IsWriteProtected";
+			_typeInfo.ValueList[MediaInfoPhysicalMediaType]			= "PhysicalMediaType";
+			_typeInfo.ValueList[MediaInfoSizeOfSerialNumberInBytes] = "SizeOfSerialNumberInBytes";
+			_typeInfo.ValueList[MediaInfoSerialNumber]				= "SerialNumber";
+			_typeInfo.ValueList[MediaInfoIsSystemMedia]				= "IsSystemMedia";
+			_typeInfo.ValueList[MediaInfoIsMediaPresent]			= "IsMediaPresent";
+			_typeInfo.ValueList[MediaInfoNandPageSizeInBytes]		= "NandPageSizeInBytes";
+			_typeInfo.ValueList[MediaInfoNandMfgId]					= "NandMfgId";
+			_typeInfo.ValueList[MediaInfoNandIdDetails]				= "NandIdDetails";
+			_typeInfo.ValueList[MediaInfoNandChipEnables]			= "NandChipEnables";
 		}
 
 		virtual ~StGetLogicalMediaInfo() {};
@@ -1016,9 +1016,9 @@ namespace api
 		StGetLogicalDriveInfo(UCHAR driveNumber, _LOGICAL_DRIVE_INFO typeInfo, UINT responseSize=0)
 			: StApiT<_ST_SCSI_CDB::_CDBDRIVEINFO16>(API_TYPE_ST_SCSI, ST_READ_CMD, _T("GetLogicalDriveInfo"))
 		{
-			_params[L"Drive Number"] = &_driveNumber;
-			_params[L"Info Type"] = &_typeInfo;
-			_params[L"Response Size"] = &_responseSize;
+			_params["Drive Number"] = &_driveNumber;
+			_params["Info Type"] = &_typeInfo;
+			_params["Response Size"] = &_responseSize;
 
 			_driveNumber.Value = driveNumber;
 			_typeInfo.Value = typeInfo;
@@ -1030,20 +1030,20 @@ namespace api
 
 		void InitInfoTypes()
 		{
-			_typeInfo.ValueList[DriveInfoSectorSizeInBytes]			= L"SectorSizeInBytes";
-			_typeInfo.ValueList[DriveInfoEraseSizeInBytes]			= L"EraseSizeInBytes";
-			_typeInfo.ValueList[DriveInfoSizeInBytes]				= L"SizeInBytes";
-			_typeInfo.ValueList[DriveInfoSizeInMegaBytes]			= L"SizeInMegaBytes";
-			_typeInfo.ValueList[DriveInfoSizeInSectors]				= L"SizeInSectors";
-			_typeInfo.ValueList[DriveInfoType]						= L"Type";
-			_typeInfo.ValueList[DriveInfoTag]						= L"Tag";
-			_typeInfo.ValueList[DriveInfoComponentVersion]			= L"ComponentVersion";
-			_typeInfo.ValueList[DriveInfoProjectVersion]			= L"ProjectVersion";
-			_typeInfo.ValueList[DriveInfoIsWriteProtected]			= L"IsWriteProtected";
-			_typeInfo.ValueList[DriveInfoSizeOfSerialNumberInBytes] = L"SizeOfSerialNumberInBytes";
-			_typeInfo.ValueList[DriveInfoSerialNumber]				= L"SerialNumber";
-			_typeInfo.ValueList[DriveInfoMediaPresent]				= L"MediaPresent";
-			_typeInfo.ValueList[DriveInfoMediaChange]				= L"MediaChange";
+			_typeInfo.ValueList[DriveInfoSectorSizeInBytes]			= "SectorSizeInBytes";
+			_typeInfo.ValueList[DriveInfoEraseSizeInBytes]			= "EraseSizeInBytes";
+			_typeInfo.ValueList[DriveInfoSizeInBytes]				= "SizeInBytes";
+			_typeInfo.ValueList[DriveInfoSizeInMegaBytes]			= "SizeInMegaBytes";
+			_typeInfo.ValueList[DriveInfoSizeInSectors]				= "SizeInSectors";
+			_typeInfo.ValueList[DriveInfoType]						= "Type";
+			_typeInfo.ValueList[DriveInfoTag]						= "Tag";
+			_typeInfo.ValueList[DriveInfoComponentVersion]			= "ComponentVersion";
+			_typeInfo.ValueList[DriveInfoProjectVersion]			= "ProjectVersion";
+			_typeInfo.ValueList[DriveInfoIsWriteProtected]			= "IsWriteProtected";
+			_typeInfo.ValueList[DriveInfoSizeOfSerialNumberInBytes] = "SizeOfSerialNumberInBytes";
+			_typeInfo.ValueList[DriveInfoSerialNumber]				= "SerialNumber";
+			_typeInfo.ValueList[DriveInfoMediaPresent]				= "MediaPresent";
+			_typeInfo.ValueList[DriveInfoMediaChange]				= "MediaChange";
 		}
 
 		virtual ~StGetLogicalDriveInfo() {};
@@ -1382,7 +1382,7 @@ namespace api
         StGetLogicalTable(UCHAR numEntries=media::DefaultMediaTableEntries)
 			: StApiT<_ST_SCSI_CDB::_CDB16>(API_TYPE_ST_SCSI, ST_READ_CMD, _T("GetLogicalTable"))
 		{
-			_params[L"Number of Entries"] = &_numEntries;
+			_params["Number of Entries"] = &_numEntries;
 			_numEntries.Value = numEntries;
 
 			PrepareCommand();
@@ -1533,10 +1533,10 @@ namespace api
 	public:
 		StEraseLogicalMedia(bool preserveJanus = false) : StApiT<_ST_SCSI_CDB::_CDB16>(API_TYPE_ST_SCSI, ST_WRITE_CMD, _T("EraseLogicalMedia"))
 		{
-			_params[L"Preserve Janus Drive:"] = &_preserveJanus;
+			_params["Preserve Janus Drive:"] = &_preserveJanus;
 
-			_preserveJanus.ValueList[false]	= L"false";
-			_preserveJanus.ValueList[true]	= L"true";
+			_preserveJanus.ValueList[false]	= "false";
+			_preserveJanus.ValueList[true]	= "true";
 
 			_preserveJanus.Value = preserveJanus;
 			
@@ -1606,10 +1606,10 @@ namespace api
 			: StApiT<_ST_SCSI_CDB::_CDBRWDRIVESECTOR16>(API_TYPE_ST_SCSI, ST_READ_CMD, _T("ReadLogicalDriveSector"))
 //			, _responseDataPtr(NULL)
 		{
-			_params[L"Drive Number"] = &_driveNumber;
-			_params[L"Starting Sector"] = &_sectorStart;
-			_params[L"Sector Count"] = &_sectorCount;
-			_params[L"Sector Size"] = &_sectorSize;
+			_params["Drive Number"] = &_driveNumber;
+			_params["Starting Sector"] = &_sectorStart;
+			_params["Sector Count"] = &_sectorCount;
+			_params["Sector Size"] = &_sectorSize;
 
 			_driveNumber.Value = driveNumber;
 			_sectorStart.Value = sectorStart;
@@ -1683,11 +1683,11 @@ namespace api
 			UINT sectorCount, UCHAR* pData, bool bWrite512=false)
 			: StApiT<_ST_SCSI_CDB::_CDBRWDRIVESECTOR16>(API_TYPE_ST_SCSI, ST_WRITE_CMD_PLUS_DATA, _T("WriteLogicalDriveSector"))
 		{
-			_params[L"Drive Number"] = &_driveNumber;
-			_params[L"Starting Sector"] = &_sectorStart;
-			_params[L"Sector Count"] = &_sectorCount;
-			_params[L"Sector Size"] = &_sectorSize;
-			_params[L"Write as 512"] = &_bWrite512;
+			_params["Drive Number"] = &_driveNumber;
+			_params["Starting Sector"] = &_sectorStart;
+			_params["Sector Count"] = &_sectorCount;
+			_params["Sector Size"] = &_sectorSize;
+			_params["Write as 512"] = &_bWrite512;
 
 			_driveNumber.Value = driveNumber;
 			_sectorStart.Value = sectorStart;
@@ -1703,8 +1703,8 @@ namespace api
 
 		void InitWriteTypes()
 		{
-			_bWrite512.ValueList[true]	= L"true";
-			_bWrite512.ValueList[false]	= L"false";
+			_bWrite512.ValueList[true]	= "true";
+			_bWrite512.ValueList[false]	= "false";
 		}
 
 		virtual ~StWriteLogicalDriveSector() {};
@@ -1760,7 +1760,7 @@ namespace api
 		StEraseLogicalDrive(UCHAR driveNumber)
 			: StApiT<_ST_SCSI_CDB::_CDB16>(API_TYPE_ST_SCSI, ST_WRITE_CMD, _T("EraseLogicalDrive"))
 		{
-			_params[L"Drive Number"] = &_driveNumber;
+			_params["Drive Number"] = &_driveNumber;
 			_driveNumber.Value = driveNumber;
 
 			PrepareCommand();
@@ -1848,8 +1848,8 @@ namespace api
 		StGetChipSerialNumberInfo(_SERIAL_NO_INFO typeInfo, USHORT serialNoSize = 16)
 			: StApiT<_ST_SCSI_CDB::_CDB16>(API_TYPE_ST_SCSI, ST_READ_CMD, _T("GetChipSerialNumberInfo"))
 		{
-			_params[L"Info Type"] = &_typeInfo;
-			_params[L"Serial Number Size"] = &_sizeOfSerialNoInBytes;
+			_params["Info Type"] = &_typeInfo;
+			_params["Serial Number Size"] = &_sizeOfSerialNoInBytes;
 
 			_typeInfo.Value = typeInfo;
 			_sizeOfSerialNoInBytes.Value = serialNoSize;
@@ -1861,8 +1861,8 @@ namespace api
 
 		void InitInfoTypes()
 		{
-			_typeInfo.ValueList[SerialNoInfoSizeOfSerialNumberInBytes]	= L"SizeOfSerialNumberInBytes";
-			_typeInfo.ValueList[SerialNoInfoSerialNumber]				= L"SerialNumber";
+			_typeInfo.ValueList[SerialNoInfoSizeOfSerialNumberInBytes]	= "SizeOfSerialNumberInBytes";
+			_typeInfo.ValueList[SerialNoInfoSerialNumber]				= "SerialNumber";
 		};
 
 		virtual ~StGetChipSerialNumberInfo() {};
@@ -2020,10 +2020,10 @@ namespace api
 			: StApiT<_ST_SCSI_CDB::_CDBRWDRIVESECTOR16>(API_TYPE_ST_SCSI, ST_READ_CMD, _T("ReadPhysicalMediaSector"))
 //			, _responseDataPtr(NULL)
 		{
-			_params[L"Chip Number"] = &_chipNumber;
-			_params[L"Starting Sector"] = &_sectorStart;
-			_params[L"Sector Count"] = &_sectorCount;
-			_params[L"Sector Size"] = &_sectorSize;
+			_params["Chip Number"] = &_chipNumber;
+			_params["Starting Sector"] = &_sectorStart;
+			_params["Sector Count"] = &_sectorCount;
+			_params["Sector Size"] = &_sectorSize;
 
 			_chipNumber.Value = chipNumber;
 			_sectorStart.Value = sectorStart;
@@ -2165,7 +2165,7 @@ namespace api
 		StInitializeDataStore(UCHAR storeNumber) 
 			: StApiT<_ST_SCSI_CDB::_CDB16>(API_TYPE_ST_SCSI, ST_WRITE_CMD, _T("InitializeDataStore"))
 		{
-			_params[L"Store Number"] = &_storeNumber;
+			_params["Store Number"] = &_storeNumber;
 			_storeNumber.Value = storeNumber;
 			_timeout = ST_SCSI_EXTENDED_TIMEOUT;
 
@@ -2225,7 +2225,7 @@ namespace api
 			: StApiT<_ST_SCSI_CDB::_CDB16>(API_TYPE_ST_SCSI, ST_READ_CMD, _T("GetDeviceProperties"))
 			, _exRamSize(0)
 		{
-			_params[L"Property Type:"] = &_propertyType;
+			_params["Property Type:"] = &_propertyType;
 
 			_propertyType.Value = propertyType;
 
@@ -2236,8 +2236,8 @@ namespace api
 
 		void InitPropertyTypes()
 		{
-			_propertyType.ValueList[eDevicePhysicalExternalRamSz]	= L"PhysicalExternalRamSize";
-			_propertyType.ValueList[eDeviceVirtualExternalRamSz]	= L"VirtualExternalRamSize";
+			_propertyType.ValueList[eDevicePhysicalExternalRamSz]	= "PhysicalExternalRamSize";
+			_propertyType.ValueList[eDeviceVirtualExternalRamSz]	= "VirtualExternalRamSize";
 		}
 
 		virtual ~StGetDeviceProperties() {};
@@ -2312,10 +2312,10 @@ namespace api
 	// SCSI_COMMAND: StScsiInquiry
 	//
 	//////////////////////////////////////////////////////////////////////
-	class StScsiInquiry : public StApiT<_CDB::_CDB6INQUIRY>
+	class StScsiInquiry : public StApiT<_CDB6INQUIRY>
 	{
 	public:
-		StScsiInquiry() : StApiT<_CDB::_CDB6INQUIRY>(API_TYPE_SCSI, ST_READ_CMD, _T("ScsiInquiry"))
+		StScsiInquiry() : StApiT<_CDB6INQUIRY>(API_TYPE_SCSI, ST_READ_CMD, _T("ScsiInquiry"))
 		{
 			_cdb.OperationCode = SCSIOP_INQUIRY;
 			_cdb.AllocationLength = sizeof(INQUIRYDATA);
@@ -2348,10 +2348,10 @@ namespace api
 	// SCSI_COMMAND: StScsiStartStopUnit
 	//
 	//////////////////////////////////////////////////////////////////////
-	class StScsiStartStopUnit : public StApiT<_CDB::_CDB12>
+	class StScsiStartStopUnit : public StApiT<_CDB12>
 	{
 	public:
-		StScsiStartStopUnit() : StApiT<_CDB::_CDB12>(API_TYPE_SCSI, ST_WRITE_CMD, _T("ScsiStartStopUnit"))
+		StScsiStartStopUnit() : StApiT<_CDB12>(API_TYPE_SCSI, ST_WRITE_CMD, _T("ScsiStartStopUnit"))
 		{
 			_cdb.OperationCode = SCSIOP_START_STOP_UNIT;
 			// cdb has been initialized to zeros so the cdb.Start bit should be clear.
@@ -2365,10 +2365,11 @@ namespace api
 	// SCSI_COMMAND: StReadCapacity
 	//
 	//////////////////////////////////////////////////////////////////////
-	class StReadCapacity : public StApiT<_CDB::_CDB10>
+    #if 0
+	class StReadCapacity : public StApiT<_CDB10>
 	{
 	public:
-		StReadCapacity() : StApiT<_CDB::_CDB10>(API_TYPE_SCSI, ST_READ_CMD, _T("ReadCapacity"))
+		StReadCapacity() : StApiT<_CDB10>(API_TYPE_SCSI, ST_READ_CMD, _T("ReadCapacity"))
 		{
 			_cdb.OperationCode = SCSIOP_READ_CAPACITY;
 			_xferLength = sizeof(READ_CAPACITY_DATA);
@@ -2397,17 +2398,17 @@ namespace api
 	// SCSI_COMMAND: StRead
 	//
 	//////////////////////////////////////////////////////////////////////
-	class StRead : public StApiT<_CDB::_CDB10>
+	class StRead : public StApiT<_CDB10>
 	{
 	public:
 		StRead(UINT sectorStart, USHORT sectorCount, USHORT sectorSize)
-			: StApiT<_CDB::_CDB10>(API_TYPE_SCSI, ST_READ_CMD, _T("Read"))
+			: StApiT_CDB10>(API_TYPE_SCSI, ST_READ_CMD, _T("Read"))
 //			, _responseDataPtr(NULL)
 		{
 			
-			_params[L"Starting Sector"] = &_sectorStart;
-			_params[L"Sector Count"] = &_sectorCount;
-			_params[L"Sector Size"] = &_sectorSize;
+			_params["Starting Sector"] = &_sectorStart;
+			_params["Sector Count"] = &_sectorCount;
+			_params["Sector Size"] = &_sectorSize;
 
 			_sectorStart.Value = sectorStart;
 			_sectorCount.Value = sectorCount;
@@ -2478,15 +2479,15 @@ namespace api
 	// SCSI_COMMAND: StWrite
 	//
 	//////////////////////////////////////////////////////////////////////
-	class StWrite : public StApiT<_CDB::_CDB10>
+	class StWrite : public StApiT<_CDB10>
 	{
 	public:
 		StWrite(UINT sectorStart, USHORT sectorCount, USHORT sectorSize, UCHAR* pData)
-			: StApiT<_CDB::_CDB10>(API_TYPE_SCSI, ST_WRITE_CMD_PLUS_DATA, _T("Write"))
+			: StApiT_CDB10>(API_TYPE_SCSI, ST_WRITE_CMD_PLUS_DATA, _T("Write"))
 		{
-			_params[L"Starting Sector"] = &_sectorStart;
-			_params[L"Sector Count"] = &_sectorCount;
-			_params[L"Sector Size"] = &_sectorSize;
+			_params["Starting Sector"] = &_sectorStart;
+			_params["Sector Count"] = &_sectorCount;
+			_params["Sector Size"] = &_sectorSize;
 
 			_sectorStart.Value = sectorStart;
 			_sectorCount.Value = sectorCount;
@@ -2537,11 +2538,11 @@ namespace api
 		MODE_FLEXIBLE_DISK_PAGE Page;
 	};
 
-	class StModeSense10 : public StApiT<_CDB::_MODE_SENSE10>
+	class StModeSense10 : public StApiT_MODE_SENSE10>
 	{
 	public:
 		StModeSense10()
-			: StApiT<_CDB::_MODE_SENSE10>(API_TYPE_SCSI, ST_READ_CMD, _T("ModeSense10"))
+			: StApiT_MODE_SENSE10>(API_TYPE_SCSI, ST_READ_CMD, _T("ModeSense10"))
 		{
 			_cdb.OperationCode = SCSIOP_MODE_SENSE10;
 			_cdb.PageCode = 0x05;
@@ -2571,7 +2572,7 @@ namespace api
 	private:
 		_MODESENSE10DATA _data;
 	};
-
+#endif
 	//////////////////////////////////////////////////////////////////////
 	//
 	// StApiFactory

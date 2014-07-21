@@ -17,6 +17,7 @@
 
 class KernelApi
 {
+#if 0
 	typedef BOOL (WINAPI *PGetVolumeNameForVolumeMountPointA)(
 		LPCSTR lpszVolumeMountPoint,
 		LPSTR lpszVolumeName,
@@ -26,16 +27,16 @@ class KernelApi
 		LPCWSTR lpszVolumeMountPoint,
 		LPWSTR lpszVolumeName,
 		DWORD cchBufferLength);
-
+#endif
 	HMODULE hModuleKernel32;
     bool available;
-    
+#if 0     
 	PGetVolumeNameForVolumeMountPointA GetVolumeNameForVolumeMountPointA;
 
 #if defined(UNICODE)
 	PGetVolumeNameForVolumeMountPointW GetVolumeNameForVolumeMountPointW;
 #endif
-
+#endif
 public:
 	BOOL apiGetVolumeNameForVolumeMountPoint(
 		CString ssVolumeMountPoint,

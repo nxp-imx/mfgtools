@@ -46,8 +46,10 @@ public:
 private:
 #pragma pack (push, 1)
 	struct _NT_SCSI_REQUEST
-	{
+	{	
+#if 0
 		SCSI_PASS_THROUGH PassThrough;	//should include "ntddscsi.h"
+#endif		
 		__int64          Tag;
 		SENSE_DATA        SenseData;		//should include "scsi.h"
 		UCHAR           DataBuffer[1];          // Allocate buffer space

@@ -1019,7 +1019,7 @@ LPXNode _tagXMLDocument::GetRoot()
 // Coder    Date                      Desc
 // bro      2002-10-29
 //========================================================
-CString _tagXMLAttr::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
+CString& _tagXMLAttr::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
 {
     otstringstream os;
     //os << (LPCTSTR)name << "='" << (LPCTSTR)value << "' ";
@@ -1160,7 +1160,7 @@ CString _tagXMLNode::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
 // 작성자   작성일                 작성이유
 // 조경민   2004-06-15
 //========================================================
-CString _tagXMLNode::GetText( LPDISP_OPT opt /*= &optDefault*/ )
+CString& _tagXMLNode::GetText( LPDISP_OPT opt /*= &optDefault*/ )
 {
     otstringstream os;
 

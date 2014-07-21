@@ -83,7 +83,7 @@ public:
 
 	BOOL m_bHasConnected[MAX_BOARD_NUMBERS];
 
-	pthread_mutex_t m_hMutex_cb;
+	pthread_mutex_t * m_hMutex_cb;
 	std::map<HANDLE_CALLBACK, CBStruct*> m_callbacks;
 	HANDLE_CALLBACK RegisterCallback(CBStruct *pCB);
 	void UnregisterCallback(HANDLE_CALLBACK hCallback);

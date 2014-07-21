@@ -10,7 +10,7 @@
 #include "MfgToolLib.h"
 #include "VolumeDeviceClass.h"
 #include "Volume.h"
-#include "KernelApi.h"
+//#include "KernelApi.h"
 #include "HubClass.h"
 #include "UsbHub.h"
 #include "DeviceManager.h"

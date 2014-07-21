@@ -20,13 +20,13 @@
 #include "MfgToolLib.h"
 #include "ExceptionHandle.h"
 
-#include <Dbt.h>
+//#include <Dbt.h>
 
 DeviceManager* g_pDeviceManager;
 DEV_CLASS_ARRAY g_devClasses;
 
 //only dor debug
-LARGE_INTEGER g_t1, g_t2, g_t3, g_tc;
+//LARGE_INTEGER g_t1, g_t2, g_t3, g_tc;
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -44,19 +44,22 @@ DeviceManager::DeviceManager(INSTANCE_HANDLE handle)
 	m_pLibHandle = handle;
 	m_bSelfThreadRunning = FALSE;
 	//m_bAutoDelete = FALSE; //Don't destroy the object at thread termination
-	pthread_mutex_init(&m_hMutex_cb,NULL);// = ::CreateMutex(NULL, FALSE, NULL);
+	m_hMutex_cb=new pthread_mutex_t;
 	if(m_hMutex_cb == NULL)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("create DeviceManager::m_hMutex_cb failed, errcode is %d"), GetLastError());
 		throw 1;
 	}
+	pthread_mutex_init(m_hMutex_cb,NULL);// = ::CreateMutex(NULL, FALSE, NULL);
 }
 
 DeviceManager::~DeviceManager()
 {
 	// Client has to call Close() before it exits;
 	ASSERT( _bStopped == TRUE );
-	::CloseHandle(m_hMutex_cb);
+//	::CloseHandle(m_hMutex_cb);
+	pthread_mutex_destroy(m_hMutex_cb);
+	delete m_hMutex_cb;
 }
 
 void* DevManagerThreadProc(void* pParam){
@@ -149,7 +152,7 @@ void DeviceManager::SetSelfThreadRunStatus(BOOL bRunning)
 	SetEvent(_hStartEvent);
 }
 void DeviceManager::DevChangeWnd::DeviceChangeProc(){
-
+#if 0
 	MSG messages;
 	//wchar_t *pString = reinterpret_cast<wchar_t * > (lpParam);
 	WNDCLASSEX wc;
@@ -175,6 +178,7 @@ void DeviceManager::DevChangeWnd::DeviceChangeProc(){
 		TranslateMessage(&messages);
 		DispatchMessage(&messages);
 	}
+#endif
 	return ;
 }
 //when CreateThread, this function will be executed
@@ -373,10 +377,12 @@ int DeviceManager::ExitInstance()
 	g_devClasses.clear();
 
 	// Messaging support
-    if ( _hUsbDev != INVALID_HANDLE_VALUE )
-        UnregisterDeviceNotification(_hUsbDev);
-    if ( _hUsbHub != INVALID_HANDLE_VALUE )
-        UnregisterDeviceNotification(_hUsbHub);
+    if ( _hUsbDev != (long)INVALID_HANDLE_VALUE )
+	    _hUsbDev=_hUsbDev;
+       // UnregisterDeviceNotification(_hUsbDev);
+    if ( _hUsbHub != (long)INVALID_HANDLE_VALUE )
+	    _hUsbHub=_hUsbHub;
+       // UnregisterDeviceNotification(_hUsbHub);
 
 	// Windows must be Destroyed in the thread in which they were created.
     // _DevChangeWnd was created in the DeviceManager thread in InitInstance().
@@ -403,6 +409,7 @@ int DeviceManager::ExitInstance()
 
 BOOL DeviceManager::DevChangeWnd::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 {
+#if 0
 	PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)dwData;
 	CString strMsg;
 	DWORD event = UNKNOWN_EVT;
@@ -503,7 +510,7 @@ BOOL DeviceManager::DevChangeWnd::OnDeviceChange(UINT nEventType, DWORD_PTR dwDa
 
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::DevChangeWnd::OnDeviceChange() - end"));
 	}
-	
+#endif
 	return TRUE;
 }
 
@@ -530,8 +537,9 @@ CString DeviceManager::DevChangeWnd::DrivesFromMask(ULONG UnitMask)
 
 void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 {
+#if 0
 	CString msg = (LPCTSTR)desc;
-    SysFreeString((BSTR)desc);
+   // SysFreeString((BSTR)desc);
 	OP_STATE_ARRAY *pOpStates = NULL;
 
 	if ( eventType == EVENT_KILL ) 
@@ -639,9 +647,9 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 					if(bExceptionExist)
 					{
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceArriveBeforVolumeRemove Exception occurs"));
-						pthread_mutex_lock(&m_pExpectionHandler->m_hMapMsgMutex);
+						pthread_mutex_lock(m_pExpectionHandler->m_hMapMsgMutex);
 						mapMsg[msg] = 1;
-						pthread_mutex_unlock(&m_pExpectionHandler->m_hMapMsgMutex);
+						pthread_mutex_unlock(m_pExpectionHandler->m_hMapMsgMutex);
 						//BSTR bstr_msg = msg.AllocSysString();
 						//m_pExpectionHandler->PostThreadMessage(WM_MSG_EXCEPTION_EVENT, (WPARAM)(CMyExceptionHandler::DeviceArriveBeforVolumeRemove), (LPARAM)bstr_msg);
 						return;
@@ -897,6 +905,8 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 			ASSERT(0);
 			break;
 	}	//end switch( eventType )
+#endif
+return;
 }
 
 HANDLE_CALLBACK DeviceManager::RegisterCallback(CBStruct *pCB)
@@ -911,9 +921,9 @@ HANDLE_CALLBACK DeviceManager::RegisterCallback(CBStruct *pCB)
 	pCallback->Hub = pCB->Hub;
 	pCallback->HubIndex = pCB->HubIndex;
 	pCallback->cmdOpIndex = pCB->cmdOpIndex;
-	pthread_mutex_lock(&m_hMutex_cb);// , INFINITE);
+	pthread_mutex_lock(m_hMutex_cb);// , INFINITE);
 	m_callbacks[pCallback] = pCallback;
-	pthread_mutex_unlock(&m_hMutex_cb);
+	pthread_mutex_unlock(m_hMutex_cb);
 	return pCallback;
 }
 
@@ -921,10 +931,10 @@ void DeviceManager::UnregisterCallback(HANDLE_CALLBACK hCallback)
 {
 	if(hCallback)
 	{
-		pthread_mutex_lock(&m_hMutex_cb);// , INFINITE);
+		pthread_mutex_lock(m_hMutex_cb);// , INFINITE);
 		delete (CBStruct *)hCallback;
 		m_callbacks.erase(hCallback);
-		pthread_mutex_unlock(&m_hMutex_cb);
+		pthread_mutex_unlock(m_hMutex_cb);
 	}
 }
 
@@ -970,7 +980,7 @@ void DeviceManager::Notify(DeviceClass::NotifyStruct* pnsInfo)
 
 	if(doNotify)
 	{
-		pthread_mutex_lock(&m_hMutex_cb);
+		pthread_mutex_lock(m_hMutex_cb);
 		if( !m_callbacks.empty() )
 		{
 			for(cbIt=m_callbacks.begin(); cbIt!=m_callbacks.end(); cbIt++)
@@ -983,7 +993,7 @@ void DeviceManager::Notify(DeviceClass::NotifyStruct* pnsInfo)
 				}
 			}
 		}
-		pthread_mutex_unlock(&m_hMutex_cb);
+		pthread_mutex_unlock(m_hMutex_cb);
 	}
 }
 

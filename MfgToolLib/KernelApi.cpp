@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 #include "KernelApi.h"
-#include "WindowsVersionInfo.h"
+//#include "WindowsVersionInfo.h"
 
 KernelApi::KernelApi(void)
 : GetVolumeNameForVolumeMountPointA(NULL),

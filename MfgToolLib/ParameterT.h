@@ -13,6 +13,9 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#ifndef __PARAMETER_XXX__ 
+#define __PARAMETER_XXX__ 
+#include "stdafx.h"
 #include <map>
 #include <vector>
 
@@ -73,7 +76,7 @@ namespace property
 			}
 			else
 			{
-                std::map<T, CString>::const_iterator key;
+                typename std::map<T, CString>::const_iterator key;
                 key = ValueList.find(Value);
                 if ( key == ValueList.end() )
                     str = _T("Not found.");
@@ -114,7 +117,7 @@ namespace property
 			}
 			else
 			{
-				std::map<T, CString>::iterator pair;
+				typename std::map<T, CString>::iterator pair;
 				for ( pair = ValueList.begin(); pair != ValueList.end(); ++pair )
 				{
 					if ( str.Compare((*pair).second) == 0 )
@@ -132,7 +135,7 @@ namespace property
 		StdStringArray GetValueStrings()
 		{
 			StdStringArray strArray;
-			std::map<T, CString>::iterator pair;
+			typename std::map<T, CString>::iterator pair;
 			for ( pair = ValueList.begin(); pair != ValueList.end(); ++pair )
 			{
 				strArray.push_back((*pair).second);
@@ -142,7 +145,7 @@ namespace property
 
 		T Value;
 		T Default;
-		std::map<T, CString> ValueList;
+		typename std::map<T, CString> ValueList;
 	};
 
 	int ParseParameterString(LPCTSTR stringToParse, Parameter::ParamMap& paramMap);
@@ -202,3 +205,4 @@ namespace property
 } // namespace property
 
 using namespace property;
+#endif

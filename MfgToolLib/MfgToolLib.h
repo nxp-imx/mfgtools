@@ -15,7 +15,7 @@
 //	#error "include 'stdafx.h' before including this file for PCH"
 //#endif
 
-#include "resource.h"		// main symbols
+//#include "resource.h"		// main symbols
 
 #include <vector>
 #include <map>
@@ -31,7 +31,7 @@
 // CMfgToolLibApp
 // See MfgToolLib.cpp for the implementation of this class
 //
-
+//typedef int HINSTANCE;
 extern HINSTANCE dll_module;
 
 class CMfgToolLibApp //: public CWinApp
@@ -298,7 +298,7 @@ extern HANDLE g_hOneInstance;
 ************************************************************/
 DWORD InitLogManager();
 void DeinitLogManager();
-void LogMsg(DWORD moduleID, DWORD levelID, const wchar_t * format, ... );
+void LogMsg(DWORD moduleID, DWORD levelID, const TCHAR * format, ... );
 DWORD ParseUclXml(MFGLIB_VARS *pLibVars);
 void ReleaseUclCommands(MFGLIB_VARS *pLibVars);
 DWORD InitCmdOperation(MFGLIB_VARS *pLibVars, int WndIndex);
@@ -318,7 +318,7 @@ DWORD GetCurrentDeviceDesc(MFGLIB_VARS *pLibVars, int DeviceIndex, TCHAR* desc, 
 BOOL FindLibraryHandle(MFGLIB_VARS *pLibVars);
 int FindOperationIndex(MFGLIB_VARS *pLibVars, pthread_t operationID);
 CString ReplaceKeywords(CString str);
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved);
+BOOL  DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved);
 
 
 

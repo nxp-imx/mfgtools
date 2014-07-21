@@ -80,10 +80,10 @@ namespace media
     {
         MediaAllocationEntry()
         {
-		    _params[_T("Drive Number")] = &DriveNumber;
-            _params[_T("Type")] = &Type;
-		    _params[_T("Tag")] = &Tag;
-		    _params[_T("Size (bytes)")] = &SizeInBytes;
+		   _params[_T("Drive Number")]=&DriveNumber;
+	           _params[_T("Type")] = &Type;
+		   _params[_T("Tag")] = &Tag;
+		   _params[_T("Size (bytes)")]=&SizeInBytes; 
 
 			DriveNumber.Value = 0xFF;
 			Type.Value = DriveType_Invalid;
@@ -93,10 +93,10 @@ namespace media
 
         MediaAllocationEntry(const UCHAR driveNumber, const LogicalDriveType type, const LogicalDriveTag tag, const ULONGLONG size)
         {
-		    _params[_T("Drive Number")] = &DriveNumber;
-            _params[_T("Type")] = &Type;
+		    _params[_T("Drive Number")]=&DriveNumber;
+	            _params[_T("Type")] = &Type;
 		    _params[_T("Tag")] = &Tag;
-		    _params[_T("Size (bytes)")] = &SizeInBytes;
+		    _params[_T("Size (bytes)")]=&SizeInBytes;
 
 			DriveNumber.Value = driveNumber;
 			Type.Value = type;
@@ -118,7 +118,7 @@ namespace media
 	class LogicalDrive
 	{
 	public:
-		LogicalDrive::LogicalDrive( CString _name=_T(""), 
+		LogicalDrive( CString _name=_T(""), 
 							        CString _desc=_T(""),
 							        LogicalDriveType _type=DriveType_Invalid,
 							        LogicalDriveTag _tag=DriveTag_Invalid,

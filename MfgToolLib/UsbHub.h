@@ -39,14 +39,15 @@ namespace usb
 
         const BYTE GetNumPorts() const 
 		{ 
-			return  _nodeInformation.u.HubInformation.HubDescriptor.bNumberOfPorts; 
+			return 0;// _nodeInformation.u.HubInformation.HubDescriptor.bNumberOfPorts; 
 		}
 
         Property _ports;
 
         HANDLE Open();
         int CreatePorts();
-
+#if 0
         USB_NODE_INFORMATION _nodeInformation;
+#endif
     };
 }

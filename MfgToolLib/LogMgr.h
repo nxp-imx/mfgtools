@@ -31,7 +31,7 @@ public:
 	CMfgLogMgr(CString strFilename);
     ~CMfgLogMgr();
 
-	void PrintLog(DWORD moduleID, DWORD levelID, const wchar_t * format, ... );
+	void PrintLog(DWORD moduleID, DWORD levelID, const TCHAR * format, ... );
 
 	DWORD WriteToLogFile(CString& strMsg);
 

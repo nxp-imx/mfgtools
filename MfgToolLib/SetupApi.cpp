@@ -13,7 +13,7 @@
 #include "MfgToolLib_Export.h"
 
 #include <string>
-
+#if 0
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -722,7 +722,7 @@ CString SetupApi::CM_GetProblemString( DWORD problemCode )
 
     return problemStr;
 }
-
+#endif
 
 // The one and only SetupApi object
 SetupApi& gSetupApi()

@@ -13,10 +13,10 @@
 
 #pragma once
 
-#pragma warning( disable : 4200 )
-#include <usbioctl.h>
+//#pragma warning( disable : 4200 )
+//#include <usbioctl.h>
 
-#pragma warning( default : 4200 )
+//#pragma warning( default : 4200 )
 
 #include "Property.h"
 #include "Device.h"
@@ -62,7 +62,7 @@ namespace usb
         Hub* FindHub(LPCTSTR driverName);
         Device* FindDevice(LPCTSTR driverName);
     
-        USB_NODE_CONNECTION_INFORMATION_EX _connectionInfo;       
+        //USB_NODE_CONNECTION_INFORMATION_EX _connectionInfo;      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
     /*
         // PROPERTIES
         class volumeName : public StringProperty { public: CString get(); }_volumeName;

@@ -30,7 +30,7 @@ public:
 	pthread_t Exception_thread;
 	myevent* _hStartEvent;
 	myevent * thread_dead;
-	pthread_mutex_t m_hMapMsgMutex;
+	pthread_mutex_t *m_hMapMsgMutex;
 
 	std::queue<thread_msg> t_msgQ;
 	DWORD Open();

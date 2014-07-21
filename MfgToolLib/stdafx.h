@@ -48,11 +48,11 @@
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
 #endif
 
-#include "targetver.h"
+//#include "targetver.h"
 
 
 
-
+#ifndef __linux__
 // Modify the following defines if you have to target a platform prior to the ones specified below.
 // Refer to MSDN for the latest info on corresponding values for different platforms.
 #ifndef WINVER              // Allow use of features specific to Windows 95 and Windows NT 4 or later.
@@ -75,8 +75,9 @@
 
 // turns off MFC's hiding of some common and often safely ignored warning messages
 #define _AFX_ALL_WARNINGS
+#endif
 
-#ifndef _linux_
+#ifndef __linux__
 	#include "win_def.h"
 #else
 	#include "lnx_def.h"
@@ -85,7 +86,7 @@
 
 //#include <winioctl.h>
 
-#include "resource.h"
+//#include "resource.h"
 
 #ifdef _UNICODE
 #if defined _M_IX86
@@ -112,25 +113,20 @@
 
 
 ///////////////////////////////////////////////////// my defines
+
 struct myevent {
-	pthread_mutex_t *mutex=NULL;
-	pthread_cond_t *cond=NULL;
-	bool triggered=false;
+	pthread_mutex_t *mutex;
+	pthread_cond_t *cond;
+	bool triggered;
 };
 #ifdef INFINITE
 #undef INFINITE
 #endif
-#define INFINITE (time_t)std::numeric_limits<time_t>::max;  //redefine infinite for time_t  types
+#define INFINITE (time_t)UINT_MAX;  //redefine infinite for time_t  types
 
 #ifndef __LINUX__
 int gettimeofday(struct timeval * tv);
-
-
-
 #endif
-
-
-
 
 int InitEvent(myevent **Ev);
 void SetEvent(myevent *Ev,sem_t*sem_att=NULL);

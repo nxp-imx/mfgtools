@@ -7,8 +7,8 @@
  */
 #include "stdafx.h"
 #include "HidDevice.h"
-#include "logmgr.h"
-#include <Assert.h>
+//#include "logmgr.h"
+//#include <Assert.h>
 
 HidDevice::HidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle)
 : Device(deviceClass, devInst, path, handle)
@@ -54,7 +54,7 @@ typedef UINT (CALLBACK* LPFNDLLFUNC2)(PVOID);
 INT32 HidDevice::AllocateIoBuffers()
 {
 	INT32 error = ERROR_SUCCESS;
-
+#if 0
     // Open the device
     //One may meet Error 32(The file cannot be accessed because another process uses it)
     //under some complicated environment when openning a device without shared mode.
@@ -163,7 +163,7 @@ INT32 HidDevice::AllocateIoBuffers()
             return ERROR_NOT_ENOUGH_MEMORY;
         }
     }
-
+#endif
     return ERROR_SUCCESS;
 }
 
@@ -175,9 +175,11 @@ void CALLBACK HidDevice::IoCompletion(DWORD dwErrorCode,                // compl
 
     switch (dwErrorCode)
     {
+#if 0
         case ERROR_HANDLE_EOF:
             TRACE(_T("   HidDevice::IoCompletion() 0x%x - ERROR_HANDLE_EOF.\r\n"), pDevice);
             break;
+#endif
         case 0:
             break;
         default:
@@ -190,6 +192,7 @@ void CALLBACK HidDevice::IoCompletion(DWORD dwErrorCode,                // compl
 
 UINT32 HidDevice::SendCommand(StApi& api, UINT8* additionalInfo)
 {
+#if 0
     _status = CSW_CMD_PASSED;
 
     // tell the UI we are beginning a command.
@@ -288,11 +291,13 @@ UINT32 HidDevice::SendCommand(StApi& api, UINT8* additionalInfo)
 
     nsInfo.inProgress = false;
     nsInfo.error = _status;
+#endif
     return ERROR_SUCCESS;
 }
 
 bool HidDevice::ProcessWriteCommand(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo)
 {
+#if 0 
 //  TRACE(_T(" HidDevice::ProcessWriteCommand() dev:0x%x, tag:%d\r\n"), this, api.GetTag());
     _ST_HID_CBW cbw = {0};
 
@@ -333,13 +338,14 @@ bool HidDevice::ProcessWriteCommand(const HANDLE hDevice, const StApi& api, Noti
     }
 
 //    TRACE(_T(" -HidDevice::ProcessWriteCommand()\r\n"));
+#endif
     return true;
 }
 
 bool HidDevice::ProcessReadStatus(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo)
 {
 //  TRACE(_T(" HidDevice::ProcessReadStatus() dev:0x%x, tag:%d\r\n"), this, api.GetTag());
-
+#if 0 
     UINT16 readSize = _Capabilities.InputReportByteLength;
 
     // Allocate the CSW_REPORT
@@ -368,7 +374,7 @@ bool HidDevice::ProcessReadStatus(const HANDLE hDevice, const StApi& api, Notify
     {
         /**m_AdditionalInfo =*/ _status = ((_ST_HID_STATUS_REPORT*)_pReadReport)->Csw.Status;
     }
-
+#endif 
 //    TRACE(_T(" -HidDevice::ProcessReadStatus\r\n"));
     return true;
 }
@@ -377,7 +383,7 @@ bool HidDevice::ProcessReadStatus(const HANDLE hDevice, const StApi& api, Notify
 bool HidDevice::ProcessReadData(const HANDLE hDevice, StApi* pApi, NotifyStruct& nsInfo)
 {
 //  TRACE(_T(" HidDevice::ProcessReadData() dev:0x%x, tag:%d\r\n"), this, pApi->GetTag());
-
+#if 0
     UINT16 readSize = _Capabilities.InputReportByteLength;
 
     for ( UINT32 offset=0; offset < pApi->GetTransferSize(); offset += (readSize - 1) )
@@ -411,13 +417,14 @@ bool HidDevice::ProcessReadData(const HANDLE hDevice, StApi* pApi, NotifyStruct&
         nsInfo.position = min(pApi->GetTransferSize(), offset + (readSize - 1));
     }
 //  TRACE(_T(" -HidDevice::ProcessReadData()\r\n"));
+#endif 
     return true;
 }
 
 bool HidDevice::ProcessWriteData(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo)
 {
 //  TRACE(_T(" HidDevice::ProcessWriteData() dev:0x%x, tag:%d\r\n"), this, api.GetTag());
-
+#if 0 
     UINT16 writeSize = _Capabilities.OutputReportByteLength;
 
     for ( UINT32 offset=0; offset < api.GetTransferSize(); offset += (writeSize - 1) )
@@ -452,13 +459,14 @@ bool HidDevice::ProcessWriteData(const HANDLE hDevice, const StApi& api, NotifyS
         nsInfo.position = min(api.GetTransferSize(), offset + (writeSize - 1));
     }
 //  TRACE(_T(" -HidDevice::ProcessWriteData()\r\n"));
+#endif
     return true;
 }
 
 INT32 HidDevice::ProcessTimeOut(const INT32 timeout)
 {
 //  TRACE(_T("  +HidDevice::ProcessTimeOut() 0x%x\r\n"), this);
-
+#if 0 
     HANDLE hTimer = CreateWaitableTimer(NULL, true, _T("SendCommandTimer"));
     LARGE_INTEGER waitTime;
     waitTime.QuadPart = timeout * (-10000000);
@@ -515,11 +523,15 @@ INT32 HidDevice::ProcessTimeOut(const INT32 timeout)
     }
     TRACE(_T("  -HidDevice::ProcessTimeOut() 0x%x WM_QUIT\r\n"), this);
     return ERROR_OPERATION_ABORTED;
+
+#endif 
+    return ERROR_SUCCESS;
 }
 
 
 CString HidDevice::GetSendCommandErrorStr()
 {
+
     CString msg;
 
     switch ( _status )
@@ -536,7 +548,6 @@ CString HidDevice::GetSendCommandErrorStr()
         default:
             msg.Format(_T("HID Status: UNKNOWN(0x%02X)\r\n"), _status);
     }
-
     return msg;
 }
 
@@ -577,12 +588,12 @@ HidDevice::ChipFamily_t HidDevice::GetChipFamily()
 HidDevice::HAB_t HidDevice::GetHABType(ChipFamily_t chipType)
 {
     HAB_t habType = HabUnknown;
-
+#if 0
     _ST_HID_CBW cbw = {0};
     _ST_HID_CDB::_CDBHIDINFO _cbd;
     UINT32 bltcStatus;
     UINT32 errcode;
-    HANDLE hHidDevice = INVALID_HANDLE_VALUE;
+    HANDLE hHidDevice =(long) INVALID_HANDLE_VALUE;
 
     // Make sure there we have buffers and such
     if ( _pReadReport == NULL || _pWriteReport == NULL )
@@ -591,10 +602,11 @@ HidDevice::HAB_t HidDevice::GetHABType(ChipFamily_t chipType)
     }
 
     // Open the device
+/*
     hHidDevice = CreateFile(_path.get(), GENERIC_READ|GENERIC_WRITE,
         FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
-
-    if( hHidDevice == INVALID_HANDLE_VALUE )
+*/
+    if( hHidDevice ==(long) INVALID_HANDLE_VALUE )
     {
         TRACE(_T("-HidDevice::GetHABType() Create Device Handle fail!\r\n"));
         goto EXIT;
@@ -604,7 +616,7 @@ HidDevice::HAB_t HidDevice::GetHABType(ChipFamily_t chipType)
     UINT16 writeSize = _Capabilities.OutputReportByteLength;
     if(writeSize < 1)
     {
-        errcode = ERROR_BAD_LENGTH;
+        errcode = 24L;
         TRACE(_T(" -HidDevice::GetHABType()  ERROR:(%d)\r\n"), errcode);
         goto EXIT;
     }
@@ -624,8 +636,8 @@ HidDevice::HAB_t HidDevice::GetHABType(ChipFamily_t chipType)
     memcpy(&_pWriteReport->Payload[0], &cbw, sizeof(cbw) /*writeSize - 1*/);
 
     memset(&_fileOverlapped, 0, sizeof(_fileOverlapped));
-    _fileOverlapped.hEvent = this;
-    BOOL temp = WriteFileEx(hHidDevice, _pWriteReport, writeSize, &_fileOverlapped, HidDevice::IoCompletion);
+    _fileOverlapped.hEvent =(UINT) this;
+    //BOOL temp = WriteFileEx(hHidDevice, _pWriteReport, writeSize, &_fileOverlapped, HidDevice::IoCompletion);
     if ( (errcode=GetLastError()) != ERROR_SUCCESS )
     {
         TRACE(_T(" -HidDevice::GetHABType()  ERROR:(%d)\r\n"), errcode);
@@ -644,8 +656,8 @@ HidDevice::HAB_t HidDevice::GetHABType(ChipFamily_t chipType)
     UINT16 readSize = _Capabilities.InputReportByteLength;
     memset(_pReadReport, 0x00, readSize);
     memset(&_fileOverlapped, 0, sizeof(_fileOverlapped));
-    _fileOverlapped.hEvent = this;
-    temp = ReadFileEx(hHidDevice, _pReadReport, readSize, &_fileOverlapped, HidDevice::IoCompletion);
+    _fileOverlapped.hEvent =(UINT) this;
+//    temp = ReadFileEx(hHidDevice, _pReadReport, readSize, &_fileOverlapped, HidDevice::IoCompletion);
     if ( (errcode=GetLastError()) != ERROR_SUCCESS )
     {
         TRACE(_T(" -HidDevice::GetHABType()  ERROR:(%d)\r\n"), errcode);
@@ -724,10 +736,10 @@ EXIT:
     }
     TRACE(_T(" HidDevice::GetHABType() %s.\r\n"), _strResponse.c_str());
 
-    habType = (HAB_t)api.GetSecConfig();
-
+    habType = (HAB_t)api.GetSecConfig();*/
+#endif
     return habType;
-*/
+
 }
 
 DWORD HidDevice::GetHabType()

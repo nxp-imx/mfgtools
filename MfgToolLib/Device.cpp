@@ -16,7 +16,6 @@
 #include "DeviceManager.h"
 #include "DeviceClass.h"
 #include "HubClass.h"
-
 //CMutex Device::m_mutex(FALSE, _T("Device.SendCommand"));
 
 Device::Device(DeviceClass *deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle)
@@ -48,7 +47,8 @@ Device::Device(DeviceClass *deviceClass, DEVINST devInst, CString path, INSTANCE
 	InitDevInfo();
 
     m_dwIndex = -1;
-	m_hDevCanDeleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+	InitEvent(&m_hDevCanDeleteEvent);
+	//	m_hDevCanDeleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	
 	_description.describe(this, _T("Device Description"), _T(""));
     _friendlyName.describe(this, _T("Friendly Name"), _T(""));
@@ -88,13 +88,13 @@ Device::~Device()
 
 	if ( _deviceInfoSet != INVALID_HANDLE_VALUE )
     {
-        gSetupApi().SetupDiDestroyDeviceInfoList(_deviceInfoSet);
+       // gSetupApi().SetupDiDestroyDeviceInfoList(_deviceInfoSet);
         _deviceInfoSet = INVALID_HANDLE_VALUE;
     }
 
 	if(m_hDevCanDeleteEvent != NULL)
 	{
-		::CloseHandle(m_hDevCanDeleteEvent);
+		DestroyEvent(m_hDevCanDeleteEvent);
 		m_hDevCanDeleteEvent = NULL;
 	}
 }
@@ -109,12 +109,13 @@ DEVINST Device::InstanceHandle()
 
 DWORD Device::InitDevInfo()
 {
+
 	DWORD error = ERROR_SUCCESS;
-	
+#if 0	
 	// Make a new devInfoSet that is not tied to a class
     // so we can create Parents and such. Also, we will be able 
     // to get our own Registry Properties and not have to ask the DeviceClass.
-	_deviceInfoSet = gSetupApi().SetupDiCreateDeviceInfoList(NULL,NULL);	//create an empty device information set
+//	_deviceInfoSet = gSetupApi().SetupDiCreateDeviceInfoList(NULL,NULL);	//create an empty device information set
 	if( _deviceInfoSet == INVALID_HANDLE_VALUE )
     {
 		error = GetLastError();
@@ -122,7 +123,7 @@ DWORD Device::InitDevInfo()
 	}
 	
 	CString devInstanceId;
-	DWORD hr = gSetupApi().apiCM_Get_Device_ID(_hDevInst, devInstanceId);
+//	DWORD hr = gSetupApi().apiCM_Get_Device_ID(_hDevInst, devInstanceId);
     if (hr != 0)
     {
         error = GetLastError();
@@ -139,7 +140,7 @@ DWORD Device::InitDevInfo()
         return error;
     }
 	devInstanceId.ReleaseBuffer();
-
+#endif
     return error;
 }
 
@@ -148,17 +149,18 @@ DWORD Device::InitDevInfo()
 /// </summary>
 Device* Device::Parent()
 {
+#if 0 
     if(_parent == NULL)
     {
         DEVINST parentDevInst = 0;
-        DWORD hr = gSetupApi().CM_Get_Parent(&parentDevInst, _deviceInfoData.DevInst, 0);
+       // DWORD hr = gSetupApi().CM_Get_Parent(&parentDevInst, _deviceInfoData.DevInst, 0);
 
         if(hr == 0)
         {
             _parent = new Device(_deviceClass, parentDevInst, _T(""), m_pLibHandle);
         }
     }
-
+#endif
     return _parent;
 }
 
@@ -166,7 +168,8 @@ Device* Device::Parent()
 /// Property: Gets the device's path.
 /// </summary>
 CString Device::path::get()
-{ 
+{   
+#if 0
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
 
@@ -197,7 +200,9 @@ CString Device::path::get()
             }
         }
     }
-    return _value;
+#endif
+    return  _value;
+
 }
 
 /// <summary>
@@ -238,6 +243,7 @@ CString Device::usbPath::get()
 
 CString Device::GetProperty( DWORD property, CString defaultValue )
 {
+#if 0
     DWORD propertyRegDataType = 0;
     DWORD requiredSize = 0;
     DWORD propertyBufferSize = 0;
@@ -290,18 +296,19 @@ CString Device::GetProperty( DWORD property, CString defaultValue )
 
     CString value = (PTSTR)propertyBuffer;
     free(propertyBuffer);
-
-    return value;
+#endif
+    return defaultValue;
 }
 
 DWORD Device::GetProperty(DWORD property, DWORD defaultValue)
 {
+
     DWORD propertyRegDataType = 0;
     DWORD requiredSize = 0;
     DWORD propertyBufferSize = sizeof(DWORD);
     DWORD propertyBuffer;
     DWORD error;
-
+#if 0
     if ( !gSetupApi().IsDevNodeOk(this->_deviceInfoData.DevInst) )
     {
         return defaultValue;
@@ -317,7 +324,7 @@ DWORD Device::GetProperty(DWORD property, DWORD defaultValue)
         }       
         return defaultValue;
     }
-
+#endif
     return propertyBuffer;
 }
 
@@ -328,14 +335,14 @@ LPGUID Device::classGuid::get()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-
+#if 0
     if ( _value == GUID_NULL )
     {
         CString str = dev->GetProperty(SPDRP_CLASSGUID, CString(_T("")));
         IIDFromString((LPOLESTR)str.GetBuffer(), &_value);
 		str.ReleaseBuffer();
     }
-
+#endif
     return &_value;
 }
 
@@ -346,12 +353,12 @@ CString Device::description::get()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-
+#if 0
     if ( _value.IsEmpty() )
     {
         _value = dev->GetProperty(SPDRP_DEVICEDESC, CString(_T("")));
     }
-
+#endif
     return _value;
 }
 
@@ -362,13 +369,13 @@ CString Device::friendlyName::get()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-
+#if 0
     if ( _value.IsEmpty() )
     {
         //temp _value = dev->GetProperty(SPDRP_FRIENDLYNAME, CString(_T("")));
 		_value = dev->GetProperty(SPDRP_FRIENDLYNAME, CString(_T("Linux File-Stor-lul")));
     }
-
+#endif
     return _value;
 }
 
@@ -379,12 +386,12 @@ CString Device::driver::get()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-
+#if 0
     if ( _value.IsEmpty() )
     {
         _value = dev->GetProperty(SPDRP_DRIVER, CString(_T("")));
     }
-
+#endif
     return _value;
 }
 
@@ -395,12 +402,12 @@ CString Device::deviceInstanceID::get()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-
+#if 0
     if ( _value.IsEmpty() )
     {
         gSetupApi().apiCM_Get_Device_ID(dev->_deviceInfoData.DevInst, _value);
     }
-
+#endif
     return _value;
 }
 
@@ -411,7 +418,7 @@ CString Device::enumerator::get()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-
+#if 0
 //w98 this doesn't work in W98. There is no "Enumerator" value
 //w98 suggest maybe parsing deviceinstanceid?
 //w98 CM_Get_DevNode_Registry_Property(CM_DRP_ENUMERATOR_NAME)
@@ -420,6 +427,7 @@ CString Device::enumerator::get()
     {
 		_value = dev->GetProperty(SPDRP_ENUMERATOR_NAME, CString(_T("")));           
     }
+#endif
     return _value;
 }
 
@@ -430,12 +438,12 @@ CString Device::classStr::get()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-
+#if 0
     if ( _value.IsEmpty() )
     {
         _value = (dev->GetProperty(SPDRP_CLASS, CString(_T(""))));
     }
-
+#endif
     return _value;
 }
 
@@ -446,7 +454,7 @@ CString Device::classDesc::get()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-
+#if 0 
     DWORD error;
     if ( _value.IsEmpty() )
     {
@@ -457,6 +465,7 @@ CString Device::classDesc::get()
         else
             error = GetLastError();
     }
+#endif
     return _value;
 }
 
@@ -468,7 +477,7 @@ CString Device::hub::get()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-
+#if 0 
     _value = _T("");
 
     if (dev->UsbDevice() != NULL)
@@ -487,7 +496,7 @@ CString Device::hub::get()
             }
         }
     }
-
+#endif
     return _value;
 }
 
@@ -495,7 +504,7 @@ int Device::hubIndex::getmsc(USHORT vid, USHORT pid)
 {
 	Device* dev = dynamic_cast<Device*>(_owner);
 	ASSERT(dev);
-
+#if 0
 	DWORD bytes;
 	PUSB_NODE_CONNECTION_DRIVERKEY_NAME driverName ;
 	CString TraceStr;
@@ -592,6 +601,7 @@ int Device::hubIndex::getmsc(USHORT vid, USHORT pid)
 //	}
 
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Device::hubIndex::getmsc, return the port index is: %d"), Value);
+#endif
 	return Value;
 }
 
@@ -604,7 +614,7 @@ int Device::hubIndex::get2()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-
+#if 0
 	if(Value == 0)
 	{
 //		CString hubPath = dev->_hub.get();
@@ -768,6 +778,7 @@ int Device::hubIndex::get2()
     }
 */
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Device::hubIndex::get, return the port index is: %d"), Value);
+#endif
     return Value;
 }
 
@@ -775,6 +786,7 @@ int Device::hubIndex::get()
 {
 	Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
+#if 0
 	if(Value == 0)
 	{
 		CString hubPath = dev->_hub.get();
@@ -841,7 +853,7 @@ int Device::hubIndex::get()
 		CloseHandle(hHub);
         hHub = INVALID_HANDLE_VALUE;
 	}
-
+#endif
 	return Value;
 }
 
@@ -850,11 +862,12 @@ int Device::hubIndex::get()
 /// </summary>
 Device::DeviceCapabilities Device::Capabilities()
 {
+#if 0 
     if (_capabilities == Unknown)
     {
         _capabilities = (DeviceCapabilities)GetProperty(SPDRP_CAPABILITIES, (DWORD)0);
     }
-	    
+#endif 	    
     return _capabilities;
 }
 
@@ -862,7 +875,8 @@ Device::DeviceCapabilities Device::Capabilities()
 /// Gets a value indicating whether this device is a USB device.
 /// </summary>
 bool Device::IsUsb()
-{
+{   
+
     if (Parent() == NULL)
         return false;
 

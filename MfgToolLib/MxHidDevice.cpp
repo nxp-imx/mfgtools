@@ -7,17 +7,16 @@
  */
 
 #include "stdafx.h"
-#include <Assert.h>
-#include <cfgmgr32.h>
-#include <basetyps.h>
-#include <setupapi.h>
-#include <initguid.h>
-#include <hidclass.h>
+//#include <Assert.h>
+//#include <cfgmgr32.h>
+//#include <basetyps.h>
+//#include <setupapi.h>
+//#include <initguid.h>
+//#include <hidclass.h>
 #include "Device.h"
 #include "MfgToolLib_Export.h"
 #include "MfgToolLib.h"
 #include <sys/stat.h>
-
 #include "MxHidDevice.h"
 
 //#define DCD_WRITE
@@ -37,7 +36,7 @@ DWORD EndianSwap(DWORD x)
 MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle)
 : Device(deviceClass, devInst, path, handle)
 {
-	m_hid_drive_handle = INVALID_HANDLE_VALUE;
+	m_hid_drive_handle = (unsigned long)INVALID_HANDLE_VALUE;
     //m_sync_event_tx = NULL;
     //m_sync_event_rx = NULL;
     m_pReadReport = NULL;
@@ -115,6 +114,7 @@ typedef UINT (CALLBACK* LPFNDLLFUNC1)(HANDLE, PVOID);
 typedef UINT (CALLBACK* LPFNDLLFUNC2)(PVOID);
 int MxHidDevice::AllocateIoBuffers()
 {
+#if 0
 	int error = ERROR_SUCCESS;
 
 	// Open the device
@@ -215,6 +215,7 @@ int MxHidDevice::AllocateIoBuffers()
             return ERROR_NOT_ENOUGH_MEMORY;
 		}
     }
+#endif
 
 	return ERROR_SUCCESS;
 }
@@ -259,6 +260,7 @@ BOOL MxHidDevice::OpenMxHidHandle()
 
 BOOL MxHidDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 {
+#if 0
 	*pHandle = CreateFile(pipePath,
 		GENERIC_WRITE | GENERIC_READ,
 		FILE_SHARE_WRITE | FILE_SHARE_READ,
@@ -272,13 +274,14 @@ BOOL MxHidDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("MxHidDevice::OpenUSBHandle() Failed to open (%s) = %d"), pipePath, GetLastError());
 		return FALSE;
 	}
-
+#endif
 	return TRUE;
 }
 
 #ifndef DCD_WRITE
 BOOL MxHidDevice::InitMemoryDevice(CString filename)
 {
+#if 0
 	USES_CONVERSION;
 	SDPCmd SDPCmd;
 
@@ -322,7 +325,7 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 
     //Clear device handle and report id    
     CloseMxHidHandle();
-    
+    #endif
 	return TRUE;
 }
 
@@ -330,6 +333,7 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 
 BOOL MxHidDevice::InitMemoryDevice(CString filename)
 {
+#if 0
 	USES_CONVERSION;
 
 	SDPCmd SDPCmd;
@@ -382,16 +386,16 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 
 	//Clear device handle and report id    
     CloseMxHidHandle();
-
+#endif
 	return TRUE;
 }
 #endif
 BOOL MxHidDevice::CloseMxHidHandle()
 {
-	if( m_hid_drive_handle != INVALID_HANDLE_VALUE)
+	if( m_hid_drive_handle != (unsigned long)INVALID_HANDLE_VALUE)
     {
-        CloseHandle(m_hid_drive_handle);
-        m_hid_drive_handle = INVALID_HANDLE_VALUE;
+//        CloseHandle(m_hid_drive_handle);
+        m_hid_drive_handle = (unsigned long)INVALID_HANDLE_VALUE;
     }
 
     FreeIoBuffers();
@@ -525,14 +529,14 @@ VOID MxHidDevice::PackSDPCmd(PSDPCmd pSDPCmd)
 
 int MxHidDevice::Write(UCHAR* _buf, ULONG _size)
 {
+#if 0
 	int    nBytesWrite; // for bytes actually written
-
 	if( !WriteFile(m_hid_drive_handle, _buf, _size, (PULONG) &nBytesWrite, NULL) )
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("MxHidDevice::Write() Error writing to device 0x%x."), GetLastError());
 		return MFGLIB_ERROR_CMD_EXECUTE_FAILED;
 	}
-
+#endif
     return ERROR_SUCCESS;
 }
 
@@ -541,14 +545,14 @@ int MxHidDevice::Read(void* _buf, UINT _size)
 {
 	int    nBytesRead; // for bytes actually read
 
-	Sleep(35);
-
+	sleep(35);
+#if 0
 	if( !ReadFile(m_hid_drive_handle, _buf, _size, (PULONG) &nBytesRead, NULL) )
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("MxHidDevice::Read() Error reading from device 0x%x."), GetLastError());
 		return GetLastError();
 	}
-
+#endif
 	return ERROR_SUCCESS;
 }
 
@@ -561,12 +565,12 @@ BOOL MxHidDevice::SendCmd(PSDPCmd pSDPCmd)
 	{
 		return FALSE;
 	}
-	//Send the report to USB HID device
+#if 0	//Send the report to USB HID device
 	if ( Write((unsigned char *)m_pWriteReport, m_Capabilities.OutputReportByteLength) != ERROR_SUCCESS)
 	{
 		return FALSE;
 	}
-
+#endif
 	return TRUE;
 }
 
@@ -580,11 +584,12 @@ BOOL MxHidDevice::SendData(const unsigned char * DataBuf, UINT ByteCnt)
 	memcpy(m_pWriteReport->Payload, DataBuf, ByteCnt);
 
 	m_pWriteReport->ReportId = REPORT_ID_DATA;
+#if 0
 	if (Write((unsigned char *)m_pWriteReport, m_Capabilities.OutputReportByteLength) != ERROR_SUCCESS)
 	{
 		return FALSE;	
 	}
-
+#endif
 	return TRUE;
 }
 
@@ -607,7 +612,7 @@ BOOL MxHidDevice::GetCmdAck(UINT RequiredCmdAck)
 BOOL MxHidDevice::GetDevAck(UINT RequiredCmdAck)
 {
     memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
-
+#if 0
     //Get Report4, Device to Host:
 	if ( Read( (UCHAR *)m_pReadReport, m_Capabilities.InputReportByteLength ) != ERROR_SUCCESS)
 	{
@@ -619,13 +624,14 @@ BOOL MxHidDevice::GetDevAck(UINT RequiredCmdAck)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("WriteReg(): Invalid write ack: 0x%x\n"), ((PULONG)m_pReadReport)[0]);
 		return FALSE; 
 	}
-
+#endif
     return TRUE;
 }
 
 //Device to Host
 BOOL MxHidDevice::GetHABType()
 {
+#if 0
     CString LogStr;
     memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
 
@@ -642,7 +648,7 @@ BOOL MxHidDevice::GetHABType()
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("HAB type mismatch: 0x%x!!!"), *(unsigned int *)(m_pReadReport->Payload));    
 		return FALSE;	
 	}
-
+#endif
 	return TRUE;
 }
 
@@ -701,6 +707,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 	DWORD PlugInAddr = 0;
 	PIvtHeader pIVT = NULL,pIVT2 = NULL;
 
+	PBootData pPluginDataBuf =NULL;
 	//Create device handle and report id
     OpenMxHidHandle();
 
@@ -747,7 +754,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
     //   0x00    IMAGE START ADDR
     //   0x04    IMAGE SIZE
     //   0x08    PLUGIN FLAG
-	PBootData pPluginDataBuf = (PBootData)(pPlugIn + ImgIVTOffset/sizeof(DWORD) + (pIVT->BootData - pIVT->SelfAddr)/sizeof(DWORD));
+	pPluginDataBuf = (PBootData)(pPlugIn + ImgIVTOffset/sizeof(DWORD) + (pIVT->BootData - pIVT->SelfAddr)/sizeof(DWORD));
 
 	if(pPluginDataBuf->PluginFlag)
 	{
@@ -955,7 +962,7 @@ BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * 
 	if(!SendCmd(&SDPCmd))
 		return FALSE;
     
-    Sleep(10);
+    sleep(10);
 
     UINT MaxHidTransSize = m_Capabilities.OutputReportByteLength -1;
     UINT TransSize;
@@ -1013,7 +1020,11 @@ BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
 		}
     	//Add IVT header to the image.
         //Clean the IVT header region
+#ifdef __linux__
+	memset(FlashHdr,0,sizeof(IvtHeader));
+#else
         ZeroMemory(FlashHdr, sizeof(IvtHeader));
+#endif
         
         //Fill IVT header parameter
     	pIvtHeader->IvtBarker = IVT_BARKER_HEADER;
@@ -1097,7 +1108,7 @@ BOOL MxHidDevice::Download(PImageParameter pImageParameter, UCHAR *pFileDataBuf,
 	for ( byteIndex = 0; byteIndex < dwFileSize; byteIndex += numBytesToWrite )
 	{
 		// Get some data
-		numBytesToWrite = (DWORD)min(MAX_SIZE_PER_DOWNLOAD_COMMAND, dwFileSize - byteIndex);
+		numBytesToWrite = (DWORD)std::min((long long unsigned int)MAX_SIZE_PER_DOWNLOAD_COMMAND, dwFileSize - byteIndex);
 
 		if (!TransData(pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pBuffer + byteIndex))
 		{

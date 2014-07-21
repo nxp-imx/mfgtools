@@ -9,7 +9,7 @@
 #include "stdafx.h"
 #include "Volume.h"
 #include "VolumeDeviceClass.h"
-#include "KernelApi.h"
+//#include "KernelApi.h"
 #include "DeviceManager.h"
 
 #include "DiskDeviceClass.h"

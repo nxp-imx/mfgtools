@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "SetupApi.h"
+//#include "SetupApi.h"
 #include "Property.h"
 #include <list>
 #include "MfgToolLib_Export.h"
@@ -156,7 +156,7 @@ public:
 	SP_DEVINFO_DATA _deviceInfoData;
 	CString _classGuidStr;
 
-	HANDLE m_hDevCanDeleteEvent;
+	myevent * m_hDevCanDeleteEvent;
 	DWORD  m_dwIndex;
 
 	INSTANCE_HANDLE m_pLibHandle;

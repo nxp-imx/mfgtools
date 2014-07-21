@@ -15,9 +15,9 @@
 #include <cerrno>
 #include <math.h>
 #include <wchar.h>
-#include "sched.h"
-#include "semaphore.h"
-#include "pthread.h"
+//#include "sched.h"
+//#include "semaphore.h"
+//#include "pthread.h"
 #include <limits>
 #include <time.h>
 #include <cstdio>

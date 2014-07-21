@@ -13,7 +13,7 @@
 
 usb::HubClass::HubClass(INSTANCE_HANDLE handle)
 //: DeviceClass(NULL/*&GUID_DEVINTERFACE_USB_HUB*/, &GUID_DEVCLASS_USB, _T("USB"), DeviceTypeUsbHub)
-: DeviceClass(/*NULL*/&GUID_DEVINTERFACE_USB_HUB, &GUID_DEVCLASS_USB, NULL/*_T("USB")*/, DeviceTypeUsbHub, handle)
+: DeviceClass(NULL,NULL,_T("USB"),DeviceTypeUsbHub,handle)///*NULL*/&GUID_DEVINTERFACE_USB_HUB, &GUID_DEVCLASS_USB, NULL/*_T("USB")*/, DeviceTypeUsbHub, handle)
 {
 	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new HubClass"));
 }

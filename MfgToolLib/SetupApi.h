@@ -9,14 +9,15 @@
 #pragma once
 
 #include "stdafx.h"
-#include <setupapi.h>
-#include <cfgmgr32.h>
-#include <initguid.h>
-#include <devguid.h>
-#include <usbiodef.h>
+//#include <setupapi.h>
+//#include <cfgmgr32.h>
+//#include <initguid.h>
+//#include <devguid.h>
+//#include <usbiodef.h>
 
 class SetupApi
 {
+#if 0
     typedef DWORD (WINAPI *PCM_Get_DevNode_Registry_PropertyA)(
              DEVINST     dnDevInst,
              ULONG       ulProperty,
@@ -211,8 +212,10 @@ class SetupApi
 
     HMODULE hModuleSetup;
     HMODULE hModuleCfgMgr;
+#endif
     bool available;
-    
+public:
+#if 0
     PCM_Get_DevNode_Registry_PropertyA CM_Get_DevNode_Registry_PropertyA;
     PSetupDiGetClassDescriptionA SetupDiGetClassDescriptionA;
     PSetupDiOpenDeviceInfoA SetupDiOpenDeviceInfoA;
@@ -316,7 +319,7 @@ public:
     CString CM_GetProblemString( DWORD problemCode );
     
     bool IsAvailable() const { return available; };
-    
+    #endif
     SetupApi();
     ~SetupApi();
 };

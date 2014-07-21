@@ -7,7 +7,7 @@
  */
 
 #include "stdafx.h"
-#include "logmgr.h"
+#include "LogMgr.h"
 //#include <mswmdm_i.c>
 
 extern CString g_strVersion;
@@ -15,12 +15,12 @@ extern CString g_strVersion;
 CMfgLogMgr::CMfgLogMgr()
 {
 	TCHAR buffer[MAX_PATH];
-    ::GetModuleFileName(NULL, (LPTSTR)buffer, MAX_PATH);
-    CString filename = buffer;
+   // ::GetModuleFileName(NULL, (LPTSTR)buffer, MAX_PATH);
+	 CString filename = buffer;
 
 	int pos = filename.ReverseFind(_T('\\'));
 	filename = filename.Left(pos+1);	//+1 for add '\' at the last
-    filename += LOG_FILE_NAME;
+        filename += LOG_FILE_NAME;
 	m_file = _tfopen(filename, _T("r+"));
 	struct _stat64i32 FileLen;
 	_tstat(filename, &FileLen);
@@ -103,7 +103,7 @@ void CMfgLogMgr::PrintLog(DWORD moduleID, DWORD levelID, const TCHAR * format, .
     va_start(args, format);
     len = _vsctprintf(format, args)+1;
     buffer = (TCHAR*)malloc(len*sizeof(TCHAR));
-    std::vswprintf(buffer,len, format, args);
+    std::vsnprintf(buffer,len, format, args);
     va_end(args);
 
     CString str;

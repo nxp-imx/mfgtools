@@ -1,8 +1,11 @@
 #include "stdafx.h"
 #include <string>
-
+#include <stdlib.h>
+#include <cstdarg>
 #pragma once
-#ifdef WINVER
+
+
+#ifndef __linux__
 #define tstring std::basic_string<T, std::char_traits<T>, std::allocator<T> >
 
 template<class T>
@@ -10,38 +13,43 @@ class CTString: public std::basic_string<T, std::char_traits<T>, std::allocator<
 #else
 #define tstring std::string 
 #define TCHAR char
+template<class T>
+//#define T char
 class CTString :public std::string
 #endif
 
 {
-
+#define _vsntprintf vsnprintf
+#define _tcsnicmp strncasecmp
+#define _tcslen strlen
+ 
 public: CTString() : tstring() { }
+		#define _T(x) x
 		CTString(const tstring& s) : tstring(s) { }
 		CTString(const tstring& s, std::size_t n) : tstring(s, n) { }
 		CTString(const T * s, std::size_t n) : tstring(s, n) { }
-		CTString(const T * s) : tstring(s?s:(const T *)_T("")) { }
+		CTString(const T * s) : tstring(s?s:(const T *)_T(" ")) { }
 		CTString(std::size_t n, T c) : tstring(n, c) { }
 	
 	
-		operator const T * () { return c_str(); }\
-		operator const T * () const{ return c_str(); }
-		operator T * () { return c_str(); }
-		operator T * () const { return c_str(); }
+		operator const T * () { return this->c_str(); }\
+		operator const T * () const{ return this->c_str(); }
+		operator T * () { return this->c_str(); }
+		operator T * () const { return this->c_str(); }
 		void operator=(T * buff){	this->assign(buff);return;}
 		
 		
-		
-		void Empty(){ clear(); return; }
-		const bool IsEmpty() { return empty(); }
+		void Empty(){ this->clear(); return; }
+		const bool IsEmpty() { return this->empty(); }
 		int GetLength() { return this->length(); }
-		const T * GetBuffer() { return c_str(); }
-		int Compare(const T* str) const{ return compare(str); }
-		int CompareNoCase(const T* str) { return _tcsnicmp(c_str(), str, length()); }
-		int Find(T ch) const {return find(ch);};
-		int Find(const T * lpszSub) const{ return find(lpszSub); }
-		int Find(T ch, int nStart) const{ return find(ch, nStart); }
-		int Find(const T * pstr, int nStart) const { return find(pstr, nStart); }
-		T GetAt(int nIndex) const{ return at(nIndex);}
+		const T * GetBuffer() { return this->c_str(); }
+		int Compare(const T* str) const{ return this->compare(str); }
+		int CompareNoCase(const T* str) { return _tcsnicmp(this->c_str(), str, this->length()); }
+		int Find(T ch) const {return this->find(ch);};
+		int Find(const T * lpszSub) const{ return this->find(lpszSub); }
+		int Find(T ch, int nStart) const{ return this->find(ch, nStart); }
+		int Find(const T * pstr, int nStart) const { return this->find(pstr, nStart); }
+		T GetAt(int nIndex) const{ return this->at(nIndex);}
 
 		void Format(const T *fmt, ...){
 			size_t buffLen = 512;
@@ -111,11 +119,11 @@ public: CTString() : tstring() { }
 
 		
 		void TrimLeft(){
-			if (empty())
+			if (this->empty())
 				return;
 			while (*this->begin()  == _T('\t') || *this->begin() == _T('\n') || *this->begin() == _T('\r')){
 				this->erase(this->begin());
-				if (empty())
+				if (this->empty())
 					return;
 			}
 			return;
@@ -123,11 +131,11 @@ public: CTString() : tstring() { }
 
 		
 		void TrimRight(){
-			if (empty())
+			if (this->empty())
 				return;
 			while (this->back() == _T('\t') || this->back() == _T('\n') || this->back() == _T('\r')){
 				this->erase(this->length()-1);
-				if (empty())
+				if (this->empty())
 					return;
 			}
 			return;
@@ -137,7 +145,7 @@ public: CTString() : tstring() { }
 		void TrimLeft(T  chr){
 			while (this->at(this->begin()) == chr){
 				this->erase(this->begin());
-				if (empty())
+				if (this->empty())
 					return;
 			}
 			return;
@@ -147,7 +155,7 @@ public: CTString() : tstring() { }
 		void TrimRight(T  chr){
 			while (this->back() == chr){
 				this->erase(this->length()-1);
-				if (empty())
+				if (this->empty())
 					return;
 			}
 			return;
@@ -192,9 +200,9 @@ public: CTString() : tstring() { }
 
 		int Replace(T chOld, T chNew){
 			int count = 0;
-			for (int i = 0; i < length(); i++){
-				if (at(i) == chOld){
-					at(i) = chNew;
+			for (int i = 0; i < this->length(); i++){
+				if (this->at(i) == chOld){
+					this->at(i) = chNew;
 					count++;
 				}
 			}
@@ -227,8 +235,8 @@ public: CTString() : tstring() { }
 
 		
 		void MakeUpper(){
-			for (unsigned int i = 0; i < length(); i++){
-				at(i) = _totupper(at(i));
+			for (unsigned int i = 0; i < this->length(); i++){
+				this->at(i) = toupper(this->at(i));
 			}
 		}
 
@@ -261,7 +269,7 @@ public: CTString() : tstring() { }
 
 		
 		CTString<T> Right(int nCount) const{
-			if (nCount > length())
+			if (nCount > this->length())
 				return *this;
 			return this->substr(nCount, this->length() - nCount);
 		}
@@ -275,7 +283,7 @@ public: CTString() : tstring() { }
 
 
 
-#ifdef WINVER
+#ifndef __linux__
 typedef CTString<TCHAR> CString;
 typedef CTString<char> CAnsiString;
 #else
