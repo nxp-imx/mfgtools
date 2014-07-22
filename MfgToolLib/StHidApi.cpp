@@ -28,12 +28,12 @@ HidInquiry::HidInquiry(CString& paramStr)
 	, _secConfigStatus(0)
 {
 	// ;param: InfoPage:InfoPage_Chip, InfoPage_PitcStatus, InfoPage_secConfig
-	_params[L"InfoPage:"]                    = &_infoPage;
-	_infoPage.ValueList[InfoPage_Chip]       = L"InfoPage_Chip";
-	_infoPage.ValueList[InfoPage_PitcStatus] = L"InfoPage_PitcStatus";
-	_infoPage.ValueList[InfoPage_secConfig]  = L"InfoPage_secConfig";
+	_params["InfoPage:"]                    = &_infoPage;
+	_infoPage.ValueList[InfoPage_Chip]       = "InfoPage_Chip";
+	_infoPage.ValueList[InfoPage_PitcStatus] = "InfoPage_PitcStatus";
+	_infoPage.ValueList[InfoPage_secConfig]  = "InfoPage_secConfig";
 	// ;param: InfoParam:0xAABBCCDD
-	_params[L"InfoParam:"]                    = &_infoParam;
+	_params["InfoParam:"]                    = &_infoParam;
 
     int ret = ParseParameterString(paramStr, _params);
 
@@ -46,18 +46,18 @@ HidInquiry::HidInquiry(const UCHAR infoPage, const UINT infoParam)
 	, _secConfigStatus(0)
 {
 	// ;param: InfoPage:InfoPage_Chip, InfoPage_PitcStatus, InfoPage_secConfig
-	_params[L"InfoPage:"]                    = &_infoPage;
+	_params["InfoPage:"]                    = &_infoPage;
 
-	_infoPage.Desc = L"InfoPage";
-	_infoPage.ValueList[0] = L"Reserved";
-	_infoPage.ValueList[InfoPage_Chip]       = L"InfoPage_Chip";
-	_infoPage.ValueList[InfoPage_PitcStatus] = L"InfoPage_PitcStatus";
-	_infoPage.ValueList[InfoPage_secConfig]  = L"InfoPage_secConfig";
+	_infoPage.Desc = "InfoPage";
+	_infoPage.ValueList[0] = "Reserved";
+	_infoPage.ValueList[InfoPage_Chip]       = "InfoPage_Chip";
+	_infoPage.ValueList[InfoPage_PitcStatus] = "InfoPage_PitcStatus";
+	_infoPage.ValueList[InfoPage_secConfig]  = "InfoPage_secConfig";
 	// ;param: InfoParam:0xAABBCCDD
-	_params[L"InfoParam:"]                    = &_infoParam;
+	_params["InfoParam:"]                    = &_infoParam;
 
-	_infoParam.ValueList[0] = L"InfoParam";
-	_infoParam.Desc = L"InfoParam";
+	_infoParam.ValueList[0] = "InfoParam";
+	_infoParam.Desc = "InfoParam";
 
 	_infoPage.Value = _infoPage.Default = infoPage;
 	_infoParam.Value = _infoParam.Default = infoParam;
@@ -498,14 +498,14 @@ HidPitcInquiry::HidPitcInquiry(const UCHAR infoPage, const UINT infoParam)
     , _persistentInfo()
 {
 	// ;param: InfoPage:InfoPage_Pitc,InfoPage_PitcSense,InfoPage_OtpReg
-	_params[L"InfoPage:"] = &_infoPage;
+	_params["InfoPage:"] = &_infoPage;
     _infoPage.Value = infoPage;
-	_infoPage.ValueList[InfoPage_Pitc]   = L"InfoPage_Pitc";
-	_infoPage.ValueList[InfoPage_PitcSense]   = L"InfoPage_PitcSense";
-	_infoPage.ValueList[InfoPage_OtpReg] = L"InfoPage_OtpReg";
+	_infoPage.ValueList[InfoPage_Pitc]   = "InfoPage_Pitc";
+	_infoPage.ValueList[InfoPage_PitcSense]   = "InfoPage_PitcSense";
+	_infoPage.ValueList[InfoPage_OtpReg] = "InfoPage_OtpReg";
 
     // ;param: InfoParam:0xAABBCCDD
-    _params[L"InfoParam:"] = &_infoParam;
+    _params["InfoParam:"] = &_infoParam;
     _infoParam.Value = infoParam;
 
     PrepareCommand();
@@ -524,14 +524,14 @@ HidPitcInquiry::HidPitcInquiry(CString& paramStr)
     , _persistentInfo()
 {
 	// ;param: InfoPage:InfoPage_Pitc,InfoPage_PitcSense,InfoPage_OtpReg,InfoPage_PersistentReg
-	_params[L"InfoPage:"] = &_infoPage;
-	_infoPage.ValueList[InfoPage_Pitc]   = L"InfoPage_Pitc";
-	_infoPage.ValueList[InfoPage_PitcSense]   = L"InfoPage_PitcSense";
-	_infoPage.ValueList[InfoPage_OtpReg] = L"InfoPage_OtpReg";
-	_infoPage.ValueList[InfoPage_PersistentReg] = L"InfoPage_PersistentReg";
+	_params["InfoPage:"] = &_infoPage;
+	_infoPage.ValueList[InfoPage_Pitc]   = "InfoPage_Pitc";
+	_infoPage.ValueList[InfoPage_PitcSense]   = "InfoPage_PitcSense";
+	_infoPage.ValueList[InfoPage_OtpReg] = "InfoPage_OtpReg";
+	_infoPage.ValueList[InfoPage_PersistentReg] = "InfoPage_PersistentReg";
 
     // ;param: InfoParam:0xAABBCCDD
-    _params[L"InfoParam:"] = &_infoParam;
+    _params["InfoParam:"] = &_infoParam;
 
 	int ret = ParseParameterString(paramStr, _params);
 
@@ -593,7 +593,7 @@ void HidPitcInquiry::ProcessResponse(const UCHAR *const pData, const UINT start,
 	        _pitcInfo.Version.SetRevision(Swap2(pData + sizeof(_pitcInfo.Id) + sizeof(USHORT) + sizeof(USHORT)));
             break;
         case InfoPage_PitcSense:
-            _pitcSenseInfo = (wchar_t*)pData;
+            _pitcSenseInfo = (TCHAR *)pData;
             break;
         case InfoPage_OtpReg:
             _otpRegInfo.Address  = Swap4(pData);
@@ -619,12 +619,12 @@ const CString& HidPitcInquiry::ResponseString()
 		case InfoPage_Pitc:
 		{
 	        _responseStr.Format(_T("PITC ID: 0x%08X\r\n"), GetPitcId());
-            _responseStr.AppendFormat(_T("PITC Version: %s\r\n"), GetPitcVersion().toString());
+            _responseStr.AppendFormat(_T("PITC Version: %s\r\n"), GetPitcVersion().toString().c_str());
 			break;
 		}
 		case InfoPage_PitcSense:
 		{
-            _responseStr.Format(_T("PITC Sense: %s(0x%08X)\r\n"), GetPitcSenseString(), _infoParam.Value);
+            _responseStr.Format(_T("PITC Sense: %s(0x%08X)\r\n"), GetPitcSenseString().c_str(), _infoParam.Value);
 			break;
 		}
 		case InfoPage_OtpReg:
@@ -746,10 +746,10 @@ const UINT HidPitcInquiry::GetPersistentRegValue() const
 HidPitcRead::HidPitcRead(const UINT address, const UINT length, const UINT flags, const UINT dataSize)
 : StApiT<_ST_HID_CDB::_CDBHIDREADWRITE>(API_TYPE_PITC, ST_READ_CMD, _T("Read"))
 {
-    _params[L"Address:"] = &_address;
-    _params[L"Length:"] = &_length;
-    _params[L"Flags:"] = &_flags;
-    _params[L"DataSize:"] = &_dataSize;
+    _params["Address:"] = &_address;
+    _params["Length:"] = &_length;
+    _params["Flags:"] = &_flags;
+    _params["DataSize:"] = &_dataSize;
 
     _address.Value = address;
     _length.Value = length;
@@ -772,10 +772,10 @@ HidPitcRead::HidPitcRead(CString paramStr)
 , _dataSize(0)
 {
 	// ;param: Address:0xAABBCCDD,Length:0xAABBCCDD,Flags:0xAABBCCDD,DataSize:0xAABBCCDD
-    _params[L"Address:"] = &_address;
-    _params[L"Length:"] = &_length;
-    _params[L"Flags:"] = &_flags;
-    _params[L"DataSize:"] = &_dataSize;
+    _params["Address:"] = &_address;
+    _params["Length:"] = &_length;
+    _params["Flags:"] = &_flags;
+    _params["DataSize:"] = &_dataSize;
 
 	UINT ret = ParseParameterString(paramStr, _params);
 
@@ -813,7 +813,7 @@ void HidPitcRead::PrepareCommand()
 
 void HidPitcRead::ProcessResponse(const UCHAR *const pData, const UINT start, const UINT count)
 {
-    UINT bytesToCopy = min(count, _xferLength - start);
+    UINT bytesToCopy = std::min(count, _xferLength - start);
 	
 	if ( _responseDataPtr != NULL )
 		memcpy(_responseDataPtr + start, pData, bytesToCopy);
@@ -835,9 +835,9 @@ const CString& HidPitcRead::ResponseString()
 HidPitcWrite::HidPitcWrite(const UINT address, const UINT length, const UINT flags, const UCHAR * const pData, const UINT dataSize)
 	: StApiT<_ST_HID_CDB::_CDBHIDREADWRITE>(API_TYPE_PITC, ST_WRITE_CMD_PLUS_DATA, _T("Write"))
 {
-    _params[L"Address:"] = &_address;
-    _params[L"Length:"] = &_length;
-    _params[L"Flags:"] = &_flags;
+    _params["Address:"] = &_address;
+    _params["Length:"] = &_length;
+    _params["Flags:"] = &_flags;
 
     _address.Value = address;
     _length.Value = length;
@@ -854,9 +854,9 @@ StApi* HidPitcWrite::Create(CString paramStr)
 HidPitcWrite::HidPitcWrite(LPCTSTR fileName)
 	: StApiT<_ST_HID_CDB::_CDBHIDREADWRITE>(API_TYPE_PITC, ST_WRITE_CMD_PLUS_DATA, _T("Write"))
 {
-    _params[L"Address:"] = &_address;
-    _params[L"Length:"] = &_length;
-    _params[L"Flags:"] = &_flags;
+    _params["Address:"] = &_address;
+    _params["Length:"] = &_length;
+    _params["Flags:"] = &_flags;
 
 	StFwComponent fileData(fileName);
 	SetCommandData(fileData.GetDataPtr(), fileData.size());

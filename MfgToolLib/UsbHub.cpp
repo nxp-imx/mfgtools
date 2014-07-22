@@ -17,10 +17,10 @@ usb::Hub::Hub(DeviceClass* deviceClass, DEVINST devInst, CString path, INSTANCE_
 {
     _ports.describe(this, _T("USB Ports"), _T(""));
     _index.describe(this, _T("Index"), _T(""));
-
+#if 0 
     memset(&_nodeInformation, 0, sizeof(_nodeInformation));
     _nodeInformation.NodeType = UsbHub;
-
+#endif
     int portNumbers = CreatePorts();
 
 	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new Hub, Port Numbers: %d"), portNumbers);
@@ -92,6 +92,7 @@ usb::Port* usb::Hub::Port(const size_t portNumber)
 
 HANDLE usb::Hub::Open()
 {
+#if 0 
     SECURITY_ATTRIBUTES SecurityAttrib; // Needed for Win2000
     SecurityAttrib.bInheritHandle = false;
     SecurityAttrib.lpSecurityDescriptor = NULL;
@@ -106,6 +107,10 @@ HANDLE usb::Hub::Open()
         /*FILE_SHARE_READ|FILE_SHARE_WRITE*/0,
         &SecurityAttrib, 
         OPEN_EXISTING, 0, NULL);
+
+#endif
+    return NULL;
+
 }
 
 int usb::Hub::CreatePorts()
@@ -113,7 +118,7 @@ int usb::Hub::CreatePorts()
     DWORD error = ERROR_SUCCESS;
 
     HANDLE hHub = Open();
-    if ( hHub == INVALID_HANDLE_VALUE )
+    if ( hHub == (unsigned long)INVALID_HANDLE_VALUE )
     {
         // Probably not a port. We had to look at all USB devices in order to get all hubs. If it
         // fails to open or doesn't have any ports, we don't create a usb::Hub device.
@@ -124,6 +129,7 @@ int usb::Hub::CreatePorts()
 
     // See how many Ports are on the Hub
     DWORD BytesReturned;
+#if 0
     BOOL Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_INFORMATION, &_nodeInformation, sizeof(_nodeInformation),
                                         &_nodeInformation, sizeof(_nodeInformation),&BytesReturned, NULL);
 
@@ -145,7 +151,7 @@ int usb::Hub::CreatePorts()
         Property* pPort = new usb::Port(this, index);
         _ports.getList()->push_back(pPort);
     } // end for(ports)
-
+#endif
     return GetNumPorts();
 }
 

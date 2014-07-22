@@ -24,7 +24,7 @@
 
 
 VolumeDeviceClass::VolumeDeviceClass(INSTANCE_HANDLE handle)
- : DeviceClass(&GUID_DEVINTERFACE_VOLUME, &/*GUID_DEVCLASS_DISKDRIVE*/GUID_DEVCLASS_VOLUME, _T("STORAGE"), DeviceTypeMsc, handle)
+ : DeviceClass(NULL,NULL,_T("STORAGE"),DeviceTypeMsc,handle)//&GUID_DEVINTERFACE_VOLUME, &/*GUID_DEVCLASS_DISKDRIVE*/GUID_DEVCLASS_VOLUME, _T("STORAGE"), DeviceTypeMsc, handle)
 {
 	InitDriveLettersMap();
 }
@@ -38,6 +38,7 @@ UINT VolumeDeviceClass::InitDriveLettersMap()
 {
 	CString drive_letter;
 	CString volume_path;
+#if 0
 	DWORD driveBits = ::GetLogicalDrives();
 
 	//Only used in Windows NT and above
@@ -57,7 +58,7 @@ UINT VolumeDeviceClass::InitDriveLettersMap()
 		if ( driveBits == 0 )
 			break;
 	}
-
+#endif
 	return (UINT)_logicalDrives.size();
 
 }
@@ -84,6 +85,7 @@ Device* VolumeDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DAT
 			return NULL;
 		}
 		// Open the hub.
+#if 0
 		DWORD error;
 		HANDLE hHub = CreateFile(hubPath, (GENERIC_READ|GENERIC_WRITE), FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 		if (hHub == INVALID_HANDLE_VALUE) 
@@ -111,7 +113,7 @@ Device* VolumeDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DAT
 			return NULL;
 		}
 		CloseHandle(hHub);
-
+#endif
 		return volume;
 	}
 	
@@ -322,7 +324,7 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 	{
 		//TraceStr.Format(_T("It is a USB device.\r\n"));
 		//LOGPRINT(TraceStr);
-		nsInfo.Device = pDevice;
+		nsInfo.pDevice = pDevice;
 		nsInfo.Type = _deviceClassType;
 		nsInfo.DriverLetter = path[0];
 		nsInfo.PortIndex = ((Volume*)pDevice)->StorageDisk()->_hubIndex.getmsc(m_msc_vid, m_msc_pid);
@@ -353,7 +355,7 @@ DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
 		} */
 		if ( pDevice->_description.get().IsEmpty() )
 		{
-			nsInfo.Device = NULL;
+			nsInfo.pDevice = NULL;
 			//TraceStr.Format(_T("ERROR! VolumeDeviceClass::AddUsbDevice() %s: Could not get Device Description from the registry.\r\n"), msgLetter.c_str());
 			//LOGPRINT(TraceStr);
 		}
@@ -384,7 +386,7 @@ DeviceClass::NotifyStruct VolumeDeviceClass::RemoveUsbDevice(LPCTSTR path)
 
 			if ( drvLetter.Find(msgLetter) != -1 )
 			{
-				nsInfo.Device = (*device);
+				nsInfo.pDevice = (*device);
 				nsInfo.Type = _deviceClassType;
 				nsInfo.DriverLetter = path[0];
 //				nsInfo.PortIndex = (*device)->_hubIndex.get();//((Volume*)(*device))->StorageDisk()->_hubIndex.getmsc(m_msc_vid, m_msc_pid);
@@ -412,7 +414,7 @@ DeviceClass::NotifyStruct VolumeDeviceClass::RemoveUsbDevice(LPCTSTR path)
 			}
 		}
 	}
-	if ( nsInfo.Device )
+	if ( nsInfo.pDevice )
 	{
 		ClearPort(nsInfo.Hub, nsInfo.PortIndex);
 

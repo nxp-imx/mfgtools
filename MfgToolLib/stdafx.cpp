@@ -72,7 +72,7 @@ int CheckArrayOfEvents(myevent *container[], int length){
 	return -1;
 }
 
-#ifndef __LINUX__
+#ifndef __linux__
 int gettimeofday(struct timeval * tv){
 	FILETIME ft;
 	unsigned __int64 tmpres;

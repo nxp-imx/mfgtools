@@ -1,4 +1,9 @@
-//#define CString std::string
+//#define CString std::stringa
+#pragma once
+
+#ifndef LNX_DEFS
+
+#define LNX_DEFS
 #include <string>
 #include <stdio.h>
 #include <stdarg.h>
@@ -19,6 +24,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
+
 #ifndef FALSE
 #define FALSE (0)
 #endif
@@ -26,6 +32,7 @@
 #ifndef TRUE
 #define TRUE (!FALSE)
 #endif
+
 #define _tcschr strchr
 #define _totlower tolower
 #define	_tcslen strlen
@@ -40,6 +47,7 @@
 #define _tstat stat
 #define _fputts fputs
 #define _tcstol strtol
+#define sscanf_s sscanf
 
 //#define .Format =sprintf
 #define TCHAR char 
@@ -104,6 +112,7 @@ typedef DWORD HDEVNOTIFY;
 typedef BYTE * PBYTE;
 typedef LONG * PLONG;
 typedef ULONG * PULONG;
+typedef WORD LANGID;
 
 #define __AFXWIN_H__
 #define IsEmpty empty
@@ -442,3 +451,49 @@ inline int _vscprintf (const char * format, ...) {
 }
 
 #define CAnsiString CString
+
+
+
+#define ERROR_INVALID_DATA               13L
+
+//
+// MessageId: ERROR_OUTOFMEMORY
+//
+// MessageText:
+//
+// Not enough storage is available to complete this operation.
+//
+#define ERROR_OUTOFMEMORY                14L
+
+#define _MAX_DRIVE  3   /* max. length of drive component */
+#define _MAX_DIR    256 /* max. length of path component */
+#define _MAX_FNAME  256 /* max. length of file name component */
+#define _MAX_EXT    256 /* max. length of extension component */
+
+#define ERROR_OPEN_FAILED                110L
+
+typedef HANDLE HRSRC;
+
+#define _tcsrchr        strrchr
+
+#define _tcscmp         strcmp
+
+typedef enum _USB_CONNECTION_STATUS {
+    NoDeviceConnected,
+    DeviceConnected,
+
+    /* failure codes, these map to fail reasons */
+    DeviceFailedEnumeration,
+    DeviceGeneralFailure,
+    DeviceCausedOvercurrent,
+    DeviceNotEnoughPower,
+    DeviceNotEnoughBandwidth,
+    DeviceHubNestedTooDeeply,
+    DeviceInLegacyHub,
+    DeviceEnumerating,
+    DeviceReset
+} USB_CONNECTION_STATUS, *PUSB_CONNECTION_STATUS;
+#define ERROR_NOT_ENOUGH_MEMORY          8L    // dderror
+
+#define ERROR_NO_MORE_ITEMS              259L
+#endif

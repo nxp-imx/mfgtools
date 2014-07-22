@@ -57,8 +57,8 @@
 // Refer to MSDN for the latest info on corresponding values for different platforms.
 #ifndef WINVER              // Allow use of features specific to Windows 95 and Windows NT 4 or later.
 #define WINVER 0x0502       // Change this to the appropriate value to target Windows 98 and Windows 2000 or later.
-#endif
 
+#endif
 #ifndef _WIN32_WINNT        // Allow use of features specific to Windows NT 4 or later.
 #define _WIN32_WINNT 0x0502     // Change this to the appropriate value to target Windows 98 and Windows 2000 or later.
 #endif                      
@@ -87,7 +87,7 @@
 //#include <winioctl.h>
 
 //#include "resource.h"
-
+#ifndef __linux__
 #ifdef _UNICODE
 #if defined _M_IX86
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -104,6 +104,7 @@
 #define WIDEN(x) WIDEN2(x)
 #define __WFILE__ WIDEN(__FILE__)
 
+#endif
 #ifdef UNICODE
 #define __TFILE__ __WFILE__
 #else
@@ -124,7 +125,7 @@ struct myevent {
 #endif
 #define INFINITE (time_t)UINT_MAX;  //redefine infinite for time_t  types
 
-#ifndef __LINUX__
+#ifndef __linux___
 int gettimeofday(struct timeval * tv);
 #endif
 

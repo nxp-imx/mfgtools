@@ -30,6 +30,7 @@ usb::Controller::~Controller()
 
 HANDLE usb::Controller::Open()
 {
+#if 0
     SECURITY_ATTRIBUTES SecurityAttrib; // Needed for Win2000
     SecurityAttrib.bInheritHandle = false;
     SecurityAttrib.lpSecurityDescriptor = NULL;
@@ -44,6 +45,8 @@ HANDLE usb::Controller::Open()
 				/*FILE_SHARE_READ|FILE_SHARE_WRITE*/0,
 				&SecurityAttrib, 
 				OPEN_EXISTING, 0, NULL);
+#endif
+return NULL;
 }
 
 DWORD usb::Controller::Initialize()
@@ -54,7 +57,7 @@ DWORD usb::Controller::Initialize()
     _rootHubFilename.put(_T(""));
     
     HANDLE hController = Open();
-    if( hController == INVALID_HANDLE_VALUE )
+    if( hController == (unsigned long)INVALID_HANDLE_VALUE )
     {
         errorCode = GetLastError();
         return errorCode;
@@ -68,7 +71,7 @@ DWORD usb::Controller::Initialize()
 		DWORD Length; 
 		wchar_t Name[MAX_PATH];
 	} unicodeName;
-
+#if 0
     // Get the system name of our root hub for interrogation
     success = DeviceIoControl(hController, IOCTL_USB_GET_ROOT_HUB_NAME, &unicodeName,
                               sizeof(unicodeName),&unicodeName, sizeof(unicodeName), &bytesReturned, NULL); 
@@ -86,7 +89,7 @@ DWORD usb::Controller::Initialize()
     // save the Root Hub Filename to our member variable
     _rootHubFilename.put(rootHubFilename);
     _rootHubFilename.describe(this, _T("Root Hub Filename"), _T("Filename used to talk to the Controller's root hub."));
-
+#endif
     return ERROR_SUCCESS;
 }
 

@@ -49,8 +49,10 @@ UINT32 StPitc::SendPitcCommand(StApi& api)
         _strResponse.Format(_T("Error: SendCommand(%s) failed. (%d)\r\n"), api.GetName(), err);
 
         CString strTemp;
+#if 0
         FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, strTemp.GetBufferSetLength(MAX_PATH), MAX_PATH, NULL);
-        _strResponse.AppendFormat(_T("%s"), strTemp);
+#endif
+        _strResponse.AppendFormat(_T("%s"), strTemp.c_str());
 
     }
 
@@ -61,7 +63,7 @@ UINT32 StPitc::SendPitcCommand(StApi& api)
         HidPitcRequestSense senseApi;
         err = _pHidDevice->SendCommand(senseApi, &moreInfo);
         if ( err == ERROR_SUCCESS ) {
-            _strResponse.AppendFormat(_T("\r\n%s"), senseApi.ResponseString());
+            _strResponse.AppendFormat(_T("\r\n%s"), senseApi.ResponseString().c_str());
             err = senseApi.GetSenseCode();
         }
     }

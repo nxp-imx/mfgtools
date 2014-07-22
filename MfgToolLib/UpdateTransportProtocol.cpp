@@ -6,7 +6,7 @@
  *
  */
 
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "UpdateTransportProtocol.h"
 
 UINT UpdateTransportProtocol::g_TransactionTag = 0;

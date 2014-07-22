@@ -379,7 +379,7 @@ LPTSTR _tagXMLNode::LoadAttributes( LPCTSTR pszAttrs , LPPARSEINFO pi /*= &piDef
                     pi->erorr_occur = true;
                     pi->error_pointer = xml;
                     pi->error_code = PIE_ATTR_NO_VALUE;
-                    pi->error_string.Format( _T("<%s> attribute has error "), name );
+                    pi->error_string.Format( _T("<%s> attribute has error "), name.c_str() );
                 }
                 return NULL;
             }
@@ -472,7 +472,7 @@ LPTSTR _tagXMLNode::LoadAttributes( LPCTSTR pszAttrs, LPCTSTR pszEnd, LPPARSEINF
                     pi->erorr_occur = true;
                     pi->error_pointer = xml;
                     pi->error_code = PIE_ATTR_NO_VALUE;
-                    pi->error_string.Format( _T("<%s> attribute has error "), name );
+                    pi->error_string.Format( _T("<%s> attribute has error "), name.c_str() );
                 }
                 return NULL;
             }
@@ -825,7 +825,7 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
                         pi->erorr_occur = true;
                         pi->error_pointer = xml;
                         pi->error_code = PIE_NOT_CLOSED;
-                        pi->error_string.Format(_T("%s must be closed with </%s>"), name );
+                        pi->error_string.Format(_T("%s must be closed with </%s>"), name.c_str() );
                     }
                     // error cos not exist CloseTag </TAG>
                     return NULL;
@@ -880,7 +880,7 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
                                 pi->erorr_occur = true;
                                 pi->error_pointer = xml;
                                 pi->error_code = PIE_NOT_CLOSED;
-                                pi->error_string.Format(_T("it must be closed with </%s>"), name );
+                                pi->error_string.Format(_T("it must be closed with </%s>"), name.c_str() );
                             }
                             // error
                             return NULL;
@@ -906,7 +906,7 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
                                     pi->erorr_occur = true;
                                     pi->error_pointer = xml;
                                     pi->error_code = PIE_NOT_NESTED;
-                                    pi->error_string.Format(_T("'<%s> ... </%s>' is not wel-formed."), name, closename );
+                                    pi->error_string.Format(_T("'<%s> ... </%s>' is not wel-formed."), name.c_str(), closename.c_str() );
                                 }
                                 return NULL;
                             }
@@ -930,7 +930,7 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
                                 pi->erorr_occur = true;
                                 pi->error_pointer = xml;
                                 pi->error_code = PIE_NOT_CLOSED;
-                                pi->error_string.Format(_T("it must be closed with </%s>"), name );
+                                pi->error_string.Format(_T("it must be closed with </%s>"), name.c_str() );
                             }
                             return NULL;
                         }
@@ -1019,7 +1019,7 @@ LPXNode _tagXMLDocument::GetRoot()
 // Coder    Date                      Desc
 // bro      2002-10-29
 //========================================================
-CString& _tagXMLAttr::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
+CString _tagXMLAttr::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
 {
     otstringstream os;
     //os << (LPCTSTR)name << "='" << (LPCTSTR)value << "' ";
@@ -1160,7 +1160,7 @@ CString _tagXMLNode::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
 // 작성자   작성일                 작성이유
 // 조경민   2004-06-15
 //========================================================
-CString& _tagXMLNode::GetText( LPDISP_OPT opt /*= &optDefault*/ )
+CString _tagXMLNode::GetText( LPDISP_OPT opt /*= &optDefault*/ )
 {
     otstringstream os;
 

@@ -52,7 +52,7 @@ int StApi::SetCommandData(const UCHAR * const pData, const size_t size)
 	    if ( _sendDataPtr == NULL )
         {
             _xferLength = 0;
-		    return ERROR_NOT_ENOUGH_MEMORY;
+		    return 8L;//ERROR_NOT_ENOUGH_MEMORY;
         }
 
 	    // set all the allocated memory to 0xFF
@@ -75,22 +75,22 @@ int StApi::SetCommandData(const UCHAR * const pData, const size_t size)
 //////////////////////////////////////////////////////////////////////
 StApiFactory::StApiFactory()
 {
-	RegisterApi(L"HidInquiry", HidInquiry::Create);
-	RegisterApi(L"HidDownloadFw", HidDownloadFw::Create);
-	RegisterApi(L"HidBltcRequestSense", HidBltcRequestSense::Create);
-	RegisterApi(L"HidDeviceReset", HidDeviceReset::Create);
-	RegisterApi(L"HidDevicePowerDown", HidDevicePowerDown::Create);
-	RegisterApi(L"HidTestUnitReady", HidTestUnitReady::Create);
-	RegisterApi(L"HidPitcRequestSense", HidPitcRequestSense::Create);
-	RegisterApi(L"HidPitcInquiry", HidPitcInquiry::Create);
-	RegisterApi(L"HidPitcRead", HidPitcRead::Create);
-	RegisterApi(L"HidPitcWrite", HidPitcWrite::Create);
-/*	RegisterApi(L"HidInquiry", HidInquiry::Create);
-	RegisterApi(L"HidInquiry", HidInquiry::Create);
-	RegisterApi(L"HidInquiry", HidInquiry::Create);
-	RegisterApi(L"HidInquiry", HidInquiry::Create);
-	RegisterApi(L"HidInquiry", HidInquiry::Create);
-	RegisterApi(L"HidInquiry", HidInquiry::Create);
+	RegisterApi("HidInquiry", HidInquiry::Create);
+	RegisterApi("HidDownloadFw", HidDownloadFw::Create);
+	RegisterApi("HidBltcRequestSense", HidBltcRequestSense::Create);
+	RegisterApi("HidDeviceReset", HidDeviceReset::Create);
+	RegisterApi("HidDevicePowerDown", HidDevicePowerDown::Create);
+	RegisterApi("HidTestUnitReady", HidTestUnitReady::Create);
+	RegisterApi("HidPitcRequestSense", HidPitcRequestSense::Create);
+	RegisterApi("HidPitcInquiry", HidPitcInquiry::Create);
+	RegisterApi("HidPitcRead", HidPitcRead::Create);
+	RegisterApi("HidPitcWrite", HidPitcWrite::Create);
+/*	RegisterApi("HidInquiry", HidInquiry::Create);
+	RegisterApi("HidInquiry", HidInquiry::Create);
+	RegisterApi("HidInquiry", HidInquiry::Create);
+	RegisterApi("HidInquiry", HidInquiry::Create);
+	RegisterApi("HidInquiry", HidInquiry::Create);
+	RegisterApi("HidInquiry", HidInquiry::Create);
 */
 };
 		

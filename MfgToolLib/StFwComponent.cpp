@@ -27,7 +27,7 @@ StFwComponent::StFwComponent()
 , _langId(MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL))
 , _startingOffset(0)
 , _fileType(FileType_Invalid)
-, _lastError(ERROR_INVALID_DATA)
+, _lastError(13L)
 , _isResource(false)
 { 
     InitParameters();
@@ -92,12 +92,12 @@ void StFwComponent::clear()
 
 const CString StFwComponent::GetShortFileName() const
 {
-	TCHAR fname[_MAX_FNAME];
+	TCHAR fname[_MAX_FNAME]="";
 	TCHAR ext[_MAX_EXT];
 	CString shortName;
-
+#if 0
 	_tsplitpath_s(_fileName, NULL, 0, NULL, 0, fname, _MAX_FNAME, ext,_MAX_EXT);
-
+#endif
     shortName.Format(_T("%s%s"), fname, ext);
 
 	return shortName;
@@ -283,7 +283,7 @@ const ParameterT<StFwComponent::FileType>& StFwComponent::GetFileType()
     // The full FileTypeTag_Stmp should be present for 3500-style files.
     // We will will limit the search for the FileTypeTag_Stmp to the first 1024 bytes of the file 
 	// or the size of the data which ever is smaller.
-    std::string fileTag35((char*)&_data[0], min(_data.size(), 1024));
+    std::string fileTag35((char*)&_data[0], std::min((int)_data.size(), 1024));
     
     // check 3500-stye STMP
     UINT index = (UINT)fileTag35.find(FileTypeTag_Stmp);
@@ -388,7 +388,7 @@ int StFwComponent::LoadFromFile(LPCTSTR fileName)
     _isResource = false;
 
 	// open the file in binary mode. return error on fail to open or read.
-	std::ifstream file(fileName, std::ios::in | std::ios::binary, _SH_DENYNO);
+	std::ifstream file(fileName, std::ios::in | std::ios::binary);
     if( file.fail() )
         return ERROR_OPEN_FAILED;
 
@@ -417,7 +417,7 @@ int StFwComponent::LoadFromFile(LPCTSTR fileName)
     InitVersionInfo( GetFileType().Value );
 
     // Get the last modified date/time
-    struct _stat buf = {0};
+    struct stat buf = {0};
     if ( _tstat(_fileName, &buf) == ERROR_SUCCESS )
         _fileDate = buf.st_mtime;
     else
@@ -431,7 +431,7 @@ int StFwComponent::LoadFromFile(LPCTSTR fileName)
 int StFwComponent::LoadFromResource(LPCTSTR resourceName, USHORT langId)
 {
     clear();
-
+#if 0 
     _fileName = resourceName;
 	_langId = langId;
     _isResource = true;
@@ -463,7 +463,7 @@ int StFwComponent::LoadFromResource(LPCTSTR resourceName, USHORT langId)
 
     // no valid date/time property
     _fileDate = 0;    
-
+#endif
     return ERROR_SUCCESS;
 }
 
@@ -471,12 +471,13 @@ const CString StFwComponent::toString() const
 {
     CString theInfo;
 
-    theInfo.Format(_T("Name: %s\r\n"), _fileName);
-    theInfo.AppendFormat(_T("Internal name: %s\r\n"), _internalName);
+    theInfo.Format(_T("Name: %s\r\n"), _fileName.c_str());
+    theInfo.AppendFormat(_T("Internal name: %s\r\n"), _internalName.c_str());
     theInfo.AppendFormat(_T("Size: %d bytes\r\n"), size());
 
     CString dateStr; 
     struct tm modTime;
+#if 0
     if ( _fileDate.Value != 0 )
     {
         _gmtime64_s(&modTime, &_fileDate.Value);
@@ -485,15 +486,18 @@ const CString StFwComponent::toString() const
     }
     else
     {
+#endif
         dateStr = _T("N/A");
+#if 0
     }
-    theInfo.AppendFormat(_T("Date modified: %s\r\n"), dateStr);
+#endif
+    theInfo.AppendFormat(_T("Date modified: %s\r\n"), dateStr.c_str());
     
-    theInfo.AppendFormat(_T("Type: %s\r\n"), _fileType.ToString());
+    theInfo.AppendFormat(_T("Type: %s\r\n"), _fileType.ToString().c_str());
     theInfo.AppendFormat(_T("Resource/File: %s\r\n"), IsResource() ? _T("Resource") : _T("File"));
     theInfo.AppendFormat(_T("Tag/Id: 0x%04X\r\n"), _id);
-    theInfo.AppendFormat(_T("Product version: %s\r\n"), _productVersion.toString());
-    theInfo.AppendFormat(_T("Component version: %s\r\n"), _componentVersion.toString());
+    theInfo.AppendFormat(_T("Product version: %s\r\n"), _productVersion.toString().c_str());
+    theInfo.AppendFormat(_T("Component version: %s\r\n"), _componentVersion.toString().c_str());
     theInfo.AppendFormat(_T("Language: 0x%04X\r\n"), _langId);
 
     return theInfo; 

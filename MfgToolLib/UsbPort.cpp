@@ -30,15 +30,15 @@ usb::Port::Port(usb::Hub* pHub, int index)
     _isHub.describe(this, _T("Device is hub"));
 
     // typedef enum _USB_CONNECTION_STATUS from usbioctl.h
-    _connected.ValueList[NoDeviceConnected]        = L"NoDeviceConnected";
-    _connected.ValueList[DeviceConnected]          = L"DeviceConnected";
-    _connected.ValueList[DeviceFailedEnumeration]  = L"DeviceFailedEnumeration";
-    _connected.ValueList[DeviceGeneralFailure]     = L"DeviceGeneralFailure";
-    _connected.ValueList[DeviceCausedOvercurrent]  = L"DeviceCausedOvercurrent";
-    _connected.ValueList[DeviceNotEnoughPower]     = L"DeviceNotEnoughPower";
-    _connected.ValueList[DeviceNotEnoughBandwidth] = L"DeviceNotEnoughBandwidth";
-    _connected.ValueList[DeviceHubNestedTooDeeply] = L"DeviceHubNestedTooDeeply";
-    _connected.ValueList[DeviceInLegacyHub]        = L"DeviceInLegacyHub";
+    _connected.ValueList[NoDeviceConnected]        = "NoDeviceConnected";
+    _connected.ValueList[DeviceConnected]          = "DeviceConnected";
+    _connected.ValueList[DeviceFailedEnumeration]  = "DeviceFailedEnumeration";
+    _connected.ValueList[DeviceGeneralFailure]     = "DeviceGeneralFailure";
+    _connected.ValueList[DeviceCausedOvercurrent]  = "DeviceCausedOvercurrent";
+    _connected.ValueList[DeviceNotEnoughPower]     = "DeviceNotEnoughPower";
+    _connected.ValueList[DeviceNotEnoughBandwidth] = "DeviceNotEnoughBandwidth";
+    _connected.ValueList[DeviceHubNestedTooDeeply] = "DeviceHubNestedTooDeeply";
+    _connected.ValueList[DeviceInLegacyHub]        = "DeviceInLegacyHub";
 
 	_WndIndex = -1;
 
@@ -63,6 +63,7 @@ void usb::Port::Clear()
 
 	//WaitForSingleObject(m_Mtx, INFINITE);
     // Reset Port Properties
+#if 0
     memset(&_connectionInfo, 0, sizeof(_connectionInfo));
     _connectionInfo.ConnectionIndex = _index.get();
     
@@ -76,6 +77,7 @@ void usb::Port::Clear()
 
     _device = NULL;
     //ReleaseMutex(m_Mtx);
+#endif
 }
 
 DWORD usb::Port::Refresh()
@@ -88,14 +90,14 @@ DWORD usb::Port::Refresh()
 	//WaitForSingleObject(m_Mtx, INFINITE);
     // Open hub
     HANDLE hHub = _parentHub->Open();
-    if ( hHub == INVALID_HANDLE_VALUE )
+    if ( hHub == (unsigned long)INVALID_HANDLE_VALUE )
     {
         error=GetLastError();
 //        ATLTRACE(_T("*** ERROR1 0x%X (%d): usb::Port::Refresh() hub: %d port:%d\n"), error, error, _parentHub->_index.get(), _index.get());
 		//ReleaseMutex(m_Mtx);
         return error;
     }
-
+#if 0
     // Get Connection Information
     DWORD BytesReturned;
     BOOL Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX, &_connectionInfo, sizeof(_connectionInfo),
@@ -182,7 +184,7 @@ DWORD usb::Port::Refresh()
 
 //t ATLTRACE2(_T("usb::Port::Refresh() - Hub %d, %s\r\n"), _parentHub->_index.get(), _name.c_str());
 	//ReleaseMutex(m_Mtx);
-
+#endif
     return error;
 }
 
@@ -251,7 +253,7 @@ CString usb::Port::GetUsbDevicePath()
     CString pathStr = _T("");
 
 	//WaitForSingleObject(m_Mtx, INFINITE);
-
+#if 0 
     if ( _connectionInfo.ConnectionStatus == DeviceConnected )
     {
         if ( _device != NULL ) //assert(_device);
@@ -264,7 +266,7 @@ CString usb::Port::GetUsbDevicePath()
     }
 
 	//ReleaseMutex(m_Mtx);
-
+#endif
     return pathStr;
 }
 
@@ -273,7 +275,7 @@ CString usb::Port::GetDriverKeyName(void)
     CString driverStr = _T("");
 
 	//WaitForSingleObject(m_Mtx, INFINITE);
-
+#if 0
     if ( _connectionInfo.ConnectionStatus == DeviceConnected )
     {
         if ( _device != NULL ) //assert(_device);
@@ -283,7 +285,7 @@ CString usb::Port::GetDriverKeyName(void)
     }
 
     //ReleaseMutex(m_Mtx);
-
+#endif
     return driverStr;
 }
 
@@ -292,7 +294,7 @@ CString usb::Port::GetDeviceDescription(void)
     CString descStr = _T("No device connected");
 
     //WaitForSingleObject(m_Mtx, INFINITE);
-
+#if 0
     if ( _connectionInfo.ConnectionStatus == DeviceConnected )
     {
         if ( _device != NULL )
@@ -317,7 +319,7 @@ CString usb::Port::GetDeviceDescription(void)
     }
 
     //ReleaseMutex(m_Mtx);
-
+#endif
     return descStr;
 }
 
@@ -359,7 +361,7 @@ CString usb::Port::GetDriveLetters(void)
 DWORD usb::Port::GetDeviceType(void)
 {
     DWORD devType = DeviceClass::DeviceTypeNone;
-
+#if 0
     //WaitForSingleObject(m_Mtx, INFINITE);
     if ( _connectionInfo.ConnectionStatus == DeviceConnected )
     {
@@ -370,7 +372,7 @@ DWORD usb::Port::GetDeviceType(void)
     }
 
     //ReleaseMutex(m_Mtx);
-
+#endif
     return devType;
 }
 

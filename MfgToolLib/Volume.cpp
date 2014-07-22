@@ -30,13 +30,13 @@ Volume::Volume(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANC
 	_diskNumber.describe(this, _T("Physical Disk Number"), _T(""));
 
 	_diskNumber.get();
-
+#if 0
     _hEvent = CreateEvent( 
 		NULL,    // default security attribute 
         TRUE,    // manual-reset event 
         FALSE,    // initial state = not-signaled 
 		_logicalDrive.get().GetBuffer());   // unnamed event object 
-
+#endif
 	m_pBuffer = (UCHAR *)malloc(sizeof(_NT_SCSI_REQUEST) + MAX_SCSI_DATA_TRANSFER_SIZE);
 
 	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new Volume[%p]"), this);
@@ -46,7 +46,7 @@ Volume::~Volume(void)
 {
 	if ( _hEvent != NULL )
 	{
-		CloseHandle(_hEvent);
+	//	CloseHandle(_hEvent);
 		_hEvent = NULL;
 	}
 	free(m_pBuffer);
@@ -67,10 +67,10 @@ CString Volume::volumeName::get()
 
 	if (_value.IsEmpty())
     {
-		if (!gKernelApi().apiGetVolumeNameForVolumeMountPoint(vol->_path.get() + _T("\\"), _value))
-		{
-			error = GetLastError();
-		}
+	//	if (!gKernelApi().apiGetVolumeNameForVolumeMountPoint(vol->_path.get() + _T("\\"), _value))
+	//	{
+	//		error = GetLastError();
+	//	}
     }
     return _value;
 }
@@ -126,14 +126,16 @@ int Volume::diskNumber::get()
 		if (!vol->_logicalDrive.get().IsEmpty())
         {
 			CString str;
-			str.Format(_T("\\\\.\\%s"), vol->_logicalDrive.get());
+			str.Format(_T("\\\\.\\%s"), vol->_logicalDrive.get().c_str());
+		DWORD bytesReturned = 0 ;
+
+#if 0
 			HANDLE hFile = CreateFile(str, 0, 0, NULL, OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL, NULL);
 			if (hFile == INVALID_HANDLE_VALUE)
 			{
 				DWORD error = GetLastError();
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("*** Error: %d, Drive: %s\n"), error, vol->_logicalDrive.get());
-			}
-			
+			}			
 			DWORD bytesReturned = 0;
 			STORAGE_DEVICE_NUMBER driveNumber;
 			if (!DeviceIoControl(hFile, IOCTL_STORAGE_GET_DEVICE_NUMBER, NULL, 0, &driveNumber, sizeof(driveNumber), &bytesReturned, NULL))
@@ -143,13 +145,15 @@ int Volume::diskNumber::get()
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("*** Error: %d, Drive: %s\n"), error, vol->_logicalDrive.get());
 			}
 			CloseHandle(hFile);
-
 			if (bytesReturned > 0)
 			{
 				Value = driveNumber.DeviceNumber;
 			}
 		}
     }
+
+#endif
+}}
 	return Value;
 }
 
@@ -232,14 +236,14 @@ HANDLE Volume::Lock(LockType lockType)
 		else
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("*** Volume::Lock - FAILED")); 
-			return INVALID_HANDLE_VALUE;
+			return (unsigned long)INVALID_HANDLE_VALUE;
 		}
     }
     else
     {
         disk = _path.get();
     }
-
+#if 0
 	HANDLE hDrive = ::CreateFile (
 		disk,
 		GENERIC_READ | GENERIC_WRITE,
@@ -271,8 +275,9 @@ HANDLE Volume::Lock(LockType lockType)
 		Sleep( dwSleepAmount );
 	}
 
-	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("*** Volume::Lock - FAILED")); 
-    return INVALID_HANDLE_VALUE; */
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("*** Volume::Lock - FAILED")); */
+#endif
+    return (HANDLE)INVALID_HANDLE_VALUE; 
 }
 
 // Unlocks a volume.
@@ -283,10 +288,11 @@ int Volume::Unlock(HANDLE hDrive, bool close)
 	int nTryCount;
 
 	dwSleepAmount = LOCK_TIMEOUT / LOCK_RETRIES;
-
+#if 0
     // Do this in a loop until a timeout period has expired
 	for( nTryCount = 0; nTryCount < LOCK_RETRIES; nTryCount++ ) 
 	{
+
         if (::DeviceIoControl(
 				hDrive,
 				FSCTL_UNLOCK_VOLUME,
@@ -308,6 +314,8 @@ int Volume::Unlock(HANDLE hDrive, bool close)
 
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("*** Volume::Unlock - FAILED")); 
 
+#endif 
+	
 	return GetLastError();
 }
 
@@ -323,7 +331,9 @@ UINT Volume::SendCommand(StApi& api, UCHAR* additionalInfo)
 //    nsInfo.direction = api.IsWriteCmd() ? Device::NotifyStruct::dataDir_ToDevice : Device::NotifyStruct::dataDir_FromDevice;
 //    Notify(nsInfo);
 
-    HANDLE hDrive = ::CreateFile (
+    HANDLE hDrive = NULL;
+#if 0		
+		::CreateFile (
 		_path.get()/*.c_str()*/, 
 		GENERIC_READ | GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -334,11 +344,11 @@ UINT Volume::SendCommand(StApi& api, UCHAR* additionalInfo)
 
 	if ( hDrive == INVALID_HANDLE_VALUE )
 		return GetLastError();
-
+#endif
     UINT ret = SendCommand(hDrive, api, additionalInfo, nsInfo);
-
+#if 0
     CloseHandle(hDrive);
-
+#endif
     // tell the UI we are done
 //    nsInfo.inProgress = false;
 //    Notify(nsInfo);
@@ -348,7 +358,7 @@ UINT Volume::SendCommand(StApi& api, UCHAR* additionalInfo)
 
 UINT Volume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo)
 {
-	
+	#if 0
 	// init parameter if it is used
 	if (additionalInfo)
 		*additionalInfo = SCSISTAT_GOOD;
@@ -406,7 +416,8 @@ UINT Volume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, Notif
 
 	// Sending command
 	//unsigned int start= ::GetCurrentTime();
-	DWORD dwBytesReturned;
+	DWORD dwBytesReturned=0;
+
 	BOOL bResult = ::DeviceIoControl (
 		hDrive,
 		IOCTL_SCSI_PASS_THROUGH,
@@ -456,6 +467,9 @@ UINT Volume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, Notif
         *additionalInfo = api.ScsiSenseStatus;
 
     return nsInfo.error;
+#endif
+
+    return ERROR_SUCCESS;
 }
 
 void Volume::NotifyUpdateUI(int cmdOpIndex, int position, int maximum)
