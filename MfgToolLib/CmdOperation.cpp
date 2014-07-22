@@ -365,7 +365,7 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 	struct timespec timeToWait;
 	struct timeval now;
 	
-	gettimeofday(&now);
+	gettimeofday(&now,NULL);
 	timeToWait.tv_sec = now.tv_sec+dwTimeOut;
 	timeToWait.tv_nsec = now.tv_usec * 1000;
 	

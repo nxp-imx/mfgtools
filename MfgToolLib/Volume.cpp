@@ -19,6 +19,10 @@
 #include "UpdateTransportProtocol.Api.h"
 #include "UpdateUIInfo.h"
 
+int foo()
+{
+return 0;
+}
 Volume::Volume(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle)
 : Device(deviceClass, devInst, path, handle)
 , _diskNumber(-1)

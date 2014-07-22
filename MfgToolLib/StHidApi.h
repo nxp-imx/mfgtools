@@ -121,10 +121,17 @@ namespace api
     {
     public:
         friend class StApiFactory;
-        static const UCHAR InfoPage_Chip = 0x01, InfoPage_PitcStatus = 0x02, InfoPage_secConfig = 0x3;
-		static const UINT PITC_STATUS_READY=0x00000000, PITC_STATUS_NOT_READY=0x00000001;
-		static const UINT BLTC_SEC_CONFIG_DISABLE=0x00000000, BLTC_SEC_CONFIG_FAB=0x00000001,
-							  BLTC_SEC_CONFIG_ENGINEERING=0x00000002,BLTC_SEC_CONFIG_PRODUCTION=0x00000003;
+	enum {
+	    InfoPage_Chip = 0x01, 
+	    InfoPage_PitcStatus = 0x02, 
+	    InfoPage_secConfig = 0x3,
+	    PITC_STATUS_READY=0x00000000, 
+	    PITC_STATUS_NOT_READY=0x00000001,
+	    BLTC_SEC_CONFIG_DISABLE=0x00000000, 
+	    BLTC_SEC_CONFIG_FAB=0x00000001,
+	    BLTC_SEC_CONFIG_ENGINEERING=0x00000002,
+	    BLTC_SEC_CONFIG_PRODUCTION=0x00000003
+	};
 		HidInquiry(const UCHAR infoPage, const UINT infoParam = 0);
         virtual ~HidInquiry() {};
 
@@ -312,7 +319,11 @@ namespace api
     {
     public:
         friend class StApiFactory;
-        static const UCHAR InfoPage_Pitc = 0x01, InfoPage_PitcSense = 0x02, InfoPage_OtpReg = 0x03, InfoPage_PersistentReg = 0x04;
+        enum {
+	    InfoPage_Pitc = 0x01,
+	     InfoPage_PitcSense = 0x02,
+	     InfoPage_OtpReg = 0x03,
+	     InfoPage_PersistentReg = 0x04};
 
     private:
         static StApi* Create(CString paramStr);

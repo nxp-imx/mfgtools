@@ -125,9 +125,7 @@ struct myevent {
 #endif
 #define INFINITE (time_t)UINT_MAX;  //redefine infinite for time_t  types
 
-#ifndef __linux___
-int gettimeofday(struct timeval * tv);
-#endif
+
 
 int InitEvent(myevent **Ev);
 void SetEvent(myevent *Ev,sem_t*sem_att=NULL);

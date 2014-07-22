@@ -1,9 +1,10 @@
 //#define CString std::stringa
-#pragma once
 
-#ifndef LNX_DEFS
 
-#define LNX_DEFS
+#ifndef __LNX_DEFS__
+
+#define __LNX_DEFS__
+
 #include <string>
 #include <stdio.h>
 #include <stdarg.h>
@@ -22,8 +23,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
 
 #ifndef FALSE
 #define FALSE (0)
@@ -192,7 +195,7 @@ typedef struct _SENSE_DATA {
 
 #pragma pack(1)
 
-struct _CDB6INQUIRY {
+typedef struct _CDB6INQUIRY {
         UCHAR OperationCode;    // 0x12 - SCSIOP_INQUIRY
         UCHAR Reserved1 : 5;
         UCHAR LogicalUnitNumber : 3;
@@ -203,7 +206,7 @@ struct _CDB6INQUIRY {
 } CDB6INQUIRY;
 
 
-struct _CDB12 {
+typedef struct _CDB12 {
         UCHAR OperationCode;
         UCHAR RelativeAddress : 1;
         UCHAR Reserved1 : 2;
@@ -496,4 +499,6 @@ typedef enum _USB_CONNECTION_STATUS {
 #define ERROR_NOT_ENOUGH_MEMORY          8L    // dderror
 
 #define ERROR_NO_MORE_ITEMS              259L
+#else
+    sjdlfkjasdlk
 #endif

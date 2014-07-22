@@ -174,7 +174,10 @@ typedef void (*PCALLBACK_DEVICE_CHANGE)(DEVICE_CHANGE_NOTIFY *pNsInfo);
 /************************************************************
 * Export Functions declaration
 ************************************************************/
-DWORD MfgLib_Initialize();
+extern "C"
+{
+int foo();
+extern DWORD MfgLib_Initialize();
 DWORD MfgLib_Uninitialize();
 DWORD MfgLib_CreateInstanceHandle(INSTANCE_HANDLE *pHandle);
 DWORD MfgLib_DestoryInstanceHandle(INSTANCE_HANDLE handle);
@@ -193,6 +196,6 @@ DWORD MfgLib_RegisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbTy
 DWORD MfgLib_UnregisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbType, void *pFunc);
 DWORD MfgLib_GetLibraryVersion(BYTE_t* version, int maxSize);
 DWORD MfgLib_SetUCLKeyWord(CHAR_t *key, CHAR_t *value);
-
+}
 
 
