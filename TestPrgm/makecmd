@@ -1,1 +1,2 @@
 g++ test.cpp `pkg-config --libs --cflags libusb-1.0` -g -o hotplug
+gcc soTest.cpp -L ../MfgToolLib/build/ -lMfgToolLib -I../MfgToolLib -I/usr/include/libusb-1.0 -lusb-1.0 -g -lstdc++ -lpthread

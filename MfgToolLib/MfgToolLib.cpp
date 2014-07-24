@@ -73,14 +73,14 @@ std::queue<thread_msg> msg_queue;
 
 CMfgToolLibApp::CMfgToolLibApp()
 {
-	// TODO: add construction code here,
+	InitInstance();// TODO: add construction code here,
 	// Place all significant initialization in InitInstance
 }
 
 
 // The one and only CMfgToolLibApp object
 
-CMfgToolLibApp theApp;
+CMfgToolLibApp *theApp;
 
 /************************************************************
 * Global variables definition
@@ -110,13 +110,13 @@ BOOL CMfgToolLibApp::InitInstance()
 {
 	//CWinApp::InitInstance();
 
-	TCHAR _path[MAX_PATH] = {0};
+	TCHAR *_path = get_current_dir_name();
 	//::GetModuleFileName(AfxGetStaticModuleState()->m_hCurrentInstanceHandle, _path, MAX_PATH);
-
-	theApp.m_strDllFullPath = _path;
-	int pos = theApp.m_strDllFullPath.ReverseFind(_T('\\'));
-	theApp.m_strDllFullPath = theApp.m_strDllFullPath.Left(pos+1);  //+1 for add '\' at the last
-
+	
+	m_strDllFullPath=_path;
+	int pos = m_strDllFullPath.ReverseFind(_T('/'));
+	m_strDllFullPath = m_strDllFullPath.Left(pos+1);  //+1 for add '\' at the last
+	printf("this is the path %s\n",m_strDllFullPath.c_str());
 	g_pLogMgr = NULL;
 	g_hOneInstance = NULL;
 
@@ -130,6 +130,8 @@ BOOL CMfgToolLibApp::InitInstance()
 ************************************************************/
 DWORD MfgLib_Initialize()
 {
+
+	theApp=new CMfgToolLibApp;
 	// Only an instance
 #if 0
 	g_hOneInstance = ::CreateMutex(NULL, FALSE, UNIQE_NAME);
@@ -142,6 +144,7 @@ DWORD MfgLib_Initialize()
 		return MFGLIB_ERROR_ALREADY_INITIALIZED;
 	}
 #endif
+	printf("initialize hello");
 	return MFGLIB_ERROR_SUCCESS;
 }
 
@@ -159,10 +162,10 @@ DWORD MfgLib_Uninitialize()
 
 DWORD MfgLib_CreateInstanceHandle(INSTANCE_HANDLE *pHandle)
 {
-	if(g_hOneInstance == NULL)
-	{
-		return MFGLIB_ERROR_NOT_INITIALIZED;
-	}
+	//if(g_hOneInstance == NULL)
+	//{
+//		return MFGLIB_ERROR_NOT_INITIALIZED;
+//	}
 
 	MFGLIB_VARS *pLibVars = NULL;
 
@@ -242,7 +245,7 @@ DWORD MfgLib_SetProfileName(INSTANCE_HANDLE handle, BYTE_t *strName)
 	}
 
 	pLibVars->g_CfgParam.chip = (char *)strName;
-	pLibVars->g_strUclFilename = theApp.m_strDllFullPath + _T("Profiles") + _T("\\") + pLibVars->g_CfgParam.chip + _T("\\") + _T("OS Firmware") + _T("\\") + DEFAULT_UCL_XML_FILE_NAME;
+	pLibVars->g_strUclFilename = theApp->m_strDllFullPath + _T("Profiles") + _T("/") + pLibVars->g_CfgParam.chip + _T("/") + _T("OS Firmware") + _T("/") + DEFAULT_UCL_XML_FILE_NAME;
 
 	return MFGLIB_ERROR_SUCCESS;
 }
@@ -288,9 +291,9 @@ DWORD MfgLib_SetUCLFile(INSTANCE_HANDLE handle, BYTE_t *strName)
 		return MFGLIB_ERROR_INVALID_PARAM;
 	}
 /*
-	pLibVars->g_strUclFilename = theApp.m_strDllFullPath + _T("Profiles") + _T("\\") + pLibVars->g_CfgParam.chip + _T("\\") + _T("OS Firmware") + _T("\\") + strName;
+	pLibVars->g_strUclFilename = theApp->m_strDllFullPath + _T("Profiles") + _T("\\") + pLibVars->g_CfgParam.chip + _T("\\") + _T("OS Firmware") + _T("\\") + strName;
 */	
-	pLibVars->g_strUclFilename.assign(theApp.m_strDllFullPath);
+	pLibVars->g_strUclFilename.assign(theApp->m_strDllFullPath);
 	pLibVars->g_strUclFilename.append(_T("Profiles"));
 	pLibVars->g_strUclFilename.append(_T("\\"));
 	pLibVars->g_strUclFilename.append(pLibVars->g_CfgParam.chip);
@@ -362,6 +365,7 @@ DWORD MfgLib_InitializeOperation(INSTANCE_HANDLE handle)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Initialize log manager failed, error code: %d"), error);
 		goto ERROR_END;
 	}
+	printf("test");
 	//Parse xml
 	error = ParseUclXml(pLibVars);
 	if( (error != MFGLIB_ERROR_SUCCESS) && (error != MFGLIB_ERROR_ALREADY_EXIST) )
@@ -369,6 +373,7 @@ DWORD MfgLib_InitializeOperation(INSTANCE_HANDLE handle)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Parse ucl script failed, error code: %d"), error);
 		goto ERROR_END;
 	}
+	printf("UCL/XML done");
 	//Initialize Device Manager
 	error = InitDeviceManager(pLibVars);
 	if( (error != MFGLIB_ERROR_SUCCESS) && (error != MFGLIB_ERROR_ALREADY_EXIST) )
@@ -377,8 +382,10 @@ DWORD MfgLib_InitializeOperation(INSTANCE_HANDLE handle)
 		goto ERROR_END;
 	}
 	//scan devices
+	printf("device Manager done");
 	AutoScanDevice(pLibVars, pLibVars->g_iMaxBoardNum);
 	//Initialize command operation object
+	printf("autoscan done");
 	for(int i=0; i<pLibVars->g_iMaxBoardNum; i++)
 	{
 		error = InitCmdOperation(pLibVars, i);
@@ -882,11 +889,12 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	//for use atl convert macro, A2T
 	//USES_CONVERSION;
 	//read Ucl.xml
-	pLibVars->g_strUclFilename = "C:\\Users\\B48406\\Downloads\\mfgtools\\Profiles\\Linux\\OS Firmware\\ucl2.xml";
-	int pos = pLibVars->g_strUclFilename.ReverseFind(_T('\\'));
+//	pLibVars->g_strUclFilename = "ucl2.xml";
+	int pos = pLibVars->g_strUclFilename.ReverseFind(_T('/'));
 	pLibVars->g_strPath = pLibVars->g_strUclFilename.Left(pos+1);  //+1 for add '\' at the last
 
-	
+	printf("%s is the path\n",pLibVars->g_strPath.c_str());
+	printf("%s is the filename\n",pLibVars->g_strUclFilename.c_str());
 	CAnsiString uclString;
 	FILE* UclXmlFile = _tfopen(pLibVars->g_strUclFilename, _T("r"));
 	
@@ -902,7 +910,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	// Load xml file content
 #ifdef __linux__	
 	pLibVars->g_pXmlHandler->Load(uclString);
-	
+	printf("loaded xml");
 #else
 
 	int len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, uclString, -1, NULL, 0);
@@ -2500,22 +2508,20 @@ DWORD InitDeviceManager(MFGLIB_VARS *pLibVars)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_WARNING, _T("DeviceManager object has been existed"));
 		return MFGLIB_ERROR_ALREADY_EXIST;
 	}
-
 	try
 	{
+		printf("initDevmanager out function\n");
 		g_pDeviceManager = new DeviceManager((INSTANCE_HANDLE)pLibVars);
 	}
 	catch(...)
 	{
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-
 	if(g_pDeviceManager == NULL)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Create DeviceManager object failed"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	
 	DWORD error = MFGLIB_ERROR_SUCCESS;
 	error = g_pDeviceManager->Open();
 
@@ -2538,10 +2544,11 @@ void AutoScanDevice(MFGLIB_VARS *pLibVars, int iPortUsedNums)
 	BYTE portIndex;
 	CString strPath;
 	CString strFiliter;
+	printf("in AutoScan\n");
 	OP_STATE_ARRAY *pOpStates = GetOpStates(pLibVars);
+	printf(" %p pointer \n",pOpStates);
 	OP_STATE_ARRAY::iterator stateIt = pOpStates->begin();
 	UINT uEnablePorts = 0;
-
 	// Get the list of the USB Hubs
 	DEVICES_ARRAY HubList = g_devClasses[DeviceClass::DeviceTypeUsbHub]->Devices();
 	std::list<Device*>::iterator hub;

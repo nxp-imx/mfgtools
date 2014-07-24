@@ -277,7 +277,7 @@ typedef struct _port_list
 /************************************************************
 * Global variables declaration
 ************************************************************/
-extern CMfgToolLibApp theApp;
+extern CMfgToolLibApp* theApp;
 /*
 extern CUclXml* g_pXmlHandler;
 extern CString g_strPath;
