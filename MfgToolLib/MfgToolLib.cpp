@@ -114,9 +114,8 @@ BOOL CMfgToolLibApp::InitInstance()
 	//::GetModuleFileName(AfxGetStaticModuleState()->m_hCurrentInstanceHandle, _path, MAX_PATH);
 	
 	m_strDllFullPath=_path;
-	int pos = m_strDllFullPath.ReverseFind(_T('/'));
-	m_strDllFullPath = m_strDllFullPath.Left(pos+1);  //+1 for add '\' at the last
-	printf("this is the path %s\n",m_strDllFullPath.c_str());
+	m_strDllFullPath.append("/");
+	
 	g_pLogMgr = NULL;
 	g_hOneInstance = NULL;
 
@@ -144,7 +143,6 @@ DWORD MfgLib_Initialize()
 		return MFGLIB_ERROR_ALREADY_INITIALIZED;
 	}
 #endif
-	printf("initialize hello");
 	return MFGLIB_ERROR_SUCCESS;
 }
 
@@ -245,7 +243,7 @@ DWORD MfgLib_SetProfileName(INSTANCE_HANDLE handle, BYTE_t *strName)
 	}
 
 	pLibVars->g_CfgParam.chip = (char *)strName;
-	pLibVars->g_strUclFilename = theApp->m_strDllFullPath + _T("Profiles") + _T("/") + pLibVars->g_CfgParam.chip + _T("/") + _T("OS Firmware") + _T("/") + DEFAULT_UCL_XML_FILE_NAME;
+	pLibVars->g_strUclFilename = theApp->m_strDllFullPath + _T("Profiles") + _T("/") + pLibVars->g_CfgParam.chip + _T("/") + _T("OS\ Firmware") + _T("/") + DEFAULT_UCL_XML_FILE_NAME;
 
 	return MFGLIB_ERROR_SUCCESS;
 }
@@ -365,7 +363,7 @@ DWORD MfgLib_InitializeOperation(INSTANCE_HANDLE handle)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Initialize log manager failed, error code: %d"), error);
 		goto ERROR_END;
 	}
-	printf("test");
+	
 	//Parse xml
 	error = ParseUclXml(pLibVars);
 	if( (error != MFGLIB_ERROR_SUCCESS) && (error != MFGLIB_ERROR_ALREADY_EXIST) )
@@ -373,7 +371,6 @@ DWORD MfgLib_InitializeOperation(INSTANCE_HANDLE handle)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Parse ucl script failed, error code: %d"), error);
 		goto ERROR_END;
 	}
-	printf("UCL/XML done");
 	//Initialize Device Manager
 	error = InitDeviceManager(pLibVars);
 	if( (error != MFGLIB_ERROR_SUCCESS) && (error != MFGLIB_ERROR_ALREADY_EXIST) )
@@ -382,12 +379,13 @@ DWORD MfgLib_InitializeOperation(INSTANCE_HANDLE handle)
 		goto ERROR_END;
 	}
 	//scan devices
-	printf("device Manager done");
+	printf("device Manager done\n");
 	AutoScanDevice(pLibVars, pLibVars->g_iMaxBoardNum);
 	//Initialize command operation object
-	printf("autoscan done");
+	printf("autoscan done\n");
 	for(int i=0; i<pLibVars->g_iMaxBoardNum; i++)
 	{
+		printf(" about to init CMDop\n");
 		error = InitCmdOperation(pLibVars, i);
 		if(error != MFGLIB_ERROR_SUCCESS)
 		{
@@ -893,8 +891,6 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	int pos = pLibVars->g_strUclFilename.ReverseFind(_T('/'));
 	pLibVars->g_strPath = pLibVars->g_strUclFilename.Left(pos+1);  //+1 for add '\' at the last
 
-	printf("%s is the path\n",pLibVars->g_strPath.c_str());
-	printf("%s is the filename\n",pLibVars->g_strUclFilename.c_str());
 	CAnsiString uclString;
 	FILE* UclXmlFile = _tfopen(pLibVars->g_strUclFilename, _T("r"));
 	
@@ -910,7 +906,6 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	// Load xml file content
 #ifdef __linux__	
 	pLibVars->g_pXmlHandler->Load(uclString);
-	printf("loaded xml");
 #else
 
 	int len = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, uclString, -1, NULL, 0);
@@ -941,6 +936,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	COpState *pState = NULL;
 	CString strTemp;
 	// for each STATE
+	
 	for(; state!=states.end(); ++state)
 	{
 		try
@@ -1070,7 +1066,6 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	}
 	CString strCmdType;
 	COpCommand* pOpCmd;
-
 	XNodes nodes = pCmdList->GetChilds(_T("CMD"));
 	if(nodes.empty())
 	{
@@ -1197,6 +1192,8 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 			pOpCmd->m_pLibVars = (INSTANCE_HANDLE)pLibVars;
 			strTemp = (*it)->GetAttrValue(_T("file"));
 			strTemp = ReplaceKeywords(strTemp);
+			strTemp.TrimLeft();
+			strTemp.TrimRight();
 			if(!strTemp.IsEmpty())
 			{
 				retVal = ((COpCmd_Push*)pOpCmd)->SetFileMapping(strTemp);
@@ -1408,11 +1405,13 @@ COpCmd_Boot::~COpCmd_Boot()
 
 UINT COpCmd_Boot::SetFileMapping(CString &strFile)
 {
+#ifndef __linux__
 	int index = strFile.Find(_T('/'));	//find '/'
 	if(-1 != index)
 	{
 		strFile.Replace(_T('/'), _T('\\'));
 	}
+#endif
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
 #ifndef __linux__
 	FILE* fwFile=_tfopen(m_FileName,_T("r+")); //// need to deny write to other processes
@@ -1602,12 +1601,15 @@ COpCmd_Init::~COpCmd_Init()
 }
 
 UINT COpCmd_Init::SetFileMapping(CString &strFile)
-{
+{	
+	
+#ifndef __linux__
 	int index = strFile.Find(_T('/'));	//find '/'
 	if(-1 != index)
 	{
 		strFile.Replace(_T('/'), _T('\\'));
 	}
+#endif
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
 #ifndef __linux__
 	FILE* fwFile=_tfopen(m_FileName,_T("r"));
@@ -1871,11 +1873,13 @@ UINT COpCmd_Load::ExecuteCommand(int index)
 
 UINT COpCmd_Load::SetFileMapping(CString &strFile)
 {
+#ifndef __linux__
 	int index = strFile.Find(_T('/'));	//find '/'
 	if(-1 != index)
 	{
 		strFile.Replace(_T('/'), _T('\\'));
 	}
+#endif
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
 #ifndef __linux__	
 	FILE* fwFile=_tfopen(m_FileName,_T("r"));
@@ -2074,11 +2078,14 @@ COpCmd_Push::~COpCmd_Push()
 
 UINT COpCmd_Push::SetFileMapping(CString &strFile)
 {
+
+#ifndef __linux__
 	int index = strFile.Find(_T('/'));	//find '/'
 	if(-1 != index)
 	{
 		strFile.Replace(_T('/'), _T('\\'));
 	}
+#endif
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
 
 	FILE* fwFile=_tfopen(m_FileName,_T("r"));
@@ -2475,13 +2482,14 @@ DWORD InitCmdOperation(MFGLIB_VARS *pLibVars, int WndIndex)
 		delete pLibVars->g_CmdOperationArray[WndIndex];
 		pLibVars->g_CmdOperationArray[WndIndex] = NULL;
 	}
+	printf(" InitCmdOperation about to create new CMDOperation\n");
 	pLibVars->g_CmdOperationArray[WndIndex] = new CCmdOpreation((INSTANCE_HANDLE)pLibVars, WndIndex);
 	if(pLibVars->g_CmdOperationArray[WndIndex] == NULL)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Create CCmdOpreation[%d] object failed"), WndIndex);
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-
+	printf("created about to open\n");
 	return (pLibVars->g_CmdOperationArray[WndIndex]->Open());
 }
 
@@ -2510,13 +2518,14 @@ DWORD InitDeviceManager(MFGLIB_VARS *pLibVars)
 	}
 	try
 	{
-		printf("initDevmanager out function\n");
+		
 		g_pDeviceManager = new DeviceManager((INSTANCE_HANDLE)pLibVars);
 	}
 	catch(...)
 	{
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
+	printf("DevManager init creation\n");
 	if(g_pDeviceManager == NULL)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Create DeviceManager object failed"));

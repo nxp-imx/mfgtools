@@ -34,7 +34,7 @@ DEV_CLASS_ARRAY g_devClasses;
 //
 //////////////////////////////////////////////////////////////////////
 //IMPLEMENT_DYNCREATE(DeviceManager, CWinThread)
-
+pthread_t usbThread;
 DeviceManager::DeviceManager(INSTANCE_HANDLE handle)
 : _hUsbDev(NULL)
 , _hUsbHub(NULL)
@@ -64,14 +64,12 @@ DeviceManager::~DeviceManager()
 
 void* DevManagerThreadProc(void* pParam){
 	DeviceManager* pDevManage = (DeviceManager*)pParam;
-	
 	pDevManage->InitInstance();// init the instance that would normally be called by CreateThread on a CWinThread object
 	pDevManage->m_bSelfThreadRunning = true; // set the thread var to running
 	printf("before start event \n");
     	SetEvent(pDevManage->_hStartEvent); // post the event so  Open() can complete
 	printf("after start event\n");
 	while (1){
-
 	    sem_wait( &pDevManage->msgs);
 	    if(pDevManage->DevMgrMsgs.front().message==-1){
 		printf("Dev thread kill msg received\n");
@@ -87,10 +85,19 @@ void* DevManagerThreadProc(void* pParam){
 
 }
 
+void * UsbProcEvents(void * pParam){
+	printf("usb thread inside\n");
+	while(1){
+	    libusb_handle_events_completed(NULL, NULL);
+	    sleep(1);
+	}
+    return NULL;
+}
+
+	
 
 // Create DeviceManager thread
-DWORD DeviceManager::Open()
-{	printf("hellllllo\n");
+DWORD DeviceManager::Open(){
 	//must make sure the DeviceManager thread  is not running
 	if( !_bStopped )
 	{
@@ -125,8 +132,14 @@ DWORD DeviceManager::Open()
 	    libusb_exit(NULL);
 	    return MFGLIB_ERROR_DEV_MANAGER_RUN_FAILED;
 	}	
-
+	
+	rc = pthread_create(&usbThread, NULL, UsbProcEvents, this);
+	if(rc!=0){
+	    printf("usb Thread Fail\n");
+	}
 	int result = pthread_create(&m_hThread, NULL, DevManagerThreadProc, this);
+
+
 	if (result==0) //create DeviceManager thread successfully
 	{
 		printf("created thread successfully\n");
@@ -261,7 +274,7 @@ BOOL DeviceManager::InitInstance()
 	{
 		m_bHasConnected[i] = FALSE;
 	}
-	printf("initInstance DevMgr");
+	printf("initInstance DevMgr\n");
 	m_pExpectionHandler = new CMyExceptionHandler;
 	if(NULL == m_pExpectionHandler)
 	{
@@ -276,6 +289,7 @@ BOOL DeviceManager::InitInstance()
 		return FALSE;
 	}
 	
+	printf("initInstance DevMgr after exception\n");
 	//init all device classes
 	DeviceClass *pDevClass = NULL;
 	try
@@ -312,6 +326,8 @@ BOOL DeviceManager::InitInstance()
 		SetSelfThreadRunStatus(FALSE);
 		return FALSE;
 	}
+	
+	printf("initInstance DevMgr right befor state iterator\n");
 	std::vector<COpState*>::iterator stateIt = pCurrentStates->begin();
 	for(; stateIt!=pCurrentStates->end(); stateIt++)
 	{
@@ -351,6 +367,7 @@ BOOL DeviceManager::InitInstance()
 		case DEV_HID_MX6D:
 		case DEV_HID_MX6SL:
 		case DEV_HID_MX6SX:
+		//	printf("iterator MX6\n");
 			pDevClass = new MxHidDeviceClass(m_pLibHandle);
 			if(pDevClass == NULL)
 			{
@@ -362,13 +379,15 @@ BOOL DeviceManager::InitInstance()
 			pDevClass->Devices();
 			break;
 		case DEV_MSC_UPDATER:	//VolumeDeviceClass and DiskDeviceClass
-			pDevClass = new DiskDeviceClass(m_pLibHandle);
+			printf("msc update iterate\n");
+	    		pDevClass = new DiskDeviceClass(m_pLibHandle);
 			if(pDevClass == NULL)
 			{
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create DiskDeviceClass"));
 				SetSelfThreadRunStatus(FALSE);
 				return FALSE;
 			}
+			printf(" after creation\n");
 			g_devClasses[DeviceClass::DeviceTypeDisk] = pDevClass;
 			(dynamic_cast<DiskDeviceClass *>(g_devClasses[DeviceClass::DeviceTypeDisk]))->Refresh();
 			//don't enum devices
@@ -386,7 +405,7 @@ BOOL DeviceManager::InitInstance()
 			break;
 		}
 	}
-
+	printf("after iterations\n");
 	// Init all the USB Ports.
 	((usb::HubClass*)(g_devClasses[DeviceClass::DeviceTypeUsbHub]))->RefreshHubs();
 
@@ -453,8 +472,9 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
         struct libusb_device_descriptor desc;
         int rc;
         (void)libusb_get_device_descriptor(dev, &desc);
-	switch(event){
-	    LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED: {  // a device matching our PID/VID pairs has shown up
+	switch((int)event){
+	    case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED: {  // a device matching our PID/VID pairs has shown up
+		    printf(" Dev arrival in libusb callback\n");
 		    thread_msg temp;
 		    CString strDesc;
 		    strDesc.Format(_T("vid_%04x&pid_%04x"), desc.idVendor, desc.idProduct);
@@ -465,7 +485,7 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 		    sem_post(&pDevManage->msgs);		  
 		    break;
 		}
-	    LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT: {  //a device matching our PID/VID pair has left
+	    case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT: {  //a device matching our PID/VID pair has left
 		if (handle) {
 		    printf("closed already open device\n");
 		    libusb_close(handle);
@@ -479,6 +499,8 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 	    }
         default:// error for event
             printf("Unhandled event %d\n", event);
+	    printf("evnt arrived %d\n",LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED);
+	    printf("evnt left %d\n",LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT);
 	    return -1;
         }
         return 0;
@@ -640,7 +662,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 	switch( eventType )
 	{
 		case DEVICE_ARRIVAL_EVT:
-		{
+		{	printf("detected an event arrival in msg handler\n");
 			TRACE(_T("Device manager device arrive\r\n"));
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT(%s)"), msg.c_str());
 			pOpStates = GetOpStates((MFGLIB_VARS *)m_pLibHandle);

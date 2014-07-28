@@ -43,14 +43,14 @@ int main (void) {
     libusb_hotplug_callback_handle handle;
     int rc;//////////////0781:5406 
     libusb_init(NULL);
-    rc = libusb_hotplug_register_callback(NULL,(libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT), (libusb_hotplug_flag)0, 0x0781, 0x5406,LIBUSB_HOTPLUG_MATCH_ANY, hotplug_callback, NULL,&handle);
+    rc = libusb_hotplug_register_callback(NULL,(libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT), (libusb_hotplug_flag)0,LIBUSB_HOTPLUG_MATCH_ANY, LIBUSB_HOTPLUG_MATCH_ANY,LIBUSB_HOTPLUG_MATCH_ANY, hotplug_callback, NULL,&handle);
     if (LIBUSB_SUCCESS != rc) {
 	printf("Error creating a hotplug callback\n");
 	libusb_exit(NULL);
 	return EXIT_FAILURE;
     }   
-    while (count < 2) {
-	libusb_handle_events_completed(NULL, NULL);
+    while (count < 20) {
+	//libusb_handle_events_completed(NULL, NULL);
 	sleep(1);
     }
     libusb_hotplug_deregister_callback(NULL, handle);

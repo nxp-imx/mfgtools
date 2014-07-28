@@ -121,7 +121,7 @@ public: CTString() : tstring() { }
 		void TrimLeft(){
 			if (this->empty())
 				return;
-			while (*this->begin()  == _T('\t') || *this->begin() == _T('\n') || *this->begin() == _T('\r')){
+			while (*this->begin()  == _T('\t') || *this->begin() == _T('\n') || *this->begin() == _T('\r') || *this->begin() == _T(' ')){
 				this->erase(this->begin());
 				if (this->empty())
 					return;
@@ -133,7 +133,7 @@ public: CTString() : tstring() { }
 		void TrimRight(){
 			if (this->empty())
 				return;
-			while (this->back() == _T('\t') || this->back() == _T('\n') || this->back() == _T('\r')){
+			while (this->back() == _T('\t') || this->back() == _T('\n') || this->back() == _T('\r') || this->back() == _T(' ')){
 				this->erase(this->length()-1);
 				if (this->empty())
 					return;

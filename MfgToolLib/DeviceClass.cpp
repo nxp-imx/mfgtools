@@ -129,6 +129,7 @@ void DeviceClass::DestroyDevInfoSet()
 }
 
 DWORD DeviceClass::EnumDeviceInterfaceDetails(DWORD index, CString& devPath, PSP_DEVINFO_DATA pDevData)
+
 {
 #if 0 
 	DWORD error;
@@ -161,7 +162,7 @@ DWORD DeviceClass::EnumDeviceInterfaceDetails(DWORD index, CString& devPath, PSP
 	devPath = (PTSTR)detailData->DevicePath;
     free(detailData);
 	#endif
-	return ERROR_SUCCESS;
+	return ERROR_NO_MORE_ITEMS;
 }
 
 //Enum all devices according to GUID

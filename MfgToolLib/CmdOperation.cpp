@@ -112,6 +112,7 @@ DWORD CCmdOpreation::Open()
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 	
+
 	m_bKilled = FALSE;
 	m_bRun = FALSE;
 	m_bDeviceOn = FALSE;
@@ -131,8 +132,8 @@ DWORD CCmdOpreation::Open()
 	}
 	ev_semaphore = new sem_t;
 	sem_init(ev_semaphore, NULL, 0);
-
-	if (pthread_create(&m_pThread, NULL, CmdListThreadProc,this) != 0)
+	
+	if (pthread_create(&m_pThread, NULL, CmdListThreadProc,this) == 0)
 	{
 
 		WaitOnEvent(m_hThreadStartEvent);
@@ -245,6 +246,7 @@ void CCmdOpreation::SetUsbPort(usb::Port* _port)
 BOOL CCmdOpreation::InitInstance()
 {
 	//m_pThread = AfxBeginThread(CmdListThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+	printf(" %p \n",m_hThreadStartEvent);
 	SetEvent(m_hThreadStartEvent);
 	return TRUE;
 }
@@ -451,7 +453,7 @@ void* CmdListThreadProc(void* pParam)
 	DWORD dwStateIndex = 0;
 	CString chip;
 
-
+	
 	if (!pOperation->InitInstance()){
 
 	}

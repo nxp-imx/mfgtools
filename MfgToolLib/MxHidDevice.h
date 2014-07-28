@@ -63,7 +63,8 @@ typedef struct
 /// A MxHidDevice device.
 /// </summary>
 class MxHidDevice : public Device
-{
+{   
+    struct libusb_device_handle *m_Handle;
 public: 
     MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle);
     virtual ~MxHidDevice();

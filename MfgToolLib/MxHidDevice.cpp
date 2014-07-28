@@ -258,9 +258,9 @@ BOOL MxHidDevice::OpenMxHidHandle()
 	return TRUE;
 }
 
-BOOL MxHidDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
+BOOL MxHidDevice::OpenUSBHandle(struct libusb_device_handle** pHandle, CString pipePath)
 {
-#if 0
+#ifndef __linux__
 	*pHandle = CreateFile(pipePath,
 		GENERIC_WRITE | GENERIC_READ,
 		FILE_SHARE_WRITE | FILE_SHARE_READ,
@@ -274,8 +274,18 @@ BOOL MxHidDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("MxHidDevice::OpenUSBHandle() Failed to open (%s) = %d"), pipePath, GetLastError());
 		return FALSE;
 	}
-#endif
+
 	return TRUE;
+#else
+	ret = libusb_open(rdev, pHandle);
+        if (ret)
+		printf(stderr, "Could not open device, ret=%i\n", ret);
+
+
+	
+
+
+#endif
 }
 
 #ifndef DCD_WRITE
@@ -380,7 +390,7 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to initialize memory!"));
 			free(pMemPara);
 			return FALSE;
-		}
+		/}
 		free(pMemPara);
 	}
 
@@ -529,15 +539,37 @@ VOID MxHidDevice::PackSDPCmd(PSDPCmd pSDPCmd)
 
 int MxHidDevice::Write(UCHAR* _buf, ULONG _size)
 {
-#if 0
+
+#ifdef __linux__
+//    struct libusb_device_handle  is the structure of handle
+    int ret;
+    int transferCount=_size;
+    int last_trans = 0;
+    int report=_buf[0];
+    const int control_transfer =
+	LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS |
+	LIBUSB_RECIPIENT_INTERFACE;
+    do{
+    ret = libusb_control_transfer(m_Handle, control_transfer,
+		HID_SET_REPORT,
+		(HID_REPORT_TYPE_OUTPUT << 8) | report,
+		0, _buf+last_trans, _size-last_trans, 1000);
+    last_trans += (ret > 0) ? ret - 1 : 0;
+    if (ret > 0)
+	    ret = 0;
+  
+    }while(last_trans<_size || ret<0);
+    return ret;
+#else
 	int    nBytesWrite; // for bytes actually written
 	if( !WriteFile(m_hid_drive_handle, _buf, _size, (PULONG) &nBytesWrite, NULL) )
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("MxHidDevice::Write() Error writing to device 0x%x."), GetLastError());
 		return MFGLIB_ERROR_CMD_EXECUTE_FAILED;
 	}
-#endif
+
     return ERROR_SUCCESS;
+#endif
 }
 
 // Read from HID device

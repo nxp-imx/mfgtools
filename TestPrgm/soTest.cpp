@@ -16,7 +16,7 @@ int main (int argc,char * argv[]){
     }
     std::map<CString, CString> m_uclKeywords;
     std::map<CString, CString>::const_iterator it;
-    m_uclKeywords["board"] = "sabreadsd";
+    m_uclKeywords["board"] = "sabresd";
     m_uclKeywords["mmc"] = "0";
     m_uclKeywords["sxuboot"]="17x17arm2";
     m_uclKeywords["sxdtb"]="17x17-arm2";
@@ -60,7 +60,10 @@ int main (int argc,char * argv[]){
 	printf("init op Failed code# %d \n",ret);
 	return -1;
     } 
-
+    while(1){
+	sleep(3);
+	printf("tick\n");
+    }
     ret=MfgLib_UninitializeOperation(lib);
     if(ret!=MFGLIB_ERROR_SUCCESS){
 	printf("init op Failed %d\n",ret);
