@@ -67,7 +67,7 @@
 typedef int INT;
 typedef unsigned char BYTE;
 typedef unsigned int UINT;
-typedef unsigned long DWORD;
+typedef unsigned int DWORD;
 typedef unsigned short WORD;
 typedef unsigned char UCHAR;
 //#define BYTE unsigned char
@@ -76,7 +76,7 @@ typedef unsigned char UCHAR;
 //#define WORD unsigned short  /// define windows types for linux
 typedef unsigned short USHORT;
 typedef DWORD DEVINST;
-typedef DWORD HANDLE;
+typedef uint64_t HANDLE;
 typedef struct _GUID {
     unsigned long  Data1;
     unsigned short Data2;
@@ -110,7 +110,7 @@ typedef unsigned int UINT32;
 #define _tstoi64 atoll
 typedef DWORD LRESULT;
 typedef WORD WPARAM;
-typedef DWORD LPARAM;
+typedef uint64_t LPARAM;
 typedef DWORD HWND;
 typedef DWORD HDEVNOTIFY;
 typedef BYTE * PBYTE;

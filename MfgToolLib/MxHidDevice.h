@@ -188,27 +188,27 @@ public:
 
 	typedef struct _ImgFormatDCDData
 	{
-		unsigned long Address;
-		unsigned long Data;
+		uint32_t Address;
+		uint32_t Data;
 	}ImgFormatDCDData, *PImgFormatDCDData;
 
 
 	typedef struct _IvtHeader
 	{
-           unsigned long IvtBarker;
-           unsigned long ImageStartAddr;
-           unsigned long Reserved;
-		   unsigned long DCDAddress;
-		   unsigned long BootData;
-           unsigned long SelfAddr;
-           unsigned long Reserved2[2];
+           uint32_t IvtBarker;
+           uint32_t ImageStartAddr;
+           uint32_t Reserved;
+		   uint32_t DCDAddress;
+		   uint32_t BootData;
+           uint32_t SelfAddr;
+           uint32_t Reserved2[2];
 	}IvtHeader, *PIvtHeader;
 
 	typedef struct _BootData
 	{
-           unsigned long ImageStartAddr;
-           unsigned long ImageSize;
-		   unsigned long PluginFlag;
+           uint32_t ImageStartAddr;
+           uint32_t ImageSize;
+		   uint32_t PluginFlag;
 	}BootData, *PBootData;
 
 	enum MemorySection 

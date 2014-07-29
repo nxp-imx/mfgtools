@@ -26,6 +26,8 @@
 #include "UpdateUIInfo.h"
 
 #ifdef _DEBUG
+
+
 //#define new DEBUG_NEW
 #endif
 
@@ -826,6 +828,7 @@ void DeinitLogManager()
 
 void LogMsg(DWORD moduleID, DWORD levelID, const TCHAR * format, ... )
 {
+    return;
 	TCHAR* buffer;
     va_list args;
     int len;
@@ -1479,6 +1482,7 @@ void COpCmd_Boot::CloseFileMapping()
 
 UINT COpCmd_Boot::ExecuteCommand(int index)
 {
+	printf(" boot cmd execute\n");
 	CString strMsg;
 	strMsg.Format(_T("ExecuteCommand--Boot[WndIndex:%d], File is %s"), index, m_FileName.c_str());
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg.c_str());
@@ -1497,9 +1501,12 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 	strDesc.ReleaseBuffer();
 	((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
 
-	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
+//	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
+	if(1)
 	{
-		MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
+	//	MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
+		
+		MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice);
 		if(pMxHidDevice==NULL)
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("PortMgrDlg(%d)--No MxHidDevice"), index);

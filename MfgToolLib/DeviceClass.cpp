@@ -569,7 +569,15 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path,libusb_device *
 	printf("Add USB device\n");
 	Device *pDevice = CreateDevice(this,devData , _T(""));
 	printf("Create Device %p\n", pDevice);
-	libusb_open(dev,&pDevice->m_libusbdevHandle);
+	int rc=libusb_open(dev,&pDevice->m_libusbdevHandle);
+	 if (LIBUSB_SUCCESS != rc) {
+	    if(rc==LIBUSB_ERROR_ACCESS){
+		printf("failed to open no access\n");
+	    }
+	 printf("could not open USB Device\n");
+	 delete pDevice;
+         return nsInfo;
+	}
 
 	if ( pDevice != NULL )
          {

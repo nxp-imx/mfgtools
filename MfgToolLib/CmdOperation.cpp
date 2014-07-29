@@ -15,6 +15,11 @@
 
 #include "DeviceManager.h"
 
+#undef LogMsg
+#define LogMsg
+
+
+
 extern DEV_CLASS_ARRAY g_devClasses;
 
 //only for debug
@@ -485,8 +490,11 @@ void* CmdListThreadProc(void* pParam)
 				dwTimeout = INFINITE;
 				break;
 			}
+			printf("450 void* CmdListThreadProc(void* pParam)\n");
+
 			if(pOperation->CanRun())
 			{
+			    printf("CanRun\n");
 			    if(!pDevice)
 			    {
 				    //first time to execute
@@ -512,17 +520,17 @@ void* CmdListThreadProc(void* pParam)
 					if(CurrentCommands.size() == 0)
 					{
 						bStateCmdFinished = TRUE;
-                        dwTimeout = INFINITE;
+						 dwTimeout = INFINITE;
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("current state no command, so SetEvent(hDevCanDeleteEvent)"));
 						//SetEvent(pDevice->m_hDevCanDeleteEvent);
-                        TRACE( _T("DeviceCmd is NULL, just finished\n"));
+			                        TRACE( _T("DeviceCmd is NULL, just finished\n"));
 						//pOperation->UpdateUI(&_uiInfo,dwStateIndex);
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceCmd is NULL, just finished."));
 						break;
 					}
 					cmdIt = CurrentCommands.begin();
 					pOperation->m_dwCmdIndex = 1;
-                    bStateCmdFinished = FALSE;
+		                        bStateCmdFinished = FALSE;
 					if(pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 					{
 						chip = ((MxHidDevice*)pDevice)->_chiFamilyName;
@@ -624,6 +632,7 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 	switch(pnsinfo->Event)
 	{
 	case DeviceManager::DEVICE_ARRIVAL_EVT:
+		printf(" device Arrival ChgNotify\n");
 		m_ni.Event = MX_DEVICE_ARRIVAL_EVT;
 		strDesc = pnsinfo->pDevice->_description.get();
 		_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
