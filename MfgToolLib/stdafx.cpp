@@ -64,8 +64,10 @@ int DestroyEvent(myevent * Ev){
 	return ret;
 }
 int CheckArrayOfEvents(myevent *container[], int length){
+	printf(" this is the length %d\n",length);
 	for (int i = 0; i < length; i++){
 		if (CheckEvent(container[i])){
+			printf(" the index returned was %d \n",i);
 			return i;
 		}
 	}

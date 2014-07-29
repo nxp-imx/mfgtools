@@ -31,6 +31,8 @@ CCmdOpreation::CCmdOpreation(INSTANCE_HANDLE handle, int WndIndex)
 	m_usb_port_index = 0;
 	m_pUTP = NULL;
 
+	m_pDevice = NULL;
+
 	m_pLibHandle = handle;
 
 	m_hDeviceChangeCallback = NULL;
@@ -119,6 +121,7 @@ DWORD CCmdOpreation::Open()
 
 	m_usb_hub_name = ((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[m_WndIndex].hubPath;
 	m_usb_port_index = ((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[m_WndIndex].portIndex;
+	printf (" hub name %s port index %d \n",m_usb_hub_name.c_str(),m_usb_port_index);
 	SetUsbPort(FindPort());
 
 	if(g_pDeviceManager != NULL)
@@ -186,7 +189,8 @@ void CCmdOpreation::Close()
 }
 
 MX_DEVICE_STATE CCmdOpreation::GetDeviceState()
-{
+{	
+	return MX_BOOTSTRAP;
 	if(NULL == m_p_usb_port->GetDevice())
 	{
 		return MX_DISCONNECTED;
@@ -259,7 +263,7 @@ BOOL CCmdOpreation::OnStart()
 		{
 			m_pUTP->m_bShouldStop = FALSE;
 		}
-        SetEvent(m_hRunEvent);
+        SetEvent(m_hRunEvent,ev_semaphore);
         return TRUE;
     }
     else
@@ -277,7 +281,7 @@ BOOL CCmdOpreation::OnStop()
 		{
 			m_pUTP->m_bShouldStop = TRUE;
 		}
-        SetEvent(m_hStopEvent);
+        SetEvent(m_hStopEvent,ev_semaphore);
         return TRUE;
     }
     else
@@ -288,11 +292,11 @@ BOOL CCmdOpreation::OnStop()
 }
 
 BOOL CCmdOpreation::OnDeviceArrive()
-{
+{   printf("onDevArrive called \n");
 	if (NULL != (*m_hDeviceArriveEvent).mutex)
     {
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceArriveEvent."), m_WndIndex);
-        SetEvent(m_hDeviceArriveEvent);
+        SetEvent(m_hDeviceArriveEvent,ev_semaphore);
         return TRUE;
     }
     else
@@ -307,7 +311,7 @@ BOOL CCmdOpreation::OnDeviceRemove()
 	if (NULL != (*m_hDeviceRemoveEvent).mutex)
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceRemoveEvent."), m_WndIndex);
-        SetEvent(m_hDeviceRemoveEvent);
+        SetEvent(m_hDeviceRemoveEvent,ev_semaphore);
         return TRUE;
     }
     else
@@ -327,9 +331,9 @@ BOOL CCmdOpreation::CanRun()
 {
     if(m_bRun
 	    //&& m_bDeviceOn
-	    && !m_bKilled
-	    && m_p_usb_port
-	    && m_p_usb_port->Connected())
+	    && !m_bKilled)
+	    //&& m_p_usb_port
+	    //&& m_p_usb_port->Connected())
 	{
 		//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d]-CanRun return TRUE."), m_WndIndex);
 	    return TRUE;
@@ -382,10 +386,12 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 	int dwResult;
 	if (-1 == sem_timedwait(ev_semaphore, &timeToWait)){
 		dwResult = 6;
+		printf("timedout\n");
 	}
 	else{
-		int dwResult = CheckArrayOfEvents(waitHandles, 6);
+		dwResult = CheckArrayOfEvents(waitHandles, 6);
 	}//DWORD dwResult = ::WaitForMultipleObjects(6, &waitHandles[0], FALSE, dwTimeOut);//////////////////////////////
+
 	switch(dwResult)
 	{
 	case 0:  // stop command execution thread
@@ -417,10 +423,12 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 		dwRet = 2;
 		break;
 	case 3: // press the Start button
+		TRACE(_T("WaitForEvent start button \n"));
 		m_bRun = TRUE;
 		dwRet = 3;
 		break;
 	case 4: // press the Stop button
+		TRACE(_T("WaitForEvents stop button \n"));
 		m_bRun = FALSE;
 		dwRet = 4;
 		break;
@@ -457,9 +465,7 @@ void* CmdListThreadProc(void* pParam)
 	if (!pOperation->InitInstance()){
 
 	}
-
 	WaitOnEvent(pOperation->RunFlag);
-
 
 	while(!pOperation->m_bKilled)
 	{
@@ -484,7 +490,7 @@ void* CmdListThreadProc(void* pParam)
 			    if(!pDevice)
 			    {
 				    //first time to execute
-				    pDevice = pOperation->m_p_usb_port->GetDevice();
+				    pDevice = pOperation->m_pDevice;
 					if(!pDevice)
 					{
 						TRACE( _T("DeviceChanged port connected but device not found\n"));
@@ -494,7 +500,7 @@ void* CmdListThreadProc(void* pParam)
 					}
 
 					currentState = pOperation->GetDeviceState();
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d] device chagned and reset to state %d"), pOperation->m_WndIndex, currentState);
+				//	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d] device chagned and reset to state %d"), pOperation->m_WndIndex, currentState);
 					CurrentCommands = ((MFGLIB_VARS *)(pOperation->m_pLibHandle))->g_StateCommands[currentState];
 					dwStateIndex = (DWORD)currentState;
 					pOperation->m_currentState = currentState;
@@ -681,6 +687,8 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 
 	m_usb_hub_name = pnsinfo->Hub;
 	m_usb_port_index = pnsinfo->PortIndex;
+	m_pDevice = pnsinfo->pDevice;
+
 	SetUsbPort(FindPort());
 
 	if( (pnsinfo->Event != DeviceManager::HUB_ARRIVAL_EVT) && (pnsinfo->Event != DeviceManager::HUB_REMOVAL_EVT) )

@@ -143,6 +143,7 @@ DWORD MfgLib_Initialize()
 		return MFGLIB_ERROR_ALREADY_INITIALIZED;
 	}
 #endif
+	libusb_init(NULL);
 	return MFGLIB_ERROR_SUCCESS;
 }
 
@@ -155,6 +156,7 @@ DWORD MfgLib_Uninitialize()
 		g_hOneInstance = NULL;
 	}
 #endif
+	libusb_exit(NULL);
 	return MFGLIB_ERROR_SUCCESS;
 }
 

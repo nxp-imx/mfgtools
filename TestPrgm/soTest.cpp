@@ -4,6 +4,7 @@
 int main (int argc,char * argv[]){
     INSTANCE_HANDLE lib;
     printf("hello\n");
+    OPERATIONS_INFORMATION infoOp;
     int ret=MfgLib_Initialize();
     if(ret!=MFGLIB_ERROR_SUCCESS){
 	printf("Failed to initialize MfgLib\n");
@@ -52,14 +53,36 @@ int main (int argc,char * argv[]){
 
     printf(" this is a test at the top level\n");
 
-
+    OPERATION_INFOMATION *pOpInformation = NULL;
+    pOpInformation = new OPERATION_INFOMATION[1];// has index of how many concurrent boards
+    if(NULL == pOpInformation)
+    {
+	printf(_T("Lack of Memory!!!."));
+	return -1;
+    }
+    infoOp.pOperationInfo = pOpInformation;
 
 
     ret=MfgLib_InitializeOperation(lib);
     if(ret!=MFGLIB_ERROR_SUCCESS){
 	printf("init op Failed code# %d \n",ret);
 	return -1;
-    } 
+    }
+    ret= MfgLib_GetOperationInformation(lib,&infoOp);
+    if(ret!=MFGLIB_ERROR_SUCCESS){
+	printf("Get op info  Failed code# %d \n",ret);
+	return -1;
+    }     
+
+    ret=MfgLib_StartOperation(lib,infoOp.pOperationInfo[0].OperationID);
+    if(ret!=MFGLIB_ERROR_SUCCESS){
+	printf("start op Failed code# %d \n",ret);
+	return -1;
+    }
+    
+
+
+
     while(1){
 	sleep(3);
 	printf("tick\n");

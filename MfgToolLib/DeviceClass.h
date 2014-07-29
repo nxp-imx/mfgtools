@@ -70,7 +70,7 @@ public:
 	virtual std::list<Device*>& Refresh();
 	virtual Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
 
-	virtual NotifyStruct AddUsbDevice(LPCTSTR path);
+	virtual NotifyStruct AddUsbDevice(LPCTSTR path=NULL,struct libusb_device * dev=NULL);
 	virtual NotifyStruct RemoveUsbDevice(LPCTSTR path);
 	virtual Device* FindDeviceByUsbPath(CString pathToFind, const DeviceListType devList, const DeviceListAction devListAction = DeviceListAction_None);
 	

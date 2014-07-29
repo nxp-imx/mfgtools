@@ -491,15 +491,15 @@ Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListTyp
 
 }
 
-DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
+DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path,libusb_device *dev)
 {
-
+#ifndef __linux__
 
 	NotifyStruct nsInfo = {0};
-#if 0
-	Device * pDevice = NULL;
 	CString pathToFind = path + 4;
+	Device * pDevice = NULL;
 
+	
 	int RetryCount = 0;
 	while( RetryCount < RETRY_COUNT )
 	{
@@ -558,8 +558,41 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
 			nsInfo.Device = NULL;
 		}
 	}
-#endif
+
 	return nsInfo;
+#else
+	
+	NotifyStruct nsInfo = {0};
+	SP_DEVINFO_DATA devData;
+	devData.cbSize = sizeof(SP_DEVINFO_DATA);
+
+	printf("Add USB device\n");
+	Device *pDevice = CreateDevice(this,devData , _T(""));
+	printf("Create Device %p\n", pDevice);
+	libusb_open(dev,&pDevice->m_libusbdevHandle);
+
+	if ( pDevice != NULL )
+         {
+         nsInfo.pDevice = pDevice;
+         nsInfo.Type = _deviceClassType;
+         nsInfo.DriverLetter = _T('\0');
+         nsInfo.PortIndex = pDevice->_hubIndex.get();
+         nsInfo.Hub = pDevice->_hub.get();
+                 // Find our Hub in gDeviceManager's list of [Hub].Devices()
+         usb::HubClass* pHubClass = dynamic_cast<usb::HubClass*>(g_devClasses[DeviceClass::DeviceTypeUsbHub]);
+         usb::Hub *pHub = pHubClass->FindHubByPath(nsInfo.Hub);
+                 if(pHub != NULL)
+                 {
+                         nsInfo.HubIndex = pHub->_index.get();
+                 }
+
+                 // Delete device from old device list since it's in our current list
+ //              FindDeviceByUsbPath(pathToFind, DeviceListType_Old, DeviceListAction_Remove);
+         }
+
+	 return nsInfo;
+
+#endif
 }
 
 DeviceClass::NotifyStruct DeviceClass::RemoveUsbDevice(LPCTSTR path)

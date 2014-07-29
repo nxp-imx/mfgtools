@@ -39,6 +39,7 @@ Device* MxHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA
     //An example of value of path: "\\?\hid#vid_413c&pid_2011&mi_01&col02#8&2598dfbd&0&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}"
 
     //add filiters
+	printf("MxHidDeviceClass::CreateDevice\n");
 	OP_STATE_ARRAY *pOpStates = GetOpStates((MFGLIB_VARS *)m_pLibHandle);
 	CString filter;
 	BOOL isRightDevice = FALSE;
@@ -58,6 +59,7 @@ Device* MxHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA
 			break;
 		}
 	}
+	isRightDevice = TRUE; // temp use hard code
 	if(isRightDevice) //OK, find the device
 	{
 		return new MxHidDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);

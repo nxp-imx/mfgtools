@@ -45,7 +45,9 @@ public:
     }UniqueID, *PUniqueID;  
 
     UniqueID m_UniqueID;
-
+	
+	Device *m_pDevice;
+	
 	DWORD Open();
 	void Close();
 	virtual BOOL InitInstance();

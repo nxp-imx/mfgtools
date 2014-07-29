@@ -500,6 +500,35 @@ typedef enum _USB_CONNECTION_STATUS {
 #define ERROR_NOT_ENOUGH_MEMORY          8L    // dderror
 
 #define ERROR_NO_MORE_ITEMS              259L
+
+
+
+
+
+#define HID_SET_REPORT                  0x09
+#define HID_REPORT_TYPE_OUTPUT          0x02
+#define BLTC_CMD_INQUIRY                0x01
+#define BLTC_CMD_DOWNLOAD_FIRMWARE      0x02
+
+#define BLTC_PAGE_INQUIRY_CHIP_INFO     0x01
+
+
+
+
+
+
+
+
+
+
+
+
 #else
-    sjdlfkjasdlk
+
 #endif
+
+
+
+
+
+

@@ -61,16 +61,16 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 	OP_STATE_ARRAY *pOpStates = GetOpStates((MFGLIB_VARS *)m_pLibHandle);
 	OP_STATE_ARRAY::iterator it = pOpStates->begin();
 	COpState *pCurrentState = NULL;
-	for(; it!=pOpStates->end(); it++)
+/*	for(; it!=pOpStates->end(); it++)
 	{
-		filter.Format(_T("vid_%04x&pid_%04x"), (*it)->uiVid, (*it)->uiPid);
-		path.MakeUpper();
-		filter.MakeUpper();
-		if( path.Find(filter) != -1 )
-		{	//find
-			pCurrentState = (*it);
-			break;
-		}
+
+		  if( descObj.idVendor==(*it)->uiVid && descObj.idProduct==(*it)->uiPid )
+		    {       //find
+			  TRACE(_T(" right device \n"));
+			  isRightDevice = TRUE;
+			  pCurrentState = (*it);
+			  break;
+		    }
 	}
 
 	if(pCurrentState)
@@ -80,9 +80,11 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 
 	switch(pCurrentState->opDeviceType)
 	{
-	case DEV_HID_MX6Q:
+	case DEV_HID_MX6Q:*/
 		_chipFamily = MX6Q;
-		break;
+
+		_chiFamilyName = "MX6Q";
+/*		break;
 	case DEV_HID_MX6D:
 		_chipFamily = MX6D;
 		break;
@@ -97,7 +99,7 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 		break;
 	}
 
-	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new MxHidDevice[%p]"), this);
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new MxHidDevice[%p]"), this);*/
 }
 
 void MxHidDevice::Reset(DEVINST devInst, CString path)
@@ -248,17 +250,17 @@ BOOL MxHidDevice::OpenMxHidHandle()
 		return FALSE;
 	}
 
-	// Open the device 
+/*	// Open the device 
     if (!OpenUSBHandle(&m_hid_drive_handle,_path.get()))
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR,  _T(" ERROR: OpenUSBHandle failed."));
 		return FALSE;
     }
-
+*/
 	return TRUE;
 }
 
-BOOL MxHidDevice::OpenUSBHandle(struct libusb_device_handle** pHandle, CString pipePath)
+BOOL MxHidDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 {
 #ifndef __linux__
 	*pHandle = CreateFile(pipePath,
@@ -277,10 +279,12 @@ BOOL MxHidDevice::OpenUSBHandle(struct libusb_device_handle** pHandle, CString p
 
 	return TRUE;
 #else
-	ret = libusb_open(rdev, pHandle);
+	
+/*
+	ret = libusb_open(rdev, &m_libusbdevHandle);
         if (ret)
 		printf(stderr, "Could not open device, ret=%i\n", ret);
-
+*/
 
 	
 

@@ -39,6 +39,10 @@ public:
         HardwareDisabled = 0x00000100,
         NonDynamic = 0x00000200,
     };
+	
+
+
+	struct libusb_device_handle *m_libusbdevHandle;
 
 	typedef struct NotifyStruct
 	{

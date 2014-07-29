@@ -25,7 +25,8 @@ Device::Device(DeviceClass *deviceClass, DEVINST devInst, CString path, INSTANCE
 {
 	m_pLibHandle = handle;
 
-	_classGuid.put(GUID_NULL);
+    return;	
+    _classGuid.put(GUID_NULL);
 	_hubIndex.put(0);
 	_classGuidStr.Empty();
 	_capabilities = Unknown;

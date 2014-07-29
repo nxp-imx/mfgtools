@@ -20,6 +20,8 @@
 #include "MfgToolLib.h"
 #include "ExceptionHandle.h"
 
+#undef LogMsg
+#define LogMsg
 //#include <Dbt.h>
 
 DeviceManager* g_pDeviceManager;
@@ -123,7 +125,6 @@ DWORD DeviceManager::Open(){
 	DWORD dwErrCode = ERROR_SUCCESS;
 	sem_init(&msgs,0,0);
 	libusb_hotplug_callback_handle handle;
-	libusb_init(NULL);
 	int rc;
 	rc = libusb_hotplug_register_callback(NULL,(libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT), (libusb_hotplug_flag)0,LIBUSB_HOTPLUG_MATCH_ANY,LIBUSB_HOTPLUG_MATCH_ANY,LIBUSB_HOTPLUG_MATCH_ANY,DevChange_callback, this,&handle);
 	
@@ -188,7 +189,6 @@ void DeviceManager::Close()
 	// Wait for the DeviceManager thread to die before returninga
 	SetEvent(_hKillEvent);
 	pthread_join(m_hThread,NULL);
-	libusb_exit(NULL);
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Device Manager thread is closed"));
 
 	_bStopped = TRUE;
@@ -479,7 +479,7 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 		    CString strDesc;
 		    strDesc.Format(_T("vid_%04x&pid_%04x"), desc.idVendor, desc.idProduct);
 		    temp.message=DeviceManager::DEVICE_ARRIVAL_EVT;
-		    temp.lParam=(unsigned long)&strDesc;
+		    temp.lParam=(unsigned long)dev;
 		    temp.wParam=NULL;
 		    pDevManage->DevMgrMsgs.push(temp);
 		    sem_post(&pDevManage->msgs);		  
@@ -636,8 +636,10 @@ CString DeviceManager::DevChangeWnd::DrivesFromMask(ULONG UnitMask)
 
 void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 {
-
-	CString msg = (LPCTSTR)desc;
+	struct libusb_device_descriptor descObj;
+	CString msg = "";//(LPCTSTR)desc;
+	(void)libusb_get_device_descriptor((libusb_device*)desc, &descObj);
+	
    // SysFreeString((BSTR)desc);
 	OP_STATE_ARRAY *pOpStates = NULL;
 #if 0
@@ -662,7 +664,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 	switch( eventType )
 	{
 		case DEVICE_ARRIVAL_EVT:
-		{	printf("detected an event arrival in msg handler\n");
+		{	
 			TRACE(_T("Device manager device arrive\r\n"));
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT(%s)"), msg.c_str());
 			pOpStates = GetOpStates((MFGLIB_VARS *)m_pLibHandle);
@@ -677,6 +679,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 			COpState *pCurrentState = NULL;
 			for(; it!=pOpStates->end(); it++)
 			{
+#ifndef __linux__
 				filter.Format(_T("vid_%04x&pid_%04x"), (*it)->uiVid, (*it)->uiPid);
 				msg.MakeUpper();
 				filter.MakeUpper();
@@ -686,6 +689,17 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 					pCurrentState = (*it);
 					break;
 				}
+#else
+				
+				TRACE(_T(" state VID: %x  PID: %x  \t  VID: %x   PID:  %x  for device just plugged in\n"),(*it)->uiVid,(*it)->uiPid,descObj.idVendor,descObj.idProduct);
+				if( descObj.idVendor==(*it)->uiVid && descObj.idProduct==(*it)->uiPid )
+				{	//find
+					TRACE(_T(" right device \n"));
+					isRightDevice = TRUE;
+					pCurrentState = (*it);
+					break;
+				}
+#endif
 			}
 			if(isRightDevice) //OK, find the device
 			{
@@ -693,7 +707,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 				switch(pCurrentState->opDeviceType)
 				{
 				case DEV_HID_MX28:	//Hid
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeHid]->AddUsbDevice(msg);
+					nsInfo = g_devClasses[DeviceClass::DeviceTypeHid]->AddUsbDevice(NULL,(libusb_device *)desc);
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[HidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
 					break;
 
@@ -712,7 +726,8 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 		        case DEV_HID_MX6SL:
 				case DEV_HID_MX6SX:
 				case DEV_HID_MX6Q:	//MxHid
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeMxHid]->AddUsbDevice(msg);
+					TRACE(_T("Creating the device \n"));
+					nsInfo = g_devClasses[DeviceClass::DeviceTypeMxHid]->AddUsbDevice(_T(""),(libusb_device*)desc);
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
 					break;
 				case DEV_MSC_UPDATER:
