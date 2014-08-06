@@ -1375,6 +1375,8 @@ void COpCommand::SetIfDevString(CString &str)
 
 bool COpCommand::IsRun(CString &str)
 {
+	m_ifdev.TrimLeft();
+	m_ifdev.TrimRight();
 	if(m_ifdev.IsEmpty())
 		return true;
 	if(m_ifdev.Find(str,0) >= 0)
@@ -1501,8 +1503,8 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 	strDesc.ReleaseBuffer();
 	((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
 
-//	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
-	if(1)
+	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
+//	if(1)
 	{
 	//	MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
 		
@@ -1711,9 +1713,9 @@ UINT COpCmd_Init::ExecuteCommand(int index)
 	strDesc.ReleaseBuffer();
 	((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
 
-	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
+	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 	{
-		MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
+		MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice);//_usb_port->GetDevice());
 		if(pMxHidDevice==NULL)
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("PortMgrDlg(%d)--No MxHidDevice"), index);
@@ -1797,9 +1799,9 @@ UINT COpCmd_Load::ExecuteCommand(int index)
 	strDesc.ReleaseBuffer();
 	((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
 
-	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
+	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 	{
-		MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
+		MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice);//_usb_port->GetDevice());
 		if(pMxHidDevice==NULL)
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("PortMgrDlg(%d)--No MxHidDevice"), index);
@@ -2016,10 +2018,10 @@ UINT COpCmd_Jump::ExecuteCommand(int index)
 	_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 	strDesc.ReleaseBuffer();
 	((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
-
-	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
+//if (1)
+	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 	{
-		MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
+		MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice);//_usb_port->GetDevice());
 		if(pMxHidDevice==NULL)
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("PortMgrDlg(%d)--No MxHidDevice"), index);

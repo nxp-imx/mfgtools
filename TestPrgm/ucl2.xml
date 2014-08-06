@@ -30,6 +30,7 @@
 
   <LIST name="SDCard" desc="Choose SD Card as media">
 	<CMD state="BootStrap" type="boot" body="BootStrap" file ="firmware/u-boot-imx6q%board%_sd.imx" ifdev="MX6Q">Loading U-boot</CMD>
+	<CMD state="BootStrap" type="jump" > Jumping to OS image. </CMD>
 	<CMD state="BootStrap" type="boot" body="BootStrap" file ="firmware/u-boot-imx6dl%board%_sd.imx" ifdev="MX6D">Loading U-boot</CMD>
 	<CMD state="BootStrap" type="boot" body="BootStrap" file ="firmware/u-boot-imx6slevk_sd.imx" ifdev="MX6SL">Loading U-boot</CMD>
 	<CMD state="BootStrap" type="boot" body="BootStrap" file ="firmware/u-boot-imx6sx%sxuboot%_sd.imx" ifdev="MX6SX">Loading U-boot</CMD>

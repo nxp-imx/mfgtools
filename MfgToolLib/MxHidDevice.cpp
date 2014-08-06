@@ -219,8 +219,8 @@ int MxHidDevice::AllocateIoBuffers()
     }
 #endif
 
-     m_pWriteReport = (_MX_HID_DATA_REPORT*)malloc(64);
-     m_pReadReport = (_MX_HID_DATA_REPORT*)malloc(64);
+     m_pWriteReport = (_MX_HID_DATA_REPORT*)malloc(1025);
+     m_pReadReport = (_MX_HID_DATA_REPORT*)malloc(1025);
 
 	return ERROR_SUCCESS;
 }
@@ -479,13 +479,14 @@ BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount)
 			return FALSE;
 		}
 
-		UINT MaxHidTransSize = m_Capabilities.OutputReportByteLength -1;
+		UINT MaxHidTransSize = 1025 -1;
 	    
 		while(RegCount > 0)
 		{
 			UINT ByteCntTransfered = (RegCount > MaxHidTransSize) ? MaxHidTransSize : RegCount;
+			printf(" the bytecnt is %d\n",ByteCntTransfered);
+			//ByteCntTransfered = 1025;
 			RegCount -= ByteCntTransfered;
-
 			if(!SendData(DataBuf, ByteCntTransfered))
 			{
 				return FALSE;
@@ -519,9 +520,9 @@ VOID MxHidDevice::PackSDPCmd(PSDPCmd pSDPCmd)
 	{
 		return;
 	}
-    memset((UCHAR *)m_pWriteReport, 0, 64);
+    memset((UCHAR *)m_pWriteReport, 0, 1025);
     m_pWriteReport->ReportId = (unsigned char)REPORT_ID_SDP_CMD;
-    PLONG pTmpSDPCmd = (PLONG)(m_pWriteReport->Payload);
+    uint32_t* pTmpSDPCmd = (uint32_t*)(m_pWriteReport->Payload);
 
 	pTmpSDPCmd[0] = (  ((pSDPCmd->address  & 0x00FF0000) << 8) 
 		          | ((pSDPCmd->address  & 0xFF000000) >> 8) 
@@ -556,16 +557,16 @@ int MxHidDevice::Write(UCHAR* _buf, ULONG _size)
     const int control_transfer =
 	LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS |
 	LIBUSB_RECIPIENT_INTERFACE;
-    do{
+   // do{
     ret = libusb_control_transfer(m_libusbdevHandle, control_transfer,
 		HID_SET_REPORT,
 		(HID_REPORT_TYPE_OUTPUT << 8) | report,
-		0, _buf+last_trans, _size-last_trans, 1000);
+		0, _buf+last_trans, _size, 1000);
     last_trans += (ret > 0) ? ret - 1 : 0;
     if (ret > 0)
 	    ret = 0;
   
-    }while(last_trans<_size || ret<0);
+   // }while(last_trans<_size || ret<0);
     return ret;
 #else
 	int    nBytesWrite; // for bytes actually written
@@ -584,15 +585,24 @@ int MxHidDevice::Read(void* _buf, UINT _size)
 {
 	int    nBytesRead; // for bytes actually read
 
-	sleep(35);
-#if 0
+	
+#ifndef __linux__
 	if( !ReadFile(m_hid_drive_handle, _buf, _size, (PULONG) &nBytesRead, NULL) )
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("MxHidDevice::Read() Error reading from device 0x%x."), GetLastError());
 		return GetLastError();
 	}
-#endif
 	return ERROR_SUCCESS;
+
+#else
+	const int interrupt_transfer =  LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN;
+	int ret = libusb_interrupt_transfer(m_libusbdevHandle, interrupt_transfer,(unsigned char *) _buf, _size, &nBytesRead, 10000);
+	if(ret!=0){
+	    printf("read failed with num %d size %d \n",ret,_size);
+	    return errno;
+	}
+	return ERROR_SUCCESS;
+#endif
 }
 
 BOOL MxHidDevice::SendCmd(PSDPCmd pSDPCmd)
@@ -605,7 +615,7 @@ BOOL MxHidDevice::SendCmd(PSDPCmd pSDPCmd)
 		return FALSE;
 	}
 	//Send the report to USB HID device
-	if ( Write((unsigned char *)m_pWriteReport, 64) <0)
+	if ( Write((unsigned char *)m_pWriteReport, 17) <0)
 	{
 		return FALSE;
 	}
@@ -619,12 +629,12 @@ BOOL MxHidDevice::SendData(const unsigned char * DataBuf, UINT ByteCnt)
 	{
 		return FALSE;
 	}
-
+	printf(" in SendData the bytecnt is %d\n",ByteCnt);
 	memcpy(m_pWriteReport->Payload, DataBuf, ByteCnt);
 
 	m_pWriteReport->ReportId = REPORT_ID_DATA;
 
-	if (Write((unsigned char *)m_pWriteReport, 64) <0)
+	if (Write((unsigned char *)m_pWriteReport,/*ByteCnt + 1*/1025) <0)
 	{
 		return FALSE;	
 	}
@@ -650,10 +660,10 @@ BOOL MxHidDevice::GetCmdAck(UINT RequiredCmdAck)
 //Report4, Device to Host
 BOOL MxHidDevice::GetDevAck(UINT RequiredCmdAck)
 {
-    memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
-#if 0
+    memset((UCHAR *)m_pReadReport, 0, 1025);
+
     //Get Report4, Device to Host:
-	if ( Read( (UCHAR *)m_pReadReport, m_Capabilities.InputReportByteLength ) != ERROR_SUCCESS)
+	if ( Read( (UCHAR *)m_pReadReport, 1025 ) != ERROR_SUCCESS)
 	{
 		return FALSE;
 	}
@@ -663,36 +673,38 @@ BOOL MxHidDevice::GetDevAck(UINT RequiredCmdAck)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("WriteReg(): Invalid write ack: 0x%x\n"), ((PULONG)m_pReadReport)[0]);
 		return FALSE; 
 	}
-#endif
     return TRUE;
 }
 
 //Device to Host
 BOOL MxHidDevice::GetHABType()
 {
-#if 0
+
     CString LogStr;
-    memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
+    memset((UCHAR *)m_pReadReport, 0, 1025);
 
     //Get Report3, Device to Host:
     //4 bytes HAB mode indicating Production/Development part
-	if ( Read( (UCHAR *)m_pReadReport, m_Capabilities.InputReportByteLength )  != ERROR_SUCCESS)
+	if ( Read( (UCHAR *)m_pReadReport, 1025 )  != ERROR_SUCCESS)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to read HAB type from ROM!!!"));  
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to read HAB type from ROM!!!"));  		
+		printf("read HAB failed\n");
 		return FALSE;
 	}
+	printf("read HAB succeeded\n");
 	if ( (*(unsigned int *)(m_pReadReport->Payload) != HabEnabled)  && 
 		 (*(unsigned int *)(m_pReadReport->Payload) != HabDisabled) ) 
 	{
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("HAB type mismatch: 0x%x!!!"), *(unsigned int *)(m_pReadReport->Payload));    
 		return FALSE;	
 	}
-#endif
+
 	return TRUE;
 }
 
 BOOL MxHidDevice::Jump()
 {
+    printf("in jump command %x \n",m_jumpAddr);
 	//Create device handle and report id
     OpenMxHidHandle();
     
@@ -727,11 +739,11 @@ BOOL MxHidDevice::Jump(UINT RAMAddress)
 
 	}
 
-//	if(!GetHABType())
-//    {
-//        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to get HAB type from ROM, ignoredro!!!"));
-//        return FALSE;
-//    }
+	if(!GetHABType())
+    {
+        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to get HAB type from ROM, ignoredro!!!"));
+        return FALSE;
+    }
 	
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("*********MxHidDevice[%p] Jump to Ramkernel successfully!**********"), this);
 	
@@ -997,20 +1009,19 @@ BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * 
     SDPCmd.format = 0;
     SDPCmd.data = 0;
     SDPCmd.address = address;
-
+    printf(" address is %x \n",address);
 	if(!SendCmd(&SDPCmd))
 		return FALSE;
     
-    sleep(10);
+   
 
-    UINT MaxHidTransSize = m_Capabilities.OutputReportByteLength -1;
+    UINT MaxHidTransSize = 1025 - 1;
     UINT TransSize;
     
     while(byteCount > 0)
     {
         TransSize = (byteCount > MaxHidTransSize) ? MaxHidTransSize : byteCount;
-
-		if(!SendData(pBuf, TransSize))
+	if(!SendData(pBuf,TransSize ))
 			return FALSE;
 
         byteCount -= TransSize;
@@ -1114,15 +1125,15 @@ BOOL MxHidDevice::ReadData(UINT address, UINT byteCount, unsigned char * pBuf)
 	if(!GetHABType())
 		return FALSE;
 
-    UINT MaxHidTransSize = m_Capabilities.InputReportByteLength -1;
+    UINT MaxHidTransSize = 1025 -1;
     
     while(byteCount > 0)
     {
         UINT TransSize = (byteCount > MaxHidTransSize) ? MaxHidTransSize : byteCount;
 
-        memset((UCHAR *)m_pReadReport, 0, m_Capabilities.InputReportByteLength);
+        memset((UCHAR *)m_pReadReport, 0, 1025);
 
-        if ( Read( (UCHAR *)m_pReadReport, m_Capabilities.InputReportByteLength )  != ERROR_SUCCESS)
+        if ( Read( (UCHAR *)m_pReadReport, 1025 )  != ERROR_SUCCESS)
         {
             return FALSE;
         }

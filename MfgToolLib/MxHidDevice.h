@@ -145,10 +145,10 @@ public:
 	{
         short command;
         char format;
-        UINT address;
-        UINT dataCount;
-        UINT data;
-	}SDPCmd, * PSDPCmd;
+        uint32_t address;
+        uint32_t dataCount;
+        uint32_t data;
+	} __attribute__ ((__packed__)) SDPCmd, * PSDPCmd;
 
 	#pragma pack(1)
     typedef struct _MX_HID_DATA_REPORT
@@ -198,8 +198,8 @@ public:
            uint32_t IvtBarker;
            uint32_t ImageStartAddr;
            uint32_t Reserved;
-		   uint32_t DCDAddress;
-		   uint32_t BootData;
+	   uint32_t DCDAddress;
+	   uint32_t BootData;
            uint32_t SelfAddr;
            uint32_t Reserved2[2];
 	}IvtHeader, *PIvtHeader;
@@ -208,7 +208,7 @@ public:
 	{
            uint32_t ImageStartAddr;
            uint32_t ImageSize;
-		   uint32_t PluginFlag;
+	   uint32_t PluginFlag;
 	}BootData, *PBootData;
 
 	enum MemorySection 

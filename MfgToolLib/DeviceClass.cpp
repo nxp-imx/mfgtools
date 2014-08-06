@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2013, Freescale Semiconductor, Inc. All Rights Reserved.
+ n Copyright (C) 2009-2013, Freescale Semiconductor, Inc. All Rights Reserved.
  * THIS SOURCE CODE IS CONFIDENTIAL AND PROPRIETARY AND MAY NOT
  * BE USED OR DISTRIBUTED WITHOUT THE WRITTEN PERMISSION OF
  * Freescale Semiconductor, Inc.
@@ -574,10 +574,20 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path,libusb_device *
 	    if(rc==LIBUSB_ERROR_ACCESS){
 		printf("failed to open no access\n");
 	    }
-	 printf("could not open USB Device\n");
-	 delete pDevice;
-         return nsInfo;
+	    printf("could not open USB Device\n");
+	    delete pDevice;
+	    return nsInfo;
 	}
+	if (libusb_kernel_driver_active(pDevice->m_libusbdevHandle, 0)){
+               libusb_detach_kernel_driver(pDevice->m_libusbdevHandle, 0);
+	}
+
+        rc = libusb_claim_interface(pDevice->m_libusbdevHandle, 0);
+	if (rc) {
+                fprintf(stderr, "Failed to claim interface\n");
+		delete pDevice;
+		return nsInfo;
+         }
 
 	if ( pDevice != NULL )
          {
