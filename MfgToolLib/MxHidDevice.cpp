@@ -1009,7 +1009,7 @@ BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * 
     SDPCmd.format = 0;
     SDPCmd.data = 0;
     SDPCmd.address = address;
-    printf(" address is %x \n",address);
+    printf(" Trans Data address is %x \n",address);
 	if(!SendCmd(&SDPCmd))
 		return FALSE;
     

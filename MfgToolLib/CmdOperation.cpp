@@ -537,7 +537,7 @@ void* CmdListThreadProc(void* pParam)
 				}
 				
 				COpCommand *pCmd = (*cmdIt);
-				printf(" command description %s and body string %s \n",pCmd->GetDescString().c_str(),pCmd->GetBodyString().c_str());
+				printf(" command description \"%s\" and body string \"%s\" \n",pCmd->GetDescString().c_str(),pCmd->GetBodyString().c_str());
 				if(pCmd->IsRun(chip))
 				{
 					dwError = pCmd->ExecuteCommand(pOperation->m_WndIndex);

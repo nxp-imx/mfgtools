@@ -1161,6 +1161,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 			}
 
 			strTemp = (*it)->GetAttrValue(_T("address"));
+			printf("address from XML %s \n",strTemp.c_str());
 			strTemp = ReplaceKeywords(strTemp);
 			((COpCmd_Load*)pOpCmd)->SetAddress(strTemp);
 
@@ -1967,11 +1968,16 @@ DWORD COpCmd_Load::GetFileDataSize()
 
 void COpCmd_Load::SetAddress(CString &strAddr)
 {
+	
+	printf("strAddrLen = %d \n",strAddr.GetLength());
 	if(strAddr.Find(_T("0x")) != -1)
 	{
 		strAddr = strAddr.Right(strAddr.GetLength()-2);
 	}
+	printf("strAddr = %s \n",strAddr.c_str());
+	printf("number equivalent %x \n",(UINT)_tcstoul(LPCTSTR(strAddr), NULL, 16));
 	m_address = (UINT)_tcstoul(LPCTSTR(strAddr), NULL, 16);
+	
 }
 
 void COpCmd_Load::SetloadSection(CString &str)

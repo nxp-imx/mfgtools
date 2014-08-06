@@ -271,7 +271,7 @@ public: CTString() : tstring() { }
 		CTString<T> Right(int nCount) const{
 			if (nCount > this->length())
 				return *this;
-			return this->substr(nCount, this->length() - nCount);
+			return this->substr(this->length()-nCount,  nCount);
 		}
 
 		
