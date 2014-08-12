@@ -331,6 +331,7 @@ BOOL DeviceManager::InitInstance()
 	std::vector<COpState*>::iterator stateIt = pCurrentStates->begin();
 	for(; stateIt!=pCurrentStates->end(); stateIt++)
 	{
+		
 		switch((*stateIt)->opDeviceType)
 		{
 		case DEV_HID_MX28:
@@ -367,7 +368,7 @@ BOOL DeviceManager::InitInstance()
 		case DEV_HID_MX6D:
 		case DEV_HID_MX6SL:
 		case DEV_HID_MX6SX:
-		//	printf("iterator MX6\n");
+			printf("iterator MX6\n");
 			pDevClass = new MxHidDeviceClass(m_pLibHandle);
 			if(pDevClass == NULL)
 			{
@@ -477,8 +478,15 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 		    printf(" Dev arrival in libusb callback\n");
 		    thread_msg temp;
 		    CString strDesc;
-		    strDesc.Format(_T("vid_%04x&pid_%04x"), desc.idVendor, desc.idProduct);
-		    temp.message=DeviceManager::DEVICE_ARRIVAL_EVT;
+		    strDesc.Format(_T("vid_%04x&pid_%04x"),desc.idVendor, desc.idProduct);
+		    printf(" device class num : %d \n",desc.bDeviceClass);
+		    printf(" device arrival VID: %d \t PID: %d  volume pid: %x vid: %x\n", desc.idVendor,desc.idProduct,0x066f,0x37FF);
+		    if(desc.idVendor==0x066f &&desc.idProduct==0x37FF){//(desc.bDeviceClass==LIBUSB_CLASS_MASS_STORAGE){
+			temp.message=DeviceManager::VOLUME_ARRIVAL_EVT;
+		    }
+		    else{
+			temp.message=DeviceManager::DEVICE_ARRIVAL_EVT;
+		    }
 		    temp.lParam=(unsigned long)dev;
 		    temp.wParam=NULL;
 		    pDevManage->DevMgrMsgs.push(temp);
@@ -652,7 +660,8 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 #endif
 	//Skip MSC device message if there is no MSC device required.
 	if(VOLUME_ARRIVAL_EVT == eventType || VOLUME_REMOVAL_EVT == eventType)
-	{
+	{	
+		printf(" volume arrival detected  VID: %x \tPID: %x  \n",descObj.idVendor, descObj.idProduct);
 		if(g_devClasses[DeviceClass::DeviceTypeMsc]->m_msc_vid == 0x00 && 
 			g_devClasses[DeviceClass::DeviceTypeMsc]->m_msc_pid == 0x00)
 		{
@@ -912,6 +921,8 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 
 			g_devClasses[DeviceClass::DeviceTypeDisk]->Refresh();
 
+#ifndef __linux__
+
 			for ( msgLetterIndex = 0; msgLetterIndex < msg.GetLength(); ++msgLetterIndex )
 			{
 				driveLetterStr = msg.substr(msgLetterIndex,1);
@@ -927,6 +938,27 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 					Notify(&nsInfo);
 				}
 			}
+
+
+#else
+
+
+			DeviceClass::NotifyStruct nsInfo = g_devClasses[DeviceClass::DeviceTypeMsc]->AddUsbDevice(driveLetterStr);
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT-Disk(%s), Hub:%d-Port:%d"), driveLetterStr.c_str(), nsInfo.HubIndex, nsInfo.PortIndex);
+			if(nsInfo.pDevice)
+			{
+				//QueryPerformanceFrequency(&g_tc);
+				//QueryPerformanceCounter(&g_t1);
+
+				nsInfo.Event = VOLUME_ARRIVAL_EVT;
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT, Notify"));
+				Notify(&nsInfo);
+			}
+
+#endif
+
+
+
 			break;
 		} //end case VOLUME_ARRIVAL_EVT
 		case VOLUME_REMOVAL_EVT:
