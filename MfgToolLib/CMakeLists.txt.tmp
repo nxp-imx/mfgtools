@@ -19,8 +19,10 @@ cmake_minimum_required (VERSION 2.6)
 #  endif(POLICY CMP0015)
 #endif(COMMAND cmake_policy)
 
+#find_package(libusb-1.0 REQUIRED)
 
 
+#include_directories (${PROJECT_SOURCE_DIR}  {LIBUSB_1_INCLUDE_DIRS} )
 project( MfgToolLib )
 
     set(SOURCES_files
@@ -119,7 +121,7 @@ project( MfgToolLib )
     ${SOURCES_Header_Files}
   )
 
-include_directories(BEFORE ${PROJECT_SOURCE_DIR})
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}  )
 SET( CMAKE_VERBOSE_MAKEFILE on )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -167,8 +169,8 @@ if(TARGET MfgToolLib)
     _WINDOWS
   )
 endif(TARGET MfgToolLib)
-set (CMAKE_CXX_FLAGS "-std=c++11")
+set (CMAKE_CXX_FLAGS "-std=c++11 -fpic `pkg-config --libs --cflags libusb-1.0` -g")
 set(SOURCES ${SOURCES_})
 
-add_library( MfgToolLib SHARED ${SOURCES} )
+add_library( MfgToolLib ${SOURCES} )
 

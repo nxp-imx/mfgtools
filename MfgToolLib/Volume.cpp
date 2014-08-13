@@ -169,6 +169,7 @@ bool Volume::IsUsb()
 {
 	CString path = _path.get();
 	path.MakeUpper();
+	printf(" the path is %s \n",path.c_str());
 	if ( path.Find(_T("REMOVABLEMEDIA")) != -1 )
 		return true;
 	else if ( path.Find(_T("USBSTOR")) != -1 )
