@@ -17,9 +17,9 @@ public:
 	virtual ~Disk(void);
 
 	//PROPERTIES
-	class driveNumber : public Int32Property 
-	{ 
-	public: 
-		int get(); 
+	class driveNumber : public Int32Property
+	{
+	public:
+		int get();
 	}_driveNumber;
 };

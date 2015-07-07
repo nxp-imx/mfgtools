@@ -37,5 +37,3 @@ public:
 public:
     CString ToString() { return _T("MxRomDeviceClass"); }
 };
-
-

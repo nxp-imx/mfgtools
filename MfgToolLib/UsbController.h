@@ -25,5 +25,3 @@ namespace usb
 		StringProperty _rootHubFilename; //the root hub name, also the root hub path
 	};
 }	// namespace usb
-
-

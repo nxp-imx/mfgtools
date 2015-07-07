@@ -42,9 +42,9 @@ namespace api
 	#define ST_SCSIOP_UTP						0xF0
 
 	enum _API_TYPE {
-		API_TYPE_ST_SCSI =0, 
-		API_TYPE_SCSI    =1, 
-		API_TYPE_BLTC    =2, 
+		API_TYPE_ST_SCSI =0,
+		API_TYPE_SCSI    =1,
+		API_TYPE_BLTC    =2,
 		API_TYPE_PITC    =3,
 		API_TYPE_ST_MTP  =4,
 		API_TYPE_UTP     =5
@@ -53,16 +53,16 @@ namespace api
 	const UCHAR ST_READ_CMD=0, ST_WRITE_CMD=1, ST_WRITE_CMD_PLUS_DATA=2;
 
 	enum _DDI_COMMAND_SET {
-		DDI_GET_PROTOCOL_VERSION				= 0x00,					
-		DDI_GET_STATUS							= 0x01,							
-		DDI_GET_LOGICAL_MEDIA_INFO				= 0x02,							
-		DDI_GET_ALLOCATION_TABLE				= 0x05,							
-		DDI_SET_ALLOCATE_TABLE					= 0x06,									
-		DDI_ERASE_LOGICAL_MEDIA					= 0x07,									
-		DDI_ERASE_LOGICAL_MEDIA_ASYNC			= 0x08,									
-		DDI_GET_LOGICAL_DRIVE_INFO				= 0x12,									
-		DDI_READ_LOGICAL_DRIVE_SECTOR			= 0x13,									
-		DDI_SET_LOGICAL_DRIVE_INFO				= 0x20,									
+		DDI_GET_PROTOCOL_VERSION				= 0x00,
+		DDI_GET_STATUS							= 0x01,
+		DDI_GET_LOGICAL_MEDIA_INFO				= 0x02,
+		DDI_GET_ALLOCATION_TABLE				= 0x05,
+		DDI_SET_ALLOCATE_TABLE					= 0x06,
+		DDI_ERASE_LOGICAL_MEDIA					= 0x07,
+		DDI_ERASE_LOGICAL_MEDIA_ASYNC			= 0x08,
+		DDI_GET_LOGICAL_DRIVE_INFO				= 0x12,
+		DDI_READ_LOGICAL_DRIVE_SECTOR			= 0x13,
+		DDI_SET_LOGICAL_DRIVE_INFO				= 0x20,
 		DDI_WRITE_LOGICAL_DRIVE_SECTOR			= 0x23,
 		DDI_ERASE_LOGICAL_DRIVE					= 0x2f,
 		DDI_GET_CHIP_MAJOR_REV_ID				= 0x30,
@@ -198,11 +198,11 @@ namespace api
 		};
 
 		// API_TYPE_UTP
-		// 
+		//
 		//
 		struct _CDBUTP16 {
 			UCHAR OperationCode;		// 0xF0 - ST_SCSIOP_UTP
-			UCHAR Command;			// 
+			UCHAR Command;			//
 			UINT Tag;
 			__int64 LParam;
 			UCHAR Reserved[2];
@@ -239,7 +239,7 @@ namespace api
 			, _responseStr(_T(""))
 			, _responseDataPtr(NULL)
 		{};
-        virtual ~StApi(); 
+        virtual ~StApi();
 		const UCHAR IsWriteCmd() const { return _write; };
 		const UINT GetTransferSize() const { return _xferLength; };
 		const UINT GetTimeout() const { return _timeout; };
@@ -269,7 +269,7 @@ namespace api
 		};
 
         virtual	void PrepareCommand() {};
-		
+
 		// Used mainly for UI support. Most applications
 		// should provide all necessary Parameters and/or Data
 		// at construction time.
@@ -320,7 +320,7 @@ namespace api
 		}
 */
 		// Creates a string representing space separated data bytes (*pByte)
-		// with a 4-digit hex address per line. Number of bytes displayed 
+		// with a 4-digit hex address per line. Number of bytes displayed
 		// per line is specified by width. Data word sizes is specified by wordSize.
 		void FormatReadResponse(const UCHAR* const pByte, const UCHAR width, const UCHAR wordSize = 1)
 		{
@@ -350,7 +350,7 @@ namespace api
 				}
 			}
 		}
-		
+
 		class SenseKey
 		{
 		public:
@@ -475,11 +475,11 @@ namespace api
 
 		// Use ONLY for creating runtime commands
 		// This info should be calculated/set as required for each StApi class definition
-		void SetWriteCmd(UCHAR write) { _write = write; }; 
+		void SetWriteCmd(UCHAR write) { _write = write; };
 		void SetTransferSize(UINT xferLength) { _xferLength = xferLength; };
 
 	protected:
-		// 
+		//
 		UINT _tag;
 		UCHAR _write;
 		UINT _xferLength;
@@ -557,7 +557,7 @@ namespace api
 					break;
 				case ProtocolUpdater2:
 					_responseStr.Format(_T("ProtocolUpdater2 (%d.%d):\r\n    Extends ProtocolUpdater to include DDI_GET_DEVICE_PROPERTIES.\r\n    Does not include Janus support."), GetMajorVersion(), GetMinorVersion());
-					break;						   
+					break;
 				case ProtocolUpdaterJanus:
 					_responseStr.Format(_T("ProtocolUpdaterJanus (%d.%d):\r\n    Extends ProtocolUpdater to include Janus support."), GetMajorVersion(), GetMinorVersion());
 					break;
@@ -607,7 +607,7 @@ namespace api
 			assert( count >= _xferLength );
 
 			_chipId = Swap2(pData);
-			_responseStr.Format(_T("chipId: 0x%04X"), GetChipMajorRevId());	
+			_responseStr.Format(_T("chipId: 0x%04X"), GetChipMajorRevId());
 		};
 
 		USHORT GetChipMajorRevId() { return _chipId; };
@@ -639,7 +639,7 @@ namespace api
 			assert( count >= _xferLength );
 
 			_chipRev = Swap2(pData);;
-			_responseStr.Format(_T("chipRev: 0x%04X"), GetChipPartRevId());	
+			_responseStr.Format(_T("chipRev: 0x%04X"), GetChipPartRevId());
 		};
 
 		USHORT GetChipPartRevId() { return _chipRev; };
@@ -671,7 +671,7 @@ namespace api
 			assert( count >= _xferLength );
 
 			_romRev = Swap2(pData);
-			_responseStr.Format(_T("romRev: 0x%04X"), GetROMRevId());	
+			_responseStr.Format(_T("romRev: 0x%04X"), GetROMRevId());
 		};
 
 		USHORT GetROMRevId() { return _romRev; };
@@ -703,7 +703,7 @@ namespace api
 			assert( count >= _xferLength );
 
 			_status = Swap2(pData);
-			_responseStr.Format(_T("status: 0x%04X"), GetStatus());	
+			_responseStr.Format(_T("status: 0x%04X"), GetStatus());
 		};
 
 		USHORT GetStatus() { return _status; };
@@ -766,7 +766,7 @@ namespace api
 			_cdb.Command = DDI_GET_LOGICAL_MEDIA_INFO;
 			_cdb.SubCommand = _typeInfo.Value;
 
-			 
+
 			switch(_typeInfo.Value)
 			{
 				case MediaInfoNumberOfDrives:
@@ -962,7 +962,7 @@ namespace api
 		{
 			if( _cdb.SubCommand != MediaInfoPhysicalMediaType )
                 return media::MediaType_Invalid;
-		
+
 			return *(media::PhysicalMediaType*)_responseBuffer;
 		};
 
@@ -973,7 +973,7 @@ namespace api
 
 			return *(USHORT*)_responseBuffer;
 		};
-		
+
 		size_t GetSerialNumber(UCHAR* serialNumber)
 		{
 			if( _cdb.SubCommand != MediaInfoSerialNumber )
@@ -1063,7 +1063,7 @@ namespace api
 			_cdb.DriveNumber = _driveNumber.Value;
 			_cdb.TypeInfo = _typeInfo.Value;
 
-			 
+
 			switch(_typeInfo.Value)
 			{
 				case DriveInfoSectorSizeInBytes:
@@ -1252,7 +1252,7 @@ namespace api
 		{
 			if(_cdb.TypeInfo != DriveInfoType)
                 return media::DriveType_Invalid;
-		
+
             return *(media::LogicalDriveType*)_responseBuffer;
 		};
 		UINT GetTag()
@@ -1262,7 +1262,7 @@ namespace api
 
 			return *(UINT*)_responseBuffer;
 		};
-	    
+
 		int GetComponentVersion(StVersionInfo& version)
 		{
 			if(_cdb.TypeInfo != DriveInfoComponentVersion)
@@ -1274,7 +1274,7 @@ namespace api
 
 			return ERROR_SUCCESS;
 		};
-		
+
 		int GetProjectVersion(StVersionInfo& version)
 		{
 			if(_cdb.TypeInfo != DriveInfoProjectVersion)
@@ -1286,7 +1286,7 @@ namespace api
 
 			return ERROR_SUCCESS;
 		};
-		
+
 		bool IsWriteProtected()
 		{
 			if(_cdb.TypeInfo != DriveInfoIsWriteProtected)
@@ -1294,7 +1294,7 @@ namespace api
 
 			return *(bool*)_responseBuffer;
 		};
-	    
+
 		UINT GetSizeOfSerialNumberInBytes()
 		{
 			if(_cdb.TypeInfo != DriveInfoSizeOfSerialNumberInBytes)
@@ -1343,7 +1343,7 @@ namespace api
 	class StSetLogicalDriveInfo : public StApiT<_ST_SCSI_CDB::_CDBDRIVEINFO16>
 	{
 	public:
-		StSetLogicalDriveInfo(UCHAR driveNumber, _LOGICAL_DRIVE_INFO typeInfo, UCHAR tag) 
+		StSetLogicalDriveInfo(UCHAR driveNumber, _LOGICAL_DRIVE_INFO typeInfo, UCHAR tag)
 			: StApiT<_ST_SCSI_CDB::_CDBDRIVEINFO16>(API_TYPE_ST_SCSI, ST_WRITE_CMD, _T("SetLogicalDriveInfo.tag"))
 		{
 			_cdb.OperationCode = ST_SCSIOP_WRITE;
@@ -1352,8 +1352,8 @@ namespace api
 			_cdb.TypeInfo = (UCHAR)typeInfo; // DriveInfoTag
 			_cdb.Tag = tag;
 		};
-		
-		StSetLogicalDriveInfo(UCHAR driveNumber, _LOGICAL_DRIVE_INFO typeInfo, StVersionInfo& version) 
+
+		StSetLogicalDriveInfo(UCHAR driveNumber, _LOGICAL_DRIVE_INFO typeInfo, StVersionInfo& version)
 			: StApiT<_ST_SCSI_CDB::_CDBDRIVEINFO16>(API_TYPE_ST_SCSI, ST_WRITE_CMD_PLUS_DATA, _T("SetLogicalDriveInfo.ver"))
 		{
 			_cdb.OperationCode = ST_SCSIOP_WRITE;
@@ -1387,7 +1387,7 @@ namespace api
 
 			PrepareCommand();
 		};
-		
+
 		virtual ~StGetLogicalTable() {};
 
 		void ParseCdb()
@@ -1404,7 +1404,7 @@ namespace api
 
             _xferLength = sizeof(USHORT) + (_numEntries.Value * media::MediaAllocationEntry::Size());
 		}
-		
+
 		void ProcessResponse(const UCHAR *const pData, const UINT start, const UINT count)
 		{
 			assert( count >= _xferLength );
@@ -1423,13 +1423,13 @@ namespace api
 				myDrive.Type =  (media::LogicalDriveType)pInfo[1];
 				myDrive.Tag =  (media::LogicalDriveTag)pInfo[2];
 				myDrive.SizeInBytes = Swap8(&pInfo[3]);
-				
+
                 _driveArray.AddDrive(myDrive);
-                
+
 				pInfo += media::MediaAllocationEntry::Size();
 			}
 		};
-		
+
         media::LogicalDriveArray GetEntryArray() { return _driveArray; };
 
 		void UpdateDriveArray(media::LogicalDriveArray& updateArray)
@@ -1442,7 +1442,7 @@ namespace api
 				updateArray.GetDrive(currentDrive.Tag).SizeInBytes = currentDrive.SizeInBytes;
 			}
 		}
-		
+
 		CString& ResponseString()
 		{
 			_responseStr.Format(_T("numEntries: %d\r\n"), (UINT)_driveArray.Size());
@@ -1458,7 +1458,7 @@ namespace api
 			}
 			return _responseStr;
 		};
-		
+
 	private:
 		ParameterT<UCHAR> _numEntries;
 		media::LogicalDriveArray _driveArray;
@@ -1466,7 +1466,7 @@ namespace api
 
 	//////////////////////////////////////////////////////////////////////
 	//
-	// DDI_COMMAND: StAllocateLogicalMedia 
+	// DDI_COMMAND: StAllocateLogicalMedia
 	//
 	// TODO: NOT TESTED
 	//
@@ -1477,8 +1477,8 @@ namespace api
 		StAllocateLogicalMedia(media::MediaAllocationTable* pEntryArray)
 			: StApiT<_ST_SCSI_CDB::_CDB16>(API_TYPE_ST_SCSI, ST_WRITE_CMD_PLUS_DATA, _T("AllocateLogicalMedia"))
 		{
-			_mediaArray = *pEntryArray;			
-			
+			_mediaArray = *pEntryArray;
+
 			_cdb.OperationCode = ST_SCSIOP_WRITE;
 			_cdb.Command = DDI_SET_ALLOCATE_TABLE;
 			_cdb.SubCommand = (UCHAR)pEntryArray->size();
@@ -1492,7 +1492,7 @@ namespace api
 		void PrepareCommand()
 		{
 			_xferLength = (UINT)_mediaArray.size() * sizeof(_ALLOCATE_MEDIA_CMD_ENTRY);
-			
+
 			if ( _sendDataPtr )
 			{
 				free( _sendDataPtr );
@@ -1501,7 +1501,7 @@ namespace api
 			_sendDataPtr = (UCHAR*)malloc(_xferLength);
 			if ( _sendDataPtr == NULL )
 				return;
-			
+
 			memset(_sendDataPtr, 0, _xferLength);
 
 			_ALLOCATE_MEDIA_CMD_ENTRY* pCmdEntry = (_ALLOCATE_MEDIA_CMD_ENTRY*)_sendDataPtr;
@@ -1523,7 +1523,7 @@ namespace api
 
 	//////////////////////////////////////////////////////////////////////
 	//
-	// DDI_COMMAND: StEraseLogicalMedia : 
+	// DDI_COMMAND: StEraseLogicalMedia :
 	//
 	// TODO: LONG COMMAND
 	//
@@ -1539,13 +1539,13 @@ namespace api
 			_preserveJanus.ValueList[true]	= "true";
 
 			_preserveJanus.Value = preserveJanus;
-			
+
 			_timeout = ST_SCSI_ERASE_MEDIA_TIMEOUT;
 
 			PrepareCommand();
 
 		};
-		
+
 		virtual ~StEraseLogicalMedia() {};
 
 		void ParseCdb()
@@ -1570,7 +1570,7 @@ namespace api
 
 	//////////////////////////////////////////////////////////////////////
 	//
-	// DDI_COMMAND: StEraseLogicalMediaAsync : 
+	// DDI_COMMAND: StEraseLogicalMediaAsync :
 	//
 	// TODO: LONG COMMAND
 	//
@@ -1582,7 +1582,7 @@ namespace api
 		{
 			PrepareCommand();
 		};
-		
+
 		virtual ~StEraseLogicalMediaAsync() {};
 
 		void PrepareCommand()
@@ -1618,7 +1618,7 @@ namespace api
 
 			PrepareCommand();
 		};
-		
+
 		virtual ~StReadLogicalDriveSector() {};
 
 		void ParseCdb()
@@ -1640,7 +1640,7 @@ namespace api
 
 			_xferLength = _sectorCount.Value * _sectorSize.Value;
 		}
-		
+
 		void ProcessResponse(const UCHAR *const pData, const UINT start, const UINT count)
 		{
 			assert( count >= _xferLength );
@@ -1657,7 +1657,7 @@ namespace api
 		};
 
 //		UCHAR* GetDataPtr() { return _responseDataPtr; };
-		
+
 		CString& ResponseString()
 		{
 			FormatReadResponse(_responseDataPtr, 16);
@@ -1679,7 +1679,7 @@ namespace api
 	class StWriteLogicalDriveSector : public StApiT<_ST_SCSI_CDB::_CDBRWDRIVESECTOR16>
 	{
 	public:
-		StWriteLogicalDriveSector(UCHAR driveNumber, UINT sectorSize, ULONGLONG sectorStart, 
+		StWriteLogicalDriveSector(UCHAR driveNumber, UINT sectorSize, ULONGLONG sectorStart,
 			UINT sectorCount, UCHAR* pData, bool bWrite512=false)
 			: StApiT<_ST_SCSI_CDB::_CDBRWDRIVESECTOR16>(API_TYPE_ST_SCSI, ST_WRITE_CMD_PLUS_DATA, _T("WriteLogicalDriveSector"))
 		{
@@ -1738,7 +1738,7 @@ namespace api
 				SetCommandData(tempBuf, _sectorCount.Value * _sectorSize.Value);
 				free (tempBuf);
 			}
-			
+
 		}
 
     private:
@@ -1765,7 +1765,7 @@ namespace api
 
 			PrepareCommand();
 		};
-		
+
 		virtual ~StEraseLogicalDrive() {};
 
 		void ParseCdb()
@@ -1780,7 +1780,7 @@ namespace api
 			_cdb.Command = DDI_ERASE_LOGICAL_DRIVE;
 			_cdb.SubCommand = _driveNumber.Value;
 		};
-		
+
 	private:
 		ParameterT<UCHAR> _driveNumber;
 	};
@@ -1828,7 +1828,7 @@ namespace api
 			_cdb.OperationCode = ST_SCSIOP_WRITE;
 			_cdb.Command = DDI_CHIP_RESET;
 		};
-		
+
 		virtual ~StChipReset() {};
 	};
 
@@ -1958,7 +1958,7 @@ namespace api
         UINT wTotalPages;
         UINT wTotalBlocks;
         UINT wTotalInternalDice;       // (1/2/4/...) - number of chips pretending to be a single chip
-        UINT wBlocksPerDie;            // (wTotalBlocks / wTotalInternalDice )   
+        UINT wBlocksPerDie;            // (wTotalBlocks / wTotalInternalDice )
         UINT wTotalZones;
     } PHYSICAL_MEDIA_INFO, * P_PHYSICAL_MEDIA_INFO;
 
@@ -2032,7 +2032,7 @@ namespace api
 
 			PrepareCommand();
 		};
-		
+
         virtual ~StReadPhysicalMediaSector() {};
 
 		void ParseCdb()
@@ -2054,7 +2054,7 @@ namespace api
 
 			_xferLength = _sectorCount.Value * _sectorSize.Value;
 		}
-		
+
 		void ProcessResponse(const UCHAR *const pData, const UINT start, const UINT count)
 		{
 			assert( count >= _xferLength );
@@ -2071,7 +2071,7 @@ namespace api
 		};
 
 //		UCHAR* GetDataPtr() { return _responseDataPtr; };
-		
+
 		CString& ResponseString()
 		{
 			FormatReadResponse(_responseDataPtr, 16);
@@ -2098,13 +2098,13 @@ namespace api
 			_cdb.OperationCode = ST_SCSIOP_WRITE;
 			_cdb.Command = DDI_RESET_TO_RECOVERY;
 		};
-		
+
 		virtual ~StResetToRecovery() {};
 	};
 
 	//////////////////////////////////////////////////////////////////////
 	//
-	// DDI_COMMAND: StInitializeJanus 
+	// DDI_COMMAND: StInitializeJanus
 	//
 	//////////////////////////////////////////////////////////////////////
 	class StInitializeJanus : public StApiT<_ST_SCSI_CDB::_CDB16>
@@ -2116,7 +2116,7 @@ namespace api
 			_cdb.Command = DDI_INITIALIZE_JANUS;
 			_timeout = ST_SCSI_EXTENDED_TIMEOUT; //ST_SCSI_DEFAULT_TIMEOUT;
 		};
-		
+
 		virtual ~StInitializeJanus() {};
 	};
 
@@ -2128,7 +2128,7 @@ namespace api
 	class StGetJanusStatus : public StApiT<_ST_SCSI_CDB::_CDB16>
 	{
 	public:
-		StGetJanusStatus() 
+		StGetJanusStatus()
 			: StApiT<_ST_SCSI_CDB::_CDB16>(API_TYPE_ST_SCSI, ST_READ_CMD, _T("GetJanusStatus"))
 			, _status(0)
 		{
@@ -2137,7 +2137,7 @@ namespace api
 
 			_xferLength = sizeof(_status);
 		};
-		
+
 		virtual ~StGetJanusStatus() {};
 
 		void ProcessResponse(const UCHAR *const pData, const UINT start, const UINT count)
@@ -2145,7 +2145,7 @@ namespace api
 			assert( count >= _xferLength );
 
 			_status = *(UCHAR*)pData;
-			_responseStr.Format(_T("Janus Status: 0x%02X"), GetJanusStatus());	
+			_responseStr.Format(_T("Janus Status: 0x%02X"), GetJanusStatus());
 		};
 
 		UCHAR GetJanusStatus() { return _status; };
@@ -2156,13 +2156,13 @@ namespace api
 
 	//////////////////////////////////////////////////////////////////////
 	//
-	// DDI_COMMAND: StInitializeDataStore 
+	// DDI_COMMAND: StInitializeDataStore
 	//
 	//////////////////////////////////////////////////////////////////////
 	class StInitializeDataStore : public StApiT<_ST_SCSI_CDB::_CDB16>
 	{
 	public:
-		StInitializeDataStore(UCHAR storeNumber) 
+		StInitializeDataStore(UCHAR storeNumber)
 			: StApiT<_ST_SCSI_CDB::_CDB16>(API_TYPE_ST_SCSI, ST_WRITE_CMD, _T("InitializeDataStore"))
 		{
 			_params["Store Number"] = &_storeNumber;
@@ -2171,7 +2171,7 @@ namespace api
 
 			PrepareCommand();
 		};
-		
+
 		virtual ~StInitializeDataStore() {};
 
 		void ParseCdb()
@@ -2186,7 +2186,7 @@ namespace api
 			_cdb.Command = DDI_INIT_DATA_STORE;
 			_cdb.SubCommand = _storeNumber.Value;
 		};
-		
+
 	private:
 		ParameterT<UCHAR> _storeNumber;
 	};
@@ -2204,7 +2204,7 @@ namespace api
 			_cdb.OperationCode = ST_SCSIOP_WRITE;
 			_cdb.Command = DDI_RESET_TO_UPDATER;
 		};
-		
+
 		virtual ~StResetToUpdater() {};
 	};
 
@@ -2217,7 +2217,7 @@ namespace api
 		eDevicePhysicalExternalRamSz = 0,
 		eDeviceVirtualExternalRamSz  = 1
 	};
-	
+
 	class StGetDeviceProperties : public StApiT<_ST_SCSI_CDB::_CDB16>
 	{
 	public:
@@ -2254,7 +2254,7 @@ namespace api
 			_cdb.OperationCode = ST_SCSIOP_READ;
 			_cdb.Command = DDI_GET_DEVICE_PROPERTIES;
 			_cdb.SubCommand = _propertyType.Value;
-			 
+
 			_xferLength = sizeof(UINT);
 		};
 
@@ -2303,7 +2303,7 @@ namespace api
 			_cdb.OperationCode = ST_SCSIOP_WRITE;
 			_cdb.Command = DDI_SET_UPDATE_FLAG;
 		};
-		
+
 		virtual ~StSetUpdateFlag() {};
 	};
 
@@ -2332,7 +2332,7 @@ namespace api
 		};
 
 		INQUIRYDATA& GetInquiryData() { return _data; };
-		
+
 		CString& ResponseString()
 		{
 			FormatReadResponse((UCHAR*)&_data, 16);
@@ -2384,7 +2384,7 @@ namespace api
 			_data.LogicalBlockAddress = Swap4(pData);
 			_data.BytesPerBlock = Swap4(pData + sizeof(_data.LogicalBlockAddress));
 
-			_responseStr.Format(_T("LogicalBlockAddress: 0x%X\r\nBytesPerBlock: 0x%X"), _data.LogicalBlockAddress, _data.BytesPerBlock);	
+			_responseStr.Format(_T("LogicalBlockAddress: 0x%X\r\nBytesPerBlock: 0x%X"), _data.LogicalBlockAddress, _data.BytesPerBlock);
 		};
 
 		READ_CAPACITY_DATA& GetCapacity() { return _data; };
@@ -2405,7 +2405,7 @@ namespace api
 			: StApiT_CDB10>(API_TYPE_SCSI, ST_READ_CMD, _T("Read"))
 //			, _responseDataPtr(NULL)
 		{
-			
+
 			_params["Starting Sector"] = &_sectorStart;
 			_params["Sector Count"] = &_sectorCount;
 			_params["Sector Size"] = &_sectorSize;
@@ -2441,7 +2441,7 @@ namespace api
 
 			_xferLength = _sectorCount.Value * _sectorSize.Value;
 		}
-		
+
 		void ProcessResponse(const UCHAR *const pData, const UINT start, const UINT count)
 		{
 			assert( count >= _xferLength );
@@ -2460,7 +2460,7 @@ namespace api
 		};
 
 //		UCHAR* GetDataPtr() { return _responseDataPtr; };
-		
+
 		CString& ResponseString()
 		{
 			FormatReadResponse(_responseDataPtr, 16);
@@ -2495,7 +2495,7 @@ namespace api
 
 			SetCommandData(pData, sectorCount * sectorSize);
 		};
-		
+
 		virtual ~StWrite() {};
 
 		void ParseCdb()
@@ -2558,17 +2558,17 @@ namespace api
 			assert( count >= _xferLength );
 
 			memset(&_data, 0xdb, sizeof(_MODESENSE10DATA));
-			memcpy(&_data, pData, sizeof(_MODESENSE10DATA)); 
+			memcpy(&_data, pData, sizeof(_MODESENSE10DATA));
 		};
 
 		_MODESENSE10DATA& GetFlexibleDiskModePage() { return _data; };
-		
+
 		CString& ResponseString()
 		{
 			FormatReadResponse((UCHAR*)&_data, 16);
 			return _responseStr;
 		};
-	
+
 	private:
 		_MODESENSE10DATA _data;
 	};
@@ -2584,11 +2584,11 @@ namespace api
 		typedef StApi* (*CreateApiCallback)(CString paramStr);
 	private:
 		typedef std::map<CString, CreateApiCallback> CallbackMap;
-	
+
 	public:
         StApiFactory();
 		StApi* CreateApi(CString name, CString paramStr=_T(""));
-	
+
 	private:
 		bool RegisterApi(CString name, CreateApiCallback createFn);
 		bool UnregisterApi(CString name);

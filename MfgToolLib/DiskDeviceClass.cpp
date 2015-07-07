@@ -18,7 +18,7 @@
 DiskDeviceClass::DiskDeviceClass(INSTANCE_HANDLE handle)
 : DeviceClass(NULL,NULL,_T(""),DeviceTypeDisk,handle)//&GUID_DEVINTERFACE_DISK, &GUID_DEVCLASS_DISKDRIVE, _T(""), DeviceTypeDisk, handle)
 {
-	//The system-supplied storage class drivers register an instance of GUID_DEVINTERFACE_DISK for a hard disk storage device. 
+	//The system-supplied storage class drivers register an instance of GUID_DEVINTERFACE_DISK for a hard disk storage device.
 }
 
 DiskDeviceClass::~DiskDeviceClass(void)
@@ -28,15 +28,15 @@ DiskDeviceClass::~DiskDeviceClass(void)
 Device* DiskDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
 {
 	Disk* disk = new Disk(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
-	
+
 	// Only Create USB Disks
 	if ( disk->IsUsb() )
 	{
 		return disk;
 	}
-	
+
 	delete disk;
-	
+
 	return NULL;
 }
 

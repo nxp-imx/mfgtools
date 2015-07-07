@@ -101,7 +101,3 @@
 #define IDI_COMPANY_ICON                104
 #define IDI_COMPANY_BMP					109
 #define IDI_CUSTOM_COMPANY_BMP			110
-
-
-
-

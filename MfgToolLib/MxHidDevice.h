@@ -44,28 +44,28 @@
 #define HAB_CMD_WRT_DAT					0xcc  /**< Write Data */
 #define HAB_CMD_CHK_DAT					0xcf  /**< Check Data */
 #define HAB_TAG_DCD							0xd2       /**< Device Configuration Data */
-#define HAB_DCD_BYTES_MAX				1768 
+#define HAB_DCD_BYTES_MAX				1768
 
 //DCD binary data format:
 //4 bytes for format	4 bytes for register1 address	4 bytes for register1 value to set
 //4 bytes for format	4 bytes for register2 address	4 bytes for register2 value to set
 //...
-typedef struct 
+typedef struct
 {
     UINT format;
     UINT addr;
     UINT data;
 } FslMemoryInit;
 
-// Address ranges for Production parts: 
+// Address ranges for Production parts:
 
 /// <summary>
 /// A MxHidDevice device.
 /// </summary>
 class MxHidDevice : public Device
-{   
+{
     struct libusb_device_handle *m_Handle;
-public: 
+public:
     MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle);
     virtual ~MxHidDevice();
 
@@ -75,7 +75,7 @@ public:
 	public:
 		// [XmlAttribute("addr")]
 		unsigned int GetAddress()
-		{ 
+		{
 			unsigned int addr = 0; // default to 0
 
 			CString attr = GetAttrValue(_T("addr"));
@@ -90,12 +90,12 @@ public:
 				addr = (unsigned int)_tstoi64(attr);
 			}
 
-			return addr; 
+			return addr;
 		};
 
 		// [XmlAttribute("data")]
 		unsigned int GetData()
-		{ 
+		{
 			unsigned int data = 0; // default to 0
 
 			CString attr = GetAttrValue(_T("data"));
@@ -110,12 +110,12 @@ public:
 				data = (unsigned int)_tstoi64(attr);
 			}
 
-			return data; 
+			return data;
 		};
 
 		// [XmlAttribute("format")]
 		unsigned int GetFormat()
-		{ 
+		{
 			unsigned char format = 0; // default to 0
 
 			CString attr = GetAttrValue(_T("format"));
@@ -130,7 +130,7 @@ public:
 				format = (unsigned char)_tstoi64(attr);
 			}
 
-			return format; 
+			return format;
 		};
 
 		CString ToString()
@@ -211,17 +211,17 @@ public:
 	   uint32_t PluginFlag;
 	}BootData, *PBootData;
 
-	enum MemorySection 
-	{ 
-		MemSectionOTH = 0x00, 
-		MemSectionAPP = 0xAA, 
-		MemSectionCSF = 0xCC, 
-		MemSectionDCD = 0xEE 
+	enum MemorySection
+	{
+		MemSectionOTH = 0x00,
+		MemSectionAPP = 0xAA,
+		MemSectionCSF = 0xCC,
+		MemSectionDCD = 0xEE
 	};
 
 	typedef struct _ImageParameter
 	{
-        UINT PhyRAMAddr4KRL;//The physical address in RAM where an image locates. 
+        UINT PhyRAMAddr4KRL;//The physical address in RAM where an image locates.
         MemorySection loadSection;
 		MemorySection setSection;
 		BOOL HasFlashHeader;//Does an image have a flash header or ivt header.
@@ -247,11 +247,11 @@ public:
 		else return MemSectionOTH;
 	}
 
-	enum MemoryAction 
-	{ 
-		MemAction_None, 
-		MemAction_Set, 
-		MemAction_Jump 
+	enum MemoryAction
+	{
+		MemAction_None,
+		MemAction_Set,
+		MemAction_Jump
 	};
 	static MemoryAction StringToMemoryAction(CString action)
 	{
@@ -274,7 +274,7 @@ public:
 	BOOL SendCmd(PSDPCmd pSDPCmd);
 	BOOL SendData(const unsigned char * DataBuf, UINT ByteCnt);
 	BOOL GetHABType();
-	BOOL GetDevAck(UINT RequiredCmdAck);  
+	BOOL GetDevAck(UINT RequiredCmdAck);
 	VOID PackSDPCmd(PSDPCmd pSDPCmd);
 	int Read(void* buf, UINT size);
 	int Write(UCHAR* buf, ULONG size);

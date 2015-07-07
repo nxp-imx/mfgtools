@@ -27,14 +27,14 @@ namespace property
         typedef std::vector<Property*> PropertyList;
         typedef std::vector<Property*>::iterator PropertyIterator;
 
-        Property(bool container = false) 
+        Property(bool container = false)
             : _container(container)
             , _owner(NULL)
             , _name(_T(""))
             , _desc(_T(""))
         {};
 
-        virtual ~Property() 
+        virtual ~Property()
         {
             _propertyList.erase(_propertyList.begin(), _propertyList.end());
         };
@@ -58,7 +58,7 @@ namespace property
         // virtual value_type get() {return _value;};
         // virtual void put(const value_type& val) {_value = val;}
         virtual CString ToString(LPCTSTR f=_T("%d")){return CString(_T(""));};
-        
+
     protected:
         bool _container;
         CString _name;
@@ -86,7 +86,7 @@ namespace property
         {
             CString guidStr;
             LPOLESTR str;
-        
+
             StringFromIID(*get(), &str);
             //guidStr = SSOLE2T(str);
 			guidStr = str;
@@ -178,7 +178,7 @@ namespace property
     // declaration: INT32_PROPERTY(myIntProperty);
     //   creates a member variable: Int32Property _myIntProperty
     //
-    // instantiation of override: 
+    // instantiation of override:
     //     int MyPropertyContainerClass::myIntProperty::get()
     //     {
     //          MyPropertyContainerClass* container = dynamic_cast<MyPropertyContainerClass*>(_owner);

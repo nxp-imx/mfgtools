@@ -13,8 +13,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#ifndef __PARAMETER_XXX__ 
-#define __PARAMETER_XXX__ 
+#ifndef __PARAMETER_XXX__
+#define __PARAMETER_XXX__
 #include "stdafx.h"
 #include <map>
 #include <vector>
@@ -43,7 +43,7 @@ namespace property
 	class ParameterT : public Parameter
 	{
 	public:
-		ParameterT(T value = (T)0, T valDefault = (T)0, LPCTSTR desc = NULL) 
+		ParameterT(T value = (T)0, T valDefault = (T)0, LPCTSTR desc = NULL)
 			: Parameter(desc)
             , Value(value)
             , Default(valDefault)
@@ -91,7 +91,7 @@ namespace property
 /*        template <__time64_t>
         const CString ToString() const
         {
-            CString dateStr; 
+            CString dateStr;
             struct tm modTime;
             if ( Value != 0 )
             {
@@ -191,14 +191,14 @@ namespace property
 			{
 				;// Warning: no Key for this Key:Value pair
 			}
-			
+
 			// Parse the Value into the ParameterT
 			if( !keyStr.IsEmpty() )
 			{
 				numParamsParsed += paramMap[keyStr]->Parse(valueStr);
 			}
 		}
-		
+
 		return numParamsParsed;
 	};
 */

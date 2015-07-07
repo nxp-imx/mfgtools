@@ -23,12 +23,12 @@ struct StVersionInfo
 	bool operator != (const StVersionInfo&) const;
 	bool operator == (const StVersionInfo&) const;
 	bool operator > (const StVersionInfo& rhsVer) const;
-	
-	void clear() 
-	{ 
-		_major = _minor = _revision = 0; 
+
+	void clear()
+	{
+		_major = _minor = _revision = 0;
 	} // Set version fields to 0
-	
+
     const UCHAR * const data() { return (UCHAR*) &_major; };
     const size_t size() const { return sizeof(_major) + sizeof(_minor) + sizeof(_revision); };
 	const CString toString() const;
@@ -48,10 +48,10 @@ private:
     USHORT	_major;
 	USHORT	_minor;
 	USHORT	_revision;
-    
+
     ////////////////////////////////////////////////////////////////////////////////
 	//! Converts a four digit BCD number to the decimal equivalent.
-	//! Remember that the BCD value is big endian but read as a 16-bit little 
+	//! Remember that the BCD value is big endian but read as a 16-bit little
 	//! endian number. So we have to byte swap during this conversion.
 	//!
 	//! \param bcdNumber BCD value in reverse byte order.
@@ -64,7 +64,7 @@ private:
 		resultVersion += ( ((bcdNumber & 0x00000f00) >> 8)  * 1);
 		resultVersion += ( ((bcdNumber & 0x0000f000) >> 12) * 10);
 		return resultVersion;
-	} 
+	}
 };
 
 #endif // !defined(AFX_STVERSIONINFO_H__INCLUDED_)

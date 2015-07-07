@@ -8,7 +8,7 @@
 #include <string>
 #include <stdio.h>
 #include <stdarg.h>
-#include <cstring>  
+#include <cstring>
 #include <ctype.h>
 #include <iostream>
 #include <cstdlib>
@@ -54,16 +54,16 @@
 #define sscanf_s sscanf
 
 //#define .Format =sprintf
-#define TCHAR char 
-#define _T(x) x 
-#define StringFromIID(x,y) 
-#define CoTaskMemFree(x) 
+#define TCHAR char
+#define _T(x) x
+#define StringFromIID(x,y)
+#define CoTaskMemFree(x)
 #define _stscanf_s sscanf
 #define MAX_PATH 260
 #define INVALID_HANDLE_VALUE (void *)0xFFFFFFFFUL
 
 #define ERROR_SUCCESS 0
- 
+
 typedef int INT;
 typedef unsigned char BYTE;
 typedef unsigned int UINT;
@@ -406,12 +406,12 @@ typedef struct _HIDP_CAPS
 
 #define CALLBACK
 
-#define ASSERT(x) 
+#define ASSERT(x)
 #define _tcscpy strcpy
 #define _vsntprintf  vsnprintf
 #define _vsctprintf _vscprintf
 #define _tcserror strerror
-inline int GetLastError() { return errno;} 
+inline int GetLastError() { return errno;}
 
 #define ERROR_FILE_NOT_FOUND             2L
 
@@ -422,7 +422,7 @@ struct thread_msg{
     LPARAM lParam;
     thread_msg() : message(), wParam(), lParam() {}
     thread_msg(UINT msg, WPARAM wPar, LPARAM lPar):message(msg),wParam(wPar),lParam(lPar){}
-    
+
 
 };
 
@@ -445,13 +445,13 @@ typedef struct _OVERLAPPED {
 } OVERLAPPED, *LPOVERLAPPED;
 
 
-inline int _vscprintf (const char * format, ...) { 
-      int retval; 
-      va_list argcopy; 
-      va_start(argcopy,format); 
-      retval = vsnprintf(NULL, 0, format, argcopy); 
-      va_end(argcopy); 
-      return retval; 
+inline int _vscprintf (const char * format, ...) {
+      int retval;
+      va_list argcopy;
+      va_start(argcopy,format);
+      retval = vsnprintf(NULL, 0, format, argcopy);
+      va_end(argcopy);
+      return retval;
 }
 
 #define CAnsiString CString
@@ -526,9 +526,3 @@ typedef enum _USB_CONNECTION_STATUS {
 #else
 
 #endif
-
-
-
-
-
-

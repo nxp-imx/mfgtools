@@ -9,7 +9,7 @@
 #pragma once
 
 #include "stdafx.h"
-#include <fstream>   
+#include <fstream>
 #include <iostream>
 
 //if want to change log file name, change it, don't change code
@@ -36,7 +36,5 @@ public:
 	DWORD WriteToLogFile(CString& strMsg);
 
 private:
-    FILE * m_file; 
+    FILE * m_file;
 };
-
-

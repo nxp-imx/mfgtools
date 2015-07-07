@@ -3,7 +3,7 @@
 // XMLite : XML Lite Parser Library
 // by bro ( Cho,Kyung Min: bro@shinbiro.com ) 2002-10-30
 // Microsoft MVP (Visual C++) bro@msmvp.com
-// 
+//
 // You can use/modify/redistribute XMLite for commercial/noncomercial,
 // but please give me thanks email with your project information.
 //
@@ -39,7 +39,7 @@ static const XENTITY x_EntityTable[] = {
         { _T('\"'), _T("&quot;"), 6 } ,
         { _T('\''), _T("&apos;"), 6 } ,
         { _T('<'), _T("&lt;"), 4 } ,
-        { _T('>'), _T("&gt;"), 4 } 
+        { _T('>'), _T("&gt;"), 4 }
     };
 
 PARSEINFO piDefault;
@@ -52,7 +52,7 @@ XENTITYS entityDefault((LPXENTITY)x_EntityTable, sizeof(x_EntityTable)/sizeof(x_
 
 //========================================================
 // Name   : _tcschrs
-// Desc   : same with _tcspbrk 
+// Desc   : same with _tcspbrk
 // Param  :
 // Return :
 //--------------------------------------------------------
@@ -73,7 +73,7 @@ LPTSTR _tcschrs( LPCTSTR psz, LPCTSTR pszchs )
 //========================================================
 // Name   : _tcsskip
 // Desc   : skip space
-// Param  : 
+// Param  :
 // Return : skiped string
 //--------------------------------------------------------
 // Coder    Date                      Desc
@@ -83,7 +83,7 @@ LPTSTR _tcsskip( LPCTSTR psz )
 {
     //while( psz && *psz == ' ' && *psz == 13 && *psz == 10 ) psz++;
     while( psz && _istspace(*psz) ) psz++;
-        
+
     return (LPTSTR)psz;
 }
 
@@ -91,7 +91,7 @@ LPTSTR _tcsskip( LPCTSTR psz )
 // Name   : _tcsechr
 // Desc   : similar with _tcschr with escape process
 // Param  : escape - will be escape character
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -105,7 +105,7 @@ LPTSTR _tcsechr( LPCTSTR psz, int ch, int escape )
         if( escape != 0 && *pch == escape )
             pch++;
         else
-        if( *pch == ch ) 
+        if( *pch == ch )
             return (LPTSTR)pch;
         pch++;
     }
@@ -116,12 +116,12 @@ LPTSTR _tcsechr( LPCTSTR psz, int ch, int escape )
 // Name   : _tcselen
 // Desc   : similar with _tcslen with escape process
 // Param  : escape - will be escape character
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
 //========================================================
-int _tcselen( int escape, LPTSTR srt, LPTSTR end = NULL ) 
+int _tcselen( int escape, LPTSTR srt, LPTSTR end = NULL )
 {
     int len = 0;
     LPTSTR pch = srt;
@@ -145,7 +145,7 @@ int _tcselen( int escape, LPTSTR srt, LPTSTR end = NULL )
 // Name   : _tcsecpy
 // Desc   : similar with _tcscpy with escape process
 // Param  : escape - will be escape character
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -175,7 +175,7 @@ void _tcsecpy( LPTSTR psz, int escape, LPTSTR srt, LPTSTR end = NULL )
 // Name   : _tcsepbrk
 // Desc   : similar with _tcspbrk with escape process
 // Param  : escape - will be escape character
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -192,7 +192,7 @@ LPTSTR _tcsepbrk( LPCTSTR psz, LPCTSTR chset, int escape )
         {
             prev_escape = NULL;
             if( _tcschr( chset, *pch ) )
-                return (LPTSTR)pch;     
+                return (LPTSTR)pch;
         }
         pch++;
     }
@@ -203,7 +203,7 @@ LPTSTR _tcsepbrk( LPCTSTR psz, LPCTSTR chset, int escape )
 // Name   : _tcsenicmp
 // Desc   : similar with _tcsnicmp with escape process
 // Param  : escape - will be escape character
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -214,7 +214,7 @@ int _tcsenicmp( LPCTSTR psz, LPCTSTR str, int len, int escape )
     LPTSTR prev_escape = NULL;
     LPTSTR des = (LPTSTR)str;
     int i = 0;
-    
+
     while( pch && *pch && i < len )
     {
         if( escape != 0 && *pch == escape && prev_escape == NULL )
@@ -228,7 +228,7 @@ int _tcsenicmp( LPCTSTR psz, LPCTSTR str, int len, int escape )
         }
         pch ++;
     }
-    
+
     // find
     if( i == len )
         return 0;
@@ -241,7 +241,7 @@ int _tcsenicmp( LPCTSTR psz, LPCTSTR str, int len, int escape )
 // Name   : _tcsenistr
 // Desc   : similar with _tcsistr with escape process
 // Param  : escape - will be escape character
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -252,7 +252,7 @@ LPTSTR _tcsenistr( LPCTSTR psz, LPCTSTR str, int len, int escape )
     LPTSTR prev_escape = NULL;
     LPTSTR des = (LPTSTR)str;
     int i = 0;
-    
+
     while( pch && *pch )
     {
         if( escape != 0 && *pch == escape && prev_escape == NULL )
@@ -272,7 +272,7 @@ LPTSTR _tcsenistr( LPCTSTR psz, LPCTSTR str, int len, int escape )
 // Name   : _tcseistr
 // Desc   : similar with _tcsistr with escape process
 // Param  : escape - will be escape character
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -287,7 +287,7 @@ LPTSTR _tcseistr( LPCTSTR psz, LPCTSTR str, int escape )
 // Name   : _SetString
 // Desc   : put string of (psz~end) on ps string
 // Param  : trim - will be trim?
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -322,7 +322,7 @@ _tagXMLNode::~_tagXMLNode()
 void _tagXMLNode::Close()
 {
     size_t i;
-    
+
     for( i = 0 ; i < childs.size(); i ++)
     {
         LPXNode p = childs[i];
@@ -332,7 +332,7 @@ void _tagXMLNode::Close()
         }
     }
     childs.clear();
-    
+
     for( i = 0 ; i < attrs.size(); i ++)
     {
         LPXAttr p = attrs[i];
@@ -343,7 +343,7 @@ void _tagXMLNode::Close()
     }
     attrs.clear();
 }
-    
+
 // attr1="value1" attr2='value2' attr3=value3 />
 //                                            ^- return pointer
 //========================================================
@@ -371,10 +371,10 @@ LPTSTR _tagXMLNode::LoadAttributes( LPCTSTR pszAttrs , LPPARSEINFO pi /*= &piDef
 
             // XML Attr Name
             TCHAR* pEnd = _tcspbrk( xml, _T(" =") );
-            if( pEnd == NULL ) 
+            if( pEnd == NULL )
             {
                 // error
-                if( pi->erorr_occur == false ) 
+                if( pi->erorr_occur == false )
                 {
                     pi->erorr_occur = true;
                     pi->error_pointer = xml;
@@ -383,17 +383,17 @@ LPTSTR _tagXMLNode::LoadAttributes( LPCTSTR pszAttrs , LPPARSEINFO pi /*= &piDef
                 }
                 return NULL;
             }
-            
+
             LPXAttr attr = new XAttr;
             attr->parent = this;
 
             // XML Attr Name
             _SetString( xml, pEnd, &attr->name );
-            
+
             // add new attribute
             attrs.push_back( attr );
             xml = pEnd;
-            
+
             // XML Attr Value
             if( xml = _tcsskip( xml ) )
             {
@@ -409,7 +409,7 @@ LPTSTR _tagXMLNode::LoadAttributes( LPCTSTR pszAttrs , LPPARSEINFO pi /*= &piDef
                             pEnd = _tcsechr( ++xml, quote, chXMLEscape );
                         else
                         {
-                            //attr= value> 
+                            //attr= value>
                             // none quote mode
                             //pEnd = _tcsechr( xml, ' ', '\\' );
                             pEnd = _tcsepbrk( xml, _T(" >"), chXMLEscape );
@@ -417,10 +417,10 @@ LPTSTR _tagXMLNode::LoadAttributes( LPCTSTR pszAttrs , LPPARSEINFO pi /*= &piDef
 
                         bool trim = pi->trim_value;
                         TCHAR escape = pi->escape_value;
-                        //_SetString( xml, pEnd, &attr->value, trim, chXMLEscape ); 
+                        //_SetString( xml, pEnd, &attr->value, trim, chXMLEscape );
                         _SetString( xml, pEnd, &attr->value, trim, escape );
                         xml = pEnd;
-                        // ATTRVALUE 
+                        // ATTRVALUE
                         if( pi->entity_value && pi->entitys )
                             attr->value = pi->entitys->Ref2Entity(attr->value);
 
@@ -464,10 +464,10 @@ LPTSTR _tagXMLNode::LoadAttributes( LPCTSTR pszAttrs, LPCTSTR pszEnd, LPPARSEINF
 
             // XML Attr Name
             TCHAR* pEnd = _tcspbrk( xml, _T(" =") );
-            if( pEnd == NULL ) 
+            if( pEnd == NULL )
             {
                 // error
-                if( pi->erorr_occur == false ) 
+                if( pi->erorr_occur == false )
                 {
                     pi->erorr_occur = true;
                     pi->error_pointer = xml;
@@ -476,17 +476,17 @@ LPTSTR _tagXMLNode::LoadAttributes( LPCTSTR pszAttrs, LPCTSTR pszEnd, LPPARSEINF
                 }
                 return NULL;
             }
-            
+
             LPXAttr attr = new XAttr;
             attr->parent = this;
 
             // XML Attr Name
             _SetString( xml, pEnd, &attr->name );
-            
+
             // add new attribute
             attrs.push_back( attr );
             xml = pEnd;
-            
+
             // XML Attr Value
             if( xml = _tcsskip( xml ) )
             {
@@ -502,7 +502,7 @@ LPTSTR _tagXMLNode::LoadAttributes( LPCTSTR pszAttrs, LPCTSTR pszEnd, LPPARSEINF
                             pEnd = _tcsechr( ++xml, quote, chXMLEscape );
                         else
                         {
-                            //attr= value> 
+                            //attr= value>
                             // none quote mode
                             //pEnd = _tcsechr( xml, ' ', '\\' );
                             pEnd = _tcsepbrk( xml, _T(" >"), chXMLEscape );
@@ -510,10 +510,10 @@ LPTSTR _tagXMLNode::LoadAttributes( LPCTSTR pszAttrs, LPCTSTR pszEnd, LPPARSEINF
 
                         bool trim = pi->trim_value;
                         TCHAR escape = pi->escape_value;
-                        //_SetString( xml, pEnd, &attr->value, trim, chXMLEscape ); 
+                        //_SetString( xml, pEnd, &attr->value, trim, chXMLEscape );
                         _SetString( xml, pEnd, &attr->value, trim, escape );
                         xml = pEnd;
-                        // ATTRVALUE 
+                        // ATTRVALUE
                         if( pi->entity_value && pi->entitys )
                             attr->value = pi->entitys->Ref2Entity(attr->value);
 
@@ -557,12 +557,12 @@ LPTSTR _tagXMLNode::LoadProcessingInstrunction( LPCTSTR pszXml, LPPARSEINFO pi /
         node->parent = this;
         node->doc = doc;
         node->type = XNODE_PI;
-        
+
         xml += sizeof(szXMLPIOpen)/sizeof(TCHAR)-1;
         TCHAR* pTagEnd = _tcspbrk( xml, _T(" ?>") );
         _SetString( xml, pTagEnd, &node->name );
         xml = pTagEnd;
-        
+
         node->LoadAttributes( xml, end, pi );
 
         doc->childs.push_back( node );
@@ -599,7 +599,7 @@ LPTSTR _tagXMLNode::LoadComment( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/
     {
         LPTSTR xml = (LPTSTR)pszXml;
         xml += sizeof(szXMLCommentOpen)/sizeof(TCHAR)-1;
-        
+
         LPXNode node = new XNode;
         node->parent = this;
         node->doc = doc;
@@ -641,7 +641,7 @@ LPTSTR _tagXMLNode::LoadCDATA( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
     {
         LPTSTR xml = (LPTSTR)pszXml;
         xml += sizeof(szXMLCDATAOpen)/sizeof(TCHAR)-1;
-        
+
         LPXNode node = new XNode;
         node->parent = this;
         node->doc = doc;
@@ -703,7 +703,7 @@ LPTSTR LoadOtherNodes( LPXNode node, bool* pbRet, LPCTSTR pszXml, LPPARSEINFO pi
             // return pointer is next node of comment
             xml = node->LoadComment( xml, pi );
             // comment node is terminal node
-            if( node->parent && node->parent->type != XNODE_DOC 
+            if( node->parent && node->parent->type != XNODE_DOC
                 && xml != prev )
             {
                 *pbRet = true;
@@ -724,7 +724,7 @@ LPTSTR LoadOtherNodes( LPXNode node, bool* pbRet, LPCTSTR pszXml, LPPARSEINFO pi
             // return pointer is next node of CDATA
             xml = node->LoadCDATA( xml, pi );
             // CDATA node is terminal node
-            if( node->parent && node->parent->type != XNODE_DOC 
+            if( node->parent && node->parent->type != XNODE_DOC
                 && xml != prev )
             {
                 *pbRet = true;
@@ -774,9 +774,9 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
     bool bRet = false;
     LPTSTR ret = NULL;
     ret = LoadOtherNodes( this, &bRet, xml, pi );
-    if( ret != NULL ) 
+    if( ret != NULL )
         xml = ret;
-    if( bRet ) 
+    if( bRet )
         return xml;
 
     // XML Node Tag Name Open
@@ -797,7 +797,7 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
             else
             {
                 // error: <TAG ... / >
-                if( pi->erorr_occur == false ) 
+                if( pi->erorr_occur == false )
                 {
                     pi->erorr_occur = true;
                     pi->error_pointer = xml;
@@ -816,11 +816,11 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
             //if( this->value.IsEmpty() || this->value == _T("") )
             if( XIsEmptyString( value ) )
             {
-                // Text Value 
+                // Text Value
                 TCHAR* pEnd = _tcsechr( ++xml, chXMLTagOpen, chXMLEscape );
-                if( pEnd == NULL ) 
+                if( pEnd == NULL )
                 {
-                    if( pi->erorr_occur == false ) 
+                    if( pi->erorr_occur == false )
                     {
                         pi->erorr_occur = true;
                         pi->error_pointer = xml;
@@ -830,7 +830,7 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
                     // error cos not exist CloseTag </TAG>
                     return NULL;
                 }
-                
+
                 bool trim = pi->trim_value;
                 TCHAR escape = pi->escape_value;
                 //_SetString( xml, pEnd, &value, trim, chXMLEscape );
@@ -849,7 +849,7 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
                 node->parent = this;
                 node->doc = doc;
                 node->type = type;
-                
+
                 xml = node->Load( xml,pi );
                 if( node->name.IsEmpty() == FALSE )
                 {
@@ -868,14 +868,14 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
                 {
                     // </Close>
                     xml+=2; // C
-                    
+
                     if( xml = _tcsskip( xml ) )
                     {
                         CString closename;
                         TCHAR* pEnd = _tcspbrk( xml, _T(" >") );
-                        if( pEnd == NULL ) 
+                        if( pEnd == NULL )
                         {
-                            if( pi->erorr_occur == false ) 
+                            if( pi->erorr_occur == false )
                             {
                                 pi->erorr_occur = true;
                                 pi->error_pointer = xml;
@@ -901,7 +901,7 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
                             if( pi->force_parse == false )
                             {
                                 // not welformed open/close
-                                if( pi->erorr_occur == false ) 
+                                if( pi->erorr_occur == false )
                                 {
                                     pi->erorr_occur = true;
                                     pi->error_pointer = xml;
@@ -914,18 +914,18 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
                     }
                 }
                 else    // Alone child Tag Loaded
-                        // else ÇØ¾ßÇÏ´ÂÁö ¸»¾Æ¾ßÇÏ´ÂÁö ÀÇ½É°£´Ù.
+                        // else ï¿½Ø¾ï¿½ï¿½Ï´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Æ¾ï¿½ï¿½Ï´ï¿½ï¿½ï¿½ ï¿½Ç½É°ï¿½ï¿½ï¿½.
                 {
-                    
+
                     //if( xml && this->value.IsEmpty() && *xml !=chXMLTagOpen )
                     if( xml && XIsEmptyString( value ) && *xml !=chXMLTagOpen )
                     {
-                        // Text Value 
+                        // Text Value
                         TCHAR* pEnd = _tcsechr( xml, chXMLTagOpen, chXMLEscape );
-                        if( pEnd == NULL ) 
+                        if( pEnd == NULL )
                         {
                             // error cos not exist CloseTag </TAG>
-                            if( pi->erorr_occur == false )  
+                            if( pi->erorr_occur == false )
                             {
                                 pi->erorr_occur = true;
                                 pi->error_pointer = xml;
@@ -934,7 +934,7 @@ LPTSTR _tagXMLNode::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= &piDefault*/ )
                             }
                             return NULL;
                         }
-                        
+
                         bool trim = pi->trim_value;
                         TCHAR escape = pi->escape_value;
                         //_SetString( xml, pEnd, &value, trim, chXMLEscape );
@@ -976,7 +976,7 @@ LPTSTR _tagXMLDocument::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= NULL*/ )
     node->type = XNODE_ELEMENT;
     node->doc = this;
     LPTSTR end;
-    
+
     if( pi == NULL )
         pi = &parse_info;
 
@@ -992,7 +992,7 @@ LPTSTR _tagXMLDocument::Load( LPCTSTR pszXml, LPPARSEINFO pi /*= NULL*/ )
     LPTSTR ret;
     bool bRet = false;
     ret = LoadOtherNodes( node, &bRet, end, pi );
-    if( ret != NULL ) 
+    if( ret != NULL )
         end = ret;
 
     return end;
@@ -1023,9 +1023,9 @@ CString _tagXMLAttr::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
 {
     otstringstream os;
     //os << (LPCTSTR)name << "='" << (LPCTSTR)value << "' ";
-    
-    os << (LPCTSTR)name << _T("=") << opt->value_quotation_mark 
-        << (LPCTSTR)(opt->reference_value&&opt->entitys?opt->entitys->Entity2Ref(value):value) 
+
+    os << (LPCTSTR)name << _T("=") << opt->value_quotation_mark
+        << (LPCTSTR)(opt->reference_value&&opt->entitys?opt->entitys->Entity2Ref(value):value)
         << opt->value_quotation_mark << _T(" ");
     return os.str().c_str();
 }
@@ -1063,14 +1063,14 @@ CString _tagXMLNode::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
     {
         // <?TAG
         os << szXMLPIOpen << (LPCTSTR)name;
-        // <?TAG Attr1="Val1" 
+        // <?TAG Attr1="Val1"
         if( attrs.empty() == false ) os << _T(' ');
         for( size_t i = 0 ; i < attrs.size(); i++ )
         {
             os << (LPCTSTR)attrs[i]->GetXML(opt);
         }
         //?>
-        os << szXMLPIClose; 
+        os << szXMLPIClose;
         return os.str().c_str();
     }
     else
@@ -1079,7 +1079,7 @@ CString _tagXMLNode::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
         // <--comment
         os << szXMLCommentOpen << (LPCTSTR)value;
         //-->
-        os << szXMLCommentClose;    
+        os << szXMLCommentClose;
         return os.str().c_str();
     }
     else
@@ -1088,24 +1088,24 @@ CString _tagXMLNode::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
         // <--comment
         os << szXMLCDATAOpen << (LPCTSTR)value;
         //-->
-        os << szXMLCDATAClose;  
+        os << szXMLCDATAClose;
         return os.str().c_str();
     }
 
     // <TAG
     os << _T('<') << (LPCTSTR)name;
 
-    // <TAG Attr1="Val1" 
+    // <TAG Attr1="Val1"
     if( attrs.empty() == false ) os << _T(' ');
     for( size_t i = 0 ; i < attrs.size(); i++ )
     {
         os << (LPCTSTR)attrs[i]->GetXML(opt);
     }
-    
+
     if( childs.empty() && value.IsEmpty() )
     {
-        // <TAG Attr1="Val1"/> alone tag 
-        os << _T("/>"); 
+        // <TAG Attr1="Val1"/> alone tag
+        os << _T("/>");
     }
     else
     {
@@ -1118,7 +1118,7 @@ CString _tagXMLNode::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
 
         for( size_t i = 0 ; i < childs.size(); i++ )
             os << (LPCTSTR)childs[i]->GetXML( opt );
-        
+
         // Text Value
         if( value != _T("") )
         {
@@ -1147,18 +1147,18 @@ CString _tagXMLNode::GetXML( LPDISP_OPT opt /*= &optDefault*/ )
                 opt->tab_base--;
         }
     }
-    
+
     return os.str().c_str();
 }
 
 //========================================================
-// ÇÔ¼ö¸í : GetText
-// ¼³  ¸í : ³ëµå ÇÏ³ª¸¦ ÅØ½ºÆ® ¹®ÀÚ¿­·Î ¹ÝÈ¯
-// ÀÎ  ÀÚ :
-// ¸®ÅÏ°ª : º¯È¯µÈ ¹®ÀÚ¿­
+// ï¿½Ô¼ï¿½ï¿½ï¿½ : GetText
+// ï¿½ï¿½  ï¿½ï¿½ : ï¿½ï¿½ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
+// ï¿½ï¿½  ï¿½ï¿½ :
+// ï¿½ï¿½ï¿½Ï°ï¿½ : ï¿½ï¿½È¯ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½
 //--------------------------------------------------------
-// ÀÛ¼ºÀÚ   ÀÛ¼ºÀÏ                 ÀÛ¼ºÀÌÀ¯
-// Á¶°æ¹Î   2004-06-15
+// ï¿½Û¼ï¿½ï¿½ï¿½   ï¿½Û¼ï¿½ï¿½ï¿½                 ï¿½Û¼ï¿½ï¿½ï¿½ï¿½ï¿½
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½   2004-06-15
 //========================================================
 CString _tagXMLNode::GetText( LPDISP_OPT opt /*= &optDefault*/ )
 {
@@ -1196,12 +1196,12 @@ CString _tagXMLNode::GetText( LPDISP_OPT opt /*= &optDefault*/ )
             // childs text
             for( size_t i = 0 ; i < childs.size(); i++ )
                 os << (LPCTSTR)childs[i]->GetText();
-            
+
             // Text Value
             os << (LPCTSTR)(opt->reference_value&&opt->entitys?opt->entitys->Entity2Ref(value):value);
         }
     }
-    
+
     return os.str().c_str();
 }
 
@@ -1209,7 +1209,7 @@ CString _tagXMLNode::GetText( LPDISP_OPT opt /*= &optDefault*/ )
 // Name   : GetAttr
 // Desc   : get attribute with attribute name
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1232,7 +1232,7 @@ LPXAttr _tagXMLNode::GetAttr( LPCTSTR attrname )
 // Name   : GetAttrs
 // Desc   : find attributes with attribute name, return its list
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1256,7 +1256,7 @@ XAttrs _tagXMLNode::GetAttrs( LPCTSTR name )
 // Name   : GetAttrValue
 // Desc   : get attribute with attribute name, return its value
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1276,7 +1276,7 @@ XNodes _tagXMLNode::GetChilds()
 // Name   : GetChilds
 // Desc   : Find childs with name and return childs list
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1293,7 +1293,7 @@ XNodes _tagXMLNode::GetChilds( LPCTSTR name )
                 nodes.push_back( node );
         }
     }
-    return nodes;   
+    return nodes;
 }
 
 //========================================================
@@ -1436,7 +1436,7 @@ XNodes::iterator _tagXMLNode::GetChildIterator( LPXNode node )
 // Name   : AppendChild
 // Desc   : add node
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1450,7 +1450,7 @@ LPXNode _tagXMLNode::AppendChild( LPCTSTR name /*= NULL*/, LPCTSTR value /*= NUL
 // Name   : AppendChild
 // Desc   : add node
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1467,7 +1467,7 @@ LPXNode _tagXMLNode::AppendChild( LPXNode node )
 // Name   : RemoveChild
 // Desc   : detach node and delete object
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1488,7 +1488,7 @@ bool _tagXMLNode::RemoveChild( LPXNode node )
 // Name   : GetAttr
 // Desc   : get attribute with index in attribute list
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1503,7 +1503,7 @@ LPXAttr _tagXMLNode::GetAttr( size_t i )
 //========================================================
 // Name   : GetAttrIterator
 // Desc   : get attribute iterator
-// Param  : 
+// Param  :
 // Return : std::vector<LPXAttr>::iterator
 //--------------------------------------------------------
 // Coder    Date                      Desc
@@ -1524,7 +1524,7 @@ XAttrs::iterator _tagXMLNode::GetAttrIterator( LPXAttr attr )
 // Name   : AppendAttr
 // Desc   : add attribute
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1540,7 +1540,7 @@ LPXAttr _tagXMLNode::AppendAttr( LPXAttr attr )
 // Name   : RemoveAttr
 // Desc   : detach attribute and delete object
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1561,7 +1561,7 @@ bool _tagXMLNode::RemoveAttr( LPXAttr attr )
 // Name   : CreateNode
 // Desc   : Create node object and return it
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1578,7 +1578,7 @@ LPXNode _tagXMLNode::CreateNode( LPCTSTR name /*= NULL*/, LPCTSTR value /*= NULL
 // Name   : CreateAttr
 // Desc   : create Attribute object and return it
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1595,7 +1595,7 @@ LPXAttr _tagXMLNode::CreateAttr( LPCTSTR name /*= NULL*/, LPCTSTR value /*= NULL
 // Name   : AppendAttr
 // Desc   : add attribute
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1609,7 +1609,7 @@ LPXAttr _tagXMLNode::AppendAttr( LPCTSTR name /*= NULL*/, LPCTSTR value /*= NULL
 // Name   : DetachChild
 // Desc   : no delete object, just detach in list
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1629,7 +1629,7 @@ LPXNode _tagXMLNode::DetachChild( LPXNode node )
 // Name   : DetachAttr
 // Desc   : no delete object, just detach in list
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1649,7 +1649,7 @@ LPXAttr _tagXMLNode::DetachAttr( LPXAttr attr )
 // Name   : CopyNode
 // Desc   : copy current level node with own attributes
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1675,9 +1675,9 @@ void _tagXMLNode::CopyNode( LPXNode node )
 
 //========================================================
 // Name   : _CopyBranch
-// Desc   : recursive internal copy branch 
+// Desc   : recursive internal copy branch
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1704,7 +1704,7 @@ void _tagXMLNode::_CopyBranch( LPXNode node )
 // Name   : AppendChildBranch
 // Desc   : add child branch ( deep-copy )
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1721,7 +1721,7 @@ LPXNode _tagXMLNode::AppendChildBranch( LPXNode node )
 // Name   : CopyBranch
 // Desc   : copy branch ( deep-copy )
 // Param  :
-// Return : 
+// Return :
 //--------------------------------------------------------
 // Coder    Date                      Desc
 // bro      2002-10-29
@@ -1729,7 +1729,7 @@ LPXNode _tagXMLNode::AppendChildBranch( LPXNode node )
 void _tagXMLNode::CopyBranch( LPXNode branch )
 {
     Close();
-    
+
     _CopyBranch( branch );
 }
 
@@ -1793,9 +1793,9 @@ int _tagXMLEntitys::Ref2Entity( LPCTSTR estr, LPTSTR str, int strlen )
         ps++;
     }
     *ps = _T('\0');
-    
+
     // total copied characters
-    return ps-str;  
+    return ps-str;
 }
 
 int _tagXMLEntitys::Entity2Ref( LPCTSTR str, LPTSTR estr, int estrlen )
@@ -1818,7 +1818,7 @@ int _tagXMLEntitys::Entity2Ref( LPCTSTR str, LPTSTR estr, int estrlen )
         ps++;
     }
     *pes = _T('\0');
-    
+
     // total copied characters
     return pes-estr;
 }

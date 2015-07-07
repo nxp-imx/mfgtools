@@ -17,7 +17,7 @@
 #define new DEBUG_NEW
 #endif
 
-usb::Port::Port(usb::Hub* pHub, int index) 
+usb::Port::Port(usb::Hub* pHub, int index)
 : Property(true)
 , _parentHub(pHub)
 , _index(index)
@@ -66,7 +66,7 @@ void usb::Port::Clear()
 #if 0
     memset(&_connectionInfo, 0, sizeof(_connectionInfo));
     _connectionInfo.ConnectionIndex = _index.get();
-    
+
     _propertyList.erase(_propertyList.begin(), _propertyList.end());
     _index.describe(this, _T("Index"));
     _connected.describe(this, _T("Connection status"));
@@ -83,10 +83,10 @@ void usb::Port::Clear()
 DWORD usb::Port::Refresh()
 {
     DWORD error = ERROR_SUCCESS;
-    
+
     // Reset Port Properties
     Clear();
-    
+
 	//WaitForSingleObject(m_Mtx, INFINITE);
     // Open hub
     HANDLE hHub = _parentHub->Open();
@@ -102,7 +102,7 @@ DWORD usb::Port::Refresh()
     DWORD BytesReturned;
     BOOL Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX, &_connectionInfo, sizeof(_connectionInfo),
                             &_connectionInfo, sizeof(_connectionInfo), &BytesReturned, NULL);
-    if (!Success) 
+    if (!Success)
     {
         error = GetLastError();
         CloseHandle(hHub);
@@ -122,13 +122,13 @@ DWORD usb::Port::Refresh()
     {
         DWORD bytes = sizeof(DWORD)*2 + MAX_PATH*2;
         PUSB_NODE_CONNECTION_DRIVERKEY_NAME driverName = (PUSB_NODE_CONNECTION_DRIVERKEY_NAME)malloc(bytes);
-        driverName->ConnectionIndex = _index.get(); 
+        driverName->ConnectionIndex = _index.get();
         DWORD i=0;
-        
+
         // Get the name of the driver key of the device attached to the specified port.
         Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_DRIVERKEY_NAME, driverName,
                                 bytes, driverName, bytes, &BytesReturned, NULL);
-        if (!Success) 
+        if (!Success)
         {
             error = GetLastError();
             CloseHandle(hHub);
@@ -195,9 +195,9 @@ usb::Hub* usb::Port::FindHub(LPCTSTR driverName)
 
     // Find our Hub in gDeviceManager's list of [Hub].Devices()
     usb::HubClass* pHubClass = dynamic_cast<usb::HubClass*>(g_devClasses[DeviceClass::DeviceTypeUsbHub]);
-    
+
     ASSERT(pHubClass);
-    
+
     return pHubClass->FindHubByDriver(driverName);
 }
 
@@ -208,7 +208,7 @@ Device* usb::Port::FindDevice(LPCTSTR driverName)
 
     if ( driverNameStr.IsEmpty() )
         return NULL;
-    
+
     // Find our Device in gDeviceManager's Master List of [*DeviceClass].Devices()
     //std::list<Device*> DeviceList = gDeviceManager::Instance().Devices();
 	std::list<Device*> DeviceList;
@@ -253,7 +253,7 @@ CString usb::Port::GetUsbDevicePath()
     CString pathStr = _T("");
 
 	//WaitForSingleObject(m_Mtx, INFINITE);
-#if 0 
+#if 0
     if ( _connectionInfo.ConnectionStatus == DeviceConnected )
     {
         if ( _device != NULL ) //assert(_device);
@@ -326,12 +326,12 @@ CString usb::Port::GetDeviceDescription(void)
 CString usb::Port::GetDriveLetters(void)
 {
     CString driveStr = _T("");
-/*    
+/*
     if ( _connectionInfo.ConnectionStatus == DeviceConnected )
     {
         DWORD ret = WaitForSingleObject(gDeviceManager::Instance()[DeviceClass::DeviceTypeMsc]->devicesMutex, INFINITE);
 
-        if ( _device != NULL && 
+        if ( _device != NULL &&
              _device->GetDeviceType() == DeviceClass::DeviceTypeMsc )
         {
             // Go though the list of Volumes and see if any of them have the same USB hub and hubIndex
@@ -381,7 +381,7 @@ CString  usb::Port::GetName(void)
     return _parentHub->_path.get();
 }
 
-int usb::Port::GetIndex(void) 
+int usb::Port::GetIndex(void)
 {
     //WaitForSingleObject(m_Mtx, INFINITE);
     int t = _index.get();
@@ -421,4 +421,3 @@ usb::Hub* usb::Port::GetParentHub(void)
     //ReleaseMutex(m_Mtx);
     return pHub;
 }
-

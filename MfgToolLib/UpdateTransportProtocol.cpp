@@ -106,7 +106,7 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
                         {
                             CurrentSize = Math.Min(TotalSize, TotalSize - CurrentState.Msg.ResponseInfo);
                         }
-                        
+
                         CurrentState = new BusyState(this, CurrentState.Msg.ResponseInfo);
                         if (KeepPolling)
                             Thread.Sleep(UpdateProtocol.BusyDelay);
@@ -121,7 +121,7 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
                         break;
                     default:
 //                        String msg = String.Format("In: {0}, Sent: {1}\r\n Response: {2}\r\n Moving to: {3}");
-                        String msg = String.Format("Illegal ResponseCode({0}) for {1}->{2} message.",CurrentState.Msg.ResponseCode, CurrentState.GetType().Name, CurrentState.Msg); 
+                        String msg = String.Format("Illegal ResponseCode({0}) for {1}->{2} message.",CurrentState.Msg.ResponseCode, CurrentState.GetType().Name, CurrentState.Msg);
 //                        InvalidTransactionStateException e = new InvalidTransactionStateException(msg2);
 //                        throw e;
                         CurrentState = new DoneState(this, -65536, msg + " (-65536)");
@@ -247,15 +247,15 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
                     switch (CurrentState.Msg.ResponseCode)
                     {
                         case ScsiUtpMsg.ResponseCodeType.BUSY:
-                            
+
                             TotalSize = CurrentState.Msg.ResponseInfo;
                             CurrentSize = 0;
 
                             CurrentState = new BusyState(this, CurrentState.Msg.ResponseInfo);
                             Thread.Sleep(UpdateProtocol.BusyDelay);
-                            
+
                             break;
-                        
+
                         case ScsiUtpMsg.ResponseCodeType.EXIT:
                             CurrentState = new DoneState(this, CurrentState.Msg.ResponseInfo, CurrentState.Msg.ResponseString);
                             break;
@@ -282,7 +282,7 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
                                 Thread.Sleep(UpdateProtocol.BusyDelay);
                             else
                                 CurrentState = new DoneState(this, -65535, "ERROR: Polling stalled. (-65535)");
-                            
+
                             break;
 
                         case ScsiUtpMsg.ResponseCodeType.PASS:
@@ -423,7 +423,7 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
             public PutDataState(WriteTransaction transaction)
                 : base(transaction)
             {
-// TODO: CLW - USE THIS WHEN PAUL FIXES FW TO NOT DEPEND ON SECTOR SIZES 
+// TODO: CLW - USE THIS WHEN PAUL FIXES FW TO NOT DEPEND ON SECTOR SIZES
 //                Int64 numBytesToWrite = Math.Min(transaction.UpdateProtocol.MaxPacketSize, transaction.TotalSize - transaction.CurrentSize);
 //                Byte[] buffer = new Byte[numBytesToWrite];
 //                Array.Copy(transaction.Data, transaction.CurrentSize, buffer, 0, buffer.LongLength);
@@ -436,7 +436,7 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
                 _Msg = new ScsiUtpMsg.Put(transaction.Tag, transaction.PacketCount, buffer);
                 transaction.CurrentSize += numBytesToWrite;
             }
-        
+
             public override string ToString()
             {
                 return String.Format("   PutDataState - {0} // {1}", Msg.ToString(), Msg.ResponseString);
@@ -550,7 +550,7 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
             UtpDevice.SendCommand(hDevice, modeMsg);
             if (modeMsg.ResponseCode == ScsiUtpMsg.ResponseCodeType.PASS)
             {
-                // Set _Disposed to true so we don't try to unlock the device 
+                // Set _Disposed to true so we don't try to unlock the device
                 // since it should be disconnecting from the bus and Windows will take care of it.
                 _Disposed = true;
             }
@@ -630,7 +630,7 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
             cmdProgress.InProgress = false;
             ((Volume)UtpDevice).DoSendProgress(cmdProgress);
 
-            // Create the file 
+            // Create the file
             try
             {
                 File.WriteAllBytes(filename, transaction.Data);
@@ -673,7 +673,7 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
             while (!(transaction.CurrentState is DoneState))
             {
                 UtpDevice.SendCommand(hDevice, transaction.CurrentState.Msg);
-                
+
                 // Update the UI
                 cmdProgress.Maximum = transaction.TotalSize;
                 cmdProgress.Position = (Int32)transaction.CurrentSize;
@@ -693,7 +693,7 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
             return ((DoneState)transaction.CurrentState).ResponseInfo;
 
         } // UtpWrite()
-    
+
     } // class UpdateTransportProtocol
 
 }

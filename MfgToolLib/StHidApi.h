@@ -55,14 +55,14 @@ namespace api
     //------------------------------------------------------------------------------
     // HID Report Types (IDs)
     //------------------------------------------------------------------------------
-    const UCHAR 
+    const UCHAR
         HID_BLTC_REPORT_TYPE_COMMAND_OUT    = 0x01,
-        HID_BLTC_REPORT_TYPE_DATA_OUT       = 0x02, 
-        HID_BLTC_REPORT_TYPE_DATA_IN        = 0x03, 
+        HID_BLTC_REPORT_TYPE_DATA_OUT       = 0x02,
+        HID_BLTC_REPORT_TYPE_DATA_IN        = 0x03,
         HID_BLTC_REPORT_TYPE_STATUS_IN      = 0x04,
         HID_PITC_REPORT_TYPE_COMMAND_OUT    = 0x05,
-        HID_PITC_REPORT_TYPE_DATA_OUT       = 0x06, 
-        HID_PITC_REPORT_TYPE_DATA_IN        = 0x07, 
+        HID_PITC_REPORT_TYPE_DATA_OUT       = 0x06,
+        HID_PITC_REPORT_TYPE_DATA_IN        = 0x07,
         HID_PITC_REPORT_TYPE_STATUS_IN      = 0x08;
 
 
@@ -122,12 +122,12 @@ namespace api
     public:
         friend class StApiFactory;
 	enum {
-	    InfoPage_Chip = 0x01, 
-	    InfoPage_PitcStatus = 0x02, 
+	    InfoPage_Chip = 0x01,
+	    InfoPage_PitcStatus = 0x02,
 	    InfoPage_secConfig = 0x3,
-	    PITC_STATUS_READY=0x00000000, 
+	    PITC_STATUS_READY=0x00000000,
 	    PITC_STATUS_NOT_READY=0x00000001,
-	    BLTC_SEC_CONFIG_DISABLE=0x00000000, 
+	    BLTC_SEC_CONFIG_DISABLE=0x00000000,
 	    BLTC_SEC_CONFIG_FAB=0x00000001,
 	    BLTC_SEC_CONFIG_ENGINEERING=0x00000002,
 	    BLTC_SEC_CONFIG_PRODUCTION=0x00000003
@@ -195,7 +195,7 @@ namespace api
         BLTC_SENSE_INVALID_CDB_COMMAND              = 0x00000002,
         BLTC_SENSE_INVALID_INQUIRY_PAGE             = 0x00010001,
         BLTC_SENSE_FW_DLOAD_INVALID_LENGTH          = 0x00020001,
-        BLTC_SENSE_ROM_LOADER_INVALID_COMMAND       = 0x00020002, 
+        BLTC_SENSE_ROM_LOADER_INVALID_COMMAND       = 0x00020002,
         BLTC_SENSE_ROM_LOADER_DECRYPTION_FAILURE    = 0x00020003
     };
 
@@ -341,7 +341,7 @@ namespace api
         const StVersionInfo& GetPitcVersion() const;
 
         const CString GetPitcSenseString() const;
-        
+
         struct OtpRegInfoPage {
             UINT Address;
             UCHAR  LockBit;
@@ -364,11 +364,11 @@ namespace api
 
         const UINT GetPersistentRegAddress() const;
         const UINT GetPersistentRegValue() const;
- 
+
     private:
         ParameterT<UCHAR>  _infoPage;
         ParameterT<UINT> _infoParam;
-        
+
         struct PitcInfoPage {
             UINT Id;
 		    StVersionInfo Version;
@@ -378,7 +378,7 @@ namespace api
         }_pitcInfo;
 
         CString _pitcSenseInfo;
-        
+
         OtpRegInfoPage _otpRegInfo;
 
         struct PersistentInfoPage {
@@ -434,7 +434,7 @@ namespace api
         virtual void PrepareCommand();
 
     public:
-        HidPitcWrite(const UINT address, const UINT length, const UINT flags, 
+        HidPitcWrite(const UINT address, const UINT length, const UINT flags,
             const UCHAR * const pData = NULL, const UINT dataSize = 0);
         virtual ~HidPitcWrite() {};
 

@@ -18,7 +18,7 @@
 // StApi class implementation
 //
 //////////////////////////////////////////////////////////////////////
-StApi::~StApi() 
+StApi::~StApi()
 {
 	if ( _responseDataPtr )
 	{
@@ -46,11 +46,11 @@ int StApi::SetCommandData(const UCHAR * const pData, const size_t size)
     }
 
 //    size_t arraySize = max(size,_xferLength);
-    
+
     if ( size && pData )
     {
         _sendDataPtr = (UCHAR*)malloc(size);
-    
+
 	    if ( _sendDataPtr == NULL )
         {
             _xferLength = 0;
@@ -95,7 +95,7 @@ StApiFactory::StApiFactory()
 	RegisterApi("HidInquiry", HidInquiry::Create);
 */
 };
-		
+
 StApi* StApiFactory::CreateApi(CString name, CString paramStr)
 {
 	CallbackMap::const_iterator i = _callbacks.find(name);

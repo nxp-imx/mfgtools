@@ -21,7 +21,7 @@ KernelApi::KernelApi(void)
     memset(this, 0, sizeof(*this));
     hModuleKernel32 = LoadLibrary(_T("KERNEL32.dll"));
     if (hModuleKernel32)
-    {	    
+    {
 		// We got the library, that should work no matter what we're running on.
 		FINDPROC(GetVolumeNameForVolumeMountPointA);
 		// Get wide versions of functions if on unicode
@@ -33,7 +33,7 @@ KernelApi::KernelApi(void)
 #endif
 		if ( GetVolumeNameForVolumeMountPointA )
 		{
-#if defined(UNICODE)	
+#if defined(UNICODE)
 			// if NT based
 			//if (gWinVersionInfo().IsWinNT())
 			{
@@ -80,8 +80,8 @@ BOOL KernelApi::apiGetVolumeNameForVolumeMountPoint(
 		ssVolumeMountPoint.ReleaseBuffer();
 		if (success)
 			ssVolumeName = Buffer;
-		
-		return success;		
+
+		return success;
     }
 #else
     Success = GetVolumeNameForVolumeMountPoint(ssVolumeMountPoint.GetBuffer(), Buffer, MAX_PATH);

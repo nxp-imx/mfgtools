@@ -19,7 +19,7 @@ namespace api
 	public:
 
         /// <summary>
-        /// Utp Command Set. 
+        /// Utp Command Set.
         /// Byte[1] of the CDB for Vendor-specific SCSI commands.
         /// </summary>
         typedef enum _CommandSet
@@ -60,10 +60,10 @@ namespace api
 		}
 
 		/// <summary>
-        /// Utp Response Code Set. 
+        /// Utp Response Code Set.
         /// Byte[12-13] of the SENSE_DATA structure for Vendor-specific SCSI commands.
         /// </summary>
-        typedef enum 
+        typedef enum
         {
             PASS = 0x8000,
             EXIT = 0x8001,
@@ -84,10 +84,10 @@ namespace api
         }
 
 	public:
-		virtual CString ToString() 
-		{ 
-			CString str; 
-			str.Format(_T("Unknown(tag:%d, lParam:%#08x, cmd:%#01x)"), _cdb.Tag, _cdb.LParam, _cdb.Command); 
+		virtual CString ToString()
+		{
+			CString str;
+			str.Format(_T("Unknown(tag:%d, lParam:%#08x, cmd:%#01x)"), _cdb.Tag, _cdb.LParam, _cdb.Command);
 			return str;
 		}
 
@@ -140,8 +140,8 @@ namespace api
 			if (GetResponseCode() == SIZE)
             {
                 UCHAR tempData[8] =
-                { 
-                    ScsiSenseData.CommandSpecificInformation[0], ScsiSenseData.CommandSpecificInformation[1], ScsiSenseData.CommandSpecificInformation[2], ScsiSenseData.CommandSpecificInformation[3], 
+                {
+                    ScsiSenseData.CommandSpecificInformation[0], ScsiSenseData.CommandSpecificInformation[1], ScsiSenseData.CommandSpecificInformation[2], ScsiSenseData.CommandSpecificInformation[3],
                     ScsiSenseData.Information[0], ScsiSenseData.Information[1], ScsiSenseData.Information[2], ScsiSenseData.Information[3]
                 };
                 return (__int64)Swap8(tempData);
@@ -167,7 +167,7 @@ namespace api
             }
 			else
 				_responseStr = _T("UNKNOWN");
-				
+
 			return CString(StApi::ResponseString());
         };
     }; // ScsiUtpMsg
@@ -191,7 +191,7 @@ namespace api
         CString ToString()
         {
 			CString retStr, lparam;
-            
+
             switch(_cdb.LParam)
 			{
 				case None:
@@ -260,7 +260,7 @@ namespace api
 
 			return str;
         }
-    
+
     }; // class Exec
 
     /// <summary>
@@ -284,7 +284,7 @@ namespace api
 
 			return str;
         }
-    
+
     }; // class Get
 
     /// <summary>
@@ -314,9 +314,9 @@ namespace api
 
 			return str;
         }
-    
+
     }; // class Put
-    
+
 /*
     public class ScsiUtpApi : ScsiApi
     {
@@ -361,9 +361,9 @@ namespace api
 
         /// ////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// 
+        ///
         /// UtpCommand
-        /// 
+        ///
         /// </summary>
         /// ////////////////////////////////////////////////////////////////////////////////////
         [MemberFunction()]
@@ -389,9 +389,9 @@ namespace api
 
         /// ////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// 
+        ///
         /// UtpRead
-        /// 
+        ///
         /// </summary>
         /// ////////////////////////////////////////////////////////////////////////////////////
         [MemberFunction()]
@@ -427,9 +427,9 @@ namespace api
 
         /// ////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// 
+        ///
         /// UtpWrite
-        /// 
+        ///
         /// </summary>
         /// ////////////////////////////////////////////////////////////////////////////////////
         [MemberFunction()]

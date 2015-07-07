@@ -26,7 +26,7 @@ usb::HubClass::~HubClass()
 Device* usb::HubClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
 {
     usb::Hub* hub = new usb::Hub(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
-    
+
     // Enumerator finds all USB devices, so we don't create the device if it doesn't have any ports.
     if ( hub->GetNumPorts() == 0 )
     {
@@ -121,6 +121,3 @@ usb::Hub* usb::HubClass::FindHubByPath(LPCTSTR pathName)
 
     return pHub;
 }
-
-
-

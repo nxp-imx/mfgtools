@@ -21,25 +21,25 @@ namespace usb
 
         usb::Port* Port(const size_t portNumber); // portNumbers start at 1 not 0
 
-        property::Property::PropertyList* Ports() 
-		{ 
-			return _ports.getList(); 
+        property::Property::PropertyList* Ports()
+		{
+			return _ports.getList();
 		}
 
         DWORD RefreshPort(const int portNumber);
         DWORD ClearPort(const int portNumber);
 
         // PROPERTIES
-        class index : public Int32Property 
-		{ 
-		public: 
-			void put(int val); 
+        class index : public Int32Property
+		{
+		public:
+			void put(int val);
 			int get();
 		}_index;	//save the index of the hub
 
-        const BYTE GetNumPorts() const 
-		{ 
-			return 0;// _nodeInformation.u.HubInformation.HubDescriptor.bNumberOfPorts; 
+        const BYTE GetNumPorts() const
+		{
+			return 0;// _nodeInformation.u.HubInformation.HubDescriptor.bNumberOfPorts;
 		}
 
         Property _ports;

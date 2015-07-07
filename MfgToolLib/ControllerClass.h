@@ -23,5 +23,3 @@ namespace usb
 		CString ToString() { return _T("ControllerClass"); }
 	};
 }	// namespace usb
-
-

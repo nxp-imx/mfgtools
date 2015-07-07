@@ -32,7 +32,7 @@
 #define L_STMP_RESINFO_TYPE				L"STMPRESINFOTYPE"
 
 
-typedef enum 
+typedef enum
 {
 	DLG_DEFAULT		= 0,
 	DLG_MINIMAL		= 1,
@@ -55,6 +55,3 @@ typedef struct _DRIVE_DESC {
 //   BOOLEAN  bEncrypted;
    ULONG    ulRequestedKB;
 } DRIVE_DESC, *PDRIVE_DESC;
-
-
-

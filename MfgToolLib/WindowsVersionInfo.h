@@ -19,7 +19,7 @@ public:
     BOOL IsAvailable() { return m_is_available; };
     bool IsWin9x() { return ( m_family == WIN_9X ); };
     bool IsWinNT() { return ( m_family == WIN_NT ); };
-    bool IsWin2K() { return ( m_osvi.dwMajorVersion == 5 && m_osvi.dwMinorVersion == 0 ); };  
+    bool IsWin2K() { return ( m_osvi.dwMajorVersion == 5 && m_osvi.dwMinorVersion == 0 ); };
     bool IsWmp10() { return m_bMTPSupported; };
     bool IsWinXPSP1() { return (m_osvi.dwMajorVersion == 5 && m_osvi.dwMinorVersion >= 1 && m_osvi.wServicePackMajor == 1); };
     bool IsWinXPSP2() { return (m_osvi.dwMajorVersion == 5 && m_osvi.dwMinorVersion >= 1 && m_osvi.wServicePackMajor == 2); };
@@ -43,7 +43,7 @@ public:
         if( !(m_bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &m_osvi)) )
         {
             m_osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-            if (! GetVersionEx ( (OSVERSIONINFO *) &m_osvi) ) 
+            if (! GetVersionEx ( (OSVERSIONINFO *) &m_osvi) )
                 return;
         }
 
@@ -86,7 +86,7 @@ public:
                     else
                         m_desc += _T("Professional\r\n");
                     }
-                    
+
                     // Test for the server type.
                     else if ( m_osvi.wProductType == VER_NT_SERVER )
                     {
@@ -112,7 +112,7 @@ public:
                             m_desc += _T("Server\r\n");
                     }
 
-                    else  // Windows NT 4.0 
+                    else  // Windows NT 4.0
                     {
                         if( m_osvi.wSuiteMask & VER_SUITE_ENTERPRISE )
                             m_desc += _T("Server 4.0, Enterprise Edition\r\n");
@@ -153,7 +153,7 @@ public:
 
             // Display service pack (if any) and build number.
 
-                if( m_osvi.dwMajorVersion == 4 && 
+                if( m_osvi.dwMajorVersion == 4 &&
                     CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, m_osvi.szCSDVersion, -1, _T("Service Pack 6"), -1) == 0 )
                 {
                     HKEY hKey;
@@ -164,7 +164,7 @@ public:
                     _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Hotfix\\Q246009"),
                     0, KEY_QUERY_VALUE, &hKey );
                     if( lRet == ERROR_SUCCESS )
-                        m_desc.AppendFormat(_T("Service Pack 6a (Build %d)\r\n"), m_osvi.dwBuildNumber & 0xFFFF );         
+                        m_desc.AppendFormat(_T("Service Pack 6a (Build %d)\r\n"), m_osvi.dwBuildNumber & 0xFFFF );
                     else // Windows NT 4.0 prior to SP6a
                     {
                         m_desc.AppendFormat(_T("%s (Build %d)\r\n"),
@@ -187,7 +187,7 @@ public:
             case VER_PLATFORM_WIN32_WINDOWS:
 
                 m_family = WIN_9X;
-                
+
                 if (m_osvi.dwMajorVersion == 4 && m_osvi.dwMinorVersion == 0)
                 {
                     m_desc = _T("Microsoft Windows 95 ");
@@ -195,7 +195,7 @@ public:
                         m_desc += _T("OSR2\r\n" );
                     else
                         m_desc += _T("\r\n" );
-                } 
+                }
 
                 if (m_osvi.dwMajorVersion == 4 && m_osvi.dwMinorVersion == 10)
                 {
@@ -204,12 +204,12 @@ public:
                         m_desc += _T("SE\r\n" );
                     else
                         m_desc += _T("\r\n" );
-                } 
+                }
 
                 if (m_osvi.dwMajorVersion == 4 && m_osvi.dwMinorVersion == 90)
                 {
                     m_desc = _T("Microsoft Windows Millennium Edition\r\n");
-                } 
+                }
                 break;
 
             case VER_PLATFORM_WIN32s:
@@ -217,7 +217,7 @@ public:
                 m_desc = _T("Microsoft Win32s\r\n");
                 break;
         }
-           
+
         // Check the version of Windows Media Player
         //
         // Open the installed versions key and read the data for wmplayer.exe
@@ -248,7 +248,7 @@ public:
         }
 
         m_is_available = true;
-        return; 
+        return;
     }
 
 protected:
@@ -259,4 +259,3 @@ protected:
     WIN_FAMILY_VER m_family;
     CString m_desc;
 };
-

@@ -85,20 +85,20 @@ CMfgToolLibApp::CMfgToolLibApp()
 CMfgToolLibApp *theApp;
 
 /************************************************************
-* Global variables definition
-************************************************************/
+ * Global variables definition
+ ************************************************************/
 CMfgLogMgr *g_pLogMgr;
 /*
-OP_STATE_ARRAY g_OpStates;
-CFG_PARAMETER g_CfgParam;
-CUclXml* g_pXmlHandler;
-CString g_strPath;
-CString g_strUclFilename;
-int g_iMaxBoardNum;
-std::vector<CCmdOpreation*> g_CmdOperationArray(MAX_BOARD_NUMBERS);
-StateCommansMap_t g_StateCommands;
-PORT_DEV_INFO g_PortDevInfoArray[MAX_BOARD_NUMBERS];
-*/
+	 OP_STATE_ARRAY g_OpStates;
+	 CFG_PARAMETER g_CfgParam;
+	 CUclXml* g_pXmlHandler;
+	 CString g_strPath;
+	 CString g_strUclFilename;
+	 int g_iMaxBoardNum;
+	 std::vector<CCmdOpreation*> g_CmdOperationArray(MAX_BOARD_NUMBERS);
+	 StateCommansMap_t g_StateCommands;
+	 PORT_DEV_INFO g_PortDevInfoArray[MAX_BOARD_NUMBERS];
+ */
 std::vector<MFGLIB_VARS *> g_LibVarsArray;
 //std::vector<USB_PORT_NODE *> g_PortTable;
 std::map<CString, CString> g_UclKeywords;
@@ -114,10 +114,10 @@ BOOL CMfgToolLibApp::InitInstance()
 
 	TCHAR *_path = get_current_dir_name();
 	//::GetModuleFileName(AfxGetStaticModuleState()->m_hCurrentInstanceHandle, _path, MAX_PATH);
-	
+
 	m_strDllFullPath=_path;
 	m_strDllFullPath.append("/");
-	
+
 	g_pLogMgr = NULL;
 	g_hOneInstance = NULL;
 
@@ -127,8 +127,8 @@ BOOL CMfgToolLibApp::InitInstance()
 }
 
 /************************************************************
-* Export Functions implementation
-************************************************************/
+ * Export Functions implementation
+ ************************************************************/
 DWORD MfgLib_Initialize()
 {
 
@@ -166,8 +166,8 @@ DWORD MfgLib_CreateInstanceHandle(INSTANCE_HANDLE *pHandle)
 {
 	//if(g_hOneInstance == NULL)
 	//{
-//		return MFGLIB_ERROR_NOT_INITIALIZED;
-//	}
+	//		return MFGLIB_ERROR_NOT_INITIALIZED;
+	//	}
 
 	MFGLIB_VARS *pLibVars = NULL;
 
@@ -292,9 +292,9 @@ DWORD MfgLib_SetUCLFile(INSTANCE_HANDLE handle, BYTE_t *strName)
 	{
 		return MFGLIB_ERROR_INVALID_PARAM;
 	}
-/*
-	pLibVars->g_strUclFilename = theApp->m_strDllFullPath + _T("Profiles") + _T("\\") + pLibVars->g_CfgParam.chip + _T("\\") + _T("OS Firmware") + _T("\\") + strName;
-*/	
+	/*
+		 pLibVars->g_strUclFilename = theApp->m_strDllFullPath + _T("Profiles") + _T("\\") + pLibVars->g_CfgParam.chip + _T("\\") + _T("OS Firmware") + _T("\\") + strName;
+	 */
 	pLibVars->g_strUclFilename.assign(theApp->m_strDllFullPath);
 	pLibVars->g_strUclFilename.append(_T("Profiles"));
 	pLibVars->g_strUclFilename.append(_T("\\"));
@@ -314,11 +314,11 @@ DWORD MfgLib_SetUCLFile(INSTANCE_HANDLE handle, BYTE_t *strName)
 	//Open Ucl.xml
 	FILE * UclXmlFile = _tfopen(pLibVars->g_strUclFilename, _T("r+"));
 	if( UclXmlFile==NULL)
-    {
+	{
 		return MFGLIB_ERROR_FILE_NOT_EXIST;
-    }
+	}
 	std::fclose(UclXmlFile);
-	
+
 
 	return MFGLIB_ERROR_SUCCESS;
 }
@@ -367,7 +367,7 @@ DWORD MfgLib_InitializeOperation(INSTANCE_HANDLE handle)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Initialize log manager failed, error code: %d"), error);
 		goto ERROR_END;
 	}
-	
+
 	//Parse xml
 	error = ParseUclXml(pLibVars);
 	if( (error != MFGLIB_ERROR_SUCCESS) && (error != MFGLIB_ERROR_ALREADY_EXIST) )
@@ -443,26 +443,26 @@ DWORD MfgLib_StartOperation(INSTANCE_HANDLE handle, pthread_t OperationID)
 	}
 
 	int DeviceIndex;
-/*	USB_PORT_NODE *pPortNode = NULL;
-	pPortNode = FindPortPhysicalNode(PortID);
-	if(pPortNode == NULL)
-	{
-		return MFGLIB_ERROR_INVALID_PORT_ID;
-	}
-	for(int i=0; i<pLibVars->g_iMaxBoardNum; i++)
-	{
-		if( (pLibVars->g_PortDevInfoArray[i].hubPath.CompareNoCase(pPortNode->hubPath) == 0)
+	/*	USB_PORT_NODE *pPortNode = NULL;
+			pPortNode = FindPortPhysicalNode(PortID);
+			if(pPortNode == NULL)
+			{
+			return MFGLIB_ERROR_INVALID_PORT_ID;
+			}
+			for(int i=0; i<pLibVars->g_iMaxBoardNum; i++)
+			{
+			if( (pLibVars->g_PortDevInfoArray[i].hubPath.CompareNoCase(pPortNode->hubPath) == 0)
 			&& (pLibVars->g_PortDevInfoArray[i].portIndex == pPortNode->portIndex) )
-		{
+			{
 			DeviceIndex = i;
 			break;
-		}
-	}
-	if(DeviceIndex >= pLibVars->g_iMaxBoardNum)
-	{
-		return MFGLIB_ERROR_INVALID_PORT_ID;
-	}
-*/
+			}
+			}
+			if(DeviceIndex >= pLibVars->g_iMaxBoardNum)
+			{
+			return MFGLIB_ERROR_INVALID_PORT_ID;
+			}
+	 */
 	DeviceIndex = FindOperationIndex(pLibVars, OperationID);
 	if(DeviceIndex >= pLibVars->g_iMaxBoardNum)
 	{
@@ -500,25 +500,25 @@ DWORD MfgLib_StopOperation(INSTANCE_HANDLE handle, pthread_t OperationID)
 	}
 
 	int DeviceIndex = -1;
-/*	USB_PORT_NODE *pPortNode = NULL;
-	pPortNode = FindPortPhysicalNode(PortID);
-	if(pPortNode == NULL)
-	{
-		return MFGLIB_ERROR_INVALID_PORT_ID;
-	}
-	for(int i=0; i<pLibVars->g_iMaxBoardNum; i++)
-	{
-		if( (pLibVars->g_PortDevInfoArray[i].hubPath.CompareNoCase(pPortNode->hubPath) == 0)
+	/*	USB_PORT_NODE *pPortNode = NULL;
+			pPortNode = FindPortPhysicalNode(PortID);
+			if(pPortNode == NULL)
+			{
+			return MFGLIB_ERROR_INVALID_PORT_ID;
+			}
+			for(int i=0; i<pLibVars->g_iMaxBoardNum; i++)
+			{
+			if( (pLibVars->g_PortDevInfoArray[i].hubPath.CompareNoCase(pPortNode->hubPath) == 0)
 			&& (pLibVars->g_PortDevInfoArray[i].portIndex == pPortNode->portIndex) )
-		{
+			{
 			DeviceIndex = i;
 			break;
-		}
-	}
-	if(DeviceIndex >= pLibVars->g_iMaxBoardNum)
-	{
-		return MFGLIB_ERROR_INVALID_PORT_ID;
-	} */
+			}
+			}
+			if(DeviceIndex >= pLibVars->g_iMaxBoardNum)
+			{
+			return MFGLIB_ERROR_INVALID_PORT_ID;
+			} */
 
 	DeviceIndex = FindOperationIndex(pLibVars, OperationID);
 	if(DeviceIndex >= pLibVars->g_iMaxBoardNum)
@@ -588,14 +588,14 @@ DWORD MfgLib_GetOperationInformation(INSTANCE_HANDLE handle, OPERATIONS_INFORMAT
 			pInfo->ConnectedDeviceState = MX_DISCONNECTED;
 		}
 
-/*		USB_PORT_NODE portphynode;
-		portphynode.hubPath = pInfo->HubName;
-		portphynode.hubIndex = pInfo->HubIndex;
-		portphynode.portIndex = pInfo->PortIndex;
-		PORT_ID portID = FindPortLogicalID(&portphynode);
+		/*		USB_PORT_NODE portphynode;
+					portphynode.hubPath = pInfo->HubName;
+					portphynode.hubIndex = pInfo->HubIndex;
+					portphynode.portIndex = pInfo->PortIndex;
+					PORT_ID portID = FindPortLogicalID(&portphynode);
 
-		pInfo->PortID = portID;
-*/
+					pInfo->PortID = portID;
+		 */
 		pInfo->OperationID = pLibVars->g_CmdOpThreadID[i];
 		pInfo = (OPERATION_INFOMATION *)((UCHAR *)(pOperationsInfo->pOperationInfo) + (i+1) * sizeof(OPERATION_INFOMATION));
 	}
@@ -700,28 +700,28 @@ DWORD MfgLib_RegisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbTy
 	void *pCallback = NULL;
 	switch(cbType)
 	{
-	case DeviceChange:
-		for(i=0; i<pLibVars->g_iMaxBoardNum; i++)
-		{
-			pCallback = new DeviceChangeCallbackStruct;
-			((DeviceChangeCallbackStruct *)pCallback)->OperationID = pLibVars->g_CmdOpThreadID[i];
-			((DeviceChangeCallbackStruct *)pCallback)->pfunc = (PCALLBACK_DEVICE_CHANGE)pFunc;
-			RegisterUIDevChangeCallback((MFGLIB_VARS *)handle, (DeviceChangeCallbackStruct *)pCallback);
-			pLibVars->g_cbDevChangeHandle[i] = pCallback;
-		}
-		break;
-	case OperateResult:
-		for(i=0; i<pLibVars->g_iMaxBoardNum; i++)
-		{
-			pCallback = new OperateResultUpdateStruct;
-			((OperateResultUpdateStruct *)pCallback)->OperationID = pLibVars->g_CmdOpThreadID[i];
-			((OperateResultUpdateStruct *)pCallback)->pfunc = (PCALLBACK_OPERATE_RESULT)pFunc;
-			RegisterUIInfoUpdateCallback((MFGLIB_VARS *)handle, (OperateResultUpdateStruct *)pCallback);
-			pLibVars->g_cbOpResultHandle[i] = pCallback;
-		}
-		break;
-	default:
-		return MFGLIB_ERROR_CALLBACK_INVALID_TYPE;
+		case DeviceChange:
+			for(i=0; i<pLibVars->g_iMaxBoardNum; i++)
+			{
+				pCallback = new DeviceChangeCallbackStruct;
+				((DeviceChangeCallbackStruct *)pCallback)->OperationID = pLibVars->g_CmdOpThreadID[i];
+				((DeviceChangeCallbackStruct *)pCallback)->pfunc = (PCALLBACK_DEVICE_CHANGE)pFunc;
+				RegisterUIDevChangeCallback((MFGLIB_VARS *)handle, (DeviceChangeCallbackStruct *)pCallback);
+				pLibVars->g_cbDevChangeHandle[i] = pCallback;
+			}
+			break;
+		case OperateResult:
+			for(i=0; i<pLibVars->g_iMaxBoardNum; i++)
+			{
+				pCallback = new OperateResultUpdateStruct;
+				((OperateResultUpdateStruct *)pCallback)->OperationID = pLibVars->g_CmdOpThreadID[i];
+				((OperateResultUpdateStruct *)pCallback)->pfunc = (PCALLBACK_OPERATE_RESULT)pFunc;
+				RegisterUIInfoUpdateCallback((MFGLIB_VARS *)handle, (OperateResultUpdateStruct *)pCallback);
+				pLibVars->g_cbOpResultHandle[i] = pCallback;
+			}
+			break;
+		default:
+			return MFGLIB_ERROR_CALLBACK_INVALID_TYPE;
 	}
 
 	return MFGLIB_ERROR_SUCCESS;
@@ -743,29 +743,29 @@ DWORD MfgLib_UnregisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cb
 	int i=0;
 	switch(cbType)
 	{
-	case DeviceChange:
-		for(i=0; i<pLibVars->g_iMaxBoardNum; i++)
-		{
-			UnregisterUIDevChangeCallback(pLibVars, i);
-			if(pLibVars->g_cbDevChangeHandle[i] != NULL)
+		case DeviceChange:
+			for(i=0; i<pLibVars->g_iMaxBoardNum; i++)
 			{
-				delete pLibVars->g_cbDevChangeHandle[i];
+				UnregisterUIDevChangeCallback(pLibVars, i);
+				if(pLibVars->g_cbDevChangeHandle[i] != NULL)
+				{
+					delete pLibVars->g_cbDevChangeHandle[i];
+				}
 			}
-		}
-		
-		break;
-	case OperateResult:
-		for(i=0; i<pLibVars->g_iMaxBoardNum; i++)
-		{
-			UnregisterUIInfoUpdateCallback(pLibVars, i);
-			if(pLibVars->g_cbOpResultHandle[i] != NULL)
+
+			break;
+		case OperateResult:
+			for(i=0; i<pLibVars->g_iMaxBoardNum; i++)
 			{
-				delete pLibVars->g_cbOpResultHandle[i];
+				UnregisterUIInfoUpdateCallback(pLibVars, i);
+				if(pLibVars->g_cbOpResultHandle[i] != NULL)
+				{
+					delete pLibVars->g_cbOpResultHandle[i];
+				}
 			}
-		}
-		break;
-	default:
-		return MFGLIB_ERROR_CALLBACK_INVALID_TYPE;
+			break;
+		default:
+			return MFGLIB_ERROR_CALLBACK_INVALID_TYPE;
 	}
 
 	return MFGLIB_ERROR_SUCCESS;
@@ -786,8 +786,8 @@ DWORD MfgLib_GetLibraryVersion(BYTE_t* version, int maxSize)
 }
 
 /************************************************************
-* Internal Functions implementation
-************************************************************/
+ * Internal Functions implementation
+ ************************************************************/
 DWORD InitLogManager()
 {
 	if(g_pLogMgr != NULL)
@@ -809,7 +809,7 @@ DWORD InitLogManager()
 	{
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	
+
 	if(NULL == g_pLogMgr)
 	{
 		return MFGLIB_ERROR_NO_MEMORY;
@@ -828,26 +828,26 @@ void DeinitLogManager()
 
 void LogMsg(DWORD moduleID, DWORD levelID, const TCHAR * format, ... )
 {
-    return;
+	return;
 	TCHAR* buffer;
-    va_list args;
-    int len;
+	va_list args;
+	int len;
 
-    va_start(args, format);
-    len = _vsctprintf(format, args)+1;
-    buffer = (TCHAR*)malloc(len*sizeof(TCHAR));
-    std::vsnprintf(buffer,len, format, args);
-    va_end(args);
+	va_start(args, format);
+	len = _vsctprintf(format, args)+1;
+	buffer = (TCHAR*)malloc(len*sizeof(TCHAR));
+	std::vsnprintf(buffer,len, format, args);
+	va_end(args);
 
-    CString str;
-    str.Format(_T("ModuleID[%d] LevelID[%d]: %s\n"),moduleID, levelID, buffer);
-	
+	CString str;
+	str.Format(_T("ModuleID[%d] LevelID[%d]: %s\n"),moduleID, levelID, buffer);
+
 	if(g_pLogMgr != NULL)
 	{
 		g_pLogMgr->WriteToLogFile(str);
 	}
 
-    free(buffer);
+	free(buffer);
 }
 
 //parse xml file
@@ -892,15 +892,15 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	//for use atl convert macro, A2T
 	//USES_CONVERSION;
 	//read Ucl.xml
-//	pLibVars->g_strUclFilename = "ucl2.xml";
+	//	pLibVars->g_strUclFilename = "ucl2.xml";
 	int pos = pLibVars->g_strUclFilename.ReverseFind(_T('/'));
 	pLibVars->g_strPath = pLibVars->g_strUclFilename.Left(pos+1);  //+1 for add '\' at the last
 
 	CAnsiString uclString;
 	FILE* UclXmlFile = _tfopen(pLibVars->g_strUclFilename, _T("r"));
-	
+
 	if(UclXmlFile==NULL)
-	{	
+	{
 		CString test= _tcserror(errno);
 		return MFGLIB_ERROR_FILE_OPEN_FAILED;
 	}
@@ -909,7 +909,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	std::fread(uclString.GetBufferSetLength((int)FileLen.st_size),sizeof(char), (unsigned int)FileLen.st_size,UclXmlFile);
 	uclString.ReleaseBuffer();
 	// Load xml file content
-#ifdef __linux__	
+#ifdef __linux__
 	pLibVars->g_pXmlHandler->Load(uclString);
 #else
 
@@ -941,7 +941,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 	COpState *pState = NULL;
 	CString strTemp;
 	// for each STATE
-	
+
 	for(; state!=states.end(); ++state)
 	{
 		try
@@ -965,11 +965,11 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 		pState->strStateName = strTemp;
 		if ( strTemp.CompareNoCase(_T("BootStrap")) == 0 )
 		{
-		   pState->opState = MX_BOOTSTRAP;
+			pState->opState = MX_BOOTSTRAP;
 		}
 		else if ( strTemp.CompareNoCase(_T("Updater")) == 0 )
 		{
-		   pState->opState = MX_UPDATER;
+			pState->opState = MX_UPDATER;
 		}
 		else
 		{
@@ -981,34 +981,34 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 
 		strTemp = (*state)->GetAttrValue(_T("dev"));
 		pState->strDevice = strTemp;
-/*		if( strTemp.CompareNoCase(_T("MX23")) == 0 )
-		{
-			pState->opDeviceType = DEV_MX23;
-		}
-		else if( strTemp.CompareNoCase(_T("MX25")) == 0 )
-		{
-			pState->opDeviceType = DEV_MX25;
-		}
-		else if( strTemp.CompareNoCase(_T("MX28")) == 0 )
-		{
-			pState->opDeviceType = DEV_MX28;
-		}
-		else if( strTemp.CompareNoCase(_T("MX35")) == 0 )
-		{
-			pState->opDeviceType = DEV_MX35;
-		}
-		else if( strTemp.CompareNoCase(_T("MX50")) == 0 )
-		{
-			pState->opDeviceType = DEV_MX50;
-		}
-		else if( strTemp.CompareNoCase(_T("MX51")) == 0 )
-		{
-			pState->opDeviceType = DEV_MX51;
-		}
-		else if( strTemp.CompareNoCase(_T("MX53")) == 0 )
-		{
-			pState->opDeviceType = DEV_MX53;
-		} */
+		/*		if( strTemp.CompareNoCase(_T("MX23")) == 0 )
+					{
+					pState->opDeviceType = DEV_MX23;
+					}
+					else if( strTemp.CompareNoCase(_T("MX25")) == 0 )
+					{
+					pState->opDeviceType = DEV_MX25;
+					}
+					else if( strTemp.CompareNoCase(_T("MX28")) == 0 )
+					{
+					pState->opDeviceType = DEV_MX28;
+					}
+					else if( strTemp.CompareNoCase(_T("MX35")) == 0 )
+					{
+					pState->opDeviceType = DEV_MX35;
+					}
+					else if( strTemp.CompareNoCase(_T("MX50")) == 0 )
+					{
+					pState->opDeviceType = DEV_MX50;
+					}
+					else if( strTemp.CompareNoCase(_T("MX51")) == 0 )
+					{
+					pState->opDeviceType = DEV_MX51;
+					}
+					else if( strTemp.CompareNoCase(_T("MX53")) == 0 )
+					{
+					pState->opDeviceType = DEV_MX53;
+					} */
 		if( strTemp.CompareNoCase(_T("MX6Q")) == 0 )
 		{
 			pState->opDeviceType = DEV_HID_MX6Q;
@@ -1220,28 +1220,28 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 				((COpCmd_Push*)pOpCmd)->m_bIngoreError = TRUE;
 			}
 		}
-	/*	else if( strCmdType.CompareNoCase(_T("burn")) == 0 )
-		{
-			pOpCmd = new COpCmd_Burn;
-			if(pOpCmd == NULL)
-			{
+		/*	else if( strCmdType.CompareNoCase(_T("burn")) == 0 )
+				{
+				pOpCmd = new COpCmd_Burn;
+				if(pOpCmd == NULL)
+				{
 				retVal = MFGLIB_ERROR_NO_MEMORY;
 				goto CMD_ERR;
-			}
-			pOpCmd->m_pLibVars = (INSTANCE_HANDLE)pLibVars;
-			strTemp = (*it)->GetAttrValue(_T("file"));
-			if(strTemp.IsEmpty())
-			{
+				}
+				pOpCmd->m_pLibVars = (INSTANCE_HANDLE)pLibVars;
+				strTemp = (*it)->GetAttrValue(_T("file"));
+				if(strTemp.IsEmpty())
+				{
 				retVal = MFGLIB_ERROR_NO_FILENAME;
 				goto CMD_ERR;
-			}
-			((COpCmd_Burn*)pOpCmd)->SetFileName(strTemp);
-		} */
+				}
+				((COpCmd_Burn*)pOpCmd)->SetFileName(strTemp);
+				} */
 
 		strTemp = (*it)->GetAttrValue(_T("body"));
 		strTemp = ReplaceKeywords(strTemp);
 		pOpCmd->SetBodyString(strTemp);
-	//	pOpCmd->SetDescString((*it)->GetText());
+		//	pOpCmd->SetDescString((*it)->GetText());
 
 		strTemp = (*it)->GetAttrValue(_T("ifdev"));
 		pOpCmd->SetIfDevString(strTemp);
@@ -1299,8 +1299,8 @@ void ReleaseUclCommands(MFGLIB_VARS *pLibVars)
 	}
 }
 /*
-* CCommandList implementation
-*/
+ * CCommandList implementation
+ */
 CString CCommandList::GetName()
 {
 	return CString(GetAttrValue(_T("name")));
@@ -1318,7 +1318,7 @@ CCommandList* CUclXml::GetCmdListNode(LPCTSTR name)
 	{
 		return NULL;
 	}
-	
+
 	std::vector<LPXNode>::iterator it = lists.begin();
 	for(; it!=lists.end(); ++it)
 	{
@@ -1329,12 +1329,12 @@ CCommandList* CUclXml::GetCmdListNode(LPCTSTR name)
 			return pList;
 		}
 	}
-	
+
 	return NULL;
 }
 /*
-* COpCommand implementation
-*/
+ * COpCommand implementation
+ */
 COpCommand::COpCommand()
 {
 	m_pLibVars = NULL;
@@ -1386,8 +1386,8 @@ bool COpCommand::IsRun(CString &str)
 }
 
 /*
-* COpCmd_Find implementation
-*/
+ * COpCmd_Find implementation
+ */
 void COpCmd_Find::SetTimeout(CString &strTO)
 {
 	m_timeout = _tcstol(LPCTSTR(strTO), NULL, 10);
@@ -1399,8 +1399,8 @@ UINT COpCmd_Find::ExecuteCommand(int index)
 }
 
 /*
-* COpCmd_Boot implementation
-*/
+ * COpCmd_Boot implementation
+ */
 COpCmd_Boot::COpCmd_Boot()
 {
 	m_pDataBuf = NULL;
@@ -1426,18 +1426,18 @@ UINT COpCmd_Boot::SetFileMapping(CString &strFile)
 	struct _stat64i32 FileLen;
 	_tstat(m_FileName, &FileLen);
 	if ( fwFile==NULL )
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file %s failed to open.errcode is %d"), m_FileName.c_str(),GetLastError());
-        return MFGLIB_ERROR_FILE_NOT_EXIST;
-    }
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file %s failed to open.errcode is %d"), m_FileName.c_str(),GetLastError());
+		return MFGLIB_ERROR_FILE_NOT_EXIST;
+	}
 	m_qwFileSize = FileLen.st_size;
 	m_pDataBuf = (UCHAR*)VirtualAlloc(NULL, (size_t)m_qwFileSize, MEM_COMMIT, PAGE_READWRITE);
 
-	 if(m_pDataBuf == NULL)
-         {
-                 LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file[%s] data buffer      alloc failed"), m_FileName);
-                 return MFGLIB_ERROR_NO_MEMORY;
-         }
+	if(m_pDataBuf == NULL)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file[%s] data buffer      alloc failed"), m_FileName);
+		return MFGLIB_ERROR_NO_MEMORY;
+	}
 
 	std::fread(m_pDataBuf,sizeof(*m_pDataBuf), (UINT)m_qwFileSize,fwFile);
 	std::fclose(fwFile);
@@ -1446,24 +1446,24 @@ UINT COpCmd_Boot::SetFileMapping(CString &strFile)
 	struct _stat64i32 FileLen;
 	_tstat(m_FileName, &FileLen);
 	if ( fwFile==-1 )
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file %s failed to open.errcode is %d"), m_FileName.c_str(),GetLastError());
-        return MFGLIB_ERROR_FILE_NOT_EXIST;
-    }
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file %s failed to open.errcode is %d"), m_FileName.c_str(),GetLastError());
+		return MFGLIB_ERROR_FILE_NOT_EXIST;
+	}
 	m_qwFileSize = FileLen.st_size;
 	m_pDataBuf= (UCHAR *)mmap(NULL, FileLen.st_size, PROT_READ,  MAP_PRIVATE, fwFile,0);
-	
+
 	if(m_pDataBuf == MAP_FAILED)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file[%s] data buffer alloc failed"), m_FileName.c_str());
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	if(close(fwFile)!=0){		
+	if(close(fwFile)!=0){
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Boot command-- file[%s] failed to close"), m_FileName.c_str());
-	    return MFGLIB_ERROR_NO_MEMORY;
+		return MFGLIB_ERROR_NO_MEMORY;
 	}
 #endif
-		return MFGLIB_ERROR_SUCCESS;
+	return MFGLIB_ERROR_SUCCESS;
 }
 
 void COpCmd_Boot::CloseFileMapping()
@@ -1476,9 +1476,9 @@ void COpCmd_Boot::CloseFileMapping()
 	}
 #else
 	if(m_pDataBuf!=MAP_FAILED){
-	    if(	munmap(m_pDataBuf,m_qwFileSize)!=0)
-		perror(" couldnt unmap");
-	    m_pDataBuf=NULL;
+		if(	munmap(m_pDataBuf,m_qwFileSize)!=0)
+			perror(" couldnt unmap");
+		m_pDataBuf=NULL;
 	}
 #endif
 }
@@ -1505,10 +1505,10 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 	((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
 
 	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
-//	if(1)
+		//	if(1)
 	{
-	//	MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
-		
+		//	MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
+
 		MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice);
 		if(pMxHidDevice==NULL)
 		{
@@ -1600,8 +1600,8 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 }
 
 /*
-* COpCmd_Init implementation
-*/
+ * COpCmd_Init implementation
+ */
 COpCmd_Init::COpCmd_Init()
 {
 	m_pDataBuf = NULL;
@@ -1613,8 +1613,8 @@ COpCmd_Init::~COpCmd_Init()
 }
 
 UINT COpCmd_Init::SetFileMapping(CString &strFile)
-{	
-	
+{
+
 #ifndef __linux__
 	int index = strFile.Find(_T('/'));	//find '/'
 	if(-1 != index)
@@ -1628,10 +1628,10 @@ UINT COpCmd_Init::SetFileMapping(CString &strFile)
 	struct _stat64i32 FileLen;
 	_tstat(m_FileName, &FileLen);
 	if ( fwFile==NULL )
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
-        return MFGLIB_ERROR_FILE_NOT_EXIST;
-    }
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
+		return MFGLIB_ERROR_FILE_NOT_EXIST;
+	}
 	m_qwFileSize = FileLen.st_size;
 	//m_pDataBuf = (UCHAR*)malloc((size_t)m_qwFileSize);
 	m_pDataBuf = (UCHAR*)VirtualAlloc(NULL, (size_t)m_qwFileSize, MEM_COMMIT, PAGE_READWRITE);
@@ -1648,10 +1648,10 @@ UINT COpCmd_Init::SetFileMapping(CString &strFile)
 	struct _stat64i32 FileLen;
 	_tstat(m_FileName, &FileLen);
 	if ( fwFile==-1 )
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
-        return MFGLIB_ERROR_FILE_NOT_EXIST;
-    }
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
+		return MFGLIB_ERROR_FILE_NOT_EXIST;
+	}
 	m_qwFileSize = FileLen.st_size;
 	//m_pDataBuf = (UCHAR*)malloc((size_t)m_qwFileSize);
 	m_pDataBuf = (UCHAR*)mmap(NULL, FileLen.st_size, PROT_READ,  MAP_PRIVATE, fwFile,0);
@@ -1660,8 +1660,8 @@ UINT COpCmd_Init::SetFileMapping(CString &strFile)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command--file[%s] data buffer alloc failed."), m_FileName.c_str());
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	
-	if(close(fwFile)!=0){		
+
+	if(close(fwFile)!=0){
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Init command-- file[%s] failed to close"), m_FileName.c_str());
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
@@ -1686,9 +1686,9 @@ void COpCmd_Init::CloseFileMapping()
 	}
 #else
 	if(m_pDataBuf!=MAP_FAILED){
-	    if(	munmap(m_pDataBuf,m_qwFileSize)!=0)
-		perror(" couldnt unmap");
-	    m_pDataBuf=NULL;
+		if(	munmap(m_pDataBuf,m_qwFileSize)!=0)
+			perror(" couldnt unmap");
+		m_pDataBuf=NULL;
 	}
 #endif
 
@@ -1767,8 +1767,8 @@ UINT COpCmd_Init::ExecuteCommand(int index)
 }
 
 /*
-* COpCmd_Load implementation
-*/
+ * COpCmd_Load implementation
+ */
 COpCmd_Load::COpCmd_Load()
 {
 	m_iPercentComplete = 0;
@@ -1822,7 +1822,7 @@ UINT COpCmd_Load::ExecuteCommand(int index)
 		}
 
 		//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("ExecuteCommand--Load, Device[0x%X]"), pMxHidDevice);
-	
+
 		int retryCount = 0;
 		while(retryCount < 3)
 		{
@@ -1893,15 +1893,15 @@ UINT COpCmd_Load::SetFileMapping(CString &strFile)
 	}
 #endif
 	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
-#ifndef __linux__	
+#ifndef __linux__
 	FILE* fwFile=_tfopen(m_FileName,_T("r"));
 	struct _stat64i32 FileLen;
 	_tstat(m_FileName, &FileLen);
 	if ( fwFile==NULL )
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
-        return MFGLIB_ERROR_FILE_NOT_EXIST;
-    }
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
+		return MFGLIB_ERROR_FILE_NOT_EXIST;
+	}
 	m_qwFileSize = FileLen.st_size;
 	//m_pDataBuf = (UCHAR*)malloc((size_t)m_qwFileSize);
 	m_pDataBuf = (UCHAR*)VirtualAlloc(NULL, (size_t)m_qwFileSize, MEM_COMMIT, PAGE_READWRITE);
@@ -1918,10 +1918,10 @@ UINT COpCmd_Load::SetFileMapping(CString &strFile)
 	struct _stat64i32 FileLen;
 	_tstat(m_FileName, &FileLen);
 	if ( fwFile==-1 )
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
-        return MFGLIB_ERROR_FILE_NOT_EXIST;
-    }
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file %s failed to open.errcode is %d."), m_FileName.c_str(),GetLastError());
+		return MFGLIB_ERROR_FILE_NOT_EXIST;
+	}
 	m_qwFileSize = FileLen.st_size;
 	//m_pDataBuf = (UCHAR*)malloc((size_t)m_qwFileSize);
 	m_pDataBuf = (UCHAR*)mmap(NULL, FileLen.st_size, PROT_READ,  MAP_PRIVATE, fwFile,0);
@@ -1930,8 +1930,8 @@ UINT COpCmd_Load::SetFileMapping(CString &strFile)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command--file[%s] data buffer alloc failed."), m_FileName.c_str());
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	
-	if(close(fwFile)!=0){		
+
+	if(close(fwFile)!=0){
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load command-- file[%s] failed to close"), m_FileName.c_str());
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
@@ -1954,9 +1954,9 @@ void COpCmd_Load::CloseFileMapping()
 	}
 #else
 	if(m_pDataBuf!=MAP_FAILED){
-	    if(	munmap(m_pDataBuf,m_qwFileSize)!=0)
-		perror(" couldnt unmap");
-	    m_pDataBuf=NULL;
+		if(	munmap(m_pDataBuf,m_qwFileSize)!=0)
+			perror(" couldnt unmap");
+		m_pDataBuf=NULL;
 	}
 #endif
 }
@@ -1968,7 +1968,7 @@ DWORD COpCmd_Load::GetFileDataSize()
 
 void COpCmd_Load::SetAddress(CString &strAddr)
 {
-	
+
 	printf("strAddrLen = %d \n",strAddr.GetLength());
 	if(strAddr.Find(_T("0x")) != -1)
 	{
@@ -1977,7 +1977,7 @@ void COpCmd_Load::SetAddress(CString &strAddr)
 	printf("strAddr = %s \n",strAddr.c_str());
 	printf("number equivalent %x \n",(UINT)_tcstoul(LPCTSTR(strAddr), NULL, 16));
 	m_address = (UINT)_tcstoul(LPCTSTR(strAddr), NULL, 16);
-	
+
 }
 
 void COpCmd_Load::SetloadSection(CString &str)
@@ -2003,8 +2003,8 @@ void COpCmd_Load::SetIsHasFlashHeader(CString &str)
 }
 
 /*
-* COpCmd_Jump implementation
-*/
+ * COpCmd_Jump implementation
+ */
 UINT COpCmd_Jump::ExecuteCommand(int index)
 {
 	CString strMsg;
@@ -2024,7 +2024,7 @@ UINT COpCmd_Jump::ExecuteCommand(int index)
 	_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 	strDesc.ReleaseBuffer();
 	((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
-//if (1)
+	//if (1)
 	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 	{
 		MxHidDevice* pMxHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice);//_usb_port->GetDevice());
@@ -2078,8 +2078,8 @@ UINT COpCmd_Jump::ExecuteCommand(int index)
 }
 
 /*
-* COpCmd_Push implementation
-*/
+ * COpCmd_Push implementation
+ */
 COpCmd_Push::COpCmd_Push()
 {
 	m_FileName = _T("");
@@ -2109,10 +2109,10 @@ UINT COpCmd_Push::SetFileMapping(CString &strFile)
 	struct _stat64i32 FileLen;
 	_tstat(m_FileName, &FileLen);
 	if ( fwFile==NULL )
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Push command--file %s failed to open.errcode is %d"), m_FileName.c_str(),GetLastError());
-        return MFGLIB_ERROR_FILE_NOT_EXIST;
-    }
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Push command--file %s failed to open.errcode is %d"), m_FileName.c_str(),GetLastError());
+		return MFGLIB_ERROR_FILE_NOT_EXIST;
+	}
 
 	return 0;
 }
@@ -2152,43 +2152,43 @@ UINT COpCmd_Push::ExecuteCommand(int index)
 
 	if(m_FileName.IsEmpty())
 	{
-	/*	if(csCmdBody.Find(_T("GenNewUID")) != -1)
-        {
-            int Begin, End, i=0;
-			CString strTemp;
-            //Replace $() with real value
-            //Search all variables which has a format of $()
-            do{
-                Begin = csCmdBody.Find(_T("$("));
-                End = csCmdBody.Find(_T(")"));           
-                
-                if(Begin != -1 && End != -1)
-                {
-                    //Extract Current key word
-					strTemp = _T("$(");
-        			Begin += strTemp.GetLength();
-                    CString CurKeyWord = csCmdBody.Mid(Begin, (End-Begin));
-                    
-                    //Find current key word value in m_UniqueID.KeyWord list
-                    for(i=0;i<MAX_CNT_KEYWORD;i++)
-                    {
-                        if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName.CompareNoCase(CurKeyWord) == 0)
-                        {
-                            //Replace $() with real value
-        					CString csCurKeyWordValue;
-        					csCurKeyWordValue.Format(_T("0x%x"),((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue);
-                            CString csTemp;
-							csTemp.Format(_T("$(%s)"), CurKeyWord);
-                            csCmdBody.Replace(csTemp, csCurKeyWordValue);
-                            break;
-                        }
-                    }
-                    if(i >= MAX_CNT_KEYWORD)
-                        return MFGLIB_ERROR_WRITE_LOG;
-                }             
-            }while(Begin != -1 && End != -1);                 
-        }
-	*/
+		/*	if(csCmdBody.Find(_T("GenNewUID")) != -1)
+				{
+				int Begin, End, i=0;
+				CString strTemp;
+		//Replace $() with real value
+		//Search all variables which has a format of $()
+		do{
+		Begin = csCmdBody.Find(_T("$("));
+		End = csCmdBody.Find(_T(")"));
+
+		if(Begin != -1 && End != -1)
+		{
+		//Extract Current key word
+		strTemp = _T("$(");
+		Begin += strTemp.GetLength();
+		CString CurKeyWord = csCmdBody.Mid(Begin, (End-Begin));
+
+		//Find current key word value in m_UniqueID.KeyWord list
+		for(i=0;i<MAX_CNT_KEYWORD;i++)
+		{
+		if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName.CompareNoCase(CurKeyWord) == 0)
+		{
+		//Replace $() with real value
+		CString csCurKeyWordValue;
+		csCurKeyWordValue.Format(_T("0x%x"),((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue);
+		CString csTemp;
+		csTemp.Format(_T("$(%s)"), CurKeyWord);
+		csCmdBody.Replace(csTemp, csCurKeyWordValue);
+		break;
+		}
+		}
+		if(i >= MAX_CNT_KEYWORD)
+		return MFGLIB_ERROR_WRITE_LOG;
+		}
+		}while(Begin != -1 && End != -1);
+		}
+		 */
 		if(m_SavedFileName.IsEmpty())
 		{
 			retValue = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pUTP->UtpCommand(csCmdBody);
@@ -2230,7 +2230,7 @@ UINT COpCmd_Push::ExecuteCommand(int index)
 				_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_COMPLETE;
 				((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
 				return MFGLIB_ERROR_SUCCESS;
- 			}
+			}
 		}
 		else
 		{	//read command
@@ -2340,155 +2340,155 @@ UINT COpCmd_Push::ExecuteCommand(int index)
 }
 
 /*
-* COpCmd_Burn implementation
+ * COpCmd_Burn implementation
 
-COpCmd_Burn::COpCmd_Burn()
+ COpCmd_Burn::COpCmd_Burn()
+ {
+ m_FileName = _T("");
+ }
+
+ COpCmd_Burn::~COpCmd_Burn()
+ {
+ }
+
+ void COpCmd_Burn::SetFileName(CString strFile)
+ {
+ m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
+ }
+
+ UINT COpCmd_Burn::ExecuteCommand(int index)
+ {
+ if(m_FileName.IsEmpty())
+ {
+ return MFGLIB_ERROR_FILE_NOT_EXIST;
+ }
+
+ CString csCmdBody = GetBodyString();
+ CString strTemp;
+ int Index, Begin, End, i=0;
+//Search keyword: "Key" and exstract all key words
+if(csCmdBody.Find(_T("readRange:")) == 0)
 {
-	m_FileName = _T("");
+Index = csCmdBody.Find(_T("section"));
+while(Index != -1)
+{
+strTemp = _T("section");
+csCmdBody = csCmdBody.Right(csCmdBody.GetLength()-Index-strTemp.GetLength());
+Begin = csCmdBody.Find(_T("="));
+End = csCmdBody.Find(_T(","));
+if(Begin != -1 && End != -1)
+{
+((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName = csCmdBody.Mid(Begin+1, (End-Begin-1));
+((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeBegin = GetPrivateProfileInt(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName, _T("START"), 1, m_FileName);
+((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeEnd = GetPrivateProfileInt(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName, _T("END"), 1, m_FileName );
+i++;
 }
-
-COpCmd_Burn::~COpCmd_Burn()
+else
 {
+return MFGLIB_ERROR_FORMAT_MISMATCH;
 }
-
-void COpCmd_Burn::SetFileName(CString strFile)
-{
-	m_FileName = ((MFGLIB_VARS *)m_pLibVars)->g_strPath + strFile;
+Index = csCmdBody.Find(_T("section"));
 }
-
-UINT COpCmd_Burn::ExecuteCommand(int index)
+}
+else if(csCmdBody.Find(_T("readValue:")) == 0)
 {
-	if(m_FileName.IsEmpty())
+Index = csCmdBody.Find(_T("section="));
+if(Index != -1)
+{
+strTemp = _T("section=");
+Begin = Index + strTemp.GetLength();
+End = csCmdBody.Find(_T(","));
+((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.Section = csCmdBody.Mid(Begin, (End-Begin));
+csCmdBody = csCmdBody.Right(csCmdBody.GetLength()-End-1);
+}
+else
+{
+return MFGLIB_ERROR_FORMAT_MISMATCH;
+}
+//Search all variables which has a format of "key"
+Begin = csCmdBody.Find(_T("key="));
+End = csCmdBody.Find(_T(","));
+while(Begin != -1 && End != -1)
+{
+strTemp = _T("key=");
+Begin += strTemp.GetLength();
+CString CurKeyWord = csCmdBody.Mid(Begin, (End-Begin));
+//Verify current key word in m_UniqueID.KeyWord list
+for(i=0;i<MAX_CNT_KEYWORD;i++)
+{
+	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName.CompareNoCase(CurKeyWord) == 0)
 	{
-		return MFGLIB_ERROR_FILE_NOT_EXIST;
+		//Read current key word value
+		((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue = GetPrivateProfileInt(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.Section, CurKeyWord, 1, m_FileName);
+		//Is the value in the range specified?
+		if( (((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue < ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeBegin) ||
+				(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue >= ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeEnd) )
+		{
+			return MFGLIB_ERROR_BEYOND_RANGE;
+		}
+		break;
 	}
-	
-	CString csCmdBody = GetBodyString();
-	CString strTemp;
-	int Index, Begin, End, i=0;
-	//Search keyword: "Key" and exstract all key words
-	if(csCmdBody.Find(_T("readRange:")) == 0)
+}
+csCmdBody = csCmdBody.Right(csCmdBody.GetLength()-End-1);
+Begin = csCmdBody.Find(_T("key="));
+End = csCmdBody.Find(_T(","));
+}
+}
+else if(csCmdBody.Find(_T("write:")) == 0)
+{
+	//First of all, find the name of m_UniqueID.Section we are writing to
+	Index = csCmdBody.Find(_T("section="));
+	if(Index != -1)
 	{
-		Index = csCmdBody.Find(_T("section")); 
-		while(Index != -1)
-		{
-			strTemp = _T("section");
-			csCmdBody = csCmdBody.Right(csCmdBody.GetLength()-Index-strTemp.GetLength());
-			Begin = csCmdBody.Find(_T("="));
-			End = csCmdBody.Find(_T(","));
-			if(Begin != -1 && End != -1)
-			{
-				((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName = csCmdBody.Mid(Begin+1, (End-Begin-1));
-				((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeBegin = GetPrivateProfileInt(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName, _T("START"), 1, m_FileName); 
-				((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeEnd = GetPrivateProfileInt(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName, _T("END"), 1, m_FileName );
-				i++;
-			}
-			else
-			{
-				return MFGLIB_ERROR_FORMAT_MISMATCH;
-			}
-			Index = csCmdBody.Find(_T("section"));
-		}
-	}
-	else if(csCmdBody.Find(_T("readValue:")) == 0)
-	{
-		Index = csCmdBody.Find(_T("section="));
-		if(Index != -1)
-		{
-			strTemp = _T("section=");
-			Begin = Index + strTemp.GetLength();
-			End = csCmdBody.Find(_T(","));
-			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.Section = csCmdBody.Mid(Begin, (End-Begin));
-			csCmdBody = csCmdBody.Right(csCmdBody.GetLength()-End-1);
-		}
-		else
-		{
-			return MFGLIB_ERROR_FORMAT_MISMATCH;
-		}
-		//Search all variables which has a format of "key"
-		Begin = csCmdBody.Find(_T("key="));
+		strTemp = _T("section=");
+		Begin = Index + strTemp.GetLength();
 		End = csCmdBody.Find(_T(","));
-		while(Begin != -1 && End != -1)
-		{
-			strTemp = _T("key=");
-			Begin += strTemp.GetLength();
-			CString CurKeyWord = csCmdBody.Mid(Begin, (End-Begin));
-			//Verify current key word in m_UniqueID.KeyWord list
-			for(i=0;i<MAX_CNT_KEYWORD;i++)
-			{
-				if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName.CompareNoCase(CurKeyWord) == 0)
-				{
-					//Read current key word value
-					((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue = GetPrivateProfileInt(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.Section, CurKeyWord, 1, m_FileName);
-					//Is the value in the range specified? 
-					if( (((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue < ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeBegin) || 
-                        (((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue >= ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeEnd) )
-					{
-						return MFGLIB_ERROR_BEYOND_RANGE;
-					}
-					break;
-				}
-			}
-			csCmdBody = csCmdBody.Right(csCmdBody.GetLength()-End-1);
-			Begin = csCmdBody.Find(_T("key="));
-			End = csCmdBody.Find(_T(","));
-		}
+		((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.Section = csCmdBody.Mid(Begin, (End-Begin));
+		csCmdBody = csCmdBody.Right(csCmdBody.GetLength()-End-1);
 	}
-	else if(csCmdBody.Find(_T("write:")) == 0)
+	//Search all variables which has a format of $()
+	Begin = csCmdBody.Find(_T("$("));
+	End = csCmdBody.Find(_T(")+="));
+	while(Begin != -1 && End != -1)
 	{
-		//First of all, find the name of m_UniqueID.Section we are writing to
-		Index = csCmdBody.Find(_T("section="));
-		if(Index != -1)
+		//Extract Current key word
+		strTemp = _T("$(");
+		Begin += strTemp.GetLength();
+		CString CurKeyWord = csCmdBody.Mid(Begin, (End-Begin));
+		//Extract current key value
+		strTemp = _T(")+=");
+		Begin = End + strTemp.GetLength();
+		End = csCmdBody.Find(_T(","));
+		DWORD IncreaseValue = _tcstoul(csCmdBody.Mid(Begin, (End-Begin)), NULL, 16);
+		//Find current key word in m_UniqueID.KeyWord list
+		for(i=0;i<MAX_CNT_KEYWORD;i++)
 		{
-			strTemp = _T("section=");
-			Begin = Index + strTemp.GetLength();
-			End = csCmdBody.Find(_T(","));
-			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.Section = csCmdBody.Mid(Begin, (End-Begin));
-			csCmdBody = csCmdBody.Right(csCmdBody.GetLength()-End-1);
-		}
-		//Search all variables which has a format of $()
-		Begin = csCmdBody.Find(_T("$("));
-        End = csCmdBody.Find(_T(")+=")); 
-		while(Begin != -1 && End != -1)
-		{
-			//Extract Current key word
-			strTemp = _T("$(");
-			Begin += strTemp.GetLength();
-			CString CurKeyWord = csCmdBody.Mid(Begin, (End-Begin));
-			//Extract current key value
-			strTemp = _T(")+=");
-			Begin = End + strTemp.GetLength();
-			End = csCmdBody.Find(_T(","));
-			DWORD IncreaseValue = _tcstoul(csCmdBody.Mid(Begin, (End-Begin)), NULL, 16);
-			//Find current key word in m_UniqueID.KeyWord list
-			for(i=0;i<MAX_CNT_KEYWORD;i++)
+			if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName.CompareNoCase(CurKeyWord) == 0)
 			{
-				if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].KeyWordName.CompareNoCase(CurKeyWord) == 0)
+				//Read current key word value
+				((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue = GetPrivateProfileInt(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.Section, CurKeyWord, 1, m_FileName);
+				//Change current value according to the value specified in ucl
+				((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].NextValue = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue + IncreaseValue;
+				//Is the value in the range specified?
+				if( (((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].NextValue < ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeBegin) ||
+						(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].NextValue >= ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeEnd) )
 				{
-					//Read current key word value
-					((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue = GetPrivateProfileInt(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.Section, CurKeyWord, 1, m_FileName);
-					//Change current value according to the value specified in ucl
-					((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].NextValue = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].CurrentValue + IncreaseValue;
-					//Is the value in the range specified?
-					if( (((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].NextValue < ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeBegin) || 
-                        (((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].NextValue >= ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].RangeEnd) )
-					{
-						return MFGLIB_ERROR_BEYOND_RANGE;
-					}
-					//Write the value to file specified in ucl
-					CString csNextKeyWordValue;
-					csNextKeyWordValue.Format(_T("0x%0x"), ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].NextValue);
-					WritePrivateProfileString(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.Section, CurKeyWord, csNextKeyWordValue, m_FileName);
-					break;
+					return MFGLIB_ERROR_BEYOND_RANGE;
 				}
+				//Write the value to file specified in ucl
+				CString csNextKeyWordValue;
+				csNextKeyWordValue.Format(_T("0x%0x"), ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.keyWord[i].NextValue);
+				WritePrivateProfileString(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_UniqueID.Section, CurKeyWord, csNextKeyWordValue, m_FileName);
+				break;
 			}
-			csCmdBody = csCmdBody.Right(csCmdBody.GetLength()-End-1);
-			Begin = csCmdBody.Find(_T("$("));
-			End = csCmdBody.Find(_T(")+=")); 
 		}
+		csCmdBody = csCmdBody.Right(csCmdBody.GetLength()-End-1);
+		Begin = csCmdBody.Find(_T("$("));
+		End = csCmdBody.Find(_T(")+="));
 	}
+}
 
-	return MFGLIB_ERROR_SUCCESS;
+return MFGLIB_ERROR_SUCCESS;
 }
 */
 // WndIndex is port dlg index(based 0), every PortMgrDlg has its own CCmdOpreation(g_CmdOperationArray[WndIndex])
@@ -2517,7 +2517,7 @@ void DeinitCmdOperation(MFGLIB_VARS *pLibVars, int WndIndex)
 		pLibVars->g_CmdOperationArray[WndIndex]->Close();
 		//::PostThreadMessage(pLibVars->g_CmdOperationArray[WndIndex]->m_nThreadID, WM_QUIT, 0, 0);
 		// Wait for the CCmdOpreation thread to die before returning
-		
+
 
 		delete pLibVars->g_CmdOperationArray[WndIndex];
 		pLibVars->g_CmdOperationArray[WndIndex] = NULL;
@@ -2535,7 +2535,7 @@ DWORD InitDeviceManager(MFGLIB_VARS *pLibVars)
 	}
 	try
 	{
-		
+
 		g_pDeviceManager = new DeviceManager((INSTANCE_HANDLE)pLibVars);
 	}
 	catch(...)
@@ -2590,39 +2590,39 @@ void AutoScanDevice(MFGLIB_VARS *pLibVars, int iPortUsedNums)
 			{
 				switch(pPort->GetDevice()->GetDeviceType())
 				{
-				case DeviceClass::DeviceTypeMsc:
-					pPortMappings[uEnablePorts] = pPort;
-					pLibVars->g_PortDevInfoArray[uEnablePorts].m_bConnected = TRUE;
-					uEnablePorts++;
-					if(iPortUsedNums == uEnablePorts)
-					{
-						goto SCAN_END;
-					}
-					break;
-				case DeviceClass::DeviceTypeHid:
-                case DeviceClass::DeviceTypeMxHid:
-				case DeviceClass::DeviceTypeMxRom:
-					{
-						strPath = pPort->GetDevice()->_path.get();
-						strPath.MakeUpper();
-						stateIt = pOpStates->begin();
-						for(; stateIt!=pOpStates->end(); stateIt++)
+					case DeviceClass::DeviceTypeMsc:
+						pPortMappings[uEnablePorts] = pPort;
+						pLibVars->g_PortDevInfoArray[uEnablePorts].m_bConnected = TRUE;
+						uEnablePorts++;
+						if(iPortUsedNums == uEnablePorts)
 						{
-							strFiliter.Format(_T("vid_%04x&pid_%04x"), (*stateIt)->uiVid, (*stateIt)->uiPid);
-							strFiliter.MakeUpper();
-							if(strPath.Find(strFiliter) != -1)
+							goto SCAN_END;
+						}
+						break;
+					case DeviceClass::DeviceTypeHid:
+					case DeviceClass::DeviceTypeMxHid:
+					case DeviceClass::DeviceTypeMxRom:
+						{
+							strPath = pPort->GetDevice()->_path.get();
+							strPath.MakeUpper();
+							stateIt = pOpStates->begin();
+							for(; stateIt!=pOpStates->end(); stateIt++)
 							{
-								pPortMappings[uEnablePorts] = pPort;
-								pLibVars->g_PortDevInfoArray[uEnablePorts].m_bConnected = TRUE;
-								uEnablePorts++;
-								if(iPortUsedNums == uEnablePorts)
+								strFiliter.Format(_T("vid_%04x&pid_%04x"), (*stateIt)->uiVid, (*stateIt)->uiPid);
+								strFiliter.MakeUpper();
+								if(strPath.Find(strFiliter) != -1)
 								{
-									goto SCAN_END;
+									pPortMappings[uEnablePorts] = pPort;
+									pLibVars->g_PortDevInfoArray[uEnablePorts].m_bConnected = TRUE;
+									uEnablePorts++;
+									if(iPortUsedNums == uEnablePorts)
+									{
+										goto SCAN_END;
+									}
 								}
 							}
 						}
-					}
-					break;
+						break;
 				}
 			}
 		}
@@ -2657,7 +2657,7 @@ SCAN_END:
 		else
 		{
 			g_pDeviceManager->m_bHasConnected[i] = FALSE;
-		} 
+		}
 	}
 }
 
@@ -2731,7 +2731,7 @@ DWORD GetCurrentDeviceDesc(MFGLIB_VARS *pLibVars, int DeviceIndex, TCHAR* desc, 
 		{
 			strDesc = pDevice->_description.get();
 		}
-		
+
 		if(strDesc.GetLength() > maxSize)
 		{
 			return MFGLIB_ERROR_SIZE_IS_SMALL;
@@ -2757,7 +2757,7 @@ OP_STATE_ARRAY *GetOpStates(MFGLIB_VARS *pLibVars)
 
 DWORD GetOpStatesTimeout(OP_STATE_ARRAY *pOpStateArray, MX_DEVICE_STATE _state)
 {
-    std::vector<COpState*>::iterator stateIt = pOpStateArray->begin();
+	std::vector<COpState*>::iterator stateIt = pOpStateArray->begin();
 	for(; stateIt!=pOpStateArray->end(); stateIt++)
 	{
 		if(_state == (*stateIt)->opState)
@@ -2783,38 +2783,38 @@ BOOL FindLibraryHandle(MFGLIB_VARS *pLibVars)
 	}
 }
 /*
-USB_PORT_NODE *FindPortPhysicalNode(PORT_ID portID)
-{
-	USB_PORT_NODE *pPortNode = NULL;
+	 USB_PORT_NODE *FindPortPhysicalNode(PORT_ID portID)
+	 {
+	 USB_PORT_NODE *pPortNode = NULL;
 
-	for(int i=0; i<(int)(g_PortTable.size()); i++)
-	{
-		pPortNode = g_PortTable[i];
-		if(portID == pPortNode->portID)
-		{
-			return pPortNode;
-		}
-	}
+	 for(int i=0; i<(int)(g_PortTable.size()); i++)
+	 {
+	 pPortNode = g_PortTable[i];
+	 if(portID == pPortNode->portID)
+	 {
+	 return pPortNode;
+	 }
+	 }
 
-	return NULL;
-}
+	 return NULL;
+	 }
 
-PORT_ID FindPortLogicalID(USB_PORT_NODE *pPortNode)
-{
-	for(int i=0; i<(int)(g_PortTable.size()); i++)
-	{
-		if(g_PortTable[i]->hubPath.CompareNoCase(pPortNode->hubPath) == 0)
-		{
-			if(g_PortTable[i]->portIndex == pPortNode->portIndex)
-			{
-				return g_PortTable[i]->portID;
-			}
-		}
-	}
+	 PORT_ID FindPortLogicalID(USB_PORT_NODE *pPortNode)
+	 {
+	 for(int i=0; i<(int)(g_PortTable.size()); i++)
+	 {
+	 if(g_PortTable[i]->hubPath.CompareNoCase(pPortNode->hubPath) == 0)
+	 {
+	 if(g_PortTable[i]->portIndex == pPortNode->portIndex)
+	 {
+	 return g_PortTable[i]->portID;
+	 }
+	 }
+	 }
 
-	return 0;
-}
-*/
+	 return 0;
+	 }
+ */
 int FindOperationIndex(MFGLIB_VARS *pLibVars, pthread_t operationID)
 {
 	int iret = -1;
@@ -2843,12 +2843,12 @@ CString ReplaceKeywords(CString str)
 {
 	std::map<CString, CString>::const_iterator it;
 	for ( it=g_UclKeywords.begin(); it!=g_UclKeywords.end(); ++it )
-    {
+	{
 		CString key = _T("%");
 		key +=	it->first;
-		key += _T("%");		
+		key += _T("%");
 		CString value = it->second;
-		str.Replace(key, value);		
+		str.Replace(key, value);
 	}
 	return str;
 }

@@ -19,43 +19,43 @@
 /// </summary>
 class Volume : public Device
 {
-public:
-	Volume(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle);
-	virtual ~Volume(void);
+	public:
+		Volume(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle);
+		virtual ~Volume(void);
 
-	enum LockType{ LockType_Physical, LockType_Logical };
+		enum LockType{ LockType_Physical, LockType_Logical };
 
-	bool IsUsb();
-	virtual Device* UsbDevice();
-	Disk* StorageDisk();
-	HANDLE Lock(LockType lockType);
-	int Unlock(HANDLE hDrive, bool close = true);
-	virtual UINT SendCommand(StApi& api, UCHAR* additionalInfo = NULL);
-	UINT SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo);
+		bool IsUsb();
+		virtual Device* UsbDevice();
+		Disk* StorageDisk();
+		HANDLE Lock(LockType lockType);
+		int Unlock(HANDLE hDrive, bool close = true);
+		virtual UINT SendCommand(StApi& api, UCHAR* additionalInfo = NULL);
+		UINT SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo);
 
-	UCHAR *m_pBuffer;
+		UCHAR *m_pBuffer;
 
-	// PROPERTIES
-	class volumeName : public StringProperty { public: CString get(); }_volumeName;
-	class logicalDrive : public StringProperty { public: CString get(); }_logicalDrive;
-	class friendlyName : public Device::friendlyName { public: CString get(); }_friendlyName;
-	class diskNumber : public Int32Property { public: diskNumber(int val):Int32Property(val){}; int get(); }_diskNumber;
+		// PROPERTIES
+		class volumeName : public StringProperty { public: CString get(); }_volumeName;
+		class logicalDrive : public StringProperty { public: CString get(); }_logicalDrive;
+		class friendlyName : public Device::friendlyName { public: CString get(); }_friendlyName;
+		class diskNumber : public Int32Property { public: diskNumber(int val):Int32Property(val){}; int get(); }_diskNumber;
 
-	void NotifyUpdateUI(int cmdOpIndex, int position, int maximum);
+		void NotifyUpdateUI(int cmdOpIndex, int position, int maximum);
 
-private:
+	private:
 #pragma pack (push, 1)
-	struct _NT_SCSI_REQUEST
-	{	
+		struct _NT_SCSI_REQUEST
+		{
 #if 0
-		SCSI_PASS_THROUGH PassThrough;	//should include "ntddscsi.h"
-#endif		
-		__int64          Tag;
-		SENSE_DATA        SenseData;		//should include "scsi.h"
-		UCHAR           DataBuffer[1];          // Allocate buffer space
-	};
+			SCSI_PASS_THROUGH PassThrough;	//should include "ntddscsi.h"
+#endif
+			__int64          Tag;
+			SENSE_DATA        SenseData;		//should include "scsi.h"
+			UCHAR           DataBuffer[1];          // Allocate buffer space
+		};
 #pragma pack (pop)
 
-	Disk* _Disk;
-	HANDLE _hEvent;
+		Disk* _Disk;
+		HANDLE _hEvent;
 };

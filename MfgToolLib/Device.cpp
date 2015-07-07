@@ -31,7 +31,7 @@ Device::Device(DeviceClass *deviceClass, DEVINST devInst, CString path, INSTANCE
 	_capabilities = Unknown;
 	_usbPath.put(_T(""));
 	memset(&_deviceInfoData, 0, sizeof(SP_DEVINFO_DATA));
-	
+
 	_deviceClass = deviceClass;
 	_hDevInst = devInst;
 
@@ -43,13 +43,13 @@ Device::Device(DeviceClass *deviceClass, DEVINST devInst, CString path, INSTANCE
 	path.Replace(_T("\\??"), _T("\\\\."));
 	path.Replace(_T("\\\\?"), _T("\\\\."));
 	_path.put(path);
-	
+
 	InitDevInfo();
 
     m_dwIndex = -1;
 	InitEvent(&m_hDevCanDeleteEvent);
 	//	m_hDevCanDeleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-	
+
 	_description.describe(this, _T("Device Description"), _T(""));
     _friendlyName.describe(this, _T("Friendly Name"), _T(""));
     _path.describe(this, _T("Path"), _T(""));
@@ -103,7 +103,7 @@ Device::~Device()
 /// Gets the device's instance handle.
 /// </summary>
 DEVINST Device::InstanceHandle()
-{ 
+{
     return _hDevInst;
 }
 
@@ -111,9 +111,9 @@ DWORD Device::InitDevInfo()
 {
 
 	DWORD error = ERROR_SUCCESS;
-#if 0	
+#if 0
 	// Make a new devInfoSet that is not tied to a class
-    // so we can create Parents and such. Also, we will be able 
+    // so we can create Parents and such. Also, we will be able
     // to get our own Registry Properties and not have to ask the DeviceClass.
 //	_deviceInfoSet = gSetupApi().SetupDiCreateDeviceInfoList(NULL,NULL);	//create an empty device information set
 	if( _deviceInfoSet == INVALID_HANDLE_VALUE )
@@ -121,7 +121,7 @@ DWORD Device::InitDevInfo()
 		error = GetLastError();
 		return error;
 	}
-	
+
 	CString devInstanceId;
 //	DWORD hr = gSetupApi().apiCM_Get_Device_ID(_hDevInst, devInstanceId);
     if (hr != 0)
@@ -129,8 +129,8 @@ DWORD Device::InitDevInfo()
         error = GetLastError();
         return error;
     }
-	
-	// Initialize our SP_DEVINFO_DATA struct for future calls to 
+
+	// Initialize our SP_DEVINFO_DATA struct for future calls to
     // SetupDiGetDeviceRegistryProperty()
     _deviceInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
 	if (!gSetupApi().apiSetupDiOpenDeviceInfo(_deviceInfoSet, devInstanceId.GetBuffer(), NULL, 0, &_deviceInfoData))
@@ -149,7 +149,7 @@ DWORD Device::InitDevInfo()
 /// </summary>
 Device* Device::Parent()
 {
-#if 0 
+#if 0
     if(_parent == NULL)
     {
         DEVINST parentDevInst = 0;
@@ -168,7 +168,7 @@ Device* Device::Parent()
 /// Property: Gets the device's path.
 /// </summary>
 CString Device::path::get()
-{   
+{
 #if 0
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
@@ -178,12 +178,12 @@ CString Device::path::get()
         HKEY hKey;
         DWORD error = gSetupApi().CM_Open_DevNode_Key(
             dev->_deviceInfoData.DevInst,
-            KEY_QUERY_VALUE, 
-            0, 
+            KEY_QUERY_VALUE,
+            0,
             RegDisposition_OpenExisting,
-            &hKey, 
+            &hKey,
             CM_REGISTRY_HARDWARE);
-        
+
         if(error == ERROR_SUCCESS)
         {
             BYTE buffer[MAX_PATH];
@@ -209,7 +209,7 @@ CString Device::path::get()
 /// Gets the device connected to the USB bus.
 /// </summary>
 Device* Device::UsbDevice()
-{   
+{
     if (Parent() == NULL)
         return NULL;
 
@@ -223,7 +223,7 @@ Device* Device::UsbDevice()
 /// Property: Gets the device's USB device path w/o the first 4 characters.
 /// </summary>
 CString Device::usbPath::get()
-{ 
+{
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
 
@@ -265,7 +265,7 @@ CString Device::GetProperty( DWORD property, CString defaultValue )
                 //ATLTRACE(_T("*** ASSERTION FAILED: Line %d of file %s\n"), __LINE__, __TFILE__);
                 throw;
             }
-    
+
 
             // Why would we get INVALID_DATA here, but IsDevNodeOk() above returns true?
             //
@@ -275,11 +275,11 @@ CString Device::GetProperty( DWORD property, CString defaultValue )
             return defaultValue;
         }
     }
-    
+
     propertyBuffer = (PBYTE)malloc(requiredSize);
     propertyBufferSize = requiredSize;
 
-    if ( !gSetupApi().apiSetupDiGetDeviceRegistryProperty(_deviceInfoSet, &_deviceInfoData, property, &propertyRegDataType, 
+    if ( !gSetupApi().apiSetupDiGetDeviceRegistryProperty(_deviceInfoSet, &_deviceInfoData, property, &propertyRegDataType,
         propertyBuffer, propertyBufferSize, &requiredSize))
     {
         error = GetLastError();
@@ -289,7 +289,7 @@ CString Device::GetProperty( DWORD property, CString defaultValue )
             //ATLTRACE(_T("*** ASSERTION FAILED: Line %d of file %s\n"), __LINE__, __TFILE__);
             throw;
         }
-        
+
         free(propertyBuffer);
         return defaultValue;
     }
@@ -314,14 +314,14 @@ DWORD Device::GetProperty(DWORD property, DWORD defaultValue)
         return defaultValue;
     }
 
-    if ( !gSetupApi().apiSetupDiGetDeviceRegistryProperty(_deviceInfoSet, &_deviceInfoData, property, &propertyRegDataType, 
+    if ( !gSetupApi().apiSetupDiGetDeviceRegistryProperty(_deviceInfoSet, &_deviceInfoData, property, &propertyRegDataType,
         (PBYTE)&propertyBuffer, propertyBufferSize, &requiredSize))
     {
         error = GetLastError();
         if (error != ERROR_INVALID_DATA)
         {
             throw;
-        }       
+        }
         return defaultValue;
     }
 #endif
@@ -425,7 +425,7 @@ CString Device::enumerator::get()
 //w98 have to implement apiCM_Get_DevNode_Registry_Property in setupapi.cpp first
     if ( _value.IsEmpty() )
     {
-		_value = dev->GetProperty(SPDRP_ENUMERATOR_NAME, CString(_T("")));           
+		_value = dev->GetProperty(SPDRP_ENUMERATOR_NAME, CString(_T("")));
     }
 #endif
     return _value;
@@ -454,7 +454,7 @@ CString Device::classDesc::get()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-#if 0 
+#if 0
     DWORD error;
     if ( _value.IsEmpty() )
     {
@@ -477,7 +477,7 @@ CString Device::hub::get()
 {
     Device* dev = dynamic_cast<Device*>(_owner);
     ASSERT(dev);
-#if 0 
+#if 0
     _value = _T("");
 
     if (dev->UsbDevice() != NULL)
@@ -515,7 +515,7 @@ int Device::hubIndex::getmsc(USHORT vid, USHORT pid)
 		{
 			CString hubPath = dev->_hub.get();
 			if (hubPath.IsEmpty())
-			{	
+			{
 				return Value;
 			}
 			// Open the hub.
@@ -525,7 +525,7 @@ int Device::hubIndex::getmsc(USHORT vid, USHORT pid)
 			hubPath.Replace(_T("\\??"), _T("\\\\."));
 			HANDLE hHub = CreateFile(hubPath, (GENERIC_READ|GENERIC_WRITE), FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("hubIndex::getmsc() hHub is %x, hubPath is %s"), hHub, hubPath);
-			if (hHub == INVALID_HANDLE_VALUE) 
+			if (hHub == INVALID_HANDLE_VALUE)
 			{
 				error = GetLastError();
 				return Value;
@@ -536,7 +536,7 @@ int Device::hubIndex::getmsc(USHORT vid, USHORT pid)
 			DWORD BytesReturned;
 			BOOL Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_INFORMATION, &NodeInformation, sizeof(NodeInformation),
 												&NodeInformation, sizeof(NodeInformation),&BytesReturned, NULL);
-			if (!Success) 
+			if (!Success)
 			{
 				error = GetLastError();
 				CloseHandle(hHub);
@@ -548,13 +548,13 @@ int Device::hubIndex::getmsc(USHORT vid, USHORT pid)
 			// the Port. If the DriveryKey from the hub matches the DriverKey for our device, we have our Hub Index.
 			//
 			// Port index is 1-based
-			for	(UCHAR index=1; index<=NodeInformation.u.HubInformation.HubDescriptor.bNumberOfPorts; index++) 
+			for	(UCHAR index=1; index<=NodeInformation.u.HubInformation.HubDescriptor.bNumberOfPorts; index++)
 			{
 				USB_NODE_CONNECTION_INFORMATION_EX ConnectionInformation;
 				ConnectionInformation.ConnectionIndex = index;
 				Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX, &ConnectionInformation, sizeof(ConnectionInformation),
 										&ConnectionInformation, sizeof(ConnectionInformation), &BytesReturned, NULL);
-				if (!Success) 
+				if (!Success)
 				{
 					continue;
 				}
@@ -570,19 +570,19 @@ int Device::hubIndex::getmsc(USHORT vid, USHORT pid)
 
 					bytes = sizeof(DWORD)*2 + MAX_PATH*2;
 					driverName = (PUSB_NODE_CONNECTION_DRIVERKEY_NAME)malloc(bytes);
-					driverName->ConnectionIndex = index; 
+					driverName->ConnectionIndex = index;
 
 					// Get the name of the driver key of the device attached to the specified port.
 					Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_DRIVERKEY_NAME, driverName,
 											bytes, driverName, bytes, &BytesReturned, NULL);
-					
-					if (!Success) 
+
+					if (!Success)
 					{
 						continue;
 					}
 					// If the Driver Keys match, this is the correct Port
 					if ( dev->UsbDevice()->_driver.get().CompareNoCase((PWSTR)driverName->DriverKeyName) == 0 )
-					{			
+					{
 						Value = index;
 						free (driverName);
 						break;
@@ -594,7 +594,7 @@ int Device::hubIndex::getmsc(USHORT vid, USHORT pid)
 			CloseHandle(hHub);
 			hHub = INVALID_HANDLE_VALUE;
 		}
-	} 
+	}
 //	if(Value == 0)
 //	{
 //		Value = dev->GetProperty(SPDRP_ADDRESS, 0);
@@ -632,7 +632,7 @@ int Device::hubIndex::get2()
         //wxp - Replace it with \\.\ so we can use it for CreateFile
 //        hubPath.Replace(_T("\\??"), _T("\\\\."));
 //		HANDLE hHub = CreateFile(hubPath, (GENERIC_READ|GENERIC_WRITE), FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-//        if (hHub == INVALID_HANDLE_VALUE) 
+//        if (hHub == INVALID_HANDLE_VALUE)
 //        {
 //            error = GetLastError();
 //			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Device::hubIndex::get, CreateFile(hHub) failed, errcode: %d"), error);
@@ -643,7 +643,7 @@ int Device::hubIndex::get2()
 //        DWORD BytesReturned;
 //        BOOL Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_INFORMATION, &NodeInformation, sizeof(NodeInformation),
 //                                            &NodeInformation, sizeof(NodeInformation),&BytesReturned, NULL);
-//        if (!Success) 
+//        if (!Success)
 //        {
 //            error = GetLastError();
 //            CloseHandle(hHub);
@@ -665,7 +665,7 @@ int Device::hubIndex::get2()
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Device::hubIndex::get, hubPath is NULL"));
             return Value;
 		}
-        
+
         // Open the hub.
         DWORD error;
         //w98 - In Windows 98 the hub path starts with \DosDevices\
@@ -677,7 +677,7 @@ int Device::hubIndex::get2()
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Device::hubIndex::get, hubPath is: %s"), hubPath);
         //HANDLE hHub = CreateFile(hubPath, 0, 0, NULL, OPEN_EXISTING, 0, NULL);
 		HANDLE hHub = CreateFile(hubPath, (GENERIC_READ|GENERIC_WRITE), FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-        if (hHub == INVALID_HANDLE_VALUE) 
+        if (hHub == INVALID_HANDLE_VALUE)
         {
             error = GetLastError();
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Device::hubIndex::get, CreateFile(hHub) failed, errcode: %d"), error);
@@ -689,7 +689,7 @@ int Device::hubIndex::get2()
         DWORD BytesReturned;
         BOOL Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_INFORMATION, &NodeInformation, sizeof(NodeInformation),
                                             &NodeInformation, sizeof(NodeInformation),&BytesReturned, NULL);
-        if (!Success) 
+        if (!Success)
         {
             error = GetLastError();
             CloseHandle(hHub);
@@ -702,13 +702,13 @@ int Device::hubIndex::get2()
         //
         // Port index is 1-based
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Device::hubIndex::get, the hub has port numbers: %d"), NodeInformation.u.HubInformation.HubDescriptor.bNumberOfPorts);
-        for (UCHAR index=1; index<=NodeInformation.u.HubInformation.HubDescriptor.bNumberOfPorts; index++) 
+        for (UCHAR index=1; index<=NodeInformation.u.HubInformation.HubDescriptor.bNumberOfPorts; index++)
         {
             USB_NODE_CONNECTION_INFORMATION_EX ConnectionInformation;
             ConnectionInformation.ConnectionIndex = index;
             Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX, &ConnectionInformation, sizeof(ConnectionInformation),
                                     &ConnectionInformation, sizeof(ConnectionInformation), &BytesReturned, NULL);
-            if (!Success) 
+            if (!Success)
             {
                 error = GetLastError();
 				if(error == ERROR_DEVICE_NOT_CONNECTED)
@@ -727,11 +727,11 @@ int Device::hubIndex::get2()
                 DWORD bytes = sizeof(DWORD)*2 + MAX_PATH*2;
                 PUSB_NODE_CONNECTION_DRIVERKEY_NAME driverName = (PUSB_NODE_CONNECTION_DRIVERKEY_NAME)malloc(bytes);
 				memset(driverName, 0, bytes);
-                driverName->ConnectionIndex = index; 
+                driverName->ConnectionIndex = index;
                 // Get the name of the driver key of the device attached to the specified port.
                 Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_DRIVERKEY_NAME, driverName,
                                         bytes, driverName, bytes, &BytesReturned, NULL);
-                if (!Success) 
+                if (!Success)
                 {
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Device::hubIndex::get, IOCTL_USB_GET_NODE_CONNECTION_DRIVERKEY_NAME failed, DriverKey: %s"), (PWSTR)driverName->DriverKeyName);
 					int retrycnt = 1;
@@ -761,7 +761,7 @@ int Device::hubIndex::get2()
                 // If the Driver Keys match, this is the correct Port
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Device::hubIndex::get, the port(%d) connected device's DriverKeyName is %s, and the find device driverkey is: %s"), index, (PWSTR)driverName->DriverKeyName, dev->UsbDevice()->_driver.get());
                 if ( dev->UsbDevice()->_driver.get().CompareNoCase((PWSTR)driverName->DriverKeyName) == 0 )
-                {           
+                {
                     Value = index;
                     free (driverName);
 					driverName = NULL;
@@ -822,7 +822,7 @@ int Device::hubIndex::get()
             ConnectionInformation.ConnectionIndex = index;
 			Success = DeviceIoControl(hHub, IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX, &ConnectionInformation, sizeof(ConnectionInformation),
                                     &ConnectionInformation, sizeof(ConnectionInformation), &BytesReturned, NULL);
-            if (!Success) 
+            if (!Success)
             {
                 continue;
 			}
@@ -862,12 +862,12 @@ int Device::hubIndex::get()
 /// </summary>
 Device::DeviceCapabilities Device::Capabilities()
 {
-#if 0 
+#if 0
     if (_capabilities == Unknown)
     {
         _capabilities = (DeviceCapabilities)GetProperty(SPDRP_CAPABILITIES, (DWORD)0);
     }
-#endif 	    
+#endif
     return _capabilities;
 }
 
@@ -875,7 +875,7 @@ Device::DeviceCapabilities Device::Capabilities()
 /// Gets a value indicating whether this device is a USB device.
 /// </summary>
 bool Device::IsUsb()
-{   
+{
 
     if (Parent() == NULL)
         return false;
@@ -941,5 +941,3 @@ void Device::SetDeviceWndIndex(DWORD dwIndex)
 {
     m_dwIndex = dwIndex;
 }
-
-

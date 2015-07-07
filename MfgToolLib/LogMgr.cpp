@@ -101,7 +101,7 @@ void CMfgLogMgr::PrintLog(DWORD moduleID, DWORD levelID, const TCHAR * format, .
     TCHAR* buffer;
     va_list args;
     int len;
-    
+
     va_start(args, format);
     len = _vsctprintf(format, args)+1;
     buffer = (TCHAR*)malloc(len*sizeof(TCHAR));
@@ -115,9 +115,6 @@ void CMfgLogMgr::PrintLog(DWORD moduleID, DWORD levelID, const TCHAR * format, .
 		_fputts(str,m_file);
 		std::fflush(m_file);
 	}
-    
+
     free(buffer);
 }
-
-
-

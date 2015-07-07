@@ -42,30 +42,30 @@ public:
 		TCHAR DriverLetter;
 	};
 
-	enum DeviceListType 
-	{ 
-		DeviceListType_Old, 
-		DeviceListType_Current, 
-		DeviceListType_New 
+	enum DeviceListType
+	{
+		DeviceListType_Old,
+		DeviceListType_Current,
+		DeviceListType_New
 	};
 
-	enum DeviceListAction 
-	{ 
-		DeviceListAction_None, 
-		DeviceListAction_Add, 
-		DeviceListAction_Remove 
+	enum DeviceListAction
+	{
+		DeviceListAction_None,
+		DeviceListAction_Add,
+		DeviceListAction_Remove
 	};
 
 	DeviceClass(LPCGUID iFaceGuid, LPCGUID devGuid, LPCTSTR enumerator, DEV_CLASS_TYPE type, INSTANCE_HANDLE handle);
 	virtual ~DeviceClass();
-	
+
 	HDEVINFO GetDevInfoSet();
 	void DestroyDevInfoSet();
 	DWORD EnumDeviceInterfaceDetails(DWORD index, CString& devPath, PSP_DEVINFO_DATA pDevData);
 
 	int RefreshPort(const CString hubPath, const int hubIndex);
 	int ClearPort(const CString hubPath, const int hubIndex);
-	
+
 	virtual DEVICES_ARRAY& Devices();
 	virtual std::list<Device*>& Refresh();
 	virtual Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
@@ -73,15 +73,15 @@ public:
 	virtual NotifyStruct AddUsbDevice(LPCTSTR path=NULL,struct libusb_device * dev=NULL);
 	virtual NotifyStruct RemoveUsbDevice(LPCTSTR path);
 	virtual Device* FindDeviceByUsbPath(CString pathToFind, const DeviceListType devList, const DeviceListAction devListAction = DeviceListAction_None);
-	
+
 public:
 	GuidProperty(_classIfaceGuid);	//GUID for a device interface class.
     GuidProperty(_classDevGuid);	//GUID for a device setup class.
     StringProperty(_enumerator);
-	
-	class classDesc : public StringProperty 
-	{ 
-	public: 
+
+	class classDesc : public StringProperty
+	{
+	public:
 		CString get();
 	}_classDesc;
 
@@ -99,8 +99,3 @@ public:
 };
 
 typedef std::map<DWORD, DeviceClass*> DEV_CLASS_ARRAY;
-
-
-
-
-

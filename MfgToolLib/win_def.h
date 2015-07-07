@@ -3,7 +3,7 @@
 #include <tchar.h>
 #include <string>
 #include <string.h>
-#include <cstring>  
+#include <cstring>
 #include <iostream>
 #include <cstdlib>
 
@@ -26,13 +26,13 @@
 #ifdef DEBUG
 #define ASSERT assert
 #else
-#define ASSERT 
+#define ASSERT
 #endif
 
 
 #define TRACE 1? 0: _tprintf
 
-#if 0 
+#if 0
 
 #ifndef FALSE
 #define FALSE (0)
@@ -48,7 +48,7 @@
 #define _tcspbrk strpbrk
 #define _tcsnicmp _strnicmp
 //#define .Format =sprintf
-#define TCHAR char 
+#define TCHAR char
 #define _T
 
 
@@ -67,7 +67,7 @@ struct thread_msg{
 	LPARAM lParam;
 	thread_msg() : message(), wParam(), lParam() {}
 	thread_msg(UINT msg, WPARAM wPar, LPARAM lPar):message(msg),wParam(wPar),lParam(lPar){}
-	
+
 
 };
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
@@ -76,5 +76,3 @@ struct thread_msg{
 #define DELTA_EPOCH_IN_MICROSECS  116444736000000000ULL // CORRECT
 #endif
 //std::string str_format(const std::string fmt_str, ...);
-
-

@@ -13,8 +13,8 @@
 #include "stdafx.h"
 
 /************************************************************
-* Error Code
-************************************************************/
+ * Error Code
+ ************************************************************/
 #define MFGLIB_ERROR_SUCCESS							0
 #define MFGLIB_ERROR_UNKNOWN							1
 #define MFGLIB_ERROR_ALREADY_EXIST						2
@@ -51,8 +51,8 @@
 #define MFGLIB_ERROR_SKIP								33
 
 /************************************************************
-* Type definition
-************************************************************/
+ * Type definition
+ ************************************************************/
 #if 0
 typedef wchar_t CHAR_t;
 typedef wchar_t BYTE_t;
@@ -64,17 +64,17 @@ typedef unsigned char BYTE_t;
 typedef void *INSTANCE_HANDLE;
 
 /************************************************************
-* MfgTool can support max boards simultaneously
-************************************************************/
+ * MfgTool can support max boards simultaneously
+ ************************************************************/
 #define MAX_BOARD_NUMBERS        4
 /************************************************************
-* MfgToolLib can support max characters in a character buffer
-************************************************************/
+ * MfgToolLib can support max characters in a character buffer
+ ************************************************************/
 #define MAX_CHAR_NUMBERS         260
 
 /************************************************************
-* Struct&Class definition
-************************************************************/
+ * Struct&Class definition
+ ************************************************************/
 typedef enum _Device_Change_Event
 {
 	MX_DEVICE_ARRIVAL_EVT,
@@ -112,10 +112,10 @@ typedef enum _Callback_Type
 typedef struct _Device_Change_Notify
 {
 	pthread_t OperationID;
-    BYTE_t Hub[MAX_CHAR_NUMBERS];
-    int HubIndex;
+	BYTE_t Hub[MAX_CHAR_NUMBERS];
+	int HubIndex;
 	int PortIndex;
-    MX_DEVICE_CHANGE_EVENT Event;
+	MX_DEVICE_CHANGE_EVENT Event;
 	BYTE_t DeviceDesc[MAX_CHAR_NUMBERS];
 	BYTE_t DriverLetter;
 } DEVICE_CHANGE_NOTIFY;
@@ -172,30 +172,28 @@ typedef void (*PCALLBACK_OPERATE_RESULT)(OPERATE_RESULT *pNsInfo);
 typedef void (*PCALLBACK_DEVICE_CHANGE)(DEVICE_CHANGE_NOTIFY *pNsInfo);
 
 /************************************************************
-* Export Functions declaration
-************************************************************/
+ * Export Functions declaration
+ ************************************************************/
 extern "C"
 {
-int foo();
-extern DWORD MfgLib_Initialize();
-DWORD MfgLib_Uninitialize();
-DWORD MfgLib_CreateInstanceHandle(INSTANCE_HANDLE *pHandle);
-DWORD MfgLib_DestoryInstanceHandle(INSTANCE_HANDLE handle);
-DWORD MfgLib_SetProfileName(INSTANCE_HANDLE handle, BYTE_t *strName);
-DWORD MfgLib_SetListName(INSTANCE_HANDLE handle, BYTE_t *strName);
-DWORD MfgLib_SetUCLFile(INSTANCE_HANDLE handle, BYTE_t *strName);
-DWORD MfgLib_SetMaxBoardNumber(INSTANCE_HANDLE handle, int boardNum);
-DWORD MfgLib_InitializeOperation(INSTANCE_HANDLE handle);
-DWORD MfgLib_UninitializeOperation(INSTANCE_HANDLE handle);
-DWORD MfgLib_StartOperation(INSTANCE_HANDLE handle, pthread_t OperationID);
-DWORD MfgLib_StopOperation(INSTANCE_HANDLE handle, pthread_t OperationID);
-DWORD MfgLib_GetOperationInformation(INSTANCE_HANDLE handle, OPERATIONS_INFORMATION *pOperationsInfo);
-DWORD MfgLib_GetPhaseInformation(INSTANCE_HANDLE handle, PHASES_INFORMATION *pPhasesInfo);
-DWORD MfgLib_GetTotalCommandNumbers(INSTANCE_HANDLE handle, UINT *Number);
-DWORD MfgLib_RegisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbType, void *pFunc);
-DWORD MfgLib_UnregisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbType, void *pFunc);
-DWORD MfgLib_GetLibraryVersion(BYTE_t* version, int maxSize);
-DWORD MfgLib_SetUCLKeyWord(CHAR_t *key, CHAR_t *value);
+	int foo();
+	extern DWORD MfgLib_Initialize();
+	DWORD MfgLib_Uninitialize();
+	DWORD MfgLib_CreateInstanceHandle(INSTANCE_HANDLE *pHandle);
+	DWORD MfgLib_DestoryInstanceHandle(INSTANCE_HANDLE handle);
+	DWORD MfgLib_SetProfileName(INSTANCE_HANDLE handle, BYTE_t *strName);
+	DWORD MfgLib_SetListName(INSTANCE_HANDLE handle, BYTE_t *strName);
+	DWORD MfgLib_SetUCLFile(INSTANCE_HANDLE handle, BYTE_t *strName);
+	DWORD MfgLib_SetMaxBoardNumber(INSTANCE_HANDLE handle, int boardNum);
+	DWORD MfgLib_InitializeOperation(INSTANCE_HANDLE handle);
+	DWORD MfgLib_UninitializeOperation(INSTANCE_HANDLE handle);
+	DWORD MfgLib_StartOperation(INSTANCE_HANDLE handle, pthread_t OperationID);
+	DWORD MfgLib_StopOperation(INSTANCE_HANDLE handle, pthread_t OperationID);
+	DWORD MfgLib_GetOperationInformation(INSTANCE_HANDLE handle, OPERATIONS_INFORMATION *pOperationsInfo);
+	DWORD MfgLib_GetPhaseInformation(INSTANCE_HANDLE handle, PHASES_INFORMATION *pPhasesInfo);
+	DWORD MfgLib_GetTotalCommandNumbers(INSTANCE_HANDLE handle, UINT *Number);
+	DWORD MfgLib_RegisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbType, void *pFunc);
+	DWORD MfgLib_UnregisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbType, void *pFunc);
+	DWORD MfgLib_GetLibraryVersion(BYTE_t* version, int maxSize);
+	DWORD MfgLib_SetUCLKeyWord(CHAR_t *key, CHAR_t *value);
 }
-
-

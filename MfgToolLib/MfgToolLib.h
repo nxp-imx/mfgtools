@@ -36,21 +36,21 @@ extern HINSTANCE dll_module;
 
 class CMfgToolLibApp //: public CWinApp
 {
-public:
-	CMfgToolLibApp();
+	public:
+		CMfgToolLibApp();
 
-	CString m_strDllFullPath;
+		CString m_strDllFullPath;
 
-// Overrides
-public:
-	virtual BOOL InitInstance();
+		// Overrides
+	public:
+		virtual BOOL InitInstance();
 
-	//DECLARE_MESSAGE_MAP()
+		//DECLARE_MESSAGE_MAP()
 };
 
 /************************************************************
-* constant definition
-************************************************************/
+ * constant definition
+ ************************************************************/
 #define LOG_MODULE_MAIN_APP					1
 #define LOG_MODULE_MFGTOOL_LIB				2
 
@@ -65,8 +65,8 @@ public:
 #define DEFAULT_UCL_XML_FILE_NAME			_T("ucl2.xml")
 
 /************************************************************
-* Struct&Class definition
-************************************************************/
+ * Struct&Class definition
+ ************************************************************/
 typedef struct _tagCfgParam
 {
 	CString	chip;
@@ -76,163 +76,163 @@ typedef struct _tagCfgParam
 // <LIST ...> ... </LIST>
 class CCommandList : public XNode
 {
-public:
-	// [XmlAttribute("name")]
-	CString GetName();
-	// [XmlAttribute("desc")]
-	CString GetDescription();
+	public:
+		// [XmlAttribute("name")]
+		CString GetName();
+		// [XmlAttribute("desc")]
+		CString GetDescription();
 };
 //a class for ucl.xml file, this is the toppest class
 class CUclXml : public XNode
 {
-public:
-	// [XmlElement("LIST")]
-	CCommandList* GetCmdListNode(LPCTSTR name);
+	public:
+		// [XmlElement("LIST")]
+		CCommandList* GetCmdListNode(LPCTSTR name);
 };
 
 class COpState
 {
-public:
-	MX_DEVICE_STATE opState;
-	CString strStateName;
-	CString strDevice;
-	MX_DEVICE_TYPE  opDeviceType;
-	UINT uiVid;
-	UINT uiPid;
-	DWORD dwTimeout;   // waiting for change to next state(for example: the timeout of find command)
+	public:
+		MX_DEVICE_STATE opState;
+		CString strStateName;
+		CString strDevice;
+		MX_DEVICE_TYPE  opDeviceType;
+		UINT uiVid;
+		UINT uiPid;
+		DWORD dwTimeout;   // waiting for change to next state(for example: the timeout of find command)
 };
 typedef std::vector<COpState*> OP_STATE_ARRAY;
 
 //command class family
 class COpCommand
 {
-public:
-	COpCommand();
-	virtual ~COpCommand();
-	virtual UINT ExecuteCommand(int index);
-	virtual void SetBodyString(CString &str);
-	virtual CString GetBodyString();
-	virtual void SetDescString(CString &str);
-	virtual CString GetDescString();
-	virtual void SetIfDevString(CString &str);
-	virtual bool IsRun(CString &dev);
-	INSTANCE_HANDLE m_pLibVars;
+	public:
+		COpCommand();
+		virtual ~COpCommand();
+		virtual UINT ExecuteCommand(int index);
+		virtual void SetBodyString(CString &str);
+		virtual CString GetBodyString();
+		virtual void SetDescString(CString &str);
+		virtual CString GetDescString();
+		virtual void SetIfDevString(CString &str);
+		virtual bool IsRun(CString &dev);
+		INSTANCE_HANDLE m_pLibVars;
 
-protected:
-	CString m_bodyString;
-	CString m_descString;
-	CString m_ifdev;
+	protected:
+		CString m_bodyString;
+		CString m_descString;
+		CString m_ifdev;
 };
 
 class COpCmd_Find : public COpCommand
 {
-public:
-	virtual UINT ExecuteCommand(int index);
-	void SetTimeout(CString &strTO);
-	UINT GetTimeout() const
-	{
-		return m_timeout;
-	}
+	public:
+		virtual UINT ExecuteCommand(int index);
+		void SetTimeout(CString &strTO);
+		UINT GetTimeout() const
+		{
+			return m_timeout;
+		}
 
-private:
-	UINT m_timeout;
+	private:
+		UINT m_timeout;
 };
 
 class COpCmd_Boot : public COpCommand
 {
-public:
-	COpCmd_Boot();
-	virtual ~COpCmd_Boot();
-	virtual UINT ExecuteCommand(int index);
-	UINT SetFileMapping(CString &strFile);
-	void CloseFileMapping();
-	CString GetFilename() const
-	{
-		return m_FileName;
-	}
+	public:
+		COpCmd_Boot();
+		virtual ~COpCmd_Boot();
+		virtual UINT ExecuteCommand(int index);
+		UINT SetFileMapping(CString &strFile);
+		void CloseFileMapping();
+		CString GetFilename() const
+		{
+			return m_FileName;
+		}
 
-private:
-	CString m_FileName;
-	UCHAR *m_pDataBuf;
-	__int64 m_qwFileSize;
+	private:
+		CString m_FileName;
+		UCHAR *m_pDataBuf;
+		__int64 m_qwFileSize;
 };
 
 class COpCmd_Init : public COpCommand
 {
-public:
-	COpCmd_Init();
-	virtual ~COpCmd_Init();
-	virtual UINT ExecuteCommand(int index);
-	UINT SetFileMapping(CString &strFile);
-	void CloseFileMapping();
-	CString GetFilename() const
-	{
-		return m_FileName;
-	}
+	public:
+		COpCmd_Init();
+		virtual ~COpCmd_Init();
+		virtual UINT ExecuteCommand(int index);
+		UINT SetFileMapping(CString &strFile);
+		void CloseFileMapping();
+		CString GetFilename() const
+		{
+			return m_FileName;
+		}
 
-private:
-	CString m_FileName;
-	UCHAR *m_pDataBuf;
-	__int64 m_qwFileSize;
+	private:
+		CString m_FileName;
+		UCHAR *m_pDataBuf;
+		__int64 m_qwFileSize;
 };
 
 class COpCmd_Load : public COpCommand
 {
-public:
-	COpCmd_Load();
-	virtual ~COpCmd_Load();
-	virtual UINT ExecuteCommand(int index);
-	UINT SetFileMapping(CString &strFile);
-	void CloseFileMapping();
-	void SetAddress(CString &strAddr);
-	void SetloadSection(CString &str);
-	void SetsetSection(CString &str);
-	void SetIsHasFlashHeader(CString &str);
-	DWORD GetFileDataSize();
-private:
-	CString m_FileName;
-	UINT m_address;
-	CString m_strloadSection;
-	CString m_strsetSection;
-	BOOL m_bHasFlashHeader;
-	__int64 m_qwFileSize;
-	UCHAR *m_pDataBuf;
-	int m_iPercentComplete;
+	public:
+		COpCmd_Load();
+		virtual ~COpCmd_Load();
+		virtual UINT ExecuteCommand(int index);
+		UINT SetFileMapping(CString &strFile);
+		void CloseFileMapping();
+		void SetAddress(CString &strAddr);
+		void SetloadSection(CString &str);
+		void SetsetSection(CString &str);
+		void SetIsHasFlashHeader(CString &str);
+		DWORD GetFileDataSize();
+	private:
+		CString m_FileName;
+		UINT m_address;
+		CString m_strloadSection;
+		CString m_strsetSection;
+		BOOL m_bHasFlashHeader;
+		__int64 m_qwFileSize;
+		UCHAR *m_pDataBuf;
+		int m_iPercentComplete;
 };
 
 class COpCmd_Jump : public COpCommand
 {
-public:
-	virtual UINT ExecuteCommand(int index);
+	public:
+		virtual UINT ExecuteCommand(int index);
 };
 
 class COpCmd_Push : public COpCommand
 {
-public:
-	COpCmd_Push();
-	virtual ~COpCmd_Push();
-	virtual UINT ExecuteCommand(int index);
-	UINT SetFileMapping(CString &strFile);
-	void CloseFileMapping();
-	BOOL m_bIngoreError;
-	CString m_SavedFileName;
-private:
-	CString m_FileName;
-	__int64 m_qwFileSize;
-	UCHAR *m_pDataBuf;
+	public:
+		COpCmd_Push();
+		virtual ~COpCmd_Push();
+		virtual UINT ExecuteCommand(int index);
+		UINT SetFileMapping(CString &strFile);
+		void CloseFileMapping();
+		BOOL m_bIngoreError;
+		CString m_SavedFileName;
+	private:
+		CString m_FileName;
+		__int64 m_qwFileSize;
+		UCHAR *m_pDataBuf;
 };
 /*
-class COpCmd_Burn : public COpCommand
-{
-public:
-	COpCmd_Burn();
-	virtual ~COpCmd_Burn();
-	virtual UINT ExecuteCommand(int index);
-	void SetFileName(CString strFile);
-private:
-	CString m_FileName;
-};
-*/
+	 class COpCmd_Burn : public COpCommand
+	 {
+	 public:
+	 COpCmd_Burn();
+	 virtual ~COpCmd_Burn();
+	 virtual UINT ExecuteCommand(int index);
+	 void SetFileName(CString strFile);
+	 private:
+	 CString m_FileName;
+	 };
+ */
 typedef std::vector<COpCommand*> OP_COMMAND_ARRAY;
 typedef std::map<MX_DEVICE_STATE, OP_COMMAND_ARRAY> StateCommansMap_t;
 
@@ -265,37 +265,37 @@ typedef struct _t_lib_vars
 
 typedef void (*PINTERNALCALLBACK)(INSTANCE_HANDLE handle, DeviceClass::NotifyStruct *pnsinfo);
 /*
-typedef struct _port_list
-{
-	CString hubPath;
-	int hubIndex;
-	int portIndex;
-	PORT_ID portID;
-	Device *pHubDevice;
-} USB_PORT_NODE;
-*/
+	 typedef struct _port_list
+	 {
+	 CString hubPath;
+	 int hubIndex;
+	 int portIndex;
+	 PORT_ID portID;
+	 Device *pHubDevice;
+	 } USB_PORT_NODE;
+ */
 /************************************************************
-* Global variables declaration
-************************************************************/
+ * Global variables declaration
+ ************************************************************/
 extern CMfgToolLibApp* theApp;
 /*
-extern CUclXml* g_pXmlHandler;
-extern CString g_strPath;
-extern CString g_strUclFilename;
-extern CFG_PARAMETER g_CfgParam;
-extern int g_iMaxBoardNum;
-extern std::vector<CCmdOpreation*> g_CmdOperationArray;
-extern HANDLE g_hDevCanDeleteEvts[MAX_BOARD_NUMBERS];
-extern PORT_DEV_INFO g_PortDevInfoArray[MAX_BOARD_NUMBERS];
-extern OP_STATE_ARRAY g_OpStates;
-extern StateCommansMap_t g_StateCommands;
-*/
+	 extern CUclXml* g_pXmlHandler;
+	 extern CString g_strPath;
+	 extern CString g_strUclFilename;
+	 extern CFG_PARAMETER g_CfgParam;
+	 extern int g_iMaxBoardNum;
+	 extern std::vector<CCmdOpreation*> g_CmdOperationArray;
+	 extern HANDLE g_hDevCanDeleteEvts[MAX_BOARD_NUMBERS];
+	 extern PORT_DEV_INFO g_PortDevInfoArray[MAX_BOARD_NUMBERS];
+	 extern OP_STATE_ARRAY g_OpStates;
+	 extern StateCommansMap_t g_StateCommands;
+ */
 extern std::vector<MFGLIB_VARS *> g_LibVarsArray;
 extern HANDLE g_hOneInstance;
 //extern std::vector<USB_PORT_NODE *> g_PortTable;
 /************************************************************
-* Function declaration
-************************************************************/
+ * Function declaration
+ ************************************************************/
 DWORD InitLogManager();
 void DeinitLogManager();
 void LogMsg(DWORD moduleID, DWORD levelID, const TCHAR * format, ... );
@@ -319,6 +319,3 @@ BOOL FindLibraryHandle(MFGLIB_VARS *pLibVars);
 int FindOperationIndex(MFGLIB_VARS *pLibVars, pthread_t operationID);
 CString ReplaceKeywords(CString str);
 BOOL  DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved);
-
-
-

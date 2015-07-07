@@ -118,7 +118,7 @@ DWORD CCmdOpreation::Open()
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create RunFlag error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	
+
 
 	m_bKilled = FALSE;
 	m_bRun = FALSE;
@@ -140,7 +140,7 @@ DWORD CCmdOpreation::Open()
 	}
 	ev_semaphore = new sem_t;
 	sem_init(ev_semaphore, NULL, 0);
-	
+
 	if (pthread_create(&m_pThread, NULL, CmdListThreadProc,this) == 0)
 	{
 
@@ -149,7 +149,7 @@ DWORD CCmdOpreation::Open()
 	if (DestroyEvent(m_hThreadStartEvent) != 0){
 		std::cerr << "failed to delete event" << std::endl;
 	}
-	
+
 
 	((MFGLIB_VARS *)m_pLibHandle)->g_CmdOpThreadID[m_WndIndex] = m_pThread;
 
@@ -194,7 +194,7 @@ void CCmdOpreation::Close()
 }
 
 MX_DEVICE_STATE CCmdOpreation::GetDeviceState()
-{	
+{
 	return MX_BOOTSTRAP;
 	if(NULL == m_p_usb_port->GetDevice())
 	{
@@ -224,7 +224,7 @@ MX_DEVICE_STATE CCmdOpreation::GetDeviceState()
 usb::Port* CCmdOpreation::FindPort()
 {
 	usb::Port * pPort = NULL;
-	if ( m_usb_hub_name.IsEmpty() || m_usb_port_index == 0 ) 
+	if ( m_usb_hub_name.IsEmpty() || m_usb_port_index == 0 )
 	{
         return NULL;
     }
@@ -375,16 +375,16 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
     DWORD dwRet = 0;
 	struct timespec timeToWait;
 	struct timeval now;
-	
+
 	gettimeofday(&now,NULL);
 	timeToWait.tv_sec = now.tv_sec+dwTimeOut;
 	timeToWait.tv_nsec = now.tv_usec * 1000;
-	
-    myevent *waitHandles[6] = { 
-				m_hKillEvent, 
+
+    myevent *waitHandles[6] = {
+				m_hKillEvent,
 				m_hDeviceArriveEvent,
 				m_hDeviceRemoveEvent,
-				m_hRunEvent,  
+				m_hRunEvent,
 				m_hStopEvent,
 				m_hOneCmdCompleteEvent
 	};
@@ -407,7 +407,7 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 		TRACE(_T("WaitforEvents device arrive1\r\n"));
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--WaitforEvents device arrive1"), m_WndIndex);
 		//bDeviceChange = TRUE;
-        //bStateCmdFinished = FALSE; 
+        //bStateCmdFinished = FALSE;
 		//dwError = MFGLIB_ERROR_SUCCESS;
 		m_bDeviceOn = TRUE;
 		dwRet = 1;
@@ -416,7 +416,7 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 		TRACE(_T("CmdListThreadProc device remove1\r\n"));
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--WaitforEvents device remove1"), m_WndIndex);
 		//bDeviceChange = TRUE;
-        //bStateCmdFinished = TRUE; 
+        //bStateCmdFinished = TRUE;
 		//dwError = MFGLIB_ERROR_SUCCESS;
 		m_bDeviceOn = FALSE;
 		//if(pOperation->m_pUTP != NULL)
@@ -466,7 +466,7 @@ void* CmdListThreadProc(void* pParam)
 	DWORD dwStateIndex = 0;
 	CString chip;
 
-	
+
 	if (!pOperation->InitInstance()){
 
 	}
@@ -515,7 +515,7 @@ void* CmdListThreadProc(void* pParam)
 					//Update state progress
 					//UI_UPDATE_INFORMATION _uiInfo;
 					//pOperation->UpdateUI(&_uiInfo,dwStateIndex);
-					
+
 					if(CurrentCommands.size() == 0)
 					{
 						bStateCmdFinished = TRUE;
@@ -535,7 +535,7 @@ void* CmdListThreadProc(void* pParam)
 						chip = ((MxHidDevice*)pDevice)->_chiFamilyName;
 					}
 				}
-				
+
 				COpCommand *pCmd = (*cmdIt);
 				printf(" command description \"%s\" and body string \"%s\" \n",pCmd->GetDescString().c_str(),pCmd->GetBodyString().c_str());
 				if(pCmd->IsRun(chip))
@@ -555,7 +555,7 @@ void* CmdListThreadProc(void* pParam)
 					}
 
 				    cmdIt++;
-					
+
 					//In current state(Bootstrap or Updater), all commands are executed
 					if(cmdIt == CurrentCommands.end())
 					{
@@ -586,7 +586,7 @@ void* CmdListThreadProc(void* pParam)
 				{
 					// error
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d], current command executed failed, so SetEvent(hDevCanDeleteEvent)"), pOperation->m_WndIndex);
-					dwTimeout = INFINITE; 
+					dwTimeout = INFINITE;
 				}
 				pOperation->m_dwCmdIndex++;
 			}
@@ -752,7 +752,7 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
             if(m_bRun)
             {
                 OnStop();
-            }        
+            }
         }
 		break;
 	default:

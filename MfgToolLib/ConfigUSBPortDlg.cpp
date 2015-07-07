@@ -79,9 +79,9 @@ void CConfigUSBPortDlg::CUSBTreeCtrl::OnRButtonDown(UINT nFlags, CPoint point)
     UINT uFlags;
     HTREEITEM hti = HitTest(point,&uFlags);
 
-    if( hti && uFlags & TVHT_ONITEM )   
-	{   
-        PortNodeInfo* info = (PortNodeInfo*)GetItemData(hti);        
+    if( hti && uFlags & TVHT_ONITEM )
+	{
+        PortNodeInfo* info = (PortNodeInfo*)GetItemData(hti);
         m_tool_tip_ctrl->Activate(true);
         return;
     }
@@ -94,7 +94,7 @@ void CConfigUSBPortDlg::CUSBTreeCtrl::OnRButtonUp(UINT nFlags, CPoint point)
     UINT uFlags;
     HTREEITEM hti = HitTest(point,&uFlags);
 
-    if( hti && uFlags & TVHT_ONITEM )   
+    if( hti && uFlags & TVHT_ONITEM )
 	{
         m_tool_tip_ctrl->Activate(false);
         return;
@@ -179,7 +179,7 @@ void CConfigUSBPortDlg::DoTreeOperation(CConfigUSBPortDlg::e_TREE_OP _op_type, c
         while ( hti )
         {
             pInfo = (PortNodeInfo*)m_tree_ctrl.GetItemData(hti);
-            
+
             if ( pInfo && pInfo->CbState == CbStateUnchecked )
             {
                 pInfo->CbState = CbStateGrayed;
@@ -193,7 +193,7 @@ void CConfigUSBPortDlg::DoTreeOperation(CConfigUSBPortDlg::e_TREE_OP _op_type, c
         while ( hti )
         {
             pInfo = (PortNodeInfo*)m_tree_ctrl.GetItemData(hti);
-            
+
             if ( pInfo && (pInfo->CbState == CbStateChecked || pInfo->CbState == CbStateGrayed) )
             {
                 pInfo->CbState = CbStateUnchecked;
@@ -209,7 +209,7 @@ void CConfigUSBPortDlg::DoTreeOperation(CConfigUSBPortDlg::e_TREE_OP _op_type, c
         while ( hti )
         {
             pInfo = (PortNodeInfo*)m_tree_ctrl.GetItemData(hti);
-            
+
             if ( (  pInfo && pInfo->CbState == CbStateGrayed )&& // if the node is grayed and
                  (  pInfo->pUsbHub && pInfo->PortIndex != 0 ) && // if the node is a port
                  ( !pInfo->pUsbHub->Port(pInfo->PortIndex)->IsHub() ) ) // and a HUB is not connected to the port
@@ -226,7 +226,7 @@ void CConfigUSBPortDlg::DoTreeOperation(CConfigUSBPortDlg::e_TREE_OP _op_type, c
         while ( hti )
         {
             pInfo = (PortNodeInfo*)m_tree_ctrl.GetItemData(hti);
-            
+
             if ( pInfo && pInfo->pUsbHub && pInfo->PortIndex != 0 ) // if the node  is  a port
             {
                 if((pNsinfo->Hub.Compare(pInfo->pUsbHub->_path.get()) == 0) && (pInfo->PortIndex == pNsinfo->HubIndex))
@@ -257,7 +257,7 @@ void CConfigUSBPortDlg::DoTreeOperation(CConfigUSBPortDlg::e_TREE_OP _op_type, c
             CString resStr = _T("My Computer");
             HTREEITEM htiRoot = m_tree_ctrl.InsertItem(resStr, TVI_ROOT);
             SetTreeItemInfo( htiRoot );
-            
+
             // Loop through the USB Controllers
             std::list<Device*>::iterator controllerItem;
 
@@ -266,12 +266,12 @@ void CConfigUSBPortDlg::DoTreeOperation(CConfigUSBPortDlg::e_TREE_OP _op_type, c
             {
                 // cast our Device* to a usb::Controller*
                 usb::Controller* pController = dynamic_cast<usb::Controller*>(*controllerItem);
-                
+
                 // insert the controller
                 resStr = _T("Controller");
                 HTREEITEM htiController = m_tree_ctrl.InsertItem(resStr, htiRoot);
                 SetTreeItemInfo( htiController, pController );
-                
+
                 // insert the controller's root_hub
                 usb::Hub* pRootHub = pController->GetRootHub();
                 HTREEITEM htiRootHub = m_tree_ctrl.InsertItem(pRootHub->name(), htiController);
@@ -313,34 +313,34 @@ HTREEITEM CConfigUSBPortDlg::GetNextTreeItem( HTREEITEM _hti /*= 0 */ )
         hti = hti_last;
 	}
 
-    if ( !hti ) 
+    if ( !hti )
 	{
         hti_next = 0;
     }
-    
-    while (!walkDone) 
+
+    while (!walkDone)
 	{
         if ( hti_next )
             break;
         // find the next node
         hti_next = m_tree_ctrl.GetNextItem(hti, TVGN_CHILD);
-        if (hti_next) 
+        if (hti_next)
 		{
             hti = hti_next;
             continue;
         }
 
-        for (;;) 
+        for (;;)
 		{
             hti_next = m_tree_ctrl.GetNextSiblingItem(hti);
-            if (hti_next) 
+            if (hti_next)
 			{
                 hti = hti_next;
                 break;
             }
 
             hti_next = m_tree_ctrl.GetParentItem(hti);
-            if (hti_next) 
+            if (hti_next)
 			{
                 hti = hti_next;
             }
@@ -358,7 +358,7 @@ HTREEITEM CConfigUSBPortDlg::GetNextTreeItem( HTREEITEM _hti /*= 0 */ )
 }
 
 // For the ROOT_NODE and Controller nodes
-CConfigUSBPortDlg::PortNodeInfo* 
+CConfigUSBPortDlg::PortNodeInfo*
 CConfigUSBPortDlg::SetTreeItemInfo(const HTREEITEM _hti, const usb::Controller *const _pUsbController)
 {
     PortNodeInfo* pNodeInfo = (PortNodeInfo*)m_tree_ctrl.GetItemData(_hti);
@@ -367,7 +367,7 @@ CConfigUSBPortDlg::SetTreeItemInfo(const HTREEITEM _hti, const usb::Controller *
     {
         pNodeInfo = new PortNodeInfo(NULL, 0, CbStateNone, -1);
     }
-    
+
     if ( pNodeInfo )
     {
         m_tree_ctrl.SetItemData( _hti, (DWORD_PTR) pNodeInfo );
@@ -378,11 +378,11 @@ CConfigUSBPortDlg::SetTreeItemInfo(const HTREEITEM _hti, const usb::Controller *
 }
 
 // For RootHubs _index =0, For Ports we have pHub and _index ( 1 or greater)
-CConfigUSBPortDlg::PortNodeInfo* 
+CConfigUSBPortDlg::PortNodeInfo*
 CConfigUSBPortDlg::SetTreeItemInfo(const HTREEITEM _hti, usb::Hub *const _pUsbHub, const BYTE _index)
 {
     PortNodeInfo * pNodeInfo = (PortNodeInfo*)m_tree_ctrl.GetItemData(_hti);
-    
+
     if ( pNodeInfo == NULL )
     {
         pNodeInfo = new PortNodeInfo(_pUsbHub, _index);
@@ -396,7 +396,7 @@ CConfigUSBPortDlg::SetTreeItemInfo(const HTREEITEM _hti, usb::Hub *const _pUsbHu
         {
             SetPortItemText(_hti, pNodeInfo);
         }
-        
+
         m_tree_ctrl.SetItemData( _hti, (DWORD_PTR) pNodeInfo );
         m_tree_ctrl.SetItemState(_hti, INDEXTOSTATEIMAGEMASK( pNodeInfo->CbState ), TVIS_STATEIMAGEMASK);
     }
@@ -404,7 +404,7 @@ CConfigUSBPortDlg::SetTreeItemInfo(const HTREEITEM _hti, usb::Hub *const _pUsbHu
     return pNodeInfo;
 }
 
-CConfigUSBPortDlg::CbState_t 
+CConfigUSBPortDlg::CbState_t
 CConfigUSBPortDlg::GetPortState(PortNodeInfo* _info)
 {
     // if it isn't a port, or a port with a hub connected to it
@@ -412,7 +412,7 @@ CConfigUSBPortDlg::GetPortState(PortNodeInfo* _info)
     {
         // a PortMgrDlg can only be associated with a port
         _info->DlgIndex = -1;
-        
+
         // if it is a hub, or a port with a hub cnnected to it, gray the box
         if (  ((_info->pUsbHub != NULL) && (_info->PortIndex == 0)) || _info->pUsbHub->Port(_info->PortIndex)->IsHub() )
         {
@@ -423,11 +423,11 @@ CConfigUSBPortDlg::GetPortState(PortNodeInfo* _info)
         {
             _info->CbState = CbStateNone;
         }
-        
+
         return _info->CbState;
     }
-    
-    // search through the Port Dlgs to see if one has a matching 
+
+    // search through the Port Dlgs to see if one has a matching
     // Hub Name and Hub Index
     int dlgIndex;
     for ( dlgIndex = 0; dlgIndex < (int)m_MaxEnabledPorts; ++dlgIndex)
@@ -457,7 +457,7 @@ CConfigUSBPortDlg::GetPortState(PortNodeInfo* _info)
 
 BOOL CConfigUSBPortDlg::SetPortItemText(HTREEITEM _hti, PortNodeInfo* _pInfo)
 {
-    CString ui_str, label; 
+    CString ui_str, label;
 	int pos = 0;
 
     ASSERT(_pInfo);
@@ -466,12 +466,12 @@ BOOL CConfigUSBPortDlg::SetPortItemText(HTREEITEM _hti, PortNodeInfo* _pInfo)
     // if it is a PORT
     if ( _pInfo->PortIndex != 0 )
     {
-        usb::Port* pPort = _pInfo->pUsbHub->Port(_pInfo->PortIndex);        
+        usb::Port* pPort = _pInfo->pUsbHub->Port(_pInfo->PortIndex);
         // if it is a PORT with a HUB connected to it
         if ( pPort->IsHub() )
         {
             if ((usb::Hub*)pPort->GetDevice() != NULL)
-                label.Format( _T("Port %d - Hub %d"), _pInfo->PortIndex, ((usb::Hub*)pPort->GetDevice())->_index.get() ); 
+                label.Format( _T("Port %d - Hub %d"), _pInfo->PortIndex, ((usb::Hub*)pPort->GetDevice())->_index.get() );
             else
                 label = _T("DISABLED");
         }
@@ -485,7 +485,7 @@ BOOL CConfigUSBPortDlg::SetPortItemText(HTREEITEM _hti, PortNodeInfo* _pInfo)
             {
                 ui_str.Format(_T("(Panel %C)"), _T('A') + _pInfo->DlgIndex);
             }
-            
+
             if ( pPort->Connected() == DeviceConnected )
             {
                 label.Format( _T("Port %d %s [Connected] "), _pInfo->PortIndex, ui_str );
@@ -525,7 +525,7 @@ BOOL CConfigUSBPortDlg::SetPortItemText(HTREEITEM _hti, PortNodeInfo* _pInfo)
     // if it is a ROOT HUB
     else if ( _pInfo->PortIndex == 0 )
     {
-        label.Format( _T("Hub %d"), _pInfo->pUsbHub->_index.get() ); 
+        label.Format( _T("Hub %d"), _pInfo->pUsbHub->_index.get() );
     }
 
     return ( m_tree_ctrl.SetItemText(_hti, label) );
@@ -542,7 +542,7 @@ void CConfigUSBPortDlg::InsertHubPorts(usb::Hub *const pHub, const HTREEITEM hti
         pPort->Refresh();
 
         if( _bInsertPorts || pPort->IsHub() )
-        {      
+        {
             htiPort = m_tree_ctrl.InsertItem(pPort->name(), htiHub);
             SetTreeItemInfo( htiPort, pHub, portIndex );
             m_tree_ctrl.EnsureVisible(htiPort);
@@ -567,7 +567,7 @@ void CConfigUSBPortDlg::OnNMClickUsbTree(NMHDR *pNMHDR, LRESULT *pResult)
     m_tree_ctrl.ScreenToClient(&pt);
     HTREEITEM hti = m_tree_ctrl.HitTest(pt,&uFlags);
 
-    if( uFlags & TVHT_ONITEMSTATEICON ) 
+    if( uFlags & TVHT_ONITEMSTATEICON )
 	{
         EnablePort(hti);
     }
@@ -579,10 +579,10 @@ void CConfigUSBPortDlg::OnTvnKeydownUsbTree(NMHDR *pNMHDR, LRESULT *pResult)
     *pResult = 0;
     LPNMTVKEYDOWN pTVKeyDown = reinterpret_cast<LPNMTVKEYDOWN>(pNMHDR);
 
-    if( pTVKeyDown->wVKey == VK_SPACE ) 
+    if( pTVKeyDown->wVKey == VK_SPACE )
 	{
         HTREEITEM hti = m_tree_ctrl.GetSelectedItem();
-        if (hti) 
+        if (hti)
 		{
             EnablePort(hti);
         }
@@ -603,7 +603,7 @@ CConfigUSBPortDlg::CbState_t CConfigUSBPortDlg::EnablePort(HTREEITEM _hti)
                 // if you were quick you could enable another item before it became checked/greyed.
 
      // UNCHECKED -> CHECKED
-    if (state == CbStateUnchecked ) 
+    if (state == CbStateUnchecked )
     {
         ASSERT(pInfo->pUsbHub);
         ASSERT(pInfo->PortIndex != 0);
@@ -639,7 +639,7 @@ CConfigUSBPortDlg::CbState_t CConfigUSBPortDlg::EnablePort(HTREEITEM _hti)
         ASSERT(pInfo->PortIndex != 0);
         ASSERT(pInfo->DlgIndex != -1);
         pInfo->CbState = CbStateUnchecked;
-        // have to do this because the state will automatically 
+        // have to do this because the state will automatically
         // go to grayed after checked unless we manage it
         m_tree_ctrl.SetItemState(_hti, INDEXTOSTATEIMAGEMASK( CbStateChecked+1 ), TVIS_STATEIMAGEMASK);
         // unassign the Port Dlg
@@ -647,7 +647,7 @@ CConfigUSBPortDlg::CbState_t CConfigUSBPortDlg::EnablePort(HTREEITEM _hti)
         m_pPortMappings[pInfo->DlgIndex] = NULL;
         pInfo->DlgIndex = -1;
         m_bPortsChanged = TRUE;
-        // if now we are able to support more ports, enable the disabled ports 
+        // if now we are able to support more ports, enable the disabled ports
         // !NOTE: must be done AFTER pDlg->SetUSBPort
         if ( Release() == m_MaxEnabledPorts-1 )
         {
@@ -660,7 +660,7 @@ CConfigUSBPortDlg::CbState_t CConfigUSBPortDlg::EnablePort(HTREEITEM _hti)
     else
     {
         pInfo->CbState = CbStateGrayed;
-        // have to do this because the state will automatically 
+        // have to do this because the state will automatically
         // go to unchecked after grayed unless we manage it
         m_tree_ctrl.SetItemState(_hti, INDEXTOSTATEIMAGEMASK( CbStateGrayed-1 ), TVIS_STATEIMAGEMASK);
     }

@@ -63,7 +63,7 @@ SetupApi::SetupApi(void)
     memset(this, 0, sizeof(*this));
     hModuleSetup = LoadLibrary(_T("SETUPAPI.dll"));
     if (hModuleSetup)
-    {       
+    {
         // We got the library, that should work no matter what
         // we're running on.
         FINDPROC(SetupDiCreateDeviceInfoList);
@@ -102,7 +102,7 @@ SetupApi::SetupApi(void)
        FINDPROC(CM_Get_Device_IDW);
        FINDPROC(CM_Request_Device_EjectW);
 #endif
-            
+
         if (CM_Get_DevNode_Registry_PropertyA &&
             SetupDiCreateDeviceInfoList       &&
             SetupDiGetClassDescriptionA       &&
@@ -130,7 +130,7 @@ SetupApi::SetupApi(void)
                 SetupDiGetClassDescriptionW       &&
                 SetupDiOpenDeviceInfoW            &&
                 SetupDiGetDeviceInterfaceDetailW  &&
-                SetupDiGetClassDevsW              &&    
+                SetupDiGetClassDevsW              &&
                 SetupDiGetDeviceRegistryPropertyW &&
                 SetupDiGetDeviceInstanceIdW       &&
                 CM_Get_Device_IDW                 &&
@@ -158,14 +158,14 @@ SetupApi::~SetupApi(void)
 //    TRACEC(TRACE_USBENUM, "Leave SetupAPI destructor.\n");
 }
 
-HDEVINFO SetupApi::apiSetupDiGetClassDevs(LPCGUID  ClassGuid, 
-                                LPCTSTR  Enumerator, 
-                                HWND  hwndParent, 
+HDEVINFO SetupApi::apiSetupDiGetClassDevs(LPCGUID  ClassGuid,
+                                LPCTSTR  Enumerator,
+                                HWND  hwndParent,
                                 DWORD  Flags)
 {
     USES_CONVERSION;
 #if defined(UNICODE)
-    return SetupDiGetClassDevsW(ClassGuid, Enumerator, hwndParent, Flags);  
+    return SetupDiGetClassDevsW(ClassGuid, Enumerator, hwndParent, Flags);
 #else
     return SetupDiGetClassDevs(ClassGuid, Enumerator, hwndParent, Flags);
 #endif
@@ -188,9 +188,9 @@ BOOL SetupApi::apiSetupDiOpenDeviceInfo(
 
 BOOL SetupApi::apiSetupDiGetDeviceInterfaceDetail(HDEVINFO  DeviceInfoSet,
     PSP_DEVICE_INTERFACE_DATA  DeviceInterfaceData,
-    PSP_DEVICE_INTERFACE_DETAIL_DATA  DeviceInterfaceDetailData, 
+    PSP_DEVICE_INTERFACE_DETAIL_DATA  DeviceInterfaceDetailData,
     DWORD  DeviceInterfaceDetailDataSize,
-    PDWORD  RequiredSize, 
+    PDWORD  RequiredSize,
     PSP_DEVINFO_DATA  DeviceInfoData)
 {
     USES_CONVERSION;
@@ -220,7 +220,7 @@ BOOL SetupApi::apiSetupDiGetDeviceRegistryProperty(
             PropertyRegDataType, PropertyBuffer, PropertyBufferSize, RequiredSize);
 #else
     return SetupDiGetDeviceRegistryProperty(DeviceInfoSet, DeviceInfoData, Property,
-        PropertyRegDataType, PropertyBuffer, PropertyBufferSize, RequiredSize); 
+        PropertyRegDataType, PropertyBuffer, PropertyBufferSize, RequiredSize);
 #endif
 }
 
@@ -238,7 +238,7 @@ DWORD SetupApi::apiCM_Get_DevNode_Registry_Property(
             Buffer, pulLength, ulFlags);
 #else
     return CM_Get_DevNode_Registry_Property(dnDevInst, ulProperty, pulRegDataType,
-                Buffer, pulLength, ulFlags);    
+                Buffer, pulLength, ulFlags);
 #endif
 }
 
@@ -294,7 +294,7 @@ DWORD SetupApi::apiCM_Get_Device_ID(
 
     // add 1 character for terminating NULL
     ++BufferLen;
-   
+
 #if defined(UNICODE)
     USES_CONVERSION;
     // allocate BufferLen * sizeof(wchar)
@@ -307,7 +307,7 @@ DWORD SetupApi::apiCM_Get_Device_ID(
         //ATLTRACE(_T("*** ASSERTION FAILED: Line %d of file %s\n"), __LINE__, __TFILE__);
         throw;
     }
-    
+
     deviceInstanceId = Buffer;
     free(Buffer);
     return error;
@@ -321,7 +321,7 @@ DWORD SetupApi::apiCM_Get_Device_ID(
         ATLTRACE(_T("*** ASSERTION FAILED: Line %d of file %s\n"), __LINE__, __TFILE__);
         throw;
     }
-    
+
     deviceInstanceId = Buffer;
     free(Buffer);
     return error;
@@ -347,7 +347,7 @@ bool SetupApi::IsDevNodeOk( DEVINST dnDevInst )
     DWORD error;
     ULONG  status;
     ULONG  problemNumber;
-    
+
     error = gSetupApi().CM_Get_DevNode_Status(&status, &problemNumber, dnDevInst, 0);
     if ( error == ERROR_SUCCESS)
     {

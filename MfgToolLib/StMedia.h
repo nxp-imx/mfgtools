@@ -15,7 +15,7 @@ namespace media
 {
     static const UCHAR DefaultMediaTableEntries = 20; // 20 - Default number of Media Table Entries
 	static const UCHAR InvalidDriveNumber = 0xFF;     // 0xFF - Unassigned drive number
-	
+
     enum PhysicalMediaType{
         MediaType_Invalid = -1,
         MediaType_Nand    = 0,
@@ -54,7 +54,7 @@ namespace media
 		DriveTag_SettingsBin  = 0x07,
 		DriveTag_OtgRsc		  = 0x08,
 		DriveTag_Data         = 0x0A,
-		DriveTag_Data2        = 0x1A, 
+		DriveTag_Data2        = 0x1A,
 		DriveTag_DataJanus    = 0x0B,
 		DriveTag_DataSettings = 0x0C,
 		DriveTag_Bootmanger   = 0x50,
@@ -83,7 +83,7 @@ namespace media
 		   _params[_T("Drive Number")]=&DriveNumber;
 	           _params[_T("Type")] = &Type;
 		   _params[_T("Tag")] = &Tag;
-		   _params[_T("Size (bytes)")]=&SizeInBytes; 
+		   _params[_T("Size (bytes)")]=&SizeInBytes;
 
 			DriveNumber.Value = 0xFF;
 			Type.Value = DriveType_Invalid;
@@ -118,7 +118,7 @@ namespace media
 	class LogicalDrive
 	{
 	public:
-		LogicalDrive( CString _name=_T(""), 
+		LogicalDrive( CString _name=_T(""),
 							        CString _desc=_T(""),
 							        LogicalDriveType _type=DriveType_Invalid,
 							        LogicalDriveTag _tag=DriveTag_Invalid,
@@ -143,7 +143,7 @@ namespace media
 		UCHAR DriveNumber;
 		ULONGLONG SizeInBytes;
 		USHORT FileListIndex;
-	
+
 		const UINT SizeInSectors(UINT sectorSize) const
 		{
 			UINT sectors = (UINT)(SizeInBytes / sectorSize);
@@ -153,7 +153,7 @@ namespace media
 			return sectors;
 		}
 	};
-	
+
 	class LogicalDriveArray
 	{
 	public:
@@ -177,7 +177,7 @@ namespace media
 		};
 
 		size_t GetNumDrivesByType(const LogicalDriveType drvType) const
-		{ 
+		{
 			size_t numDrives = 0;
 
 //			std::map<LogicalDriveTag, LogicalDrive>::const_iterator drv;
@@ -259,7 +259,7 @@ namespace media
 				StFwComponent fw((*this)[driveIndex].Name, loadFlag);
 				if ( fw.size() > bytesToAllocate )
 					bytesToAllocate = fw.size();
-				
+
 				// Create the table entry
 				media::MediaAllocationEntry entry(InvalidDriveNumber, (*this)[driveIndex].Type, (*this)[driveIndex].Tag, bytesToAllocate);
 				table.push_back(entry);
@@ -275,9 +275,9 @@ namespace media
 //		int GetFileListIndex (const LogicalDrive& drive) { return drive.FileListIndex; };
 		size_t Size() const { return DriveArray.size(); };
 		LogicalDrive& operator[](size_t position)
-		{ 
+		{
 			return DriveArray[position];
-		};  
+		};
 
 	private:
 		std::vector<LogicalDrive> DriveArray;
@@ -385,7 +385,7 @@ public:
     }* P_LOGICAL_DRIVE_TYPE;
 
     #pragma pack (1)
-     
+
     typedef struct MEDIA_ALLOCATION_TABLE_ENTRY {
         UCHAR DriveNumber;
         UCHAR Type;
@@ -422,7 +422,7 @@ public:
     class CStMediaDrive : public CStBase
     {
         public:
-	        CStMediaDrive( CString _name=_T(""), 
+	        CStMediaDrive( CString _name=_T(""),
                         CString _desc=_T(""),
                         LOGICAL_DRIVE_TYPE _type=DriveTypeInvalid,
                         UCHAR _tag=0,
@@ -439,7 +439,7 @@ public:
             UCHAR m_tag;
             bool m_encrypted;
             ULONG m_additional_memory;
-            
+
             void InitFwComponent();
             CString ToString();
             DWORD Validate();
@@ -492,4 +492,3 @@ public:
     UCHAR GetDriveTag(MediaDriveIdx _index);
     LPCTSTR GetSystemDriveName(MediaDriveIdx _index);
 ////////////////////////////////////////////*/
-

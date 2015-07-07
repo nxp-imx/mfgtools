@@ -12,7 +12,7 @@
 
 typedef void *HANDLE_CALLBACK;
 
-typedef struct 
+typedef struct
 {
 	pthread_t OperationID;
 	PCALLBACK_DEVICE_CHANGE pfunc;

@@ -56,14 +56,14 @@ int property::ParseParameterString(LPCTSTR stringToParse, Parameter::ParamMap& p
 		{
 			;// Warning: no Key for this Key:Value pair
 		}
-		
+
 		// Parse the Value into the ParameterT
 		if( !keyStr.IsEmpty() )
 		{
 			numParamsParsed += paramMap[keyStr]->Parse(valueStr);
 		}
 	}
-	
+
 	return numParamsParsed;
 };
 /*
@@ -93,7 +93,7 @@ const CString property::ParameterT<T>::ToString() const
 template <>
 const CString property::ParameterT<__time64_t>::ToString() const
 {
-    CString dateStr; 
+    CString dateStr;
     struct tm modTime;
     if ( Value != 0 )
     {

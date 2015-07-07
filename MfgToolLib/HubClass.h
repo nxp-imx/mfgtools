@@ -18,15 +18,14 @@ namespace usb
 	public:
 		HubClass(INSTANCE_HANDLE handle);
 		virtual ~HubClass();
-		
+
 		Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
 
 		Hub* FindHubByDriver(LPCTSTR driverName);
 		Hub* FindHubByPath(LPCTSTR pathName);
 
 		void RefreshHubs();
-		
+
 		CString ToString() { return _T("HubClass"); }
 	};
 }	// namespace usb
-

@@ -297,7 +297,7 @@ UINT32 HidDevice::SendCommand(StApi& api, UINT8* additionalInfo)
 
 bool HidDevice::ProcessWriteCommand(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo)
 {
-#if 0 
+#if 0
 //  TRACE(_T(" HidDevice::ProcessWriteCommand() dev:0x%x, tag:%d\r\n"), this, api.GetTag());
     _ST_HID_CBW cbw = {0};
 
@@ -345,7 +345,7 @@ bool HidDevice::ProcessWriteCommand(const HANDLE hDevice, const StApi& api, Noti
 bool HidDevice::ProcessReadStatus(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo)
 {
 //  TRACE(_T(" HidDevice::ProcessReadStatus() dev:0x%x, tag:%d\r\n"), this, api.GetTag());
-#if 0 
+#if 0
     UINT16 readSize = _Capabilities.InputReportByteLength;
 
     // Allocate the CSW_REPORT
@@ -374,7 +374,7 @@ bool HidDevice::ProcessReadStatus(const HANDLE hDevice, const StApi& api, Notify
     {
         /**m_AdditionalInfo =*/ _status = ((_ST_HID_STATUS_REPORT*)_pReadReport)->Csw.Status;
     }
-#endif 
+#endif
 //    TRACE(_T(" -HidDevice::ProcessReadStatus\r\n"));
     return true;
 }
@@ -417,14 +417,14 @@ bool HidDevice::ProcessReadData(const HANDLE hDevice, StApi* pApi, NotifyStruct&
         nsInfo.position = min(pApi->GetTransferSize(), offset + (readSize - 1));
     }
 //  TRACE(_T(" -HidDevice::ProcessReadData()\r\n"));
-#endif 
+#endif
     return true;
 }
 
 bool HidDevice::ProcessWriteData(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo)
 {
 //  TRACE(_T(" HidDevice::ProcessWriteData() dev:0x%x, tag:%d\r\n"), this, api.GetTag());
-#if 0 
+#if 0
     UINT16 writeSize = _Capabilities.OutputReportByteLength;
 
     for ( UINT32 offset=0; offset < api.GetTransferSize(); offset += (writeSize - 1) )
@@ -466,7 +466,7 @@ bool HidDevice::ProcessWriteData(const HANDLE hDevice, const StApi& api, NotifyS
 INT32 HidDevice::ProcessTimeOut(const INT32 timeout)
 {
 //  TRACE(_T("  +HidDevice::ProcessTimeOut() 0x%x\r\n"), this);
-#if 0 
+#if 0
     HANDLE hTimer = CreateWaitableTimer(NULL, true, _T("SendCommandTimer"));
     LARGE_INTEGER waitTime;
     waitTime.QuadPart = timeout * (-10000000);
@@ -524,7 +524,7 @@ INT32 HidDevice::ProcessTimeOut(const INT32 timeout)
     TRACE(_T("  -HidDevice::ProcessTimeOut() 0x%x WM_QUIT\r\n"), this);
     return ERROR_OPERATION_ABORTED;
 
-#endif 
+#endif
     return ERROR_SUCCESS;
 }
 

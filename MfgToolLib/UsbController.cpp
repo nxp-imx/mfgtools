@@ -43,7 +43,7 @@ HANDLE usb::Controller::Open()
 				filePath,
 				/*GENERIC_WRITE*/0,
 				/*FILE_SHARE_READ|FILE_SHARE_WRITE*/0,
-				&SecurityAttrib, 
+				&SecurityAttrib,
 				OPEN_EXISTING, 0, NULL);
 #endif
 return NULL;
@@ -55,7 +55,7 @@ DWORD usb::Controller::Initialize()
 
     // reset the member variable
     _rootHubFilename.put(_T(""));
-    
+
     HANDLE hController = Open();
     if( hController == (unsigned long)INVALID_HANDLE_VALUE )
     {
@@ -66,15 +66,15 @@ DWORD usb::Controller::Initialize()
     BOOL success;
     DWORD bytesReturned;
     CString rootHubFilename = _T("\\\\.\\");
-    struct 
+    struct
 	{
-		DWORD Length; 
+		DWORD Length;
 		wchar_t Name[MAX_PATH];
 	} unicodeName;
 #if 0
     // Get the system name of our root hub for interrogation
     success = DeviceIoControl(hController, IOCTL_USB_GET_ROOT_HUB_NAME, &unicodeName,
-                              sizeof(unicodeName),&unicodeName, sizeof(unicodeName), &bytesReturned, NULL); 
+                              sizeof(unicodeName),&unicodeName, sizeof(unicodeName), &bytesReturned, NULL);
 
     CloseHandle(hController);
 
@@ -115,4 +115,3 @@ usb::Hub * usb::Controller::GetRootHub()
 
     return pHub;
 }
-

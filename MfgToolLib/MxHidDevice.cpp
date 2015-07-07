@@ -24,7 +24,7 @@
 
 DWORD EndianSwap(DWORD x)
 {
-    return (x>>24) | 
+    return (x>>24) |
         ((x<<8) & 0x00FF0000) |
         ((x>>8) & 0x0000FF00) |
         (x<<24);
@@ -145,7 +145,7 @@ int MxHidDevice::AllocateIoBuffers()
         // handle the error
 		error = GetLastError();
         CloseHandle(hHidDevice);
-        FreeLibrary(hHidDll);       
+        FreeLibrary(hHidDll);
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().GetProcAddress(HidD_GetPreparsedData) ERROR:(%d)"), error);
         return error;
     }
@@ -156,7 +156,7 @@ int MxHidDevice::AllocateIoBuffers()
         // handle the error
 		error = GetLastError();
         CloseHandle(hHidDevice);
-        FreeLibrary(hHidDll);       
+        FreeLibrary(hHidDll);
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().GetProcAddress(HidD_FreePreparsedData) ERROR:(%d)"), error);
         return error;
     }
@@ -165,7 +165,7 @@ int MxHidDevice::AllocateIoBuffers()
     {
 		error = GetLastError();
         CloseHandle(hHidDevice);
-        FreeLibrary(hHidDll);       
+        FreeLibrary(hHidDll);
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().HidD_GetPreparsedData ERROR:(%d)"), error);
 		return error != ERROR_SUCCESS ? error : ERROR_GEN_FAILURE;
     }
@@ -177,7 +177,7 @@ int MxHidDevice::AllocateIoBuffers()
 		error = GetLastError();
         CloseHandle(hHidDevice);
 		lpfnDllFunc2(PreparsedData);
-        FreeLibrary(hHidDll);       
+        FreeLibrary(hHidDll);
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().GetProcAddress(HidP_GetCaps) ERROR:(%d)"), error);
         return error;
     }
@@ -187,14 +187,14 @@ int MxHidDevice::AllocateIoBuffers()
 		{
 			CloseHandle(hHidDevice);
 			lpfnDllFunc2(PreparsedData);
-			FreeLibrary(hHidDll);       
+			FreeLibrary(hHidDll);
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().GetCaps ERROR:(%d)"), HIDP_STATUS_INVALID_PREPARSED_DATA);
 			return HIDP_STATUS_INVALID_PREPARSED_DATA;
 		}
 	}
 
 	lpfnDllFunc2(PreparsedData);
-	FreeLibrary(hHidDll);       
+	FreeLibrary(hHidDll);
     CloseHandle(hHidDevice);
 
 	// Allocate a Read and Write Report buffers
@@ -253,7 +253,7 @@ BOOL MxHidDevice::OpenMxHidHandle()
 		return FALSE;
 	}
 
-/*	// Open the device 
+/*	// Open the device
     if (!OpenUSBHandle(&m_hid_drive_handle,_path.get()))
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR,  _T(" ERROR: OpenUSBHandle failed."));
@@ -274,7 +274,7 @@ BOOL MxHidDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 		0/* FILE_FLAG_OVERLAPPED */,
 		NULL);
 
-	if (*pHandle == INVALID_HANDLE_VALUE) 
+	if (*pHandle == INVALID_HANDLE_VALUE)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("MxHidDevice::OpenUSBHandle() Failed to open (%s) = %d"), pipePath, GetLastError());
 		return FALSE;
@@ -282,14 +282,14 @@ BOOL MxHidDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 
 	return TRUE;
 #else
-	
+
 /*
 	ret = libusb_open(rdev, &m_libusbdevHandle);
         if (ret)
 		printf(stderr, "Could not open device, ret=%i\n", ret);
 */
 
-	
+
 
 
 #endif
@@ -304,7 +304,7 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 
     //Create device handle and report id
     OpenMxHidHandle();
-    
+
     SDPCmd.command = ROM_KERNEL_CMD_WR_MEM;
     SDPCmd.dataCount = 4;
 
@@ -340,7 +340,7 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 		}
 	}
 
-    //Clear device handle and report id    
+    //Clear device handle and report id
     CloseMxHidHandle();
     #endif
 	return TRUE;
@@ -401,7 +401,7 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 		free(pMemPara);
 	}
 
-	//Clear device handle and report id    
+	//Clear device handle and report id
     CloseMxHidHandle();
 #endif
 	return TRUE;
@@ -416,7 +416,7 @@ BOOL MxHidDevice::CloseMxHidHandle()
     }
 
     FreeIoBuffers();
-        
+
     return TRUE;
 }
 
@@ -429,7 +429,7 @@ BOOL MxHidDevice::WriteReg(PSDPCmd pSDPCmd)
 	{
 		return FALSE;
 	}
-    
+
     return TRUE;
 }
 
@@ -480,7 +480,7 @@ BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount)
 		}
 
 		UINT MaxHidTransSize = 1025 -1;
-	    
+
 		while(RegCount > 0)
 		{
 			UINT ByteCntTransfered = (RegCount > MaxHidTransSize) ? MaxHidTransSize : RegCount;
@@ -506,8 +506,8 @@ BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount)
 }
 
 /// <summary>
-//-------------------------------------------------------------------------------------		
-// Function to 16 byte SDP command format, these 16 bytes will be sent by host to 
+//-------------------------------------------------------------------------------------
+// Function to 16 byte SDP command format, these 16 bytes will be sent by host to
 // device in SDP command field of report 1 data structure
 //
 // @return
@@ -524,8 +524,8 @@ VOID MxHidDevice::PackSDPCmd(PSDPCmd pSDPCmd)
     m_pWriteReport->ReportId = (unsigned char)REPORT_ID_SDP_CMD;
     uint32_t* pTmpSDPCmd = (uint32_t*)(m_pWriteReport->Payload);
 
-	pTmpSDPCmd[0] = (  ((pSDPCmd->address  & 0x00FF0000) << 8) 
-		          | ((pSDPCmd->address  & 0xFF000000) >> 8) 
+	pTmpSDPCmd[0] = (  ((pSDPCmd->address  & 0x00FF0000) << 8)
+		          | ((pSDPCmd->address  & 0xFF000000) >> 8)
 		          |  (pSDPCmd->command   & 0x0000FFFF) );
 
 	pTmpSDPCmd[1] = (   (pSDPCmd->dataCount & 0xFF000000)
@@ -539,9 +539,9 @@ VOID MxHidDevice::PackSDPCmd(PSDPCmd pSDPCmd)
 		          | ((pSDPCmd->dataCount & 0x00FF0000) >> 16));
 
 	pTmpSDPCmd[3] = (  ((0x00  & 0x000000FF) << 24)
-		          | ((pSDPCmd->data     & 0x00FF0000) >> 16) 
+		          | ((pSDPCmd->data     & 0x00FF0000) >> 16)
 		          |  (pSDPCmd->data     & 0x0000FF00)
-		          | ((pSDPCmd->data     & 0x000000FF) << 16));   
+		          | ((pSDPCmd->data     & 0x000000FF) << 16));
 
 }
 
@@ -565,7 +565,7 @@ int MxHidDevice::Write(UCHAR* _buf, ULONG _size)
     last_trans += (ret > 0) ? ret - 1 : 0;
     if (ret > 0)
 	    ret = 0;
-  
+
    // }while(last_trans<_size || ret<0);
     return ret;
 #else
@@ -585,7 +585,7 @@ int MxHidDevice::Read(void* _buf, UINT _size)
 {
 	int    nBytesRead; // for bytes actually read
 
-	
+
 #ifndef __linux__
 	if( !ReadFile(m_hid_drive_handle, _buf, _size, (PULONG) &nBytesRead, NULL) )
 	{
@@ -636,7 +636,7 @@ BOOL MxHidDevice::SendData(const unsigned char * DataBuf, UINT ByteCnt)
 
 	if (Write((unsigned char *)m_pWriteReport,/*ByteCnt + 1*/1025) <0)
 	{
-		return FALSE;	
+		return FALSE;
 	}
 
 	return TRUE;
@@ -671,7 +671,7 @@ BOOL MxHidDevice::GetDevAck(UINT RequiredCmdAck)
 	if (*(unsigned int *)(m_pReadReport->Payload) != RequiredCmdAck)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("WriteReg(): Invalid write ack: 0x%x\n"), ((PULONG)m_pReadReport)[0]);
-		return FALSE; 
+		return FALSE;
 	}
     return TRUE;
 }
@@ -687,16 +687,16 @@ BOOL MxHidDevice::GetHABType()
     //4 bytes HAB mode indicating Production/Development part
 	if ( Read( (UCHAR *)m_pReadReport, 1025 )  != ERROR_SUCCESS)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to read HAB type from ROM!!!"));  		
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to read HAB type from ROM!!!"));
 		printf("read HAB failed\n");
 		return FALSE;
 	}
 	printf("read HAB succeeded\n");
-	if ( (*(unsigned int *)(m_pReadReport->Payload) != HabEnabled)  && 
-		 (*(unsigned int *)(m_pReadReport->Payload) != HabDisabled) ) 
+	if ( (*(unsigned int *)(m_pReadReport->Payload) != HabEnabled)  &&
+		 (*(unsigned int *)(m_pReadReport->Payload) != HabDisabled) )
 	{
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("HAB type mismatch: 0x%x!!!"), *(unsigned int *)(m_pReadReport->Payload));    
-		return FALSE;	
+        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("HAB type mismatch: 0x%x!!!"), *(unsigned int *)(m_pReadReport->Payload));
+		return FALSE;
 	}
 
 	return TRUE;
@@ -707,7 +707,7 @@ BOOL MxHidDevice::Jump()
     printf("in jump command %x \n",m_jumpAddr);
 	//Create device handle and report id
     OpenMxHidHandle();
-    
+
 	if(!Jump(m_jumpAddr))
     {
         //Clear device handle and report id
@@ -744,9 +744,9 @@ BOOL MxHidDevice::Jump(UINT RAMAddress)
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to get HAB type from ROM, ignoredro!!!"));
         return FALSE;
     }
-	
+
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("*********MxHidDevice[%p] Jump to Ramkernel successfully!**********"), this);
-	
+
 	return TRUE;
 }
 
@@ -785,7 +785,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 	//Search for IVT
     pPlugIn = (DWORD *)pDataBuf;
 	//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
-	while(ImgIVTOffset < dwFileSize && 
+	while(ImgIVTOffset < dwFileSize &&
 		(pPlugIn[ImgIVTOffset/sizeof(DWORD)] != IVT_BARKER_HEADER &&
 		 pPlugIn[ImgIVTOffset/sizeof(DWORD)] != IVT_BARKER2_HEADER
 		))
@@ -810,7 +810,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 	if(pPluginDataBuf->PluginFlag)
 	{
 		//Plugin mode
-	  
+
 		//---------------------------------------------------------
 		//Run plugin in IRAM
 		//Download plugin data into IRAM.
@@ -828,7 +828,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): Failed to addhdr to RAM address: 0x%x."), PlugInAddr);
 			goto ERR_HANDLE;
 		}
-	    
+
 		if( !Jump(m_jumpAddr))
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): Failed to jump to RAM address: 0x%x."), m_jumpAddr);
@@ -836,16 +836,16 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 		}
 
 		//---------------------------------------------------------
-		//Download eboot to ram		
+		//Download eboot to ram
 		//Search IVT2.
 		//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
 		DWORD IVT2Offset = ImgIVTOffset + sizeof(IvtHeader);
 
-		while(IVT2Offset < dwFileSize && 
+		while(IVT2Offset < dwFileSize &&
 			(pPlugIn[IVT2Offset/sizeof(DWORD)] != IVT_BARKER_HEADER &&
 			pPlugIn[IVT2Offset/sizeof(DWORD)] != IVT_BARKER2_HEADER))
 			IVT2Offset+= sizeof(DWORD);
-		
+
 		if(IVT2Offset >= dwFileSize)
 		{
 			goto ERR_HANDLE;
@@ -860,7 +860,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 				PhyRAMAddr4KRL, dwFileSize, pDataBuf);
 			goto ERR_HANDLE;
 		}
-	    
+
 		DWORD ImgStartAddr = pIVT2->ImageStartAddr;
 		if(!AddIvtHdr(ImgStartAddr))
 		{
@@ -874,7 +874,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
         {
     		//DCD mode
     		DWORD * pDCDRegion = pPlugIn + ImgIVTOffset/sizeof(DWORD) + (pIVT->DCDAddress - pIVT->SelfAddr)/sizeof(DWORD);
-    		//i.e. DCD_BE  0xD2020840              ;DCD_HEADR Tag=0xd2, len=64*8+4+4, ver= 0x40    
+    		//i.e. DCD_BE  0xD2020840              ;DCD_HEADR Tag=0xd2, len=64*8+4+4, ver= 0x40
     		//i.e. DCD_BE  0xCC020404              ;write dcd cmd headr Tag=0xcc, len=64*8+4, param=4
     		//The first 2 32bits data in DCD region is used to give some info about DCD data.
     		//Here big endian format is used, so it must be converted.
@@ -887,8 +887,8 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 			if( (_chipFamily >= MX6Q) )
 			{
 				//The DCD_WRITE command handling was changed from i.MX508.
-				//Now the DCD is  performed by HAB and therefore the format of DCD is the same format as in regular image. 
-				//The DCD_WRITE parameters require size and address. Size is the size of entire DCD file including header. 
+				//Now the DCD is  performed by HAB and therefore the format of DCD is the same format as in regular image.
+				//The DCD_WRITE parameters require size and address. Size is the size of entire DCD file including header.
 				//Address is the temporary address that USB will use for storing the DCD file before processing.
 
     			DWORD DCDHeader = EndianSwap(*pDCDRegion);
@@ -924,7 +924,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
     			DCD_BE 0xCC031C04   ; Tag = 0xCC, Len = 99*8+4=0x031c, parm = 4*/
 
     			DWORD CurDCDDataCount = 1, ValidRegCount=0;
-    			
+
     			//Quit if current DCD data count reaches total DCD data count.
     			while(CurDCDDataCount < DCDDataCount)
     			{
@@ -932,7 +932,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
     				CurDCDDataCount++;
     				if((DCDCmdHdr >> 24) == HAB_CMD_WRT_DAT)
     				{
-    					DWORD DCDDataSegCount = (((DCDCmdHdr & 0x00FFFF00) >>8) -4)/sizeof(ImgFormatDCDData); 
+    					DWORD DCDDataSegCount = (((DCDCmdHdr & 0x00FFFF00) >>8) -4)/sizeof(ImgFormatDCDData);
     					PImgFormatDCDData pImgFormatDCDData = (PImgFormatDCDData)(pDCDRegion + CurDCDDataCount);
     					//Must convert image dcd data format to ROM dcd format.
     					for(DWORD i=0; i<DCDDataSegCount; i++)
@@ -947,7 +947,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
     				}
     				else if((DCDCmdHdr >> 24) == HAB_CMD_CHK_DAT)
     				{
-    					CurDCDDataCount += (((DCDCmdHdr & 0x00FFFF00) >>8) -4)/sizeof(DWORD); 
+    					CurDCDDataCount += (((DCDCmdHdr & 0x00FFFF00) >>8) -4)/sizeof(DWORD);
     				}
     			}
 
@@ -981,8 +981,8 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 			goto ERR_HANDLE;
 		}*/
 	}
-		
-    //Clear device handle and report id    
+
+    //Clear device handle and report id
     CloseMxHidHandle();
 	if(pDataBuf != NULL)
 	{
@@ -991,7 +991,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
     return TRUE;
 
 ERR_HANDLE:
-    //Clear device handle and report id    
+    //Clear device handle and report id
     CloseMxHidHandle();
 	if(pDataBuf != NULL)
 	{
@@ -1012,12 +1012,12 @@ BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * 
     printf(" Trans Data address is %x \n",address);
 	if(!SendCmd(&SDPCmd))
 		return FALSE;
-    
-   
+
+
 
     UINT MaxHidTransSize = 1025 - 1;
     UINT TransSize;
-    
+
     while(byteCount > 0)
     {
         TransSize = (byteCount > MaxHidTransSize) ? MaxHidTransSize : byteCount;
@@ -1027,7 +1027,7 @@ BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * 
         byteCount -= TransSize;
         pBuf += TransSize;
     }
-    
+
     //below function should be invoked for mx50
 	if ( !GetCmdAck(ROM_STATUS_ACK) )
 	{
@@ -1042,7 +1042,7 @@ BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
 	UINT FlashHdrAddr;
 
 	//transfer length of ROM_TRANSFER_SIZE is a must to ROM code.
-	unsigned char FlashHdr[ROM_TRANSFER_SIZE] = { 0 };	
+	unsigned char FlashHdr[ROM_TRANSFER_SIZE] = { 0 };
 
 	// create a header and append the data
 
@@ -1075,12 +1075,12 @@ BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
 #else
         ZeroMemory(FlashHdr, sizeof(IvtHeader));
 #endif
-        
+
         //Fill IVT header parameter
     	pIvtHeader->IvtBarker = IVT_BARKER_HEADER;
     	pIvtHeader->ImageStartAddr = ImageStartAddr;
-    	pIvtHeader->SelfAddr = FlashHdrAddr;   
-    
+    	pIvtHeader->SelfAddr = FlashHdrAddr;
+
         //Send the IVT header to destiny address
     	if ( !TransData(FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr) )
     	{
@@ -1088,7 +1088,7 @@ BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
                 FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
     		return FALSE;
     	}
-        
+
         //Verify the data
        	unsigned char Tempbuf[ROM_TRANSFER_SIZE] = { 0 };
         if ( !ReadData(FlashHdrAddr, ROM_TRANSFER_SIZE, Tempbuf) )
@@ -1101,11 +1101,11 @@ BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
     		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X) failed.\n"),
                 FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
     		return FALSE;
-    	}        
+    	}
     }
 
     m_jumpAddr = FlashHdrAddr;
-    
+
 	return TRUE;
 }
 
@@ -1126,7 +1126,7 @@ BOOL MxHidDevice::ReadData(UINT address, UINT byteCount, unsigned char * pBuf)
 		return FALSE;
 
     UINT MaxHidTransSize = 1025 -1;
-    
+
     while(byteCount > 0)
     {
         UINT TransSize = (byteCount > MaxHidTransSize) ? MaxHidTransSize : byteCount;
@@ -1168,7 +1168,7 @@ BOOL MxHidDevice::Download(PImageParameter pImageParameter, UCHAR *pFileDataBuf,
 		}
 	}
 
-	// If we are downloading to DCD or CSF, we don't need to send 
+	// If we are downloading to DCD or CSF, we don't need to send
 	if ( pImageParameter->loadSection == MemSectionDCD || pImageParameter->loadSection == MemSectionCSF )
 	{
 		return TRUE;
@@ -1185,7 +1185,7 @@ BOOL MxHidDevice::Download(PImageParameter pImageParameter, UCHAR *pFileDataBuf,
         if(!AddIvtHdr(ImageStartAddr))
         {
             LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("DownloadImage(): AddHdr(0x%x) failed."),ImageStartAddr);
-            goto ERR_HANDLE;    
+            goto ERR_HANDLE;
         }
     }
 
@@ -1197,7 +1197,6 @@ BOOL MxHidDevice::Download(PImageParameter pImageParameter, UCHAR *pFileDataBuf,
 ERR_HANDLE:
     //Clear device handle and report id
     CloseMxHidHandle();
-    
+
 	return FALSE;
 }
-

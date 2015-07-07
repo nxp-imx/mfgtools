@@ -105,26 +105,26 @@ class SetupApi
         PBYTE            PropertyBuffer,
         DWORD            PropertyBufferSize,
         PDWORD           RequiredSize);
-    
+
     typedef BOOL(WINAPI *PSetupDiGetDeviceInterfaceDetailW)(
         HDEVINFO  DeviceInfoSet,
         PSP_DEVICE_INTERFACE_DATA  DeviceInterfaceData,
-        PSP_DEVICE_INTERFACE_DETAIL_DATA_W  DeviceInterfaceDetailData, 
+        PSP_DEVICE_INTERFACE_DETAIL_DATA_W  DeviceInterfaceDetailData,
         DWORD  DeviceInterfaceDetailDataSize,
-        PDWORD  RequiredSize, 
+        PDWORD  RequiredSize,
         PSP_DEVINFO_DATA  DeviceInfoData);
 
     typedef BOOL(WINAPI *PSetupDiGetDeviceInterfaceDetailA)(
         HDEVINFO  DeviceInfoSet,
         PSP_DEVICE_INTERFACE_DATA  DeviceInterfaceData,
-        PSP_DEVICE_INTERFACE_DETAIL_DATA_A  DeviceInterfaceDetailData, 
+        PSP_DEVICE_INTERFACE_DETAIL_DATA_A  DeviceInterfaceDetailData,
         DWORD  DeviceInterfaceDetailDataSize,
-        PDWORD  RequiredSize, 
+        PDWORD  RequiredSize,
         PSP_DEVINFO_DATA  DeviceInfoData);
-    
+
     typedef BOOL (WINAPI *PSetupDiEnumDeviceInterfaces)(
         HDEVINFO  DeviceInfoSet,
-        PSP_DEVINFO_DATA  DeviceInfoData, 
+        PSP_DEVINFO_DATA  DeviceInfoData,
         LPCGUID  InterfaceClassGuid,
         DWORD  MemberIndex,
         PSP_DEVICE_INTERFACE_DATA  DeviceInterfaceData);
@@ -135,17 +135,17 @@ class SetupApi
         PSP_DEVINFO_DATA  DeviceInfoData);
 
     typedef HDEVINFO (WINAPI *PSetupDiGetClassDevsW)(
-        LPCGUID  ClassGuid, 
-        PCWSTR  Enumerator, 
-        HWND  hwndParent, 
+        LPCGUID  ClassGuid,
+        PCWSTR  Enumerator,
+        HWND  hwndParent,
         DWORD  Flags);
 
     typedef HDEVINFO (WINAPI *PSetupDiGetClassDevsA)(
-        LPCGUID  ClassGuid, 
-        PCSTR  Enumerator, 
-        HWND  hwndParent, 
+        LPCGUID  ClassGuid,
+        PCSTR  Enumerator,
+        HWND  hwndParent,
         DWORD  Flags);
-    
+
     typedef DWORD (WINAPI *PCM_Get_Device_IDA)(
         DEVINST  dnDevInst,
         PCHAR    Buffer,
@@ -188,17 +188,17 @@ class SetupApi
         PDEVINST pdnDevInst,
         DEVINST  dnDevInst,
         ULONG    ulFlags );
-    
+
     typedef DWORD (WINAPI *PCM_Get_Sibling)(
         PDEVINST pdnDevInst,
         DEVINST  dnDevInst,
         ULONG    ulFlags );
-    
+
     typedef DWORD (WINAPI *PCM_Get_Parent)(
         PDEVINST pdnDevInst,
         DEVINST  dnDevInst,
         ULONG    ulFlags );
-    
+
     typedef DWORD (WINAPI *PCM_Get_Device_ID_Size)(
         PULONG   pulLen,
         DEVINST  dnDevInst,
@@ -271,18 +271,18 @@ public:
     BOOL apiSetupDiGetDeviceInterfaceDetail(
         HDEVINFO  DeviceInfoSet,
         PSP_DEVICE_INTERFACE_DATA  DeviceInterfaceData,
-        PSP_DEVICE_INTERFACE_DETAIL_DATA  DeviceInterfaceDetailData, 
+        PSP_DEVICE_INTERFACE_DETAIL_DATA  DeviceInterfaceDetailData,
         DWORD  DeviceInterfaceDetailDataSize,
-        PDWORD  RequiredSize, 
+        PDWORD  RequiredSize,
         PSP_DEVINFO_DATA  DeviceInfoData);
 
     HDEVINFO apiSetupDiGetClassDevs(
-        LPCGUID  ClassGuid, 
-        LPCTSTR  Enumerator, 
-        HWND  hwndParent, 
+        LPCGUID  ClassGuid,
+        LPCTSTR  Enumerator,
+        HWND  hwndParent,
         DWORD  Flags);
-    
-    BOOL apiSetupDiGetDeviceRegistryProperty(    
+
+    BOOL apiSetupDiGetDeviceRegistryProperty(
         HDEVINFO DeviceInfoSet,
         PSP_DEVINFO_DATA DeviceInfoData,
         DWORD Property,
@@ -317,7 +317,7 @@ public:
     bool IsDevNodeOk( DEVINST dnDevInst );
     CString CR_GetErrorString( DWORD errorCode );
     CString CM_GetProblemString( DWORD problemCode );
-    
+
     bool IsAvailable() const { return available; };
     #endif
     SetupApi();

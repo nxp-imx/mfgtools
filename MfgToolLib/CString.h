@@ -11,7 +11,7 @@
 template<class T>
 class CTString: public std::basic_string<T, std::char_traits<T>, std::allocator<T> >
 #else
-#define tstring std::string 
+#define tstring std::string
 #define TCHAR char
 template<class T>
 //#define T char
@@ -22,7 +22,7 @@ class CTString :public std::string
 #define _vsntprintf vsnprintf
 #define _tcsnicmp strncasecmp
 #define _tcslen strlen
- 
+
 public: CTString() : tstring() { }
 		#define _T(x) x
 		CTString(const tstring& s) : tstring(s) { }
@@ -30,15 +30,15 @@ public: CTString() : tstring() { }
 		CTString(const T * s, std::size_t n) : tstring(s, n) { }
 		CTString(const T * s) : tstring(s?s:(const T *)_T(" ")) { }
 		CTString(std::size_t n, T c) : tstring(n, c) { }
-	
-	
+
+
 		operator const T * () { return this->c_str(); }\
 		operator const T * () const{ return this->c_str(); }
 		operator T * () { return this->c_str(); }
 		operator T * () const { return this->c_str(); }
 		void operator=(T * buff){	this->assign(buff);return;}
-		
-		
+
+
 		void Empty(){ this->clear(); return; }
 		const bool IsEmpty() { return this->empty(); }
 		int GetLength() { return this->length(); }
@@ -111,13 +111,13 @@ public: CTString() : tstring() { }
 
 		}
 
-		
+
 		 T * GetBufferSetLength(int length){
 			this->resize(length);
 			return (T*) this->data();
 		}
 
-		
+
 		void TrimLeft(){
 			if (this->empty())
 				return;
@@ -129,7 +129,7 @@ public: CTString() : tstring() { }
 			return;
 		}
 
-		
+
 		void TrimRight(){
 			if (this->empty())
 				return;
@@ -141,7 +141,7 @@ public: CTString() : tstring() { }
 			return;
 		}
 
-		
+
 		void TrimLeft(T  chr){
 			while (this->at(this->begin()) == chr){
 				this->erase(this->begin());
@@ -151,7 +151,7 @@ public: CTString() : tstring() { }
 			return;
 		}
 
-		
+
 		void TrimRight(T  chr){
 			while (this->back() == chr){
 				this->erase(this->length()-1);
@@ -161,7 +161,7 @@ public: CTString() : tstring() { }
 			return;
 		}
 
-		
+
 		void TrimLeft(const T * chr){
 			bool present = true;
 			int i;
@@ -180,7 +180,7 @@ public: CTString() : tstring() { }
 
 		}
 
-		
+
 		void TrimRight(const T *chr){
 			bool present = true;
 			int i;
@@ -210,7 +210,7 @@ public: CTString() : tstring() { }
 			return count;
 		}
 
-		
+
 		int Replace(const T * lpszOld, const T * lpszNew){
 			bool found = true;
 			int count = 0;
@@ -233,14 +233,14 @@ public: CTString() : tstring() { }
 
 		}
 
-		
+
 		void MakeUpper(){
 			for (unsigned int i = 0; i < this->length(); i++){
 				this->at(i) = toupper(this->at(i));
 			}
 		}
 
-		
+
 		void ReleaseBuffer(int nlength = -1){
 			if (nlength == -1){
 				this->assign(this->c_str()); // essentially resizing the string as needed
@@ -252,29 +252,29 @@ public: CTString() : tstring() { }
 			}
 		}
 
-		
+
 		CTString<T> Mid(int nFirst) const{
 			return	this->substr(nFirst, this->length() - nFirst);
 		}
 
-		
+
 		CTString<T> Mid(int nFirst, int nCount) const{
 			return this->substr(nFirst, nCount);
 		}
 
-		
+
 		CTString<T> Left(int nCount) const{
 			return this->substr(0, nCount);
 		}
 
-		
+
 		CTString<T> Right(int nCount) const{
 			if (nCount > this->length())
 				return *this;
 			return this->substr(this->length()-nCount,  nCount);
 		}
 
-		
+
 		int ReverseFind(T ch) const{
 			return (int)this->rfind(ch);
 		}

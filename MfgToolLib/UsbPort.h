@@ -33,7 +33,7 @@ namespace usb
     public:
         Port(Hub* pHub, int index);
         virtual ~Port();
-        
+
         DWORD Refresh();
         void Clear();
         CString GetUsbDevicePath();
@@ -54,15 +54,15 @@ namespace usb
     private:
         Hub* _parentHub;
         Int32Property _connected;
-        Int32Property _isHub; 
+        Int32Property _isHub;
         Int32Property _index;
         Device* _device;
 		DWORD _WndIndex;
 
         Hub* FindHub(LPCTSTR driverName);
         Device* FindDevice(LPCTSTR driverName);
-    
-        //USB_NODE_CONNECTION_INFORMATION_EX _connectionInfo;      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+
+        //USB_NODE_CONNECTION_INFORMATION_EX _connectionInfo;      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /*
         // PROPERTIES
         class volumeName : public StringProperty { public: CString get(); }_volumeName;
@@ -94,7 +94,7 @@ namespace usb
         DWORD GetDeviceDescAndPath(void);
         USHORT GetDeviceDescriptor(USHORT LanguageID, PUCHAR BufferPtr);
         USHORT GetConfigurationDescriptor(USHORT LanguageID);
-        USHORT GetStringDescriptor(USHORT LanguageID, UCHAR Index); 
+        USHORT GetStringDescriptor(USHORT LanguageID, UCHAR Index);
         void GetDriveLetters(PSP_DEVINFO_DATA pDeviceInfoData);
         CString GetDeviceRegistryProperty(DWORD Property);
     */

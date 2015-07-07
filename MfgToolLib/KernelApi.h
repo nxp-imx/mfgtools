@@ -30,7 +30,7 @@ class KernelApi
 #endif
 	HMODULE hModuleKernel32;
     bool available;
-#if 0     
+#if 0
 	PGetVolumeNameForVolumeMountPointA GetVolumeNameForVolumeMountPointA;
 
 #if defined(UNICODE)

@@ -39,7 +39,7 @@ public:
         HardwareDisabled = 0x00000100,
         NonDynamic = 0x00000200,
     };
-	
+
 
 
 	struct libusb_device_handle *m_libusbdevHandle;
@@ -61,7 +61,7 @@ public:
         int error;
 		CString status;
 	};
-	
+
 	DWORD InitDevInfo();
 	Device* Parent();	//get the parent device
 	virtual Device* UsbDevice();
@@ -75,83 +75,83 @@ public:
 	void Reset(DEVINST devInst, CString path);
 	DWORD GetDeviceWndIndex(void);
 	void SetDeviceWndIndex(DWORD dwIndex);
-	
+
 public:
 	// PROPERTIES
-	class path : public StringProperty 
-	{ 
-	public: 
+	class path : public StringProperty
+	{
+	public:
 		CString get();
 	}_path;		//the hole device path
-	
-	class usbPath : public StringProperty 
-	{ 
-	public: 
-		CString get(); 
+
+	class usbPath : public StringProperty
+	{
+	public:
+		CString get();
 	}_usbPath;
-	
-	class classGuid : public GuidProperty 
-	{ 
-	public: 
-		LPGUID get(); 
+
+	class classGuid : public GuidProperty
+	{
+	public:
+		LPGUID get();
 	}_classGuid;
-	
-	class hubIndex : public Int32Property 
-	{ 
-	public: 
-		int get(); 
+
+	class hubIndex : public Int32Property
+	{
+	public:
+		int get();
 		int getmsc(USHORT vid, USHORT pid);
 		int get2();
 	}_hubIndex;	//this device is connected to which port in the hub(from 1)
-	
-	class description : public StringProperty 
-	{ 
-	public: 
-		CString get(); 
-	}_description;
-	
-	class friendlyName : public StringProperty 
-	{ 
-	public: 
-		virtual CString get(); 
-	}_friendlyName;
-	
-	class driver : public StringProperty 
-	{ 
-	public: 
-		CString get(); 
-	}_driver;
-	
-	class deviceInstanceID : public StringProperty 
-	{ 
-	public: 
-		CString get(); 
-	}_deviceInstanceID;
-	
-	class enumerator : public StringProperty 
-	{ 
-	public: 
-		CString get(); 
-	}_enumerator;
-	
-	class classStr : public StringProperty 
-	{ 
-	public: 
-		CString get(); 
-	}_classStr;
-	
-	class classDesc : public StringProperty 
-	{ 
-	public: 
-		CString get(); 
-	}_classDesc;
-	
-	class hub : public StringProperty 
-	{ 
-	public: 
+
+	class description : public StringProperty
+	{
+	public:
 		CString get();
-	}_hub;	//hub¡¯s device path
-	
+	}_description;
+
+	class friendlyName : public StringProperty
+	{
+	public:
+		virtual CString get();
+	}_friendlyName;
+
+	class driver : public StringProperty
+	{
+	public:
+		CString get();
+	}_driver;
+
+	class deviceInstanceID : public StringProperty
+	{
+	public:
+		CString get();
+	}_deviceInstanceID;
+
+	class enumerator : public StringProperty
+	{
+	public:
+		CString get();
+	}_enumerator;
+
+	class classStr : public StringProperty
+	{
+	public:
+		CString get();
+	}_classStr;
+
+	class classDesc : public StringProperty
+	{
+	public:
+		CString get();
+	}_classDesc;
+
+	class hub : public StringProperty
+	{
+	public:
+		CString get();
+	}_hub;	//hubï¿½ï¿½s device path
+
 	DeviceClass* _deviceClass;
 	DeviceCapabilities _capabilities;
 	Device* _parent;
@@ -167,4 +167,3 @@ public:
 };
 
 typedef std::list<Device *> DEVICES_ARRAY;
-

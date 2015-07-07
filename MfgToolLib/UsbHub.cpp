@@ -17,7 +17,7 @@ usb::Hub::Hub(DeviceClass* deviceClass, DEVINST devInst, CString path, INSTANCE_
 {
     _ports.describe(this, _T("USB Ports"), _T(""));
     _index.describe(this, _T("Index"), _T(""));
-#if 0 
+#if 0
     memset(&_nodeInformation, 0, sizeof(_nodeInformation));
     _nodeInformation.NodeType = UsbHub;
 #endif
@@ -86,13 +86,13 @@ usb::Port* usb::Hub::Port(const size_t portNumber)
     ASSERT( portNumber <= _ports.getList()->size() );
 
     usb::Port* pPort = dynamic_cast<usb::Port*>(_ports.getList()->at(portNumber-1));
-    
+
     return pPort;
 }
 
 HANDLE usb::Hub::Open()
 {
-#if 0 
+#if 0
     SECURITY_ATTRIBUTES SecurityAttrib; // Needed for Win2000
     SecurityAttrib.bInheritHandle = false;
     SecurityAttrib.lpSecurityDescriptor = NULL;
@@ -105,7 +105,7 @@ HANDLE usb::Hub::Open()
         filePath,
         /*GENERIC_WRITE*/0,
         /*FILE_SHARE_READ|FILE_SHARE_WRITE*/0,
-        &SecurityAttrib, 
+        &SecurityAttrib,
         OPEN_EXISTING, 0, NULL);
 
 #endif
@@ -135,7 +135,7 @@ int usb::Hub::CreatePorts()
 
     CloseHandle(hHub);
 
-    if (!Success) 
+    if (!Success)
     {
         error = GetLastError();
         return 0;
@@ -146,7 +146,7 @@ int usb::Hub::CreatePorts()
     //
     BYTE index;
     // Port index is 1-based
-    for ( index=1; index<=GetNumPorts(); ++index ) 
+    for ( index=1; index<=GetNumPorts(); ++index )
     {
         Property* pPort = new usb::Port(this, index);
         _ports.getList()->push_back(pPort);

@@ -21,7 +21,7 @@ MxRomDeviceClass::MxRomDeviceClass(INSTANCE_HANDLE handle)
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("new MxRomDeviceClass"));
 }
 
-MxRomDeviceClass::~MxRomDeviceClass() 
+MxRomDeviceClass::~MxRomDeviceClass()
 {
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("delete MxRomDeviceClass"));
 }
@@ -32,5 +32,3 @@ Device* MxRomDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA
 
     return pDev;
 }
-
-

@@ -25,7 +25,7 @@ namespace api
 		typedef StApi* (*CreateApiCallback)(CStdString paramStr);
 	private:
 		typedef std::map<CStdString, CreateApiCallback> CallbackMap;
-	
+
 	public:
         StApiFactory()
 		{
@@ -53,12 +53,12 @@ namespace api
 		{
 			return _callbacks.insert(CallbackMap::value_type(name, createFn)).second;
 		};
-		
+
 		bool UnregisterApi(CStdString name)
 		{
 			return _callbacks.erase(name) == 1;
 		};
-		
+
 		StApi* CreateApi(CStdString name, CStdString paramStr="")
 		{
 			CallbackMap::const_iterator i = _callbacks.find(name);
@@ -70,7 +70,7 @@ namespace api
 			// Invoke the creation function
 			return (i->second)(paramStr);
 		};
-	
+
 	private:
 		CallbackMap _callbacks;
 	};

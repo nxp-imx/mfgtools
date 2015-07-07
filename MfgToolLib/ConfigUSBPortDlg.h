@@ -48,11 +48,11 @@ public:
     }m_tree_ctrl;
 
 	typedef enum CbState_t
-	{ 
-		CbStateNone = 0, 
-		CbStateUnchecked, 
-		CbStateChecked, 
-		CbStateGrayed 
+	{
+		CbStateNone = 0,
+		CbStateUnchecked,
+		CbStateChecked,
+		CbStateGrayed
 	};
 
 	struct PortNodeInfo
@@ -70,13 +70,13 @@ public:
     };
 
 	typedef enum _tag_e_TREE_OP
-	{ 
-		OP_NONE = 0, 
-		OP_DELETE_ALL, 
-		OP_GRAY_UNCHECKED, 
-		OP_UNCHECK_GRAYED, 
-		OP_REFRESH_PORTS, 
-		OP_INIT_TREE, 
+	{
+		OP_NONE = 0,
+		OP_DELETE_ALL,
+		OP_GRAY_UNCHECKED,
+		OP_UNCHECK_GRAYED,
+		OP_REFRESH_PORTS,
+		OP_INIT_TREE,
 		OP_UNCHECK_ALL
 	} e_TREE_OP;
 
@@ -96,9 +96,9 @@ public:
 	BOOL SetPortItemText(HTREEITEM _hti, PortNodeInfo* _p_info);
 	void InsertHubPorts(usb::Hub *const pHub, const HTREEITEM htiHub, BOOL _bInsertPorts);
 
-	INT_PTR AddRef() 
-	{ 
-		if (m_num_enabled_ports == m_MaxEnabledPorts) 
+	INT_PTR AddRef()
+	{
+		if (m_num_enabled_ports == m_MaxEnabledPorts)
 		{
 			return 0;
 		}
@@ -108,10 +108,10 @@ public:
 		}
 	};
 
-	INT_PTR Release() 
-	{ 
-		ASSERT(m_num_enabled_ports);  
-		return --m_num_enabled_ports; 
+	INT_PTR Release()
+	{
+		ASSERT(m_num_enabled_ports);
+		return --m_num_enabled_ports;
 	};
 
 protected:

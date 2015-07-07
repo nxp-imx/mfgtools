@@ -3,14 +3,14 @@
 // XMLite : XML Lite Parser Library
 // by bro ( Cho,Kyung Min: bro@shinbiro.com ) 2002-10-30
 // Microsoft MVP (Visual C++) bro@msmvp.com
-// 
+//
 // History.
 // 2002-10-29 : First Coded. Parsing XMLElelement and Attributes.
 //              get xml parsed string ( looks good )
 // 2002-10-30 : Get Node Functions, error handling ( not completed )
 // 2002-12-06 : Helper Funtion string to long
 // 2002-12-12 : Entity Helper Support
-// 2003-04-08 : Close, 
+// 2003-04-08 : Close,
 // 2003-07-23 : add property escape_value. (now no escape on default)
 // 2003-10-24 : bugfix) attribute parsing <tag a='1' \r\n/> is now ok
 // 2004-03-05 : add branch copy functions
@@ -18,7 +18,7 @@
 // 2004-06-14 : now support, XML Document and PI, Comment, CDATA node
 // 2004-06-15 : add GetText()/ Find() functions
 // 2004-06-15 : add force_parse : now can parse HTML (not-welformed xml)
-// 
+//
 // You can use/modify/redistribute XMLite for commercial/noncomercial,
 // but please give me thanks email with your project information.
 //
@@ -63,21 +63,21 @@ typedef struct _tagXmlEntity
 typedef struct _tagXMLEntitys : public std::vector<XENTITY>
 {
     LPXENTITY GetEntity( int entity );
-    LPXENTITY GetEntity( LPTSTR entity );   
+    LPXENTITY GetEntity( LPTSTR entity );
     int GetEntityCount( LPCTSTR str );
     int Ref2Entity( LPCTSTR estr, LPTSTR str, int strlen );
     int Entity2Ref( LPCTSTR str, LPTSTR estr, int estrlen );
     CString Ref2Entity( LPCTSTR estr );
-    CString Entity2Ref( LPCTSTR str );  
+    CString Entity2Ref( LPCTSTR str );
 
     _tagXMLEntitys(){};
     _tagXMLEntitys( LPXENTITY entities, int count );
 }XENTITYS,*LPXENTITYS;
 extern XENTITYS entityDefault;
 CString XRef2Entity( LPCTSTR estr );
-CString XEntity2Ref( LPCTSTR str ); 
+CString XEntity2Ref( LPCTSTR str );
 
-typedef enum 
+typedef enum
 {
     PIE_PARSE_WELFORMED = 0,
     PIE_ALONE_NOT_CLOSED,
@@ -124,7 +124,7 @@ typedef struct _tagXMLAttr
 {
     CString name;
     CString value;
-    
+
     _tagXMLNode*    parent;
 
     CString GetXML( LPDISP_OPT opt = &optDefault );
@@ -150,7 +150,7 @@ typedef struct _tagXMLNode
     LPXNode parent;     // parent node
     XNodes  childs;     // child node
     XAttrs  attrs;      // attributes
-    NODE_TYPE type;     // node type 
+    NODE_TYPE type;     // node type
     LPXDoc  doc;        // document
 
     // Load/Save XML
@@ -162,28 +162,28 @@ typedef struct _tagXMLNode
     LPTSTR  LoadAttributes( LPCTSTR pszAttrs, LPPARSEINFO pi = &piDefault );
     LPTSTR  LoadAttributes( LPCTSTR pszAttrs, LPCTSTR pszEnd, LPPARSEINFO pi = &piDefault );
     LPTSTR  LoadProcessingInstrunction( LPCTSTR pszXml, LPPARSEINFO pi = &piDefault );
-    LPTSTR  LoadComment( LPCTSTR pszXml, LPPARSEINFO pi = &piDefault ); 
-    LPTSTR  LoadCDATA( LPCTSTR pszXml, LPPARSEINFO pi = &piDefault ); 
+    LPTSTR  LoadComment( LPCTSTR pszXml, LPPARSEINFO pi = &piDefault );
+    LPTSTR  LoadCDATA( LPCTSTR pszXml, LPPARSEINFO pi = &piDefault );
 
     // in own attribute list
-    LPXAttr GetAttr( LPCTSTR attrname ); 
-    LPCTSTR GetAttrValue( LPCTSTR attrname ); 
-    XAttrs  GetAttrs( LPCTSTR name ); 
+    LPXAttr GetAttr( LPCTSTR attrname );
+    LPCTSTR GetAttrValue( LPCTSTR attrname );
+    XAttrs  GetAttrs( LPCTSTR name );
 
     // in one level child nodes
-    LPXNode GetChild( LPCTSTR name ); 
-    LPCTSTR GetChildValue( LPCTSTR name ); 
+    LPXNode GetChild( LPCTSTR name );
+    LPCTSTR GetChildValue( LPCTSTR name );
     CString GetChildText( LPCTSTR name, LPDISP_OPT opt = &optDefault );
-    XNodes  GetChilds( LPCTSTR name ); 
-    XNodes  GetChilds(); 
+    XNodes  GetChilds( LPCTSTR name );
+    XNodes  GetChilds();
 
     LPXAttr GetChildAttr( LPCTSTR name, LPCTSTR attrname );
     LPCTSTR GetChildAttrValue( LPCTSTR name, LPCTSTR attrname );
-    
+
     // search node
     LPXNode Find( LPCTSTR name );
 
-    // modify DOM 
+    // modify DOM
     size_t  GetChildCount();
     LPXNode GetChild( size_t i );
     XNodes::iterator GetChildIterator( LPXNode node );
@@ -224,7 +224,7 @@ typedef struct _tagXMLDocument : public XNode
     PARSEINFO   parse_info;
 
     _tagXMLDocument() { parent = NULL; doc = this; type = XNODE_DOC; }
-    
+
     LPTSTR  Load( LPCTSTR pszXml, LPPARSEINFO pi = NULL );
     LPXNode GetRoot();
 

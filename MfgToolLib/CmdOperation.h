@@ -42,12 +42,12 @@ public:
     {
         CString Section;
         KeyWord keyWord[MAX_CNT_KEYWORD];
-    }UniqueID, *PUniqueID;  
+    }UniqueID, *PUniqueID;
 
     UniqueID m_UniqueID;
-	
+
 	Device *m_pDevice;
-	
+
 	DWORD Open();
 	void Close();
 	virtual BOOL InitInstance();
@@ -82,7 +82,7 @@ public:
 	UpdateTransportProtocol* m_pUTP;
 	HANDLE_CALLBACK m_hDeviceChangeCallback;
 
-	
+
     OPERATE_RESULT m_uiInfo;
 	MX_DEVICE_STATE m_currentState;
 	DWORD m_dwCmdIndex;
@@ -105,4 +105,3 @@ public:
 	BOOL CanRun(void);
 	DWORD UpdateUI(UI_UPDATE_INFORMATION* _uiInfo,DWORD dwStateIndex);
 };
-

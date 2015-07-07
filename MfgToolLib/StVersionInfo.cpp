@@ -124,6 +124,6 @@ const CString StVersionInfo::toString() const
 {
     CString str;
     str.Format(_T("%03d.%03d.%03d"), GetMajor(), GetMinor(), GetRevision());
-	
+
     return str;
 }

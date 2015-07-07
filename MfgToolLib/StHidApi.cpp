@@ -103,7 +103,7 @@ void HidInquiry::ProcessResponse(const UCHAR *const pData, const UINT start, con
 	}
 	else if ( _cdb.InfoPage == InfoPage_PitcStatus )
 	{
-		_pitcStatus = *(UINT*)pData; 
+		_pitcStatus = *(UINT*)pData;
 	}
 	else if ( _cdb.InfoPage == InfoPage_secConfig)
 	{
@@ -161,48 +161,48 @@ const CString& HidInquiry::ResponseString()
 		}
 	default:
 		_responseStr.Format(_T("Invalid Inquiry InfoPage.(0x%02X)"), _cdb.InfoPage);
-	
+
 	}
 	return _responseStr;
 }
 
 USHORT HidInquiry::GetChipId() const
-{ 
+{
 	if( _cdb.InfoPage != InfoPage_Chip )
 		return 0;
-	
+
 	return _chipInfo.ChipId;
 }
-	
+
 USHORT HidInquiry::GetChipRevision() const
-{ 
+{
 	if( _cdb.InfoPage != InfoPage_Chip )
 		return 0;
-	
+
 	return _chipInfo.ChipRevision;
 };
 
 USHORT HidInquiry::GetRomVersion() const
-{ 
+{
 	if( _cdb.InfoPage != InfoPage_Chip )
 		return 0;
-	
+
 	return _chipInfo.RomVersion;
 };
 
 USHORT HidInquiry::GetRomLoaderProtocolVersion() const
-{ 
+{
 	if( _cdb.InfoPage != InfoPage_Chip )
 		return 0;
-	
+
 	return _chipInfo.RomLoaderProtocolVersion;
 };
 
 UINT HidInquiry::GetPitcStatus() const
-{ 
+{
 	if( _cdb.InfoPage != InfoPage_PitcStatus )
 		return -1;
-	
+
 	return _pitcStatus;
 };
 
@@ -210,7 +210,7 @@ UINT HidInquiry::GetSecConfig() const
 {
 	if( _cdb.InfoPage != InfoPage_secConfig )
 			return -1;
-		
+
 	return _secConfigStatus;
 };
 
@@ -282,7 +282,7 @@ void HidBltcRequestSense::PrepareCommand()
 void HidBltcRequestSense::ProcessResponse(const UCHAR *const pData, const UINT start, const UINT count)
 {
 	assert( count >= _xferLength );
-	
+
 	_senseCode = *(UINT *)pData;
 }
 
@@ -319,7 +319,7 @@ const CString& HidBltcRequestSense::ResponseString()
 }
 
 UINT HidBltcRequestSense::GetSenseCode() const
-{ 
+{
 	return _senseCode;
 }
 
@@ -431,7 +431,7 @@ void HidPitcRequestSense::PrepareCommand()
 void HidPitcRequestSense::ProcessResponse(const UCHAR *const pData, const UINT start, const UINT count)
 {
 	assert( count >= _xferLength );
-	
+
 	_senseCode = *(UINT *)pData;
 }
 
@@ -480,7 +480,7 @@ const CString& HidPitcRequestSense::ResponseString()
 }
 
 UINT HidPitcRequestSense::GetSenseCode() const
-{ 
+{
 	return _senseCode;
 }
 
@@ -647,20 +647,20 @@ const CString& HidPitcInquiry::ResponseString()
 		}
 	default:
 		_responseStr.Format(_T("Invalid Inquiry InfoPage.(0x%02X)"), _cdb.InfoPage);
-	
+
 	}
 	return _responseStr;
 }
 
 const USHORT HidPitcInquiry::GetPitcId() const
-{ 
+{
 	assert(_cdb.InfoPage == InfoPage_Pitc);
 
     return _pitcInfo.Id;
 }
-	
+
 const StVersionInfo& HidPitcInquiry::GetPitcVersion() const
-{ 
+{
 	assert(_cdb.InfoPage == InfoPage_Pitc);
 
 	return _pitcInfo.Version;
@@ -674,63 +674,63 @@ const CString HidPitcInquiry::GetPitcSenseString() const
 }
 
 const HidPitcInquiry::OtpRegInfoPage HidPitcInquiry::GetOtpRegInfoPage() const
-{ 
+{
 	assert(_cdb.InfoPage == InfoPage_OtpReg);
 
     return _otpRegInfo;
 };
 
 const UINT HidPitcInquiry::GetOtpRegAddress() const
-{ 
+{
 	assert(_cdb.InfoPage == InfoPage_OtpReg);
 
     return _otpRegInfo.Address;
 };
 
 const UCHAR HidPitcInquiry::GetOtpRegLockBit() const
-{ 
+{
 	assert(_cdb.InfoPage == InfoPage_OtpReg);
 
     return _otpRegInfo.LockBit;
 };
 
 const UCHAR HidPitcInquiry::GetOtpRegBank() const
-{ 
+{
 	assert(_cdb.InfoPage == InfoPage_OtpReg);
 
     return _otpRegInfo.OtpBank;
 };
 
 const UCHAR HidPitcInquiry::GetOtpRegWord() const
-{ 
+{
 	assert(_cdb.InfoPage == InfoPage_OtpReg);
 
     return _otpRegInfo.OtpWord;
 };
 
 const UCHAR HidPitcInquiry::IsOtpRegLocked() const
-{ 
+{
 	assert(_cdb.InfoPage == InfoPage_OtpReg);
 
     return _otpRegInfo.Locked;
 };
 
 const UCHAR HidPitcInquiry::IsOtpRegShadowed() const
-{ 
+{
 	assert(_cdb.InfoPage == InfoPage_OtpReg);
 
     return _otpRegInfo.Shadowed;
 };
 
 const UINT HidPitcInquiry::GetPersistentRegAddress() const
-{ 
+{
 	assert(_cdb.InfoPage == InfoPage_PersistentReg);
 
     return _persistentInfo.Address;
 };
 
 const UINT HidPitcInquiry::GetPersistentRegValue() const
-{ 
+{
 	assert(_cdb.InfoPage == InfoPage_PersistentReg);
 
     return _persistentInfo.Value;
@@ -814,7 +814,7 @@ void HidPitcRead::PrepareCommand()
 void HidPitcRead::ProcessResponse(const UCHAR *const pData, const UINT start, const UINT count)
 {
     UINT bytesToCopy = std::min(count, _xferLength - start);
-	
+
 	if ( _responseDataPtr != NULL )
 		memcpy(_responseDataPtr + start, pData, bytesToCopy);
 }

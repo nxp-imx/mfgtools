@@ -29,7 +29,7 @@ StFwComponent::StFwComponent()
 , _fileType(FileType_Invalid)
 , _lastError(13L)
 , _isResource(false)
-{ 
+{
     InitParameters();
 }
 
@@ -145,7 +145,7 @@ void StFwComponent::InitVersionInfo(const StFwComponent::FileType fileType)
             // to the first 1024 bytes of the file.
             std::string versionLabel((char*)&_data[0], 1024);
             UINT major=0, minor=0, revision=0;
-            
+
             // check for VersionLabel_Product
             size_t index = versionLabel.find(VersionLabel_Product);
             if ( index != std::string::npos )
@@ -219,10 +219,10 @@ const ParameterT<StFwComponent::FileType>& StFwComponent::GetFileType()
         return _fileType;
     }
 
-	// 3700-style firmware files have a BootImageHeader at the beginning of the file. 
+	// 3700-style firmware files have a BootImageHeader at the beginning of the file.
 	// The signature is unfortunately placed at the same offset for 36xx and 37xx.  So for
 	// 37xx we have two signatures.
-    // "STMP" should be located in the m_signature field and "sgtl" in the second signature. 
+    // "STMP" should be located in the m_signature field and "sgtl" in the second signature.
     //
     // The FileTypeTag_Stmp needs to be incremented by 1 to skip the 0x1a leading byte for all but 3500-stlye
     // firmware files.
@@ -230,7 +230,7 @@ const ParameterT<StFwComponent::FileType>& StFwComponent::GetFileType()
 	{
 		std::string fileTag37((char*)((BootImageHeader*)&_data[0])->Signature, FileTypeTag_Stmp.size()-1);
 		std::string fileTag37_2((char*)((BootImageHeader*)&_data[0])->Signature2, FileTypeTag_Stmp.size()-1);
-	    
+
 		// check 3700-stye STMP
 		if ( (FileTypeTag_Stmp.find(fileTag37) != std::string::npos ) &&
 				(FileTypeTag_Sgtl.find(fileTag37_2) != std::string::npos ) )
@@ -258,9 +258,9 @@ const ParameterT<StFwComponent::FileType>& StFwComponent::GetFileType()
     if ( _data.size() >= sizeof(FirstBlockHeader) )
 	{
 		std::string fileTag36((char*)((FirstBlockHeader*)&_data[0])->Tag, FileTypeTag_Stmp.size()-1);
-	    
+
 		// check 3600-stye STMP
-		if ( FileTypeTag_Stmp.find(fileTag36) != std::string::npos ) 
+		if ( FileTypeTag_Stmp.find(fileTag36) != std::string::npos )
 		{
 			_startingOffset = 0;
 			_fileType.Value = FileType_3600_Stmp;
@@ -277,14 +277,14 @@ const ParameterT<StFwComponent::FileType>& StFwComponent::GetFileType()
 	}
 
     // 3500-style files have 2 lines of plain text defining the ProductVersion and ComponentVersion.
-    // All information up to and including the (0x1A)STMP tag must be stripped off of the file. Thus, for 
+    // All information up to and including the (0x1A)STMP tag must be stripped off of the file. Thus, for
     // 3500-style files, _startingOffset will be non-zero. For all other types, _startingOffset will be 0.
     //
     // The full FileTypeTag_Stmp should be present for 3500-style files.
-    // We will will limit the search for the FileTypeTag_Stmp to the first 1024 bytes of the file 
+    // We will will limit the search for the FileTypeTag_Stmp to the first 1024 bytes of the file
 	// or the size of the data which ever is smaller.
     std::string fileTag35((char*)&_data[0], std::min((int)_data.size(), 1024));
-    
+
     // check 3500-stye STMP
     UINT index = (UINT)fileTag35.find(FileTypeTag_Stmp);
     if ( index != std::string::npos )
@@ -304,12 +304,12 @@ const ParameterT<StFwComponent::FileType>& StFwComponent::GetFileType()
 void StFwComponent::GetData(size_t fromOffset, size_t count, UCHAR * pDest) const
 {
     // 3500-style files have 2 lines of plain text defining the ProductVersion and ComponentVersion.
-    // All information before the STMP or RSRC tag must be stripped off of the file. Thus, for 
+    // All information before the STMP or RSRC tag must be stripped off of the file. Thus, for
     // 3500-style files, _startingOffset will be non-zero. For all other types, _startingOffset will be 0.
     size_t startOffset = fromOffset + _startingOffset;
 
 	size_t index;
-    
+
     if( startOffset > _data.size() )
 	{
 		// fromOffset is out of range. Fill pDest with 0xff.
@@ -319,7 +319,7 @@ void StFwComponent::GetData(size_t fromOffset, size_t count, UCHAR * pDest) cons
 		}
 	}
 
-    if( count > _data.size() - startOffset ) 
+    if( count > _data.size() - startOffset )
 	{
 		// data is less than asked for so fill the remaining with 0xff
 		for( index = 0; index < ( _data.size() - startOffset ); index++ )
@@ -344,8 +344,8 @@ void StFwComponent::GetData(size_t fromOffset, size_t count, UCHAR * pDest) cons
 
 // return a pointer to the actual firmware data
 const UCHAR * const StFwComponent::GetDataPtr() const
-{ 
-    return _data.empty() ? NULL : &_data[0] + _startingOffset; 
+{
+    return _data.empty() ? NULL : &_data[0] + _startingOffset;
 }
 
 int StFwComponent::Load(LPCTSTR fileName, LoadFlag loadFlag, USHORT langId)
@@ -357,21 +357,21 @@ int StFwComponent::Load(LPCTSTR fileName, LoadFlag loadFlag, USHORT langId)
             if ( _lastError != ERROR_SUCCESS )
 				_lastError = LoadFromResource(fileName, langId);
             break;
-        
+
         case LoadFlag_ResourceFirst:
             _lastError = LoadFromResource(fileName, langId);
             if ( _lastError != ERROR_SUCCESS )
                 _lastError = LoadFromFile(fileName);
 			break;
-        
+
         case LoadFlag_FileOnly:
             _lastError = LoadFromFile(fileName);
 			break;
-        
+
         case LoadFlag_ResourceOnly:
             _lastError = LoadFromResource(fileName, langId);
 			break;
-        
+
         default:
             _lastError = ERROR_INVALID_DATA;
 			break;
@@ -383,7 +383,7 @@ int StFwComponent::Load(LPCTSTR fileName, LoadFlag loadFlag, USHORT langId)
 int StFwComponent::LoadFromFile(LPCTSTR fileName)
 {
     clear();
-    
+
     _fileName = fileName;
     _isResource = false;
 
@@ -401,7 +401,7 @@ int StFwComponent::LoadFromFile(LPCTSTR fileName)
 			file.close();
 			return ERROR_INVALID_DATA;
 	}
-	
+
 	// Size our vector to accomodate the file size.
     _data.resize(fileSize);
 
@@ -431,7 +431,7 @@ int StFwComponent::LoadFromFile(LPCTSTR fileName)
 int StFwComponent::LoadFromResource(LPCTSTR resourceName, USHORT langId)
 {
     clear();
-#if 0 
+#if 0
     _fileName = resourceName;
 	_langId = langId;
     _isResource = true;
@@ -440,7 +440,7 @@ int StFwComponent::LoadFromResource(LPCTSTR resourceName, USHORT langId)
     HRSRC hResInfo = FindResourceEx( GetModuleHandle(NULL), L_STMP_FW_RESTYPE, MAKEINTRESOURCE(iResId), langId );
     if ( hResInfo == NULL )
         return ERROR_OPEN_FAILED;
-    
+
 	HGLOBAL hRes = LoadResource(GetModuleHandle(NULL), hResInfo);
 	if ( hRes == NULL )
         return GetLastError();
@@ -462,7 +462,7 @@ int StFwComponent::LoadFromResource(LPCTSTR resourceName, USHORT langId)
     InitVersionInfo( GetFileType().Value );
 
     // no valid date/time property
-    _fileDate = 0;    
+    _fileDate = 0;
 #endif
     return ERROR_SUCCESS;
 }
@@ -475,7 +475,7 @@ const CString StFwComponent::toString() const
     theInfo.AppendFormat(_T("Internal name: %s\r\n"), _internalName.c_str());
     theInfo.AppendFormat(_T("Size: %d bytes\r\n"), size());
 
-    CString dateStr; 
+    CString dateStr;
     struct tm modTime;
 #if 0
     if ( _fileDate.Value != 0 )
@@ -492,7 +492,7 @@ const CString StFwComponent::toString() const
     }
 #endif
     theInfo.AppendFormat(_T("Date modified: %s\r\n"), dateStr.c_str());
-    
+
     theInfo.AppendFormat(_T("Type: %s\r\n"), _fileType.ToString().c_str());
     theInfo.AppendFormat(_T("Resource/File: %s\r\n"), IsResource() ? _T("Resource") : _T("File"));
     theInfo.AppendFormat(_T("Tag/Id: 0x%04X\r\n"), _id);
@@ -500,7 +500,7 @@ const CString StFwComponent::toString() const
     theInfo.AppendFormat(_T("Component version: %s\r\n"), _componentVersion.toString().c_str());
     theInfo.AppendFormat(_T("Language: 0x%04X\r\n"), _langId);
 
-    return theInfo; 
+    return theInfo;
 }
 
 

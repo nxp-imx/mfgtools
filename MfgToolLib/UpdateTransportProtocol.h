@@ -24,7 +24,7 @@
 #endif
 #endif
 
-#define MIN_DATA_PROGRESS_BAR_CHANGE (6*1024*1024) //When a file is transferred, data transfer progress bar will be 
+#define MIN_DATA_PROGRESS_BAR_CHANGE (6*1024*1024) //When a file is transferred, data transfer progress bar will be
                                                  //Updated once defined data quantity is reached.
 
 class UpdateTransportProtocol
@@ -73,7 +73,7 @@ public:
 				m_pCurrentState = NULL;
 			}
 		}
-        
+
 		bool KeepPolling()
         {
             return m_BusyCount < m_pUpdateProtocol->GetMaxPollBusy();
@@ -125,7 +125,7 @@ public:
         void Next()
         {
 			State* pNextState = NULL;
-			
+
 			CString cmd = GetCommand();
 			if( cmd.CompareNoCase(_T("!3")) == 0 )
 			{
@@ -145,7 +145,7 @@ public:
 						else
 						{
 							m_CurrentSize = std::min(m_TotalSize, m_TotalSize - m_pCurrentState->GetUtpMsg()->GetResponseInfo());
-						}   
+						}
 						pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
 						if (KeepPolling())
 							sleep(GetBusyDelay());
@@ -164,10 +164,10 @@ public:
 					default:
 	//                        String msg = String.Format("In: {0}, Sent: {1}\r\n Response: {2}\r\n Moving to: {3}");
 						CString msg;
-						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
+						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."),
 							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()).c_str(),
 							State::StateToString(m_pCurrentState->GetStateType()).c_str(),
-							m_pCurrentState->GetUtpMsg()->ToString().c_str()); 
+							m_pCurrentState->GetUtpMsg()->ToString().c_str());
 	//                        InvalidTransactionStateException e = new InvalidTransactionStateException(msg2);
 	//                        throw e;
 						pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
@@ -221,7 +221,7 @@ public:
                     default:
 //                            throw new Exception("Illegal Response Code for this transaction.");
                         CString msg;
-						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
+						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."),
 							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()).c_str(),
 							State::StateToString(m_pCurrentState->GetStateType()).c_str(),
 							m_pCurrentState->GetUtpMsg()->ToString().c_str());
@@ -254,7 +254,7 @@ public:
                         break;
                     default:
 						CString msg;
-						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
+						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."),
 							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()).c_str(),
 							State::StateToString(m_pCurrentState->GetStateType()).c_str(),
 							m_pCurrentState->GetUtpMsg()->ToString().c_str());
@@ -320,7 +320,7 @@ public:
 
 				m_LParam = m_TotalSize = FileAttrData.nFileSizeLow;
 
-#endif				m_pCurrentState = new StartState(this);				
+#endif				m_pCurrentState = new StartState(this);
 			}
 #endif
         }
@@ -340,9 +340,9 @@ public:
 
                         pNextState = new BusyState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo());
                         sleep(GetBusyDelay());
-                        
+
                         break;
-                    
+
 					case ScsiUtpMsg::EXIT:
                         pNextState = new DoneState(this, m_pCurrentState->GetUtpMsg()->GetResponseInfo(), m_pCurrentState->GetUtpMsg()->GetResponseString());
                         break;
@@ -351,7 +351,7 @@ public:
                         break;
                     default:
 						CString msg;
-						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
+						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."),
 							ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()).c_str(),
 							State::StateToString(m_pCurrentState->GetStateType()).c_str(),
 							m_pCurrentState->GetUtpMsg()->ToString().c_str());
@@ -385,7 +385,7 @@ public:
                         break;
                     default:
 						CString msg;
-						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."), 
+						msg.Format(_T("Illegal ResponseCode(%s) for %s->%s message."),
 						ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()).c_str(),
 						State::StateToString(m_pCurrentState->GetStateType()).c_str(),
 						m_pCurrentState->GetUtpMsg()->ToString().c_str());
@@ -407,7 +407,7 @@ public:
     {
 	public:
 		typedef enum { StartState = 0, DoneState, BusyState, GetDataState, PutDataState } StateType;
-		
+
 		static CString StateToString(StateType stateType)
 		{
 			CString str;
@@ -512,7 +512,7 @@ public:
     {
 	private:
 		UINT m_Tag;
-	
+
 	public:
         int m_ResponseInfo;
 		CString m_ResponseString;
@@ -561,7 +561,7 @@ public:
 		PutDataState(WriteTransaction* pTransaction)
 			: State(pTransaction, State::PutDataState)
         {
-// TODO: CLW - USE THIS WHEN PAUL FIXES FW TO NOT DEPEND ON SECTOR SIZES 
+// TODO: CLW - USE THIS WHEN PAUL FIXES FW TO NOT DEPEND ON SECTOR SIZES
 //                Int64 numBytesToWrite = Math.Min(transaction.UpdateProtocol.MaxPacketSize, transaction.TotalSize - transaction.CurrentSize);
 //                Byte[] buffer = new Byte[numBytesToWrite];
 //                Array.Copy(transaction.Data, transaction.CurrentSize, buffer, 0, buffer.LongLength);
@@ -573,7 +573,7 @@ public:
 			m_pMsg = new api::Put(pTransaction->GetTag(), pTransaction->GetPacketCount(), pTransaction->GetData(numBytesToWrite));
             pTransaction->SetCurrentSize(pTransaction->GetCurrentSize() + numBytesToWrite);
         }
-    
+
         CString ToString()
         {
 			CString str;
@@ -651,7 +651,7 @@ public:
         m_pUtpDevice->SendCommand(m_hDevice, modeMsg, NULL, cmdProgress);
 		if (modeMsg.GetResponseCode() == ScsiUtpMsg::PASS)
         {
-            // Set _Disposed to true so we don't try to unlock the device 
+            // Set _Disposed to true so we don't try to unlock the device
             // since it should be disconnecting from the bus and Windows will take care of it.
             m_Disposed = true;
         }
@@ -755,7 +755,7 @@ public:
 #define afilename filename
 #endif
 
-		// Create the file 
+		// Create the file
         FILE * myFile;
 		//CFileException fileException;
 		myFile = std::fopen(afilename, "w");
@@ -787,14 +787,14 @@ public:
     {
 #if 0
 //#define TIMETEST
-#ifdef TIMETEST 
+#ifdef TIMETEST
 		LARGE_INTEGER liStartTime = {0}, liStopTime = {0};
 		LARGE_INTEGER liTemp = {0}, timeCount = {0};
 		QueryPerformanceFrequency(&liTemp);
         liTemp.QuadPart /= 1000;
-        UINT BusyCnt = 0;        
+        UINT BusyCnt = 0;
 #endif
-		//If @FILESIZE is found in a command body, then it indicates the macro ($FILESIZE) must be replaced by a real value of the size of the file to be sent. 
+		//If @FILESIZE is found in a command body, then it indicates the macro ($FILESIZE) must be replaced by a real value of the size of the file to be sent.
 		if ( cmd.Find(_T("@FILESIZE")) != -1 )
 		{
 			// get the length of the file
@@ -816,7 +816,7 @@ public:
 		// Because the DEVICE_REMOVAL_EVT will come and the operation will be done "_devices.erase(device)" when the USB cable is pulled.
 		// And m_pUtpDevice will be erased too.So all operation related to m_pUtpDevice will fail.
 		// And may cause invalid addr access:Access violation reading location 0x??????????
-		// So add a judgement to check the validity of m_pUtpDevice by compare to dwUtpDeviceAddr 
+		// So add a judgement to check the validity of m_pUtpDevice by compare to dwUtpDeviceAddr
 		DWORD dwUtpDeviceAddr = (DWORD)m_pUtpDevice;
         // tell the UI we are beginning a command.
 //		HANDLE hCallback = m_pUtpDevice->RegisterCallback(callback);
@@ -836,7 +836,7 @@ public:
 
 		while (transaction.GetCurrentState()->GetStateType() != State::DoneState)
         {
-#ifdef TIMETEST 			                      
+#ifdef TIMETEST
 			QueryPerformanceCounter(&liStartTime);
 #endif
 			if ((UINT)m_pUtpDevice != dwUtpDeviceAddr)
@@ -851,29 +851,29 @@ public:
 			if(ERROR_SUCCESS != cmdProgress.error)
             {
                 TRACE(_T("!!!!!!!!!!!!!!!!!!!!!!!!!Error returned by device in command sending, Error code: 0x%x, data transferred: 0x%x. Error info: %s. \
-                    \n"), cmdProgress.error, cmdProgress.position, cmdProgress.status);                    
+                    \n"), cmdProgress.error, cmdProgress.position, cmdProgress.status);
                 //Don't return since  it may succeed later.
                 //break;
             }
-#ifdef TIMETEST			
-			QueryPerformanceCounter(&liStopTime);        
+#ifdef TIMETEST
+			QueryPerformanceCounter(&liStopTime);
 			timeCount.QuadPart = ((liStopTime.QuadPart - liStartTime.QuadPart)/liTemp.QuadPart);
 			TRACE(_T("Command time = %I64d ms\n"), timeCount.QuadPart);
             QueryPerformanceCounter(&liStartTime);
-#endif		
+#endif
             //copy data to internal buffer
             transaction.Next();
-		
+
             cmdProgress.position = (UINT)transaction.GetCurrentSize();
-            DataTrasfered = cmdProgress.position - ProviousPosition;  
+            DataTrasfered = cmdProgress.position - ProviousPosition;
 
 #ifdef TIMETEST
-			QueryPerformanceCounter(&liStopTime);        
+			QueryPerformanceCounter(&liStopTime);
 			timeCount.QuadPart = ((liStopTime.QuadPart - liStartTime.QuadPart)/liTemp.QuadPart);
 			TRACE(_T("Data = 0x%x, Total = 0x%x, time = %I64d ms\n"), \
-				DataTrasfered, cmdProgress.position, timeCount.QuadPart); 
+				DataTrasfered, cmdProgress.position, timeCount.QuadPart);
             BusyCnt = 0;
-#endif            
+#endif
             if(DataTrasfered == 0)
             {
                 //Here must be busy state.
@@ -881,23 +881,23 @@ public:
                 BusyCnt++;
                 if(!(BusyCnt % 50))
                     TRACE(_T("*************Device hang!!!!!!!!!!!!!!!!!!!!!!!!!\n"));
-#endif                
-                continue; 
+#endif
+                continue;
             }
-            // Update the UI            
-            //To improve performance, data transfer progress bar in UI will be updated only if 10MB data is 
+            // Update the UI
+            //To improve performance, data transfer progress bar in UI will be updated only if 10MB data is
             //transferred since UI updating can be time-consuming.
-            if((cmdProgress.position % MIN_DATA_PROGRESS_BAR_CHANGE) == 0)                 
+            if((cmdProgress.position % MIN_DATA_PROGRESS_BAR_CHANGE) == 0)
             {
     			cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
     			if ((UINT)m_pUtpDevice != dwUtpDeviceAddr)
     				goto ERROR_NO_DEVICE;
 //    			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 				((Volume*)m_pUtpDevice)->NotifyUpdateUI(cmdOpIndex, cmdProgress.position, cmdProgress.maximum);
-#ifdef TIMETEST			
-    			QueryPerformanceCounter(&liStopTime);        
+#ifdef TIMETEST
+    			QueryPerformanceCounter(&liStopTime);
     			timeCount.QuadPart = ((liStopTime.QuadPart - liStartTime.QuadPart)/liTemp.QuadPart);
-    			TRACE(_T("TimeOfWrite: Notify timeused = %I64d ms\n"), timeCount.QuadPart); 
+    			TRACE(_T("TimeOfWrite: Notify timeused = %I64d ms\n"), timeCount.QuadPart);
                 QueryPerformanceCounter(&liStartTime);
 #endif
             }
@@ -917,14 +917,14 @@ public:
 //		m_pUtpDevice->UnregisterCallback(hCallback);
         if(cmdProgress.error != ERROR_SUCCESS)
             TRACE(_T("!!!!!!!!Error in data sending: Error code: 0x%x, data transferred: 0x%x. Error info: %s. \
-                \n"), cmdProgress.error, cmdProgress.position, cmdProgress.status);              
+                \n"), cmdProgress.error, cmdProgress.position, cmdProgress.status);
 
 		return cmdProgress.error;
 
 	ERROR_NO_DEVICE:
 		TRACE(_T("The Device handle is destroyed.m_pUtpDevice is 0x%x, dwUtpdeviceAddr is 0x%x\r\n"),m_pUtpDevice,dwUtpDeviceAddr);
 		return ERROR_INVALID_HANDLE;
-#endif    
+#endif
     } // UtpWrite()
 
 }; // class UpdateTransportProtocol

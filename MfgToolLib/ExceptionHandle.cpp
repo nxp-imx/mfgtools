@@ -22,7 +22,7 @@ CMyExceptionHandler::~CMyExceptionHandler()
 }
 
 void* ExceptionHandlerThreadProc(void* pParam)
-{	
+{
 	CMyExceptionHandler* pExceptionHandler = (CMyExceptionHandler*)pParam;
 	pExceptionHandler->InitInstance();
 
@@ -79,10 +79,10 @@ void CMyExceptionHandler::Close()
 	//PostThreadMessage(WM_MSG_EXCEPTION_EVENT, KillExceptionHandlerThread, 0);
 	// Wait for the Exception Handler thread to die before returning
 	pthread_join(Exception_thread,NULL);//WaitForSingleObject(m_hThread, INFINITE);
-	
+
 	pthread_mutex_destroy(m_hMapMsgMutex);
 	m_hMapMsgMutex = NULL;
-	
+
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Exception Handler thread is closed"));
 	//m_hThread = NULL;
 }
@@ -110,7 +110,7 @@ void CMyExceptionHandler::OnMsgExceptionEvent(WPARAM ExceptionType, LPARAM desc)
 	{
 		CString msg = (LPCTSTR)desc;
 		CString bstr_msg;
-		
+
 		//SysFreeString((BSTR)desc);
 
 		sleep(50);
@@ -147,5 +147,3 @@ void CMyExceptionHandler::OnMsgExceptionEvent(WPARAM ExceptionType, LPARAM desc)
 		}
 	}
 }
-
-

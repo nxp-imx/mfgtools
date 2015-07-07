@@ -44,14 +44,14 @@ int Disk::driveNumber::get()
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("***CreateFile Error: %d, Drive: %s\n"), error, disk->_path.get());
             return Value;
 		}
-		
+
 		DWORD bytesReturned = 0;
 		STORAGE_DEVICE_NUMBER driveNumber;
 		if (!DeviceIoControl(hFile, IOCTL_STORAGE_GET_DEVICE_NUMBER, NULL, 0, &driveNumber, sizeof(driveNumber), &bytesReturned, NULL))
 		{
 			// do nothing here on purpose
 			DWORD error = GetLastError();
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("***DeviceIoControl Error: %d, Drive: %s\n"), error, disk->_path.get());     
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("***DeviceIoControl Error: %d, Drive: %s\n"), error, disk->_path.get());
        return Value;
 		}
 		CloseHandle(hFile);
@@ -61,7 +61,7 @@ int Disk::driveNumber::get()
 			Value = driveNumber.DeviceNumber;
 		}
     }
-#endif	
+#endif
 	    }
 	return Value;
 }

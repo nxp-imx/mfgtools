@@ -173,4 +173,3 @@ set (CMAKE_CXX_FLAGS "-std=c++11 -fpic `pkg-config --libs --cflags libusb-1.0` -
 set(SOURCES ${SOURCES_})
 
 add_library( MfgToolLib ${SOURCES} )
-
