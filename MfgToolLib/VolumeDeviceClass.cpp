@@ -72,6 +72,9 @@ Device* VolumeDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DAT
 	{
 		Disk* pdisk;
 		pdisk = volume->StorageDisk();
+#ifdef __linux__
+		return volume;
+#endif
 		if(pdisk == NULL)
 		{
 			delete volume;

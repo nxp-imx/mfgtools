@@ -941,9 +941,22 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 
 
 #else
+					libusb_device*** list;
+					libusb_device* foundDevice;
+					int numDevices = libusb_get_device_list(NULL, list);
 
+					for (int i = 0; i < numDevices; i++)
+					{
+						struct libusb_device_descriptor desc;
+						foundDevice = *list[i];
+						libusb_get_device_descriptor(foundDevice, &desc);
+						if (desc.idVendor == 0x066f && desc.idProduct == 0x37ff)
+						{
+							break;
+						}
+					}
 
-					DeviceClass::NotifyStruct nsInfo = g_devClasses[DeviceClass::DeviceTypeMsc]->AddUsbDevice(driveLetterStr);
+					DeviceClass::NotifyStruct nsInfo = g_devClasses[DeviceClass::DeviceTypeMsc]->AddUsbDevice(driveLetterStr, foundDevice);
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT-Disk(%s), Hub:%d-Port:%d"), driveLetterStr.c_str(), nsInfo.HubIndex, nsInfo.PortIndex);
 					if(nsInfo.pDevice)
 					{

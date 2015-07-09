@@ -74,7 +74,9 @@ void Device::Reset(DEVINST devInst, CString path)
 
 Device::~Device()
 {
+#ifndef __linux__
 	_classGuid.put(GUID_NULL);
+#endif
     _hubIndex.put(0);
     _capabilities = Unknown;
     _classGuidStr.Empty();

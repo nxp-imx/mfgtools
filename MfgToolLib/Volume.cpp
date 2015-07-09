@@ -167,6 +167,9 @@ return Value;
 
 bool Volume::IsUsb()
 {
+	#ifdef __linux__
+	return true;
+	#endif
 	CString path = _path.get();
 	path.MakeUpper();
 	printf(" the path is %s \n",path.c_str());
