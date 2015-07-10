@@ -195,14 +195,8 @@ void CCmdOpreation::Close()
 
 MX_DEVICE_STATE CCmdOpreation::GetDeviceState()
 {
-	return MX_BOOTSTRAP;
-	if(NULL == m_p_usb_port->GetDevice())
-	{
-		return MX_DISCONNECTED;
-	}
-
 	MX_DEVICE_STATE state = MX_DISCONNECTED;
-	switch((DeviceClass::DEV_CLASS_TYPE)(m_p_usb_port->GetDeviceType()))
+	switch((DeviceClass::DEV_CLASS_TYPE)m_pDevice->GetDeviceType())
 	{
 	case DeviceClass::DeviceTypeHid:
 	case DeviceClass::DeviceTypeMxHid:
