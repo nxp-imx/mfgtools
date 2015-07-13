@@ -2147,7 +2147,9 @@ UINT COpCmd_Push::ExecuteCommand(int index)
 
 	if(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pUTP == NULL)
 	{
-		((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pUTP = new UpdateTransportProtocol((Volume*)(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice()));
+		libusb_device_handle *dev_handle = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice->m_libusbdevHandle;
+		//((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pUTP = new UpdateTransportProtocol((libusbVolume*)(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice()));
+		((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pUTP = new UpdateTransportProtocol((libusbVolume*)((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice->m_libusbdevHandle);
 	}
 
 	if(m_FileName.IsEmpty())

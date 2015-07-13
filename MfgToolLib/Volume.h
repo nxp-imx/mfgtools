@@ -21,6 +21,7 @@ class Volume : public Device
 {
 	public:
 		Volume(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle);
+		libusb_device_handle* handle;
 		virtual ~Volume(void);
 
 		enum LockType{ LockType_Physical, LockType_Logical };

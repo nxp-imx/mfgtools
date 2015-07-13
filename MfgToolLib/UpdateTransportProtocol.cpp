@@ -492,9 +492,10 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
             private set { _MaxPacketSize = value; }
         }
         private Int64 _MaxPacketSize;
-
-        public UpdateTransportProtocol(Volume device)
+*
+        public vUpdateTransportProtocol::UpdateTransportProtocol(Volume device)
         {
+#ifndef __linux__
             UtpDevice = device;
             MaxPacketSize = Volume.MaxTransferSize;
 
@@ -506,8 +507,11 @@ UINT UpdateTransportProtocol::g_TransactionTag = 0;
             UtpDevice.SendCommand(hDevice, pollMsg);
             if (pollMsg.ResponseCode == ScsiUtpMsg.ResponseCodeType.EXIT)
                 UtpVersion = pollMsg.ResponseInfo;
+#else
+            *dev_handle = device->dev_handle;
+#endif
         }
-
+/*
 
         private void Dispose(bool isDisposing)
         {

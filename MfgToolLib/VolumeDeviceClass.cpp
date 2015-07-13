@@ -65,7 +65,12 @@ UINT VolumeDeviceClass::InitDriveLettersMap()
 
 Device* VolumeDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
 {
+#ifndef __linux__
 	Volume* volume = new Volume(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
+#else
+	libusb_device_handle *dev_handle;
+	libusbVolume* volume = new libusbVolume(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle, dev_handle);
+#endif
 
 	// Only Create USB Volumes
 	if ( volume->IsUsb() )

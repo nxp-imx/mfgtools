@@ -10,6 +10,7 @@
 
 #include "MfgToolLib_Export.h"
 #include "Volume.h"
+#include "libusbVolume.h"
 #include "UpdateTransportProtocol.Api.h"
 
 //only for debug
@@ -46,6 +47,7 @@ public:
 	UINT GetMaxPollBusy() { return m_MaxPollBusy; };
 	__int64 GetMaxPacketSize() { return m_MaxPacketSize; };
     typedef enum { PowerDown, ChipReset, ResetToRecovery, ResetToUpdater } ResetType;
+	libusb_device_handle *dev_handle;
 
 	class State;
 
@@ -584,6 +586,7 @@ public:
 
 
 
+#ifndef __linux__
     UpdateTransportProtocol(Volume* pDevice)
     {
         m_pUtpDevice = pDevice;
@@ -605,7 +608,22 @@ public:
 		if (pollMsg.GetResponseCode() == ScsiUtpMsg::EXIT)
             m_UtpVersion = pollMsg.GetResponseInfo();
     }
+	#else
+    UpdateTransportProtocol(libusbVolume* pDevice)
+    {
+        m_pUtpDevice = pDevice;
+		m_MaxPacketSize = Volume::MaxTransferSizeInBytes;
+		m_MaxPollBusy = 3;
+		m_Disposed = false;
 
+		m_bShouldStop = FALSE;
+
+		// Dummy info
+		Device::NotifyStruct dummyInfo(_T("Not used"), Device::NotifyStruct::dataDir_Off, 0);
+
+        // Get the UTP Protocol version.
+    }
+#endif
     ~UpdateTransportProtocol()
     {
         Dispose(false);
@@ -725,7 +743,7 @@ public:
 
 		while (transaction.GetCurrentState()->GetStateType() != State::DoneState)
         {
-			m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
+					m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
 			if (transaction.GetCurrentState()->GetStateType() == State::GetDataState)
                 transaction.CopyData();
 
