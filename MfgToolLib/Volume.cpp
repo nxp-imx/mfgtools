@@ -366,7 +366,7 @@ UINT Volume::SendCommand(StApi& api, UCHAR* additionalInfo)
 
 UINT Volume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo)
 {
-#if 0
+#ifndef __linux__
 	// init parameter if it is used
 	if (additionalInfo)
 		*additionalInfo = SCSISTAT_GOOD;

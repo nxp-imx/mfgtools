@@ -2,8 +2,8 @@
 #include "libusbVolume.h"
 #include "Volume.h"
 
-	libusbVolume::libusbVolume(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle, libusb_device_handle *dev_handle)
-: Volume(deviceClass, devInst, path, handle)
+	libusbVolume::libusbVolume(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE ihandle, libusb_device_handle *dev_handle)
+: Volume(deviceClass, devInst, path, ihandle)
 {
 	this->handle = dev_handle;
 }

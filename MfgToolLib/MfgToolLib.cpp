@@ -2149,7 +2149,7 @@ UINT COpCmd_Push::ExecuteCommand(int index)
 	{
 		libusb_device_handle *dev_handle = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice->m_libusbdevHandle;
 		//((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pUTP = new UpdateTransportProtocol((libusbVolume*)(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice()));
-		((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pUTP = new UpdateTransportProtocol((libusbVolume*)((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice->m_libusbdevHandle);
+		((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pUTP = new UpdateTransportProtocol((libusbVolume*)((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pDevice);
 	}
 
 	if(m_FileName.IsEmpty())

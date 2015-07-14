@@ -803,7 +803,7 @@ class UpdateTransportProtocol
 		//    int UtpWrite(CString cmd, CString filename, Device::UI_Callback callback)
 		int UtpWrite(CString cmd, CString filename, int cmdOpIndex)
 		{
-#if 0
+#ifndef __linux__
 			//#define TIMETEST
 #ifdef TIMETEST
 			LARGE_INTEGER liStartTime = {0}, liStopTime = {0};
@@ -825,6 +825,24 @@ class UpdateTransportProtocol
 
 				cmd.Replace(_T("@FILESIZE"), sfileSize);
 			}
+			// When the data is transfering,the app will crash if pull away the USB connection crab.
+			// Because the DEVICE_REMOVAL_EVT will come and the operation will be done "_devices.erase(device)" when the USB cable is pulled.
+			// And m_pUtpDevice will be erased too.So all operation related to m_pUtpDevice will fail.
+			// And may cause invalid addr access:Access violation reading location 0x??????????
+			// So add a judgement to check the validity of m_pUtpDevice by compare to dwUtpDeviceAddr
+			DWORD_PTR dwUtpDeviceAddr = (DWORD_PTR)m_pUtpDevice;
+#else 
+			//CString cmd, CString filename, int cmdOpIndex
+			dev_handle = m_pUtpDevice->handle;
+			int filelength = -1;
+
+			struct stat64 stat;
+			if(stat64(filename, &stat))
+				return ERROR_OPEN_FAILED;
+			CString sfileSize;
+			sfileSize.Format(_T("%d"), stat.st_size);
+			cmd.Replace(_T("@FILESIZE"), sfileSize);
+			return 0;
 
 			WriteTransaction transaction(this, cmd, filename);
 			if(transaction.GetTotalSize()==0)
@@ -835,13 +853,15 @@ class UpdateTransportProtocol
 			// And m_pUtpDevice will be erased too.So all operation related to m_pUtpDevice will fail.
 			// And may cause invalid addr access:Access violation reading location 0x??????????
 			// So add a judgement to check the validity of m_pUtpDevice by compare to dwUtpDeviceAddr
-			DWORD dwUtpDeviceAddr = (DWORD)m_pUtpDevice;
+			DWORD_PTR dwUtpDeviceAddr = libusb_get_device_address(libusb_get_device(dev_handle));
+#endif
+
 			// tell the UI we are beginning a command.
 			//		HANDLE hCallback = m_pUtpDevice->RegisterCallback(callback);
 			//        Utils.ByteFormatConverter byteConverter = new Utils.ByteFormatConverter();
 			//	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, (int)myNewFwCommandSupport.GetFwComponent().size(), 0);       // STAGE 2 of the Load Operation
 			Device::NotifyStruct cmdProgress(_T("UtpWrite"), Device::NotifyStruct::dataDir_ToDevice, (UINT)transaction.GetTotalSize());
-			cmdProgress.status.Format(_T(" UtpWrite(%s, %s) tag:%d totalSize:%d"), cmd, filename, transaction.GetTag(), transaction.GetTotalSize());
+			cmdProgress.status.Format(_T(" UtpWrite(%s, %s) tag:%d totalSize:%d"),(const char*)cmd, (const char*)filename, transaction.GetTag(), transaction.GetTotalSize());
 			cmdProgress.error = ERROR_SUCCESS;
 			//		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 			cmdProgress.maximum = (UINT)transaction.GetTotalSize();
@@ -851,12 +871,12 @@ class UpdateTransportProtocol
 
 			((Volume*)m_pUtpDevice)->NotifyUpdateUI(cmdOpIndex, cmdProgress.position, cmdProgress.maximum);
 			//for update ui
-
 			while (transaction.GetCurrentState()->GetStateType() != State::DoneState)
 			{
 #ifdef TIMETEST
 				QueryPerformanceCounter(&liStartTime);
 #endif
+#ifndef __linux__
 				if ((UINT)m_pUtpDevice != dwUtpDeviceAddr)
 					goto ERROR_NO_DEVICE;
 				if(m_bShouldStop)
@@ -873,6 +893,22 @@ class UpdateTransportProtocol
 					//Don't return since  it may succeed later.
 					//break;
 				}
+#else
+				if(m_bShouldStop)
+				{
+					return -1;
+				}
+				ProviousPosition = cmdProgress.position;
+				//Send data or command
+				m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
+				if(ERROR_SUCCESS != cmdProgress.error)
+				{
+					TRACE(_T("!!!!!!!!!!!!!!!!!!!!!!!!!Error returned by device in command sending, Error code: 0x%x, data transferred: 0x%x. Error info: %s. \
+								\n"), (unsigned int)cmdProgress.error, (unsigned int)cmdProgress.position, (const TCHAR*)cmdProgress.status);
+					//Don't return since  it may succeed later.
+					//break;
+				}
+#endif
 #ifdef TIMETEST
 				QueryPerformanceCounter(&liStopTime);
 				timeCount.QuadPart = ((liStopTime.QuadPart - liStartTime.QuadPart)/liTemp.QuadPart);
@@ -907,10 +943,12 @@ class UpdateTransportProtocol
 				//transferred since UI updating can be time-consuming.
 				if((cmdProgress.position % MIN_DATA_PROGRESS_BAR_CHANGE) == 0)
 				{
-					cmdProgress.status.Format(_T("%s // pos:%d"), transaction.GetCurrentState()->ToString(), transaction.GetCurrentSize());
+					cmdProgress.status.Format(_T("%s // pos:%d"), (const TCHAR*)transaction.GetCurrentState()->ToString(), (const TCHAR*)transaction.GetCurrentSize());
+#ifndef __linux__
 					if ((UINT)m_pUtpDevice != dwUtpDeviceAddr)
 						goto ERROR_NO_DEVICE;
 					//    			((Volume*)m_pUtpDevice)->Notify(cmdProgress);
+#endif
 					((Volume*)m_pUtpDevice)->NotifyUpdateUI(cmdOpIndex, cmdProgress.position, cmdProgress.maximum);
 #ifdef TIMETEST
 					QueryPerformanceCounter(&liStopTime);
@@ -921,7 +959,7 @@ class UpdateTransportProtocol
 				}
 
 			}
-
+#ifndef __linux__
 			// tell the UI we are done
 			//            cmdProgress.Position = (Int32)totalTransferSize;
 			cmdProgress.status = transaction.GetCurrentState()->ToString();
