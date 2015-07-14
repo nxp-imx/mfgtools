@@ -7,13 +7,13 @@
 {
 	this->handle = dev_handle;
 }
-UINT Volume::SendCommand(StApi& api, UCHAR* additionalInfo)
+UINT libusbVolume::SendCommand(StApi& api, UCHAR* additionalInfo)
 {
 	std::cout << additionalInfo << std::endl;
 	printf("SendCommand working");
 	return 0;
 }
-UINT Volume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo)
+UINT libusbVolume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo)
 {
 	std::cout << additionalInfo << std::endl;
 	printf("SendCommand2 working");
