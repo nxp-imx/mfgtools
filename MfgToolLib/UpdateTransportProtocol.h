@@ -959,28 +959,31 @@ class UpdateTransportProtocol
 				}
 
 			}
-#ifndef __linux__
 			// tell the UI we are done
 			//            cmdProgress.Position = (Int32)totalTransferSize;
 			cmdProgress.status = transaction.GetCurrentState()->ToString();
 			cmdProgress.error = ((DoneState*)transaction.GetCurrentState())->GetResponseInfo();
 			cmdProgress.inProgress = false;
+#ifndef __linux__
 			if (dwUtpDeviceAddr != (UINT)m_pUtpDevice)
 				goto ERROR_NO_DEVICE;
 			//		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
+#endif
 			((Volume*)m_pUtpDevice)->NotifyUpdateUI(cmdOpIndex, cmdProgress.position, cmdProgress.maximum);
 
 			//		m_pUtpDevice->UnregisterCallback(hCallback);
 			if(cmdProgress.error != ERROR_SUCCESS)
 				TRACE(_T("!!!!!!!!Error in data sending: Error code: 0x%x, data transferred: 0x%x. Error info: %s. \
-							\n"), cmdProgress.error, cmdProgress.position, cmdProgress.status);
+							\n"), (unsigned int)cmdProgress.error, (unsigned int)cmdProgress.position, (const TCHAR*)cmdProgress.status);
 
 			return cmdProgress.error;
 
+#ifndef __linux__
 ERROR_NO_DEVICE:
 			TRACE(_T("The Device handle is destroyed.m_pUtpDevice is 0x%x, dwUtpdeviceAddr is 0x%x\r\n"),m_pUtpDevice,dwUtpDeviceAddr);
 			return ERROR_INVALID_HANDLE;
 #endif
+
 		} // UtpWrite()
 
 }; // class UpdateTransportProtocol
