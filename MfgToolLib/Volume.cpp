@@ -366,11 +366,13 @@ UINT Volume::SendCommand(StApi& api, UCHAR* additionalInfo)
 
 UINT Volume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo)
 {
-#ifndef __linux__
 	// init parameter if it is used
 	if (additionalInfo)
 		*additionalInfo = SCSISTAT_GOOD;
 
+#ifdef __linux__
+
+#else
 	// Allocate the SCSI request
 	DWORD totalSize = sizeof(_NT_SCSI_REQUEST) + api.GetTransferSize();
 	_NT_SCSI_REQUEST* pRequest = (_NT_SCSI_REQUEST*)m_pBuffer;
@@ -476,8 +478,6 @@ UINT Volume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, Notif
 
 	return nsInfo.error;
 #endif
-
-	return ERROR_SUCCESS;
 }
 
 void Volume::NotifyUpdateUI(int cmdOpIndex, int position, int maximum)

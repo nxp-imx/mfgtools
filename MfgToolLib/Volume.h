@@ -55,6 +55,7 @@ class Volume : public Device
 			SENSE_DATA        SenseData;		//should include "scsi.h"
 			UCHAR           DataBuffer[1];          // Allocate buffer space
 		};
+
 #pragma pack (pop)
 
 		Disk* _Disk;
