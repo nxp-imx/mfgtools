@@ -68,46 +68,46 @@ DWORD CCmdOpreation::Open()
 	}
 
 	//m_hDeviceArriveEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(InitEvent(&m_hDeviceArriveEvent) != 0)
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDeviceArriveEvent error\n"));
+	if(InitEvent(&m_hDeviceArriveEvent) != 0)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDeviceArriveEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
-    }
+	}
 	//m_hDeviceRemoveEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(InitEvent(&m_hDeviceRemoveEvent) != 0)
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDeviceRemoveEvent error\n"));
+	if(InitEvent(&m_hDeviceRemoveEvent) != 0)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDeviceRemoveEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
-    }
+	}
 	//m_hRunEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(InitEvent(&m_hRunEvent) != 0)
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hRunEvent error\n"));
+	if(InitEvent(&m_hRunEvent) != 0)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hRunEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
-    }
+	}
 	//m_hStopEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(InitEvent(&m_hStopEvent) != 0)
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hStopEvent error\n"));
+	if(InitEvent(&m_hStopEvent) != 0)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hStopEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
-    }
+	}
 	//m_hOneCmdCompleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(InitEvent(&m_hOneCmdCompleteEvent) != 0)
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hOneCmdCompleteEvent error\n"));
+	if(InitEvent(&m_hOneCmdCompleteEvent) != 0)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hOneCmdCompleteEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
-    }
+	}
 
 	//m_hDevCanDeleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	if(InitEvent(&m_hDevCanDeleteEvent) != 0)
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDevCanDeleteEvent error\n"));
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDevCanDeleteEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
-    }
+	}
 	((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[m_WndIndex] = m_hDevCanDeleteEvent;
 
 	//m_hThreadStartEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(InitEvent(&m_hThreadStartEvent) != 0)
+	if(InitEvent(&m_hThreadStartEvent) != 0)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hThreadStartEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
@@ -198,18 +198,18 @@ MX_DEVICE_STATE CCmdOpreation::GetDeviceState()
 	MX_DEVICE_STATE state = MX_DISCONNECTED;
 	switch((DeviceClass::DEV_CLASS_TYPE)m_pDevice->GetDeviceType())
 	{
-	case DeviceClass::DeviceTypeHid:
-	case DeviceClass::DeviceTypeMxHid:
-	case DeviceClass::DeviceTypeMxRom:
-		state = MX_BOOTSTRAP;
-		break;
-	case DeviceClass::DeviceTypeMsc:
-	case DeviceClass::DeviceTypeDisk:
-		state = MX_UPDATER;
-		break;
-	default:
-		state = MX_DISCONNECTED;
-		break;
+		case DeviceClass::DeviceTypeHid:
+		case DeviceClass::DeviceTypeMxHid:
+		case DeviceClass::DeviceTypeMxRom:
+			state = MX_BOOTSTRAP;
+			break;
+		case DeviceClass::DeviceTypeMsc:
+		case DeviceClass::DeviceTypeDisk:
+			state = MX_UPDATER;
+			break;
+		default:
+			state = MX_DISCONNECTED;
+			break;
 	}
 
 	return state;
@@ -220,16 +220,16 @@ usb::Port* CCmdOpreation::FindPort()
 	usb::Port * pPort = NULL;
 	if ( m_usb_hub_name.IsEmpty() || m_usb_port_index == 0 )
 	{
-        return NULL;
-    }
+		return NULL;
+	}
 
 	usb::HubClass *pHubClass = dynamic_cast<usb::HubClass*>(g_devClasses[DeviceClass::DeviceTypeUsbHub]);
 	ASSERT(pHubClass);
 	usb::Hub* pHub = pHubClass->FindHubByPath(m_usb_hub_name);
 	if ( pHub )
-    {
+	{
 		pPort = pHub->Port(m_usb_port_index);
-    }
+	}
 
 	return pPort;
 }
@@ -240,7 +240,7 @@ void CCmdOpreation::SetUsbPort(usb::Port* _port)
 	{
 		m_p_usb_port = _port;
 		m_usb_hub_name = _port->GetParentHub()->_path.get();
-        m_usb_port_index = _port->GetIndex();
+		m_usb_port_index = _port->GetIndex();
 		m_p_usb_port->SetWndIndex(m_WndIndex);
 		m_p_usb_port->Refresh();
 	}
@@ -257,67 +257,67 @@ BOOL CCmdOpreation::InitInstance()
 BOOL CCmdOpreation::OnStart()
 {
 	if(NULL!=(*m_hRunEvent).mutex && !m_bRun)
-    {
+	{
 		if(m_pUTP != NULL)
 		{
 			m_pUTP->m_bShouldStop = FALSE;
 		}
-        SetEvent(m_hRunEvent,ev_semaphore);
-        return TRUE;
-    }
-    else
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't set m_hRunEvent before it initialized or it already run\n"));
-        return FALSE;
-    }
+		SetEvent(m_hRunEvent,ev_semaphore);
+		return TRUE;
+	}
+	else
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't set m_hRunEvent before it initialized or it already run\n"));
+		return FALSE;
+	}
 }
 
 BOOL CCmdOpreation::OnStop()
 {
 	if (NULL != (*m_hStopEvent).mutex && m_bRun)
-    {
+	{
 		if(m_pUTP != NULL)
 		{
 			m_pUTP->m_bShouldStop = TRUE;
 		}
-        SetEvent(m_hStopEvent,ev_semaphore);
-        return TRUE;
-    }
-    else
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't set m_hStopEvent before it initialized or it already stop\n"));
-        return FALSE;
-    }
+		SetEvent(m_hStopEvent,ev_semaphore);
+		return TRUE;
+	}
+	else
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't set m_hStopEvent before it initialized or it already stop\n"));
+		return FALSE;
+	}
 }
 
 BOOL CCmdOpreation::OnDeviceArrive()
 {   printf("onDevArrive called \n");
 	if (NULL != (*m_hDeviceArriveEvent).mutex)
-    {
+	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceArriveEvent."), m_WndIndex);
-        SetEvent(m_hDeviceArriveEvent,ev_semaphore);
-        return TRUE;
-    }
-    else
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't set m_hDeviceArriveEvent before it initialized\n"));
-        return FALSE;
-    }
+		SetEvent(m_hDeviceArriveEvent,ev_semaphore);
+		return TRUE;
+	}
+	else
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't set m_hDeviceArriveEvent before it initialized\n"));
+		return FALSE;
+	}
 }
 
 BOOL CCmdOpreation::OnDeviceRemove()
 {
 	if (NULL != (*m_hDeviceRemoveEvent).mutex)
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceRemoveEvent."), m_WndIndex);
-        SetEvent(m_hDeviceRemoveEvent,ev_semaphore);
-        return TRUE;
-    }
-    else
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't set m_hDeviceRemoveEvent before it initialized\n"));
-        return FALSE;
-    }
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceRemoveEvent."), m_WndIndex);
+		SetEvent(m_hDeviceRemoveEvent,ev_semaphore);
+		return TRUE;
+	}
+	else
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't set m_hDeviceRemoveEvent before it initialized\n"));
+		return FALSE;
+	}
 }
 
 int CCmdOpreation::ExitInstance()
@@ -328,14 +328,14 @@ int CCmdOpreation::ExitInstance()
 
 BOOL CCmdOpreation::CanRun()
 {
-    if(m_bRun
-	    //&& m_bDeviceOn
-	    && !m_bKilled)
-	    //&& m_p_usb_port
-	    //&& m_p_usb_port->Connected())
+	if(m_bRun
+			//&& m_bDeviceOn
+			&& !m_bKilled)
+		//&& m_p_usb_port
+		//&& m_p_usb_port->Connected())
 	{
 		//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d]-CanRun return TRUE."), m_WndIndex);
-	    return TRUE;
+		return TRUE;
 	}
 	else
 	{
@@ -366,7 +366,7 @@ DWORD CCmdOpreation::UpdateUI(UI_UPDATE_INFORMATION* _uiInfo,DWORD dwStateIndex)
 
 DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 {
-    DWORD dwRet = 0;
+	DWORD dwRet = 0;
 	struct timespec timeToWait;
 	struct timeval now;
 
@@ -374,13 +374,13 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 	timeToWait.tv_sec = now.tv_sec+dwTimeOut;
 	timeToWait.tv_nsec = now.tv_usec * 1000;
 
-    myevent *waitHandles[6] = {
-				m_hKillEvent,
-				m_hDeviceArriveEvent,
-				m_hDeviceRemoveEvent,
-				m_hRunEvent,
-				m_hStopEvent,
-				m_hOneCmdCompleteEvent
+	myevent *waitHandles[6] = {
+		m_hKillEvent,
+		m_hDeviceArriveEvent,
+		m_hDeviceRemoveEvent,
+		m_hRunEvent,
+		m_hStopEvent,
+		m_hOneCmdCompleteEvent
 	};
 	int dwResult;
 	if (-1 == sem_timedwait(ev_semaphore, &timeToWait)){
@@ -393,57 +393,57 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 
 	switch(dwResult)
 	{
-	case 0:  // stop command execution thread
-		m_bKilled = TRUE;
-		dwRet = 0;
-		break;
-	case 1: // device arrive
-		TRACE(_T("WaitforEvents device arrive1\r\n"));
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--WaitforEvents device arrive1"), m_WndIndex);
-		//bDeviceChange = TRUE;
-        //bStateCmdFinished = FALSE;
-		//dwError = MFGLIB_ERROR_SUCCESS;
-		m_bDeviceOn = TRUE;
-		dwRet = 1;
-		break;
-	case 2: // device remove
-		TRACE(_T("CmdListThreadProc device remove1\r\n"));
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--WaitforEvents device remove1"), m_WndIndex);
-		//bDeviceChange = TRUE;
-        //bStateCmdFinished = TRUE;
-		//dwError = MFGLIB_ERROR_SUCCESS;
-		m_bDeviceOn = FALSE;
-		//if(pOperation->m_pUTP != NULL)
-    	//{
-    	//	delete pOperation->m_pUTP;
-    	//	pOperation->m_pUTP = NULL;
-    	//}
-		//SetEvent(pOperation->m_hDevCanDeleteEvent);
-		dwRet = 2;
-		break;
-	case 3: // press the Start button
-		TRACE(_T("WaitForEvent start button \n"));
-		m_bRun = TRUE;
-		dwRet = 3;
-		break;
-	case 4: // press the Stop button
-		TRACE(_T("WaitForEvents stop button \n"));
-		m_bRun = FALSE;
-		dwRet = 4;
-		break;
-	case 5: // one command execution finished
-		//pOperation->m_CmdIndex++;
-		dwRet = 5;
-		break;
-	case 6: // no any event, time out
-		//dwTimeout = INFINITE;
-		dwRet = 6;
-		break;
-	default:
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_WARNING, _T("CmdOpreation[%d]--WaitForEvent wrong code"), m_WndIndex);
-		break;
+		case 0:  // stop command execution thread
+			m_bKilled = TRUE;
+			dwRet = 0;
+			break;
+		case 1: // device arrive
+			TRACE(_T("WaitforEvents device arrive1\r\n"));
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--WaitforEvents device arrive1"), m_WndIndex);
+			//bDeviceChange = TRUE;
+			//bStateCmdFinished = FALSE;
+			//dwError = MFGLIB_ERROR_SUCCESS;
+			m_bDeviceOn = TRUE;
+			dwRet = 1;
+			break;
+		case 2: // device remove
+			TRACE(_T("CmdListThreadProc device remove1\r\n"));
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--WaitforEvents device remove1"), m_WndIndex);
+			//bDeviceChange = TRUE;
+			//bStateCmdFinished = TRUE;
+			//dwError = MFGLIB_ERROR_SUCCESS;
+			m_bDeviceOn = FALSE;
+			//if(pOperation->m_pUTP != NULL)
+			//{
+			//	delete pOperation->m_pUTP;
+			//	pOperation->m_pUTP = NULL;
+			//}
+			//SetEvent(pOperation->m_hDevCanDeleteEvent);
+			dwRet = 2;
+			break;
+		case 3: // press the Start button
+			TRACE(_T("WaitForEvent start button \n"));
+			m_bRun = TRUE;
+			dwRet = 3;
+			break;
+		case 4: // press the Stop button
+			TRACE(_T("WaitForEvents stop button \n"));
+			m_bRun = FALSE;
+			dwRet = 4;
+			break;
+		case 5: // one command execution finished
+			//pOperation->m_CmdIndex++;
+			dwRet = 5;
+			break;
+		case 6: // no any event, time out
+			//dwTimeout = INFINITE;
+			dwRet = 6;
+			break;
+		default:
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_WARNING, _T("CmdOpreation[%d]--WaitForEvent wrong code"), m_WndIndex);
+			break;
 	}
-    return dwRet;
+	return dwRet;
 }
 
 void* CmdListThreadProc(void* pParam)
@@ -471,27 +471,27 @@ void* CmdListThreadProc(void* pParam)
 		bStateCmdFinished = FALSE;
 		do
 		{
-		    DWORD dwResult = pOperation->WaitforEvents(dwTimeout);
+			DWORD dwResult = pOperation->WaitforEvents(dwTimeout);
 			if(dwResult == 2)
-		    {
-		        pDevice = NULL;
+			{
+				pDevice = NULL;
 				if(pOperation->m_pUTP != NULL)
-        		{
-        			delete pOperation->m_pUTP;
-        			pOperation->m_pUTP = NULL;
-        		}
-    			SetEvent(pOperation->m_hDevCanDeleteEvent);
+				{
+					delete pOperation->m_pUTP;
+					pOperation->m_pUTP = NULL;
+				}
+				SetEvent(pOperation->m_hDevCanDeleteEvent);
 				dwTimeout = INFINITE;
 				break;
 			}
 
 			if(pOperation->CanRun())
 			{
-			    printf("CanRun\n");
-			    if(!pDevice)
-			    {
-				    //first time to execute
-				    pDevice = pOperation->m_pDevice;
+				printf("CanRun\n");
+				if(!pDevice)
+				{
+					//first time to execute
+					pDevice = pOperation->m_pDevice;
 					if(!pDevice)
 					{
 						TRACE( _T("DeviceChanged port connected but device not found\n"));
@@ -501,7 +501,7 @@ void* CmdListThreadProc(void* pParam)
 					}
 
 					currentState = pOperation->GetDeviceState();
-				//	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d] device chagned and reset to state %d"), pOperation->m_WndIndex, currentState);
+					//	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d] device chagned and reset to state %d"), pOperation->m_WndIndex, currentState);
 					CurrentCommands = ((MFGLIB_VARS *)(pOperation->m_pLibHandle))->g_StateCommands[currentState];
 					dwStateIndex = (DWORD)currentState;
 					pOperation->m_currentState = currentState;
@@ -513,17 +513,17 @@ void* CmdListThreadProc(void* pParam)
 					if(CurrentCommands.size() == 0)
 					{
 						bStateCmdFinished = TRUE;
-						 dwTimeout = INFINITE;
+						dwTimeout = INFINITE;
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("current state no command, so SetEvent(hDevCanDeleteEvent)"));
 						//SetEvent(pDevice->m_hDevCanDeleteEvent);
-			                        TRACE( _T("DeviceCmd is NULL, just finished\n"));
+						TRACE( _T("DeviceCmd is NULL, just finished\n"));
 						//pOperation->UpdateUI(&_uiInfo,dwStateIndex);
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceCmd is NULL, just finished."));
 						break;
 					}
 					cmdIt = CurrentCommands.begin();
 					pOperation->m_dwCmdIndex = 1;
-		                        bStateCmdFinished = FALSE;
+					bStateCmdFinished = FALSE;
 					if(pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 					{
 						chip = ((MxHidDevice*)pDevice)->_chiFamilyName;
@@ -548,7 +548,7 @@ void* CmdListThreadProc(void* pParam)
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d], skip current command, so SetEvent(hDevCanDeleteEvent)"), pOperation->m_WndIndex);
 					}
 
-				    cmdIt++;
+					cmdIt++;
 
 					//In current state(Bootstrap or Updater), all commands are executed
 					if(cmdIt == CurrentCommands.end())
@@ -563,7 +563,7 @@ void* CmdListThreadProc(void* pParam)
 					}
 					else
 					{
-					    dwTimeout = 0;
+						dwTimeout = 0;
 					}
 				}
 				else if(dwError == MFGLIB_ERROR_SUCCESS_UPDATE_COMPLETE)
@@ -612,64 +612,64 @@ void CCmdOpreation::mRegisterUIInfoUpdateCallback(OperateResultUpdateStruct *pCB
 
 void CCmdOpreation::mUnregisterUIInfoUpdateCallback()
 {
-		pthread_mutex_lock(&m_hMutex_cb2);
-		m_callbacks2.erase(m_WndIndex);
-		pthread_mutex_unlock(&m_hMutex_cb2);
+	pthread_mutex_lock(&m_hMutex_cb2);
+	m_callbacks2.erase(m_WndIndex);
+	pthread_mutex_unlock(&m_hMutex_cb2);
 }
 
 void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 {
-    TRACE(_T("OnDeviceChangeNotify bbb\r\n"));
+	TRACE(_T("OnDeviceChangeNotify bbb\r\n"));
 	std::map<int, DeviceChangeCallbackStruct*>::iterator cbIt = m_callbacks.begin();
 	CString strDesc;
 
 	switch(pnsinfo->Event)
 	{
-	case DeviceManager::DEVICE_ARRIVAL_EVT:
-		printf(" device Arrival ChgNotify\n");
-		m_ni.Event = MX_DEVICE_ARRIVAL_EVT;
-		strDesc = pnsinfo->pDevice->_description.get();
-		_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
-		strDesc.ReleaseBuffer();
-		break;
-	case DeviceManager::DEVICE_REMOVAL_EVT:
-		m_ni.Event = MX_DEVICE_REMOVAL_EVT;
-		strDesc = pnsinfo->pDevice->_description.get();
-		_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
-		strDesc.ReleaseBuffer();
-		break;
-	case DeviceManager::VOLUME_ARRIVAL_EVT:
-		m_ni.Event = MX_VOLUME_ARRIVAL_EVT;
-		m_ni.DriverLetter = pnsinfo->DriverLetter;
-		//strDesc = ((Volume*)(pnsinfo->pDevice))->_friendlyName.get();
-		strDesc = _T("USB Mass Storage Devcie");
-		_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
-		strDesc.ReleaseBuffer();
-		//QueryPerformanceFrequency(&g_tc);
-		//QueryPerformanceCounter(&g_t1);
-//		if(m_pUTP != NULL)
-//		{
-//			delete m_pUTP;
-//			m_pUTP = NULL;
-//		}
-		//QueryPerformanceCounter(&g_t2);
-		//d1 = (double)(g_t2.QuadPart-g_t1.QuadPart) / (double)g_tc.QuadPart;
-		//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Delete UTP times(%f)"), d1);
-		break;
-	case DeviceManager::VOLUME_REMOVAL_EVT:
-		m_ni.Event = MX_VOLUME_REMOVAL_EVT;
-		m_ni.DriverLetter = _T(' ');
-		//m_ni.DeviceDesc = ((Volume*)(pnsinfo->pDevice))->_friendlyName.get();
-		strDesc = _T("USB Mass Storage Device");
-		_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
-		strDesc.ReleaseBuffer();
-		break;
-	case DeviceManager::HUB_ARRIVAL_EVT:
-		m_ni.Event = MX_HUB_ARRIVAL_EVT;
-		break;
-	case DeviceManager::HUB_REMOVAL_EVT:
-		m_ni.Event = MX_HUB_REMOVAL_EVT;
-		break;
+		case DeviceManager::DEVICE_ARRIVAL_EVT:
+			printf(" device Arrival ChgNotify\n");
+			m_ni.Event = MX_DEVICE_ARRIVAL_EVT;
+			strDesc = pnsinfo->pDevice->_description.get();
+			_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
+			strDesc.ReleaseBuffer();
+			break;
+		case DeviceManager::DEVICE_REMOVAL_EVT:
+			m_ni.Event = MX_DEVICE_REMOVAL_EVT;
+			strDesc = pnsinfo->pDevice->_description.get();
+			_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
+			strDesc.ReleaseBuffer();
+			break;
+		case DeviceManager::VOLUME_ARRIVAL_EVT:
+			m_ni.Event = MX_VOLUME_ARRIVAL_EVT;
+			m_ni.DriverLetter = pnsinfo->DriverLetter;
+			//strDesc = ((Volume*)(pnsinfo->pDevice))->_friendlyName.get();
+			strDesc = _T("USB Mass Storage Devcie");
+			_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
+			strDesc.ReleaseBuffer();
+			//QueryPerformanceFrequency(&g_tc);
+			//QueryPerformanceCounter(&g_t1);
+			//		if(m_pUTP != NULL)
+			//		{
+			//			delete m_pUTP;
+			//			m_pUTP = NULL;
+			//		}
+			//QueryPerformanceCounter(&g_t2);
+			//d1 = (double)(g_t2.QuadPart-g_t1.QuadPart) / (double)g_tc.QuadPart;
+			//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Delete UTP times(%f)"), d1);
+			break;
+		case DeviceManager::VOLUME_REMOVAL_EVT:
+			m_ni.Event = MX_VOLUME_REMOVAL_EVT;
+			m_ni.DriverLetter = _T(' ');
+			//m_ni.DeviceDesc = ((Volume*)(pnsinfo->pDevice))->_friendlyName.get();
+			strDesc = _T("USB Mass Storage Device");
+			_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
+			strDesc.ReleaseBuffer();
+			break;
+		case DeviceManager::HUB_ARRIVAL_EVT:
+			m_ni.Event = MX_HUB_ARRIVAL_EVT;
+			break;
+		case DeviceManager::HUB_REMOVAL_EVT:
+			m_ni.Event = MX_HUB_REMOVAL_EVT;
+			break;
 	}
 	_tcscpy((TCHAR *)m_ni.Hub, pnsinfo->Hub.GetBuffer());
 	pnsinfo->Hub.ReleaseBuffer();
@@ -709,48 +709,48 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 
 	switch(pnsinfo->Event)
 	{
-	case DeviceManager::VOLUME_ARRIVAL_EVT:
-	case DeviceManager::VOLUME_REMOVAL_EVT:
-    case DeviceManager::DEVICE_ARRIVAL_EVT:
-    case DeviceManager::DEVICE_REMOVAL_EVT:
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, Volume Arrive/Remove or Device Arrive/Remove"), m_WndIndex);
-		TRACE(_T("OnDeviceChangeNotify\r\n"));
-		if(m_p_usb_port != NULL)
-        {
-            TRACE(_T("OnDeviceChangeNotify11\r\n"));
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, m_p_usb_port is not NULL, so only refresh"), m_WndIndex);
-            m_p_usb_port->Refresh();
-			TRACE(_T("OnDeviceChangeNotify12\r\n"));
-			//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("OnDeviceChangeNotify12"));
-        }
-		if( (pnsinfo->Event == DeviceManager::VOLUME_ARRIVAL_EVT) || (pnsinfo->Event == DeviceManager::DEVICE_ARRIVAL_EVT) )
-		{
-			//QueryPerformanceCounter(&g_t2);
-			TRACE(_T("OnDeviceChangeNotify3\r\n"));
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, Volume/Device Arrive"), m_WndIndex);
-			OnDeviceArrive();
-		}
-		else
-		{
-		    TRACE(_T("OnDeviceChangeNotify4\r\n"));
-		    LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, Volume/Device Remove"), m_WndIndex);
-			OnDeviceRemove();
-		}
-		break;
-	case DeviceManager::HUB_ARRIVAL_EVT:
-    case DeviceManager::HUB_REMOVAL_EVT:
-		if ( FindPort() == NULL )
-        {
-            SetUsbPort( NULL );
-            // it means the hub which our port attached to is removed, so we need stop all the image updater action
-            if(m_bRun)
-            {
-                OnStop();
-            }
-        }
-		break;
-	default:
-		break;
+		case DeviceManager::VOLUME_ARRIVAL_EVT:
+		case DeviceManager::VOLUME_REMOVAL_EVT:
+		case DeviceManager::DEVICE_ARRIVAL_EVT:
+		case DeviceManager::DEVICE_REMOVAL_EVT:
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, Volume Arrive/Remove or Device Arrive/Remove"), m_WndIndex);
+			TRACE(_T("OnDeviceChangeNotify\r\n"));
+			if(m_p_usb_port != NULL)
+			{
+				TRACE(_T("OnDeviceChangeNotify11\r\n"));
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, m_p_usb_port is not NULL, so only refresh"), m_WndIndex);
+				m_p_usb_port->Refresh();
+				TRACE(_T("OnDeviceChangeNotify12\r\n"));
+				//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("OnDeviceChangeNotify12"));
+			}
+			if( (pnsinfo->Event == DeviceManager::VOLUME_ARRIVAL_EVT) || (pnsinfo->Event == DeviceManager::DEVICE_ARRIVAL_EVT) )
+			{
+				//QueryPerformanceCounter(&g_t2);
+				TRACE(_T("OnDeviceChangeNotify3\r\n"));
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, Volume/Device Arrive"), m_WndIndex);
+				OnDeviceArrive();
+			}
+			else
+			{
+				TRACE(_T("OnDeviceChangeNotify4\r\n"));
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, Volume/Device Remove"), m_WndIndex);
+				OnDeviceRemove();
+			}
+			break;
+		case DeviceManager::HUB_ARRIVAL_EVT:
+		case DeviceManager::HUB_REMOVAL_EVT:
+			if ( FindPort() == NULL )
+			{
+				SetUsbPort( NULL );
+				// it means the hub which our port attached to is removed, so we need stop all the image updater action
+				if(m_bRun)
+				{
+					OnStop();
+				}
+			}
+			break;
+		default:
+			break;
 	}
 }
 

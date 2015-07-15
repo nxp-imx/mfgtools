@@ -796,7 +796,7 @@ class UpdateTransportProtocol
 				 Debug.WriteLine(String.Format("!ERROR: UpdateTransportProtocol.UtpRead({0}, {1}), tag:{2} - {3}", cmd, filename, TransactionTag, e.Message));
 				 return retVal;
 				 }
-			 */
+				 */
 			return ((DoneState*)transaction.GetCurrentState())->GetResponseInfo();
 		}
 
