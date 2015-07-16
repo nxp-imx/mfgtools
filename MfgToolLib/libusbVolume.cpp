@@ -2,10 +2,10 @@
 #include "libusbVolume.h"
 #include "Volume.h"
 
-	libusbVolume::libusbVolume(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE ihandle, libusb_device_handle *dev_handle)
+	libusbVolume::libusbVolume(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE ihandle)
 : Volume(deviceClass, devInst, path, ihandle)
 {
-	this->handle = dev_handle;
+	//TODO
 }
 UINT libusbVolume::SendCommand(StApi& api, UCHAR* additionalInfo)
 {
