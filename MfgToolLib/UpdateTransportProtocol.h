@@ -9,7 +9,6 @@
 #pragma once
 
 #include "MfgToolLib_Export.h"
-#include "Volume.h"
 #include "libusbVolume.h"
 #include "UpdateTransportProtocol.Api.h"
 
@@ -303,8 +302,8 @@ class UpdateTransportProtocol
 			WriteTransaction(UpdateTransportProtocol* pUtpInstance, CString command, CString filename)
 				: Transaction(pUtpInstance, command)
 			{
-#if 0
 				m_BusyDelay = 2;
+#ifndef __linux__ 
 				// open the file for binary reading
 				file.open(filename, std::ios_base::binary, NULL);
 				if(!file.is_open())
@@ -315,15 +314,20 @@ class UpdateTransportProtocol
 				else
 				{
 					// get the length of the file
-#if 0
 					WIN32_FILE_ATTRIBUTE_DATA FileAttrData;
 					if( !GetFileAttributesEx(filename, GetFileExInfoStandard,&FileAttrData) )
 						return;
 
 					m_LParam = m_TotalSize = FileAttrData.nFileSizeLow;
 
-#endif				m_pCurrentState = new StartState(this);
+					m_pCurrentState = new StartState(this);
 				}
+#else
+				struct stat64 stat;
+				if(stat64(filename, &stat))
+					return;
+				m_LParam = m_TotalSize = stat.st_size;
+				m_pCurrentState = new StartState(this);
 #endif
 			}
 
@@ -743,7 +747,7 @@ class UpdateTransportProtocol
 
 			while (transaction.GetCurrentState()->GetStateType() != State::DoneState)
 			{
-				m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
+				(libusbVolume*)m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
 				if (transaction.GetCurrentState()->GetStateType() == State::GetDataState)
 					transaction.CopyData();
 
@@ -833,7 +837,7 @@ class UpdateTransportProtocol
 			DWORD_PTR dwUtpDeviceAddr = (DWORD_PTR)m_pUtpDevice;
 #else 
 			//CString cmd, CString filename, int cmdOpIndex
-			dev_handle = m_pUtpDevice->handle;
+			dev_handle = m_pUtpDevice->m_libusbdevHandle;
 			int filelength = -1;
 
 			struct stat64 stat;
@@ -842,9 +846,9 @@ class UpdateTransportProtocol
 			CString sfileSize;
 			sfileSize.Format(_T("%d"), stat.st_size);
 			cmd.Replace(_T("@FILESIZE"), sfileSize);
-			return 0;
 
 			WriteTransaction transaction(this, cmd, filename);
+			transaction.SetCurrentSize(stat.st_size);
 			if(transaction.GetTotalSize()==0)
 				return ERROR_OPEN_FAILED;
 
