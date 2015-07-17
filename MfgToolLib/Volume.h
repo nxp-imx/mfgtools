@@ -32,7 +32,7 @@ class Volume : public Device
 		HANDLE Lock(LockType lockType);
 		int Unlock(HANDLE hDrive, bool close = true);
 		virtual UINT SendCommand(StApi& api, UCHAR* additionalInfo = NULL);
-		UINT SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo);
+		virtual UINT SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo);
 
 		UCHAR *m_pBuffer;
 
