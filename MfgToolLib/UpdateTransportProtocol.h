@@ -869,9 +869,9 @@ class UpdateTransportProtocol
 			cmdProgress.error = ERROR_SUCCESS;
 			//		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 			cmdProgress.maximum = (UINT)transaction.GetTotalSize();
-			UINT ProviousPosition = 0;
+			UINT PreviousPosition = 0;
 			cmdProgress.position = 0;
-			DWORD DataTrasfered = 0;
+			DWORD DataTransferred = 0;
 
 			((Volume*)m_pUtpDevice)->NotifyUpdateUI(cmdOpIndex, cmdProgress.position, cmdProgress.maximum);
 			//for update ui
@@ -887,7 +887,7 @@ class UpdateTransportProtocol
 				{
 					return -1;
 				}
-				ProviousPosition = cmdProgress.position;
+				PreviousPosition = cmdProgress.position;
 				//Send data or command
 				m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
 				if(ERROR_SUCCESS != cmdProgress.error)
@@ -902,7 +902,7 @@ class UpdateTransportProtocol
 				{
 					return -1;
 				}
-				ProviousPosition = cmdProgress.position;
+				PreviousPosition = cmdProgress.position;
 				//Send data or command
 				m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
 				if(ERROR_SUCCESS != cmdProgress.error)
@@ -923,16 +923,16 @@ class UpdateTransportProtocol
 				transaction.Next();
 
 				cmdProgress.position = (UINT)transaction.GetCurrentSize();
-				DataTrasfered = cmdProgress.position - ProviousPosition;
+				DataTransferred = cmdProgress.position - PreviousPosition;
 
 #ifdef TIMETEST
 				QueryPerformanceCounter(&liStopTime);
 				timeCount.QuadPart = ((liStopTime.QuadPart - liStartTime.QuadPart)/liTemp.QuadPart);
 				TRACE(_T("Data = 0x%x, Total = 0x%x, time = %I64d ms\n"), \
-						DataTrasfered, cmdProgress.position, timeCount.QuadPart);
+						DataTransferred, cmdProgress.position, timeCount.QuadPart);
 				BusyCnt = 0;
 #endif
-				if(DataTrasfered == 0)
+				if(DataTransferred == 0)
 				{
 					//Here must be busy state.
 #ifdef TIMETEST

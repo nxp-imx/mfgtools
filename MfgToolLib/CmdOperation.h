@@ -22,12 +22,12 @@
 
 
 
-class CCmdOpreation //: public CWinThread
+class CCmdOperation //: public CWinThread
 {
 public:
-	//DECLARE_DYNCREATE(CCmdOpreation)
-	CCmdOpreation(INSTANCE_HANDLE handle, int WndIndex = 0);
-	virtual ~CCmdOpreation();
+	//DECLARE_DYNCREATE(CCmdOperation)
+	CCmdOperation(INSTANCE_HANDLE handle, int WndIndex = 0);
+	virtual ~CCmdOperation();
 
 	typedef struct _KeyWord
     {

@@ -253,7 +253,7 @@ typedef struct _t_lib_vars
 	CString g_strUclFilename;
 	CFG_PARAMETER g_CfgParam;
 	int g_iMaxBoardNum;
-	CCmdOpreation *g_CmdOperationArray[MAX_BOARD_NUMBERS];
+	CCmdOperation *g_CmdOperationArray[MAX_BOARD_NUMBERS];
 	pthread_t g_CmdOpThreadID[MAX_BOARD_NUMBERS];
 	myevent* g_hDevCanDeleteEvts[MAX_BOARD_NUMBERS];
 	OP_STATE_ARRAY g_OpStates;
@@ -284,7 +284,7 @@ extern CMfgToolLibApp* theApp;
 	 extern CString g_strUclFilename;
 	 extern CFG_PARAMETER g_CfgParam;
 	 extern int g_iMaxBoardNum;
-	 extern std::vector<CCmdOpreation*> g_CmdOperationArray;
+	 extern std::vector<CCmdOperation*> g_CmdOperationArray;
 	 extern HANDLE g_hDevCanDeleteEvts[MAX_BOARD_NUMBERS];
 	 extern PORT_DEV_INFO g_PortDevInfoArray[MAX_BOARD_NUMBERS];
 	 extern OP_STATE_ARRAY g_OpStates;

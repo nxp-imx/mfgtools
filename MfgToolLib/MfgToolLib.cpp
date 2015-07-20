@@ -95,7 +95,7 @@ CMfgLogMgr *g_pLogMgr;
 	 CString g_strPath;
 	 CString g_strUclFilename;
 	 int g_iMaxBoardNum;
-	 std::vector<CCmdOpreation*> g_CmdOperationArray(MAX_BOARD_NUMBERS);
+	 std::vector<CCmdOperation*> g_CmdOperationArray(MAX_BOARD_NUMBERS);
 	 StateCommansMap_t g_StateCommands;
 	 PORT_DEV_INFO g_PortDevInfoArray[MAX_BOARD_NUMBERS];
  */
@@ -2493,7 +2493,7 @@ else if(csCmdBody.Find(_T("write:")) == 0)
 return MFGLIB_ERROR_SUCCESS;
 }
 */
-// WndIndex is port dlg index(based 0), every PortMgrDlg has its own CCmdOpreation(g_CmdOperationArray[WndIndex])
+// WndIndex is port dlg index(based 0), every PortMgrDlg has its own CCmdOperation(g_CmdOperationArray[WndIndex])
 DWORD InitCmdOperation(MFGLIB_VARS *pLibVars, int WndIndex)
 {
 	if(NULL != pLibVars->g_CmdOperationArray[WndIndex])
@@ -2502,10 +2502,10 @@ DWORD InitCmdOperation(MFGLIB_VARS *pLibVars, int WndIndex)
 		pLibVars->g_CmdOperationArray[WndIndex] = NULL;
 	}
 	printf(" InitCmdOperation about to create new CMDOperation\n");
-	pLibVars->g_CmdOperationArray[WndIndex] = new CCmdOpreation((INSTANCE_HANDLE)pLibVars, WndIndex);
+	pLibVars->g_CmdOperationArray[WndIndex] = new CCmdOperation((INSTANCE_HANDLE)pLibVars, WndIndex);
 	if(pLibVars->g_CmdOperationArray[WndIndex] == NULL)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Create CCmdOpreation[%d] object failed"), WndIndex);
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Create CCmdOperation[%d] object failed"), WndIndex);
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 	printf("created about to open\n");
@@ -2518,13 +2518,13 @@ void DeinitCmdOperation(MFGLIB_VARS *pLibVars, int WndIndex)
 	{
 		pLibVars->g_CmdOperationArray[WndIndex]->Close();
 		//::PostThreadMessage(pLibVars->g_CmdOperationArray[WndIndex]->m_nThreadID, WM_QUIT, 0, 0);
-		// Wait for the CCmdOpreation thread to die before returning
+		// Wait for the CCmdOperation thread to die before returning
 
 
 		delete pLibVars->g_CmdOperationArray[WndIndex];
 		pLibVars->g_CmdOperationArray[WndIndex] = NULL;
 
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CCmdOpreation[%d] thread is Closed"), WndIndex);
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CCmdOperation[%d] thread is Closed"), WndIndex);
 	}
 }
 

@@ -28,7 +28,7 @@ extern DEV_CLASS_ARRAY g_devClasses;
 void *CmdListThreadProc(void * pParam);
 
 
-CCmdOpreation::CCmdOpreation(INSTANCE_HANDLE handle, int WndIndex)
+CCmdOperation::CCmdOperation(INSTANCE_HANDLE handle, int WndIndex)
 {
 	//m_bAutoDelete = FALSE; //Don't destroy the object at thread termination
 	m_WndIndex = WndIndex;
@@ -46,7 +46,7 @@ CCmdOpreation::CCmdOpreation(INSTANCE_HANDLE handle, int WndIndex)
 	pthread_mutex_init(&m_hMutex_cb2, NULL);// = ::CreateMutex(NULL, FALSE, NULL);
 }
 
-CCmdOpreation::~CCmdOpreation()
+CCmdOperation::~CCmdOperation()
 {
 	if (m_pUTP != NULL)
 	{
@@ -58,50 +58,50 @@ CCmdOpreation::~CCmdOpreation()
 	pthread_mutex_destroy(&m_hMutex_cb2);
 }
 
-DWORD CCmdOpreation::Open()
+DWORD CCmdOperation::Open()
 { /// changing function from  windows events to pthread conditions  as such the errors and structure change
 	//m_hKillEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	if(InitEvent(&m_hKillEvent)!=0)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hKillEvent error\n"));
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOperation::Open---Create m_hKillEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 
 	//m_hDeviceArriveEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	if(InitEvent(&m_hDeviceArriveEvent) != 0)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDeviceArriveEvent error\n"));
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOperation::Open---Create m_hDeviceArriveEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 	//m_hDeviceRemoveEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	if(InitEvent(&m_hDeviceRemoveEvent) != 0)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDeviceRemoveEvent error\n"));
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOperation::Open---Create m_hDeviceRemoveEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 	//m_hRunEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	if(InitEvent(&m_hRunEvent) != 0)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hRunEvent error\n"));
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOperation::Open---Create m_hRunEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 	//m_hStopEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	if(InitEvent(&m_hStopEvent) != 0)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hStopEvent error\n"));
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOperation::Open---Create m_hStopEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 	//m_hOneCmdCompleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	if(InitEvent(&m_hOneCmdCompleteEvent) != 0)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hOneCmdCompleteEvent error\n"));
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOperation::Open---Create m_hOneCmdCompleteEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 
 	//m_hDevCanDeleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	if(InitEvent(&m_hDevCanDeleteEvent) != 0)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hDevCanDeleteEvent error\n"));
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOperation::Open---Create m_hDevCanDeleteEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 	((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[m_WndIndex] = m_hDevCanDeleteEvent;
@@ -109,13 +109,13 @@ DWORD CCmdOpreation::Open()
 	//m_hThreadStartEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	if(InitEvent(&m_hThreadStartEvent) != 0)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create m_hThreadStartEvent error\n"));
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOperation::Open---Create m_hThreadStartEvent error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 
 	if (InitEvent(&RunFlag) != 0)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOpreation::Open---Create RunFlag error\n"));
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CCmdOperation::Open---Create RunFlag error\n"));
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 
@@ -157,12 +157,12 @@ DWORD CCmdOpreation::Open()
 	SetEvent(RunFlag);
 	//m_pThread->ResumeThread();
 
-	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CCmdOpreation[%d]-[Device:%p] thread is Running"), m_WndIndex, m_p_usb_port->GetDevice());
+	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CCmdOperation[%d]-[Device:%p] thread is Running"), m_WndIndex, m_p_usb_port->GetDevice());
 
 	return MFGLIB_ERROR_SUCCESS;
 }
 
-void CCmdOpreation::Close()
+void CCmdOperation::Close()
 {
 	//End CmdListThreadProc
 	SetEvent(m_hKillEvent);
@@ -190,10 +190,10 @@ void CCmdOpreation::Close()
 		}
 	}
 
-	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CCmdOpreation[%d] thread is Closed"), m_WndIndex);
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CCmdOperation[%d] thread is Closed"), m_WndIndex);
 }
 
-MX_DEVICE_STATE CCmdOpreation::GetDeviceState()
+MX_DEVICE_STATE CCmdOperation::GetDeviceState()
 {
 	MX_DEVICE_STATE state = MX_DISCONNECTED;
 	switch((DeviceClass::DEV_CLASS_TYPE)m_pDevice->GetDeviceType())
@@ -215,7 +215,7 @@ MX_DEVICE_STATE CCmdOpreation::GetDeviceState()
 	return state;
 }
 
-usb::Port* CCmdOpreation::FindPort()
+usb::Port* CCmdOperation::FindPort()
 {
 	usb::Port * pPort = NULL;
 	if ( m_usb_hub_name.IsEmpty() || m_usb_port_index == 0 )
@@ -234,7 +234,7 @@ usb::Port* CCmdOpreation::FindPort()
 	return pPort;
 }
 
-void CCmdOpreation::SetUsbPort(usb::Port* _port)
+void CCmdOperation::SetUsbPort(usb::Port* _port)
 {
 	if(_port != NULL)
 	{
@@ -246,7 +246,7 @@ void CCmdOpreation::SetUsbPort(usb::Port* _port)
 	}
 }
 
-BOOL CCmdOpreation::InitInstance()
+BOOL CCmdOperation::InitInstance()
 {
 	//m_pThread = AfxBeginThread(CmdListThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
 	printf(" %p \n",m_hThreadStartEvent);
@@ -254,7 +254,7 @@ BOOL CCmdOpreation::InitInstance()
 	return TRUE;
 }
 
-BOOL CCmdOpreation::OnStart()
+BOOL CCmdOperation::OnStart()
 {
 	if(NULL!=(*m_hRunEvent).mutex && !m_bRun)
 	{
@@ -272,7 +272,7 @@ BOOL CCmdOpreation::OnStart()
 	}
 }
 
-BOOL CCmdOpreation::OnStop()
+BOOL CCmdOperation::OnStop()
 {
 	if (NULL != (*m_hStopEvent).mutex && m_bRun)
 	{
@@ -290,11 +290,11 @@ BOOL CCmdOpreation::OnStop()
 	}
 }
 
-BOOL CCmdOpreation::OnDeviceArrive()
+BOOL CCmdOperation::OnDeviceArrive()
 {   printf("onDevArrive called \n");
 	if (NULL != (*m_hDeviceArriveEvent).mutex)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceArriveEvent."), m_WndIndex);
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOperation[%d]--set m_hDeviceArriveEvent."), m_WndIndex);
 		SetEvent(m_hDeviceArriveEvent,ev_semaphore);
 		return TRUE;
 	}
@@ -305,11 +305,11 @@ BOOL CCmdOpreation::OnDeviceArrive()
 	}
 }
 
-BOOL CCmdOpreation::OnDeviceRemove()
+BOOL CCmdOperation::OnDeviceRemove()
 {
 	if (NULL != (*m_hDeviceRemoveEvent).mutex)
 	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOpreation[%d]--set m_hDeviceRemoveEvent."), m_WndIndex);
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOperation[%d]--set m_hDeviceRemoveEvent."), m_WndIndex);
 		SetEvent(m_hDeviceRemoveEvent,ev_semaphore);
 		return TRUE;
 	}
@@ -320,13 +320,13 @@ BOOL CCmdOpreation::OnDeviceRemove()
 	}
 }
 
-int CCmdOpreation::ExitInstance()
+int CCmdOperation::ExitInstance()
 {
 	// TODO: Add your specialized code here and/or call the base class
 	return 0;// CWinThread::ExitInstance();
 }
 
-BOOL CCmdOpreation::CanRun()
+BOOL CCmdOperation::CanRun()
 {
 	if(m_bRun
 			//&& m_bDeviceOn
@@ -345,7 +345,7 @@ BOOL CCmdOpreation::CanRun()
 }
 
 //update the phase index
-DWORD CCmdOpreation::UpdateUI(UI_UPDATE_INFORMATION* _uiInfo,DWORD dwStateIndex)
+DWORD CCmdOperation::UpdateUI(UI_UPDATE_INFORMATION* _uiInfo,DWORD dwStateIndex)
 {
 	_uiInfo->OperationID = ((MFGLIB_VARS *)m_pLibHandle)->g_CmdOpThreadID[m_WndIndex];
 	//_uiInfo->bUpdateCommandsProgress = FALSE;
@@ -364,7 +364,7 @@ DWORD CCmdOpreation::UpdateUI(UI_UPDATE_INFORMATION* _uiInfo,DWORD dwStateIndex)
 
 
 
-DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
+DWORD CCmdOperation::WaitforEvents(time_t dwTimeOut)
 {
 	DWORD dwRet = 0;
 	struct timespec timeToWait;
@@ -399,7 +399,7 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 			break;
 		case 1: // device arrive
 			TRACE(_T("WaitforEvents device arrive1\r\n"));
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--WaitforEvents device arrive1"), m_WndIndex);
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d]--WaitforEvents device arrive1"), m_WndIndex);
 			//bDeviceChange = TRUE;
 			//bStateCmdFinished = FALSE;
 			//dwError = MFGLIB_ERROR_SUCCESS;
@@ -408,7 +408,7 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 			break;
 		case 2: // device remove
 			TRACE(_T("CmdListThreadProc device remove1\r\n"));
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--WaitforEvents device remove1"), m_WndIndex);
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d]--WaitforEvents device remove1"), m_WndIndex);
 			//bDeviceChange = TRUE;
 			//bStateCmdFinished = TRUE;
 			//dwError = MFGLIB_ERROR_SUCCESS;
@@ -440,7 +440,7 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 			dwRet = 6;
 			break;
 		default:
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_WARNING, _T("CmdOpreation[%d]--WaitForEvent wrong code"), m_WndIndex);
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_WARNING, _T("CmdOperation[%d]--WaitForEvent wrong code"), m_WndIndex);
 			break;
 	}
 	return dwRet;
@@ -448,7 +448,7 @@ DWORD CCmdOpreation::WaitforEvents(time_t dwTimeOut)
 
 void* CmdListThreadProc(void* pParam)
 {
-	CCmdOpreation* pOperation = (CCmdOpreation*)pParam;
+	CCmdOperation* pOperation = (CCmdOperation*)pParam;
 
 	BOOL bStateCmdFinished = FALSE;
 	time_t dwTimeout = INFINITE;
@@ -495,7 +495,7 @@ void* CmdListThreadProc(void* pParam)
 					if(!pDevice)
 					{
 						TRACE( _T("DeviceChanged port connected but device not found\n"));
-						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--DeviceChanged port connected but device not found."), pOperation->m_WndIndex);
+						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d]--DeviceChanged port connected but device not found."), pOperation->m_WndIndex);
 						dwTimeout = INFINITE;
 						break;
 					}
@@ -589,35 +589,35 @@ void* CmdListThreadProc(void* pParam)
 	return 0;
 }
 
-void CCmdOpreation::mRegisterUIDevChangeCallback(DeviceChangeCallbackStruct *pCB)
+void CCmdOperation::mRegisterUIDevChangeCallback(DeviceChangeCallbackStruct *pCB)
 {
 	pthread_mutex_lock(&m_hMutex_cb);
 	m_callbacks[m_WndIndex] = pCB;
 	pthread_mutex_unlock(&m_hMutex_cb);
 }
 
-void CCmdOpreation::mUnregisterUIDevChangeCallback()
+void CCmdOperation::mUnregisterUIDevChangeCallback()
 {
 	pthread_mutex_lock(&m_hMutex_cb);
 	m_callbacks.erase(m_WndIndex);
 	pthread_mutex_unlock(&m_hMutex_cb);
 }
 
-void CCmdOpreation::mRegisterUIInfoUpdateCallback(OperateResultUpdateStruct *pCB)
+void CCmdOperation::mRegisterUIInfoUpdateCallback(OperateResultUpdateStruct *pCB)
 {
 	pthread_mutex_lock(&m_hMutex_cb2);
 	m_callbacks2[m_WndIndex] = pCB;
 	pthread_mutex_unlock(&m_hMutex_cb2);
 }
 
-void CCmdOpreation::mUnregisterUIInfoUpdateCallback()
+void CCmdOperation::mUnregisterUIInfoUpdateCallback()
 {
 	pthread_mutex_lock(&m_hMutex_cb2);
 	m_callbacks2.erase(m_WndIndex);
 	pthread_mutex_unlock(&m_hMutex_cb2);
 }
 
-void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
+void CCmdOperation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 {
 	TRACE(_T("OnDeviceChangeNotify bbb\r\n"));
 	std::map<int, DeviceChangeCallbackStruct*>::iterator cbIt = m_callbacks.begin();
@@ -713,12 +713,12 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 		case DeviceManager::VOLUME_REMOVAL_EVT:
 		case DeviceManager::DEVICE_ARRIVAL_EVT:
 		case DeviceManager::DEVICE_REMOVAL_EVT:
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, Volume Arrive/Remove or Device Arrive/Remove"), m_WndIndex);
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d]--OnDeviceChangeNotify, Volume Arrive/Remove or Device Arrive/Remove"), m_WndIndex);
 			TRACE(_T("OnDeviceChangeNotify\r\n"));
 			if(m_p_usb_port != NULL)
 			{
 				TRACE(_T("OnDeviceChangeNotify11\r\n"));
-				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, m_p_usb_port is not NULL, so only refresh"), m_WndIndex);
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d]--OnDeviceChangeNotify, m_p_usb_port is not NULL, so only refresh"), m_WndIndex);
 				m_p_usb_port->Refresh();
 				TRACE(_T("OnDeviceChangeNotify12\r\n"));
 				//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("OnDeviceChangeNotify12"));
@@ -727,13 +727,13 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 			{
 				//QueryPerformanceCounter(&g_t2);
 				TRACE(_T("OnDeviceChangeNotify3\r\n"));
-				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, Volume/Device Arrive"), m_WndIndex);
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d]--OnDeviceChangeNotify, Volume/Device Arrive"), m_WndIndex);
 				OnDeviceArrive();
 			}
 			else
 			{
 				TRACE(_T("OnDeviceChangeNotify4\r\n"));
-				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOpreation[%d]--OnDeviceChangeNotify, Volume/Device Remove"), m_WndIndex);
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d]--OnDeviceChangeNotify, Volume/Device Remove"), m_WndIndex);
 				OnDeviceRemove();
 			}
 			break;
@@ -756,12 +756,12 @@ void CCmdOpreation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 
 void gOnDeviceChangeNotify(INSTANCE_HANDLE handle, DeviceClass::NotifyStruct *pNsInfo)
 {
-	CCmdOpreation *pOperation = ((MFGLIB_VARS *)handle)->g_CmdOperationArray[pNsInfo->cmdOpIndex];
+	CCmdOperation *pOperation = ((MFGLIB_VARS *)handle)->g_CmdOperationArray[pNsInfo->cmdOpIndex];
 
 	pOperation->OnDeviceChangeNotify(pNsInfo);
 }
 
-void CCmdOpreation::ExecuteUIUpdate(UI_UPDATE_INFORMATION *pInfo)
+void CCmdOperation::ExecuteUIUpdate(UI_UPDATE_INFORMATION *pInfo)
 {
 	OperateResultUpdateStruct* pCallback;
 	std::map<int, OperateResultUpdateStruct*>::iterator cbIt;
