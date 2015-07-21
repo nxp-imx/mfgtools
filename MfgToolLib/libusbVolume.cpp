@@ -38,8 +38,25 @@ UINT libusbVolume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo,
 	memcpy((void*)&request.CDB, api.GetCdbPtr(), api.GetCdbSize());
 	request.bCBWCBLength = api.GetCdbSize();
 	request.dCBWDataTransferLength = api.GetTransferSize();
-	response = libusb_bulk_transfer(m_libusbdevHandle, 0x01, (unsigned char*)&request, sizeof(CBW_UTP), &length , api.GetTimeout() * 1000);
-	response += libusb_bulk_transfer(m_libusbdevHandle, 0x01, (unsigned char*)api.GetCmdDataPtr(), api.GetTransferSize(),  &length, api.GetTimeout() * 1000);
+	response = libusb_bulk_transfer(m_libusbdevHandle, 0x01, (UCHAR*)&request, sizeof(CBW_UTP), &length , api.GetTimeout() * 1000);
+	response += libusb_bulk_transfer(m_libusbdevHandle, 0x01, (UCHAR*)api.GetCmdDataPtr(), api.GetTransferSize(),  &length, api.GetTimeout() * 1000);
+
+	api.ScsiSenseData.SenseKey = SCSI_SENSE_UNIQUE;
+	api.ScsiSenseData.AdditionalSenseCode = (ScsiUtpMsg::EXIT & 0xFF00)>>8;
+	api.ScsiSenseData.AdditionalSenseCodeQualifier = (ScsiUtpMsg::EXIT & 0x00FF);
+	api.ScsiSenseData.Information[0] = 0xff;
+	api.ScsiSenseData.Information[1] = 0xff;
+	api.ScsiSenseData.Information[2] = 0xff;
+	api.ScsiSenseData.Information[3] = 0xff;
+
+	CSW_UTP uResponse;
+	libusb_bulk_transfer(m_libusbdevHandle, 0x81, (UCHAR*) &uResponse, 32, &length, 1000);
+
+	if ( !api.IsWriteCmd() )
+		api.ProcessResponse((UCHAR*)&request, 0, api.GetTransferSize());
+
+	api.ScsiSenseStatus = uResponse.bCSWStatus;
+
 	nsInfo.error = response;
 	return response;
 }

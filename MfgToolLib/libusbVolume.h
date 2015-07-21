@@ -18,7 +18,6 @@ struct CDB_UTP
 	uint32_t UTPParam2;
 	uint16_t SCSIExtra;
 };
-#pragma pack (push, 1)
 struct CBW_UTP
 {
 	//CBW
@@ -31,3 +30,23 @@ struct CBW_UTP
 	//CDB
 	CDB_UTP CDB;
 };
+struct CSW_UTP
+{
+	uint8_t dCBWSignature[4];
+	uint32_t dCSWTag;
+	uint32_t dCSWDataResidue;
+	uint8_t bCSWStatus;
+};
+struct SENSE_UTP
+{
+	uint8_t UTPResponseCode;
+	uint8_t UTPSpec;
+	uint8_t UTPSenseKey;
+	uint32_t UTPReplyInfoLower;
+	uint8_t UTPSenseLength;
+	uint32_t UTPReplyInfoUpper;
+	uint8_t UTPSenseCode;
+	uint8_t UTPReplyCode;
+	uint32_t SCSIExtra;
+};
+#pragma pack (pop)

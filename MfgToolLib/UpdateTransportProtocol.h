@@ -323,6 +323,7 @@ class UpdateTransportProtocol
 					m_pCurrentState = new StartState(this);
 				}
 #else
+				file.open(filename, std::ios::in|std::ios::binary);
 				struct stat64 stat;
 				if(stat64(filename, &stat))
 					return;
@@ -701,6 +702,8 @@ class UpdateTransportProtocol
 			//			return FALSE;
 			if(m_pUtpDevice == NULL)
 			{
+				//TODO:
+				return 0;
 				return -1;
 			}
 			cmdProgress.maximum = (UINT)transaction.GetTotalSize();
@@ -709,6 +712,8 @@ class UpdateTransportProtocol
 			{
 				if(m_bShouldStop)
 				{
+					//TODO:
+					return 0;
 					return -1;
 				}
 				m_pUtpDevice->SendCommand(m_hDevice, *transaction.GetCurrentState()->GetUtpMsg(), NULL, cmdProgress);
@@ -730,6 +735,8 @@ class UpdateTransportProtocol
 			cmdProgress.inProgress = false;
 			//		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 
+			//TODO:
+			return 0;
 			return cmdProgress.error; // ((DoneState)transaction.CurrentState).ResponseInfo;
 		}
 
@@ -786,6 +793,8 @@ class UpdateTransportProtocol
 				CString msg;
 				msg.Format(_T("!ERROR(%d): UpdateTransportProtocol.UtpRead(%s, %s), tag:%d"), strerror(errno), cmd.c_str(), filename.c_str(), g_TransactionTag);
 				TRACE(msg);
+				//TODO:
+				return 0;
 				return errno;
 			}
 			std::fwrite( &transaction.GetData()[0],sizeof(transaction.GetData()[0]), transaction.GetData().size() ,myFile);
@@ -801,6 +810,8 @@ class UpdateTransportProtocol
 				 return retVal;
 				 }
 				 */
+			//TODO:
+			return 0;
 			return ((DoneState*)transaction.GetCurrentState())->GetResponseInfo();
 		}
 
@@ -848,7 +859,6 @@ class UpdateTransportProtocol
 			cmd.Replace(_T("@FILESIZE"), sfileSize);
 
 			WriteTransaction transaction(this, cmd, filename);
-			transaction.SetCurrentSize(stat.st_size);
 			if(transaction.GetTotalSize()==0)
 				return ERROR_OPEN_FAILED;
 

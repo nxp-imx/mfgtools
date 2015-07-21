@@ -133,7 +133,7 @@ int Volume::diskNumber::get()
 			str.Format(_T("\\\\.\\%s"), vol->_logicalDrive.get().c_str());
 			DWORD bytesReturned = 0 ;
 
-#if 0
+#ifndef __linux__
 			HANDLE hFile = CreateFile(str, 0, 0, NULL, OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL, NULL);
 			if (hFile == INVALID_HANDLE_VALUE)
 			{
@@ -251,7 +251,7 @@ HANDLE Volume::Lock(LockType lockType)
 	{
 		disk = _path.get();
 	}
-#if 0
+#ifndef __linux__ 
 	HANDLE hDrive = ::CreateFile (
 			disk,
 			GENERIC_READ | GENERIC_WRITE,
@@ -296,7 +296,7 @@ int Volume::Unlock(HANDLE hDrive, bool close)
 	int nTryCount;
 
 	dwSleepAmount = LOCK_TIMEOUT / LOCK_RETRIES;
-#if 0
+#ifndef __linux__
 	// Do this in a loop until a timeout period has expired
 	for( nTryCount = 0; nTryCount < LOCK_RETRIES; nTryCount++ )
 	{
