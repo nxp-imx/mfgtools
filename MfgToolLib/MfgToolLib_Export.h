@@ -196,4 +196,5 @@ extern "C"
 	DWORD MfgLib_UnregisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbType, void *pFunc);
 	DWORD MfgLib_GetLibraryVersion(BYTE_t* version, int maxSize);
 	DWORD MfgLib_SetUCLKeyWord(CHAR_t *key, CHAR_t *value);
+	DWORD MfgLib_SetProfilePath(INSTANCE_HANDLE handle, BYTE_t* newpath);
 }

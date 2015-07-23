@@ -252,6 +252,33 @@ DWORD MfgLib_SetProfileName(INSTANCE_HANDLE handle, BYTE_t *strName)
 	return MFGLIB_ERROR_SUCCESS;
 }
 
+DWORD MfgLib_SetProfilePath(INSTANCE_HANDLE handle, BYTE_t* newpath)
+{
+	MFGLIB_VARS *pLibVars = (MFGLIB_VARS *)handle;
+
+	if (NULL == pLibVars)
+	{
+		return MFGLIB_ERROR_INVALID_PARAM;
+	}
+	BOOL bFind = FindLibraryHandle(pLibVars);
+	if (!bFind)
+	{
+		return MFGLIB_ERROR_NOT_FIND;
+	}
+	if (newpath == NULL)
+	{
+		return MFGLIB_ERROR_INVALID_PARAM;
+	}
+
+#ifdef __linux__
+	theApp->m_strDllFullPath = (char*)newpath;
+#else
+	theApp.m_strDllFullPath = newpath;
+#endif
+	return MFGLIB_ERROR_SUCCESS;
+}
+
+
 DWORD MfgLib_SetListName(INSTANCE_HANDLE handle, BYTE_t *strName)
 {
 	MFGLIB_VARS *pLibVars = (MFGLIB_VARS *)handle;
