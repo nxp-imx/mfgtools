@@ -226,7 +226,7 @@ class UpdateTransportProtocol
 									ScsiUtpMsg::CodeToString(m_pCurrentState->GetUtpMsg()->GetResponseCode()).c_str(),
 									State::StateToString(m_pCurrentState->GetStateType()).c_str(),
 									m_pCurrentState->GetUtpMsg()->ToString().c_str());
-							pNextState = new DoneState(this, -65536, msg + _T(" (-65536)"));
+							pNextState = new DoneState(this, 0, m_pCurrentState->GetUtpMsg()->GetResponseString());
 							break;
 					}
 				}
@@ -810,8 +810,6 @@ class UpdateTransportProtocol
 				 return retVal;
 				 }
 				 */
-			//TODO:
-			return 0;
 			return ((DoneState*)transaction.GetCurrentState())->GetResponseInfo();
 		}
 

@@ -1,13 +1,6 @@
 #pragma once
 #include "UpdateTransportProtocol.Api.h"
 #include "Volume.h"
-class libusbVolume : public Volume
-{
-	public:
-		libusbVolume(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle);
-		UINT SendCommand(StApi& api, UCHAR* additionalInfo);
-		UINT SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo);
-};
 #pragma pack (push, 1)
 struct CDB_UTP
 {
@@ -45,8 +38,15 @@ struct SENSE_UTP
 	uint32_t UTPReplyInfoLower;
 	uint8_t UTPSenseLength;
 	uint32_t UTPReplyInfoUpper;
-	uint8_t UTPSenseCode;
-	uint8_t UTPReplyCode;
+	uint16_t UTPSenseCode;
 	uint32_t SCSIExtra;
 };
 #pragma pack (pop)
+class libusbVolume : public Volume
+{
+	public:
+		libusbVolume(DeviceClass* deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle);
+		int pollDevice(CSW_UTP* sResponse, StApi& api);
+		UINT SendCommand(StApi& api, UCHAR* additionalInfo);
+		UINT SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo);
+};
