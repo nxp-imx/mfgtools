@@ -1,9 +1,46 @@
 #include <stdio.h>
+#include <string.h>
+#include <cstring>
 #include "MfgToolLib_Export.h"
 
-int main (int argc,char * argv[]){
+int main (int argc,char* argv[]){
 	INSTANCE_HANDLE lib;
 	printf("hello\n");
+
+	char * newpath;
+	int hasnewpath = 0;
+
+
+	std::map<CString, CString> m_uclKeywords;
+	std::map<CString, CString>::const_iterator it;
+
+	for (int i = 1; i < argc; i++)
+	{
+		if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--setting") == 0)
+		{
+			CString* argString = new CString(argv[i + 1]);
+			int loc = argString->find('=', 0);
+			if (loc == std::string::npos)
+			{
+				m_uclKeywords[*argString] = argv[i+2];
+				i+=2;
+			}
+			else
+			{
+				m_uclKeywords[argString->substr(0, loc)] = argString->substr(loc + 1, argString->size() - loc);
+				i+=1;
+			}
+			delete argString;
+		}
+		else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
+		{
+			printf("Usage: [program] [arguments] [settings]=[values]\n");
+			printf("  -s  --setting		Specify any UCL keywords.\n");
+			printf("  -h  --help      Display this help information.\n");
+			exit(EXIT_SUCCESS);
+		}
+	}
+
 	OPERATIONS_INFORMATION infoOp;
 	int ret=MfgLib_Initialize();
 	if(ret!=MFGLIB_ERROR_SUCCESS){
@@ -15,12 +52,9 @@ int main (int argc,char * argv[]){
 		printf("CreateInstanceHandle failed\n");
 		return -1;
 	}
-	std::map<CString, CString> m_uclKeywords;
-	std::map<CString, CString>::const_iterator it;
-	m_uclKeywords["board"] = "sabresd";
-	m_uclKeywords["mmc"] = "0";
-	m_uclKeywords["sxuboot"]="17x17arm2";
-	m_uclKeywords["sxdtb"]="17x17-arm2";
+
+
+
 	for ( it=m_uclKeywords.begin(); it!=m_uclKeywords.end(); ++it )
 	{
 		CString key = it->first;
@@ -29,6 +63,8 @@ int main (int argc,char * argv[]){
 	}
 
 
+	if (hasnewpath == 1)
+		ret = MfgLib_SetProfilePath(lib, (BYTE_t *) newpath);
 
 	//set profile and list
 	ret = MfgLib_SetProfileName(lib,(BYTE_t *) _T("Linux"));
@@ -83,9 +119,9 @@ int main (int argc,char * argv[]){
 
 
 
-	while(1){
+	while(1)
+	{
 		sleep(3);
-		printf("tick\n");
 	}
 	ret=MfgLib_UninitializeOperation(lib);
 	if(ret!=MFGLIB_ERROR_SUCCESS){
