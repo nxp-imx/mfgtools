@@ -28,14 +28,21 @@ int main (int argc,char* argv[]){
 			else
 			{
 				m_uclKeywords[argString->substr(0, loc)] = argString->substr(loc + 1, argString->size() - loc);
-				i+=1;
+				i++;
 			}
 			delete argString;
+		}
+		else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--profile") == 0)
+		{
+			hasnewpath = 1;
+			newpath = argv[i+1];
+			i++;
 		}
 		else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
 		{
 			printf("Usage: [program] [arguments] [settings]=[values]\n");
 			printf("  -s  --setting		Specify any UCL keywords.\n");
+			printf("	-p	--profile		Specify path to Profiles directory.\n");
 			printf("  -h  --help      Display this help information.\n");
 			exit(EXIT_SUCCESS);
 		}
