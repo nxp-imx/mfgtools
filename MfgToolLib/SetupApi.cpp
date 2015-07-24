@@ -730,3 +730,10 @@ SetupApi& gSetupApi()
     static SetupApi sApi;
     return sApi;
 };
+
+SetupApi::SetupApi()
+{
+}
+SetupApi::~SetupApi()
+{
+}
