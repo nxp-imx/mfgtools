@@ -126,7 +126,7 @@ DWORD CCmdOperation::Open()
 
 	m_usb_hub_name = ((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[m_WndIndex].hubPath;
 	m_usb_port_index = ((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[m_WndIndex].portIndex;
-	printf (" hub name %s port index %d \n",m_usb_hub_name.c_str(),m_usb_port_index);
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" hub name %s port index %d \n"), m_usb_hub_name.c_str(), m_usb_port_index);
 	SetUsbPort(FindPort());
 
 	if(g_pDeviceManager != NULL)
@@ -249,7 +249,7 @@ void CCmdOperation::SetUsbPort(usb::Port* _port)
 BOOL CCmdOperation::InitInstance()
 {
 	//m_pThread = AfxBeginThread(CmdListThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
-	printf(" %p \n",m_hThreadStartEvent);
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T(" %p \n"), m_hThreadStartEvent);
 	SetEvent(m_hThreadStartEvent);
 	return TRUE;
 }
@@ -291,7 +291,7 @@ BOOL CCmdOperation::OnStop()
 }
 
 BOOL CCmdOperation::OnDeviceArrive()
-{   printf("onDevArrive called \n");
+{ 
 	if (NULL != (*m_hDeviceArriveEvent).mutex)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CmdOperation[%d]--set m_hDeviceArriveEvent."), m_WndIndex);
@@ -385,7 +385,7 @@ DWORD CCmdOperation::WaitforEvents(time_t dwTimeOut)
 	int dwResult;
 	if (-1 == sem_timedwait(ev_semaphore, &timeToWait)){
 		dwResult = 6;
-		printf("timedout\n");
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Event timed out.\n"));
 	}
 	else{
 		dwResult = CheckArrayOfEvents(waitHandles, 6);
@@ -487,7 +487,7 @@ void* CmdListThreadProc(void* pParam)
 
 			if(pOperation->CanRun())
 			{
-				printf("CanRun\n");
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CanRun\n"));
 				if(!pDevice)
 				{
 					//first time to execute
@@ -531,7 +531,7 @@ void* CmdListThreadProc(void* pParam)
 				}
 
 				COpCommand *pCmd = (*cmdIt);
-				printf(" command description \"%s\" and body string \"%s\" \n",pCmd->GetDescString().c_str(),pCmd->GetBodyString().c_str());
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T(" command description \"%s\" and body string \"%s\" \n"), pCmd->GetDescString().c_str(),pCmd->GetBodyString().c_str());
 				if(pCmd->IsRun(chip))
 				{
 					dwError = pCmd->ExecuteCommand(pOperation->m_WndIndex);
@@ -626,7 +626,7 @@ void CCmdOperation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 	switch(pnsinfo->Event)
 	{
 		case DeviceManager::DEVICE_ARRIVAL_EVT:
-			printf(" device Arrival ChgNotify\n");
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T(" device Arrival ChgNotify\n"));
 			m_ni.Event = MX_DEVICE_ARRIVAL_EVT;
 			strDesc = pnsinfo->pDevice->_description.get();
 			_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
