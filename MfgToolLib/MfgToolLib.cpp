@@ -228,6 +228,43 @@ DWORD MfgLib_DestoryInstanceHandle(INSTANCE_HANDLE handle)
 	return MFGLIB_ERROR_SUCCESS;
 }
 
+DWORD InitLogManager(CString location)
+{
+	if (g_pLogMgr != NULL)
+	{
+		return MFGLIB_ERROR_ALREADY_EXIST;
+	}
+
+	try
+	{
+		#ifndef __linux__
+		int pos = location.ReverseFind(_T('\\'));
+		#else
+		int pos = location.ReverseFind(_T('/'));
+		#endif
+		location = location.Left(pos + 1);	//+1 for add '\' at the last
+		location += LOG_FILE_NAME;
+		g_pLogMgr = new CMfgLogMgr(location);
+	}
+	catch (int &val)
+	{
+		TRACE(_T("open log file failed(%d)\n"), val);
+		val = 0;
+		return MFGLIB_ERROR_LOG_FILE_OPEN_FAILED;
+	}
+	catch (...)
+	{
+		return MFGLIB_ERROR_NO_MEMORY;
+	}
+
+	if (NULL == g_pLogMgr)
+	{
+		return MFGLIB_ERROR_NO_MEMORY;
+	}
+
+	return MFGLIB_ERROR_SUCCESS;
+}
+
 DWORD MfgLib_SetProfileName(INSTANCE_HANDLE handle, BYTE_t *strName)
 {
 	MFGLIB_VARS *pLibVars = (MFGLIB_VARS *)handle;
@@ -847,9 +884,10 @@ DWORD InitLogManager()
 
 void DeinitLogManager()
 {
-	if(g_pLogMgr != NULL)
+	if (g_pLogMgr != NULL)
 	{
 		delete g_pLogMgr;
+		g_pLogMgr = NULL; //<<<---- the added line - this should avoid errors in accessing log in multiple operations
 	}
 }
 
