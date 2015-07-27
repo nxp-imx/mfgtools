@@ -5,7 +5,6 @@
 
 int main (int argc,char* argv[]){
 	INSTANCE_HANDLE lib;
-	printf("hello\n");
 
 	char * newpath;
 	int hasnewpath = 0;
@@ -93,8 +92,6 @@ int main (int argc,char* argv[]){
 		return -1;
 	}
 
-
-	printf(" this is a test at the top level\n");
 
 	OPERATION_INFOMATION *pOpInformation = NULL;
 	pOpInformation = new OPERATION_INFOMATION[1];// has index of how many concurrent boards
