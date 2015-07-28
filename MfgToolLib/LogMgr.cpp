@@ -15,12 +15,12 @@ extern CString g_strVersion;
 CMfgLogMgr::CMfgLogMgr()
 {
 	TCHAR buffer[MAX_PATH];
-   // ::GetModuleFileName(NULL, (LPTSTR)buffer, MAX_PATH);
-	 CString filename = "MfgToolLibLog.txt";//buffer;
+	// ::GetModuleFileName(NULL, (LPTSTR)buffer, MAX_PATH);
+	CString filename = "MfgToolLibLog.txt";//buffer;
 
 	int pos = filename.ReverseFind(_T('\\'));
 	filename = filename.Left(pos+1);	//+1 for add '\' at the last
-        filename += LOG_FILE_NAME;
+	filename += LOG_FILE_NAME;
 	m_file = _tfopen(filename, _T("a+"));
 	if(m_file==NULL)
 	{
@@ -31,8 +31,8 @@ CMfgLogMgr::CMfgLogMgr()
 	_tstat(filename, &FileLen);
 	//BOOL bret = m_file.Open(filename, CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone | CFile::osWriteThrough | CFile::typeText);
 
-    if (m_file!=NULL)
-        std::fseek(m_file,FileLen.st_size,SEEK_SET);
+	if (m_file!=NULL)
+		std::fseek(m_file,FileLen.st_size,SEEK_SET);
 
 	CString strDllVersion = _T("");
 	strDllVersion += g_strVersion;
@@ -75,9 +75,9 @@ CMfgLogMgr::CMfgLogMgr(CString strFilename)
 
 CMfgLogMgr::~CMfgLogMgr()
 {
-    if (m_file!=NULL)
+	if (m_file!=NULL)
 	{
-        std::fclose(m_file);
+		std::fclose(m_file);
 		m_file = NULL;
 	}
 }
@@ -85,7 +85,7 @@ CMfgLogMgr::~CMfgLogMgr()
 DWORD CMfgLogMgr::WriteToLogFile(CString& strMsg)
 {
 	if (m_file != NULL)
-    {
+	{
 		_fputts(strMsg, m_file);
 		std::fflush(m_file);
 		return WRITE_SUCCESS;
@@ -98,23 +98,23 @@ DWORD CMfgLogMgr::WriteToLogFile(CString& strMsg)
 
 void CMfgLogMgr::PrintLog(DWORD moduleID, DWORD levelID, const TCHAR * format, ... )
 {
-    TCHAR* buffer;
-    va_list args;
-    int len;
+	TCHAR* buffer;
+	va_list args;
+	int len;
 
-    va_start(args, format);
-    len = _vsctprintf(format, args)+1;
-    buffer = (TCHAR*)malloc(len*sizeof(TCHAR));
-    std::vsnprintf(buffer,len, format, args);
-    va_end(args);
+	va_start(args, format);
+	len = _vsctprintf(format, args)+1;
+	buffer = (TCHAR*)malloc(len*sizeof(TCHAR));
+	std::vsnprintf(buffer,len, format, args);
+	va_end(args);
 
-    CString str;
-    str.Format(_T("ModuleID[%d] LevelID[%d]: %s\n"),moduleID, levelID, buffer);
+	CString str;
+	str.Format(_T("ModuleID[%d] LevelID[%d]: %s\n"),moduleID, levelID, buffer);
 	if (m_file != NULL)
-    {
+	{
 		_fputts(str,m_file);
 		std::fflush(m_file);
 	}
 
-    free(buffer);
+	free(buffer);
 }

@@ -26,15 +26,15 @@
 //////////////////////////////////////////////////////////////////////
 class CMfgLogMgr
 {
-public:
-    CMfgLogMgr();
-	CMfgLogMgr(CString strFilename);
-    ~CMfgLogMgr();
+	public:
+		CMfgLogMgr();
+		CMfgLogMgr(CString strFilename);
+		~CMfgLogMgr();
 
-	void PrintLog(DWORD moduleID, DWORD levelID, const TCHAR * format, ... );
+		void PrintLog(DWORD moduleID, DWORD levelID, const TCHAR * format, ... );
 
-	DWORD WriteToLogFile(CString& strMsg);
+		DWORD WriteToLogFile(CString& strMsg);
 
-private:
-    FILE * m_file;
+	private:
+		FILE * m_file;
 };
