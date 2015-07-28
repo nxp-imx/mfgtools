@@ -12,41 +12,6 @@
 
 extern CString g_strVersion;
 
-CMfgLogMgr::CMfgLogMgr()
-{
-	TCHAR buffer[MAX_PATH];
-	// ::GetModuleFileName(NULL, (LPTSTR)buffer, MAX_PATH);
-	CString filename = "MfgToolLibLog.txt";//buffer;
-
-	int pos = filename.ReverseFind(_T('\\'));
-	filename = filename.Left(pos+1);	//+1 for add '\' at the last
-	filename += LOG_FILE_NAME;
-	m_file = _tfopen(filename, _T("a+"));
-	if(m_file==NULL)
-	{
-		perror("logMgr init");
-		throw 1;
-	}
-	struct _stat64i32 FileLen;
-	_tstat(filename, &FileLen);
-	//BOOL bret = m_file.Open(filename, CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone | CFile::osWriteThrough | CFile::typeText);
-
-	if (m_file!=NULL)
-		std::fseek(m_file,FileLen.st_size,SEEK_SET);
-
-	CString strDllVersion = _T("");
-	strDllVersion += g_strVersion;
-	strDllVersion += _T("\n");
-	WriteToLogFile(strDllVersion);
-
-	time_t timer;
-	time(&timer);// = CTime::GetCurrentTime();
-	CString cstr_time = _T("");
-	cstr_time.AppendFormat(_T("%s"), _tctime(&timer));
-	cstr_time += _T("   Start new logging\n");
-	WriteToLogFile(cstr_time);
-}
-
 CMfgLogMgr::CMfgLogMgr(CString strFilename)
 {
 	m_file = _tfopen(strFilename, _T("a+"));
