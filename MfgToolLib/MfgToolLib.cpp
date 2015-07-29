@@ -893,7 +893,6 @@ void DeinitLogManager()
 
 void LogMsg(DWORD moduleID, DWORD levelID, const TCHAR * format, ... )
 {
-	return;
 	TCHAR* buffer;
 	va_list args;
 	int len;

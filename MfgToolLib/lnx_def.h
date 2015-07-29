@@ -445,13 +445,13 @@ typedef struct _OVERLAPPED {
 } OVERLAPPED, *LPOVERLAPPED;
 
 
-inline int _vscprintf (const char * format, ...) {
-      int retval;
-      va_list argcopy;
-      va_start(argcopy,format);
-      retval = vsnprintf(NULL, 0, format, argcopy);
-      va_end(argcopy);
-      return retval;
+inline int _vscprintf (const char * format, va_list pargs) {
+	int retval;
+	va_list argcopy; 
+	va_copy(argcopy, pargs); 
+	retval = vsnprintf(NULL, 0, format, argcopy);
+	va_end(argcopy); 
+	return retval;
 }
 
 #define CAnsiString CString
