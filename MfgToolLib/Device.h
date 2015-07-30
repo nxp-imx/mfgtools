@@ -75,6 +75,7 @@ public:
 	void Reset(DEVINST devInst, CString path);
 	DWORD GetDeviceWndIndex(void);
 	void SetDeviceWndIndex(DWORD dwIndex);
+	virtual void NotifyOpen();
 
 public:
 	// PROPERTIES

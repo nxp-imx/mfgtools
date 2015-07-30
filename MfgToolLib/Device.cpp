@@ -72,6 +72,10 @@ void Device::Reset(DEVINST devInst, CString path)
 {
 }
 
+void Device::NotifyOpen()
+{
+}
+
 Device::~Device()
 {
 #ifndef __linux__

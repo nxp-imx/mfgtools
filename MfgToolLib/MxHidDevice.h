@@ -166,6 +166,7 @@ public:
 		MX6D,
 		MX6SL,
 		MX6SX,
+		MX7D
     };
 
 	enum HAB_t
@@ -289,6 +290,8 @@ public:
 	//BOOL Download(PImageParameter pImageParameter, HANDLE hFileMapping, ULONGLONG dwFileSize);
 	BOOL Download(PImageParameter pImageParameter, UCHAR *pFileDataBuf, ULONGLONG dwFileSize, int cmdOpIndex);
 	void Reset(DEVINST devInst, CString path);
+	void SetChipFamily();
+	void NotifyOpen();
 };
 
 #endif //  __MXHIDDEVICE_H__

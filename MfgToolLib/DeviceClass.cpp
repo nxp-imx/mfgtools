@@ -570,6 +570,7 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path,libusb_device *
 	Device *pDevice = CreateDevice(this,devData , _T(""));
 	printf("Create Device %p\n", pDevice);
 	int rc=libusb_open(dev,&pDevice->m_libusbdevHandle);
+	pDevice->NotifyOpen();
 	 if (LIBUSB_SUCCESS != rc) {
 	    if(rc==LIBUSB_ERROR_ACCESS){
 		printf("failed to open no access\n");

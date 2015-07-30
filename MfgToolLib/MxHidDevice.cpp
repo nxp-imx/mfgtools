@@ -57,20 +57,23 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 	{
 		_chipFamily = MX50;
 	} */
+}
+void MxHidDevice::NotifyOpen()
+{
 	CString filter;
 	OP_STATE_ARRAY *pOpStates = GetOpStates((MFGLIB_VARS *)m_pLibHandle);
 	OP_STATE_ARRAY::iterator it = pOpStates->begin();
 	COpState *pCurrentState = NULL;
-/*	for(; it!=pOpStates->end(); it++)
+	libusb_device_descriptor descObj;
+	libusb_device *pDevice = libusb_get_device(m_libusbdevHandle);
+	libusb_get_device_descriptor(pDevice, &descObj);
+	for(; it!=pOpStates->end(); it++)
 	{
-
-		  if( descObj.idVendor==(*it)->uiVid && descObj.idProduct==(*it)->uiPid )
-		    {       //find
-			  TRACE(_T(" right device \n"));
-			  isRightDevice = TRUE;
-			  pCurrentState = (*it);
-			  break;
-		    }
+		if( descObj.idVendor==(*it)->uiVid && descObj.idProduct==(*it)->uiPid )
+		{
+			pCurrentState = (*it);
+			break;
+		}
 	}
 
 	if(pCurrentState)
@@ -80,26 +83,28 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 
 	switch(pCurrentState->opDeviceType)
 	{
-	case DEV_HID_MX6Q:*/
-		_chipFamily = MX6Q;
-
-		_chiFamilyName = "MX6Q";
-/*		break;
-	case DEV_HID_MX6D:
-		_chipFamily = MX6D;
-		break;
-	case DEV_HID_MX6SL:
-		_chipFamily = MX6SL;
-		break;
-	case DEV_HID_MX6SX:
-		_chipFamily = MX6SX;
-		break;
-	default:
-		_chipFamily = MX50;
-		break;
+		case DEV_HID_MX6Q:
+			_chipFamily = MX6Q;
+			_chiFamilyName = "MX6Q";
+			break;
+		case DEV_HID_MX6D:
+			_chipFamily = MX6D;
+			break;
+		case DEV_HID_MX6SL:
+			_chipFamily = MX6SL;
+			break;
+		case DEV_HID_MX6SX:
+			_chipFamily = MX6SX;
+			break;
+		case DEV_HID_MX7D:
+			_chipFamily = MX7D;
+			break;
+		default:
+			_chipFamily = MX50;
+			break;
 	}
 
-	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new MxHidDevice[%p]"), this);*/
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new MxHidDevice[%p]"), this);
 }
 
 void MxHidDevice::Reset(DEVINST devInst, CString path)

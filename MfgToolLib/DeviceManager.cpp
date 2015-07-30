@@ -368,7 +368,8 @@ BOOL DeviceManager::InitInstance()
 			case DEV_HID_MX6D:
 			case DEV_HID_MX6SL:
 			case DEV_HID_MX6SX:
-				printf("iterator MX6\n");
+			case DEV_HID_MX7D:
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Found class: MX6/MX7"));
 				pDevClass = new MxHidDeviceClass(m_pLibHandle);
 				if(pDevClass == NULL)
 				{
@@ -734,6 +735,7 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 							case DEV_HID_MX6D:
 							case DEV_HID_MX6SL:
 							case DEV_HID_MX6SX:
+							case DEV_HID_MX7D:
 							case DEV_HID_MX6Q:	//MxHid
 								TRACE(_T("Creating the device \n"));
 								nsInfo = g_devClasses[DeviceClass::DeviceTypeMxHid]->AddUsbDevice(_T(""),(libusb_device*)desc);
@@ -790,6 +792,7 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 								case DEV_HID_MX6D:
 								case DEV_HID_MX6SL:
 								case DEV_HID_MX6SX:
+								case DEV_HID_MX7D:
 								case DEV_HID_MX6Q:	//MxHid
 									{
 										LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceArriveButEnumFailed Exception occurs"));
@@ -869,6 +872,7 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 							case DEV_HID_MX6D:
 							case DEV_HID_MX6SL:
 							case DEV_HID_MX6SX:
+							case DEV_HID_MX7D:
 								nsInfo = g_devClasses[DeviceClass::DeviceTypeMxHid]->RemoveUsbDevice(msg);
 								class_type = DeviceClass::DeviceTypeMxHid;
 								LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
