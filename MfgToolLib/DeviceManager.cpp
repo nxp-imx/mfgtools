@@ -945,14 +945,14 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 
 
 #else
-					libusb_device*** list;
+					libusb_device** list;
 					libusb_device* foundDevice;
-					int numDevices = libusb_get_device_list(NULL, list);
+					int numDevices = libusb_get_device_list(NULL, &list);
 
 					for (int i = 0; i < numDevices; i++)
 					{
 						struct libusb_device_descriptor desc;
-						foundDevice = *list[i];
+						foundDevice = list[i];
 						libusb_get_device_descriptor(foundDevice, &desc);
 						if (desc.idVendor == 0x066f && desc.idProduct == 0x37ff)
 						{
