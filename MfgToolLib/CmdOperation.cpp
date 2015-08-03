@@ -454,6 +454,7 @@ void* CmdListThreadProc(void* pParam)
 	time_t dwTimeout = INFINITE;
 	Device* pDevice = NULL;
 	MX_DEVICE_STATE currentState = MX_DISCONNECTED;
+	MX_DEVICE_STATE lastState;
 	DWORD dwError = MFGLIB_ERROR_SUCCESS;
 	OP_COMMAND_ARRAY CurrentCommands;
 	OP_COMMAND_ARRAY::iterator cmdIt;
@@ -499,6 +500,7 @@ void* CmdListThreadProc(void* pParam)
 						dwTimeout = INFINITE;
 						break;
 					}
+					lastState = currentState;
 
 					currentState = pOperation->GetDeviceState();
 					//	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d] device chagned and reset to state %d"), pOperation->m_WndIndex, currentState);
@@ -510,6 +512,13 @@ void* CmdListThreadProc(void* pParam)
 					//UI_UPDATE_INFORMATION _uiInfo;
 					//pOperation->UpdateUI(&_uiInfo,dwStateIndex);
 
+					if (lastState == MX_UPDATER && currentState == MX_UPDATER)
+					{
+						pOperation->m_bKilled = true;
+						bStateCmdFinished = TRUE;
+						dwTimeout = INFINITE;
+						break;
+					}
 					if(CurrentCommands.size() == 0)
 					{
 						bStateCmdFinished = TRUE;
