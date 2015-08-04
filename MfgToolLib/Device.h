@@ -41,7 +41,7 @@ public:
     };
 
 
-
+	bool FinishState = false;
 	struct libusb_device_handle *m_libusbdevHandle;
 
 	typedef struct NotifyStruct

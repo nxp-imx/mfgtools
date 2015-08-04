@@ -166,7 +166,7 @@ void CCmdOperation::Close()
 {
 	//End CmdListThreadProc
 	SetEvent(m_hKillEvent);
-	pthread_join(m_pThread,NULL);
+	MfgLib_StopOperation(m_pLibHandle, m_pThread);
 
 	DestroyEvent(m_hKillEvent);
 	//m_hKillEvent = NULL;
@@ -514,6 +514,7 @@ void* CmdListThreadProc(void* pParam)
 
 					if (lastState == MX_UPDATER && currentState == MX_UPDATER)
 					{
+						pDevice->FinishState = true;
 						pOperation->m_bKilled = true;
 						bStateCmdFinished = TRUE;
 						dwTimeout = INFINITE;

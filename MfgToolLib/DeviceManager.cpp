@@ -188,7 +188,7 @@ void DeviceManager::Close()
 	//PostThreadMessage(WM_MSG_DEV_EVENT, EVENT_KILL, 0);
 	// Wait for the DeviceManager thread to die before returninga
 	SetEvent(_hKillEvent);
-	pthread_join(m_hThread,NULL);
+	MfgLib_StopOperation(m_pLibHandle, m_hThread);
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Device Manager thread is closed"));
 
 	_bStopped = TRUE;

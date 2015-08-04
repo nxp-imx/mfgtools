@@ -482,6 +482,26 @@ DWORD MfgLib_UninitializeOperation(INSTANCE_HANDLE handle)
 		return MFGLIB_ERROR_NOT_FIND;
 	}
 
+	BOOL bFinished = false;
+	while(!bFinished)
+	{
+		bFinished = true;
+		sleep(3);
+		for (int index = 0; index < pLibVars->g_iMaxBoardNum; index++)
+		{
+			Device* iDevice = ((MFGLIB_VARS *)pLibVars)->g_CmdOperationArray[index]->m_pDevice;
+			if(iDevice)
+			{
+				if (!iDevice->FinishState)
+				{
+					bFinished = false;
+				}
+			}
+			else if (!iDevice && index == 0)
+				bFinished = false;
+		}
+	}
+
 	for(int i=0; i<pLibVars->g_iMaxBoardNum; i++)
 	{
 		DeinitCmdOperation(pLibVars, i);
@@ -1229,7 +1249,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 			}
 
 			strTemp = (*it)->GetAttrValue(_T("address"));
-			printf("address from XML %s \n",strTemp.c_str());
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("address from XML %s \n"), strTemp.c_str());
 			strTemp = ReplaceKeywords(strTemp);
 			((COpCmd_Load*)pOpCmd)->SetAddress(strTemp);
 

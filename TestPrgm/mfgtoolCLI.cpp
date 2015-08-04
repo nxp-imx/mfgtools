@@ -120,13 +120,6 @@ int main (int argc,char* argv[]){
 		return -1;
 	}
 
-
-
-
-	while(1)
-	{
-		sleep(3);
-	}
 	ret=MfgLib_UninitializeOperation(lib);
 	if(ret!=MFGLIB_ERROR_SUCCESS){
 		printf("init op Failed %d\n",ret);
