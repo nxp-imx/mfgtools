@@ -13,6 +13,8 @@ int main (int argc,char* argv[]){
 	std::map<CString, CString> m_uclKeywords;
 	std::map<CString, CString>::const_iterator it;
 
+	printf("Your Options:\n");
+
 	for (int i = 1; i < argc; i++)
 	{
 		if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--setting") == 0)
@@ -22,11 +24,13 @@ int main (int argc,char* argv[]){
 			if (loc == std::string::npos)
 			{
 				m_uclKeywords[*argString] = argv[i+2];
+				std::cout << argString << ": " << argv[i+2] << std::endl;
 				i+=2;
 			}
 			else
 			{
 				m_uclKeywords[argString->substr(0, loc)] = argString->substr(loc + 1, argString->size() - loc);
+				std::cout << argString->substr(0, loc) << ": " << argString->substr(loc + 1, argString->size() - loc) << std::endl;
 				i++;
 			}
 			delete argString;
@@ -138,6 +142,9 @@ int main (int argc,char* argv[]){
 		printf("Uninitialize failed  %d  \n",ret);
 		return -1;
 	}
+
+	printf("Update complete!");
+	
 	return 0;
 
 }
