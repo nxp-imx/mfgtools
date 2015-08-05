@@ -166,7 +166,8 @@ public:
 		MX6D,
 		MX6SL,
 		MX6SX,
-		MX7D
+		MX7D,
+		MX6UL,
     };
 
 	enum HAB_t
