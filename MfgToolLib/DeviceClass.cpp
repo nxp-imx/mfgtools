@@ -566,16 +566,16 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path,libusb_device *
 	SP_DEVINFO_DATA devData;
 	devData.cbSize = sizeof(SP_DEVINFO_DATA);
 
-	printf("Add USB device\n");
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Add USB device\n"));
 	Device *pDevice = CreateDevice(this,devData , _T(""));
-	printf("Create Device %p\n", pDevice);
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Create Device %p\n"), pDevice);
 	int rc=libusb_open(dev,&pDevice->m_libusbdevHandle);
 	pDevice->NotifyOpen();
 	 if (LIBUSB_SUCCESS != rc) {
 	    if(rc==LIBUSB_ERROR_ACCESS){
-		printf("failed to open no access\n");
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("failed to open no access\n"));
 	    }
-	    printf("could not open USB Device\n");
+	    LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("could not open USB Device\n"));
 	    delete pDevice;
 	    return nsInfo;
 	}

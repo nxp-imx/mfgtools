@@ -489,7 +489,6 @@ BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount)
 		while(RegCount > 0)
 		{
 			UINT ByteCntTransfered = (RegCount > MaxHidTransSize) ? MaxHidTransSize : RegCount;
-			printf(" the bytecnt is %d\n",ByteCntTransfered);
 			//ByteCntTransfered = 1025;
 			RegCount -= ByteCntTransfered;
 			if(!SendData(DataBuf, ByteCntTransfered))
@@ -603,7 +602,7 @@ int MxHidDevice::Read(void* _buf, UINT _size)
 	const int interrupt_transfer =  LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN;
 	int ret = libusb_interrupt_transfer(m_libusbdevHandle, interrupt_transfer,(unsigned char *) _buf, _size, &nBytesRead, 10000);
 	if(ret!=0){
-	    printf("read failed with num %d size %d \n",ret,_size);
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("MxHidDevice::Read() Error reading from device 0x%d with size %d."), ret,_size);
 	    return errno;
 	}
 	return ERROR_SUCCESS;
@@ -634,7 +633,6 @@ BOOL MxHidDevice::SendData(const unsigned char * DataBuf, UINT ByteCnt)
 	{
 		return FALSE;
 	}
-	printf(" in SendData the bytecnt is %d\n",ByteCnt);
 	memcpy(m_pWriteReport->Payload, DataBuf, ByteCnt);
 
 	m_pWriteReport->ReportId = REPORT_ID_DATA;
@@ -693,10 +691,8 @@ BOOL MxHidDevice::GetHABType()
 	if ( Read( (UCHAR *)m_pReadReport, 1025 )  != ERROR_SUCCESS)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to read HAB type from ROM!!!"));
-		printf("read HAB failed\n");
 		return FALSE;
 	}
-	printf("read HAB succeeded\n");
 	if ( (*(unsigned int *)(m_pReadReport->Payload) != HabEnabled)  &&
 		 (*(unsigned int *)(m_pReadReport->Payload) != HabDisabled) )
 	{
@@ -709,7 +705,6 @@ BOOL MxHidDevice::GetHABType()
 
 BOOL MxHidDevice::Jump()
 {
-    printf("in jump command %x \n",m_jumpAddr);
 	//Create device handle and report id
     OpenMxHidHandle();
 
@@ -1014,7 +1009,7 @@ BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * 
     SDPCmd.format = 0;
     SDPCmd.data = 0;
     SDPCmd.address = address;
-    printf(" Trans Data address is %x \n",address);
+    LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T(" Trans Data address is %x \n"),address);
 	if(!SendCmd(&SDPCmd))
 		return FALSE;
 

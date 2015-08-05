@@ -378,7 +378,7 @@ typedef struct _INQUIRYDATA {
 #define SCSIOP_PERSISTENT_RESERVE_OUT   0x5F
 
 
-#define TRACE printf
+#define TRACE 
 #define USAGE UINT
 typedef struct _HIDP_CAPS
 {

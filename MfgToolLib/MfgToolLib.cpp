@@ -447,13 +447,10 @@ DWORD MfgLib_InitializeOperation(INSTANCE_HANDLE handle)
 		goto ERROR_END;
 	}
 	//scan devices
-	printf("device Manager done\n");
 	AutoScanDevice(pLibVars, pLibVars->g_iMaxBoardNum);
 	//Initialize command operation object
-	printf("autoscan done\n");
 	for(int i=0; i<pLibVars->g_iMaxBoardNum; i++)
 	{
-		printf(" about to init CMDop\n");
 		error = InitCmdOperation(pLibVars, i);
 		if(error != MFGLIB_ERROR_SUCCESS)
 		{
@@ -1573,7 +1570,6 @@ void COpCmd_Boot::CloseFileMapping()
 
 UINT COpCmd_Boot::ExecuteCommand(int index)
 {
-	printf(" boot cmd execute\n");
 	CString strMsg;
 	strMsg.Format(_T("ExecuteCommand--Boot[WndIndex:%d], File is %s"), index, m_FileName.c_str());
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg.c_str());
@@ -2057,13 +2053,10 @@ DWORD COpCmd_Load::GetFileDataSize()
 void COpCmd_Load::SetAddress(CString &strAddr)
 {
 
-	printf("strAddrLen = %d \n",strAddr.GetLength());
 	if(strAddr.Find(_T("0x")) != -1)
 	{
 		strAddr = strAddr.Right(strAddr.GetLength()-2);
 	}
-	printf("strAddr = %s \n",strAddr.c_str());
-	printf("number equivalent %x \n",(UINT)_tcstoul(LPCTSTR(strAddr), NULL, 16));
 	m_address = (UINT)_tcstoul(LPCTSTR(strAddr), NULL, 16);
 
 }
@@ -2589,14 +2582,12 @@ DWORD InitCmdOperation(MFGLIB_VARS *pLibVars, int WndIndex)
 		delete pLibVars->g_CmdOperationArray[WndIndex];
 		pLibVars->g_CmdOperationArray[WndIndex] = NULL;
 	}
-	printf(" InitCmdOperation about to create new CMDOperation\n");
 	pLibVars->g_CmdOperationArray[WndIndex] = new CCmdOperation((INSTANCE_HANDLE)pLibVars, WndIndex);
 	if(pLibVars->g_CmdOperationArray[WndIndex] == NULL)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Create CCmdOperation[%d] object failed"), WndIndex);
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	printf("created about to open\n");
 	return (pLibVars->g_CmdOperationArray[WndIndex]->Open());
 }
 
@@ -2632,7 +2623,6 @@ DWORD InitDeviceManager(MFGLIB_VARS *pLibVars)
 	{
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
-	printf("DevManager init creation\n");
 	if(g_pDeviceManager == NULL)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Create DeviceManager object failed"));
@@ -2660,9 +2650,7 @@ void AutoScanDevice(MFGLIB_VARS *pLibVars, int iPortUsedNums)
 	BYTE portIndex;
 	CString strPath;
 	CString strFiliter;
-	printf("in AutoScan\n");
 	OP_STATE_ARRAY *pOpStates = GetOpStates(pLibVars);
-	printf(" %p pointer \n",pOpStates);
 	OP_STATE_ARRAY::iterator stateIt = pOpStates->begin();
 	UINT uEnablePorts = 0;
 	// Get the list of the USB Hubs
