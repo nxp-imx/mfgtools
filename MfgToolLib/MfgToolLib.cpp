@@ -480,24 +480,30 @@ DWORD MfgLib_UninitializeOperation(INSTANCE_HANDLE handle)
 	}
 
 	BOOL bFinished = false;
-	while(!bFinished)
+	do	
 	{
 		bFinished = true;
-		sleep(3);
 		for (int index = 0; index < pLibVars->g_iMaxBoardNum; index++)
 		{
-			Device* iDevice = ((MFGLIB_VARS *)pLibVars)->g_CmdOperationArray[index]->m_pDevice;
-			if(iDevice)
+			Device* iDevice;
+			if (((MFGLIB_VARS *)pLibVars)->g_CmdOperationArray[index])
 			{
-				if (!iDevice->FinishState)
+				iDevice = ((MFGLIB_VARS *)pLibVars)->g_CmdOperationArray[index]->m_pDevice;
+				if(iDevice)
 				{
-					bFinished = false;
+					if (!iDevice->FinishState)
+					{
+						bFinished = false;
+					}
 				}
+				else if (!iDevice && index == 0)
+					bFinished = false;
 			}
-			else if (!iDevice && index == 0)
-				bFinished = false;
+			else
+				bFinished = true;
 		}
 	}
+	while(!bFinished && !sleep(3));
 
 	for(int i=0; i<pLibVars->g_iMaxBoardNum; i++)
 	{
