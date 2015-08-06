@@ -1,8 +1,19 @@
 #include <stdio.h>
 #include <string.h>
 #include <cstring>
+#include <fstream>
+#include <string>
 #include "MfgToolLib_Export.h"
 
+void updateUI(OPERATE_RESULT* puiInfo)
+{
+	std::cout << "Command Index: " << puiInfo->cmdIndex << std::endl;
+	std::cout << "Command Info: " << puiInfo->cmdInfo << std::endl;
+	std::cout << "Progress in Command: " << puiInfo->bProgressWithinCommand << std::endl;
+	std::cout << "Done in Command: " << puiInfo->DoneWithinCommand << std::endl;
+	std::cout << "Total in Command: " << puiInfo->TotalWithinCommand << std::endl;
+	return;
+}
 int main (int argc,char* argv[]){
 	INSTANCE_HANDLE lib;
 
@@ -12,6 +23,28 @@ int main (int argc,char* argv[]){
 
 	std::map<CString, CString> m_uclKeywords;
 	std::map<CString, CString>::const_iterator it;
+
+
+	std::ifstream file("cfg.ini");
+	std::string str;
+	int state = 0;
+	while (std::getline(file, str))
+	{
+		if (state == 3)
+		{
+			size_t locBreak = str.find(" ");
+			int strip = 3;
+			if (locBreak == std::string::npos)
+			{
+				locBreak = str.find("=");
+				strip = 1;
+			}
+			m_uclKeywords[str.substr(0, locBreak)] = str.substr(locBreak + strip, str.size() - locBreak);
+		}
+		if (str.compare("[variable]") == 0)
+			state = 3;
+	}
+
 
 	printf("Your Options:\n");
 
@@ -107,6 +140,8 @@ int main (int argc,char* argv[]){
 	infoOp.pOperationInfo = pOpInformation;
 
 
+	printf("Ready to flash.\n");
+
 	ret=MfgLib_InitializeOperation(lib);
 	if(ret!=MFGLIB_ERROR_SUCCESS){
 		printf("init op Failed code# %d \n",ret);
@@ -123,6 +158,8 @@ int main (int argc,char* argv[]){
 		printf("start op Failed code# %d \n",ret);
 		return -1;
 	}
+
+	ret=MfgLib_RegisterCallbackFunction(lib, OperateResult, updateUI);
 
 	ret=MfgLib_UninitializeOperation(lib);
 	if(ret!=MFGLIB_ERROR_SUCCESS){

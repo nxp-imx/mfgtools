@@ -1335,7 +1335,8 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 		strTemp = (*it)->GetAttrValue(_T("body"));
 		strTemp = ReplaceKeywords(strTemp);
 		pOpCmd->SetBodyString(strTemp);
-		//	pOpCmd->SetDescString((*it)->GetText());
+		CString descString = (*it)->GetText();
+		pOpCmd->SetDescString(descString);
 
 		strTemp = (*it)->GetAttrValue(_T("ifdev"));
 		pOpCmd->SetIfDevString(strTemp);
