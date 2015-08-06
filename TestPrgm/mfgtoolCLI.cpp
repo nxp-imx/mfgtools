@@ -3,18 +3,74 @@
 #include <cstring>
 #include <fstream>
 #include <string>
+#include <iomanip>
+#include <sys/ioctl.h>
+#include <unistd.h>
 #include "MfgToolLib_Export.h"
+int TERM_WIDTH = 80;
+int TEXT_WIDTH = 0.4 * TERM_WIDTH;
+int BAR_WIDTH = 0.5 * TERM_WIDTH;
 
+//char curCommand[TEXT_WIDTH] = "Starting";
+//char oldCommand[TEXT_WIDTH];
+std::string curCommand = std::string("Starting");
+std::string oldCommand = std::string("");
+std::string trim(std::string str)
+{
+	size_t first = str.find_first_not_of(' ');
+	size_t last = str.find_last_not_of(' ');
+	if (last > TEXT_WIDTH)
+		last = TEXT_WIDTH - 1;
+	return str.substr(first, (last-first+1));
+}
 void updateUI(OPERATE_RESULT* puiInfo)
 {
-	std::cout << "Command Index: " << puiInfo->cmdIndex << std::endl;
-	std::cout << "Command Info: " << puiInfo->cmdInfo << std::endl;
-	std::cout << "Progress in Command: " << puiInfo->bProgressWithinCommand << std::endl;
-	std::cout << "Done in Command: " << puiInfo->DoneWithinCommand << std::endl;
-	std::cout << "Total in Command: " << puiInfo->TotalWithinCommand << std::endl;
+	struct winsize w;
+	ioctl(0, TIOCGWINSZ, &w);
+	TERM_WIDTH = w.ws_col;
+	TEXT_WIDTH = 0.4 * TERM_WIDTH;
+	BAR_WIDTH = 0.4 * TERM_WIDTH;
+	std::string cmdInfo = std::string(puiInfo->cmdInfo);
+	if (!cmdInfo.empty())
+	{
+		cmdInfo = trim(cmdInfo);
+		oldCommand = std::string(curCommand);
+		curCommand = std::string(cmdInfo);
+	}
+	if (oldCommand.compare(curCommand) != 0)
+	{
+		std::cout << "\r" << std::setw(TEXT_WIDTH) << oldCommand << " [";
+		for (int i = 0; i < BAR_WIDTH; i++)
+		{
+			std::cout << "=";
+		}
+		std::cout << ">] Done!" << std::endl;
+	}
+	else
+	{
+		std::cout << "\r" << std::setw(TEXT_WIDTH) << oldCommand << " [";
+		float percentage = (float) puiInfo->DoneWithinCommand / puiInfo->TotalWithinCommand;
+		int bars = percentage * (float) BAR_WIDTH;
+		for (int i = 0; i < bars; i ++)
+		{
+			std::cout << "=";
+		}
+		std::cout << ">";
+		for (int i = 0; i < BAR_WIDTH - bars; i++)
+		{
+			std::cout << " ";
+		}
+		std::cout << "]";
+	}
+	std::cout.flush();
 	return;
 }
 int main (int argc,char* argv[]){
+	struct winsize w;
+	ioctl(0, TIOCGWINSZ, &w);
+	TERM_WIDTH = w.ws_col;
+	TEXT_WIDTH = 0.4 * TERM_WIDTH;
+	BAR_WIDTH = 0.4 * TERM_WIDTH;
 	INSTANCE_HANDLE lib;
 
 	char * newpath;
@@ -179,9 +235,5 @@ int main (int argc,char* argv[]){
 		printf("Uninitialize failed  %d  \n",ret);
 		return -1;
 	}
-
-	printf("Update complete!");
-	
 	return 0;
-
 }
