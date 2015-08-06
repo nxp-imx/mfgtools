@@ -310,7 +310,7 @@ DWORD MfgLib_SetProfilePath(INSTANCE_HANDLE handle, BYTE_t* newpath)
 #ifdef __linux__
 	theApp->m_strDllFullPath = (char*)newpath;
 #else
-	theApp.m_strDllFullPath = newpath;
+	theApp->m_strDllFullPath = newpath;
 #endif
 	return MFGLIB_ERROR_SUCCESS;
 }

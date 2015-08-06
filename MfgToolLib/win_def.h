@@ -15,14 +15,23 @@
 #include <cerrno>
 #include <math.h>
 #include <wchar.h>
-//#include "sched.h"
-//#include "semaphore.h"
-//#include "pthread.h"
+#include "sched.h"
+#include "semaphore.h"
+#include "pthread.h"
 #include <limits>
 #include <time.h>
 #include <cstdio>
-
+#include <cfgmgr32.h>
+#include <stdint.h>
+#include <initguid.h>
+#include <devguid.h>
+#include <usbiodef.h>
+#include <usbioctl.h>
+#include <SetupAPI.h>
+#include <Dbt.h>
 #include "CString.h"
+#include <libusb.h>
+
 #ifdef DEBUG
 #define ASSERT assert
 #else
@@ -31,7 +40,33 @@
 
 
 #define TRACE 1? 0: _tprintf
+#define libusbVolume Volume
+#define TRACE 1? 0: _tprintf
+#define sleep(x) Sleep(x)
 
+//definitions from scsi.h that are defined here so they don't use _CDB namespace - parallels lnx_def.h
+struct _CDB6INQUIRY {
+	UCHAR OperationCode;    // 0x12 - SCSIOP_INQUIRY
+	UCHAR Reserved1 : 5;
+	UCHAR LogicalUnitNumber : 3;
+	UCHAR PageCode;
+	UCHAR IReserved;
+	UCHAR AllocationLength;
+	UCHAR Control;
+} CDB6INQUIRY;
+
+struct _CDB12 {
+	UCHAR OperationCode;
+	UCHAR RelativeAddress : 1;
+	UCHAR Reserved1 : 2;
+	UCHAR ForceUnitAccess : 1;
+	UCHAR DisablePageOut : 1;
+	UCHAR LogicalUnitNumber : 3;
+	UCHAR LogicalBlock[4];
+	UCHAR TransferLength[4];
+	UCHAR Reserved2;
+	UCHAR Control;
+} CDB12;
 #if 0
 
 #ifndef FALSE
@@ -70,6 +105,9 @@ struct thread_msg{
 
 
 };
+
+int gettimeofday(struct timeval *, void* n = nullptr);
+
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
 #define DELTA_EPOCH_IN_MICROSECS  116444736000000000Ui64 // CORRECT
 #else

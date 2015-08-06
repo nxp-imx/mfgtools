@@ -140,7 +140,8 @@ public:
 			return str;
 		}
 	};
-
+	
+	#pragma pack (push, 1)
 	typedef struct _SDPCmd
 	{
         short command;
@@ -148,7 +149,8 @@ public:
         uint32_t address;
         uint32_t dataCount;
         uint32_t data;
-	} __attribute__ ((__packed__)) SDPCmd, * PSDPCmd;
+	}  SDPCmd, * PSDPCmd;
+	#pragma pack (pop)
 
 	#pragma pack(1)
     typedef struct _MX_HID_DATA_REPORT

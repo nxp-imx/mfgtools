@@ -19,12 +19,14 @@ class CTString :public std::string
 #endif
 
 {
+#ifdef __linux__
 #define _vsntprintf vsnprintf
 #define _tcsnicmp strncasecmp
 #define _tcslen strlen
-
+#define _T(x) x
+#endif
 public: CTString() : tstring() { }
-		#define _T(x) x
+		
 		CTString(const tstring& s) : tstring(s) { }
 		CTString(const tstring& s, std::size_t n) : tstring(s, n) { }
 		CTString(const T * s, std::size_t n) : tstring(s, n) { }

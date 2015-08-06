@@ -9,9 +9,12 @@
 #pragma once
 
 #include "MfgToolLib_Export.h"
-#include "libusbVolume.h"
 #include "UpdateTransportProtocol.Api.h"
-
+#ifdef __linux__
+#include "libusbVolume.h"
+#else
+#include "Volume.h"
+#endif
 //only for debug
 //extern LARGE_INTEGER g_t1, g_t2, g_t3, g_tc;
 #if 0
@@ -838,6 +841,10 @@ class UpdateTransportProtocol
 
 				cmd.Replace(_T("@FILESIZE"), sfileSize);
 			}
+
+			WriteTransaction transaction(this, cmd, filename);
+			if (transaction.GetTotalSize() == 0)
+				return ERROR_OPEN_FAILED;
 			// When the data is transfering,the app will crash if pull away the USB connection crab.
 			// Because the DEVICE_REMOVAL_EVT will come and the operation will be done "_devices.erase(device)" when the USB cable is pulled.
 			// And m_pUtpDevice will be erased too.So all operation related to m_pUtpDevice will fail.

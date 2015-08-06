@@ -48,7 +48,7 @@ class Volume : public Device
 #pragma pack (push, 1)
 		struct _NT_SCSI_REQUEST
 		{
-#if 0
+#ifndef __linux__
 			SCSI_PASS_THROUGH PassThrough;	//should include "ntddscsi.h"
 #endif
 			__int64          Tag;

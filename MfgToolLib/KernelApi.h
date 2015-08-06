@@ -17,7 +17,7 @@
 
 class KernelApi
 {
-#if 0
+#ifndef __linux__
 	typedef BOOL (WINAPI *PGetVolumeNameForVolumeMountPointA)(
 		LPCSTR lpszVolumeMountPoint,
 		LPSTR lpszVolumeName,
@@ -30,7 +30,7 @@ class KernelApi
 #endif
 	HMODULE hModuleKernel32;
     bool available;
-#if 0
+#ifndef __linux__
 	PGetVolumeNameForVolumeMountPointA GetVolumeNameForVolumeMountPointA;
 
 #if defined(UNICODE)

@@ -122,6 +122,7 @@ DWORD DeviceManager::Open(){
 	sem_init(&msgs,0,0);
 	libusb_hotplug_callback_handle handle;
 	int rc;
+	#ifdef __linux__ //libusb_hotplug is only available on linux
 	rc = libusb_hotplug_register_callback(NULL,(libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT), (libusb_hotplug_flag)0,LIBUSB_HOTPLUG_MATCH_ANY,LIBUSB_HOTPLUG_MATCH_ANY,LIBUSB_HOTPLUG_MATCH_ANY,DevChange_callback, this,&handle);
 
 	if (LIBUSB_SUCCESS != rc) {
@@ -129,7 +130,7 @@ DWORD DeviceManager::Open(){
 		libusb_exit(NULL);
 		return MFGLIB_ERROR_DEV_MANAGER_RUN_FAILED;
 	}
-
+	#endif
 	rc = pthread_create(&usbThread, NULL, UsbProcEvents, this);
 	if(rc!=0){
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("usb Thread Fail\n"));

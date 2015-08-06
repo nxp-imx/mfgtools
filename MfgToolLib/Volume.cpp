@@ -153,11 +153,10 @@ int Volume::diskNumber::get()
 			{
 				Value = driveNumber.DeviceNumber;
 			}
-		}
-	}
 
 #endif
-}}
+		}
+	}
 return Value;
 }
 
