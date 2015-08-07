@@ -118,7 +118,7 @@ int usb::Hub::CreatePorts()
     DWORD error = ERROR_SUCCESS;
 
     HANDLE hHub = Open();
-    if ( hHub == (unsigned long)INVALID_HANDLE_VALUE )
+    if ( hHub == INVALID_HANDLE_VALUE )
     {
         // Probably not a port. We had to look at all USB devices in order to get all hubs. If it
         // fails to open or doesn't have any ports, we don't create a usb::Hub device.

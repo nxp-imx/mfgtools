@@ -243,7 +243,7 @@ HANDLE Volume::Lock(LockType lockType)
 		else
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("*** Volume::Lock - FAILED"));
-			return (unsigned long)INVALID_HANDLE_VALUE;
+			return INVALID_HANDLE_VALUE;
 		}
 	}
 	else

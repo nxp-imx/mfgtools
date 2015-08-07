@@ -426,10 +426,10 @@ int DeviceManager::ExitInstance()
 	g_devClasses.clear();
 
 	// Messaging support
-	if ( _hUsbDev != (long)INVALID_HANDLE_VALUE )
+	if ( _hUsbDev != INVALID_HANDLE_VALUE )
 		_hUsbDev=_hUsbDev;
 	// UnregisterDeviceNotification(_hUsbDev);
-	if ( _hUsbHub != (long)INVALID_HANDLE_VALUE )
+	if ( _hUsbHub != INVALID_HANDLE_VALUE )
 		_hUsbHub=_hUsbHub;
 	// UnregisterDeviceNotification(_hUsbHub);
 

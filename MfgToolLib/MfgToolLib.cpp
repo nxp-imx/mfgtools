@@ -283,7 +283,7 @@ DWORD MfgLib_SetProfileName(INSTANCE_HANDLE handle, BYTE_t *strName)
 		return MFGLIB_ERROR_INVALID_PARAM;
 	}
 
-	pLibVars->g_CfgParam.chip = (char *)strName;
+	pLibVars->g_CfgParam.chip = strName;
 	pLibVars->g_strUclFilename = theApp->m_strDllFullPath + _T("Profiles") + _T("/") + pLibVars->g_CfgParam.chip + _T("/") + _T("OS\ Firmware") + _T("/") + DEFAULT_UCL_XML_FILE_NAME;
 
 	return MFGLIB_ERROR_SUCCESS;
@@ -334,7 +334,7 @@ DWORD MfgLib_SetListName(INSTANCE_HANDLE handle, BYTE_t *strName)
 		return MFGLIB_ERROR_INVALID_PARAM;
 	}
 
-	pLibVars->g_CfgParam.list = (char *) strName;
+	pLibVars->g_CfgParam.list =  strName;
 
 	return MFGLIB_ERROR_SUCCESS;
 }
@@ -366,7 +366,7 @@ DWORD MfgLib_SetUCLFile(INSTANCE_HANDLE handle, BYTE_t *strName)
 	pLibVars->g_strUclFilename.append(_T("\\"));
 	pLibVars->g_strUclFilename.append(_T("OS Firmware"));
 	pLibVars->g_strUclFilename.append(_T("\\"));
-	pLibVars->g_strUclFilename.append((const char *)strName);
+	pLibVars->g_strUclFilename.append(strName);
 
 
 
@@ -660,11 +660,11 @@ DWORD MfgLib_GetOperationInformation(INSTANCE_HANDLE handle, OPERATIONS_INFORMAT
 
 		pInfo->bConnected = pLibVars->g_PortDevInfoArray[i].m_bConnected;
 		pInfo->PortIndex = pLibVars->g_PortDevInfoArray[i].portIndex;
-		_tcscpy((char *)pInfo->HubName, pLibVars->g_PortDevInfoArray[i].hubPath.GetBuffer());
+		_tcscpy(pInfo->HubName, pLibVars->g_PortDevInfoArray[i].hubPath.GetBuffer());
 		pLibVars->g_PortDevInfoArray[i].hubPath.ReleaseBuffer();
 		//_tcscpy(pInfo->DeviceDesc, g_PortDevInfoArray[i].DeviceDesc.GetBuffer());
 		//g_PortDevInfoArray[i].DeviceDesc.ReleaseBuffer();
-		GetCurrentDeviceDesc(pLibVars, i,(char *) pInfo->DeviceDesc, MAX_CHAR_NUMBERS);
+		GetCurrentDeviceDesc(pLibVars, i, pInfo->DeviceDesc, MAX_CHAR_NUMBERS);
 		pInfo->HubIndex = pLibVars->g_PortDevInfoArray[i].hubIndex;
 		if(pInfo->bConnected)
 		{
@@ -720,7 +720,7 @@ DWORD MfgLib_GetPhaseInformation(INSTANCE_HANDLE handle, PHASES_INFORMATION *pPh
 	for(int i=0; i<(int)(pOpStates->size()); i++)
 	{
 		pPhase = pOpStates->at(i);
-		_tcscpy((char *)pInfo->szName, pPhase->strStateName.GetBuffer());
+		_tcscpy(pInfo->szName, pPhase->strStateName.GetBuffer());
 		pPhase->strStateName.ReleaseBuffer();
 		//pInfo->relativedState = pPhase->opState;
 		pInfo->index = (int)(pPhase->opState);
@@ -866,7 +866,7 @@ DWORD MfgLib_GetLibraryVersion(BYTE_t* version, int maxSize)
 	{
 		return MFGLIB_ERROR_SIZE_IS_SMALL;
 	}
-	_tcscpy((char *)version, strTemp.GetBuffer());
+	_tcscpy(version, strTemp.GetBuffer());
 	strTemp.ReleaseBuffer();
 
 	return MFGLIB_ERROR_SUCCESS;
@@ -923,7 +923,7 @@ void LogMsg(DWORD moduleID, DWORD levelID, const TCHAR * format, ... )
 	va_start(args, format);
 	len = _vsctprintf(format, args)+1;
 	buffer = (TCHAR*)malloc(len*sizeof(TCHAR));
-	std::vsnprintf(buffer,len, format, args);
+	_vsntprintf(buffer,len, format, args);
 	va_end(args);
 
 	CString str;

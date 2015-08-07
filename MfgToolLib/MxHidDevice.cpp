@@ -36,7 +36,7 @@ DWORD EndianSwap(DWORD x)
 MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle)
 : Device(deviceClass, devInst, path, handle)
 {
-	m_hid_drive_handle = (unsigned long)INVALID_HANDLE_VALUE;
+	m_hid_drive_handle = INVALID_HANDLE_VALUE;
     //m_sync_event_tx = NULL;
     //m_sync_event_rx = NULL;
     m_pReadReport = NULL;
@@ -417,10 +417,10 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 #endif
 BOOL MxHidDevice::CloseMxHidHandle()
 {
-	if( m_hid_drive_handle != (unsigned long)INVALID_HANDLE_VALUE)
+	if( m_hid_drive_handle != INVALID_HANDLE_VALUE)
     {
 //        CloseHandle(m_hid_drive_handle);
-        m_hid_drive_handle = (unsigned long)INVALID_HANDLE_VALUE;
+        m_hid_drive_handle = INVALID_HANDLE_VALUE;
     }
 
     FreeIoBuffers();

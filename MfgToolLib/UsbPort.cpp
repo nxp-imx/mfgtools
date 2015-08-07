@@ -90,7 +90,7 @@ DWORD usb::Port::Refresh()
 	//WaitForSingleObject(m_Mtx, INFINITE);
     // Open hub
     HANDLE hHub = _parentHub->Open();
-    if ( hHub == (unsigned long)INVALID_HANDLE_VALUE )
+    if ( hHub == INVALID_HANDLE_VALUE )
     {
         error=GetLastError();
 //        ATLTRACE(_T("*** ERROR1 0x%X (%d): usb::Port::Refresh() hub: %d port:%d\n"), error, error, _parentHub->_index.get(), _index.get());

@@ -57,7 +57,7 @@ DWORD usb::Controller::Initialize()
     _rootHubFilename.put(_T(""));
 
     HANDLE hController = Open();
-    if( hController == (unsigned long)INVALID_HANDLE_VALUE )
+    if( hController == INVALID_HANDLE_VALUE )
     {
         errorCode = GetLastError();
         return errorCode;

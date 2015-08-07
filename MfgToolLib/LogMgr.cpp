@@ -70,7 +70,7 @@ void CMfgLogMgr::PrintLog(DWORD moduleID, DWORD levelID, const TCHAR * format, .
 	va_start(args, format);
 	len = _vsctprintf(format, args)+1;
 	buffer = (TCHAR*)malloc(len*sizeof(TCHAR));
-	std::vsnprintf(buffer,len, format, args);
+	_vsntprintf(buffer,len, format, args);
 	va_end(args);
 
 	CString str;
