@@ -880,7 +880,7 @@ class UpdateTransportProtocol
 			//        Utils.ByteFormatConverter byteConverter = new Utils.ByteFormatConverter();
 			//	m_pPortMgrDlg->UpdateUI(NULL, m_iPercentComplete, (int)myNewFwCommandSupport.GetFwComponent().size(), 0);       // STAGE 2 of the Load Operation
 			Device::NotifyStruct cmdProgress(_T("UtpWrite"), Device::NotifyStruct::dataDir_ToDevice, (UINT)transaction.GetTotalSize());
-			cmdProgress.status.Format(_T(" UtpWrite(%s, %s) tag:%d totalSize:%d"),cmd, filename, transaction.GetTag(), transaction.GetTotalSize());
+			cmdProgress.status.Format(_T(" UtpWrite(%s, %s) tag:%d totalSize:%d"), (TCHAR*)cmd, (TCHAR*) filename, transaction.GetTag(), transaction.GetTotalSize());
 			cmdProgress.error = ERROR_SUCCESS;
 			//		((Volume*)m_pUtpDevice)->Notify(cmdProgress);
 			cmdProgress.maximum = (UINT)transaction.GetTotalSize();

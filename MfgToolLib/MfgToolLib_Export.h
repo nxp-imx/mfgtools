@@ -53,7 +53,7 @@
 /************************************************************
  * Type definition
  ************************************************************/
-#ifdef  USE_UNICODE
+#ifndef __linux__ 
 typedef wchar_t CHAR_t;
 typedef wchar_t BYTE_t;
 #else
