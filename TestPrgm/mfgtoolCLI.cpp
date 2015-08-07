@@ -73,7 +73,9 @@ int main (int argc,char* argv[]){
 	BAR_WIDTH = 0.4 * TERM_WIDTH;
 	INSTANCE_HANDLE lib;
 
-	char * newpath;
+	char * newpath = ".";
+	char * mylist = "SabreSD";
+	char * myprofile = "Linux";
 	int hasnewpath = 0;
 
 
@@ -82,11 +84,11 @@ int main (int argc,char* argv[]){
 
 
 	std::ifstream file("cfg.ini");
-	std::string str;
-	int state = 0;
-	while (std::getline(file, str))
+	if (file)
 	{
-		if (state == 3)
+		std::string str;
+		int state = 0;
+		while (std::getline(file, str))
 		{
 			size_t locBreak = str.find(" ");
 			int strip = 3;
@@ -95,10 +97,28 @@ int main (int argc,char* argv[]){
 				locBreak = str.find("=");
 				strip = 1;
 			}
-			m_uclKeywords[str.substr(0, locBreak)] = str.substr(locBreak + strip, str.size() - locBreak);
+			if (str.find("=") != std::string::npos)
+			{
+				switch (state)
+				{
+					case 0:
+						myprofile = std::string(str.substr(locBreak + strip, str.size() - locBreak)).data();
+					case 1:
+					case 2:
+						mylist = std::string(str.substr(locBreak + strip, str.size() - locBreak)).data();
+					case 3:
+						m_uclKeywords[str.substr(0, locBreak)] = str.substr(locBreak + strip, str.size() - locBreak);
+				}
+			}
+			if (str.compare("[profiles]") == 0)
+				state = 0;
+			else if (str.compare("[platform]") == 0)
+				state = 1;
+			else if (str.compare("[LIST]") == 0)
+				state = 2;
+			else if (str.compare("[variable]") == 0)
+				state = 3;
 		}
-		if (str.compare("[variable]") == 0)
-			state = 3;
 	}
 
 
@@ -130,12 +150,17 @@ int main (int argc,char* argv[]){
 			newpath = argv[i+1];
 			i++;
 		}
+		else if (strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--list") == 0)
+		{
+			mylist = argv[i+1];
+		}
 		else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
 		{
-			printf("Usage: [program] [arguments] [settings]=[values]\n");
-			printf("  -s  --setting		Specify any UCL keywords.\n");
-			printf("	-p	--profile		Specify path to Profiles directory.\n");
-			printf("  -h  --help      Display this help information.\n");
+			std::cout << "Usage: [program] [arguments] [settings]=[values]" << std::endl;
+			std::cout << std::setw(10) << "-s" << "  --setting   " << "Specify any UCL keywords." << std::endl;
+			std::cout << std::setw(10) << "-p" << "  --profile   " << "Specify path to Profiles directory." << std::endl;
+			std::cout << std::setw(10) << "-l" << "  --list      " << "Specify command list." << std::endl;
+			std::cout << std::setw(10) << "-h" << "  --help      " << "Display this help information." << std::endl;
 			exit(EXIT_SUCCESS);
 		}
 	}
@@ -166,13 +191,13 @@ int main (int argc,char* argv[]){
 		ret = MfgLib_SetProfilePath(lib, (BYTE_t *) newpath);
 
 	//set profile and list
-	ret = MfgLib_SetProfileName(lib,(BYTE_t *) _T("Linux"));
+	ret = MfgLib_SetProfileName(lib,(BYTE_t *) myprofile);
 	if(ret != MFGLIB_ERROR_SUCCESS)
 	{
 		printf(_T("Set Profile name failed\n"));
 		return -1;
 	}
-	ret = MfgLib_SetListName(lib, (BYTE_t *) _T("SDCard"));
+	ret = MfgLib_SetListName(lib, (BYTE_t *) mylist);
 	if(ret != MFGLIB_ERROR_SUCCESS)
 	{
 		printf(_T("Set List name failed\n"));
