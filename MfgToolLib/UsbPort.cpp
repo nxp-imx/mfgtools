@@ -30,15 +30,15 @@ usb::Port::Port(usb::Hub* pHub, int index)
     _isHub.describe(this, _T("Device is hub"));
 
     // typedef enum _USB_CONNECTION_STATUS from usbioctl.h
-    _connected.ValueList[NoDeviceConnected]        = "NoDeviceConnected";
-    _connected.ValueList[DeviceConnected]          = "DeviceConnected";
-    _connected.ValueList[DeviceFailedEnumeration]  = "DeviceFailedEnumeration";
-    _connected.ValueList[DeviceGeneralFailure]     = "DeviceGeneralFailure";
-    _connected.ValueList[DeviceCausedOvercurrent]  = "DeviceCausedOvercurrent";
-    _connected.ValueList[DeviceNotEnoughPower]     = "DeviceNotEnoughPower";
-    _connected.ValueList[DeviceNotEnoughBandwidth] = "DeviceNotEnoughBandwidth";
-    _connected.ValueList[DeviceHubNestedTooDeeply] = "DeviceHubNestedTooDeeply";
-    _connected.ValueList[DeviceInLegacyHub]        = "DeviceInLegacyHub";
+    _connected.ValueList[NoDeviceConnected]        = _T("NoDeviceConnected");
+    _connected.ValueList[DeviceConnected]          = _T("DeviceConnected");
+    _connected.ValueList[DeviceFailedEnumeration]  = _T("DeviceFailedEnumeration");
+    _connected.ValueList[DeviceGeneralFailure]     = _T("DeviceGeneralFailure");
+    _connected.ValueList[DeviceCausedOvercurrent]  = _T("DeviceCausedOvercurrent");
+    _connected.ValueList[DeviceNotEnoughPower]     = _T("DeviceNotEnoughPower");
+    _connected.ValueList[DeviceNotEnoughBandwidth] = _T("DeviceNotEnoughBandwidth");
+    _connected.ValueList[DeviceHubNestedTooDeeply] = _T("DeviceHubNestedTooDeeply");
+    _connected.ValueList[DeviceInLegacyHub]        = _T("DeviceInLegacyHub");
 
 	_WndIndex = -1;
 

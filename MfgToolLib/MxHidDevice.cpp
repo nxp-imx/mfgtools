@@ -85,7 +85,7 @@ void MxHidDevice::NotifyOpen()
 	{
 		case DEV_HID_MX6Q:
 			_chipFamily = MX6Q;
-			_chiFamilyName = "MX6Q";
+			_chiFamilyName = _T("MX6Q");
 			break;
 		case DEV_HID_MX6D:
 			_chipFamily = MX6D;

@@ -116,7 +116,7 @@ BOOL CMfgToolLibApp::InitInstance()
 	//::GetModuleFileName(AfxGetStaticModuleState()->m_hCurrentInstanceHandle, _path, MAX_PATH);
 
 	m_strDllFullPath=_path;
-	m_strDllFullPath.append("/");
+	m_strDllFullPath.append(_T("/"));
 
 	g_pLogMgr = NULL;
 	g_hOneInstance = NULL;

@@ -632,7 +632,7 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 	void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 	{
 		struct libusb_device_descriptor descObj;
-		CString msg = "";//(LPCTSTR)desc;
+		CString msg = _T("");//(LPCTSTR)desc;
 		(void)libusb_get_device_descriptor((libusb_device*)desc, &descObj);
 
 		// SysFreeString((BSTR)desc);

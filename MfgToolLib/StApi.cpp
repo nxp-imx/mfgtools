@@ -77,16 +77,16 @@ int StApi::SetCommandData(const UCHAR * const pData, const size_t size)
 //////////////////////////////////////////////////////////////////////
 StApiFactory::StApiFactory()
 {
-	RegisterApi("HidInquiry", HidInquiry::Create);
-	RegisterApi("HidDownloadFw", HidDownloadFw::Create);
-	RegisterApi("HidBltcRequestSense", HidBltcRequestSense::Create);
-	RegisterApi("HidDeviceReset", HidDeviceReset::Create);
-	RegisterApi("HidDevicePowerDown", HidDevicePowerDown::Create);
-	RegisterApi("HidTestUnitReady", HidTestUnitReady::Create);
-	RegisterApi("HidPitcRequestSense", HidPitcRequestSense::Create);
-	RegisterApi("HidPitcInquiry", HidPitcInquiry::Create);
-	RegisterApi("HidPitcRead", HidPitcRead::Create);
-	RegisterApi("HidPitcWrite", HidPitcWrite::Create);
+	RegisterApi(_T("HidInquiry"), HidInquiry::Create);
+	RegisterApi(_T("HidDownloadFw"), HidDownloadFw::Create);
+	RegisterApi(_T("HidBltcRequestSense"), HidBltcRequestSense::Create);
+	RegisterApi(_T("HidDeviceReset"), HidDeviceReset::Create);
+	RegisterApi(_T("HidDevicePowerDown"), HidDevicePowerDown::Create);
+	RegisterApi(_T("HidTestUnitReady"), HidTestUnitReady::Create);
+	RegisterApi(_T("HidPitcRequestSense"), HidPitcRequestSense::Create);
+	RegisterApi(_T("HidPitcInquiry"), HidPitcInquiry::Create);
+	RegisterApi(_T("HidPitcRead"), HidPitcRead::Create);
+	RegisterApi(_T("HidPitcWrite"), HidPitcWrite::Create);
 /*	RegisterApi("HidInquiry", HidInquiry::Create);
 	RegisterApi("HidInquiry", HidInquiry::Create);
 	RegisterApi("HidInquiry", HidInquiry::Create);

@@ -27,7 +27,7 @@
 class CMfgLogMgr
 {
 	public:
-		CMfgLogMgr(CString strFilename = "MfgToolLibLog.txt");
+		CMfgLogMgr(CString strFilename = _T("MfgToolLibLog.txt"));
 		~CMfgLogMgr();
 
 		void PrintLog(DWORD moduleID, DWORD levelID, const TCHAR * format, ... );

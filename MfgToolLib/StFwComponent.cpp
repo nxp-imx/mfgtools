@@ -92,7 +92,7 @@ void StFwComponent::clear()
 
 const CString StFwComponent::GetShortFileName() const
 {
-	TCHAR fname[_MAX_FNAME]="";
+	TCHAR fname[_MAX_FNAME] = _T("");
 	TCHAR ext[_MAX_EXT];
 	CString shortName;
 #if 0

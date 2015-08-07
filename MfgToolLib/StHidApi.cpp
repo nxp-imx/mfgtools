@@ -28,12 +28,12 @@ HidInquiry::HidInquiry(CString& paramStr)
 	, _secConfigStatus(0)
 {
 	// ;param: InfoPage:InfoPage_Chip, InfoPage_PitcStatus, InfoPage_secConfig
-	_params["InfoPage:"]                    = &_infoPage;
-	_infoPage.ValueList[InfoPage_Chip]       = "InfoPage_Chip";
-	_infoPage.ValueList[InfoPage_PitcStatus] = "InfoPage_PitcStatus";
-	_infoPage.ValueList[InfoPage_secConfig]  = "InfoPage_secConfig";
+	_params[_T("InfoPage:")]                    = &_infoPage;
+	_infoPage.ValueList[InfoPage_Chip]       = _T("InfoPage_Chip");
+	_infoPage.ValueList[InfoPage_PitcStatus] = _T("InfoPage_PitcStatus");
+	_infoPage.ValueList[InfoPage_secConfig]  = _T("InfoPage_secConfig");
 	// ;param: InfoParam:0xAABBCCDD
-	_params["InfoParam:"]                    = &_infoParam;
+	_params[_T("InfoParam:")]                    = &_infoParam;
 
     int ret = ParseParameterString(paramStr, _params);
 
@@ -46,18 +46,18 @@ HidInquiry::HidInquiry(const UCHAR infoPage, const UINT infoParam)
 	, _secConfigStatus(0)
 {
 	// ;param: InfoPage:InfoPage_Chip, InfoPage_PitcStatus, InfoPage_secConfig
-	_params["InfoPage:"]                    = &_infoPage;
+	_params[_T("InfoPage:")]                 = &_infoPage;
 
-	_infoPage.Desc = "InfoPage";
-	_infoPage.ValueList[0] = "Reserved";
-	_infoPage.ValueList[InfoPage_Chip]       = "InfoPage_Chip";
-	_infoPage.ValueList[InfoPage_PitcStatus] = "InfoPage_PitcStatus";
-	_infoPage.ValueList[InfoPage_secConfig]  = "InfoPage_secConfig";
+	_infoPage.Desc							 = _T("InfoPage");
+	_infoPage.ValueList[0]					 = _T("Reserved");
+	_infoPage.ValueList[InfoPage_Chip]       = _T("InfoPage_Chip");
+	_infoPage.ValueList[InfoPage_PitcStatus] = _T("InfoPage_PitcStatus");
+	_infoPage.ValueList[InfoPage_secConfig]  = _T("InfoPage_secConfig");
 	// ;param: InfoParam:0xAABBCCDD
-	_params["InfoParam:"]                    = &_infoParam;
+	_params[_T("InfoParam:")]                = &_infoParam;
 
-	_infoParam.ValueList[0] = "InfoParam";
-	_infoParam.Desc = "InfoParam";
+	_infoParam.ValueList[0] = _T("InfoParam");
+	_infoParam.Desc = _T("InfoParam");
 
 	_infoPage.Value = _infoPage.Default = infoPage;
 	_infoParam.Value = _infoParam.Default = infoParam;
@@ -498,14 +498,14 @@ HidPitcInquiry::HidPitcInquiry(const UCHAR infoPage, const UINT infoParam)
     , _persistentInfo()
 {
 	// ;param: InfoPage:InfoPage_Pitc,InfoPage_PitcSense,InfoPage_OtpReg
-	_params["InfoPage:"] = &_infoPage;
+	_params[_T("InfoPage:")] = &_infoPage;
     _infoPage.Value = infoPage;
-	_infoPage.ValueList[InfoPage_Pitc]   = "InfoPage_Pitc";
-	_infoPage.ValueList[InfoPage_PitcSense]   = "InfoPage_PitcSense";
-	_infoPage.ValueList[InfoPage_OtpReg] = "InfoPage_OtpReg";
+	_infoPage.ValueList[InfoPage_Pitc] = _T("InfoPage_Pitc");
+	_infoPage.ValueList[InfoPage_PitcSense] = _T("InfoPage_PitcSense");
+	_infoPage.ValueList[InfoPage_OtpReg] = _T("InfoPage_OtpReg");
 
     // ;param: InfoParam:0xAABBCCDD
-    _params["InfoParam:"] = &_infoParam;
+	_params[_T("InfoParam:")] = &_infoParam;
     _infoParam.Value = infoParam;
 
     PrepareCommand();
@@ -524,14 +524,14 @@ HidPitcInquiry::HidPitcInquiry(CString& paramStr)
     , _persistentInfo()
 {
 	// ;param: InfoPage:InfoPage_Pitc,InfoPage_PitcSense,InfoPage_OtpReg,InfoPage_PersistentReg
-	_params["InfoPage:"] = &_infoPage;
-	_infoPage.ValueList[InfoPage_Pitc]   = "InfoPage_Pitc";
-	_infoPage.ValueList[InfoPage_PitcSense]   = "InfoPage_PitcSense";
-	_infoPage.ValueList[InfoPage_OtpReg] = "InfoPage_OtpReg";
-	_infoPage.ValueList[InfoPage_PersistentReg] = "InfoPage_PersistentReg";
+	_params[_T("InfoPage:")] = &_infoPage;
+	_infoPage.ValueList[InfoPage_Pitc]   = _T("InfoPage_Pitc");
+	_infoPage.ValueList[InfoPage_PitcSense] = _T("InfoPage_PitcSense");
+	_infoPage.ValueList[InfoPage_OtpReg] = _T("InfoPage_OtpReg");
+	_infoPage.ValueList[InfoPage_PersistentReg] = _T("InfoPage_PersistentReg");
 
     // ;param: InfoParam:0xAABBCCDD
-    _params["InfoParam:"] = &_infoParam;
+	_params[_T("InfoParam:")] = &_infoParam;
 
 	int ret = ParseParameterString(paramStr, _params);
 
@@ -746,10 +746,10 @@ const UINT HidPitcInquiry::GetPersistentRegValue() const
 HidPitcRead::HidPitcRead(const UINT address, const UINT length, const UINT flags, const UINT dataSize)
 : StApiT<_ST_HID_CDB::_CDBHIDREADWRITE>(API_TYPE_PITC, ST_READ_CMD, _T("Read"))
 {
-    _params["Address:"] = &_address;
-    _params["Length:"] = &_length;
-    _params["Flags:"] = &_flags;
-    _params["DataSize:"] = &_dataSize;
+	_params[_T("Address:")] = &_address;
+	_params[_T("Length:")] = &_length;
+	_params[_T("Flags:")] = &_flags;
+	_params[_T("DataSize:")] = &_dataSize;
 
     _address.Value = address;
     _length.Value = length;
@@ -772,10 +772,10 @@ HidPitcRead::HidPitcRead(CString paramStr)
 , _dataSize(0)
 {
 	// ;param: Address:0xAABBCCDD,Length:0xAABBCCDD,Flags:0xAABBCCDD,DataSize:0xAABBCCDD
-    _params["Address:"] = &_address;
-    _params["Length:"] = &_length;
-    _params["Flags:"] = &_flags;
-    _params["DataSize:"] = &_dataSize;
+	_params[_T("Address:")] = &_address;
+	_params[_T("Length:")] = &_length;
+	_params[_T("Flags:")] = &_flags;
+	_params[_T("DataSize:")] = &_dataSize;
 
 	UINT ret = ParseParameterString(paramStr, _params);
 
@@ -835,9 +835,9 @@ const CString& HidPitcRead::ResponseString()
 HidPitcWrite::HidPitcWrite(const UINT address, const UINT length, const UINT flags, const UCHAR * const pData, const UINT dataSize)
 	: StApiT<_ST_HID_CDB::_CDBHIDREADWRITE>(API_TYPE_PITC, ST_WRITE_CMD_PLUS_DATA, _T("Write"))
 {
-    _params["Address:"] = &_address;
-    _params["Length:"] = &_length;
-    _params["Flags:"] = &_flags;
+	_params[_T("Address:")] = &_address;
+	_params[_T("Length:")] = &_length;
+	_params[_T("Flags:")] = &_flags;
 
     _address.Value = address;
     _length.Value = length;
@@ -854,9 +854,9 @@ StApi* HidPitcWrite::Create(CString paramStr)
 HidPitcWrite::HidPitcWrite(LPCTSTR fileName)
 	: StApiT<_ST_HID_CDB::_CDBHIDREADWRITE>(API_TYPE_PITC, ST_WRITE_CMD_PLUS_DATA, _T("Write"))
 {
-    _params["Address:"] = &_address;
-    _params["Length:"] = &_length;
-    _params["Flags:"] = &_flags;
+	_params[_T("Address:")] = &_address;
+	_params[_T("Length:")] = &_length;
+	_params[_T("Flags:")] = &_flags;
 
 	StFwComponent fileData(fileName);
 	SetCommandData(fileData.GetDataPtr(), fileData.size());
