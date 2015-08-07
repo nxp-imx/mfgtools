@@ -8,19 +8,16 @@
 #include <unistd.h>
 #include "MfgToolLib_Export.h"
 int TERM_WIDTH = 80;
-int TEXT_WIDTH = 0.4 * TERM_WIDTH;
 int BAR_WIDTH = 0.5 * TERM_WIDTH;
 
-//char curCommand[TEXT_WIDTH] = "Starting";
-//char oldCommand[TEXT_WIDTH];
 std::string curCommand = std::string("Starting");
 std::string oldCommand = std::string("");
 std::string trim(std::string str)
 {
 	size_t first = str.find_first_not_of(' ');
 	size_t last = str.find_last_not_of(' ');
-	if (last > TEXT_WIDTH)
-		last = TEXT_WIDTH - 1;
+	if (last > BAR_WIDTH)
+		last = BAR_WIDTH - 15;
 	return str.substr(first, (last-first+1));
 }
 void updateUI(OPERATE_RESULT* puiInfo)
@@ -28,8 +25,7 @@ void updateUI(OPERATE_RESULT* puiInfo)
 	struct winsize w;
 	ioctl(0, TIOCGWINSZ, &w);
 	TERM_WIDTH = w.ws_col;
-	TEXT_WIDTH = 0.4 * TERM_WIDTH;
-	BAR_WIDTH = 0.4 * TERM_WIDTH;
+	BAR_WIDTH = 0.5 * TERM_WIDTH;
 	std::string cmdInfo = std::string(puiInfo->cmdInfo);
 	if (!cmdInfo.empty())
 	{
@@ -39,17 +35,18 @@ void updateUI(OPERATE_RESULT* puiInfo)
 	}
 	if (oldCommand.compare(curCommand) != 0)
 	{
-		std::cout << "\r" << std::setw(TEXT_WIDTH) << oldCommand << " [";
+		std::cout << "\r" << std::setw(10) << "Done!" << " [";
 		for (int i = 0; i < BAR_WIDTH; i++)
 		{
 			std::cout << "=";
 		}
-		std::cout << ">] Done!" << std::endl;
+		std::cout << ">] " << oldCommand << std::endl;
 	}
 	else
 	{
-		std::cout << "\r" << std::setw(TEXT_WIDTH) << oldCommand << " [";
 		float percentage = (float) puiInfo->DoneWithinCommand / puiInfo->TotalWithinCommand;
+		int iperc = percentage * 100.0;
+		std::cout << "\r" << std::setw(9) << iperc << "% [";
 		int bars = percentage * (float) BAR_WIDTH;
 		for (int i = 0; i < bars; i ++)
 		{
@@ -60,7 +57,7 @@ void updateUI(OPERATE_RESULT* puiInfo)
 		{
 			std::cout << " ";
 		}
-		std::cout << "]";
+		std::cout << "] " << oldCommand;
 	}
 	std::cout.flush();
 	return;
@@ -69,8 +66,7 @@ int main (int argc,char* argv[]){
 	struct winsize w;
 	ioctl(0, TIOCGWINSZ, &w);
 	TERM_WIDTH = w.ws_col;
-	TEXT_WIDTH = 0.4 * TERM_WIDTH;
-	BAR_WIDTH = 0.4 * TERM_WIDTH;
+	BAR_WIDTH = 0.5 * TERM_WIDTH;
 	INSTANCE_HANDLE lib;
 
 	char * newpath = ".";
