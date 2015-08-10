@@ -69,10 +69,10 @@ int main (int argc,char* argv[]){
 	BAR_WIDTH = 0.5 * TERM_WIDTH;
 	INSTANCE_HANDLE lib;
 
-	char * newpath = ".";
+	char * newpath = "./";
 	char * mylist = "SabreSD";
 	char * myprofile = "Linux";
-	int hasnewpath = 0;
+	int ports = 0;
 
 
 	std::map<CString, CString> m_uclKeywords;
@@ -117,6 +117,25 @@ int main (int argc,char* argv[]){
 		}
 	}
 
+	std::ifstream ufile("UICfg.ini");
+	if (ufile)
+	{
+		std::string str;
+		while (std::getline(ufile, str))
+		{
+			size_t locBreak = str.find(" ");
+			int strip = 3;
+			if (locBreak == std::string::npos)
+			{
+				locBreak = str.find("=");
+				strip = 1;
+			}
+			if (str.find("=") != std::string::npos)
+			{
+				ports = std::stoi(str.substr(locBreak + strip, str.size() - locBreak));
+			}
+		}
+	}
 
 	printf("Your Options:\n");
 
@@ -140,9 +159,18 @@ int main (int argc,char* argv[]){
 			}
 			delete argString;
 		}
-		else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--profile") == 0)
+		else if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--profile") == 0)
 		{
-			hasnewpath = 1;
+			myprofile = argv[i+1];
+			i++;
+		}
+		else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--ports") == 0)
+		{
+			ports = atoi(argv[i+1]);
+			i++;
+		}
+		else if (strcmp(argv[i], "-o") == 0 || strcmp(argv[i], "--profilepath") == 0)
+		{
 			newpath = argv[i+1];
 			i++;
 		}
@@ -153,10 +181,11 @@ int main (int argc,char* argv[]){
 		else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
 		{
 			std::cout << "Usage: [program] [arguments] [settings]=[values]" << std::endl;
-			std::cout << std::setw(10) << "-s" << "  --setting   " << "Specify any UCL keywords." << std::endl;
-			std::cout << std::setw(10) << "-p" << "  --profile   " << "Specify path to Profiles directory." << std::endl;
-			std::cout << std::setw(10) << "-l" << "  --list      " << "Specify command list." << std::endl;
-			std::cout << std::setw(10) << "-h" << "  --help      " << "Display this help information." << std::endl;
+			std::cout << std::setw(6) << "-s" << "  --setting      " << "Specify any UCL keywords." << std::endl;
+			std::cout << std::setw(6) << "-o" << "  --profilepath  " << "Specify path to Profiles directory." << std::endl;
+			std::cout << std::setw(6) << "-c" << "  --profile      " << "Specify the profile to use." << std::endl;
+			std::cout << std::setw(6) << "-l" << "  --list         " << "Specify command list." << std::endl;
+			std::cout << std::setw(6) << "-h" << "  --help         " << "Display this help information." << std::endl;
 			exit(EXIT_SUCCESS);
 		}
 	}
@@ -183,8 +212,12 @@ int main (int argc,char* argv[]){
 	}
 
 
-	if (hasnewpath == 1)
-		ret = MfgLib_SetProfilePath(lib, (BYTE_t *) newpath);
+	ret = MfgLib_SetProfilePath(lib, (BYTE_t *) newpath);
+	if(ret != MFGLIB_ERROR_SUCCESS)
+	{
+		printf(_T("Set Profile path failed\n"));
+		return -1;
+	}
 
 	//set profile and list
 	ret = MfgLib_SetProfileName(lib,(BYTE_t *) myprofile);
@@ -199,7 +232,7 @@ int main (int argc,char* argv[]){
 		printf(_T("Set List name failed\n"));
 		return -1;
 	}
-	ret = MfgLib_SetMaxBoardNumber(lib,4);// hard coded for test
+	ret = MfgLib_SetMaxBoardNumber(lib, ports);
 	if(ret != MFGLIB_ERROR_SUCCESS)
 	{
 		printf(_T("The specified board number[%d] is invalid, should be 1~4\n"), 4);
@@ -230,10 +263,13 @@ int main (int argc,char* argv[]){
 		return -1;
 	}     
 
-	ret=MfgLib_StartOperation(lib,infoOp.pOperationInfo[0].OperationID);
-	if(ret!=MFGLIB_ERROR_SUCCESS){
-		printf("start op Failed code# %d \n",ret);
-		return -1;
+	for (int i = 0; i < ports; i++)
+	{
+		ret=MfgLib_StartOperation(lib,infoOp.pOperationInfo[i].OperationID);
+		if(ret!=MFGLIB_ERROR_SUCCESS){
+			printf("start op Failed code# %d \n",ret);
+			return -1;
+		}
 	}
 
 	ret=MfgLib_RegisterCallbackFunction(lib, OperateResult, updateUI);
