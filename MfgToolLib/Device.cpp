@@ -502,6 +502,16 @@ CString Device::hub::get()
             }
         }
     }
+#else		
+		int port_numbers_len = 7;
+		uint8_t port_numbers[7];
+		memset(port_numbers, 0, port_numbers_len);
+		libusb_get_port_numbers(libusb_get_device(dev->m_libusbdevHandle), port_numbers, port_numbers_len);
+		for (int i = 0; i < port_numbers_len; i++)
+		{
+			_value += std::to_string(port_numbers[i]);
+			_value += ".";
+		}
 #endif
     return _value;
 }
@@ -859,7 +869,9 @@ int Device::hubIndex::get()
 		CloseHandle(hHub);
         hHub = INVALID_HANDLE_VALUE;
 	}
-#endif
+#else
+		Value = libusb_get_bus_number(libusb_get_device(dev->m_libusbdevHandle));
+#endif	
 	return Value;
 }
 
