@@ -2813,7 +2813,7 @@ DWORD GetCurrentDeviceDesc(MFGLIB_VARS *pLibVars, int DeviceIndex, TCHAR* desc, 
 		CString strDesc;
 		if(pDevice->_deviceClass->_deviceClassType == DeviceClass::DeviceTypeMsc)
 		{
-			strDesc = _T("USB Mass Storage Devcie");
+			strDesc = _T("USB Mass Storage Device");
 		}
 		else
 		{

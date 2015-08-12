@@ -720,7 +720,7 @@ void CConfigUSBPortDlg::OnOK()
 				strTemp.Format(_T("%d"), m_pPortMappings[i]->GetParentHub()->_index.get());
 				::WritePrivateProfileString(csPanel, _T("HubIndex"), strTemp, theApp.m_strParamFilename);
 				strTemp = m_pPortMappings[i]->GetDevice()->_description.get();
-				::WritePrivateProfileString(csPanel, _T("DevcieDesc"), strTemp, theApp.m_strParamFilename); */
+				::WritePrivateProfileString(csPanel, _T("DeviceDesc"), strTemp, theApp.m_strParamFilename); */
 			}
 			else
 			{
@@ -730,7 +730,7 @@ void CConfigUSBPortDlg::OnOK()
 				strTemp.Format(_T("%d"), -1);
 				::WritePrivateProfileString(csPanel, _T("HubIndex"), strTemp, theApp.m_strParamFilename);
 				strTemp = _T("");
-				::WritePrivateProfileString(csPanel, _T("DevcieDesc"), strTemp, theApp.m_strParamFilename); */
+				::WritePrivateProfileString(csPanel, _T("DeviceDesc"), strTemp, theApp.m_strParamFilename); */
 			}
 		}
 	}

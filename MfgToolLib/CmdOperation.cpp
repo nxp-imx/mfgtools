@@ -652,7 +652,7 @@ void CCmdOperation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 			m_ni.Event = MX_VOLUME_ARRIVAL_EVT;
 			m_ni.DriverLetter = pnsinfo->DriverLetter;
 			//strDesc = ((Volume*)(pnsinfo->pDevice))->_friendlyName.get();
-			strDesc = _T("USB Mass Storage Devcie");
+			strDesc = _T("USB Mass Storage Device");
 			_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			//QueryPerformanceFrequency(&g_tc);
