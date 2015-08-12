@@ -140,7 +140,7 @@ int Volume::diskNumber::get()
 				DWORD error = GetLastError();
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("*** Error: %d, Drive: %s\n"), error, vol->_logicalDrive.get());
 			}
-			DWORD bytesReturned = 0;
+			bytesReturned = 0;
 			STORAGE_DEVICE_NUMBER driveNumber;
 			if (!DeviceIoControl(hFile, IOCTL_STORAGE_GET_DEVICE_NUMBER, NULL, 0, &driveNumber, sizeof(driveNumber), &bytesReturned, NULL))
 			{
