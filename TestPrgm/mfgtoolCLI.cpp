@@ -9,15 +9,19 @@
 #include "MfgToolLib_Export.h"
 int TERM_WIDTH = 80;
 int BAR_WIDTH = 0.5 * TERM_WIDTH;
+unsigned long opIDs[4] = {0, 0, 0, 0};
+double iperc[4] = {0, 0, 0, 0};
+int ports = 0;
+int boards = 0;
 
-std::string curCommand = std::string("Starting");
-std::string oldCommand = std::string("");
+std::string curCommand[4] = {"Starting", "Starting", "Starting", "Starting"}; 
+std::string oldCommand[4] = {"", "", "", ""};
 std::string trim(std::string str)
 {
 	size_t first = str.find_first_not_of(' ');
 	size_t last = str.find_last_not_of(' ');
-	if (last > BAR_WIDTH)
-		last = BAR_WIDTH - 15;
+	if (last > 0.8 * (BAR_WIDTH / boards))
+		last = 0.8 * (BAR_WIDTH / boards);
 	return str.substr(first, (last-first+1));
 }
 void updateUI(OPERATE_RESULT* puiInfo)
@@ -25,39 +29,81 @@ void updateUI(OPERATE_RESULT* puiInfo)
 	struct winsize w;
 	ioctl(0, TIOCGWINSZ, &w);
 	TERM_WIDTH = w.ws_col;
-	BAR_WIDTH = 0.5 * TERM_WIDTH;
+	BAR_WIDTH = TERM_WIDTH * 0.5 - (10 * boards) ;
+
+	int pval = -1;
+	
+	for (int i = 0; i < ports; i++)
+	{
+		if (opIDs[i] == puiInfo->OperationID)
+		{
+			pval = i;
+		}
+	}
+
+	if (pval == -1)
+	{
+		for (int i = 0; i < ports; i++)
+		{
+			if (opIDs[i] == 0)
+			{
+				opIDs[i] = puiInfo->OperationID;
+				pval = boards;
+				boards++;
+				break;
+			}
+		}
+	}
 	std::string cmdInfo = std::string((char*)puiInfo->cmdInfo);
 	if (!cmdInfo.empty())
 	{
 		cmdInfo = trim(cmdInfo);
-		oldCommand = std::string(curCommand);
-		curCommand = std::string(cmdInfo);
+		oldCommand[pval] = std::string(curCommand[pval]);
+		curCommand[pval] = std::string(cmdInfo);
 	}
-	if (oldCommand.compare(curCommand) != 0)
+	printf("%c[2K", 27);
+
+	std::cout << "\r";
+
+	for (int b = 0; b < boards; b++)
 	{
-		std::cout << "\r" << std::setw(10) << "Done!" << " [";
-		for (int i = 0; i < BAR_WIDTH; i++)
+		if (oldCommand[b].compare(curCommand[b]) != 0)
 		{
-			std::cout << "=";
+			std::cout << std::setw(10) << "Done!" << " [";
+			for (int i = 0; i < BAR_WIDTH / boards; i++)
+			{
+				std::cout << "=";
+			}
+			std::cout << ">] " << std::setw(0.8 * (BAR_WIDTH / boards)) << oldCommand[b];
 		}
-		std::cout << ">] " << oldCommand << std::endl;
-	}
-	else
-	{
-		float percentage = (float) puiInfo->DoneWithinCommand / puiInfo->TotalWithinCommand;
-		int iperc = percentage * 100.0;
-		std::cout << "\r" << std::setw(9) << iperc << "% [";
-		int bars = percentage * (float) BAR_WIDTH;
-		for (int i = 0; i < bars; i ++)
+		else
 		{
-			std::cout << "=";
+			float percentage = (float) puiInfo->DoneWithinCommand / puiInfo->TotalWithinCommand;
+			if (percentage != percentage)
+			{
+				percentage = 0;
+			}
+			if (b == pval)
+			{
+				iperc[b] = percentage;
+				if (iperc[b] < 0)
+					iperc[b] = 0;
+				if (iperc[b] > 1)
+					iperc[b] = 1;
+			}
+			std::cout << std::setw(9) << (int) (100 * iperc[b]) << "% [";
+			int bars = iperc[b] * (BAR_WIDTH / boards);
+			for (int i = 0; i < bars; i ++)
+			{
+				std::cout << "=";
+			}
+			std::cout << ">";
+			for (int i = 0; i < (BAR_WIDTH/boards) - bars; i++)
+			{
+				std::cout << " ";
+			}
+			std::cout << "] " << std::setw(0.8 * (BAR_WIDTH / boards)) << oldCommand[b];
 		}
-		std::cout << ">";
-		for (int i = 0; i < BAR_WIDTH - bars; i++)
-		{
-			std::cout << " ";
-		}
-		std::cout << "] " << oldCommand;
 	}
 	std::cout.flush();
 	return;
@@ -66,13 +112,12 @@ int main (int argc,char* argv[]){
 	struct winsize w;
 	ioctl(0, TIOCGWINSZ, &w);
 	TERM_WIDTH = w.ws_col;
-	BAR_WIDTH = 0.5 * TERM_WIDTH;
+	BAR_WIDTH = 0.8 * TERM_WIDTH;
 	INSTANCE_HANDLE lib;
 
 	char * newpath = "./";
 	char * mylist = "SabreSD";
 	char * myprofile = "Linux";
-	int ports = 0;
 
 
 	std::map<CString, CString> m_uclKeywords;
