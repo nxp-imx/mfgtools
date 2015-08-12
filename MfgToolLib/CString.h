@@ -36,8 +36,8 @@ public: CTString() : tstring() { }
 
 		operator const T * () { return this->c_str(); }\
 		operator const T * () const{ return this->c_str(); }
-		operator T * () { return this->c_str(); }
-		operator T * () const { return this->c_str(); }
+		operator T * () { return (T*) this->c_str(); }
+		operator T * () const { return (const T*) this->c_str(); }
 		void operator=(T * buff){	this->assign(buff);return;}
 
 

@@ -782,7 +782,10 @@ class UpdateTransportProtocol
 			//		m_pUtpDevice->UnregisterCallback(hCallback);
 #ifdef WINVER
 			//USES_CONVERSION;
-			CString afilename=(filename.c_str());
+			const size_t newsizew = (filename.GetLength() + 1) * sizeof(TCHAR);
+			char *afilename = new char[newsizew];
+			size_t convertedCharsw = 0;
+			+wcstombs_s(&convertedCharsw, afilename, newsizew, filename.c_str(), _TRUNCATE);
 #else
 #define afilename filename
 #endif
