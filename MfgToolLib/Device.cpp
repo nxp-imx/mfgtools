@@ -507,10 +507,13 @@ CString Device::hub::get()
 		uint8_t port_numbers[7];
 		memset(port_numbers, 0, port_numbers_len);
 		libusb_get_port_numbers(libusb_get_device(dev->m_libusbdevHandle), port_numbers, port_numbers_len);
-		for (int i = 0; i < port_numbers_len; i++)
+		if (!_value.CompareNoCase(""))
 		{
-			_value += std::to_string(port_numbers[i]);
-			_value += ".";
+			for (int i = 0; i < port_numbers_len; i++)
+			{
+				_value += std::to_string(port_numbers[i]);
+				_value += ".";
+			}
 		}
 #endif
     return _value;

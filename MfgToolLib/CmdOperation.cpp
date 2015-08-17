@@ -503,7 +503,7 @@ void* CmdListThreadProc(void* pParam)
 					lastState = currentState;
 
 					currentState = pOperation->GetDeviceState();
-					//	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d] device chagned and reset to state %d"), pOperation->m_WndIndex, currentState);
+					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d] device chagned and reset to state %d"), pOperation->m_WndIndex, currentState);
 					CurrentCommands = ((MFGLIB_VARS *)(pOperation->m_pLibHandle))->g_StateCommands[currentState];
 					dwStateIndex = (DWORD)currentState;
 					pOperation->m_currentState = currentState;
@@ -644,7 +644,6 @@ void CCmdOperation::OnDeviceChangeNotify(DeviceClass::NotifyStruct *pnsinfo)
 			break;
 		case DeviceManager::DEVICE_REMOVAL_EVT:
 			m_ni.Event = MX_DEVICE_REMOVAL_EVT;
-			strDesc = pnsinfo->pDevice->_description.get();
 			_tcscpy((TCHAR*)m_ni.DeviceDesc, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			break;

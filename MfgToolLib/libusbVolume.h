@@ -47,6 +47,7 @@ class libusbVolume : public Volume
 	public:
 		libusbVolume(DeviceClass* deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle);
 		int pollDevice(CSW_UTP* sResponse, StApi& api);
+		UINT ReinitializeUSBHandle(CBW_UTP response,StApi& api);
 		UINT SendCommand(StApi& api, UCHAR* additionalInfo);
 		UINT SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo);
 };

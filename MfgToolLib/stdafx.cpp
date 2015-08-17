@@ -66,6 +66,7 @@ int DestroyEvent(myevent * Ev){
 int CheckArrayOfEvents(myevent *container[], int length){
 	for (int i = 0; i < length; i++){
 		if (CheckEvent(container[i])){
+			ClearEvent(container[i]);
 			return i;
 		}
 	}

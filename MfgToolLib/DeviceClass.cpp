@@ -570,7 +570,6 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path,libusb_device *
 	Device *pDevice = CreateDevice(this,devData , _T(""));
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Create Device %p\n"), pDevice);
 	int rc=libusb_open(dev,&pDevice->m_libusbdevHandle);
-	pDevice->NotifyOpen();
 	 if (LIBUSB_SUCCESS != rc) {
 	    if(rc==LIBUSB_ERROR_ACCESS){
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("failed to open no access\n"));
@@ -582,6 +581,7 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path,libusb_device *
 	if (libusb_kernel_driver_active(pDevice->m_libusbdevHandle, 0)){
                libusb_detach_kernel_driver(pDevice->m_libusbdevHandle, 0);
 	}
+	pDevice->NotifyOpen();
 
         rc = libusb_claim_interface(pDevice->m_libusbdevHandle, 0);
 	if (rc) {

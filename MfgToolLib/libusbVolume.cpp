@@ -12,6 +12,45 @@ UINT libusbVolume::SendCommand(StApi& api, UCHAR* additionalInfo)
 	//TODO
 	return 0;
 }
+UINT libusbVolume::ReinitializeUSBHandle(CBW_UTP request, StApi& api)
+{	
+	int errc;
+	int length;
+	libusb_device **list;
+	libusb_device* foundDevice;
+	int size = libusb_get_device_list(NULL, &list);
+	for (int i = 0; i < size; i++)
+	{
+		struct libusb_device_descriptor desc;
+		foundDevice = list[i];
+		libusb_get_device_descriptor(foundDevice, &desc);
+		if (desc.idVendor == 0x066f && desc.idProduct == 0x37ff)
+		{
+			int port_numbers_len = 7;
+			uint8_t port_numbers[7];
+			memset(port_numbers, 0, port_numbers_len);
+			CString pNum;
+			libusb_get_port_numbers(foundDevice, port_numbers, port_numbers_len);
+			for (int i = 0; i < port_numbers_len; i++)
+			{
+				pNum += std::to_string(port_numbers[i]);
+				pNum += ".";
+			}
+			if (_hub.get().CompareNoCase(pNum))
+			{
+				libusb_release_interface(m_libusbdevHandle, 0);
+				libusb_close(m_libusbdevHandle);
+				errc = libusb_open(foundDevice, &m_libusbdevHandle);
+				errc = libusb_reset_device(m_libusbdevHandle);
+				if (libusb_kernel_driver_active(m_libusbdevHandle, 0))
+					errc = libusb_detach_kernel_driver(m_libusbdevHandle, 0);
+				errc = libusb_claim_interface(m_libusbdevHandle, 0);
+				libusb_free_device_list(list, true);
+				return errc;
+			}
+		}
+	}
+}
 UINT libusbVolume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo, NotifyStruct& nsInfo)
 {
 	// init parameter if it is used
@@ -40,6 +79,12 @@ UINT libusbVolume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo,
 	request.bCBWCBLength = api.GetCdbSize();
 	request.dCBWDataTransferLength = api.GetTransferSize();
 	response = libusb_bulk_transfer(m_libusbdevHandle, 0x01, (UCHAR*)&request, sizeof(CBW_UTP), &length , api.GetTimeout() * 1000);
+	if (response == -4)
+	{
+		response = ReinitializeUSBHandle(request, api);
+		response = libusb_bulk_transfer(m_libusbdevHandle, 0x01, (UCHAR*)&request, sizeof(CBW_UTP), &length , api.GetTimeout() * 1000);
+	}
+
 	response += libusb_bulk_transfer(m_libusbdevHandle, 0x01, (UCHAR*)api.GetCmdDataPtr(), api.GetTransferSize(),  &length, api.GetTimeout() * 1000);
 
 	api.ScsiSenseData.AdditionalSenseCode = (ScsiUtpMsg::EXIT & 0xFF00)>>8;

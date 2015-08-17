@@ -490,6 +490,12 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 																																												 else{
 																																													 LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG,_T("unplugged unopend device \n"));
 																																												 }
+																							 thread_msg temp;
+																									temp.message=DeviceManager::DEVICE_REMOVAL_EVT;
+																								temp.lParam=(unsigned long)dev;
+																								temp.wParam=NULL;
+																								pDevManage->DevMgrMsgs.push(temp);
+																								sem_post(&pDevManage->msgs);
 																																												 break;
 																																											 }
 																								default:// error for event
@@ -810,6 +816,7 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 					BOOL isRightDevice = FALSE;
 					OP_STATE_ARRAY::iterator it = pOpStates->begin();
 					COpState *pCurrentState = NULL;
+#ifndef __linux__
 					for(; it!=pOpStates->end(); it++)
 					{
 						filter.Format(_T("vid_%04x&pid_%04x"), (*it)->uiVid, (*it)->uiPid);
@@ -822,6 +829,20 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 							break;
 						}
 					}
+#else
+					for(; it!=pOpStates->end(); it++)
+					{
+						TRACE(_T(" state VID: %x  PID: %x  \t  VID: %x   PID:  %x  for device just plugged in\n"),(*it)->uiVid,(*it)->uiPid,descObj.idVendor,descObj.idProduct);
+						if( descObj.idVendor==(*it)->uiVid && descObj.idProduct==(*it)->uiPid )
+						{	//find
+							TRACE(_T(" right device \n"));
+							isRightDevice = TRUE;
+							pCurrentState = (*it);
+							break;
+						}
+					}
+#endif
+					DeviceClass::NotifyStruct nsInfo = {0};
 					if(isRightDevice) //OK, find the device
 					{
 						//check exception handle queue
@@ -836,7 +857,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 						}
 						pthread_mutex_unlock(m_pExpectionHandler->m_hMapMsgMutex);
 
-						DeviceClass::NotifyStruct nsInfo = {0};
 						DeviceClass::DEV_CLASS_TYPE class_type;
 						switch(pCurrentState->opDeviceType)
 						{
@@ -868,9 +888,35 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 								break;
 							case DEV_MSC_UPDATER:
 								LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[Msc,DiskDeviceClass] vid_%04x&pid_%04x, not handled"), pCurrentState->uiVid, pCurrentState->uiPid);
-								nsInfo.pDevice = NULL;
+								nsInfo = {0};
+								int cmdOpIndex = 0;
+								uint8_t port_numbers[7];
+								CString mports;
+								memset(port_numbers, 0, 7);
+								libusb_get_port_numbers((libusb_device*)desc, port_numbers, 7);
+								for (int i = 0; i < 7; i++)
+								{
+									mports += std::to_string(port_numbers[i]);
+									mports += ".";
+								}
+								while (cmdOpIndex < MAX_BOARD_NUMBERS)
+								{
+									if (((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex]->m_pDevice)
+									{
+										bool b = !mports.CompareNoCase(((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex]->m_pDevice->_hub.get());
+										if (!mports.CompareNoCase(((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex]->m_pDevice->_hub.get()))
+										{
+											nsInfo.pDevice = ((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex]->m_pDevice;
+											break;
+										}
+									}
+									cmdOpIndex++;
+								}
+								nsInfo.Event = DEVICE_REMOVAL_EVT;
+								Notify(&nsInfo, cmdOpIndex);
 								break;
 						}
+						return;
 						if(nsInfo.pDevice)
 						{
 							nsInfo.Event = DEVICE_REMOVAL_EVT;
