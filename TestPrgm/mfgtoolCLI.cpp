@@ -20,8 +20,8 @@ std::string trim(std::string str)
 {
 	size_t first = str.find_first_not_of(' ');
 	size_t last = str.find_last_not_of(' ');
-	if (last > 0.8 * (BAR_WIDTH / boards))
-		last = 0.8 * (BAR_WIDTH / boards);
+	if (last > 0.8 * (BAR_WIDTH))
+		last = 0.8 * (BAR_WIDTH);
 	return str.substr(first, (last-first+1));
 }
 void updateUI(OPERATE_RESULT* puiInfo)
@@ -50,7 +50,7 @@ void updateUI(OPERATE_RESULT* puiInfo)
 				opIDs[i] = puiInfo->OperationID;
 				pval = boards;
 				boards++;
-				break;
+				return;
 			}
 		}
 	}
@@ -61,20 +61,20 @@ void updateUI(OPERATE_RESULT* puiInfo)
 		oldCommand[pval] = std::string(curCommand[pval]);
 		curCommand[pval] = std::string(cmdInfo);
 	}
-	printf("%c[2K", 27);
 
-	std::cout << "\r";
 
 	for (int b = 0; b < boards; b++)
 	{
+		std::cout << "\r";
+		printf("%c[2K", 27);
 		if (oldCommand[b].compare(curCommand[b]) != 0)
 		{
-			std::cout << std::setw(10) << "Done!" << " [";
-			for (int i = 0; i < BAR_WIDTH / boards; i++)
+			std::cout << " " << pval + 1 << " " << std::setw(10) << "Done!" << " [";
+			for (int i = 0; i < BAR_WIDTH; i++)
 			{
 				std::cout << "=";
 			}
-			std::cout << ">] " << std::setw(0.8 * (BAR_WIDTH / boards)) << oldCommand[b];
+			std::cout << ">] " << std::setw(0.8 * (BAR_WIDTH)) << oldCommand[b] << std::endl;
 		}
 		else
 		{
@@ -91,19 +91,23 @@ void updateUI(OPERATE_RESULT* puiInfo)
 				if (iperc[b] > 1)
 					iperc[b] = 1;
 			}
-			std::cout << std::setw(9) << (int) (100 * iperc[b]) << "% [";
-			int bars = iperc[b] * (BAR_WIDTH / boards);
+			std::cout << " " << pval + 1 << " " << std::setw(9) << (int) (100 * iperc[b]) << "% [";
+			int bars = iperc[b] * (BAR_WIDTH);
 			for (int i = 0; i < bars; i ++)
 			{
 				std::cout << "=";
 			}
 			std::cout << ">";
-			for (int i = 0; i < (BAR_WIDTH/boards) - bars; i++)
+			for (int i = 0; i < (BAR_WIDTH) - bars; i++)
 			{
 				std::cout << " ";
 			}
-			std::cout << "] " << std::setw(0.8 * (BAR_WIDTH / boards)) << oldCommand[b];
+			std::cout << "] " << std::setw(0.8 * (BAR_WIDTH)) << oldCommand[b] << std::endl;
 		}
+	}
+	for (int b = 0; b < boards; b++)
+	{
+		printf("\x1B[1F");
 	}
 	std::cout.flush();
 	return;
