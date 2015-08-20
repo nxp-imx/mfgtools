@@ -133,6 +133,7 @@ typedef struct _Operate_Result
 	int cmdIndex;
 	int cmdStatus;
 	BOOL bProgressWithinCommand;
+	BOOL bFinished;
 	int DoneWithinCommand;
 	int TotalWithinCommand;
 	int CurrentPhaseIndex;

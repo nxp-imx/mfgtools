@@ -7,10 +7,13 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include "MfgToolLib_Export.h"
+INSTANCE_HANDLE lib;
 int TERM_WIDTH = 80;
 int BAR_WIDTH = 0.5 * TERM_WIDTH;
 unsigned long opIDs[4] = {0, 0, 0, 0};
+bool finished[4] = {true, true, true, true};
 double iperc[4] = {0, 0, 0, 0};
+bool bDoExit = true;
 int ports = 0;
 int boards = 0;
 
@@ -23,6 +26,30 @@ std::string trim(std::string str)
 	if (last > 0.8 * (BAR_WIDTH))
 		last = 0.8 * (BAR_WIDTH);
 	return str.substr(first, (last-first+1));
+}
+void exitLibrary()
+{
+	int ret;
+	std::cout << std::endl << std::endl;
+	ret=MfgLib_UninitializeOperation(lib);
+	if(ret!=MFGLIB_ERROR_SUCCESS){
+		printf("init op Failed %d\n",ret);
+		return -1;
+	} 
+
+
+
+	ret=MfgLib_DestoryInstanceHandle(lib);
+	if( ret!=MFGLIB_ERROR_SUCCESS){
+		printf("DestroyInstanceHandle failed  %d \n",ret);
+		return -1;
+	}
+	ret=MfgLib_Uninitialize();
+	if(ret!=MFGLIB_ERROR_SUCCESS){
+		printf("Uninitialize failed  %d  \n",ret);
+		return -1;
+	}
+	return 0;
 }
 void updateUI(OPERATE_RESULT* puiInfo)
 {
@@ -49,6 +76,7 @@ void updateUI(OPERATE_RESULT* puiInfo)
 			{
 				opIDs[i] = puiInfo->OperationID;
 				pval = boards;
+				finished[boards] = false;
 				boards++;
 				return;
 			}
@@ -62,6 +90,35 @@ void updateUI(OPERATE_RESULT* puiInfo)
 		curCommand[pval] = std::string(cmdInfo);
 	}
 
+	if (bDoExit)
+	{
+		finished[pval] = puiInfo->bFinished;
+
+		bool bExit = true;
+		for (int b = 0; b < boards; b++)
+		{
+			if (finished[b])
+			{
+				if (opIDs[b] != -1)
+				{
+					int ret = MfgLib_StopOperation(opIDs[b], lib);
+					if(ret != MFGLIB_ERROR_SUCCESS)
+					{
+						printf(_T("no brakes Could not stop operation\n"));
+						return -1;
+					}
+					opIDs[b] = -1;
+				}
+			}
+			else
+			{
+				bExit = false;
+			}
+		}
+		if (bExit)
+			exitLibrary();
+	}
+
 
 	for (int b = 0; b < boards; b++)
 	{
@@ -69,7 +126,7 @@ void updateUI(OPERATE_RESULT* puiInfo)
 		printf("%c[2K", 27);
 		if (oldCommand[b].compare(curCommand[b]) != 0)
 		{
-			std::cout << " " << pval + 1 << " " << std::setw(10) << "Done!" << " [";
+			std::cout << " " << b + 1 << " " << std::setw(10) << "Done!" << " [";
 			for (int i = 0; i < BAR_WIDTH; i++)
 			{
 				std::cout << "=";
@@ -91,7 +148,7 @@ void updateUI(OPERATE_RESULT* puiInfo)
 				if (iperc[b] > 1)
 					iperc[b] = 1;
 			}
-			std::cout << " " << pval + 1 << " " << std::setw(9) << (int) (100 * iperc[b]) << "% [";
+			std::cout << " " << b + 1 << " " << std::setw(9) << (int) (100 * iperc[b]) << "% [";
 			int bars = iperc[b] * (BAR_WIDTH);
 			for (int i = 0; i < bars; i ++)
 			{
@@ -117,7 +174,6 @@ int main (int argc,char* argv[]){
 	ioctl(0, TIOCGWINSZ, &w);
 	TERM_WIDTH = w.ws_col;
 	BAR_WIDTH = 0.8 * TERM_WIDTH;
-	INSTANCE_HANDLE lib;
 
 	char * newpath = "./";
 	char * mylist = "SabreSD";
@@ -226,6 +282,11 @@ int main (int argc,char* argv[]){
 		else if (strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--list") == 0)
 		{
 			mylist = argv[i+1];
+			i++;
+		}
+		else if (strcmp(argv[i], "-x") == 0 || strcmp(argv[i], "--noexit") == 0)
+		{
+			bDoExit = false;
 		}
 		else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
 		{
@@ -234,6 +295,7 @@ int main (int argc,char* argv[]){
 			std::cout << std::setw(6) << "-o" << "  --profilepath  " << "Specify path to Profiles directory." << std::endl;
 			std::cout << std::setw(6) << "-c" << "  --profile      " << "Specify the profile to use." << std::endl;
 			std::cout << std::setw(6) << "-l" << "  --list         " << "Specify command list." << std::endl;
+			std::cout << std::setw(6) << "-x" << "  --noexit       " << "Wait for further connections upon finishing all operations." << std::endl;
 			std::cout << std::setw(6) << "-h" << "  --help         " << "Display this help information." << std::endl;
 			exit(EXIT_SUCCESS);
 		}
@@ -323,23 +385,9 @@ int main (int argc,char* argv[]){
 
 	ret=MfgLib_RegisterCallbackFunction(lib, OperateResult, updateUI);
 
-	ret=MfgLib_UninitializeOperation(lib);
-	if(ret!=MFGLIB_ERROR_SUCCESS){
-		printf("init op Failed %d\n",ret);
-		return -1;
-	} 
-
-
-
-	ret=MfgLib_DestoryInstanceHandle(lib);
-	if( ret!=MFGLIB_ERROR_SUCCESS){
-		printf("DestroyInstanceHandle failed  %d \n",ret);
-		return -1;
+	while(true)
+	{
+		sleep(3);
 	}
-	ret=MfgLib_Uninitialize();
-	if(ret!=MFGLIB_ERROR_SUCCESS){
-		printf("Uninitialize failed  %d  \n",ret);
-		return -1;
-	}
-	return 0;
+
 }

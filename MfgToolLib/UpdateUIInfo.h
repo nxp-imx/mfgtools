@@ -16,6 +16,7 @@ typedef struct _ui_update_info
 	BOOL bUpdateDescription;
 	TCHAR strDescription[MAX_CHAR_NUMBERS];
 	BOOL bUpdateCommandsProgress;
+	BOOL bFinished;
 	int CommandsProgressIndex;
 	int CommandStatus;
 	BOOL bUpdateProgressInCommand;

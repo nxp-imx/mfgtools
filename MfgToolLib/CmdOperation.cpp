@@ -503,6 +503,13 @@ void* CmdListThreadProc(void* pParam)
 					lastState = currentState;
 
 					currentState = pOperation->GetDeviceState();
+					if (lastState == MX_UPDATER && currentState == MX_UPDATER)
+					{
+						pDevice->FinishState = true;
+						bStateCmdFinished = TRUE;
+						dwTimeout = INFINITE;
+						break;
+					}
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d] device chagned and reset to state %d"), pOperation->m_WndIndex, currentState);
 					CurrentCommands = ((MFGLIB_VARS *)(pOperation->m_pLibHandle))->g_StateCommands[currentState];
 					dwStateIndex = (DWORD)currentState;
@@ -512,14 +519,6 @@ void* CmdListThreadProc(void* pParam)
 					//UI_UPDATE_INFORMATION _uiInfo;
 					//pOperation->UpdateUI(&_uiInfo,dwStateIndex);
 
-					if (lastState == MX_UPDATER && currentState == MX_UPDATER)
-					{
-						pDevice->FinishState = true;
-						pOperation->m_bKilled = true;
-						bStateCmdFinished = TRUE;
-						dwTimeout = INFINITE;
-						break;
-					}
 					if(CurrentCommands.size() == 0)
 					{
 						bStateCmdFinished = TRUE;
@@ -796,6 +795,7 @@ void CCmdOperation::ExecuteUIUpdate(UI_UPDATE_INFORMATION *pInfo)
 		m_uiInfo.CurrentPhaseIndex = pInfo->CurrentPhaseIndex;
 		//m_uiInfo.phaseStatus = pInfo->PhaseStatus;
 	}
+	m_uiInfo.bFinished = m_pDevice->FinishState;
 	m_uiInfo.OperationID = pInfo->OperationID;
 
 	pthread_mutex_lock(&m_hMutex_cb2);
