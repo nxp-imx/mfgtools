@@ -980,22 +980,34 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 
 
 #else
-					libusb_device** list;
-					libusb_device* foundDevice;
-					int numDevices = libusb_get_device_list(NULL, &list);
-
-					for (int i = 0; i < numDevices; i++)
+					DeviceClass::NotifyStruct nsInfo = {0};
+					int cmdOpIndex = 0;
+					uint8_t port_numbers[7];
+					CString mports;
+					memset(port_numbers, 0, 7);
+					libusb_get_port_numbers((libusb_device*)desc, port_numbers, 7);
+					for (int i = 0; i < 7; i++)
 					{
-						struct libusb_device_descriptor desc;
-						foundDevice = list[i];
-						libusb_get_device_descriptor(foundDevice, &desc);
-						if (desc.idVendor == 0x066f && desc.idProduct == 0x37ff)
+						mports += std::to_string(port_numbers[i]);
+						mports += ".";
+					}
+					while (cmdOpIndex < MAX_BOARD_NUMBERS)
+					{
+						if (((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex]->m_pDevice)
+						{
+							if (!mports.CompareNoCase(((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex]->m_pDevice->_hub.get()))
+							{
+								nsInfo = g_devClasses[DeviceClass::DeviceTypeMsc]->AddUsbDevice(driveLetterStr, (libusb_device*) desc);
+								break;
+							}
+						}
+						else
 						{
 							break;
 						}
+						cmdOpIndex++;
 					}
 
-					DeviceClass::NotifyStruct nsInfo = g_devClasses[DeviceClass::DeviceTypeMsc]->AddUsbDevice(driveLetterStr, foundDevice);
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT-Disk(%s), Hub:%d-Port:%d"), driveLetterStr.c_str(), nsInfo.HubIndex, nsInfo.PortIndex);
 					if(nsInfo.pDevice)
 					{
@@ -1004,7 +1016,7 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 
 						nsInfo.Event = VOLUME_ARRIVAL_EVT;
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT, Notify"));
-						Notify(&nsInfo);
+						Notify(&nsInfo, cmdOpIndex);
 					}
 
 #endif
