@@ -464,47 +464,49 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 	int rc;
 	(void)libusb_get_device_descriptor(dev, &desc);
 	switch((int)event){
-		case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED: {  // a device matching our PID/VID pairs has shown up
-																								LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG,_T("Dev arrival in libusb callback.\ndevice class num : %d \ndevice arrival VID: %d \t PID: %d  volume pid: %x vid: %x\n"),desc.bDeviceClass,desc.idVendor,desc.idProduct,0x066f,0x37FF);
-																								thread_msg temp;
-																								CString strDesc;
-																								strDesc.Format(_T("vid_%04x&pid_%04x"),desc.idVendor, desc.idProduct);
-																								if(desc.idVendor==0x066f &&desc.idProduct==0x37FF){//(desc.bDeviceClass==LIBUSB_CLASS_MASS_STORAGE){
-																									temp.message=DeviceManager::VOLUME_ARRIVAL_EVT;
-																								}
-																								else{
-																									temp.message=DeviceManager::DEVICE_ARRIVAL_EVT;
-																								}
-																								temp.lParam=(unsigned long)dev;
-																								temp.wParam=NULL;
-																								pDevManage->DevMgrMsgs.push(temp);
-																								sem_post(&pDevManage->msgs);
-																								break;
-																								}
-																								case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT: {  //a device matching our PID/VID pair has left
-																																												 if (handle) {
-																																													 LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG,_T("closed already open device\n"));
-																																													 libusb_close(handle);
-																																													 handle = NULL;
-																																												 }
-																																												 else{
-																																													 LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG,_T("unplugged unopend device \n"));
-																																												 }
-																							 thread_msg temp;
-																									temp.message=DeviceManager::DEVICE_REMOVAL_EVT;
-																								temp.lParam=(unsigned long)dev;
-																								temp.wParam=NULL;
-																								pDevManage->DevMgrMsgs.push(temp);
-																								sem_post(&pDevManage->msgs);
-																																												 break;
-																																											 }
-																								default:// error for event
-																																											 LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR,_T("Unhandled event %d\n"), event);
-																																											 LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR,_T("evnt arrived %d\n"),LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED);
-																																											 LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR,_T("evnt left %d\n"),LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT);
-																																											 return -1;
-																							}
-																							return 0;
+		case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED: 
+			{  // a device matching our PID/VID pairs has shown up
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG,_T("Dev arrival in libusb callback.\ndevice class num : %d \ndevice arrival VID: %d \t PID: %d  volume pid: %x vid: %x\n"),desc.bDeviceClass,desc.idVendor,desc.idProduct,0x066f,0x37FF);
+				thread_msg temp;
+				CString strDesc;
+				strDesc.Format(_T("vid_%04x&pid_%04x"),desc.idVendor, desc.idProduct);
+				if(desc.idVendor==0x066f &&desc.idProduct==0x37FF){//(desc.bDeviceClass==LIBUSB_CLASS_MASS_STORAGE){
+					temp.message=DeviceManager::VOLUME_ARRIVAL_EVT;
+				}
+				else{
+					temp.message=DeviceManager::DEVICE_ARRIVAL_EVT;
+				}
+				temp.lParam=(unsigned long)dev;
+				temp.wParam=NULL;
+				pDevManage->DevMgrMsgs.push(temp);
+				sem_post(&pDevManage->msgs);
+				break;
+				}
+				case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT: 
+				{  //a device matching our PID/VID pair has left
+					if (handle) {
+						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG,_T("closed already open device\n"));
+						libusb_close(handle);
+						handle = NULL;
+					}
+					else{
+						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG,_T("unplugged unopend device \n"));
+					}
+					thread_msg temp;
+					temp.message=DeviceManager::DEVICE_REMOVAL_EVT;
+					temp.lParam=(unsigned long)dev;
+					temp.wParam=NULL;
+					pDevManage->DevMgrMsgs.push(temp);
+					sem_post(&pDevManage->msgs);
+					break;
+				}
+				default:// error for event
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR,_T("Unhandled event %d\n"), event);
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR,_T("evnt arrived %d\n"),LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED);
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR,_T("evnt left %d\n"),LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT);
+				return -1;
+			}
+			return 0;
 	}
 
 #else
