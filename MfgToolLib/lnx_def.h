@@ -48,7 +48,7 @@
 #define _tstat stat
 #define _tctime ctime
 #define _stat64i32 stat
-#define _tstat stat
+#define _stat stat
 #define _fputts fputs
 #define _tcstol strtol
 #define sscanf_s sscanf

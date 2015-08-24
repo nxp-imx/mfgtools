@@ -417,7 +417,7 @@ int StFwComponent::LoadFromFile(LPCTSTR fileName)
     InitVersionInfo( GetFileType().Value );
 
     // Get the last modified date/time
-    struct stat buf = {0};
+    struct _stat buf = {0};
     if ( _tstat(_fileName, &buf) == ERROR_SUCCESS )
         _fileDate = buf.st_mtime;
     else
