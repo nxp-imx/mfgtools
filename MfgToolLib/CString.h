@@ -46,7 +46,7 @@ public: CTString() : tstring() { }
 		int GetLength() { return this->length(); }
 		const T * GetBuffer() { return this->c_str(); }
 		int Compare(const T* str) const{ return this->compare(str); }
-		int CompareNoCase(const T* str) { return _tcsnicmp(this->c_str(), str, this->length()); }
+		int CompareNoCase(const T* str) { return _tcsnicmp(this->c_str(), str, this->length() > strlen(str) ? this->length() : strlen(str)); }
 		int Find(T ch) const {return this->find(ch);};
 		int Find(const T * lpszSub) const{ return this->find(lpszSub); }
 		int Find(T ch, int nStart) const{ return this->find(ch, nStart); }

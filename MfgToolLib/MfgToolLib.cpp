@@ -1304,6 +1304,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 			}
 			strTemp = (*it)->GetAttrValue(_T("savedfile"));
 			strTemp = ReplaceKeywords(strTemp);
+			strTemp.TrimRight();
 			if(!strTemp.IsEmpty())
 			{
 				((COpCmd_Push*)pOpCmd)->m_SavedFileName = strTemp;
