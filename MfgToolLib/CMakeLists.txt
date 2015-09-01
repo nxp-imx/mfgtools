@@ -26,10 +26,7 @@ project( MfgToolLib )
 
 find_package(libusb-1.0 REQUIRED)
 include_directories(${LIBUSB_1_INCLUDE_DIRS})
-find_package(JNI REQUIRED)
-include_directories(${JNI_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${LIBUSB_1_LIBRARIES})
-set(LIBS ${LIBS} ${JNI_LIBRARIES})
 
     set(SOURCES_files
       CmdOperation.cpp
@@ -66,7 +63,6 @@ set(LIBS ${LIBS} ${JNI_LIBRARIES})
       VolumeDeviceClass.cpp
 			libusbVolume.cpp
       XMLite.cpp
-			MfgToolLibWrapper.cpp
     )
     source_group("Source Files" FILES ${SOURCES_files})
 
@@ -119,8 +115,6 @@ set(LIBS ${LIBS} ${JNI_LIBRARIES})
 			CString.h
       WindowsVersionInfo.h
       XMLite.h
-			com_freescale_mfgtool_mfgtoollib_LibHandle.h
-			com_freescale_mfgtool_mfgtoollib_MfgToolLib.h
     )
     source_group("Header Files" FILES ${SOURCES_Header_Files})
 
