@@ -163,6 +163,15 @@ DWORD DeviceManager::Open(){
 
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Device Manager thread is running"));
 
+#ifdef __linux__
+	libusb_device **list;
+	libusb_get_device_list(NULL, &list);
+	for (int i=0; list[i]; i++)
+	{
+		DevChange_callback(NULL, list[i] ,LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED, this);
+	}
+	libusb_free_device_list(list, 0);
+#endif
 	// clean up
 	DestroyEvent(_hStartEvent);
 	_hStartEvent = NULL;
