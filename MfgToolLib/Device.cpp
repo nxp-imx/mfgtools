@@ -9,7 +9,9 @@
 #include "stdafx.h"
 #include "Device.h"
 #pragma warning( disable : 4200 )
+#ifndef __linux__
 #include <usbioctl.h>
+#endif
 #pragma warning( default : 4200 )
 
 #include "MfgToolLib_Export.h"

@@ -11,7 +11,9 @@
 #include "StHidApi.h"
 
 extern "C" {
+#ifndef __linux__
 #include <hidsdi.h>
+#endif
 }
 
 class HidDevice : public Device

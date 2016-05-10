@@ -12,7 +12,10 @@
 #pragma once
 
 #include "Device.h"
+#ifndef __linux__
 #include <hidsdi.h>
+#endif
+
 
 #include "XMLite.h"
 

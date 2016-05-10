@@ -12,7 +12,9 @@
 //#include "UsbHub.h"
 
 #pragma warning( disable : 4200 )
+#ifndef __linux__
 #include <usbioctl.h>
+#endif
 #pragma warning( default : 4200 )
 
 usb::Controller::Controller(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle)
