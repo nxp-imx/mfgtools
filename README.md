@@ -9,6 +9,6 @@ Branch windows: windows version
 
 Windows Version Build Guide
 
-Download VS2015 Community version
+ - Download VS2015 Community version
 
-Open github/Apps/MfgTool.exe/MfgTool.2015.sln
+ - Open github/Apps/MfgTool.exe/MfgTool.2015.sln
