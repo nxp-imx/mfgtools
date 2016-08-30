@@ -1,0 +1,14 @@
+*.bak
+Debug
+Release
+*.user
+*.zip
+*.db
+*.log
+*.patch
+*.txt
+*.ncb
+*.suo
+gitversion.h
+Drivers/iMX_BulkIO_Driver
+*.aps
