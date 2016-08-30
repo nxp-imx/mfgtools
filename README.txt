@@ -1,4 +1,9 @@
-mfgtools ver 2.3.4 GPL-2.0
+mfgtools ver 2.3.4
+
+Branch master: linux version
+Branch windows: windows version
+
+Linux Version Build Guide
 
 Compilation requirements:
 libusb-1.0-0-dev
