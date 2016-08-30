@@ -1,0 +1,230 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CC3AB0C4-8E41-45CE-AE95-590F6BC0E6CE}</ProjectGuid>
+    <RootNamespace>MfgToolLib</RootNamespace>
+    <Keyword>MFCDLLProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfMfc>Static</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfMfc>Static</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.23107.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>MfgToolLib</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>MfgToolLib</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\Libs\WDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <ModuleDefinitionFile>.\MfgToolLib.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <OutputFile>$(OutDir)MfgToolLib.dll</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\Libs\WDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <ModuleDefinitionFile>.\MfgToolLib.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <OutputFile>$(OutDir)MfgToolLib.dll</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="CdcDevice.cpp" />
+    <ClCompile Include="CdcDeviceClass.cpp" />
+    <ClCompile Include="CmdOperation.cpp" />
+    <ClCompile Include="ControllerClass.cpp" />
+    <ClCompile Include="Device.cpp" />
+    <ClCompile Include="DeviceClass.cpp" />
+    <ClCompile Include="DeviceManager.cpp" />
+    <ClCompile Include="Disk.cpp" />
+    <ClCompile Include="DiskDeviceClass.cpp" />
+    <ClCompile Include="ExceptionHandle.cpp" />
+    <ClCompile Include="HidDevice.cpp" />
+    <ClCompile Include="HidDeviceClass.cpp" />
+    <ClCompile Include="HubClass.cpp" />
+    <ClCompile Include="KernelApi.cpp" />
+    <ClCompile Include="LogMgr.cpp" />
+    <ClCompile Include="MfgToolLib.cpp" />
+    <ClCompile Include="MxHidDevice.cpp" />
+    <ClCompile Include="MxHidDeviceClass.cpp" />
+    <ClCompile Include="MxRomDevice.cpp" />
+    <ClCompile Include="MxRomDeviceClass.cpp" />
+    <ClCompile Include="ParameterT.cpp" />
+    <ClCompile Include="SetupApi.cpp" />
+    <ClCompile Include="StApi.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="StFwComponent.cpp" />
+    <ClCompile Include="StHidApi.cpp" />
+    <ClCompile Include="StPitc.cpp" />
+    <ClCompile Include="StVersionInfo.cpp" />
+    <ClCompile Include="UpdateTransportProtocol.cpp" />
+    <ClCompile Include="UsbController.cpp" />
+    <ClCompile Include="UsbHub.cpp" />
+    <ClCompile Include="UsbPort.cpp" />
+    <ClCompile Include="Volume.cpp" />
+    <ClCompile Include="VolumeDeviceClass.cpp" />
+    <ClCompile Include="XMLite.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MfgToolLib.def" />
+    <None Include="res\MfgToolLib.rc2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CallbackDef.h" />
+    <ClInclude Include="CdcDevice.h" />
+    <ClInclude Include="CdcDeviceClass.h" />
+    <ClInclude Include="CmdOperation.h" />
+    <ClInclude Include="ControllerClass.h" />
+    <ClInclude Include="Device.h" />
+    <ClInclude Include="DeviceClass.h" />
+    <ClInclude Include="DeviceManager.h" />
+    <ClInclude Include="Disk.h" />
+    <ClInclude Include="DiskDeviceClass.h" />
+    <ClInclude Include="ExceptionHandle.h" />
+    <ClInclude Include="HidDevice.h" />
+    <ClInclude Include="HidDeviceClass.h" />
+    <ClInclude Include="HubClass.h" />
+    <ClInclude Include="KernelApi.h" />
+    <ClInclude Include="LogMgr.h" />
+    <ClInclude Include="MfgToolLib.h" />
+    <ClInclude Include="MfgToolLib_Export.h" />
+    <ClInclude Include="MxHidDevice.h" />
+    <ClInclude Include="MxHidDeviceClass.h" />
+    <ClInclude Include="MxRomDevice.h" />
+    <ClInclude Include="MxRomDeviceClass.h" />
+    <ClInclude Include="ParameterT.h" />
+    <ClInclude Include="Property.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="SetupApi.h" />
+    <ClInclude Include="StApi.h" />
+    <ClInclude Include="StApiFactory.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="StFwComponent.h" />
+    <ClInclude Include="StHidApi.h" />
+    <ClInclude Include="StMedia.h" />
+    <ClInclude Include="StPitc.h" />
+    <ClInclude Include="StVersionInfo.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="UpdateTransportProtocol.Api.h" />
+    <ClInclude Include="UpdateTransportProtocol.h" />
+    <ClInclude Include="UpdateUIInfo.h" />
+    <ClInclude Include="UsbController.h" />
+    <ClInclude Include="UsbHub.h" />
+    <ClInclude Include="UsbPort.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="Volume.h" />
+    <ClInclude Include="VolumeDeviceClass.h" />
+    <ClInclude Include="WindowsVersionInfo.h" />
+    <ClInclude Include="XMLite.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\checks.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MfgToolLib.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
