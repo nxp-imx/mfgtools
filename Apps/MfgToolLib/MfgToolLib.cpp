@@ -1401,10 +1401,19 @@ void COpCommand::SetIfDevString(CString &str)
 
 bool COpCommand::IsRun(CString &str)
 {
-	if(m_ifdev.IsEmpty())
+	if (m_ifdev.IsEmpty())
 		return true;
-	if(m_ifdev.Find(str,0) >= 0)
-		return true;
+
+	int start = 0;
+
+	CString substr = m_ifdev;
+	while (start >= 0)
+	{
+		substr = m_ifdev.Tokenize(_T(" ,;\n\t"), start);
+		if (substr == str)
+			return true;
+	}
+
 	return false;
 }
 
