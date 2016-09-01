@@ -283,7 +283,7 @@ Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListTyp
 			{
 				if((*deviceIt)->IsUsb())
 				{
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceClass::FindDeviceByUsbPath--DeviceListType_Current, devInstPathToFind: %s, _deviceInstanceID: %s"), devInstPathToFind, (*deviceIt)->UsbDevice()->_deviceInstanceID.get());
+					//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceClass::FindDeviceByUsbPath--DeviceListType_Current, devInstPathToFind: %s, _deviceInstanceID: %s"), devInstPathToFind, (*deviceIt)->UsbDevice()->_deviceInstanceID.get());
 					if( devInstPathToFind.CompareNoCase( (*deviceIt)->UsbDevice()->_deviceInstanceID.get() ) == 0 )
 					{
 						pDevice = (*deviceIt);
