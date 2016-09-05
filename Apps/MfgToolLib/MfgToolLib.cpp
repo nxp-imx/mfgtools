@@ -2347,7 +2347,12 @@ UINT COpCmd_Blhost::ExecuteCommand(int index)
 		}
 		peripheral = CString("-p ") + CString(pCDCDevice->m_commport);
 	}
-	
+	else
+	{
+		MxHidDevice* pHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
+		peripheral.Append(pHidDevice->_path.get());
+    }
+
 	retValue = (ExecuteBlhostCommand(CString(peripheral + _T(" -- ") + csCmdBody), csCmdText));
 	if ( retValue == ERROR_SUCCESS)
 	{
