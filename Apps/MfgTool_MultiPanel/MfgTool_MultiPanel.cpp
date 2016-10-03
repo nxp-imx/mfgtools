@@ -56,7 +56,7 @@
 * Global configuration file name
 ************************************************************/
 #define DEFAULT_CFG_FILE_NAME					_T("cfg.ini")
-#define PHASE_NUMBER							8
+#define PHASE_NUMBER							64
 
 
 int g_totalOps = 0;
@@ -435,7 +435,7 @@ BOOL CMfgTool_MultiPanelApp::InitInstance()
 		return FALSE;
 	}
 	m_PhasesInformation.pPhaseInfo = pPhaseInformation;
-	error = MfgLib_GetPhaseInformation(m_pLibHandle, &m_PhasesInformation);
+	error = MfgLib_GetPhaseInformation(m_pLibHandle, &m_PhasesInformation, PHASE_NUMBER);
 	if(error != MFGLIB_ERROR_SUCCESS)
 	{
 		strMsg.Format(_T("Get Phase information failed."));
