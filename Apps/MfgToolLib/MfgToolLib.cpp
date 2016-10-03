@@ -594,7 +594,7 @@ DWORD MfgLib_GetOperationInformation(INSTANCE_HANDLE handle, OPERATIONS_INFORMAT
 	return MFGLIB_ERROR_SUCCESS;
 }
 
-DWORD MfgLib_GetPhaseInformation(INSTANCE_HANDLE handle, PHASES_INFORMATION *pPhasesInfo)
+DWORD MfgLib_GetPhaseInformation(INSTANCE_HANDLE handle, PHASES_INFORMATION *pPhasesInfo, int MaxInfos)
 {
 	MFGLIB_VARS *pLibVars = (MFGLIB_VARS *)handle;
 	if(NULL == pLibVars)
@@ -616,6 +616,11 @@ DWORD MfgLib_GetPhaseInformation(INSTANCE_HANDLE handle, PHASES_INFORMATION *pPh
 	if(pOpStates == NULL)
 	{
 		return MFGLIB_ERROR_PHASE_NOT_PARSED;
+	}
+
+	if (pOpStates->size() > MaxInfos)
+	{
+		return MFGLIB_ERROR_INVALID_PARAM;
 	}
 
 	pPhasesInfo->PhaseInfoNumbers = pOpStates->size();

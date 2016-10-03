@@ -214,7 +214,7 @@ DWORD MfgLib_UninitializeOperation(INSTANCE_HANDLE handle);
 DWORD MfgLib_StartOperation(INSTANCE_HANDLE handle, DWORD OperationID);
 DWORD MfgLib_StopOperation(INSTANCE_HANDLE handle, DWORD OperationID);
 DWORD MfgLib_GetOperationInformation(INSTANCE_HANDLE handle, OPERATIONS_INFORMATION *pOperationsInfo);
-DWORD MfgLib_GetPhaseInformation(INSTANCE_HANDLE handle, PHASES_INFORMATION *pPhasesInfo);
+DWORD MfgLib_GetPhaseInformation(INSTANCE_HANDLE handle, PHASES_INFORMATION *pPhasesInfo, int MaxInfos);
 DWORD MfgLib_GetTotalCommandNumbers(INSTANCE_HANDLE handle, UINT *Number);
 DWORD MfgLib_RegisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbType, void *pFunc);
 DWORD MfgLib_UnregisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbType, void *pFunc);
