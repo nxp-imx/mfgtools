@@ -126,6 +126,9 @@ void MxHidDevice::NotifyOpen()
 		case DEV_HID_MX6UL:
 			_chipFamily = MX6UL;
 			break;
+		case DEV_HID_MX6ULL:
+			_chipFamily = MX6ULL;
+			break;
 		default:
 			_chipFamily = MX50;
 			break;
