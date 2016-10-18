@@ -323,6 +323,7 @@ int main (int argc,char* argv[]){
 		{
 			std::cout << "Usage: [program] [arguments] [settings]=[values]" << std::endl;
 			std::cout << std::setw(6) << "-s" << "  --setting      " << "Specify any UCL keywords." << std::endl;
+			std::cout << std::setw(6) << "-p" << "  --ports        " << "Specify the number of boards connected." << std::endl;
 			std::cout << std::setw(6) << "-o" << "  --profilepath  " << "Specify path to Profiles directory." << std::endl;
 			std::cout << std::setw(6) << "-c" << "  --profile      " << "Specify the profile to use." << std::endl;
 			std::cout << std::setw(6) << "-l" << "  --list         " << "Specify command list." << std::endl;
