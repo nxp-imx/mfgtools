@@ -14,3 +14,9 @@ How to make:
 - go to TestPrgm
 - make cmake
 - make
+
+
+
+Licenses:
+- CPOL: MfgToolLib/XmlLite.CPP and XmlLite.h
+- BSD: Others.
