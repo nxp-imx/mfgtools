@@ -293,6 +293,7 @@ BOOL DeviceManager::InitInstance()
 		case DEV_HID_MX6UL:
 		case DEV_HID_MX6ULL:
 		case DEV_HID_MX6SLL:
+		case DEV_HID_MX7ULP:
 		case DEV_HID_KBL:
 			pDevClass = new MxHidDeviceClass(m_pLibHandle);
 			if(pDevClass == NULL)
@@ -607,6 +608,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 				case DEV_HID_MX6UL:
 				case DEV_HID_MX6ULL:
 				case DEV_HID_MX6SLL:
+				case DEV_HID_MX7ULP:
 				case DEV_HID_KBL:
 					nsInfo = g_devClasses[DeviceClass::DeviceTypeMxHid]->AddUsbDevice(msg);
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
@@ -674,6 +676,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 					case DEV_HID_MX6UL:
 					case DEV_HID_MX6ULL:
 					case DEV_HID_MX6SLL:
+					case DEV_HID_MX7ULP:
 					case DEV_HID_KBL:
 					case DEV_CDC_KBL:
 					{
@@ -758,6 +761,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 				case DEV_HID_MX6UL:
 				case DEV_HID_MX6ULL:
 				case DEV_HID_MX6SLL:
+				case DEV_HID_MX7ULP:
 				case DEV_HID_KBL:
 					nsInfo = g_devClasses[DeviceClass::DeviceTypeMxHid]->RemoveUsbDevice(msg);
 					class_type = DeviceClass::DeviceTypeMxHid;

@@ -127,6 +127,9 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 	case DEV_HID_MX6SLL:
 		_chipFamily = MX6SLL;
 		break;
+	case DEV_HID_MX7ULP:
+		_chipFamily = MX7ULP;
+		break;
 	default:
 		_chipFamily = MX50;
 		break;
@@ -484,7 +487,10 @@ BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount)
 	else
 	{
 		SDPCmd.dataCount = RegCount;
-		SDPCmd.address = 0x00910000;//IRAM free space
+		if (this->_chipFamily == MX7ULP)
+			SDPCmd.address = 0x2f018000;
+		else
+			SDPCmd.address = 0x00910000;//IRAM free space
 
 		if(!SendCmd(&SDPCmd))
 		{

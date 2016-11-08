@@ -1027,6 +1027,10 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 		{
 			pState->opDeviceType = DEV_HID_MX6SLL;
 		}
+		else if (strTemp.CompareNoCase(_T("MX7ULP")) == 0)
+		{
+			pState->opDeviceType = DEV_HID_MX7ULP;
+		}
 		else if( strTemp.CompareNoCase(_T("MSC")) == 0 )
 		{
 			pState->opDeviceType = DEV_MSC_UPDATER;
