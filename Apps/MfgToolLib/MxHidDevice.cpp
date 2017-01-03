@@ -130,6 +130,9 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 	case DEV_HID_MX7ULP:
 		_chipFamily = MX7ULP;
 		break;
+	case DEV_HID_K32H422:
+		_chipFamily = K32H422;
+		break;
 	default:
 		_chipFamily = MX50;
 		break;
@@ -489,6 +492,8 @@ BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount)
 		SDPCmd.dataCount = RegCount;
 		if (this->_chipFamily == MX7ULP)
 			SDPCmd.address = 0x2f018000;
+		else if (this->_chipFamily == K32H422)
+			SDPCmd.address = 0x8000;
 		else
 			SDPCmd.address = 0x00910000;//IRAM free space
 
@@ -972,7 +977,9 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 		//---------------------------------------------------------
 		//Download boot data to ram
 		PhyRAMAddr4KRL = pIVT->SelfAddr - ImgIVTOffset;
-		pIVT->DCDAddress = 0;
+
+		if (this->_chipFamily < MX7D)
+			pIVT->DCDAddress = 0;
 
 		if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, (PUCHAR)((DWORD)pDataBuf)))
 		{
