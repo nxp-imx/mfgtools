@@ -193,7 +193,7 @@ public:
 		MX6ULL,
 		MX6SLL,
 		MX7ULP,
-		K32H422,
+		K32H844P,
     };
 
 	enum HAB_t

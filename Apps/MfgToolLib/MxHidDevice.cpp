@@ -130,8 +130,8 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 	case DEV_HID_MX7ULP:
 		_chipFamily = MX7ULP;
 		break;
-	case DEV_HID_K32H422:
-		_chipFamily = K32H422;
+	case DEV_HID_K32H844P:
+		_chipFamily = K32H844P;
 		break;
 	default:
 		_chipFamily = MX50;
@@ -492,7 +492,7 @@ BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount)
 		SDPCmd.dataCount = RegCount;
 		if (this->_chipFamily == MX7ULP)
 			SDPCmd.address = 0x2f018000;
-		else if (this->_chipFamily == K32H422)
+		else if (this->_chipFamily == K32H844P)
 			SDPCmd.address = 0x8000;
 		else
 			SDPCmd.address = 0x00910000;//IRAM free space
