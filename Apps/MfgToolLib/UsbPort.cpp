@@ -332,6 +332,7 @@ CString usb::Port::GetDeviceDescription(void)
                 case DeviceClass::DeviceTypeMxHid:
                 case DeviceClass::DeviceTypeUsbController:
                 case DeviceClass::DeviceTypeUsbHub:
+                case DeviceClass::DeviceTypeKBLHID:
                 default:
                     descStr = _device->_description.get().GetBuffer();
 					_device->_description.get().ReleaseBuffer();
