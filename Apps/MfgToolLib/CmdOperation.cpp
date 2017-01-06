@@ -207,8 +207,11 @@ MX_DEVICE_STATE CCmdOpreation::GetDeviceState()
 	case DeviceClass::DeviceTypeHid:
 	case DeviceClass::DeviceTypeMxHid:
 	case DeviceClass::DeviceTypeMxRom:
-	case DeviceClass::DeviceTypeKBLCDC:
 		state = MX_BOOTSTRAP;
+		break;
+	case DeviceClass::DeviceTypeKBLCDC:
+	case DeviceClass::DeviceTypeKBLHID:
+		state = MX_BLHOST;
 		break;
 	case DeviceClass::DeviceTypeMsc:
 	case DeviceClass::DeviceTypeDisk:

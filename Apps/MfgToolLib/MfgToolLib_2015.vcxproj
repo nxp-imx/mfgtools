@@ -137,6 +137,7 @@
     <ClCompile Include="HidDevice.cpp" />
     <ClCompile Include="HidDeviceClass.cpp" />
     <ClCompile Include="HubClass.cpp" />
+    <ClCompile Include="KblHidDeviceClass.cpp" />
     <ClCompile Include="KernelApi.cpp" />
     <ClCompile Include="LogMgr.cpp" />
     <ClCompile Include="MfgToolLib.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="HidDevice.h" />
     <ClInclude Include="HidDeviceClass.h" />
     <ClInclude Include="HubClass.h" />
+    <ClInclude Include="KblHidDeviceClass.h" />
     <ClInclude Include="KernelApi.h" />
     <ClInclude Include="LogMgr.h" />
     <ClInclude Include="MfgToolLib.h" />

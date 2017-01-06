@@ -120,6 +120,9 @@
     <ClCompile Include="XMLite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="KblHidDeviceClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MfgToolLib.def">
@@ -266,6 +269,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CdcDeviceClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KblHidDeviceClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
