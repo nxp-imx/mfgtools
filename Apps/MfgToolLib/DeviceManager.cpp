@@ -36,6 +36,7 @@
 #include "MxRomDeviceClass.h"
 #include "HidDeviceClass.h"
 #include "MxHidDeviceClass.h"
+#include "KblHidDeviceClass.h"
 #include "DiskDeviceClass.h"
 #include "VolumeDeviceClass.h"
 #include "CdcDeviceClass.h"
@@ -171,6 +172,7 @@ BOOL DeviceManager::InitInstance()
 	g_devClasses[DeviceClass::DeviceTypeUsbController] = NULL;
 	g_devClasses[DeviceClass::DeviceTypeUsbHub] = NULL;
 	g_devClasses[DeviceClass::DeviceTypeKBLCDC] = NULL;
+	g_devClasses[DeviceClass::DeviceTypeKBLHID] = NULL;
 
 	// Create a hidden window and register it to receive WM_DEVICECHANGE messages
 	if( _DevChangeWnd.CreateEx(WS_EX_TOPMOST, _T("STATIC"), _T("DeviceChangeWnd"), 0, CRect(0,0,5,5), NULL, 0) )
@@ -295,7 +297,6 @@ BOOL DeviceManager::InitInstance()
 		case DEV_HID_MX6SLL:
 		case DEV_HID_MX7ULP:
 		case DEV_HID_K32H844P:
-		case DEV_HID_KBL:
 			pDevClass = new MxHidDeviceClass(m_pLibHandle);
 			if(pDevClass == NULL)
 			{
@@ -304,6 +305,17 @@ BOOL DeviceManager::InitInstance()
 				return FALSE;
 			}
 			g_devClasses[DeviceClass::DeviceTypeMxHid] = pDevClass;
+			pDevClass->Devices();
+			break;
+		case DEV_HID_KBL:
+			pDevClass = new KblHidDeviceClass(m_pLibHandle);
+			if (pDevClass == NULL)
+			{
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create MxHidDeviceClass"));
+				SetSelfThreadRunStatus(FALSE);
+				return FALSE;
+			}
+			g_devClasses[DeviceClass::DeviceTypeKBLHID] = pDevClass;
 			pDevClass->Devices();
 			break;
 		case DEV_CDC_KBL:
@@ -611,8 +623,11 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 				case DEV_HID_MX6SLL:
 				case DEV_HID_MX7ULP:
 				case DEV_HID_K32H844P:
-				case DEV_HID_KBL:
 					nsInfo = g_devClasses[DeviceClass::DeviceTypeMxHid]->AddUsbDevice(msg);
+					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
+					break;
+				case DEV_HID_KBL:
+					nsInfo = g_devClasses[DeviceClass::DeviceTypeKBLHID]->AddUsbDevice(msg);
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
 					break;
 				case DEV_CDC_KBL:
@@ -766,9 +781,13 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 				case DEV_HID_MX6SLL:
 				case DEV_HID_MX7ULP:
 				case DEV_HID_K32H844P:
-				case DEV_HID_KBL:
 					nsInfo = g_devClasses[DeviceClass::DeviceTypeMxHid]->RemoveUsbDevice(msg);
 					class_type = DeviceClass::DeviceTypeMxHid;
+					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
+					break;
+				case DEV_HID_KBL:
+					nsInfo = g_devClasses[DeviceClass::DeviceTypeKBLHID]->RemoveUsbDevice(msg);
+					class_type = DeviceClass::DeviceTypeKBLHID;
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
 					break;
 				case DEV_CDC_KBL:

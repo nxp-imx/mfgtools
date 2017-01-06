@@ -953,6 +953,9 @@ void StartForConsole()
 			case MX_UPDATER:
 				strPhase = _T("Updater phase: ");
 				break;
+			case MX_BLHOST:
+				strPhase = _T("Blhost phase: ");
+				break;
 			}
 			strMsg.Format(_T("Device %d - %s%d%%"), (i+1), strPhase, 0);
 		}

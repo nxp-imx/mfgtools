@@ -110,6 +110,7 @@ typedef enum _Device_State
 {
 	MX_BOOTSTRAP = 0,
 	MX_UPDATER,
+	MX_BLHOST,
 	MX_DISCONNECTED = 10,
 } MX_DEVICE_STATE;
 

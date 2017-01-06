@@ -953,6 +953,10 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 		{
 		   pState->opState = MX_UPDATER;
 		}
+		else if (strTemp.CompareNoCase(_T("Blhost")) == 0)
+		{
+			pState->opState = MX_BLHOST;
+		}
 		else
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Error: Invalid state name: %s"), strTemp);
@@ -1295,6 +1299,10 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 		else if(strState.CompareNoCase(_T("Updater")) == 0)
 		{
 			pLibVars->g_StateCommands[MX_UPDATER].push_back(pOpCmd);
+		}
+		else if (strState.CompareNoCase(_T("Blhost")) == 0)
+		{
+			pLibVars->g_StateCommands[MX_BLHOST].push_back(pOpCmd);
 		}
 	}
 	return MFGLIB_ERROR_SUCCESS;
@@ -2368,6 +2376,7 @@ UINT COpCmd_Blhost::ExecuteCommand(int index)
 	{
 		MxHidDevice* pHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
 		peripheral.Append(pHidDevice->_path.get());
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("PortMgrDlg(%d)--Path=%s"), index, pHidDevice->_path.get());
     }
 
 	retValue = (ExecuteBlhostCommand(CString(peripheral + _T(" -- ") + csCmdBody), csCmdText));
@@ -2761,9 +2770,10 @@ void AutoScanDevice(MFGLIB_VARS *pLibVars, int iPortUsedNums)
 					}
 					break;
 				case DeviceClass::DeviceTypeHid:
-                case DeviceClass::DeviceTypeMxHid:
+				case DeviceClass::DeviceTypeMxHid:
 				case DeviceClass::DeviceTypeMxRom:
 				case DeviceClass::DeviceTypeKBLCDC:
+				case DeviceClass::DeviceTypeKBLHID:
 					{
 						strPath = pPort->GetDevice()->_path.get();
 						strPath.MakeUpper();
