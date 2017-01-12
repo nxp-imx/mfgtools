@@ -1292,6 +1292,9 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 		strTemp = (*it)->GetAttrValue(_T("ifdev"));
 		pOpCmd->SetIfDevString(strTemp);
 
+		strTemp = (*it)->GetAttrValue(_T("ifhab"));
+		pOpCmd->SetIfHabString(strTemp);
+
 		if( strState.CompareNoCase(_T("BootStrap")) == 0 )
 		{
 			pLibVars->g_StateCommands[MX_BOOTSTRAP].push_back(pOpCmd);
@@ -1424,6 +1427,11 @@ void COpCommand::SetIfDevString(CString &str)
 	m_ifdev = str;
 }
 
+void COpCommand::SetIfHabString(CString &str)
+{
+	m_ifhab = str;
+}
+
 bool COpCommand::IsRun(CString &str)
 {
 	if (m_ifdev.IsEmpty())
@@ -1436,6 +1444,37 @@ bool COpCommand::IsRun(CString &str)
 	{
 		substr = m_ifdev.Tokenize(_T(" ,;\n\t"), start);
 		if (substr == str)
+			return true;
+	}
+
+	return false;
+}
+
+bool COpCommand::IsRun(MxHidDevice::HAB_t habState)
+{
+	if (m_ifhab.IsEmpty())
+		return true;
+
+	CString stateStr;
+	if (habState == MxHidDevice::HabDisabled)
+	{
+		stateStr = _T("Open");
+	}
+	else if (habState == MxHidDevice::HabEnabled)
+	{
+		stateStr = _T("Close");
+	}
+	else
+	{
+		stateStr = _T("Unknown");
+	}
+
+	int start = 0;
+	CString substr = m_ifhab;
+	while (start >= 0)
+	{
+		substr = m_ifhab.Tokenize(_T(" ,;\n\t"), start);
+		if (substr == stateStr)
 			return true;
 	}
 

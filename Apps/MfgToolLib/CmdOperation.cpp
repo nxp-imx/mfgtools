@@ -452,6 +452,7 @@ UINT CmdListThreadProc(LPVOID pParam)
 	OP_COMMAND_ARRAY::iterator cmdIt;
 	DWORD dwStateIndex = 0;
 	CString chip;
+	MxHidDevice::HAB_t habstate = MxHidDevice::HabUnknown;
 
 	while(!pOperation->m_bKilled)
 	{
@@ -512,11 +513,12 @@ UINT CmdListThreadProc(LPVOID pParam)
 					if(pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 					{
 						chip = ((MxHidDevice*)pDevice)->_chiFamilyName;
+						habstate = ((MxHidDevice*)pDevice)->GetHABState();
 					}
 				}
 				
 				COpCommand *pCmd = (*cmdIt);
-				if(pCmd->IsRun(chip))
+				if(pCmd->IsRun(chip) && pCmd->IsRun(habstate))
 				{
 					dwError = pCmd->ExecuteCommand(pOperation->m_WndIndex);
 				}else
