@@ -138,6 +138,8 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 		break;
 	}
 
+	m_habState = HabUnknown;
+
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new MxHidDevice[%p]"), this);
 }
 
@@ -592,7 +594,6 @@ int MxHidDevice::Read(void* _buf, UINT _size)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("MxHidDevice::Read() Error reading from device 0x%x."), GetLastError());
 		return GetLastError();
 	}
-
 	return ERROR_SUCCESS;
 }
 
@@ -683,11 +684,54 @@ BOOL MxHidDevice::GetHABType()
 	if ( (*(unsigned int *)(m_pReadReport->Payload) != HabEnabled)  && 
 		 (*(unsigned int *)(m_pReadReport->Payload) != HabDisabled) ) 
 	{
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("HAB type mismatch: 0x%x!!!"), *(unsigned int *)(m_pReadReport->Payload));    
+        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("HAB type mismatch: 0x%x!!!"), *(unsigned int *)(m_pReadReport->Payload));
+		m_habState = HabUnknown;
 		return FALSE;	
 	}
 
+	m_habState = *(unsigned int *)m_pReadReport->Payload == HabEnabled ? HabEnabled : HabDisabled;
 	return TRUE;
+}
+
+MxHidDevice::HAB_t MxHidDevice::GetHABState()
+{
+	if (m_habState != HabUnknown)
+	{
+		return  m_habState;
+	}
+	
+	// Send "Error Status" command to get the HAB state.
+	// "Error Status" doesn't write any data to ROM.
+	// "Read Memory" can be disabled by Fuse.
+	SDPCmd SDPCmd;
+
+	SDPCmd.command = ROM_KERNEL_CMD_ERROR_STATUS;
+	SDPCmd.dataCount = 0;
+	SDPCmd.format = 0;
+	SDPCmd.data = 0;
+	SDPCmd.address = 0;
+
+	OpenMxHidHandle();
+
+	if (!SendCmd(&SDPCmd))
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to send error status command to ROM!!!"));
+		goto GetHABStateFailed;
+	}
+
+	if (!GetHABType())
+		goto GetHABStateFailed;
+
+	// Just read the left data. HAB state is already got, and no need to check to result.
+	Read((UCHAR *)m_pReadReport, m_Capabilities.InputReportByteLength);
+
+	OpenMxHidHandle();
+	return m_habState;
+
+GetHABStateFailed:
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to Get HAB state!!!"));
+	OpenMxHidHandle();
+	return HabUnknown;
 }
 
 BOOL MxHidDevice::Jump()

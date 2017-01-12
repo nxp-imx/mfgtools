@@ -263,6 +263,7 @@ public:
 	ChipFamily_t _chipFamily;
 	CString		_chiFamilyName;
 	UINT m_jumpAddr;
+	HAB_t m_habState;
 
 	static MemorySection StringToMemorySection(CString section)
 	{
@@ -302,6 +303,7 @@ public:
 	BOOL SendCmd(PSDPCmd pSDPCmd);
 	BOOL SendData(const unsigned char * DataBuf, UINT ByteCnt);
 	BOOL GetHABType();
+	HAB_t GetHABState();
 	BOOL GetDevAck(UINT RequiredCmdAck);  
 	VOID PackSDPCmd(PSDPCmd pSDPCmd);
 	int Read(void* buf, UINT size);

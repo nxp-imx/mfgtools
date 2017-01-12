@@ -49,7 +49,7 @@
 #include "UsbPort.h"
 #include "UpdateTransportProtocol.h"
 #include "CmdOperation.h"
-
+#include "MxHidDevice.h"
 
 // CMfgToolLibApp
 // See MfgToolLib.cpp for the implementation of this class
@@ -136,13 +136,16 @@ public:
 	virtual void SetDescString(CString &str);
 	virtual CString GetDescString();
 	virtual void SetIfDevString(CString &str);
+	virtual void SetIfHabString(CString &str);
 	virtual bool IsRun(CString &dev);
+	virtual bool IsRun(MxHidDevice::HAB_t habState);
 	INSTANCE_HANDLE m_pLibVars;
 
 protected:
 	CString m_bodyString;
 	CString m_descString;
 	CString m_ifdev;
+	CString m_ifhab;
 };
 
 class COpCmd_Find : public COpCommand
