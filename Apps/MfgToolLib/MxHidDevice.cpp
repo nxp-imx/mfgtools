@@ -790,6 +790,9 @@ BOOL MxHidDevice::Jump(UINT RAMAddress, BOOL isPlugin)
 	if (isPlugin)
 	{
 		GetHABType();
+
+		Sleep(300); // Wait for plugin finish run
+
 		GetCmdAck(ROM_OK_ACK); /*omit rom return error code, if use plug-in mode*/
 	}
 	else
@@ -873,20 +876,14 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 		//Download plugin data into IRAM.
 		PlugInAddr = pIVT->ImageStartAddr;
 		PlugInDataOffset = pIVT->ImageStartAddr - pIVT->SelfAddr;
-		if (!TransData(PlugInAddr, pPluginDataBuf->ImageSize, (PUCHAR)((DWORD)pIVT + PlugInDataOffset)))
+		if (!TransData(pIVT->SelfAddr, pPluginDataBuf->ImageSize, (PUCHAR)((DWORD)pIVT)))
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed."),
 				PlugInAddr, pPluginDataBuf->ImageSize, ((DWORD)pIVT + PlugInDataOffset));
 			goto ERR_HANDLE;
 		}
-
-		if(!AddIvtHdr(PlugInAddr))
-		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): Failed to addhdr to RAM address: 0x%x."), PlugInAddr);
-			goto ERR_HANDLE;
-		}
-	    
-		if( !Jump(m_jumpAddr, true))
+		
+		if( !Jump(pIVT->SelfAddr, true))
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): Failed to jump to RAM address: 0x%x."), m_jumpAddr);
 			goto ERR_HANDLE;
@@ -918,12 +915,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 			goto ERR_HANDLE;
 		}
 	    
-		DWORD ImgStartAddr = pIVT2->ImageStartAddr;
-		if(!AddIvtHdr(ImgStartAddr))
-		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): Failed to addhdr to RAM address: 0x%x.\n"), ImgStartAddr);
-			goto ERR_HANDLE;
-		}
+		m_jumpAddr = pIVT2->SelfAddr;
 	}
 	else
 	{
