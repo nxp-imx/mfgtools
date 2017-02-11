@@ -911,7 +911,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
     		if(HAB_TAG_DCD != EndianSwap(*pDCDRegion)>>24)
     		{
     			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("DCD header tag doesn't match!"));
-    			return FALSE;
+    			goto ERR_HANDLE;
     		}
 
 			if( (_chipFamily >= MX6Q) )
@@ -928,13 +928,13 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
     			if(TotalDCDDataCnt > HAB_DCD_BYTES_MAX)
     			{
     				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("DCD data excceeds max limit!!!"));
-    				return FALSE;
+    				goto ERR_HANDLE;
     			}
 
     			if ( !DCDWrite((PUCHAR)(pDCDRegion),TotalDCDDataCnt) )
     			{
     				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to initialize memory!"));
-    				return FALSE;
+    				goto ERR_HANDLE;
     			}
     		}
     		else
@@ -985,7 +985,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
     			{
     				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to initialize memory!"));
     				free(pRomFormatDCDData);
-    				return FALSE;
+    				goto ERR_HANDLE;
     			}
     			free(pRomFormatDCDData);
     		}
