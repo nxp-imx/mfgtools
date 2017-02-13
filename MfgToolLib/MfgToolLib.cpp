@@ -147,6 +147,8 @@ BOOL CMfgToolLibApp::InitInstance()
 
 	g_strVersion.Format(_T("DLL version: %d.%d.%d"), FSLMFGTOOL_MAJOR_VERSION, FSLMFGTOOL_MINOR_VERSION, FSLMFGTOOL_REVISION);
 
+	free(_path);
+
 	return TRUE;
 }
 

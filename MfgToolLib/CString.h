@@ -94,7 +94,7 @@ public: CTString() : tstring() { }
 			int actual = _vsntprintf(ret, buffLen, fmt, ap);
 			do{
 				if (actual == -1){
-					delete ret;
+					delete[] ret;
 					ret = new T[buffLen*(i + 2)];
 					actual = _vsntprintf(ret, actual, fmt, ap);
 				}
@@ -106,7 +106,7 @@ public: CTString() : tstring() { }
 
 			CTString<T> str(ret);
 			this->assign(str);
-			free(ret);
+			delete[] ret;
 
 			return;
 
@@ -124,7 +124,7 @@ public: CTString() : tstring() { }
 			int actual = _vsntprintf(ret, buffLen, fmt, ap);
 			do{
 				if (actual == -1){
-					delete ret;
+					delete[] ret;
 					ret = new T[buffLen*(i+2)];
 					actual=_vsntprintf(ret, actual, fmt, ap);
 				}
@@ -136,7 +136,7 @@ public: CTString() : tstring() { }
 
 			CTString<T>  str(ret);
 			this->append(str);
-			free(ret);
+			delete[] ret;
 
 			return;
 
