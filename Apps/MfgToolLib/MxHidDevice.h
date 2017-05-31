@@ -62,12 +62,24 @@
 
 #define IVT_BARKER_HEADER				0x402000D1
 #define IVT_BARKER2_HEADER				0x412000D1
+#define MX8_IVT_BARKER_HEADER			0x434000D1
+#define MX8_IVT2_BARKER_HEADER			0x433000de
+
 #define ROM_TRANSFER_SIZE				0x400
 #define IVT_OFFSET								0x400
 #define HAB_CMD_WRT_DAT					0xcc  /**< Write Data */
 #define HAB_CMD_CHK_DAT					0xcf  /**< Check Data */
 #define HAB_TAG_DCD							0xd2       /**< Device Configuration Data */
-#define HAB_DCD_BYTES_MAX				1768 
+#define HAB_DCD_BYTES_MAX				1768
+
+// Multi-image suppport
+#define MX8_MAX_IMAGES_COUNT			4
+#define MX8_INITIAL_IMAGE_SIZE			0x1000
+#define MX8_IMG_OFFSET					0x8000
+
+#define IVT_OFFSET_SD					0x400
+
+#define ROM_ECC_SIZE_ALIGN				0x400
 
 //DCD binary data format:
 //4 bytes for format	4 bytes for register1 address	4 bytes for register1 value to set
@@ -194,6 +206,8 @@ public:
 		MX6SLL,
 		MX7ULP,
 		K32H844P,
+		MX8QM,
+		MX8QXP,
     };
 
 	enum HAB_t
@@ -238,6 +252,42 @@ public:
            unsigned long ImageSize;
 		   unsigned long PluginFlag;
 	}BootData, *PBootData;
+
+	typedef struct _SubImageInfo
+	{
+		unsigned long long	Offset;
+		unsigned long long	ImageAddr;
+		unsigned long long	ImageEntry;
+		unsigned long		ImageSize;
+		unsigned long		ImageFlag;
+	}SubImageInfo;
+
+	typedef struct _BootDataV2
+	{
+		unsigned long	NrImages; // Number of images
+		unsigned long	BootDataSize;
+		unsigned long   BootDataFlag;
+		unsigned long	Reserved;
+		SubImageInfo	Images[MX8_MAX_IMAGES_COUNT];
+		SubImageInfo	SCD;
+		SubImageInfo	CSF;
+		SubImageInfo	ImgReserved;
+	}BootDataV2, *PBootDataV2;
+
+	typedef struct _IvtHeaderV2
+	{
+		unsigned long		IvtBarker;
+		unsigned long		Reserved;
+		unsigned long long	DCDAddress;
+		unsigned long long	BootData;
+		unsigned long long	SelfAddr;
+		unsigned long long	CSFAddr;
+		union {
+			unsigned long long	SCDAddr;
+			unsigned long long	Next;
+		};
+		unsigned long long	Reserved2[2];
+	}IvtHeaderV2, *PIvtHeaderV2;
 
 	enum MemorySection 
 	{ 
@@ -311,12 +361,16 @@ public:
 	BOOL GetCmdAck(UINT RequiredCmdAck);
 	BOOL Jump();
 	BOOL Jump(UINT RAMAddress, BOOL isPlugin = FALSE);
+	BOOL RunMxMultiImg(UCHAR* pBuffer, ULONGLONG dataCount);
+	DWORD GetIvtOffset(DWORD *start, ULONGLONG dataCount);
+	BOOL MxHidDevice::RunDCD(DWORD* pDCDRegion);
 	//BOOL RunPlugIn(HANDLE hFileMapping, ULONGLONG dwFileSize);
 	BOOL RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize);
 	BOOL TransData(UINT address, UINT byteCount, const unsigned char * pBuf);
 	BOOL AddIvtHdr(UINT32 ImageStartAddr);
 	BOOL ReadData(UINT address, UINT byteCount, unsigned char * pBuf);
 	//BOOL Download(PImageParameter pImageParameter, HANDLE hFileMapping, ULONGLONG dwFileSize);
+	BOOL MxHidDevice::Download(UCHAR* pBuffer, ULONGLONG dataCount, UINT RAMAddress);
 	BOOL Download(PImageParameter pImageParameter, UCHAR *pFileDataBuf, ULONGLONG dwFileSize, int cmdOpIndex);
 	void Reset(DEVINST devInst, CString path);
 };
