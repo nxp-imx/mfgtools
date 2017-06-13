@@ -341,6 +341,17 @@ public:
 		else return MemAction_None;
 	}
 
+	unsigned long long SCUViewAddr(unsigned long long addr)
+	{
+		if (addr >= 0x30000000 && addr < 0x40000000)
+		{
+			if (this->_chipFamily == MX8QM)
+				return addr - 0x11000000;
+		}
+
+		return addr;
+	}
+
 public:
 	BOOL InitMemoryDevice(CString filename);
 	BOOL OpenMxHidHandle();
