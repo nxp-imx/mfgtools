@@ -1292,7 +1292,7 @@ BOOL MxHidDevice::RunMxMultiImg(UCHAR* pBuffer, ULONGLONG dataCount)
 
 	// Load Initial Image
 	assert((pIVT->SelfAddr - ImgIVTOffset) < (1ULL << 32));
-	if (!Download((UCHAR*)pImg, MX8_INITIAL_IMAGE_SIZE, (UINT)(pIVT->SelfAddr - ImgIVTOffset)))
+	if (!Download((UCHAR*)pImg, MX8_INITIAL_IMAGE_SIZE, (UINT)(SCUViewAddr(pIVT->SelfAddr) - ImgIVTOffset)))
 		return FALSE;
 
 	//Load all the images in the first container to their respective Address
@@ -1300,7 +1300,7 @@ BOOL MxHidDevice::RunMxMultiImg(UCHAR* pBuffer, ULONGLONG dataCount)
 		assert(pBootData1->Images[i].ImageAddr < (1ULL << 32));
 		if (!Download((UCHAR*)pImg + pBootData1->Images[i].Offset - IVT_OFFSET_SD,
 			pBootData1->Images[i].ImageSize,
-			(UINT)pBootData1->Images[i].ImageAddr))
+			(UINT)SCUViewAddr(pBootData1->Images[i].ImageAddr)))
 			return FALSE;
 	}
 
@@ -1309,7 +1309,7 @@ BOOL MxHidDevice::RunMxMultiImg(UCHAR* pBuffer, ULONGLONG dataCount)
 		assert(pBootData2->Images[i].ImageAddr < (1ULL << 32));
 		if (!Download((UCHAR*)pImg + pBootData2->Images[i].Offset - IVT_OFFSET_SD,
 			pBootData2->Images[i].ImageSize,
-			(UINT)pBootData2->Images[i].ImageAddr))
+			(UINT)SCUViewAddr(pBootData2->Images[i].ImageAddr)))
 			return FALSE;
 	}
 
