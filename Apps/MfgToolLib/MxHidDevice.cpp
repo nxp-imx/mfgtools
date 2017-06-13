@@ -1262,7 +1262,7 @@ BOOL MxHidDevice::RunMxMultiImg(UCHAR* pBuffer, ULONGLONG dataCount)
 	}
 
 	pImg += ImageOffset / sizeof(DWORD);
-	if (pImg[ImgIVTOffset] != MX8_IVT_BARKER_HEADER && pImg[ImgIVTOffset] != MX8_IVT2_BARKER_HEADER)
+	if (pImg[ImgIVTOffset / sizeof(DWORD)] != MX8_IVT_BARKER_HEADER && pImg[ImgIVTOffset / sizeof(DWORD)] != MX8_IVT2_BARKER_HEADER)
 	{
 		TRACE(_T("Not a valid image.\n"));
 		return FALSE;
@@ -1270,7 +1270,7 @@ BOOL MxHidDevice::RunMxMultiImg(UCHAR* pBuffer, ULONGLONG dataCount)
 
 	pIVT = (PIvtHeaderV2)(pImg + ImgIVTOffset / sizeof(DWORD));
 
-	if (pImg[ImgIVTOffset] == MX8_IVT2_BARKER_HEADER)
+	if (pImg[ImgIVTOffset / sizeof(DWORD)] == MX8_IVT2_BARKER_HEADER)
 	{
 		pIVT2 = (PIvtHeaderV2)(pImg + ImgIVTOffset + pIVT->Next / sizeof(DWORD));
 	}
