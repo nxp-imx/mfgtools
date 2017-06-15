@@ -176,7 +176,7 @@ public: CTString() : tstring() { }
 
 
 		void TrimLeft(T  chr){
-			while (this->at(this->begin()) == chr){
+			while (this->at(0) == chr){
 				this->erase(this->begin());
 				if (this->empty())
 					return;
@@ -201,7 +201,7 @@ public: CTString() : tstring() { }
 			while (present){
 				present = false;
 				for (i = 0; i < _tcslen(chr); i++){
-					if (this->at(this->begin()) == chr[i]){
+					if (this->at(0) == chr[i]){
 						present = true;
 						this->erase(this->begin());
 						break;
@@ -220,7 +220,7 @@ public: CTString() : tstring() { }
 			while (present){
 				present = false;
 				for (i = 0; i < _tcslen(chr); i++){
-					if (this->at(this->end()) == chr[i]){
+					if (this->at(this->length()-1) == chr[i]){
 						present = true;
 						this->erase(this->end());
 						break;
