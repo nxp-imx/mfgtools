@@ -133,6 +133,9 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 	case DEV_HID_K32H844P:
 		_chipFamily = K32H844P;
 		break;
+	case DEV_HID_MX8MQ:
+		_chipFamily = MX8MQ;
+		break;
 	case DEV_HID_MX8QM:
 		_chipFamily = MX8QM;
 		break; 
@@ -980,7 +983,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
     //   0x08    PLUGIN FLAG
 	PBootData pPluginDataBuf = (PBootData)(pPlugIn + ImgIVTOffset/sizeof(DWORD) + (pIVT->BootData - pIVT->SelfAddr)/sizeof(DWORD));
 
-	if(pPluginDataBuf->PluginFlag)
+	if(pPluginDataBuf->PluginFlag || pIVT->Reserved)
 	{
 		//Plugin mode
 	  
@@ -1002,33 +1005,56 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 			goto ERR_HANDLE;
 		}
 
-		//---------------------------------------------------------
-		//Download eboot to ram		
-		//Search IVT2.
-		//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
-		DWORD IVT2Offset = ImgIVTOffset + sizeof(IvtHeader);
+		if (pIVT->Reserved)
+		{
+				Sleep(200);
+				Uboot_header *pImage = (Uboot_header*)(pDataBuf + pIVT->Reserved);
+				if (EndianSwap(pImage->magic) == 0x27051956)
+				{
+					PhyRAMAddr4KRL = EndianSwap(pImage->load);
+					int CodeOffset = pIVT->Reserved + sizeof(Uboot_header);
+					unsigned int ExecutingAddr = EndianSwap(pImage->entry);
 
-		while(IVT2Offset < dwFileSize && 
-			(pPlugIn[IVT2Offset/sizeof(DWORD)] != IVT_BARKER_HEADER &&
-			pPlugIn[IVT2Offset/sizeof(DWORD)] != IVT_BARKER2_HEADER))
-			IVT2Offset+= sizeof(DWORD);
-		
-		if(IVT2Offset >= dwFileSize)
-		{
-			goto ERR_HANDLE;
+					if (!TransData(PhyRAMAddr4KRL, (unsigned int)(dwFileSize - CodeOffset), pDataBuf + CodeOffset))
+					{
+						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"),
+							PhyRAMAddr4KRL, dwFileSize, pDataBuf);
+						goto ERR_HANDLE;
+					}
+
+					AddIvtHdr(ExecutingAddr);
+				}
 		}
-		pIVT2 = (PIvtHeader)(pPlugIn + IVT2Offset/sizeof(DWORD));
-		BootDataImgAddrIndex = (DWORD *)pIVT2 - pPlugIn;
-		BootDataImgAddrIndex += (pIVT2->BootData - pIVT2->SelfAddr)/sizeof(DWORD);
-		PhyRAMAddr4KRL = pPlugIn[BootDataImgAddrIndex] + IVT_OFFSET - ImgIVTOffset;
-		if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, (PUCHAR)((DWORD)pDataBuf)))
+		else
 		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"),
-				PhyRAMAddr4KRL, dwFileSize, pDataBuf);
-			goto ERR_HANDLE;
+			//---------------------------------------------------------
+			//Download eboot to ram		
+			//Search IVT2.
+			//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
+			DWORD IVT2Offset = ImgIVTOffset + sizeof(IvtHeader);
+
+			while (IVT2Offset < dwFileSize &&
+				(pPlugIn[IVT2Offset / sizeof(DWORD)] != IVT_BARKER_HEADER &&
+					pPlugIn[IVT2Offset / sizeof(DWORD)] != IVT_BARKER2_HEADER))
+				IVT2Offset += sizeof(DWORD);
+
+			if (IVT2Offset >= dwFileSize)
+			{
+				goto ERR_HANDLE;
+			}
+			pIVT2 = (PIvtHeader)(pPlugIn + IVT2Offset / sizeof(DWORD));
+			BootDataImgAddrIndex = (DWORD *)pIVT2 - pPlugIn;
+			BootDataImgAddrIndex += (pIVT2->BootData - pIVT2->SelfAddr) / sizeof(DWORD);
+			PhyRAMAddr4KRL = pPlugIn[BootDataImgAddrIndex] + IVT_OFFSET - ImgIVTOffset;
+			if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, (PUCHAR)((DWORD)pDataBuf)))
+			{
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"),
+					PhyRAMAddr4KRL, dwFileSize, pDataBuf);
+				goto ERR_HANDLE;
+			}
+
+			m_jumpAddr = pIVT2->SelfAddr;
 		}
-	    
-		m_jumpAddr = pIVT2->SelfAddr;
 	}
 	else
 	{

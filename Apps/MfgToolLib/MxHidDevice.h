@@ -206,6 +206,7 @@ public:
 		MX6SLL,
 		MX7ULP,
 		K32H844P,
+		MX8MQ,
 		MX8QM,
 		MX8QXP,
     };
@@ -234,6 +235,17 @@ public:
 		unsigned long Data;
 	}ImgFormatDCDData, *PImgFormatDCDData;
 
+
+	typedef struct _uboot_header
+	{
+		uint32_t magic;
+		uint32_t r1;
+		uint32_t r2;
+		uint32_t r3;
+		uint32_t load;
+		uint32_t entry;
+		uint32_t r[10];
+	}Uboot_header;
 
 	typedef struct _IvtHeader
 	{
