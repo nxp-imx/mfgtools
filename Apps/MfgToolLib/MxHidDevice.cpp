@@ -1008,11 +1008,11 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 		if (pIVT->Reserved)
 		{
 				Sleep(200);
-				Uboot_header *pImage = (Uboot_header*)(pDataBuf + pIVT->Reserved);
+				Uboot_header *pImage = (Uboot_header*)(pDataBuf + pIVT->Reserved + IVT_OFFSET_SD);
 				if (EndianSwap(pImage->magic) == 0x27051956)
 				{
 					PhyRAMAddr4KRL = EndianSwap(pImage->load);
-					int CodeOffset = pIVT->Reserved + sizeof(Uboot_header);
+					int CodeOffset = pIVT->Reserved + sizeof(Uboot_header) + IVT_OFFSET_SD;
 					unsigned int ExecutingAddr = EndianSwap(pImage->entry);
 
 					if (!TransData(PhyRAMAddr4KRL, (unsigned int)(dwFileSize - CodeOffset), pDataBuf + CodeOffset))
@@ -1110,7 +1110,9 @@ BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * 
     SDPCmd SDPCmd;
 
 	UINT MaxHidTransSize = m_Capabilities.OutputReportByteLength - 1;
-	byteCount = ((byteCount + MaxHidTransSize - 1) / MaxHidTransSize) * MaxHidTransSize;
+
+	if (_chipFamily >= MX8QM)
+		byteCount = ((byteCount + MaxHidTransSize - 1) / MaxHidTransSize) * MaxHidTransSize;
 
     SDPCmd.command = ROM_KERNEL_CMD_WR_FILE;
     SDPCmd.dataCount = byteCount;
