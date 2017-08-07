@@ -207,8 +207,12 @@ public:
 		MX7ULP,
 		K32H844P,
 		MX8MQ,
+		MXRT102X,
+		MXRT105X,
+		// Device supporting multi image must be defined below.
 		MX8QM,
 		MX8QXP,
+
     };
 
 	enum HAB_t
