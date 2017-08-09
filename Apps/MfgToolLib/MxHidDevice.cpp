@@ -963,31 +963,41 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 		return RunMxMultiImg(pDataBuf, dwFileSize);
 	}
 
+	PBootData pPluginDataBuf;
+
 	//pDataBuf = pFileDataBuf;
 	//Search for IVT
-    pPlugIn = (DWORD *)pDataBuf;
-	//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
-	while(ImgIVTOffset < dwFileSize && 
-		(pPlugIn[ImgIVTOffset/sizeof(DWORD)] != IVT_BARKER_HEADER &&
-		 pPlugIn[ImgIVTOffset/sizeof(DWORD)] != IVT_BARKER2_HEADER
-		))
+	while(1)
 	{
-		ImgIVTOffset+= 0x100;
-	}
-	if(ImgIVTOffset >= dwFileSize)
-	{
-		goto ERR_HANDLE;
-	}
+		pPlugIn = (DWORD *)pDataBuf;
+		//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
+		while (ImgIVTOffset < dwFileSize &&
+			(pPlugIn[ImgIVTOffset / sizeof(DWORD)] != IVT_BARKER_HEADER &&
+				pPlugIn[ImgIVTOffset / sizeof(DWORD)] != IVT_BARKER2_HEADER
+				))
+		{
+			ImgIVTOffset += 0x100;
+		}
+		if (ImgIVTOffset >= dwFileSize)
+		{
+			goto ERR_HANDLE;
+		}
 
-	//Now we find IVT
-	pIVT = (PIvtHeader) (pPlugIn + ImgIVTOffset/sizeof(DWORD));
-	//Now we have to judge DCD way or plugin way used in the image
-	//The method is to check plugin flag in boot data region
-    // IVT boot data format
-    //   0x00    IMAGE START ADDR
-    //   0x04    IMAGE SIZE
-    //   0x08    PLUGIN FLAG
-	PBootData pPluginDataBuf = (PBootData)(pPlugIn + ImgIVTOffset/sizeof(DWORD) + (pIVT->BootData - pIVT->SelfAddr)/sizeof(DWORD));
+		//Now we find IVT
+		pIVT = (PIvtHeader)(pPlugIn + ImgIVTOffset / sizeof(DWORD));
+		//Now we have to judge DCD way or plugin way used in the image
+		//The method is to check plugin flag in boot data region
+		// IVT boot data format
+		//   0x00    IMAGE START ADDR
+		//   0x04    IMAGE SIZE
+		//   0x08    PLUGIN FLAG
+		pPluginDataBuf = (PBootData)(pPlugIn + ImgIVTOffset / sizeof(DWORD) + (pIVT->BootData - pIVT->SelfAddr) / sizeof(DWORD));
+
+		if (pPluginDataBuf->PluginFlag & 0xFFFFFFFE)
+			ImgIVTOffset += 0x100;
+		else
+			break;
+	} 
 
 	if(pPluginDataBuf->PluginFlag || pIVT->Reserved)
 	{
@@ -1014,11 +1024,11 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 		if (pIVT->Reserved)
 		{
 				Sleep(200);
-				Uboot_header *pImage = (Uboot_header*)(pDataBuf + pIVT->Reserved + IVT_OFFSET_SD);
+				Uboot_header *pImage = (Uboot_header*)(pDataBuf + pIVT->Reserved + IVT_OFFSET_SD + ImgIVTOffset);
 				if (EndianSwap(pImage->magic) == 0x27051956)
 				{
 					PhyRAMAddr4KRL = EndianSwap(pImage->load);
-					int CodeOffset = pIVT->Reserved + sizeof(Uboot_header) + IVT_OFFSET_SD;
+					int CodeOffset = pIVT->Reserved + sizeof(Uboot_header) + IVT_OFFSET_SD + ImgIVTOffset;
 					unsigned int ExecutingAddr = EndianSwap(pImage->entry);
 
 					if (!TransData(PhyRAMAddr4KRL, (unsigned int)(dwFileSize - CodeOffset), pDataBuf + CodeOffset))
@@ -1029,6 +1039,11 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 					}
 
 					AddIvtHdr(ExecutingAddr);
+				}
+				else
+				{
+					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("uBoot Magic number wrong\n"));
+					goto ERR_HANDLE;
 				}
 		}
 		else
