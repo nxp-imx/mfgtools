@@ -70,6 +70,10 @@ Device* KblHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DAT
 	CString msg = path;
 	for(; it!=pOpStates->end(); it++)
 	{
+        if (((*it)->opState) != MX_BLHOST)
+        {
+            continue;
+        }
 		filter.Format(_T("vid_%04x&pid_%04x"), (*it)->uiVid, (*it)->uiPid);
 		//path.MakeUpper();
 		msg.MakeUpper();

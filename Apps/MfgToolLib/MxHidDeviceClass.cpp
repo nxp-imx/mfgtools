@@ -70,6 +70,10 @@ Device* MxHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA
 	CString msg = path;
 	for(; it!=pOpStates->end(); it++)
 	{
+        if (((*it)->opState) != MX_BOOTSTRAP)
+        {
+            continue;
+        }
 		filter.Format(_T("vid_%04x&pid_%04x"), (*it)->uiVid, (*it)->uiPid);
 		//path.MakeUpper();
 		msg.MakeUpper();
