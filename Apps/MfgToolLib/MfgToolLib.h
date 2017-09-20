@@ -228,6 +228,7 @@ class COpCmd_Jump : public COpCommand
 {
 public:
 	virtual UINT ExecuteCommand(int index);
+	BOOL m_bIngoreError;
 };
 
 class COpCmd_Push : public COpCommand

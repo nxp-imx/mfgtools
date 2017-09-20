@@ -1223,6 +1223,13 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 				goto CMD_ERR;
 			}
 			pOpCmd->m_pLibVars = (INSTANCE_HANDLE)pLibVars;
+
+			((COpCmd_Jump*)pOpCmd)->m_bIngoreError = FALSE;
+			strTemp = (*it)->GetAttrValue(_T("onError"));
+			if (strTemp.CompareNoCase(_T("ignore")) == 0)
+			{
+				((COpCmd_Jump*)pOpCmd)->m_bIngoreError = TRUE;
+			}
 		}
 		else if( strCmdType.CompareNoCase(_T("push")) == 0 )
 		{
@@ -2056,20 +2063,23 @@ UINT COpCmd_Jump::ExecuteCommand(int index)
 		}
 		if(!pMxHidDevice->Jump())
 		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("PortMgrDlg(%d)--MxHidDevice--Command Jump excute failed"), index);
-			_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
-			_uiInfo.bUpdatePhaseProgress = FALSE;
-			_uiInfo.bUpdateProgressInCommand = FALSE;
-			_uiInfo.bUpdateCommandsProgress = TRUE;
-			_uiInfo.CommandsProgressIndex = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_dwCmdIndex;
-			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
-			_uiInfo.bUpdateDescription = TRUE;
-			CString strDesc;
-			strDesc.Format(_T("\"Jump\" error"));
-			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
-			strDesc.ReleaseBuffer();
-			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
-			return MFGLIB_ERROR_CMD_EXECUTE_FAILED;
+			if (!m_bIngoreError)
+			{
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("PortMgrDlg(%d)--MxHidDevice--Command Jump excute failed"), index);
+				_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
+				_uiInfo.bUpdatePhaseProgress = FALSE;
+				_uiInfo.bUpdateProgressInCommand = FALSE;
+				_uiInfo.bUpdateCommandsProgress = TRUE;
+				_uiInfo.CommandsProgressIndex = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_dwCmdIndex;
+				_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
+				_uiInfo.bUpdateDescription = TRUE;
+				CString strDesc;
+				strDesc.Format(_T("\"Jump\" error"));
+				_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
+				strDesc.ReleaseBuffer();
+				((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
+				return MFGLIB_ERROR_CMD_EXECUTE_FAILED;
+			}
 		}
 	}
 
