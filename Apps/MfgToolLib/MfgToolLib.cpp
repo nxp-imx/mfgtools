@@ -1223,6 +1223,13 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 				goto CMD_ERR;
 			}
 			pOpCmd->m_pLibVars = (INSTANCE_HANDLE)pLibVars;
+
+			((COpCmd_Jump*)pOpCmd)->m_bIngoreError = FALSE;
+			strTemp = (*it)->GetAttrValue(_T("onError"));
+			if (strTemp.CompareNoCase(_T("ignore")) == 0)
+			{
+				((COpCmd_Jump*)pOpCmd)->m_bIngoreError = TRUE;
+			}
 		}
 		else if( strCmdType.CompareNoCase(_T("push")) == 0 )
 		{
@@ -1268,7 +1275,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 			strTemp = ReplaceKeywords(strTemp);
 			if (!strTemp.IsEmpty())
 			{
-				retVal = ((COpCmd_Push*)pOpCmd)->SetFileMapping(strTemp);
+				retVal = ((COpCmd_Blhost*)pOpCmd)->SetFileMapping(strTemp);
 				if (retVal != MFGLIB_ERROR_SUCCESS)
 				{
 					goto CMD_ERR;
@@ -1278,12 +1285,26 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 			strTemp = ReplaceKeywords(strTemp);
 			if (!strTemp.IsEmpty())
 			{
-				((COpCmd_Push*)pOpCmd)->m_SavedFileName = strTemp;
+				((COpCmd_Blhost*)pOpCmd)->m_SavedFileName = strTemp;
 			}
 			strTemp = (*it)->GetAttrValue(_T("onError"));
 			if (strTemp.CompareNoCase(_T("ignore")) == 0)
 			{
-				((COpCmd_Push*)pOpCmd)->m_bIngoreError = FALSE;
+				((COpCmd_Blhost*)pOpCmd)->m_bIngoreError = FALSE;
+			}
+
+			strTemp = (*it)->GetAttrValue(_T("timeout"));
+			if (!strTemp.IsEmpty())
+			{
+				if (!((COpCmd_Blhost*)pOpCmd)->SetTimeout(strTemp))
+				{
+					retVal = MFGLIB_ERROR_INVALID_PARAM;
+					goto CMD_ERR;
+				}
+			}
+			else
+			{
+				((COpCmd_Blhost*)pOpCmd)->SetTimeout(5000);
 			}
 		}
 		/*	else if( strCmdType.CompareNoCase(_T("burn")) == 0 )
@@ -2042,20 +2063,23 @@ UINT COpCmd_Jump::ExecuteCommand(int index)
 		}
 		if(!pMxHidDevice->Jump())
 		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("PortMgrDlg(%d)--MxHidDevice--Command Jump excute failed"), index);
-			_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
-			_uiInfo.bUpdatePhaseProgress = FALSE;
-			_uiInfo.bUpdateProgressInCommand = FALSE;
-			_uiInfo.bUpdateCommandsProgress = TRUE;
-			_uiInfo.CommandsProgressIndex = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_dwCmdIndex;
-			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
-			_uiInfo.bUpdateDescription = TRUE;
-			CString strDesc;
-			strDesc.Format(_T("\"Jump\" error"));
-			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
-			strDesc.ReleaseBuffer();
-			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
-			return MFGLIB_ERROR_CMD_EXECUTE_FAILED;
+			if (!m_bIngoreError)
+			{
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("PortMgrDlg(%d)--MxHidDevice--Command Jump excute failed"), index);
+				_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
+				_uiInfo.bUpdatePhaseProgress = FALSE;
+				_uiInfo.bUpdateProgressInCommand = FALSE;
+				_uiInfo.bUpdateCommandsProgress = TRUE;
+				_uiInfo.CommandsProgressIndex = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_dwCmdIndex;
+				_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
+				_uiInfo.bUpdateDescription = TRUE;
+				CString strDesc;
+				strDesc.Format(_T("\"Jump\" error"));
+				_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
+				strDesc.ReleaseBuffer();
+				((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
+				return MFGLIB_ERROR_CMD_EXECUTE_FAILED;
+			}
 		}
 	}
 
@@ -2364,6 +2388,31 @@ UINT COpCmd_Blhost::SetFileMapping(CString &strFile)
 	return 0;
 }
 
+bool COpCmd_Blhost::SetTimeout(const CString strValue)
+{
+	if (strValue.IsEmpty())
+		return false;
+
+	if (strValue[0] == '-')
+		return false;
+
+	TCHAR *p;
+	UINT64 temp;
+	temp = _tcstoull(strValue, &p, 0);
+	if (temp > UINT32_MAX)
+	{
+		return false;
+	}
+	m_timeout = static_cast<UINT32>(temp);
+	return (p != NULL) && (*p == 0);
+}
+
+bool COpCmd_Blhost::SetTimeout(const uint32_t value)
+{
+	m_timeout = value;
+	return true;
+}
+
 void COpCmd_Blhost::CloseFileMapping()
 {
 }
@@ -2438,7 +2487,10 @@ UINT COpCmd_Blhost::ExecuteCommand(int index)
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("PortMgrDlg(%d)--Path=%s"), index, pHidDevice->_path.get());
     }
 
-	retValue = (ExecuteBlhostCommand(CString(peripheral + _T(" -- ") + csCmdBody), csCmdText));
+	CString csTimeout;
+	csTimeout.Format(_T("%d"), m_timeout);
+
+	retValue = (ExecuteBlhostCommand(CString(peripheral + _T(" -t ") + csTimeout + _T(" -- ") + csCmdBody), csCmdText));
 	if ( retValue == ERROR_SUCCESS)
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, csCmdText, index);

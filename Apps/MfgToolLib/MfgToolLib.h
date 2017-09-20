@@ -228,6 +228,7 @@ class COpCmd_Jump : public COpCommand
 {
 public:
 	virtual UINT ExecuteCommand(int index);
+	BOOL m_bIngoreError;
 };
 
 class COpCmd_Push : public COpCommand
@@ -264,11 +265,14 @@ public:
 	};
 	virtual UINT ExecuteCommand(int index);
 	UINT SetFileMapping(CString &strFile);
+	bool SetTimeout(const CString strValue);
+	bool SetTimeout(const uint32_t value);
 	void CloseFileMapping();
 	BOOL m_bIngoreError;
 	CString m_SavedFileName;
 private:
 	CString m_FileName;
+	uint32_t m_timeout;
 	__int64 m_qwFileSize;
 	UCHAR *m_pDataBuf;
 	struct BLHOST_RESULT {
