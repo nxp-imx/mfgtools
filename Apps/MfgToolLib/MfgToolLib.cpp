@@ -2535,11 +2535,146 @@ UINT COpCmd_Blhost::ExecuteCommand(int index)
 
 	return retValue;
 }
+
+UINT COpCmd_Blhost::GetSecureState(int index, MxHidDevice::HAB_t *secureState)
+{
+	CString strMsg;
+	strMsg.Format(_T("ExecuteCommand--Blhost[WndIndex:%d], Body is get-property 17"), index);
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg);
+
+	UI_UPDATE_INFORMATION _uiInfo;
+	_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
+	_uiInfo.bUpdatePhaseProgress = TRUE;
+	_uiInfo.CurrentPhaseIndex = (int)(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_currentState);
+	_uiInfo.bUpdateProgressInCommand = FALSE;
+	_uiInfo.bUpdateCommandsProgress = TRUE;
+	_uiInfo.CommandsProgressIndex = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_dwCmdIndex;
+	_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_RUNNING;
+	_uiInfo.bUpdateDescription = TRUE;
+	CString strDesc = _T("Get Secure State");
+	_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
+	strDesc.ReleaseBuffer();
+	((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
+
+	CString csCmdBody = _T("get-property 17");
+	CString csCmdText = _T("Get Property 17(Secure State)");
+
+	csCmdText.AppendFormat(_T(" [WndIndex:%d] "), index);
+	CString peripheral = _T("--usb ");
+	DWORD retValue = MFGLIB_ERROR_SUCCESS;
+	if (((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDeviceType() == DeviceClass::DeviceTypeKBLCDC)
+	{
+		CDCDevice* pCDCDevice = dynamic_cast<CDCDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
+		if (pCDCDevice == NULL)
+		{
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("PortMgrDlg(%d)--No CDCDevice"), index);
+			_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
+			_uiInfo.bUpdatePhaseProgress = FALSE;
+			_uiInfo.bUpdateProgressInCommand = FALSE;
+			_uiInfo.bUpdateCommandsProgress = TRUE;
+			_uiInfo.CommandsProgressIndex = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_dwCmdIndex;
+			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
+			_uiInfo.bUpdateDescription = TRUE;
+			CString strDesc;
+			strDesc.Format(_T("\"Execute\" error"));
+			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
+			strDesc.ReleaseBuffer();
+			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
+			return MFGLIB_ERROR_INVALID_VALUE;
+		}
+		peripheral = CString("-p ") + CString(pCDCDevice->m_commport);
+	}
+	else
+	{
+		MxHidDevice* pHidDevice = dynamic_cast<MxHidDevice*>(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_p_usb_port->GetDevice());
+		peripheral.Append(pHidDevice->_path.get());
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("PortMgrDlg(%d)--Path=%s"), index, pHidDevice->_path.get());
+	}
+
+	CString csTimeout;
+	csTimeout.Format(_T("%d"), m_timeout);
+
+	retValue = (ExecuteBlhostCommand(CString(peripheral + _T(" -t ") + csTimeout + _T(" -- ") + csCmdBody), csCmdText));
+
+	if (retValue == ERROR_SUCCESS)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, csCmdText, index);
+		_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
+		_uiInfo.bUpdatePhaseProgress = TRUE;
+		_uiInfo.CurrentPhaseIndex = (int)(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_currentState);
+		_uiInfo.bUpdateProgressInCommand = TRUE;
+		_uiInfo.bUpdateDescription = TRUE;
+		_uiInfo.bUpdateCommandsProgress = TRUE;
+		_uiInfo.CommandsProgressIndex = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_dwCmdIndex;
+		_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_COMPLETE;
+		((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
+
+		BLHOST_RESULT blhostResult;
+		Parse_blhost_output_for_response(csCmdText, &blhostResult);
+		if (_ttoi(blhostResult.Response))
+		{
+			*secureState = MxHidDevice::HAB_t::HabEnabled;
+		}
+		else
+		{
+			*secureState = MxHidDevice::HAB_t::HabDisabled;
+		}
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Secure State = %s"), (*secureState == MxHidDevice::HAB_t::HabEnabled) ? _T("SECURE") : _T("UNSECURE"));
+
+		return MFGLIB_ERROR_SUCCESS;
+	}
+	else
+	{
+		BLHOST_RESULT blhostResult;
+		Parse_blhost_output_for_error_code(csCmdText, &blhostResult);
+		if (blhostResult.error_code == KBL_Status_UnknownProperty)
+		{
+
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, csCmdText, index);
+			_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
+			_uiInfo.bUpdatePhaseProgress = TRUE;
+			_uiInfo.CurrentPhaseIndex = (int)(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_currentState);
+			_uiInfo.bUpdateProgressInCommand = TRUE;
+			_uiInfo.bUpdateDescription = TRUE;
+			_uiInfo.bUpdateCommandsProgress = TRUE;
+			_uiInfo.CommandsProgressIndex = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_dwCmdIndex;
+			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_COMPLETE;
+			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
+
+			*secureState = MxHidDevice::HAB_t::HabDisabled;
+
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Not support to check secure state, treat as UNSECURE"));
+
+			return MFGLIB_ERROR_SUCCESS;
+		}
+
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, csCmdText, index);
+		_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
+		_uiInfo.bUpdatePhaseProgress = FALSE;
+		_uiInfo.bUpdateProgressInCommand = FALSE;
+		_uiInfo.bUpdateDescription = FALSE;
+		_uiInfo.bUpdateCommandsProgress = TRUE;
+		_uiInfo.CommandsProgressIndex = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_dwCmdIndex;
+		_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
+		((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
+		return MFGLIB_ERROR_CMD_EXECUTE_FAILED;
+	}
+
+	return retValue;
+}
+
 void COpCmd_Blhost::Parse_blhost_output_for_error_code(CString& jsonStream, BLHOST_RESULT* pblhostResult)
 {
 	int index = 0;
 	index = jsonStream.Find(_T("\"value\" : "), index) - 1 + sizeof("\"value\" : ");
 	pblhostResult->error_code = _ttoi(jsonStream.Mid(index, jsonStream.Find(_T("\r\n"), index) - index));
+}
+
+void COpCmd_Blhost::Parse_blhost_output_for_response(CString& jsonStream, BLHOST_RESULT* pblhostResult)
+{
+	int index = 0;
+	index = jsonStream.Find(_T("\"response\" : [ "), index) - 1 + sizeof("\"response\" : [ ");
+	pblhostResult->Response = jsonStream.Mid(index, jsonStream.Find(_T(" ]"), index) - index);
 }
 
 DWORD COpCmd_Blhost::ExecuteBlhostCommand(CString csArguments, CString& out_text)

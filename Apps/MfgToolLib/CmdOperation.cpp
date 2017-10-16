@@ -515,6 +515,22 @@ UINT CmdListThreadProc(LPVOID pParam)
 						chip = ((MxHidDevice*)pDevice)->_chiFamilyName;
 						habstate = ((MxHidDevice*)pDevice)->GetHABState();
 					}
+
+					if ((pDevice->GetDeviceType() == DeviceClass::DeviceTypeKBLHID) || (pDevice->GetDeviceType() == DeviceClass::DeviceTypeKBLCDC))
+					{
+						if (habstate == MxHidDevice::HAB_t::HabUnknown)
+						{
+							MxHidDevice::HAB_t secureState;
+							dwError = ((COpCmd_Blhost *)(*cmdIt))->GetSecureState(pOperation->m_WndIndex, &secureState);
+							if (dwError != MFGLIB_ERROR_SUCCESS)
+							{
+								LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d], get secure state failed, so SetEvent(hDevCanDeleteEvent)"), pOperation->m_WndIndex);
+								dwTimeout = INFINITE;
+								continue;
+							}
+							habstate = secureState;
+						}
+					}
 				}
 				
 				COpCommand *pCmd = (*cmdIt);

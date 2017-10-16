@@ -257,6 +257,7 @@ public:
 	{
 		KBL_Status_Success = 0x0,
 		KBL_Status_AbortDataPhase = 0x2712,
+		KBL_Status_UnknownProperty = 0x283c,
 	};
 
 	typedef enum ResultBufferSize
@@ -264,6 +265,7 @@ public:
 		Result_Buffer_Size = 1024,
 	};
 	virtual UINT ExecuteCommand(int index);
+	virtual UINT GetSecureState(int index, MxHidDevice::HAB_t *secureState);
 	UINT SetFileMapping(CString &strFile);
 	bool SetTimeout(const CString strValue);
 	bool SetTimeout(const uint32_t value);
@@ -283,6 +285,7 @@ private:
 	};
 	DWORD ExecuteBlhostCommand(CString csArguments, CString& out_text);
 	void Parse_blhost_output_for_error_code(CString& jsonStream, BLHOST_RESULT* pblhostResult);
+	void Parse_blhost_output_for_response(CString& jsonStream, BLHOST_RESULT* pblhostResult);
 };
 
 /*
