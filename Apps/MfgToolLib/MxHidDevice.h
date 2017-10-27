@@ -402,6 +402,7 @@ public:
 	BOOL MxHidDevice::Download(UCHAR* pBuffer, ULONGLONG dataCount, UINT RAMAddress);
 	BOOL Download(PImageParameter pImageParameter, UCHAR *pFileDataBuf, ULONGLONG dwFileSize, int cmdOpIndex);
 	void Reset(DEVINST devInst, CString path);
+	BOOL LoadFitImage(UCHAR *fit, ULONGLONG dataCount);
 };
 
 #endif //  __MXHIDDEVICE_H__

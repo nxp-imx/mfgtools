@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="libfdt">
+      <UniqueIdentifier>{2d76314b-fc05-480a-9bfe-96935c0c4384}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CdcDevice.cpp">
@@ -122,6 +125,36 @@
     </ClCompile>
     <ClCompile Include="KblHidDeviceClass.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libfdt\fdt.c">
+      <Filter>libfdt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libfdt\fdt_addresses.c">
+      <Filter>libfdt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libfdt\fdt_empty_tree.c">
+      <Filter>libfdt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libfdt\fdt_overlay.c">
+      <Filter>libfdt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libfdt\fdt_region.c">
+      <Filter>libfdt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libfdt\fdt_ro.c">
+      <Filter>libfdt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libfdt\fdt_rw.c">
+      <Filter>libfdt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libfdt\fdt_strerror.c">
+      <Filter>libfdt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libfdt\fdt_sw.c">
+      <Filter>libfdt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libfdt\fdt_wip.c">
+      <Filter>libfdt</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
