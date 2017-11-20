@@ -1012,15 +1012,24 @@ BOOL MxHidDevice::LoadFitImage(UCHAR *fit, ULONGLONG dataCount)
 
 	int firmware_load, offset, firmware_len;
 
-	if (FitGetIntProp(fit, firmware, "load", &firmware_load) ||
-		FitGetIntProp(fit, firmware, "data-offset", &offset) ||
-		FitGetIntProp(fit, firmware, "data-size", &firmware_len))
+	if (!FitGetIntProp(fit, firmware, "data-offset", &offset))
 	{
-		TRACE(_T("can't find load data-offset data-len\n"));
+		offset = base_offset + offset;
+	}
+	else if (FitGetIntProp(fit, firmware, "data-position", &offset))
+	{
+		TRACE(_T("can't find data-offset or data-position\n"));
 		return FALSE;
 	}
 
-	if (!Download(fit + base_offset + offset, firmware_len, firmware_load))
+	if (FitGetIntProp(fit, firmware, "load", &firmware_load) ||
+		FitGetIntProp(fit, firmware, "data-size", &firmware_len))
+	{
+		TRACE(_T("can't find load data-len\n"));
+		return FALSE;
+	}
+
+	if (!Download(fit + offset, firmware_len, firmware_load))
 		return FALSE;
 
 
@@ -1034,16 +1043,25 @@ BOOL MxHidDevice::LoadFitImage(UCHAR *fit, ULONGLONG dataCount)
 
 	int fdt_load, fdt_size;
 
-	if (FitGetIntProp(fit, fdt, "data-offset", &offset) ||
-		FitGetIntProp(fit, fdt, "data-size", &fdt_size))
+	if (!FitGetIntProp(fit, fdt, "data-offset", &offset))
 	{
-		TRACE(_T("can't find load data-offset data-len\n"));
+		offset = base_offset + offset;
+	}
+	else if (FitGetIntProp(fit, fdt, "data-position", &offset))
+	{
+		TRACE(_T("can't find data-offset or data-position\n"));
+		return FALSE;
+	}
+
+	if (FitGetIntProp(fit, fdt, "data-size", &fdt_size))
+	{
+		TRACE(_T("can't find data-len\n"));
 		return FALSE;
 	}
 
 	fdt_load = firmware_load + firmware_len;
 
-	if (!Download(fit + base_offset + offset, fdt_size, fdt_load))
+	if (!Download(fit + offset, fdt_size, fdt_load))
 		return FALSE;
 
 	int load_node;
@@ -1054,14 +1072,24 @@ BOOL MxHidDevice::LoadFitImage(UCHAR *fit, ULONGLONG dataCount)
 		if (load_node >= 0)
 		{
 			int load, offset, len, entry;
-			if (FitGetIntProp(fit, load_node, "load", &load) ||
-				FitGetIntProp(fit, load_node, "data-offset", &offset) ||
-				FitGetIntProp(fit, load_node, "data-size", &len))
+
+			if (!FitGetIntProp(fit, load_node, "data-offset", &offset))
 			{
-				TRACE(_T("can't find load data-offset data-len\n"));
+				offset = base_offset + offset;
+			}
+			else if (FitGetIntProp(fit, load_node, "data-position", &offset))
+			{
+				TRACE(_T("can't find data-offset or data-position\n"));
 				return FALSE;
 			}
-			if (!Download(fit + base_offset + offset, len, load))
+
+			if (FitGetIntProp(fit, load_node, "load", &load) ||
+				FitGetIntProp(fit, load_node, "data-size", &len))
+			{
+				TRACE(_T("can't find load data-len\n"));
+				return FALSE;
+			}
+			if (!Download(fit + offset, len, load))
 				return FALSE;
 
 			if (FitGetIntProp(fit, load_node, "entry", &entry) == 0)
@@ -1174,11 +1202,11 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 		if (pIVT->Reserved)
 		{
 				Sleep(200);
-				Uboot_header *pImage = (Uboot_header*)(pDataBuf + pIVT->Reserved + IVT_OFFSET_SD + ImgIVTOffset);
+				Uboot_header *pImage = (Uboot_header*)(pDataBuf + pIVT->Reserved + ImgIVTOffset);
 				if (EndianSwap(pImage->magic) == 0x27051956)
 				{
 					PhyRAMAddr4KRL = EndianSwap(pImage->load);
-					int CodeOffset = pIVT->Reserved + sizeof(Uboot_header) + IVT_OFFSET_SD + ImgIVTOffset;
+					int CodeOffset = pIVT->Reserved + sizeof(Uboot_header) + ImgIVTOffset;
 					unsigned int ExecutingAddr = EndianSwap(pImage->entry);
 
 					if (!TransData(PhyRAMAddr4KRL, (unsigned int)(dwFileSize - CodeOffset), pDataBuf + CodeOffset))
