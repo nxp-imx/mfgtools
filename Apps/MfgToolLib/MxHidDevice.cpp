@@ -851,12 +851,6 @@ BOOL MxHidDevice::RunDCD(DWORD* pDCDRegion)
 		//Total dcd data bytes:
 		INT TotalDCDDataCnt = (DCDHeader & 0x00FFFF00) >> 8;
 
-		if (TotalDCDDataCnt > HAB_DCD_BYTES_MAX)
-		{
-			_tprintf(_T("DCD data excceeds max limit!!!\r\n"));
-			return FALSE;
-		}
-
 		if (!DCDWrite((PUCHAR)(pDCDRegion), TotalDCDDataCnt))
 		{
 			_tprintf(_T("Failed to initialize memory!\r\n"));
