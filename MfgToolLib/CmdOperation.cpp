@@ -226,6 +226,10 @@ MX_DEVICE_STATE CCmdOperation::GetDeviceState()
 		case DeviceClass::DeviceTypeMxRom:
 			state = MX_BOOTSTRAP;
 			break;
+		case DeviceClass::DeviceTypeKBLCDC:
+		case DeviceClass::DeviceTypeKBLHID:
+			state = MX_BLHOST;
+			break;
 		case DeviceClass::DeviceTypeMsc:
 		case DeviceClass::DeviceTypeDisk:
 			state = MX_UPDATER;
@@ -483,7 +487,7 @@ void* CmdListThreadProc(void* pParam)
 	OP_COMMAND_ARRAY::iterator cmdIt;
 	DWORD dwStateIndex = 0;
 	CString chip;
-
+	MxHidDevice::HAB_t habstate = MxHidDevice::HabUnknown;
 
 	if (!pOperation->InitInstance()){
 
@@ -559,12 +563,29 @@ void* CmdListThreadProc(void* pParam)
 					if(pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 					{
 						chip = ((MxHidDevice*)pDevice)->_chiFamilyName;
+						habstate = ((MxHidDevice*)pDevice)->GetHABState();
+					}
+
+					if ((pDevice->GetDeviceType() == DeviceClass::DeviceTypeKBLHID) || (pDevice->GetDeviceType() == DeviceClass::DeviceTypeKBLCDC))
+					{
+						if (habstate == MxHidDevice::HAB_t::HabUnknown)
+						{
+							MxHidDevice::HAB_t secureState;
+							dwError = ((COpCmd_Blhost *)(*cmdIt))->GetSecureState(pOperation->m_WndIndex, &secureState);
+							if (dwError != MFGLIB_ERROR_SUCCESS)
+							{
+								LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CmdOperation[%d], get secure state failed, so SetEvent(hDevCanDeleteEvent)"), pOperation->m_WndIndex);
+								dwTimeout = INFINITE;
+								continue;
+							}
+							habstate = secureState;
+						}
 					}
 				}
 
 				COpCommand *pCmd = (*cmdIt);
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T(" command description \"%s\" and body string \"%s\" \n"), pCmd->GetDescString().c_str(),pCmd->GetBodyString().c_str());
-				if(pCmd->IsRun(chip))
+				if(pCmd->IsRun(chip) && pCmd->IsRun(habstate))
 				{
 					dwError = pCmd->ExecuteCommand(pOperation->m_WndIndex);
 				}else

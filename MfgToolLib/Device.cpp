@@ -84,6 +84,7 @@ Device::Device(DeviceClass *deviceClass, DEVINST devInst, CString path, INSTANCE
     _deviceInstanceID.describe(this, _T("Device Instance Id"), _T(""));
     _enumerator.describe(this, _T("Enumerator"), _T(""));
     _classStr.describe(this, _T("Class"), _T(""));
+    _compatibleIds.describe(this, _T("Compatible Ids"), _T(""));
     _classDesc.describe(this, _T("Class Description"), _T(""));
     _classGuid.describe(this, _T("Device Class GUID"), _T("Describes the device class."));
     _hub.describe(this, _T("USB Hub Path"), _T("Path of Hub USB Device is connected to."));
@@ -246,8 +247,23 @@ Device* Device::UsbDevice()
         return NULL;
 
     if (_enumerator.get().CompareNoCase(_T("USB")) == 0)
-        return this;
-
+    {
+        // if current node is hub device, then return this node.
+        if ((_compatibleIds.get().MakeUpper().Find(_T("CLASS_09")) >= 0) || (_description.get().MakeUpper().Find(_T("HUB")) >= 0))
+        {
+            return this;
+        }
+        // Check if it's parent is an usb hub.
+        // If yes, this node is the correct usb device.
+        if ((Parent()->_compatibleIds.get().MakeUpper().Find(_T("CLASS_09")) >= 0) || (Parent()->_description.get().MakeUpper().Find(_T("HUB")) >= 0))
+        {
+            return this;
+        }
+        else // If not, this node is not the correct usb device, but a child of the usb device.
+        {
+            return Parent()->UsbDevice();
+        }
+    }
     return Parent()->UsbDevice();
 }
 
@@ -480,6 +496,23 @@ CString Device::classStr::get()
 }
 
 /// <summary>
+/// Property: Gets the device's compatible IDs.
+/// </summary>
+CString Device::compatibleIds::get()
+{
+	Device* dev = dynamic_cast<Device*>(_owner);
+	ASSERT(dev);
+#if 0
+	if (_value.IsEmpty())
+	{
+		_value = (dev->GetProperty(SPDRP_COMPATIBLEIDS, CString(_T(""))));
+	}
+#endif
+	return _value;
+}
+
+
+/// <summary>
 /// Property: Gets the description for the device class.
 /// </summary>
 CString Device::classDesc::get()
@@ -517,7 +550,7 @@ CString Device::hub::get()
         if(dev->UsbDevice()->Parent() != NULL)
         {
 			//if(dev->UsbDevice()->Parent()->_enumerator.get().CompareNoCase(_T("USB")) == 0)
-			if(dev->UsbDevice()->Parent()->_classStr.get().CompareNoCase(_T("USB")) == 0)
+			if ((dev->UsbDevice()->Parent()->_compatibleIds.get().MakeUpper().Find(_T("CLASS_09")) >= 0) || (dev->UsbDevice()->Parent()->_description.get().MakeUpper().Find(_T("HUB")) >= 0))
             {
                 //_value = dev->UsbDevice()->Parent()->_path.get();
 				CString hubDriver = dev->UsbDevice()->Parent()->_driver.get();

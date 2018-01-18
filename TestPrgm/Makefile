@@ -1,6 +1,6 @@
 CC ?= g++
 CMAKE ?= cmake
-CFLAGS ?= -L . -Wl,-rpath=. -l MfgToolLib -I../MfgToolLib -I/usr/include/libusb-1.0 -l usb-1.0 -g -l stdc++ -std=c++11 -l pthread  -fpermissive -Wno-write-strings
+CFLAGS ?= -L . -Wl,-rpath=. -l MfgToolLib -I../MfgToolLib -I/usr/include/libusb-1.0 -l usb-1.0 -g -l stdc++ -std=c++11 -l pthread  -fpermissive -Wno-write-strings -l:libfdt.a
 
 default:
 	cd ../MfgToolLib && make

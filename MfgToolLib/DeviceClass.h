@@ -45,13 +45,15 @@ public:
 	typedef enum __DeviceClassType
 	{
         DeviceTypeNone = -1,
-		DeviceTypeDisk = 0,
+	DeviceTypeDisk = 0,
         DeviceTypeMsc,			//Updater stage(the second stage)
         DeviceTypeHid,
         DeviceTypeMxHid,
         DeviceTypeMxRom,
         DeviceTypeUsbController,
         DeviceTypeUsbHub,
+	DeviceTypeKBLHID,
+	DeviceTypeKBLCDC,
     } DEV_CLASS_TYPE;
 
 	typedef struct NotifyStruct

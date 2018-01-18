@@ -50,7 +50,7 @@
 #include "UsbPort.h"
 #include "UpdateTransportProtocol.h"
 #include "CmdOperation.h"
-
+#include "MxHidDevice.h"
 
 // CMfgToolLibApp
 // See MfgToolLib.cpp for the implementation of this class
@@ -139,13 +139,16 @@ class COpCommand
 		virtual void SetDescString(CString &str);
 		virtual CString GetDescString();
 		virtual void SetIfDevString(CString &str);
+		virtual void SetIfHabString(CString &str);
 		virtual bool IsRun(CString &dev);
+		virtual bool IsRun(MxHidDevice::HAB_t habState);
 		INSTANCE_HANDLE m_pLibVars;
 
 	protected:
 		CString m_bodyString;
 		CString m_descString;
 		CString m_ifdev;
+		CString m_ifhab;
 };
 
 class COpCmd_Find : public COpCommand
@@ -228,6 +231,7 @@ class COpCmd_Jump : public COpCommand
 {
 	public:
 		virtual UINT ExecuteCommand(int index);
+	BOOL m_bIngoreError;
 };
 
 class COpCmd_Push : public COpCommand
@@ -245,6 +249,48 @@ class COpCmd_Push : public COpCommand
 		__int64 m_qwFileSize;
 		UCHAR *m_pDataBuf;
 };
+
+class COpCmd_Blhost : public COpCommand
+{
+public:
+	COpCmd_Blhost();
+	virtual ~COpCmd_Blhost();
+
+	typedef enum KibbleStatusCode
+	{
+		KBL_Status_Success = 0x0,
+		KBL_Status_AbortDataPhase = 0x2712,
+		KBL_Status_UnknownProperty = 0x283c,
+	};
+
+	typedef enum ResultBufferSize
+	{
+		Result_Buffer_Size = 1024,
+	};
+	virtual UINT ExecuteCommand(int index);
+	virtual UINT GetSecureState(int index, MxHidDevice::HAB_t *secureState);
+	UINT SetFileMapping(CString &strFile);
+	bool SetTimeout(const CString strValue);
+	bool SetTimeout(const uint32_t value);
+	void CloseFileMapping();
+	BOOL m_bIngoreError;
+	CString m_SavedFileName;
+private:
+	CString m_FileName;
+	uint32_t m_timeout;
+	__int64 m_qwFileSize;
+	UCHAR *m_pDataBuf;
+	struct BLHOST_RESULT {
+		CString command;
+		CString Response;
+		CString Result_description;
+		int error_code;
+	};
+	DWORD ExecuteBlhostCommand(CString csArguments, CString& out_text);
+	void Parse_blhost_output_for_error_code(CString& jsonStream, BLHOST_RESULT* pblhostResult);
+	void Parse_blhost_output_for_response(CString& jsonStream, BLHOST_RESULT* pblhostResult);
+};
+
 /*
 	 class COpCmd_Burn : public COpCommand
 	 {

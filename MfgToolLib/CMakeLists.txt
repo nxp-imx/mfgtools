@@ -63,6 +63,9 @@ set(LIBS ${LIBS} ${LIBUSB_1_LIBRARIES})
       VolumeDeviceClass.cpp
 			libusbVolume.cpp
       XMLite.cpp
+      CdcDeviceClass.cpp
+      CdcDevice.cpp
+      KblHidDeviceClass.cpp
     )
     source_group("Source Files" FILES ${SOURCES_files})
 

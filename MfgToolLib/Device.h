@@ -164,6 +164,12 @@ public:
 		CString get();
 	}_classStr;
 
+	class compatibleIds : public StringProperty
+	{
+	public:
+		CString get();
+	}_compatibleIds;
+
 	class classDesc : public StringProperty
 	{
 	public:

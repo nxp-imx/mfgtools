@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013, 2016 Freescale Semiconductor, Inc.
+ * Copyright 2009-2013, Freescale Semiconductor, Inc. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -29,35 +29,34 @@
  *
  */
 
-
 #include "stdafx.h"
 //#include <Assert.h>
 //#include <cfgmgr32.h>
 //#include <basetyps.h>
 //#include <setupapi.h>
 //#include <initguid.h>
-//extern "C" {
+extern "C" {
 //#include <hidsdi.h>
-//}
-//#include <hidclass.h>
+}
+//#include <HidClass.h>
 #include "DeviceClass.h"
 #include "MxHidDevice.h"
-#include "MxHidDeviceClass.h"
+#include "KblHidDeviceClass.h"
 #include "MfgToolLib_Export.h"
 #include "MfgToolLib.h"
 
-MxHidDeviceClass::MxHidDeviceClass(INSTANCE_HANDLE handle)
-: DeviceClass(NULL,NULL,_T("MXHID"),DeviceTypeMxHid,handle)//&GUID_DEVINTERFACE_HID, &GUID_DEVCLASS_HIDCLASS, _T("MXHID"), DeviceTypeMxHid, handle)
+KblHidDeviceClass::KblHidDeviceClass(INSTANCE_HANDLE handle)
+: DeviceClass(/*&GUID_DEVINTERFACE_HID*/NULL, /*&GUID_DEVCLASS_HIDCLASS*/NULL, _T("KBLHID"), DeviceTypeKBLHID, handle)
 {
-	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("new MxHidDeviceClass"));
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("new KBLHidDeviceClass"));
 }
 
-MxHidDeviceClass::~MxHidDeviceClass(void)
+KblHidDeviceClass::~KblHidDeviceClass(void)
 {
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("delete MxHidDeviceClass"));
 }
 
-Device* MxHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
+Device* KblHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
 {
     //Check if the path matches our device pid&vid.
     //An example of value of path: "\\?\hid#vid_413c&pid_2011&mi_01&col02#8&2598dfbd&0&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}"
@@ -71,10 +70,10 @@ Device* MxHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA
 	CString msg = path;
 	for(; it!=pOpStates->end(); it++)
 	{
-		if (((*it)->opState) != MX_BOOTSTRAP)
-        	{
-            		continue;
-        	}
+        if (((*it)->opState) != MX_BLHOST)
+        {
+            continue;
+        }
 		filter.Format(_T("vid_%04x&pid_%04x"), (*it)->uiVid, (*it)->uiPid);
 		//path.MakeUpper();
 		msg.MakeUpper();
@@ -86,7 +85,6 @@ Device* MxHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA
 			break;
 		}
 	}
-	isRightDevice = TRUE; // temp use hard code
 	if(isRightDevice) //OK, find the device
 	{
 		return new MxHidDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);

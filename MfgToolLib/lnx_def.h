@@ -73,6 +73,7 @@
 #define	_tcslen strlen
 #define _istspace isspace
 #define _ttol atol
+#define _tcstoull strtoul
 #define _tcspbrk strpbrk
 #define _totupper toupper
 #define _tfopen fopen
@@ -101,6 +102,7 @@ typedef unsigned int UINT;
 typedef unsigned int DWORD;
 typedef unsigned short WORD;
 typedef unsigned char UCHAR;
+typedef unsigned long long UINT64;
 //#define BYTE unsigned char
 //#define UINT unsigned int
 //#define DWORD unsigned int
@@ -159,6 +161,13 @@ typedef struct _SP_DEVINFO_DATA {
     ULONG_PTR Reserved;
 } SP_DEVINFO_DATA, *PSP_DEVINFO_DATA;
 
+inline void Sleep(int ms)
+{
+	struct timespec ts;
+	ts.tv_sec = ms / 1000;
+	ts.tv_nsec = (ms % 1000) * 1000000;
+	nanosleep(&ts, NULL);
+};
 
 #define LANG_NEUTRAL 0x00
 #define SUBLANG_NEUTRAL 0x03

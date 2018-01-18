@@ -42,6 +42,12 @@
 #include "MfgToolLib.h"
 #include <sys/stat.h>
 #include "MxHidDevice.h"
+extern "C"
+{
+	#include "libfdt.h"
+};
+
+#include <algorithm>   
 
 //#define DCD_WRITE
 //static PIvtHeader g_pIVT = NULL;
@@ -129,10 +135,36 @@ void MxHidDevice::NotifyOpen()
 		case DEV_HID_MX6ULL:
 			_chipFamily = MX6ULL;
 			break;
+		case DEV_HID_MX6SLL:
+			_chipFamily = MX6SLL;
+			break;
+		case DEV_HID_MX7ULP:
+			_chipFamily = MX7ULP;
+			break;
+		case DEV_HID_K32H844P:
+			_chipFamily = K32H844P;
+			break;
+		case DEV_HID_MX8MQ:
+			_chipFamily = MX8MQ;
+			break;
+		case DEV_HID_MX8QM:
+			_chipFamily = MX8QM;
+			break; 
+		case DEV_HID_MX8QXP:
+			_chipFamily = MX8QXP;
+			break;
+		case DEV_HID_MXRT102X:
+			_chipFamily = MXRT102X;
+			break;
+		case DEV_HID_MXRT105X:
+			_chipFamily = MXRT105X;
+			break;
 		default:
 			_chipFamily = MX50;
 			break;
 	}
+
+	m_habState = HabUnknown;
 
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new MxHidDevice[%p]"), this);
 }
@@ -506,15 +538,26 @@ BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount)
 	}
 	else
 	{
+		UINT MaxHidTransSize = m_Capabilities.OutputReportByteLength - 1;
+
+		if(this->_chipFamily >= MX8QM)
+			RegCount = ((RegCount + MaxHidTransSize - 1) / MaxHidTransSize) * MaxHidTransSize;
+
 		SDPCmd.dataCount = RegCount;
-		SDPCmd.address = 0x00910000;//IRAM free space
+		if (this->_chipFamily == MX7ULP)
+			SDPCmd.address = 0x2f018000;
+		else if (this->_chipFamily == K32H844P)
+			SDPCmd.address = 0x8000;
+		else if (this->_chipFamily == MX8QM || this->_chipFamily == MX8QXP)
+			SDPCmd.address = 0x2000e400;
+		else
+			SDPCmd.address = 0x00910000;//IRAM free space
+
 
 		if(!SendCmd(&SDPCmd))
 		{
 			return FALSE;
 		}
-
-		UINT MaxHidTransSize = 1025 -1;
 
 		while(RegCount > 0)
 		{
@@ -727,10 +770,53 @@ BOOL MxHidDevice::GetHABType()
 		 (*(unsigned int *)(m_pReadReport->Payload) != HabDisabled) )
 	{
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("HAB type mismatch: 0x%x!!!"), *(unsigned int *)(m_pReadReport->Payload));
+		m_habState = HabUnknown;
 		return FALSE;
 	}
 
+	m_habState = *(unsigned int *)m_pReadReport->Payload == HabEnabled ? HabEnabled : HabDisabled;
 	return TRUE;
+}
+
+MxHidDevice::HAB_t MxHidDevice::GetHABState()
+{
+	if (m_habState != HabUnknown)
+	{
+		return  m_habState;
+	}
+	
+	// Send "Error Status" command to get the HAB state.
+	// "Error Status" doesn't write any data to ROM.
+	// "Read Memory" can be disabled by Fuse.
+	SDPCmd SDPCmd;
+
+	SDPCmd.command = ROM_KERNEL_CMD_ERROR_STATUS;
+	SDPCmd.dataCount = 0;
+	SDPCmd.format = 0;
+	SDPCmd.data = 0;
+	SDPCmd.address = 0;
+
+	OpenMxHidHandle();
+
+	if (!SendCmd(&SDPCmd))
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to send error status command to ROM!!!"));
+		goto GetHABStateFailed;
+	}
+
+	if (!GetHABType())
+		goto GetHABStateFailed;
+
+	// Just read the left data. HAB state is already got, and no need to check to result.
+	Read((UCHAR *)m_pReadReport, m_Capabilities.InputReportByteLength);
+
+	OpenMxHidHandle();
+	return m_habState;
+
+GetHABStateFailed:
+	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to Get HAB state!!!"));
+	OpenMxHidHandle();
+	return HabUnknown;
 }
 
 BOOL MxHidDevice::Jump()
@@ -751,10 +837,27 @@ BOOL MxHidDevice::Jump()
     return TRUE;
 }
 
-BOOL MxHidDevice::Jump(UINT RAMAddress)
+BOOL MxHidDevice::Jump(UINT RAMAddress, BOOL isPlugin)
 {
     SDPCmd SDPCmd;
     CString LogStr;
+
+	if(this->_chipFamily >= MX7D) {
+
+		SDPCmd.command = ROM_KERNEL_CMD_SKIP_DCD_HEADER;
+		SDPCmd.dataCount = 0;
+		SDPCmd.format = 0;
+		SDPCmd.data = 0;
+		SDPCmd.address = 0;
+
+		if(!SendCmd(&SDPCmd))
+			return FALSE;
+
+		if (!GetCmdAck(ROM_OK_ACK))
+		{
+			return FALSE;
+		}
+	}
 
     SDPCmd.command = ROM_KERNEL_CMD_JUMP_ADDR;
     SDPCmd.dataCount = 0;
@@ -769,6 +872,19 @@ BOOL MxHidDevice::Jump(UINT RAMAddress)
 
 	}
 
+	if (isPlugin)
+	{
+		GetHABType();
+
+		Sleep(300); // Wait for plugin finish run
+
+		GetCmdAck(ROM_OK_ACK); /*omit rom return error code, if use plug-in mode*/
+	}
+	else
+	{
+		/* ROM jump to address, no chance send back ACK*/
+	}
+
 	if(!GetHABType())
     {
         LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to get HAB type from ROM, ignoredro!!!"));
@@ -780,15 +896,288 @@ BOOL MxHidDevice::Jump(UINT RAMAddress)
 	return TRUE;
 }
 
+BOOL MxHidDevice::RunDCD(DWORD* pDCDRegion)
+{
+	if (pDCDRegion == NULL)
+		return FALSE;
+
+	//i.e. DCD_BE  0xD2020840              ;DCD_HEADR Tag=0xd2, len=64*8+4+4, ver= 0x40    
+	//i.e. DCD_BE  0xCC020404              ;write dcd cmd headr Tag=0xcc, len=64*8+4, param=4
+	//The first 2 32bits data in DCD region is used to give some info about DCD data.
+	//Here big endian format is used, so it must be converted.
+	if (HAB_TAG_DCD != EndianSwap(*pDCDRegion) >> 24)
+	{
+		TRACE(CString("DCD header tag doesn't match!\n"));
+		return FALSE;
+	}
+
+	if (this->_chipFamily != MX50)
+	{
+		//The DCD_WRITE command handling was changed from i.MX508.
+		//Now the DCD is  performed by HAB and therefore the format of DCD is the same format as in regular image. 
+		//The DCD_WRITE parameters require size and address. Size is the size of entire DCD file including header. 
+		//Address is the temporary address that USB will use for storing the DCD file before processing.
+
+		DWORD DCDHeader = EndianSwap(*pDCDRegion);
+		//Total dcd data bytes:
+		INT TotalDCDDataCnt = (DCDHeader & 0x00FFFF00) >> 8;
+
+		if (!DCDWrite((PUCHAR)(pDCDRegion), TotalDCDDataCnt))
+		{
+			TRACE(_T("Failed to initialize memory!\r\n"));
+			return FALSE;
+		}
+	}
+	else
+	{
+		DWORD DCDDataCount = ((EndianSwap(*pDCDRegion) & 0x00FFFF00) >> 8) / sizeof(DWORD);
+
+		PRomFormatDCDData pRomFormatDCDData = (PRomFormatDCDData)malloc(DCDDataCount * sizeof(RomFormatDCDData));
+		//There are several segments in DCD region, we have to extract DCD data with segment unit.
+		//i.e. Below code shows how non-DCD data is inserted to finish a delay operation, we must avoid counting them in.
+		/*DCD_BE 0xCF001024   ; Tag = 0xCF, Len = 1*12+4=0x10, parm = 4
+
+		; Wait for divider to update
+		DCD_BE 0x53FD408C   ; Address
+		DCD_BE 0x00000004   ; Mask
+		DCD_BE 0x1FFFFFFF   ; Loop
+
+		DCD_BE 0xCC031C04   ; Tag = 0xCC, Len = 99*8+4=0x031c, parm = 4*/
+
+		DWORD CurDCDDataCount = 1, ValidRegCount = 0;
+
+		//Quit if current DCD data count reaches total DCD data count.
+		while (CurDCDDataCount < DCDDataCount)
+		{
+			DWORD DCDCmdHdr = EndianSwap(*(pDCDRegion + CurDCDDataCount));
+			CurDCDDataCount++;
+			if ((DCDCmdHdr >> 24) == HAB_CMD_WRT_DAT)
+			{
+				DWORD DCDDataSegCount = (((DCDCmdHdr & 0x00FFFF00) >> 8) - 4) / sizeof(ImgFormatDCDData);
+				PImgFormatDCDData pImgFormatDCDData = (PImgFormatDCDData)(pDCDRegion + CurDCDDataCount);
+				//Must convert image dcd data format to ROM dcd format.
+				for (DWORD i = 0; i < DCDDataSegCount; i++)
+				{
+					pRomFormatDCDData[ValidRegCount].addr = pImgFormatDCDData[i].Address;
+					pRomFormatDCDData[ValidRegCount].data = pImgFormatDCDData[i].Data;
+					pRomFormatDCDData[ValidRegCount].format = EndianSwap(32);
+					ValidRegCount++;
+					TRACE(CString("{%d,0x%08x,0x%08x},\n"), 32, EndianSwap(pImgFormatDCDData[i].Address), EndianSwap(pImgFormatDCDData[i].Data));
+				}
+				CurDCDDataCount += DCDDataSegCount * sizeof(ImgFormatDCDData) / sizeof(DWORD);
+			}
+			else if ((DCDCmdHdr >> 24) == HAB_CMD_CHK_DAT)
+			{
+				CurDCDDataCount += (((DCDCmdHdr & 0x00FFFF00) >> 8) - 4) / sizeof(DWORD);
+			}
+		}
+
+		if (!DCDWrite((PUCHAR)(pRomFormatDCDData), ValidRegCount))
+		{
+			TRACE(_T("Failed to initialize memory!\r\n"));
+			free(pRomFormatDCDData);
+			return FALSE;
+		}
+		free(pRomFormatDCDData);
+	}
+	return TRUE;
+}
+
+int FitGetImageNodeOffset(UCHAR *fit, int image_node, char * type, int index)
+{
+	int offset;
+	int len;
+	const char * config;
+	int config_node = 0;
+
+	offset = fdt_path_offset(fit, "/configurations");
+	if (offset < 0)
+	{
+		TRACE(_T("Can't found configurations\n"));
+		return offset;
+	}
+
+	config = (const char *)fdt_getprop(fit, offset, "default", &len);
+	for (int node = fdt_first_subnode(fit, offset); node >= 0; node = fdt_next_subnode(fit, node))
+	{
+		const char *name = fdt_get_name(fit, node, &len);
+		if (strcmp(config, name) == 0)
+		{
+			config_node = node;
+			break;
+		}
+	}
+
+	if (config_node <= 0)
+	{
+		TRACE(_T("can't find default config"));
+		return config_node;
+	}
+
+	char * name = (char*)fdt_getprop(fit, config_node, type, &len);
+	if (!name)
+	{
+		TRACE(_T("can't find type\n"));
+		return -1;
+	}
+
+	char *str = name;
+	for (int i = 0; i < index; i++)
+	{
+		str = strchr(str, '\0') + 1;
+		if (!str || (str - name) > len)
+		{
+			TRACE(_T("can't found index %d node"), index);
+			return -1;
+		}
+	}
+
+	return fdt_subnode_offset(fit, image_node, str);
+}
+
+int FitGetIntProp(UCHAR *fit, int node, char *prop, int *value)
+{
+	int len;
+	const void * data = fdt_getprop(fit, node, prop, &len);
+	if (data == NULL)
+	{
+		TRACE(_T("failure to get load prop\n"));
+		return -1;
+	}
+	*value = fdt32_to_cpu(*(int*)data);
+	return 0;
+}
+
+BOOL MxHidDevice::LoadFitImage(UCHAR *fit, ULONGLONG dataCount)
+{
+
+	int image_offset = fdt_path_offset(fit, "/images");
+	if (image_offset < 0)
+	{
+		TRACE(_T("Can't find /images\n"));
+		return FALSE;
+	}
+
+	int depth = 0;
+	int count = 0;
+	int node_offset = 0;
+	int entry = 0;
+
+	int size = fdt_totalsize(fit);
+	size = (size + 3) & ~3;
+	int base_offset = (size + 3) & ~3;
+
+	int firmware;
+	firmware = FitGetImageNodeOffset(fit, image_offset, "firmware", 0);
+	if (firmware < 0)
+	{
+		TRACE(_T("can't find firmware\n"));
+		return FALSE;
+	}
+
+	int firmware_load, offset, firmware_len;
+
+	if (!FitGetIntProp(fit, firmware, "data-offset", &offset))
+	{
+		offset = base_offset + offset;
+	}
+	else if (FitGetIntProp(fit, firmware, "data-position", &offset))
+	{
+		TRACE(_T("can't find data-offset or data-position\n"));
+		return FALSE;
+	}
+
+	if (FitGetIntProp(fit, firmware, "load", &firmware_load) ||
+		FitGetIntProp(fit, firmware, "data-size", &firmware_len))
+	{
+		TRACE(_T("can't find load data-len\n"));
+		return FALSE;
+	}
+
+	if (!Download(fit + offset, firmware_len, firmware_load))
+		return FALSE;
+
+
+	int fdt;
+	fdt = FitGetImageNodeOffset(fit, image_offset, "fdt", 0);
+	if (fdt < 0)
+	{
+		TRACE(_T("can't find fdt\n"));
+		return FALSE;
+	}
+
+	int fdt_load, fdt_size;
+
+	if (!FitGetIntProp(fit, fdt, "data-offset", &offset))
+	{
+		offset = base_offset + offset;
+	}
+	else if (FitGetIntProp(fit, fdt, "data-position", &offset))
+	{
+		TRACE(_T("can't find data-offset or data-position\n"));
+		return FALSE;
+	}
+
+	if (FitGetIntProp(fit, fdt, "data-size", &fdt_size))
+	{
+		TRACE(_T("can't find data-len\n"));
+		return FALSE;
+	}
+
+	fdt_load = firmware_load + firmware_len;
+
+	if (!Download(fit + offset, fdt_size, fdt_load))
+		return FALSE;
+
+	int load_node;
+	int index = 0;
+	do
+	{
+		load_node = FitGetImageNodeOffset(fit, image_offset, "loadables", index);
+		if (load_node >= 0)
+		{
+			int load, offset, len, entry;
+
+			if (!FitGetIntProp(fit, load_node, "data-offset", &offset))
+			{
+				offset = base_offset + offset;
+			}
+			else if (FitGetIntProp(fit, load_node, "data-position", &offset))
+			{
+				TRACE(_T("can't find data-offset or data-position\n"));
+				return FALSE;
+			}
+
+			if (FitGetIntProp(fit, load_node, "load", &load) ||
+				FitGetIntProp(fit, load_node, "data-size", &len))
+			{
+				TRACE(_T("can't find load data-len\n"));
+				return FALSE;
+			}
+			if (!Download(fit + offset, len, load))
+				return FALSE;
+
+			if (FitGetIntProp(fit, load_node, "entry", &entry) == 0)
+			{
+				AddIvtHdr(entry);
+			}
+		}
+		index++;
+	} while (load_node >= 0);
+
+	return TRUE;
+}
+
+
 BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 {
+
 	UCHAR* pDataBuf = NULL;
 	DWORD * pPlugIn = NULL;
 	DWORD PlugInDataOffset= 0,ImgIVTOffset= 0,BootDataImgAddrIndex= 0,PhyRAMAddr4KRL= 0;
 	DWORD PlugInAddr = 0;
 	PIvtHeader pIVT = NULL,pIVT2 = NULL;
 
-	PBootData pPluginDataBuf =NULL;
 	//Create device handle and report id
     OpenMxHidHandle();
 
@@ -804,6 +1193,9 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
     fwFile.Read(pDataBuf, (UINT)fwSize);
     fwFile.Close();
 	*/
+
+	dwFileSize = (dwFileSize + ROM_ECC_SIZE_ALIGN - 1) / ROM_ECC_SIZE_ALIGN * ROM_ECC_SIZE_ALIGN;
+
 	pDataBuf = (UCHAR*)malloc((size_t)dwFileSize);
 	if(pDataBuf == NULL)
 	{
@@ -811,208 +1203,166 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 	}
 	memcpy(pDataBuf, pFileDataBuf, (size_t)dwFileSize);
 
+	if (_chipFamily >= MX8QM)
+	{
+		return RunMxMultiImg(pDataBuf, dwFileSize);
+	}
+
+	PBootData pPluginDataBuf;
+
 	//pDataBuf = pFileDataBuf;
 	//Search for IVT
-    pPlugIn = (DWORD *)pDataBuf;
-	//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
-	while(ImgIVTOffset < dwFileSize &&
-		(pPlugIn[ImgIVTOffset/sizeof(DWORD)] != IVT_BARKER_HEADER &&
-		 pPlugIn[ImgIVTOffset/sizeof(DWORD)] != IVT_BARKER2_HEADER
-		))
+	while(1)
 	{
-		ImgIVTOffset+= 0x100;
-	}
-	if(ImgIVTOffset >= dwFileSize)
-	{
-		goto ERR_HANDLE;
-	}
+		pPlugIn = (DWORD *)pDataBuf;
+		//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
+		while (ImgIVTOffset < dwFileSize &&
+			(pPlugIn[ImgIVTOffset / sizeof(DWORD)] != IVT_BARKER_HEADER &&
+				pPlugIn[ImgIVTOffset / sizeof(DWORD)] != IVT_BARKER2_HEADER
+				))
+		{
+			ImgIVTOffset += 0x100;
+		}
+		if (ImgIVTOffset >= dwFileSize)
+		{
+			goto ERR_HANDLE;
+		}
 
-	//Now we find IVT
-	pIVT = (PIvtHeader) (pPlugIn + ImgIVTOffset/sizeof(DWORD));
-	//Now we have to judge DCD way or plugin way used in the image
-	//The method is to check plugin flag in boot data region
-    // IVT boot data format
-    //   0x00    IMAGE START ADDR
-    //   0x04    IMAGE SIZE
-    //   0x08    PLUGIN FLAG
-	pPluginDataBuf = (PBootData)(pPlugIn + ImgIVTOffset/sizeof(DWORD) + (pIVT->BootData - pIVT->SelfAddr)/sizeof(DWORD));
+		//Now we find IVT
+		pIVT = (PIvtHeader)(pPlugIn + ImgIVTOffset / sizeof(DWORD));
+		//Now we have to judge DCD way or plugin way used in the image
+		//The method is to check plugin flag in boot data region
+		// IVT boot data format
+		//   0x00    IMAGE START ADDR
+		//   0x04    IMAGE SIZE
+		//   0x08    PLUGIN FLAG
+		pPluginDataBuf = (PBootData)(pPlugIn + ImgIVTOffset / sizeof(DWORD) + (pIVT->BootData - pIVT->SelfAddr) / sizeof(DWORD));
 
-	if(pPluginDataBuf->PluginFlag)
+		if (pPluginDataBuf->PluginFlag & 0xFFFFFFFE)
+			ImgIVTOffset += 0x100;
+		else
+			break;
+	} 
+
+	if(pPluginDataBuf->PluginFlag || pIVT->Reserved)
 	{
 		//Plugin mode
-
+	  
 		//---------------------------------------------------------
 		//Run plugin in IRAM
 		//Download plugin data into IRAM.
 		PlugInAddr = pIVT->ImageStartAddr;
 		PlugInDataOffset = pIVT->ImageStartAddr - pIVT->SelfAddr;
-		if (!TransData(PlugInAddr, pPluginDataBuf->ImageSize, (PUCHAR)((uint64_t)pIVT + PlugInDataOffset)))
+		if (!TransData(pIVT->SelfAddr, pPluginDataBuf->ImageSize, (PUCHAR)((DWORD)pIVT)))
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed."),
-				PlugInAddr, pPluginDataBuf->ImageSize, ((uint64_t)pIVT + PlugInDataOffset));
+				PlugInAddr, pPluginDataBuf->ImageSize, ((DWORD)pIVT + PlugInDataOffset));
 			goto ERR_HANDLE;
 		}
-
-		if(!AddIvtHdr(PlugInAddr))
-		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): Failed to addhdr to RAM address: 0x%x."), PlugInAddr);
-			goto ERR_HANDLE;
-		}
-
-		if( !Jump(m_jumpAddr))
+		
+		if( !Jump(pIVT->SelfAddr, true))
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): Failed to jump to RAM address: 0x%x."), m_jumpAddr);
 			goto ERR_HANDLE;
 		}
 
-		//---------------------------------------------------------
-		//Download eboot to ram
-		//Search IVT2.
-		//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
-		DWORD IVT2Offset = ImgIVTOffset + sizeof(IvtHeader);
-
-		while(IVT2Offset < dwFileSize &&
-			(pPlugIn[IVT2Offset/sizeof(DWORD)] != IVT_BARKER_HEADER &&
-			pPlugIn[IVT2Offset/sizeof(DWORD)] != IVT_BARKER2_HEADER))
-			IVT2Offset+= sizeof(DWORD);
-
-		if(IVT2Offset >= dwFileSize)
+		if (pIVT->Reserved)
 		{
-			goto ERR_HANDLE;
+				Sleep(200);
+				Uboot_header *pImage = (Uboot_header*)(pDataBuf + pIVT->Reserved + ImgIVTOffset);
+				if (EndianSwap(pImage->magic) == 0x27051956)
+				{
+					PhyRAMAddr4KRL = EndianSwap(pImage->load);
+					int CodeOffset = pIVT->Reserved + sizeof(Uboot_header) + ImgIVTOffset;
+					unsigned int ExecutingAddr = EndianSwap(pImage->entry);
+
+					if (!TransData(PhyRAMAddr4KRL, (unsigned int)(dwFileSize - CodeOffset), pDataBuf + CodeOffset))
+					{
+						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"),
+							PhyRAMAddr4KRL, dwFileSize, pDataBuf);
+						goto ERR_HANDLE;
+					}
+
+					AddIvtHdr(ExecutingAddr);
+				}
+				else if (fdt_check_header((UCHAR*)pImage) == 0)
+				{
+					if (!LoadFitImage((UCHAR*)pImage, dwFileSize - ( (UCHAR*)pImage - (UCHAR*)pFileDataBuf)))
+					{
+						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Load Fit image failure\n"));
+						goto ERR_HANDLE;
+					}
+
+				}
+				else
+				{
+					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("uBoot Magic number wrong\n"));
+					goto ERR_HANDLE;
+				}
 		}
-		pIVT2 = (PIvtHeader)(pPlugIn + IVT2Offset/sizeof(DWORD));
-		BootDataImgAddrIndex = (DWORD *)pIVT2 - pPlugIn;
-		BootDataImgAddrIndex += (pIVT2->BootData - pIVT2->SelfAddr)/sizeof(DWORD);
-		PhyRAMAddr4KRL = pPlugIn[BootDataImgAddrIndex] + IVT_OFFSET - ImgIVTOffset;
-		if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, (PUCHAR)((uint64_t)pDataBuf)))
+		else
 		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"),
-				PhyRAMAddr4KRL, dwFileSize, pDataBuf);
-			goto ERR_HANDLE;
-		}
+			//---------------------------------------------------------
+			//Download eboot to ram		
+			//Search IVT2.
+			//ImgIVTOffset indicates the IVT's offset from the beginning of the image.
+			DWORD IVT2Offset = ImgIVTOffset + sizeof(IvtHeader);
 
-		DWORD ImgStartAddr = pIVT2->ImageStartAddr;
-		if(!AddIvtHdr(ImgStartAddr))
-		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): Failed to addhdr to RAM address: 0x%x.\n"), ImgStartAddr);
-			goto ERR_HANDLE;
+			while (IVT2Offset < dwFileSize &&
+				(pPlugIn[IVT2Offset / sizeof(DWORD)] != IVT_BARKER_HEADER &&
+					pPlugIn[IVT2Offset / sizeof(DWORD)] != IVT_BARKER2_HEADER))
+				IVT2Offset += sizeof(DWORD);
+
+			if (IVT2Offset >= dwFileSize)
+			{
+				goto ERR_HANDLE;
+			}
+			pIVT2 = (PIvtHeader)(pPlugIn + IVT2Offset / sizeof(DWORD));
+			BootDataImgAddrIndex = (DWORD *)pIVT2 - pPlugIn;
+			BootDataImgAddrIndex += (pIVT2->BootData - pIVT2->SelfAddr) / sizeof(DWORD);
+			PhyRAMAddr4KRL = pPlugIn[BootDataImgAddrIndex] + IVT_OFFSET - ImgIVTOffset;
+			if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, (PUCHAR)((DWORD)pDataBuf)))
+			{
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"),
+					PhyRAMAddr4KRL, dwFileSize, pDataBuf);
+				goto ERR_HANDLE;
+			}
+
+			m_jumpAddr = pIVT2->SelfAddr;
 		}
 	}
 	else
 	{
         if(NULL != pIVT->DCDAddress)
         {
-    		//DCD mode
-    		DWORD * pDCDRegion = pPlugIn + ImgIVTOffset/sizeof(DWORD) + (pIVT->DCDAddress - pIVT->SelfAddr)/sizeof(DWORD);
-    		//i.e. DCD_BE  0xD2020840              ;DCD_HEADR Tag=0xd2, len=64*8+4+4, ver= 0x40
-    		//i.e. DCD_BE  0xCC020404              ;write dcd cmd headr Tag=0xcc, len=64*8+4, param=4
-    		//The first 2 32bits data in DCD region is used to give some info about DCD data.
-    		//Here big endian format is used, so it must be converted.
-    		if(HAB_TAG_DCD != EndianSwap(*pDCDRegion)>>24)
-    		{
-    			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("DCD header tag doesn't match!"));
-    			goto ERR_HANDLE;
-    		}
+			DWORD * pDCDRegion = pPlugIn + ImgIVTOffset / sizeof(DWORD) + (pIVT->DCDAddress - pIVT->SelfAddr) / sizeof(DWORD);
 
-			if( (_chipFamily >= MX6Q) )
-			{
-				//The DCD_WRITE command handling was changed from i.MX508.
-				//Now the DCD is  performed by HAB and therefore the format of DCD is the same format as in regular image.
-				//The DCD_WRITE parameters require size and address. Size is the size of entire DCD file including header.
-				//Address is the temporary address that USB will use for storing the DCD file before processing.
-
-    			DWORD DCDHeader = EndianSwap(*pDCDRegion);
-    			//Total dcd data bytes:
-    			INT TotalDCDDataCnt = (DCDHeader & 0x00FFFF00) >> 8;
-
-    			if(TotalDCDDataCnt > HAB_DCD_BYTES_MAX)
-    			{
-    				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("DCD data excceeds max limit!!!"));
-    				goto ERR_HANDLE;
-    			}
-
-    			if ( !DCDWrite((PUCHAR)(pDCDRegion),TotalDCDDataCnt) )
-    			{
-    				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to initialize memory!"));
-    				goto ERR_HANDLE;
-    			}
-    		}
-    		else
-    		{
-    			DWORD DCDDataCount = ((EndianSwap(*pDCDRegion) & 0x00FFFF00)>>8)/sizeof(DWORD);
-
-    			PRomFormatDCDData pRomFormatDCDData = (PRomFormatDCDData)malloc(DCDDataCount*sizeof(RomFormatDCDData));
-    			//There are several segments in DCD region, we have to extract DCD data with segment unit.
-    			//i.e. Below code shows how non-DCD data is inserted to finish a delay operation, we must avoid counting them in.
-    			/*DCD_BE 0xCF001024   ; Tag = 0xCF, Len = 1*12+4=0x10, parm = 4
-
-    			; Wait for divider to update
-    			DCD_BE 0x53FD408C   ; Address
-    			DCD_BE 0x00000004   ; Mask
-    			DCD_BE 0x1FFFFFFF   ; Loop
-
-    			DCD_BE 0xCC031C04   ; Tag = 0xCC, Len = 99*8+4=0x031c, parm = 4*/
-
-    			DWORD CurDCDDataCount = 1, ValidRegCount=0;
-
-    			//Quit if current DCD data count reaches total DCD data count.
-    			while(CurDCDDataCount < DCDDataCount)
-    			{
-    				DWORD DCDCmdHdr = EndianSwap(*(pDCDRegion+CurDCDDataCount));
-    				CurDCDDataCount++;
-    				if((DCDCmdHdr >> 24) == HAB_CMD_WRT_DAT)
-    				{
-    					DWORD DCDDataSegCount = (((DCDCmdHdr & 0x00FFFF00) >>8) -4)/sizeof(ImgFormatDCDData);
-    					PImgFormatDCDData pImgFormatDCDData = (PImgFormatDCDData)(pDCDRegion + CurDCDDataCount);
-    					//Must convert image dcd data format to ROM dcd format.
-    					for(DWORD i=0; i<DCDDataSegCount; i++)
-    					{
-    						pRomFormatDCDData[ValidRegCount].addr = pImgFormatDCDData[i].Address;
-    						pRomFormatDCDData[ValidRegCount].data = pImgFormatDCDData[i].Data;
-    						pRomFormatDCDData[ValidRegCount].format = EndianSwap(32);
-    						ValidRegCount++;
-    						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("{%d,0x%08x,0x%08x}, "),32, EndianSwap(pImgFormatDCDData[i].Address),EndianSwap(pImgFormatDCDData[i].Data));
-    					}
-    					CurDCDDataCount+=DCDDataSegCount*sizeof(ImgFormatDCDData)/sizeof(DWORD);
-    				}
-    				else if((DCDCmdHdr >> 24) == HAB_CMD_CHK_DAT)
-    				{
-    					CurDCDDataCount += (((DCDCmdHdr & 0x00FFFF00) >>8) -4)/sizeof(DWORD);
-    				}
-    			}
-
-    			if ( !DCDWrite((PUCHAR)(pRomFormatDCDData),ValidRegCount) )
-    			{
-    				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to initialize memory!"));
-    				free(pRomFormatDCDData);
-    				goto ERR_HANDLE;
-    			}
-    			free(pRomFormatDCDData);
-    		}
+			RunDCD(pDCDRegion);
         }
-
 		//---------------------------------------------------------
-		//Download boot data to ram
+			//Download boot data to ram
 		PhyRAMAddr4KRL = pIVT->SelfAddr - ImgIVTOffset;
-		pIVT->DCDAddress = 0;
 
-		if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, (PUCHAR)((uint64_t)pDataBuf)))
+		if (this->_chipFamily < MX7D)
+			pIVT->DCDAddress = 0;
+
+		if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, (PUCHAR)((DWORD)pDataBuf)))
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed."),
 				PhyRAMAddr4KRL, dwFileSize, pDataBuf);
 			goto ERR_HANDLE;
 		}
 
-        m_jumpAddr = pIVT->SelfAddr;
-        //m_jumpAddr = pIVT->ImageStartAddr;
+		m_jumpAddr = pIVT->SelfAddr;
+		//m_jumpAddr = pIVT->ImageStartAddr;
 		/*if(!AddIvtHdr(pIVT->ImageStartAddr))
 		{
 			TRACE(_T("RunPlugIn(): Failed to addhdr to RAM address: 0x%x.\n"), pIVT->ImageStartAddr);
 			goto ERR_HANDLE;
 		}*/
 	}
-
-    //Clear device handle and report id
+		
+    //Clear device handle and report id    
     CloseMxHidHandle();
 	if(pDataBuf != NULL)
 	{
@@ -1021,7 +1371,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
     return TRUE;
 
 ERR_HANDLE:
-    //Clear device handle and report id
+    //Clear device handle and report id    
     CloseMxHidHandle();
 	if(pDataBuf != NULL)
 	{
@@ -1032,32 +1382,37 @@ ERR_HANDLE:
 
 BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * pBuf)
 {
-    SDPCmd SDPCmd;
+	SDPCmd SDPCmd;
+
+	UINT MaxHidTransSize = m_Capabilities.OutputReportByteLength - 1;
+
+	if (_chipFamily >= MX8QM)
+		byteCount = ((byteCount + MaxHidTransSize - 1) / MaxHidTransSize) * MaxHidTransSize;
 
     SDPCmd.command = ROM_KERNEL_CMD_WR_FILE;
     SDPCmd.dataCount = byteCount;
     SDPCmd.format = 0;
     SDPCmd.data = 0;
     SDPCmd.address = address;
-    LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T(" Trans Data address is %x \n"),address);
+
 	if(!SendCmd(&SDPCmd))
 		return FALSE;
+    
+    Sleep(10);
 
-
-
-    UINT MaxHidTransSize = 1025 - 1;
     UINT TransSize;
-
+    
     while(byteCount > 0)
     {
         TransSize = (byteCount > MaxHidTransSize) ? MaxHidTransSize : byteCount;
-	if(!SendData(pBuf,TransSize ))
+
+		if(!SendData(pBuf, TransSize))
 			return FALSE;
 
         byteCount -= TransSize;
         pBuf += TransSize;
     }
-
+    
     //below function should be invoked for mx50
 	if ( !GetCmdAck(ROM_STATUS_ACK) )
 	{
@@ -1176,29 +1531,130 @@ BOOL MxHidDevice::ReadData(UINT address, UINT byteCount, unsigned char * pBuf)
 
 	return TRUE;
 }
+DWORD MxHidDevice::GetIvtOffset(DWORD *start, ULONGLONG dataCount)
+{
+	//Search for a valid IVT Code starting from the given address
+	DWORD ImgIVTOffset = 0;
+
+	while (ImgIVTOffset < dataCount &&
+		(start[ImgIVTOffset / sizeof(DWORD)] != IVT_BARKER_HEADER &&
+			start[ImgIVTOffset / sizeof(DWORD)] != IVT_BARKER2_HEADER &&
+			start[ImgIVTOffset / sizeof(DWORD)] != MX8_IVT_BARKER_HEADER &&
+			start[ImgIVTOffset / sizeof(DWORD)] != MX8_IVT2_BARKER_HEADER
+			))
+		ImgIVTOffset += 0x100;
+
+	if (ImgIVTOffset >= dataCount)
+		return -1;
+
+	return ImgIVTOffset;
+}
+
+BOOL MxHidDevice::RunMxMultiImg(UCHAR* pBuffer, ULONGLONG dataCount)
+{
+	DWORD *pImg = (DWORD*)pBuffer;
+	DWORD * pDCDRegion;
+	DWORD ImageOffset = 0;
+	DWORD ImgIVTOffset = GetIvtOffset(pImg, MX8_INITIAL_IMAGE_SIZE);
+	PIvtHeaderV2 pIVT = NULL, pIVT2 = NULL;
+	PBootDataV2 pBootData1 = NULL, pBootData2 = NULL;
+	unsigned int i;
+
+	//if we did not find a valid IVT within INITIAL_IMAGE_SIZE we have a non zero ImageOffset
+	if (ImgIVTOffset < 0)
+	{
+		TRACE(_T("Not a valid image.\n"));
+		return FALSE;
+	}
+
+	pImg += ImageOffset / sizeof(DWORD);
+	if (pImg[ImgIVTOffset / sizeof(DWORD)] != MX8_IVT_BARKER_HEADER && pImg[ImgIVTOffset / sizeof(DWORD)] != MX8_IVT2_BARKER_HEADER)
+	{
+		TRACE(_T("Not a valid image.\n"));
+		return FALSE;
+	}
+
+	pIVT = (PIvtHeaderV2)(pImg + ImgIVTOffset / sizeof(DWORD));
+
+	if (pImg[ImgIVTOffset / sizeof(DWORD)] == MX8_IVT2_BARKER_HEADER)
+	{
+		pIVT2 = (PIvtHeaderV2)(pImg + ImgIVTOffset + pIVT->Next / sizeof(DWORD));
+	}
+	else
+	{
+		pIVT2 = pIVT + 1; // The IVT for the second container is immediatly after IVT1
+	}
+
+	pBootData1 = (PBootDataV2)((DWORD*)pIVT + (pIVT->BootData - pIVT->SelfAddr) / sizeof(DWORD));
+	pBootData2 = (PBootDataV2)((DWORD*)pIVT2 + (pIVT2->BootData - pIVT2->SelfAddr) / sizeof(DWORD));
+
+
+	if (pIVT->DCDAddress)
+	{
+		pDCDRegion = (DWORD*)pIVT + (pIVT->DCDAddress - pIVT->SelfAddr) / sizeof(DWORD);
+		if (!RunDCD(pDCDRegion))
+			return FALSE;
+	}
+
+	// Load Initial Image
+	assert((pIVT->SelfAddr - ImgIVTOffset) < (1ULL << 32));
+	if (!Download((UCHAR*)pImg, MX8_INITIAL_IMAGE_SIZE, (UINT)(SCUViewAddr(pIVT->SelfAddr) - ImgIVTOffset)))
+		return FALSE;
+
+	//Load all the images in the first container to their respective Address
+	for (i = 0; i < (pBootData1->NrImages); ++i) {
+		assert(pBootData1->Images[i].ImageAddr < (1ULL << 32));
+		if (!Download((UCHAR*)pImg + pBootData1->Images[i].Offset - IVT_OFFSET_SD,
+			pBootData1->Images[i].ImageSize,
+			(UINT)SCUViewAddr(pBootData1->Images[i].ImageAddr)))
+			return FALSE;
+	}
+
+	//Load all the images in the second container to their respective Address
+	for (i = 0; i < (pBootData2->NrImages); ++i) {
+		assert(pBootData2->Images[i].ImageAddr < (1ULL << 32));
+		if (!Download((UCHAR*)pImg + pBootData2->Images[i].Offset - IVT_OFFSET_SD,
+			pBootData2->Images[i].ImageSize,
+			(UINT)SCUViewAddr(pBootData2->Images[i].ImageAddr)))
+			return FALSE;
+	}
+
+	m_jumpAddr = pIVT->SelfAddr;
+	return TRUE;
+}
+
+BOOL MxHidDevice::Download(UCHAR* pBuffer, ULONGLONG dataCount, UINT RAMAddress)
+{
+	//if(pMxFunc->Task == TRANS)
+	DWORD byteIndex, numBytesToWrite = 0;
+
+	for (byteIndex = 0; byteIndex < dataCount; byteIndex += numBytesToWrite)
+	{
+		// Get some data
+		numBytesToWrite = std::min((DWORD)MAX_SIZE_PER_DOWNLOAD_COMMAND, (DWORD)dataCount - byteIndex);
+
+		if (!TransData(RAMAddress + byteIndex, numBytesToWrite, pBuffer + byteIndex))
+		{
+			TRACE(_T("Download(): TransData(0x%X, 0x%X,0x%X) failed.\n"), \
+				RAMAddress + byteIndex, numBytesToWrite, pBuffer + byteIndex);
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
 
 BOOL MxHidDevice::Download(PImageParameter pImageParameter, UCHAR *pFileDataBuf, ULONGLONG dwFileSize, int cmdOpIndex)
 {
-	//Create device handle and report id
+//Create device handle and report id
     OpenMxHidHandle();
 
-	UCHAR* pBuffer = pFileDataBuf;
-
-	DWORD byteIndex, numBytesToWrite = 0;
-	for ( byteIndex = 0; byteIndex < dwFileSize; byteIndex += numBytesToWrite )
+	if(!Download(pFileDataBuf, dwFileSize, pImageParameter->PhyRAMAddr4KRL))
 	{
-		// Get some data
-		numBytesToWrite = (DWORD)std::min((long long unsigned int)MAX_SIZE_PER_DOWNLOAD_COMMAND, dwFileSize - byteIndex);
-
-		if (!TransData(pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pBuffer + byteIndex))
-		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Download(): TransData(0x%X, 0x%X, 0x%X, 0x%X) failed."),
-                pImageParameter->PhyRAMAddr4KRL + byteIndex, numBytesToWrite, pImageParameter->loadSection, pBuffer + byteIndex);
-			goto ERR_HANDLE;
-		}
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR,_T("Download Failure\n"));
+		goto ERR_HANDLE;
 	}
 
-	// If we are downloading to DCD or CSF, we don't need to send
+	// If we are downloading to DCD or CSF, we don't need to send 
 	if ( pImageParameter->loadSection == MemSectionDCD || pImageParameter->loadSection == MemSectionCSF )
 	{
 		return TRUE;
@@ -1215,7 +1671,7 @@ BOOL MxHidDevice::Download(PImageParameter pImageParameter, UCHAR *pFileDataBuf,
         if(!AddIvtHdr(ImageStartAddr))
         {
             LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("DownloadImage(): AddHdr(0x%x) failed."),ImageStartAddr);
-            goto ERR_HANDLE;
+            goto ERR_HANDLE;    
         }
     }
 
@@ -1227,6 +1683,6 @@ BOOL MxHidDevice::Download(PImageParameter pImageParameter, UCHAR *pFileDataBuf,
 ERR_HANDLE:
     //Clear device handle and report id
     CloseMxHidHandle();
-
+    
 	return FALSE;
 }

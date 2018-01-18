@@ -267,13 +267,14 @@ public: CTString() : tstring() { }
 		}
 
 
-		void MakeUpper(){
+		CTString<T> MakeUpper(){
 			for (unsigned int i = 0; i < this->length(); i++){
 				this->at(i) = toupper(this->at(i));
 			}
+			return *this;
 		}
 
-
+		
 		void ReleaseBuffer(int nlength = -1){
 			if (nlength == -1){
 				this->assign(this->c_str()); // essentially resizing the string as needed
@@ -307,7 +308,11 @@ public: CTString() : tstring() { }
 			return this->substr(this->length()-nCount,  nCount);
 		}
 
-
+		CTString<T> Tokenize(T *token, int &iStart)
+		{
+			//TO
+			return *this;
+		}
 		int ReverseFind(T ch) const{
 			return (int)this->rfind(ch);
 		}
