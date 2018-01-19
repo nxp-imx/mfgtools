@@ -1104,6 +1104,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 	DWORD PlugInDataOffset= 0,ImgIVTOffset= 0,BootDataImgAddrIndex= 0,PhyRAMAddr4KRL= 0;
 	DWORD PlugInAddr = 0;
 	PIvtHeader pIVT = NULL,pIVT2 = NULL;
+	ULONGLONG dwsize = dwFileSize;
 
 	//Create device handle and report id
     OpenMxHidHandle();
@@ -1128,7 +1129,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 	{
 		return FALSE;
 	}
-	memcpy(pDataBuf, pFileDataBuf, (size_t)dwFileSize);
+	memcpy(pDataBuf, pFileDataBuf, (size_t)dwsize);
 
 	if (_chipFamily >= MX8QM)
 	{
