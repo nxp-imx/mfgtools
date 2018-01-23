@@ -313,6 +313,11 @@ BOOL MxHidDevice::OpenMxHidHandle()
 
 	memset(&m_Capabilities, 0, sizeof(m_Capabilities));
 
+#ifdef __linux__
+	m_Capabilities.OutputReportByteLength = 1025;
+	m_Capabilities.InputReportByteLength = 1025;
+#endif
+
 	err = AllocateIoBuffers();
 	if ( err != ERROR_SUCCESS )
 	{
@@ -885,12 +890,6 @@ BOOL MxHidDevice::Jump(UINT RAMAddress, BOOL isPlugin)
 		/* ROM jump to address, no chance send back ACK*/
 	}
 
-	if(!GetHABType())
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to get HAB type from ROM, ignoredro!!!"));
-        return FALSE;
-    }
-
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("*********MxHidDevice[%p] Jump to Ramkernel successfully!**********"), this);
 
 	return TRUE;
@@ -1253,7 +1252,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 		//Download plugin data into IRAM.
 		PlugInAddr = pIVT->ImageStartAddr;
 		PlugInDataOffset = pIVT->ImageStartAddr - pIVT->SelfAddr;
-		if (!TransData(pIVT->SelfAddr, pPluginDataBuf->ImageSize, (PUCHAR)((DWORD)pIVT)))
+		if (!TransData(pIVT->SelfAddr, pPluginDataBuf->ImageSize, (PUCHAR)pIVT))
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed."),
 				PlugInAddr, pPluginDataBuf->ImageSize, ((DWORD)pIVT + PlugInDataOffset));

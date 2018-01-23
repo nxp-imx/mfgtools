@@ -563,6 +563,7 @@ void* CmdListThreadProc(void* pParam)
 					if(pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 					{
 						chip = ((MxHidDevice*)pDevice)->_chiFamilyName;
+#if 0
 						habstate = ((MxHidDevice*)pDevice)->GetHABState();
 					}
 
@@ -580,12 +581,14 @@ void* CmdListThreadProc(void* pParam)
 							}
 							habstate = secureState;
 						}
+#endif
 					}
 				}
 
 				COpCommand *pCmd = (*cmdIt);
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T(" command description \"%s\" and body string \"%s\" \n"), pCmd->GetDescString().c_str(),pCmd->GetBodyString().c_str());
-				if(pCmd->IsRun(chip) && pCmd->IsRun(habstate))
+				if(pCmd->IsRun(chip))
+//				if(pCmd->IsRun(chip) && pCmd->IsRun(habstate))
 				{
 					dwError = pCmd->ExecuteCommand(pOperation->m_WndIndex);
 				}else
