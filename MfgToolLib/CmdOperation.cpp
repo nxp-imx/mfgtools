@@ -563,7 +563,6 @@ void* CmdListThreadProc(void* pParam)
 					if(pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 					{
 						chip = ((MxHidDevice*)pDevice)->_chiFamilyName;
-#if 0
 						habstate = ((MxHidDevice*)pDevice)->GetHABState();
 					}
 
@@ -581,7 +580,6 @@ void* CmdListThreadProc(void* pParam)
 							}
 							habstate = secureState;
 						}
-#endif
 					}
 				}
 

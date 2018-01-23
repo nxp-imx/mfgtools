@@ -1448,7 +1448,7 @@ BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
 		//Read the data first
 		if ( !ReadData(FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr) )
 		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("ReadData(0x%X, 0x%X, 0x%X) failed.\n"),
+			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("AddIvtHdr 2: ReadData(0x%X, 0x%X, 0x%X) failed.\n"),
 				FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
 			return FALSE;
 		}
