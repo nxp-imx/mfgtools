@@ -277,21 +277,21 @@ public:
 
 	typedef struct _SubImageInfo
 	{
-		unsigned long long	Offset;
-		unsigned long long	ImageAddr;
-		unsigned long long	ImageEntry;
-		unsigned long		ImageSize;
-		unsigned long		ImageFlag;
-		unsigned long		Flag1;
-		unsigned long		Flag2;
+		uint64_t	Offset;
+		uint64_t	ImageAddr;
+		uint64_t	ImageEntry;
+		uint32_t		ImageSize;
+		uint32_t		ImageFlag;
+		uint32_t		Flag1;
+		uint32_t		Flag2;
 	}SubImageInfo;
 
 	typedef struct _BootDataV2
 	{
-		unsigned long	NrImages; // Number of images
-		unsigned long	BootDataSize;
-		unsigned long   BootDataFlag;
-		unsigned long	Reserved;
+		uint32_t	NrImages; // Number of images
+		uint32_t	BootDataSize;
+		uint32_t   BootDataFlag;
+		uint32_t	Reserved;
 		SubImageInfo	Images[MX8_MAX_IMAGES_COUNT];
 		SubImageInfo	SCD;
 		SubImageInfo	CSF;
@@ -300,17 +300,17 @@ public:
 
 	typedef struct _IvtHeaderV2
 	{
-		unsigned long		IvtBarker;
-		unsigned long		Reserved;
-		unsigned long long	DCDAddress;
-		unsigned long long	BootData;
-		unsigned long long	SelfAddr;
-		unsigned long long	CSFAddr;
+		uint32_t		IvtBarker;
+		uint32_t		Reserved;
+		uint64_t	DCDAddress;
+		uint64_t	BootData;
+		uint64_t	SelfAddr;
+		uint64_t	CSFAddr;
 		union {
-			unsigned long long	SCDAddr;
-			unsigned long long	Next;
+			uint64_t	SCDAddr;
+			uint64_t	Next;
 		};
-		unsigned long long	Reserved2[2];
+		uint64_t	Reserved2[2];
 	}IvtHeaderV2, *PIvtHeaderV2;
 
 	enum MemorySection
