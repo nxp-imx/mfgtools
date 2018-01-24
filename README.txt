@@ -8,6 +8,7 @@ Linux Version Build Guide
 Compilation requirements:
 libusb-1.0-0-dev
 libusb-1.0-0
+libfdt-dev
 build-essential
 
 How to make:
