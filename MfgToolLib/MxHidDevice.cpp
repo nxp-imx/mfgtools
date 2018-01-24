@@ -715,7 +715,7 @@ BOOL MxHidDevice::SendData(const unsigned char * DataBuf, UINT ByteCnt)
 
 	m_pWriteReport->ReportId = REPORT_ID_DATA;
 
-	if (Write((unsigned char *)m_pWriteReport,/*ByteCnt + 1*/1025) <0)
+	if (Write((unsigned char *)m_pWriteReport, ByteCnt + 1) <0)
 	{
 		return FALSE;
 	}
@@ -1426,7 +1426,7 @@ BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
 	UINT FlashHdrAddr;
 
 	//transfer length of ROM_TRANSFER_SIZE is a must to ROM code.
-	unsigned char FlashHdr[ROM_TRANSFER_SIZE] = { 0 };
+	unsigned char FlashHdr[sizeof(IvtHeader)] = { 0 };
 
 	// create a header and append the data
 
@@ -1435,18 +1435,18 @@ BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
 	FlashHdrAddr = ImageStartAddr;// - sizeof(IvtHeader);
 
     //Read the data first
-	if ( !ReadData(FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr) )
+	if ( !ReadData(FlashHdrAddr, sizeof(IvtHeader), FlashHdr) )
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("AddIvtHdr(): ReadData(0x%X, 0x%X, 0x%X) failed."),
             FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
 		return FALSE;
 	}
 
-    if(pIvtHeader->IvtBarker != IVT_BARKER_HEADER)
-    {
+	if(pIvtHeader->IvtBarker != IVT_BARKER_HEADER)
+	{
 		FlashHdrAddr = ImageStartAddr - sizeof(IvtHeader);
 		//Read the data first
-		if ( !ReadData(FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr) )
+		if ( !ReadData(FlashHdrAddr, sizeof(IvtHeader), FlashHdr) )
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("AddIvtHdr 2: ReadData(0x%X, 0x%X, 0x%X) failed.\n"),
 				FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
@@ -1455,9 +1455,9 @@ BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
     	//Add IVT header to the image.
         //Clean the IVT header region
 #ifdef __linux__
-	memset(FlashHdr,0,sizeof(IvtHeader));
+		memset(FlashHdr,0,sizeof(IvtHeader));
 #else
-        ZeroMemory(FlashHdr, sizeof(IvtHeader));
+        	ZeroMemory(FlashHdr, sizeof(IvtHeader));
 #endif
 
         //Fill IVT header parameter
@@ -1466,7 +1466,7 @@ BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
     	pIvtHeader->SelfAddr = FlashHdrAddr;
 
         //Send the IVT header to destiny address
-    	if ( !TransData(FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr) )
+    	if ( !TransData(FlashHdrAddr, sizeof(IvtHeader), FlashHdr) )
     	{
     		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("AddIvtHdr(): TransData(0x%X, 0x%X, 0x%X) failed.\n"),
                 FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
@@ -1474,13 +1474,13 @@ BOOL MxHidDevice::AddIvtHdr(UINT32 ImageStartAddr)
     	}
 
         //Verify the data
-       	unsigned char Tempbuf[ROM_TRANSFER_SIZE] = { 0 };
-        if ( !ReadData(FlashHdrAddr, ROM_TRANSFER_SIZE, Tempbuf) )
+       	unsigned char Tempbuf[sizeof(IvtHeader)] = { 0 };
+        if ( !ReadData(FlashHdrAddr, sizeof(IvtHeader), Tempbuf) )
     	{
     		return FALSE;
     	}
 
-        if(memcmp(FlashHdr, Tempbuf, ROM_TRANSFER_SIZE)!= 0 )
+        if(memcmp(FlashHdr, Tempbuf, sizeof(IvtHeader))!= 0 )
     	{
     		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("DownloadImage(): TransData(0x%X, 0x%X, 0x%X) failed.\n"),
                 FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);
