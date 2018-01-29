@@ -560,7 +560,6 @@ UINT CmdListThreadProc(LPVOID pParam)
 						dwTimeout = dwTimeout * 1000;
 						bStateCmdFinished = TRUE;
 						pDevice = NULL;
-						UI_UPDATE_INFORMATION _uiInfo;
 						//pOperation->UpdateUI(&_uiInfo,dwStateIndex);
 					}
 					else

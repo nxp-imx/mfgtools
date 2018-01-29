@@ -37,7 +37,7 @@
 class WindowsVersionInfo
 {
 public:
-    typedef enum WIN_FAMILY_VER{ WIN_9X=0, WIN_NT};
+    enum WIN_FAMILY_VER{ WIN_9X=0, WIN_NT};
     virtual ~WindowsVersionInfo(){};
     BOOL IsAvailable() { return m_is_available; };
     bool IsWin9x() { return ( m_family == WIN_9X ); };

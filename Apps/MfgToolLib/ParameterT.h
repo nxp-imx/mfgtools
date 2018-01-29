@@ -133,7 +133,7 @@ namespace property
 
 			if ( ValueList.empty() )
 			{
-				_stscanf_s(str.GetBuffer(), _T("%i"), &Value);
+				_stscanf_s(str.GetBuffer(), _T("%i"), (int *)&Value); /* Remove some warnning, but it may have problem when Type is short*/
 			}
 			else
 			{

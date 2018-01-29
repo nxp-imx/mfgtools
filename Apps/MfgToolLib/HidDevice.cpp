@@ -604,7 +604,6 @@ HidDevice::HAB_t HidDevice::GetHABType(ChipFamily_t chipType)
 
     _ST_HID_CBW cbw = {0};
     _ST_HID_CDB::_CDBHIDINFO _cbd;
-    UINT32 bltcStatus;
     UINT32 errcode;
     HANDLE hHidDevice = INVALID_HANDLE_VALUE;
 
@@ -637,7 +636,7 @@ HidDevice::HAB_t HidDevice::GetHABType(ChipFamily_t chipType)
     _pWriteReport->ReportId = HID_BLTC_REPORT_TYPE_COMMAND_OUT;
     cbw.Tag = 0;
     cbw.Signature = CBW_BLTC_SIGNATURE ;
-    cbw.XferLength = sizeof(bltcStatus);
+    cbw.XferLength = sizeof(UINT32);
     cbw.Flags = CBW_DEVICE_TO_HOST_DIR;
 
     memset(&_cbd,0,sizeof(_cbd));

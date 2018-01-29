@@ -280,14 +280,14 @@ public:
 	COpCmd_Blhost();
 	virtual ~COpCmd_Blhost();
 
-	typedef enum KibbleStatusCode
+	enum KibbleStatusCode
 	{
 		KBL_Status_Success = 0x0,
 		KBL_Status_AbortDataPhase = 0x2712,
 		KBL_Status_UnknownProperty = 0x283c,
 	};
 
-	typedef enum ResultBufferSize
+	enum ResultBufferSize
 	{
 		Result_Buffer_Size = 1024,
 	};

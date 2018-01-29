@@ -55,7 +55,7 @@ public:
         DeviceTypeKBLCDC,
     } DEV_CLASS_TYPE;
 
-	typedef struct NotifyStruct
+	struct NotifyStruct
 	{
 		int cmdOpIndex;    // specify which CmdOperation
 		Device* Device;

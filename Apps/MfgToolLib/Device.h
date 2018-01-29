@@ -47,7 +47,7 @@ public:
 
 	static const DWORD MaxTransferSizeInBytes    = 128 * 512; //(128 sectors of 512 bytes each at a time) says who??
 
-	typedef enum DeviceCapabilities
+	enum DeviceCapabilities
     {
         Unknown = 0x00000000,
         // matches cfmgr32.h CM_DEVCAP_* definitions
@@ -63,7 +63,7 @@ public:
         NonDynamic = 0x00000200,
     };
 
-	typedef struct NotifyStruct
+	struct NotifyStruct
 	{
         enum dataDir { dataDir_Off, dataDir_FromDevice, dataDir_ToDevice };
         NotifyStruct(LPCTSTR name, dataDir dir, UINT max)
@@ -189,6 +189,7 @@ public:
 	DWORD  m_dwIndex;
 
 	INSTANCE_HANDLE m_pLibHandle;
+	CString		m_ChipName;
 };
 
 typedef std::list<Device *> DEVICES_ARRAY;

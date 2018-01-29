@@ -417,7 +417,7 @@ int StFwComponent::LoadFromFile(LPCTSTR fileName)
         return ERROR_OPEN_FAILED;
 
     // Get the file size
-    UINT fileSize = file.rdbuf()->pubseekoff(0, std::ios::end, std::ios::in);
+    std::streamoff fileSize = file.rdbuf()->pubseekoff(0, std::ios::end, std::ios::in);
     file.rdbuf()->pubseekpos(0, std::ios::in);
 
 	if ( fileSize == 0 )
@@ -427,7 +427,7 @@ int StFwComponent::LoadFromFile(LPCTSTR fileName)
 	}
 	
 	// Size our vector to accomodate the file size.
-    _data.resize(fileSize);
+    _data.resize((size_t)fileSize);
 
 	// Put the data from the file in our vector
 	if ( file.rdbuf()->sgetn((char*)&_data[0], _data.size()) != fileSize )
