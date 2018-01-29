@@ -94,6 +94,26 @@ typedef struct _tagCfgParam
 	CString	list;
 } CFG_PARAMETER;
 
+#define ROM_INFO_HID					   0x1
+#define ROM_INFO_HID_MX23				   0x2
+#define ROM_INFO_HID_MX50				   0x4
+#define ROM_INFO_HID_MX6				   0x8
+#define ROM_INFO_HID_SKIP_DCD			  0x10
+#define ROM_INFO_HID_MX8_MULTI_IMAGE	  0x20
+#define ROM_INFO_HID_MX8_STREAM			  0x40
+#define ROM_INFO_HID_UID_STRING			  0x80
+#define ROM_INFO_HID_SYSTEM_ADDR_MAP	 0x100     /*MX8QM use system view address map*/
+#define ROM_INFO_HID_ECC_ALIGN			 0x200
+
+
+struct ROM_INFO
+{
+	TCHAR * Name;
+	UINT    FreeAddr;
+	DeviceClass *pDeviceClass;
+	UINT	flags;
+};
+
 // <LIST ...> ... </LIST>
 class CCommandList : public XNode
 {
@@ -117,12 +137,19 @@ public:
 	MX_DEVICE_STATE opState;
 	CString strStateName;
 	CString strDevice;
-	MX_DEVICE_TYPE  opDeviceType;
+	ROM_INFO romInfo;
 	UINT uiVid;
 	UINT uiPid;
 	DWORD dwTimeout;   // waiting for change to next state(for example: the timeout of find command)
 };
 typedef std::vector<COpState*> OP_STATE_ARRAY;
+
+enum HAB_t
+{
+	HabUnknown = -1,
+	HabEnabled = 0x12343412,
+	HabDisabled = 0x56787856
+};
 
 //command class family
 class COpCommand
@@ -138,7 +165,7 @@ public:
 	virtual void SetIfDevString(CString &str);
 	virtual void SetIfHabString(CString &str);
 	virtual bool IsRun(CString &dev);
-	virtual bool IsRun(MxHidDevice::HAB_t habState);
+	virtual bool IsRun(HAB_t habState);
 	INSTANCE_HANDLE m_pLibVars;
 
 protected:
@@ -265,7 +292,7 @@ public:
 		Result_Buffer_Size = 1024,
 	};
 	virtual UINT ExecuteCommand(int index);
-	virtual UINT GetSecureState(int index, MxHidDevice::HAB_t *secureState);
+	virtual UINT GetSecureState(int index, HAB_t *secureState);
 	UINT SetFileMapping(CString &strFile);
 	bool SetTimeout(const CString strValue);
 	bool SetTimeout(const uint32_t value);

@@ -35,7 +35,7 @@
 
 #include "Device.h"
 #include <hidsdi.h>
-
+#include "MfgToolLib.h"
 #include "XMLite.h"
 
 #define MAX_SIZE_PER_FLASH_COMMAND					0x200000	/* 50k */
@@ -93,6 +93,9 @@ typedef struct
 } FslMemoryInit;
 
 // Address ranges for Production parts: 
+struct ROM_INFO;
+
+enum HAB_t;
 
 /// <summary>
 /// A MxHidDevice device.
@@ -195,32 +198,7 @@ public:
 	enum ChipFamily_t
     {
         ChipUnknown = 0,
-        MX50,
-		MX6Q,
-		MX6D,
-		MX6SL,
-		MX6SX,
-		MX7D,
-		MX6UL,
-		MX6ULL,
-		MX6SLL,
-		MX7ULP,
-		K32H844P,
-		MX8MQ,
-		MXRT102X,
-		MXRT105X,
-		// Device supporting multi image must be defined below.
-		MX8QM,
-		MX8QXP,
-
     };
-
-	enum HAB_t
-	{
-		HabUnknown  = -1,
-		HabEnabled  = 0x12343412,
-		HabDisabled = 0x56787856
-	};
 
 	//DCD binary data format:
 	//4 bytes for format	4 bytes for register1 address	4 bytes for register1 value to set
@@ -328,8 +306,7 @@ public:
     _MX_HID_DATA_REPORT		*m_pWriteReport;
 	HIDP_CAPS	m_Capabilities;
 	HANDLE	    m_hid_drive_handle;
-	ChipFamily_t _chipFamily;
-	CString		_chiFamilyName;
+	ROM_INFO	*m_pRomInfo;
 	UINT m_jumpAddr;
 	HAB_t m_habState;
 
@@ -359,16 +336,8 @@ public:
 		else return MemAction_None;
 	}
 
-	unsigned long long SCUViewAddr(unsigned long long addr)
-	{
-		if (addr >= 0x30000000 && addr < 0x40000000)
-		{
-			if (this->_chipFamily == MX8QM)
-				return addr - 0x11000000;
-		}
-
-		return addr;
-	}
+	unsigned long long SCUViewAddr(unsigned long long addr);
+	
 
 public:
 	BOOL InitMemoryDevice(CString filename);

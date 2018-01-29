@@ -44,6 +44,16 @@
 #include "CDCDevice.h"
 #include "StPitc.h"
 #include "version.h"
+#include "ControllerClass.h"
+#include "HubClass.h"
+#include "MxRomDeviceClass.h"
+#include "HidDeviceClass.h"
+#include "MxHidDeviceClass.h"
+#include "KblHidDeviceClass.h"
+#include "DiskDeviceClass.h"
+#include "VolumeDeviceClass.h"
+#include "CdcDeviceClass.h"
+
 #include <algorithm>
 #include <map>
 //#include "..\MfgTool.exe\gitversion.h"
@@ -57,6 +67,40 @@
 //HANDLE g_hDevCanDeleteEvts[MAX_BOARD_NUMBERS];
 CString g_strVersion;
 
+
+static MxHidDeviceClass g_MxHidDeviceClass(NULL);
+static MxRomDeviceClass g_MxRomDeviceClass(NULL);
+static HidDeviceClass	g_HidDeviceClass(NULL);
+static CDCDeviceClass	g_cdcDeviceClass(NULL);
+static KblHidDeviceClass g_kblHIdDeviceClass(NULL);
+
+
+ROM_INFO g_RomInfo []=
+{
+	{_T("MX23"),	0x00000000, &g_HidDeviceClass,		ROM_INFO_HID | ROM_INFO_HID_MX23},
+	{_T("MX50"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX50},
+	{_T("MX6Q"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6},
+	{_T("MX6D"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 },
+	{_T("MX6SL"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 },
+	{_T("K32H844P"),0x00008000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6},
+	{_T("MX7D"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD},
+	{_T("MX6UL"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	{_T("MX6ULL"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	{_T("MX6SLL"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	{_T("MX7ULP"),	0x2f018000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD},
+	{_T("IMX8QM"),	0x2000e400, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_MX8_MULTI_IMAGE | ROM_INFO_HID_SYSTEM_ADDR_MAP| ROM_INFO_HID_ECC_ALIGN },
+	{_T("IMX8QXP"), 0x2000e400, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_MX8_MULTI_IMAGE | ROM_INFO_HID_ECC_ALIGN },
+};
+
+static ROM_INFO * SearchCompatiableRom(CString str)
+{
+	for (int i = 0; i < sizeof(g_RomInfo) / sizeof(ROM_INFO); i++)
+	{
+		if (str.CompareNoCase(g_RomInfo[i].Name) == 0)
+			return g_RomInfo + i;
+	}
+	return NULL;
+}
 //
 //TODO: If this DLL is dynamically linked against the MFC DLLs,
 //		any functions exported from this DLL which call into
@@ -995,90 +1039,28 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 		{
 			pState->opDeviceType = DEV_MX53;
 		} */
-		if( strTemp.CompareNoCase(_T("MX6Q")) == 0 )
+
+		ROM_INFO *p = SearchCompatiableRom(strTemp);
+		if (p)
 		{
-			pState->opDeviceType = DEV_HID_MX6Q;
-		}
-		else if( strTemp.CompareNoCase(_T("MX6D")) == 0 )
-		{
-			pState->opDeviceType = DEV_HID_MX6D;
-		}
-		else if( strTemp.CompareNoCase(_T("MX6SL")) == 0 )
-		{
-			pState->opDeviceType = DEV_HID_MX6SL;
-		}
-		else if( strTemp.CompareNoCase(_T("MX6SX")) == 0 )
-		{
-			pState->opDeviceType = DEV_HID_MX6SX;
-		}
-		else if( strTemp.CompareNoCase(_T("MX7D")) == 0 )
-		{
-			pState->opDeviceType = DEV_HID_MX7D;
-		}
-		else if (strTemp.CompareNoCase(_T("MX28")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_MX28;
-		}
-		else if (strTemp.CompareNoCase(_T("MX6UL")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_MX6UL;
-		}
-		else if (strTemp.CompareNoCase(_T("MX6ULL")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_MX6ULL;
-		}
-		else if (strTemp.CompareNoCase(_T("MX6SLL")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_MX6SLL;
-		}
-		else if (strTemp.CompareNoCase(_T("MX7ULP")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_MX7ULP;
-		}
-		else if (strTemp.CompareNoCase(_T("K32H844P")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_K32H844P;
-		}
-		else if( strTemp.CompareNoCase(_T("MSC")) == 0 )
-		{
-			pState->opDeviceType = DEV_MSC_UPDATER;
-		}
-		else if (strTemp.CompareNoCase(_T("KBL-HID")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_KBL;
-		}
-		else if (strTemp.CompareNoCase(_T("KBL-CDC")) == 0)
-		{
-			pState->opDeviceType = DEV_CDC_KBL;
-		}
-		else if (strTemp.CompareNoCase(_T("MX8MQ")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_MX8MQ;
-		}
-		else if (strTemp.CompareNoCase(_T("MX8QM")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_MX8QM;
-		}
-		else if (strTemp.CompareNoCase(_T("MX8QXP")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_MX8QXP;
-		}
-		else if (strTemp.CompareNoCase(_T("MXRT102X")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_MXRT102X;
-		}
-		else if (strTemp.CompareNoCase(_T("MXRT105X")) == 0)
-		{
-			pState->opDeviceType = DEV_HID_MXRT105X;
+			pState->romInfo = *p;
 		}
 		else
 		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Error: Invalid device name: %s"), strTemp);
-			pState->opDeviceType = DEV_UNKNOWN;
-			ReleaseUclCommands(pLibVars);
-			return MFGLIB_ERROR_INVALID_DEV_NAME;
+			strTemp = (*state)->GetAttrValue(_T("compatible"));
+			p = SearchCompatiableRom(strTemp);
+			if(p)
+			{
+				pState->romInfo = *p;
+			}
+			else
+			{
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't found compatible ROM type %s-%s"), pState->strDevice, strTemp);
+				ReleaseUclCommands(pLibVars);
+				return MFGLIB_ERROR_INVALID_DEV_NAME;
+			}
 		}
-
+		
 		strTemp = (*state)->GetAttrValue(_T("vid"));
 		pState->uiVid = _tcstoul(strTemp, NULL, 16);
 
@@ -1491,17 +1473,17 @@ bool COpCommand::IsRun(CString &str)
 	return false;
 }
 
-bool COpCommand::IsRun(MxHidDevice::HAB_t habState)
+bool COpCommand::IsRun(HAB_t habState)
 {
 	if (m_ifhab.IsEmpty())
 		return true;
 
 	CString stateStr;
-	if (habState == MxHidDevice::HabDisabled)
+	if (habState == HabDisabled)
 	{
 		stateStr = _T("Open");
 	}
-	else if (habState == MxHidDevice::HabEnabled)
+	else if (habState == HabEnabled)
 	{
 		stateStr = _T("Close");
 	}
@@ -2536,7 +2518,7 @@ UINT COpCmd_Blhost::ExecuteCommand(int index)
 	return retValue;
 }
 
-UINT COpCmd_Blhost::GetSecureState(int index, MxHidDevice::HAB_t *secureState)
+UINT COpCmd_Blhost::GetSecureState(int index, HAB_t *secureState)
 {
 	CString strMsg;
 	strMsg.Format(_T("ExecuteCommand--Blhost[WndIndex:%d], Body is get-property 17"), index);
@@ -2613,13 +2595,13 @@ UINT COpCmd_Blhost::GetSecureState(int index, MxHidDevice::HAB_t *secureState)
 		Parse_blhost_output_for_response(csCmdText, &blhostResult);
 		if (_ttoi(blhostResult.Response))
 		{
-			*secureState = MxHidDevice::HAB_t::HabEnabled;
+			*secureState = HAB_t::HabEnabled;
 		}
 		else
 		{
-			*secureState = MxHidDevice::HAB_t::HabDisabled;
+			*secureState = HAB_t::HabDisabled;
 		}
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Secure State = %s"), (*secureState == MxHidDevice::HAB_t::HabEnabled) ? _T("SECURE") : _T("UNSECURE"));
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Secure State = %s"), (*secureState == HAB_t::HabEnabled) ? _T("SECURE") : _T("UNSECURE"));
 
 		return MFGLIB_ERROR_SUCCESS;
 	}
@@ -2641,7 +2623,7 @@ UINT COpCmd_Blhost::GetSecureState(int index, MxHidDevice::HAB_t *secureState)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_COMPLETE;
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
 
-			*secureState = MxHidDevice::HAB_t::HabDisabled;
+			*secureState = HAB_t::HabDisabled;
 
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Not support to check secure state, treat as UNSECURE"));
 

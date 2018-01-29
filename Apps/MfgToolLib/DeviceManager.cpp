@@ -164,6 +164,7 @@ void DeviceManager::SetSelfThreadRunStatus(BOOL bRunning)
 BOOL DeviceManager::InitInstance()
 {
 	//Reset all DeviceClasses
+	/*
 	g_devClasses[DeviceClass::DeviceTypeDisk] = NULL;
 	g_devClasses[DeviceClass::DeviceTypeMsc] = NULL;
 	g_devClasses[DeviceClass::DeviceTypeHid] = NULL;
@@ -173,6 +174,7 @@ BOOL DeviceManager::InitInstance()
 	g_devClasses[DeviceClass::DeviceTypeUsbHub] = NULL;
 	g_devClasses[DeviceClass::DeviceTypeKBLCDC] = NULL;
 	g_devClasses[DeviceClass::DeviceTypeKBLHID] = NULL;
+	*/
 
 	// Create a hidden window and register it to receive WM_DEVICECHANGE messages
 	if( _DevChangeWnd.CreateEx(WS_EX_TOPMOST, _T("STATIC"), _T("DeviceChangeWnd"), 0, CRect(0,0,5,5), NULL, 0) )
@@ -255,63 +257,44 @@ BOOL DeviceManager::InitInstance()
 	std::vector<COpState*>::iterator stateIt = pCurrentStates->begin();
 	for(; stateIt!=pCurrentStates->end(); stateIt++)
 	{
-		switch((*stateIt)->opDeviceType)
+		switch ((*stateIt)->opState)
 		{
-		case DEV_HID_MX28:
-			pDevClass = new HidDeviceClass(m_pLibHandle);
+		case MX_BOOTSTRAP:
+			if ((*stateIt)->romInfo.pDeviceClass)
+			{
+				(*stateIt)->romInfo.pDeviceClass->m_pLibHandle = m_pLibHandle;
+				g_devClasses[(*stateIt)->romInfo.pDeviceClass->_deviceClassType] = (*stateIt)->romInfo.pDeviceClass;
+				(*stateIt)->romInfo.pDeviceClass->Devices();
+			}
+			break;
+		case MX_UPDATER:
+			pDevClass = new DiskDeviceClass(m_pLibHandle);
 			if (pDevClass == NULL)
 			{
-				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create HidDeviceClass"));
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create DiskDeviceClass"));
 				SetSelfThreadRunStatus(FALSE);
 				return FALSE;
 			}
-			g_devClasses[DeviceClass::DeviceTypeHid] = pDevClass;
-			pDevClass->Devices();
-			break;
+			g_devClasses[DeviceClass::DeviceTypeDisk] = pDevClass;
+			(dynamic_cast<DiskDeviceClass *>(g_devClasses[DeviceClass::DeviceTypeDisk]))->Refresh();
+			//don't enum devices
 
-/*		case DEV_MX23:		//Hid
-		case DEV_MX28:
-			break;
-		case DEV_MX25:
-		case DEV_MX35:
-		case DEV_MX51:
-		case DEV_MX53:		//MxRom
-			pDevClass = new MxRomDeviceClass;
-			if(pDevClass == NULL)
+			pDevClass = new VolumeDeviceClass(m_pLibHandle);
+			if (pDevClass == NULL)
 			{
-				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create MxRomDeviceClass"));
+				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create VolumeDeviceClass"));
 				SetSelfThreadRunStatus(FALSE);
 				return FALSE;
 			}
-			g_devClasses[DeviceClass::DeviceTypeMxRom] = pDevClass;
-			pDevClass->Devices();
-			break; */
-		case DEV_HID_MX6Q:	//MxHid
-		//case DEV_MX50:
-		case DEV_HID_MX6D:
-		case DEV_HID_MX6SL:
-		case DEV_HID_MX6SX:
-		case DEV_HID_MX7D:
-		case DEV_HID_MX6UL:
-		case DEV_HID_MX6ULL:
-		case DEV_HID_MX6SLL:
-		case DEV_HID_MX7ULP:
-		case DEV_HID_K32H844P:
-		case DEV_HID_MX8MQ:
-		case DEV_HID_MX8QM:
-		case DEV_HID_MX8QXP:
-		case DEV_HID_MXRT102X:
-		case DEV_HID_MXRT105X:
-			pDevClass = new MxHidDeviceClass(m_pLibHandle);
-			if(pDevClass == NULL)
-			{
-				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create MxHidDeviceClass"));
-				SetSelfThreadRunStatus(FALSE);
-				return FALSE;
-			}
-			g_devClasses[DeviceClass::DeviceTypeMxHid] = pDevClass;
+			g_devClasses[DeviceClass::DeviceTypeMsc] = pDevClass;
+			g_devClasses[DeviceClass::DeviceTypeMsc]->SetMSCVidPid((*stateIt)->uiVid, (*stateIt)->uiPid);
 			pDevClass->Devices();
 			break;
+		}
+		
+		/*
+		switch((*stateIt)->opDeviceType)
+		{
 		case DEV_HID_KBL:
 			pDevClass = new KblHidDeviceClass(m_pLibHandle);
 			if (pDevClass == NULL)
@@ -358,6 +341,7 @@ BOOL DeviceManager::InitInstance()
 			pDevClass->Devices();
 			break;
 		}
+		*/
 	}
 
 	// Init all the USB Ports.
@@ -600,58 +584,12 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 			if(isRightDevice) //OK, find the device
 			{
 				DeviceClass::NotifyStruct nsInfo = {0};
-				switch(pCurrentState->opDeviceType)
+				if (pCurrentState->romInfo.pDeviceClass)
 				{
-				case DEV_HID_MX28:	//Hid
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeHid]->AddUsbDevice(msg);
+					nsInfo = pCurrentState->romInfo.pDeviceClass->AddUsbDevice(msg);
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[HidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
-					break;
-
-			/*	case DEV_MX23:		//Hid
-				case DEV_MX28:
-					break;
-				case DEV_MX25:
-				case DEV_MX35:
-				case DEV_MX51:
-				case DEV_MX53:		//MxRom
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[MxRomDeviceClass] vid_%04x&pid_%04x"), pCurrentState->uiVid, pCurrentState->uiPid);
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeMxRom]->AddUsbDevice(msg);
-					break; 
-				case DEV_MX50: */
-				case DEV_HID_MX6D:
-		        case DEV_HID_MX6SL:
-				case DEV_HID_MX6SX:
-				case DEV_HID_MX7D:
-				case DEV_HID_MX6Q:	//MxHid
-				case DEV_HID_MX6UL:
-				case DEV_HID_MX6ULL:
-				case DEV_HID_MX6SLL:
-				case DEV_HID_MX7ULP:
-				case DEV_HID_K32H844P:
-				case DEV_HID_MX8MQ:
-				case DEV_HID_MX8QM:
-				case DEV_HID_MX8QXP:
-				case DEV_HID_MXRT102X:
-				case DEV_HID_MXRT105X:
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeMxHid]->AddUsbDevice(msg);
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
-					break;
-				case DEV_HID_KBL:
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeKBLHID]->AddUsbDevice(msg);
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
-					break;
-				case DEV_CDC_KBL:
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeKBLCDC]->AddUsbDevice(msg);
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
-					break;
-				case DEV_MSC_UPDATER:
-					// don't look for USB arrival in MSC class, wait for Volume arrival.
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[Msc,DiskDeviceClass] vid_%04x&pid_%04x, not handled"), pCurrentState->uiVid, pCurrentState->uiPid);
-					nsInfo.Device = NULL;
-					//QueryPerformanceFrequency(&g_tc);
-					//QueryPerformanceCounter(&g_t1);
-					break;
 				}
+
 				if(nsInfo.Device)
 				{
 					nsInfo.Event = DEVICE_ARRIVAL_EVT;
@@ -691,27 +629,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 				}
 				else
 				{
-					switch(pCurrentState->opDeviceType)
-					{
-					//case DEV_MX50:
-					case DEV_HID_MX28:
-					case DEV_HID_MX6D:
-					case DEV_HID_MX6SL:
-					case DEV_HID_MX6SX:
-					case DEV_HID_MX7D:
-					case DEV_HID_MX6Q:	//MxHid
-					case DEV_HID_MX6UL:
-					case DEV_HID_MX6ULL:
-					case DEV_HID_MX6SLL:
-					case DEV_HID_MX7ULP:
-					case DEV_HID_K32H844P:
-					case DEV_HID_KBL:
-					case DEV_CDC_KBL:
-					case DEV_HID_MX8MQ:
-					case DEV_HID_MX8QM:
-					case DEV_HID_MX8QXP:
-					case DEV_HID_MXRT102X:
-					case DEV_HID_MXRT105X:
+					if (pCurrentState->romInfo.pDeviceClass)
 					{
 							LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceArriveButEnumFailed Exception occurs"));
 							WaitForSingleObject(m_pExpectionHandler->m_hMapMsgMutex, INFINITE);
@@ -720,8 +638,6 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 							BSTR bstr_msg = msg.AllocSysString();
 							m_pExpectionHandler->PostThreadMessage(WM_MSG_EXCEPTION_EVENT, (WPARAM)(CMyExceptionHandler::DeviceArriveButEnumFailed), (LPARAM)bstr_msg);
 							return;
-						}
-						break;
 					}
 				}
 			}
@@ -767,59 +683,12 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 				ReleaseMutex(m_pExpectionHandler->m_hMapMsgMutex);
 
 				DeviceClass::NotifyStruct nsInfo = {0};
-				DeviceClass::DEV_CLASS_TYPE class_type;
-				switch(pCurrentState->opDeviceType)
+			
+				if (pCurrentState->romInfo.pDeviceClass)
 				{
-				case DEV_HID_MX28:
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeHid]->RemoveUsbDevice(msg);
-					class_type = DeviceClass::DeviceTypeHid;
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[HidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
-					break;
-			/*	case DEV_MX23:		//Hid
-				case DEV_MX28:
-					break;
-				case DEV_MX25:
-				case DEV_MX35:
-				case DEV_MX51:
-				case DEV_MX53:		//MxRom
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[MxRomDeviceClass] vid_%04x&pid_%04x"), pCurrentState->uiVid, pCurrentState->uiPid);
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeMxRom]->RemoveUsbDevice(msg);
-					break;
-				case DEV_MX50: */
-				case DEV_HID_MX6Q:	//MxHid
-				case DEV_HID_MX6D:
-		        case DEV_HID_MX6SL:
-				case DEV_HID_MX6SX:
-				case DEV_HID_MX7D:
-				case DEV_HID_MX6UL:
-				case DEV_HID_MX6ULL:
-				case DEV_HID_MX6SLL:
-				case DEV_HID_MX7ULP:
-				case DEV_HID_K32H844P:
-				case DEV_HID_MX8MQ:
-				case DEV_HID_MX8QM:
-				case DEV_HID_MX8QXP:
-				case DEV_HID_MXRT102X:
-				case DEV_HID_MXRT105X:
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeMxHid]->RemoveUsbDevice(msg);
-					class_type = DeviceClass::DeviceTypeMxHid;
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
-					break;
-				case DEV_HID_KBL:
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeKBLHID]->RemoveUsbDevice(msg);
-					class_type = DeviceClass::DeviceTypeKBLHID;
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[MxHidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
-					break;
-				case DEV_CDC_KBL:
-					nsInfo = g_devClasses[DeviceClass::DeviceTypeKBLCDC]->RemoveUsbDevice(msg);
-					class_type = DeviceClass::DeviceTypeKBLCDC;
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[DeviceTypeKBLCDC] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
-					break;
-				case DEV_MSC_UPDATER:
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[Msc,DiskDeviceClass] vid_%04x&pid_%04x, not handled"), pCurrentState->uiVid, pCurrentState->uiPid);
-					nsInfo.Device = NULL;
-					break;
+					nsInfo = pCurrentState->romInfo.pDeviceClass->RemoveUsbDevice(msg);
 				}
+
 				if(nsInfo.Device)
 				{
 					nsInfo.Event = DEVICE_REMOVAL_EVT;
@@ -828,7 +697,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 
 					//delete device
 					std::list<Device*>::iterator deviceIt;
-					for (deviceIt = g_devClasses[class_type]->_devices.begin(); deviceIt != g_devClasses[class_type]->_devices.end(); ++deviceIt)
+					for (deviceIt = pCurrentState->romInfo.pDeviceClass->_devices.begin(); deviceIt != pCurrentState->romInfo.pDeviceClass->_devices.end(); ++deviceIt)
 					{
 						if((*deviceIt) == nsInfo.Device)
 						{
@@ -842,11 +711,11 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 					TRACE(_T("Device manager wait for end\r\n"));
 					//int index = dwResult - WAIT_OBJECT_0;
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent()-DEVICE_REMOVAL_EVT, hDevCanDeleteEvent has been set"));
-					WaitForSingleObject(g_devClasses[class_type]->devicesMutex, INFINITE);
+					WaitForSingleObject(pCurrentState->romInfo.pDeviceClass->devicesMutex, INFINITE);
 					delete (*deviceIt);
-					g_devClasses[class_type]->_devices.erase(deviceIt);
+					pCurrentState->romInfo.pDeviceClass->_devices.erase(deviceIt);
 					//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT Device Object[0x%X] has been delete"), (*deviceIt));
-					ReleaseMutex(g_devClasses[class_type]->devicesMutex);
+					ReleaseMutex(pCurrentState->romInfo.pDeviceClass->devicesMutex);
 				}
 			}
 			break;

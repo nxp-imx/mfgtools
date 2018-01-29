@@ -38,7 +38,7 @@
 class HidDeviceClass : public DeviceClass
 {
 friend class DeviceManager;
-private:
+public:
 	HidDeviceClass(INSTANCE_HANDLE handle);
     virtual ~HidDeviceClass(void);
 

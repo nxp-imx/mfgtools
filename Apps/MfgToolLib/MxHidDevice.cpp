@@ -91,59 +91,8 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 
 	if(pCurrentState)
 	{
-		_chiFamilyName = pCurrentState->strDevice;
-	}
-
-	switch(pCurrentState->opDeviceType)
-	{
-	case DEV_HID_MX6Q:
-		_chipFamily = MX6Q;
-		break;
-	case DEV_HID_MX6D:
-		_chipFamily = MX6D;
-		break;
-	case DEV_HID_MX6SL:
-		_chipFamily = MX6SL;
-		break;
-	case DEV_HID_MX6SX:
-		_chipFamily = MX6SX;
-		break;
-	case DEV_HID_MX7D:
-		_chipFamily = MX7D;
-		break;
-	case DEV_HID_MX6UL:
-		_chipFamily = MX6UL;
-		break;
-	case DEV_HID_MX6ULL:
-		_chipFamily = MX6ULL;
-		break;
-	case DEV_HID_MX6SLL:
-		_chipFamily = MX6SLL;
-		break;
-	case DEV_HID_MX7ULP:
-		_chipFamily = MX7ULP;
-		break;
-	case DEV_HID_K32H844P:
-		_chipFamily = K32H844P;
-		break;
-	case DEV_HID_MX8MQ:
-		_chipFamily = MX8MQ;
-		break;
-	case DEV_HID_MX8QM:
-		_chipFamily = MX8QM;
-		break; 
-	case DEV_HID_MX8QXP:
-		_chipFamily = MX8QXP;
-		break;
-	case DEV_HID_MXRT102X:
-		_chipFamily = MXRT102X;
-		break;
-	case DEV_HID_MXRT105X:
-		_chipFamily = MXRT105X;
-		break;
-	default:
-		_chipFamily = MX50;
-		break;
+		m_pRomInfo = &pCurrentState->romInfo;
+		m_ChipName = pCurrentState->strDevice;
 	}
 
 	m_habState = HabUnknown;
@@ -160,6 +109,17 @@ void MxHidDevice::Reset(DEVINST devInst, CString path)
 MxHidDevice::~MxHidDevice()
 {
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("delete MxHidDevice[%p]"), this);
+}
+
+unsigned long long MxHidDevice::SCUViewAddr(unsigned long long addr)
+{
+	if (addr >= 0x30000000 && addr < 0x40000000)
+	{
+		if (m_pRomInfo->flags & ROM_INFO_HID_SYSTEM_ADDR_MAP)
+			return addr - 0x11000000;
+	}
+
+	return addr;
 }
 
 typedef UINT (CALLBACK* LPFNDLLFUNC1)(HANDLE, PVOID);
@@ -470,7 +430,7 @@ BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount)
     SDPCmd.data = 0;
     SDPCmd.address = 0;
 
-	if(_chipFamily == MX50)
+	if( m_pRomInfo->flags & ROM_INFO_HID_MX50 )
 	{
 		//i.mx50
 		while(RegCount)
@@ -502,19 +462,13 @@ BOOL MxHidDevice::DCDWrite(PUCHAR DataBuf, UINT RegCount)
 	{
 		UINT MaxHidTransSize = m_Capabilities.OutputReportByteLength - 1;
 
-		if(this->_chipFamily >= MX8QM)
+		if(m_pRomInfo->flags &ROM_INFO_HID_ECC_ALIGN)
 			RegCount = ((RegCount + MaxHidTransSize - 1) / MaxHidTransSize) * MaxHidTransSize;
 
 		SDPCmd.dataCount = RegCount;
-		if (this->_chipFamily == MX7ULP)
-			SDPCmd.address = 0x2f018000;
-		else if (this->_chipFamily == K32H844P)
-			SDPCmd.address = 0x8000;
-		else if (this->_chipFamily == MX8QM || this->_chipFamily == MX8QXP)
-			SDPCmd.address = 0x2000e400;
-		else
-			SDPCmd.address = 0x00910000;//IRAM free space
-
+		
+		SDPCmd.address = m_pRomInfo->FreeAddr;
+		
 		if(!SendCmd(&SDPCmd))
 		{
 			return FALSE;
@@ -707,7 +661,7 @@ BOOL MxHidDevice::GetHABType()
 	return TRUE;
 }
 
-MxHidDevice::HAB_t MxHidDevice::GetHABState()
+HAB_t MxHidDevice::GetHABState()
 {
 	if (m_habState != HabUnknown)
 	{
@@ -771,7 +725,7 @@ BOOL MxHidDevice::Jump(UINT RAMAddress, BOOL isPlugin)
     SDPCmd SDPCmd;
     CString LogStr;
 
-	if(this->_chipFamily >= MX7D) {
+	if(m_pRomInfo->flags & ROM_INFO_HID_SKIP_DCD) {
 
 		SDPCmd.command = ROM_KERNEL_CMD_SKIP_DCD_HEADER;
 		SDPCmd.dataCount = 0;
@@ -841,7 +795,7 @@ BOOL MxHidDevice::RunDCD(DWORD* pDCDRegion)
 		return FALSE;
 	}
 
-	if (this->_chipFamily != MX50)
+	if (this->m_pRomInfo->flags & ROM_INFO_HID_MX50)
 	{
 		//The DCD_WRITE command handling was changed from i.MX508.
 		//Now the DCD is  performed by HAB and therefore the format of DCD is the same format as in regular image. 
@@ -1132,7 +1086,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 	}
 	memcpy(pDataBuf, pFileDataBuf, (size_t)dwsize);
 
-	if (_chipFamily >= MX8QM)
+	if (m_pRomInfo->flags & ROM_INFO_HID_MX8_MULTI_IMAGE)
 	{
 		return RunMxMultiImg(pDataBuf, dwFileSize);
 	}
@@ -1189,6 +1143,14 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 			goto ERR_HANDLE;
 		}
 		
+		unsigned char FlashHdr[ROM_TRANSFER_SIZE] = { 0 };                                                                           
+		if (!ReadData(0x910000, ROM_TRANSFER_SIZE, FlashHdr))                                                                          
+			{ 
+								   //LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("AddIvtHdr(): ReadData(0x%X, 0x%X, 0x%X) failed."),            x
+			                            //FlashHdrAddr, ROM_TRANSFER_SIZE, FlashHdr);                                                                             x
+			                            return FALSE;                                                                                                             
+			}
+
 		if( !Jump(pIVT->SelfAddr, true))
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): Failed to jump to RAM address: 0x%x."), m_jumpAddr);
@@ -1272,7 +1234,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 			//Download boot data to ram
 		PhyRAMAddr4KRL = pIVT->SelfAddr - ImgIVTOffset;
 
-		if (this->_chipFamily < MX7D)
+		if (!(m_pRomInfo->flags & ROM_INFO_HID_SKIP_DCD))
 			pIVT->DCDAddress = 0;
 
 		if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, (PUCHAR)((DWORD)pDataBuf)))
@@ -1315,7 +1277,7 @@ BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * 
 
 	UINT MaxHidTransSize = m_Capabilities.OutputReportByteLength - 1;
 
-	if (_chipFamily >= MX8QM)
+	if (m_pRomInfo->flags & ROM_ECC_SIZE_ALIGN)
 		byteCount = ((byteCount + MaxHidTransSize - 1) / MaxHidTransSize) * MaxHidTransSize;
 
     SDPCmd.command = ROM_KERNEL_CMD_WR_FILE;
@@ -1589,7 +1551,7 @@ BOOL MxHidDevice::Download(PImageParameter pImageParameter, UCHAR *pFileDataBuf,
 	if( pImageParameter->setSection == MemSectionAPP)
     {
     	UINT32 ImageStartAddr = 0;
-    	if(_chipFamily == MX50)
+    	if(m_pRomInfo->flags & ROM_INFO_HID_MX50)
     	{
     		ImageStartAddr = pImageParameter->PhyRAMAddr4KRL + pImageParameter->CodeOffset;
     	}

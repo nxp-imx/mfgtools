@@ -452,7 +452,7 @@ UINT CmdListThreadProc(LPVOID pParam)
 	OP_COMMAND_ARRAY::iterator cmdIt;
 	DWORD dwStateIndex = 0;
 	CString chip;
-	MxHidDevice::HAB_t habstate = MxHidDevice::HabUnknown;
+	HAB_t habstate = HabUnknown;
 
 	while(!pOperation->m_bKilled)
 	{
@@ -510,17 +510,18 @@ UINT CmdListThreadProc(LPVOID pParam)
 					cmdIt = CurrentCommands.begin();
 					pOperation->m_dwCmdIndex = 1;
                     bStateCmdFinished = FALSE;
+					
 					if(pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 					{
-						chip = ((MxHidDevice*)pDevice)->_chiFamilyName;
+						chip = ((MxHidDevice*)pDevice)->m_ChipName;
 						habstate = ((MxHidDevice*)pDevice)->GetHABState();
 					}
 
 					if ((pDevice->GetDeviceType() == DeviceClass::DeviceTypeKBLHID) || (pDevice->GetDeviceType() == DeviceClass::DeviceTypeKBLCDC))
 					{
-						if (habstate == MxHidDevice::HAB_t::HabUnknown)
+						if (habstate == HAB_t::HabUnknown)
 						{
-							MxHidDevice::HAB_t secureState;
+							HAB_t secureState;
 							dwError = ((COpCmd_Blhost *)(*cmdIt))->GetSecureState(pOperation->m_WndIndex, &secureState);
 							if (dwError != MFGLIB_ERROR_SUCCESS)
 							{
