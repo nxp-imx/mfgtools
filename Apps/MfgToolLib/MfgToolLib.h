@@ -134,6 +134,13 @@ public:
 class COpState
 {
 public:
+	COpState()
+	{
+		memset(&romInfo, 0, sizeof(ROM_INFO));
+		uiVid = 0;
+		uiPid = 0;
+		dwTimeout = -1;
+	};
 	MX_DEVICE_STATE opState;
 	CString strStateName;
 	CString strDevice;

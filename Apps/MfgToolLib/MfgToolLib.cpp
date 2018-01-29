@@ -87,9 +87,10 @@ ROM_INFO g_RomInfo []=
 	{_T("MX6UL"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{_T("MX6ULL"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{_T("MX6SLL"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	{_T("MX8MQ"),	0x00910000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{_T("MX7ULP"),	0x2f018000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD},
-	{_T("IMX8QM"),	0x2000e400, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_MX8_MULTI_IMAGE | ROM_INFO_HID_SYSTEM_ADDR_MAP| ROM_INFO_HID_ECC_ALIGN },
-	{_T("IMX8QXP"), 0x2000e400, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_MX8_MULTI_IMAGE | ROM_INFO_HID_ECC_ALIGN },
+	{_T("MX8QM"),	0x2000e400, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_MX8_MULTI_IMAGE | ROM_INFO_HID_SYSTEM_ADDR_MAP| ROM_INFO_HID_ECC_ALIGN },
+	{_T("MX8QXP"),  0x2000e400, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_MX8_MULTI_IMAGE | ROM_INFO_HID_ECC_ALIGN },
 };
 
 static ROM_INFO * SearchCompatiableRom(CString str)
@@ -1040,24 +1041,27 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 			pState->opDeviceType = DEV_MX53;
 		} */
 
-		ROM_INFO *p = SearchCompatiableRom(strTemp);
-		if (p)
+		if (pState->opState == MX_BOOTSTRAP)
 		{
-			pState->romInfo = *p;
-		}
-		else
-		{
-			strTemp = (*state)->GetAttrValue(_T("compatible"));
-			p = SearchCompatiableRom(strTemp);
-			if(p)
+			ROM_INFO *p = SearchCompatiableRom(strTemp);
+			if (p)
 			{
 				pState->romInfo = *p;
 			}
 			else
 			{
-				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't found compatible ROM type %s-%s"), pState->strDevice, strTemp);
-				ReleaseUclCommands(pLibVars);
-				return MFGLIB_ERROR_INVALID_DEV_NAME;
+				strTemp = (*state)->GetAttrValue(_T("compatible"));
+				p = SearchCompatiableRom(strTemp);
+				if (p)
+				{
+					pState->romInfo = *p;
+				}
+				else
+				{
+					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't found compatible ROM type %s-%s"), pState->strDevice, strTemp);
+					ReleaseUclCommands(pLibVars);
+					return MFGLIB_ERROR_INVALID_DEV_NAME;
+				}
 			}
 		}
 		

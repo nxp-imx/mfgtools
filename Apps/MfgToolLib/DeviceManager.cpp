@@ -218,35 +218,18 @@ BOOL DeviceManager::InitInstance()
 		return FALSE;
 	}
 	
-	//init all device classes
-	DeviceClass *pDevClass = NULL;
-	try
-	{
-		pDevClass = new usb::ControllerClass(m_pLibHandle);
-	}
-	catch(...)
-	{
-		SetSelfThreadRunStatus(FALSE);
-		return FALSE;
-	}
-	if(pDevClass == NULL)
-	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create usb::ControllerClass"));
-		SetSelfThreadRunStatus(FALSE);
-		return FALSE;
-	}
-	g_devClasses[DeviceClass::DeviceTypeUsbController] = pDevClass;
-	pDevClass->Devices();
 	
-	pDevClass = new usb::HubClass(m_pLibHandle);
-	if(pDevClass == NULL)
-	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create usb::HubClass"));
-		SetSelfThreadRunStatus(FALSE);
-		return FALSE;
-	}
-	g_devClasses[DeviceClass::DeviceTypeUsbHub] = pDevClass;
-	pDevClass->Devices();
+	static usb::ControllerClass contClass(m_pLibHandle);
+	static usb::HubClass hubclass(m_pLibHandle);
+	static DiskDeviceClass disk(m_pLibHandle);
+	static VolumeDeviceClass volClass(m_pLibHandle);
+
+	g_devClasses[DeviceClass::DeviceTypeUsbController] = &contClass;
+	contClass.Devices();
+	
+	
+	g_devClasses[DeviceClass::DeviceTypeUsbHub] = &hubclass;
+	hubclass.Devices();
 
 	OP_STATE_ARRAY *pCurrentStates = GetOpStates((MFGLIB_VARS *)m_pLibHandle);
 	if(pCurrentStates == NULL)
@@ -268,27 +251,14 @@ BOOL DeviceManager::InitInstance()
 			}
 			break;
 		case MX_UPDATER:
-			pDevClass = new DiskDeviceClass(m_pLibHandle);
-			if (pDevClass == NULL)
-			{
-				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create DiskDeviceClass"));
-				SetSelfThreadRunStatus(FALSE);
-				return FALSE;
-			}
-			g_devClasses[DeviceClass::DeviceTypeDisk] = pDevClass;
+			
+			g_devClasses[DeviceClass::DeviceTypeDisk] = &disk;
 			(dynamic_cast<DiskDeviceClass *>(g_devClasses[DeviceClass::DeviceTypeDisk]))->Refresh();
 			//don't enum devices
 
-			pDevClass = new VolumeDeviceClass(m_pLibHandle);
-			if (pDevClass == NULL)
-			{
-				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create VolumeDeviceClass"));
-				SetSelfThreadRunStatus(FALSE);
-				return FALSE;
-			}
-			g_devClasses[DeviceClass::DeviceTypeMsc] = pDevClass;
+			g_devClasses[DeviceClass::DeviceTypeMsc] = &volClass;
 			g_devClasses[DeviceClass::DeviceTypeMsc]->SetMSCVidPid((*stateIt)->uiVid, (*stateIt)->uiPid);
-			pDevClass->Devices();
+			volClass.Devices();
 			break;
 		}
 		
@@ -362,14 +332,7 @@ int DeviceManager::ExitInstance()
 
 	//delete DeviceClass that have been newed
 	std::map<DWORD, DeviceClass*>::iterator deviceClassIt;
-	for ( deviceClassIt = g_devClasses.begin(); deviceClassIt != g_devClasses.end(); ++deviceClassIt )
-	{
-		if((*deviceClassIt).second != NULL)
-		{
-			delete (*deviceClassIt).second;
-			(*deviceClassIt).second = NULL;
-		}
-	}
+	
 	g_devClasses.clear();
 
 	// Messaging support
