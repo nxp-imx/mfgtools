@@ -795,7 +795,7 @@ BOOL MxHidDevice::RunDCD(DWORD* pDCDRegion)
 		return FALSE;
 	}
 
-	if (this->m_pRomInfo->flags & ROM_INFO_HID_MX50)
+	if (!(this->m_pRomInfo->flags & ROM_INFO_HID_MX50))
 	{
 		//The DCD_WRITE command handling was changed from i.MX508.
 		//Now the DCD is  performed by HAB and therefore the format of DCD is the same format as in regular image. 
@@ -1277,7 +1277,7 @@ BOOL MxHidDevice::TransData(UINT address, UINT byteCount, const unsigned char * 
 
 	UINT MaxHidTransSize = m_Capabilities.OutputReportByteLength - 1;
 
-	if (m_pRomInfo->flags & ROM_ECC_SIZE_ALIGN)
+	if (m_pRomInfo->flags & ROM_INFO_HID_ECC_ALIGN)
 		byteCount = ((byteCount + MaxHidTransSize - 1) / MaxHidTransSize) * MaxHidTransSize;
 
     SDPCmd.command = ROM_KERNEL_CMD_WR_FILE;
