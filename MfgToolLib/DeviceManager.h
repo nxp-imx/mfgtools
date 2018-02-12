@@ -52,7 +52,7 @@ class DeviceManager//:CWinThread
 		DeviceManager(INSTANCE_HANDLE handle=NULL);
 		~DeviceManager();
 
-		typedef enum DevChangeEvent
+		enum DevChangeEvent
 		{
 			UNKNOWN_EVT = 100,
 			EVENT_KILL=-1,
