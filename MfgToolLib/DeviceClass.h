@@ -31,7 +31,6 @@
 
 #pragma once
 
-//#include "SetupApi.h"
 #include "Property.h"
 #include "Device.h"
 #include "MfgToolLib_Export.h"

@@ -31,10 +31,6 @@
 
 #pragma once
 #include "DeviceClass.h"
-//#include "StdInt.h"
-//extern "C" {
-//#include <hidsdi.h>
-//}
 
 class HidDeviceClass : public DeviceClass
 {

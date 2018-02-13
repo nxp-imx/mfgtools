@@ -84,7 +84,7 @@ public:
 
 	MX_DEVICE_STATE GetDeviceState();
 
-	pthread_t  m_pThread;//////////////////////
+	pthread_t  m_pThread;
 	int m_WndIndex;
 	myevent *m_hKillEvent;
 	myevent *m_hDeviceArriveEvent;

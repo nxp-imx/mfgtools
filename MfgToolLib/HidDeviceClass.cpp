@@ -32,12 +32,11 @@
 #include "stdafx.h"
 #include "HidDeviceClass.h"
 #include "HidDevice.h"
-//#include <hidclass.h>
 #include "MfgToolLib_Export.h"
 #include "MfgToolLib.h"
 
 HidDeviceClass::HidDeviceClass(INSTANCE_HANDLE handle)
-: DeviceClass(NULL,NULL,_T("HID"),DeviceTypeHid,handle)//&GUID_DEVINTERFACE_HID, &GUID_DEVCLASS_HIDCLASS, _T("HID"), DeviceTypeHid, handle)
+: DeviceClass(NULL,NULL,_T("HID"),DeviceTypeHid,handle)
 {
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("new HidDeviceClass"));
 }

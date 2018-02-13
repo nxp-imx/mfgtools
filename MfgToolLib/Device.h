@@ -31,7 +31,6 @@
 
 #pragma once
 
-//#include "SetupApi.h"
 #include "Property.h"
 #include <list>
 #include "MfgToolLib_Export.h"
@@ -180,7 +179,7 @@ public:
 	{
 	public:
 		CString get();
-	}_hub;	//hub��s device path
+	}_hub;	//hub's device path
 
 	DeviceClass* _deviceClass;
 	DeviceCapabilities _capabilities;

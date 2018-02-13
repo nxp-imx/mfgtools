@@ -34,11 +34,9 @@
 #include "ExceptionHandle.h"
 #include "DeviceManager.h"
 
-//IMPLEMENT_DYNCREATE(CMyExceptionHandler, CWinThread)
 
 CMyExceptionHandler::CMyExceptionHandler()
 {
-	//m_bAutoDelete = FALSE; //Don't destroy the object at thread termination
 }
 
 CMyExceptionHandler::~CMyExceptionHandler()
@@ -60,7 +58,7 @@ void* ExceptionHandlerThreadProc(void* pParam)
 }
 DWORD CMyExceptionHandler::Open()
 {
-	//_hStartEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL); //Auto reset, nosignal
+
 	if( InitEvent(&_hStartEvent) != 0 )
 	{
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("CMyExceptionHandler::Open()--Create _hStartEvent failed"));
@@ -73,7 +71,7 @@ DWORD CMyExceptionHandler::Open()
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 
-	pthread_mutex_init(m_hMapMsgMutex,NULL);// = ::CreateMutex(NULL, FALSE, NULL);
+	pthread_mutex_init(m_hMapMsgMutex,NULL);
 	DWORD dwErrCode = ERROR_SUCCESS;
 	if (pthread_create(&Exception_thread, NULL, ExceptionHandlerThreadProc, this) == 0) //create CMyExceptionHandler thread successfully
 	{
@@ -108,7 +106,6 @@ void CMyExceptionHandler::Close()
 	m_hMapMsgMutex = NULL;
 
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Exception Handler thread is closed"));
-	//m_hThread = NULL;
 }
 
 BOOL CMyExceptionHandler::InitInstance()
@@ -118,15 +115,11 @@ BOOL CMyExceptionHandler::InitInstance()
 	return TRUE;
 }
 
-//BEGIN_MESSAGE_MAP(CMyExceptionHandler, CWinThread)
-//    ON_THREAD_MESSAGE(WM_MSG_EXCEPTION_EVENT, OnMsgExceptionEvent)
-//END_MESSAGE_MAP()
 
 void CMyExceptionHandler::OnMsgExceptionEvent(WPARAM ExceptionType, LPARAM desc)
 {
 	if(KillExceptionHandlerThread == ExceptionType)
 	{
-		//PostQuitMessage(0);
 		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("CMyExceptionHandler::OnMsgExceptionEvent() - KillExceptionHandlerThread"));
 		return;
 	}
@@ -135,11 +128,9 @@ void CMyExceptionHandler::OnMsgExceptionEvent(WPARAM ExceptionType, LPARAM desc)
 		CString msg = (LPCTSTR)desc;
 		CString bstr_msg;
 
-		//SysFreeString((BSTR)desc);
-
 		sleep(50);
 
-		pthread_mutex_lock(m_hMapMsgMutex);// , INFINITE);
+		pthread_mutex_lock(m_hMapMsgMutex);
 		std::map<CString, int>::iterator it = g_pDeviceManager->mapMsg.find(msg);
 		if(it == g_pDeviceManager->mapMsg.end())
 		{
@@ -154,15 +145,11 @@ void CMyExceptionHandler::OnMsgExceptionEvent(WPARAM ExceptionType, LPARAM desc)
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceArriveBeforVolumeRemove exception handling"));
 			g_pDeviceManager->mapMsg.erase(it);
 			pthread_mutex_unlock(m_hMapMsgMutex);
-			//bstr_msg = msg.AllocSysString();
-			//g_pDeviceManager->PostThreadMessage(WM_MSG_DEV_EVENT, (WPARAM)(DeviceManager::DEVICE_ARRIVAL_EVT), (LPARAM)bstr_msg);
 			break;
 		case DeviceArriveButEnumFailed:
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceArriveButEnumFailed exception handling"));
 			g_pDeviceManager->mapMsg.erase(it);
 			pthread_mutex_unlock(m_hMapMsgMutex);
-			//bstr_msg = msg.AllocSysString();
-			//g_pDeviceManager->PostThreadMessage(WM_MSG_DEV_EVENT, (WPARAM)(DeviceManager::DEVICE_ARRIVAL_EVT), (LPARAM)bstr_msg);
 			break;
 		default:
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Unknown exception type"));

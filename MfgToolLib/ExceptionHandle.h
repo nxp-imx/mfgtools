@@ -38,7 +38,6 @@ UINT ExceptionHandleThread( LPVOID pParam );
 
 class CMyExceptionHandler //: public CWinThread
 {
-	//DECLARE_DYNCREATE(CMyExceptionHandler)
 public:
 	CMyExceptionHandler();
 	virtual ~CMyExceptionHandler();
@@ -61,5 +60,4 @@ public:
 	void Close();
 	virtual BOOL InitInstance();
 	void OnMsgExceptionEvent(WPARAM ExceptionType, LPARAM desc);
-	//DECLARE_MESSAGE_MAP()
 };

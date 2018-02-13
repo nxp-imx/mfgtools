@@ -40,16 +40,14 @@
 usb::ControllerClass::ControllerClass(INSTANCE_HANDLE handle)
 : DeviceClass(NULL,NULL, _T("PCI"), DeviceTypeUsbController, handle)
 {
-	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new ControllerClass"));
 }
 
 usb::ControllerClass::~ControllerClass()
 {
-	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("delete ControllerClass"));
 }
 
 Device* usb::ControllerClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
 {
     return new usb::Controller(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
 }
-//D_DEVINTERFACE_USB_HOST_CONTROLLER
+

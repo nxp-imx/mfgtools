@@ -33,9 +33,7 @@
 #pragma once
 
 #include "DeviceClass.h"
-//#include "MxRomDevice.h"
 
-//#include <initguid.h>
 // Device Class GUID for the Jungo/WinDriver iMX ROM Driver
 // Used in mx*.inf
 // {C671678C-82C1-43F3-D700-0049433E9A4B}

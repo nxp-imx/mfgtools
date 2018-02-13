@@ -31,15 +31,6 @@
 
 
 #include "stdafx.h"
-//#include <Assert.h>
-//#include <cfgmgr32.h>
-//#include <basetyps.h>
-//#include <setupapi.h>
-//#include <initguid.h>
-//extern "C" {
-//#include <hidsdi.h>
-//}
-//#include <hidclass.h>
 #include "DeviceClass.h"
 #include "MxHidDevice.h"
 #include "MxHidDeviceClass.h"
@@ -47,7 +38,7 @@
 #include "MfgToolLib.h"
 
 MxHidDeviceClass::MxHidDeviceClass(INSTANCE_HANDLE handle)
-: DeviceClass(NULL,NULL,_T("MXHID"),DeviceTypeMxHid,handle)//&GUID_DEVINTERFACE_HID, &GUID_DEVCLASS_HIDCLASS, _T("MXHID"), DeviceTypeMxHid, handle)
+: DeviceClass(NULL,NULL,_T("MXHID"),DeviceTypeMxHid,handle)
 {
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("new MxHidDeviceClass"));
 }
@@ -76,7 +67,6 @@ Device* MxHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA
             		continue;
         	}
 		filter.Format(_T("vid_%04x&pid_%04x"), (*it)->uiVid, (*it)->uiPid);
-		//path.MakeUpper();
 		msg.MakeUpper();
 		filter.MakeUpper();
 		if( msg.Find(filter) != -1 )

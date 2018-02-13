@@ -69,8 +69,6 @@ public:
     static const std::string VersionLabel_Component;
 
 private:
-//    StFwComponent(const StFwComponent& comp);
-//	StFwComponent& operator=(const StFwComponent& comp);
     void InitParameters();
     void InitVersionInfo(const FileType fileType);
 
@@ -89,7 +87,6 @@ public:
     const UCHAR * const GetDataPtr() const;
     const int GetLastError() const { return _lastError; };
     const UINT size() const;
-//	const size_t GetSizeInSectors(const UINT sectorSize) const;
     void clear();
     const CString toString() const;
 

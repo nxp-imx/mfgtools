@@ -31,12 +31,6 @@
 
 
 #include "stdafx.h"
-//#include <Assert.h>
-//#include <cfgmgr32.h>
-//#include <basetyps.h>
-//#include <setupapi.h>
-//#include <initguid.h>
-//#include <hidclass.h>
 #include "Device.h"
 #include "MfgToolLib_Export.h"
 #include "MfgToolLib.h"
@@ -49,8 +43,6 @@ extern "C"
 
 #include <algorithm>   
 
-//#define DCD_WRITE
-//static PIvtHeader g_pIVT = NULL;
 
 DWORD EndianSwap(DWORD x)
 {
@@ -67,27 +59,10 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 : Device(deviceClass, devInst, path, handle)
 {
 	m_hid_drive_handle = INVALID_HANDLE_VALUE;
-    //m_sync_event_tx = NULL;
-    //m_sync_event_rx = NULL;
     m_pReadReport = NULL;
     m_pWriteReport = NULL;
-/*	if ( path.Find(_T("0054")) != -1 )
-	{
-		_chipFamily = MX6Q;
-	}
-	else if ( path.Find(_T("0061")) != -1 )
-	{
-		_chipFamily = MX6D;
-	}
-	else if ( path.Find(_T("0063")) != -1 )
-	{
-		_chipFamily = MX6SL;
-	}
-	else
-	{
-		_chipFamily = MX50;
-	} */
 }
+
 void MxHidDevice::NotifyOpen()
 {
 	CString filter;
@@ -181,110 +156,9 @@ MxHidDevice::~MxHidDevice()
 
 typedef UINT (CALLBACK* LPFNDLLFUNC1)(HANDLE, PVOID);
 typedef UINT (CALLBACK* LPFNDLLFUNC2)(PVOID);
+
 int MxHidDevice::AllocateIoBuffers()
 {
-#if 0
-	int error = ERROR_SUCCESS;
-
-	// Open the device
-    HANDLE hHidDevice = CreateFile(_path.get(), GENERIC_READ|GENERIC_WRITE,
-        FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0/* FILE_FLAG_OVERLAPPED */, NULL);
-	if( hHidDevice == INVALID_HANDLE_VALUE )
-    {
-		error = GetLastError();
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().CreateFile ERROR:(%d)"), error);
-        return error;
-    }
-	// Get the Capabilities including the max size of the report buffers
-	HINSTANCE hHidDll = LoadLibrary(_T("hid.dll"));
-	if (hHidDll == NULL)
-    {
-		error = GetLastError();
-        CloseHandle(hHidDevice);
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().LoadLibrary(hid.dll) ERROR:(%d)"), error);
-        return error;
-    }
-
-	PHIDP_PREPARSED_DATA  PreparsedData = NULL;
-	LPFNDLLFUNC1 lpfnDllFunc1 = (LPFNDLLFUNC1)GetProcAddress(hHidDll, "HidD_GetPreparsedData");
-	if (!lpfnDllFunc1)
-    {
-        // handle the error
-		error = GetLastError();
-        CloseHandle(hHidDevice);
-        FreeLibrary(hHidDll);
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().GetProcAddress(HidD_GetPreparsedData) ERROR:(%d)"), error);
-        return error;
-    }
-
-	LPFNDLLFUNC2 lpfnDllFunc2 = (LPFNDLLFUNC2)GetProcAddress(hHidDll, "HidD_FreePreparsedData");
-	if (!lpfnDllFunc2)
-    {
-        // handle the error
-		error = GetLastError();
-        CloseHandle(hHidDevice);
-        FreeLibrary(hHidDll);
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().GetProcAddress(HidD_FreePreparsedData) ERROR:(%d)"), error);
-        return error;
-    }
-
-	if ( !lpfnDllFunc1(hHidDevice, &PreparsedData) )
-    {
-		error = GetLastError();
-        CloseHandle(hHidDevice);
-        FreeLibrary(hHidDll);
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().HidD_GetPreparsedData ERROR:(%d)"), error);
-		return error != ERROR_SUCCESS ? error : ERROR_GEN_FAILURE;
-    }
-
-	lpfnDllFunc1 = (LPFNDLLFUNC1)GetProcAddress(hHidDll, "HidP_GetCaps");
-    if (!lpfnDllFunc1)
-    {
-        // handle the error
-		error = GetLastError();
-        CloseHandle(hHidDevice);
-		lpfnDllFunc2(PreparsedData);
-        FreeLibrary(hHidDll);
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().GetProcAddress(HidP_GetCaps) ERROR:(%d)"), error);
-        return error;
-    }
-	else
-	{
-		if ( lpfnDllFunc1(PreparsedData, &m_Capabilities) != HIDP_STATUS_SUCCESS )
-		{
-			CloseHandle(hHidDevice);
-			lpfnDllFunc2(PreparsedData);
-			FreeLibrary(hHidDll);
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers().GetCaps ERROR:(%d)"), HIDP_STATUS_INVALID_PREPARSED_DATA);
-			return HIDP_STATUS_INVALID_PREPARSED_DATA;
-		}
-	}
-
-	lpfnDllFunc2(PreparsedData);
-	FreeLibrary(hHidDll);
-    CloseHandle(hHidDevice);
-
-	// Allocate a Read and Write Report buffers
-	FreeIoBuffers();
-	if ( m_Capabilities.InputReportByteLength )
-	{
-		m_pReadReport = (_MX_HID_DATA_REPORT*)malloc(m_Capabilities.InputReportByteLength);
-		if ( m_pReadReport == NULL )
-		{
-	        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers(). Failed to allocate memory (1)"));
-            return ERROR_NOT_ENOUGH_MEMORY;
-		}
-	}
-	if ( m_Capabilities.OutputReportByteLength )
-    {
-        m_pWriteReport = (_MX_HID_DATA_REPORT*)malloc(m_Capabilities.OutputReportByteLength);
-        if ( m_pWriteReport == NULL )
-		{
-	        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" MxHidDevice::AllocateIoBuffers(). Failed to allocate memory (2)"));
-            return ERROR_NOT_ENOUGH_MEMORY;
-		}
-    }
-#endif
 
      m_pWriteReport = (_MX_HID_DATA_REPORT*)malloc(1025);
      m_pReadReport = (_MX_HID_DATA_REPORT*)malloc(1025);
@@ -325,13 +199,6 @@ BOOL MxHidDevice::OpenMxHidHandle()
 		return FALSE;
 	}
 
-/*	// Open the device
-    if (!OpenUSBHandle(&m_hid_drive_handle,_path.get()))
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR,  _T(" ERROR: OpenUSBHandle failed."));
-		return FALSE;
-    }
-*/
 	return TRUE;
 }
 
@@ -355,12 +222,6 @@ BOOL MxHidDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 	return TRUE;
 #else
 
-/*
-	ret = libusb_open(rdev, &m_libusbdevHandle);
-        if (ret)
-		printf(stderr, "Could not open device, ret=%i\n", ret);
-*/
-
 
 
 
@@ -370,51 +231,6 @@ BOOL MxHidDevice::OpenUSBHandle(HANDLE* pHandle, CString pipePath)
 #ifndef DCD_WRITE
 BOOL MxHidDevice::InitMemoryDevice(CString filename)
 {
-#if 0
-	USES_CONVERSION;
-	SDPCmd SDPCmd;
-
-    //Create device handle and report id
-    OpenMxHidHandle();
-
-    SDPCmd.command = ROM_KERNEL_CMD_WR_MEM;
-    SDPCmd.dataCount = 4;
-
-	FILE * scriptFile = _tfopen(filename, _T("r"));
-	if( scriptFile==NULL )
-	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't open file %s."), filename);
-		return FALSE;
-	}
-	struct _stat64i32 FileLen;
-	_tstat(filename, &FileLen);
-	CAnsiString cmdString;
-	std::fread(cmdString.GetBufferSetLength(FileLen.st_size),sizeof(char), (unsigned int)FileLen.st_size,scriptFile);
-	cmdString.ReleaseBuffer();
-
-	XNode script;
-	if ( script.Load(A2T(cmdString)) != NULL )
-	{
-		XNodes cmds = script.GetChilds(_T("CMD"));
-		XNodes::iterator cmd = cmds.begin();
-		for ( ; cmd != cmds.end(); ++cmd )
-		{
-			MemoryInitCommand* pCmd = (MemoryInitCommand*)(*cmd);
-            SDPCmd.format = pCmd->GetFormat();
-            SDPCmd.data = pCmd->GetData();
-            SDPCmd.address = pCmd->GetAddress();
-			if ( !WriteReg(&SDPCmd) )
-            {
-                TRACE(_T("In InitMemoryDevice(): write memory failed\n"));
-                CloseMxHidHandle();
-                return FALSE;
-            }
-		}
-	}
-
-    //Clear device handle and report id
-    CloseMxHidHandle();
-    #endif
 	return TRUE;
 }
 
@@ -422,60 +238,6 @@ BOOL MxHidDevice::InitMemoryDevice(CString filename)
 
 BOOL MxHidDevice::InitMemoryDevice(CString filename)
 {
-#if 0
-	USES_CONVERSION;
-
-	SDPCmd SDPCmd;
-
-	//Create device handle and report id
-	OpenMxHidHandle();
-
-	SDPCmd.command = ROM_KERNEL_CMD_WR_MEM;
-    SDPCmd.dataCount = 4;
-
-	CFile scriptFile;
-	if( !scriptFile.Open(filename, CFile::modeRead | CFile::shareDenyNone, NULL) )
-	{
-		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't open file %s."), filename);
-		return FALSE;
-	}
-	CStringT<char,StrTraitMFC<char> > cmdString;
-	scriptFile.Read(cmdString.GetBufferSetLength((int)scriptFile.GetLength()), (unsigned int)scriptFile.GetLength());
-	cmdString.ReleaseBuffer();
-
-	XNode script;
-	if ( script.Load(A2T(cmdString)) != NULL )
-	{
-		XNodes cmds = script.GetChilds(_T("CMD"));
-		XNodes::iterator cmd = cmds.begin();
-		//There are no more than 200 regs to be written
-		FslMemoryInit * pMemPara = (FslMemoryInit * )malloc(0x1000);
-		if(pMemPara == NULL)
-		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Can't malloc FslMemoryInit memory."));
-			return FALSE;
-		}
-		UINT RegCount = 0;
-		for ( ; cmd != cmds.end(); ++cmd, RegCount++)
-		{
-			MemoryInitCommand* pCmd = (MemoryInitCommand*)(*cmd);
-            pMemPara[RegCount].format = EndianSwap(pCmd->GetFormat());
-            pMemPara[RegCount].addr = EndianSwap(pCmd->GetAddress());
-            pMemPara[RegCount].data = EndianSwap(pCmd->GetData());
-		}
-
-		if ( !DCDWrite((PUCHAR)pMemPara,RegCount) )
-		{
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Failed to initialize memory!"));
-			free(pMemPara);
-			return FALSE;
-		/}
-		free(pMemPara);
-	}
-
-	//Clear device handle and report id
-    CloseMxHidHandle();
-#endif
 	return TRUE;
 }
 #endif
@@ -483,7 +245,6 @@ BOOL MxHidDevice::CloseMxHidHandle()
 {
 	if( m_hid_drive_handle != INVALID_HANDLE_VALUE)
     {
-//        CloseHandle(m_hid_drive_handle);
         m_hid_drive_handle = INVALID_HANDLE_VALUE;
     }
 
@@ -639,7 +400,7 @@ int MxHidDevice::Write(UCHAR* _buf, ULONG _size)
     const int control_transfer =
 	LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS |
 	LIBUSB_RECIPIENT_INTERFACE;
-   // do{
+   
     ret = libusb_control_transfer(m_libusbdevHandle, control_transfer,
 		HID_SET_REPORT,
 		(HID_REPORT_TYPE_OUTPUT << 8) | report,
@@ -648,7 +409,7 @@ int MxHidDevice::Write(UCHAR* _buf, ULONG _size)
     if (ret > 0)
 	    ret = 0;
 
-   // }while(last_trans<_size || ret<0);
+  
     return ret;
 #else
 	int    nBytesWrite; // for bytes actually written
@@ -1180,18 +941,6 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 	//Create device handle and report id
     OpenMxHidHandle();
 
-	/*
-	if ( fwFile.Open(fwFilename, CFile::modeRead | CFile::shareDenyWrite) == 0 )
-    {
-        LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("Firmware file %s failed to open.errcode is %d\n"), fwFilename,GetLastError());
-        goto ERR_HANDLE;
-    }
-
-	fwSize = fwFile.GetLength();
-    pDataBuf = (UCHAR*)malloc((size_t)fwSize);
-    fwFile.Read(pDataBuf, (UINT)fwSize);
-    fwFile.Close();
-	*/
 
 	dwFileSize = (dwFileSize + ROM_ECC_SIZE_ALIGN - 1) / ROM_ECC_SIZE_ALIGN * ROM_ECC_SIZE_ALIGN;
 
@@ -1209,7 +958,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 
 	PBootData pPluginDataBuf;
 
-	//pDataBuf = pFileDataBuf;
+	
 	//Search for IVT
 	while(1)
 	{
@@ -1353,12 +1102,6 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 		}
 
 		m_jumpAddr = pIVT->SelfAddr;
-		//m_jumpAddr = pIVT->ImageStartAddr;
-		/*if(!AddIvtHdr(pIVT->ImageStartAddr))
-		{
-			TRACE(_T("RunPlugIn(): Failed to addhdr to RAM address: 0x%x.\n"), pIVT->ImageStartAddr);
-			goto ERR_HANDLE;
-		}*/
 	}
 		
     //Clear device handle and report id    

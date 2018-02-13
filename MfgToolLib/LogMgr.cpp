@@ -32,7 +32,6 @@
 
 #include "stdafx.h"
 #include "LogMgr.h"
-//#include <mswmdm_i.c>
 
 extern CString g_strVersion;
 
@@ -41,7 +40,6 @@ CMfgLogMgr::CMfgLogMgr(CString strFilename)
 	m_file = _tfopen(strFilename, _T("a+"));
 	struct _stat64i32 FileLen;
 	_tstat(strFilename, &FileLen);
-	//BOOL bret = m_file.Open(strFilename, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeReadWrite | CFile::shareDenyNone | CFile::osWriteThrough | CFile::typeText);
 	if(m_file==NULL)
 	{
 		throw 1;
