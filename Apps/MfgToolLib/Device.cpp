@@ -233,21 +233,7 @@ Device* Device::UsbDevice()
 
     if (_enumerator.get().CompareNoCase(_T("USB")) == 0)
     {
-        // if current node is hub device, then return this node.
-        if ((_compatibleIds.get().MakeUpper().Find(_T("CLASS_09")) >= 0) || (_description.get().MakeUpper().Find(_T("HUB")) >= 0))
-        {
-            return this;
-        }
-        // Check if it's parent is an usb hub.
-        // If yes, this node is the correct usb device.
-        if ((Parent()->_compatibleIds.get().MakeUpper().Find(_T("CLASS_09")) >= 0) || (Parent()->_description.get().MakeUpper().Find(_T("HUB")) >= 0))
-        {
-            return this;
-        }
-        else // If not, this node is not the correct usb device, but a child of the usb device.
-        {
-            return Parent()->UsbDevice();
-        }
+		return this;
     }
 
     return Parent()->UsbDevice();
