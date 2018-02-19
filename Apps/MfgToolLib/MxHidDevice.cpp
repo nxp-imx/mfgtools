@@ -151,6 +151,7 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new MxHidDevice[%p]"), this);
 }
 
+
 void MxHidDevice::Reset(DEVINST devInst, CString path)
 {
 	Device::Reset(devInst, path);

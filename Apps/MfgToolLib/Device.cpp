@@ -516,8 +516,8 @@ CString Device::hub::get()
     {
         if(dev->UsbDevice()->Parent() != NULL)
         {
-			//if(dev->UsbDevice()->Parent()->_enumerator.get().CompareNoCase(_T("USB")) == 0)
-			if ((dev->UsbDevice()->Parent()->_compatibleIds.get().MakeUpper().Find(_T("CLASS_09")) >= 0) || (dev->UsbDevice()->Parent()->_description.get().MakeUpper().Find(_T("HUB")) >= 0))
+			if(dev->UsbDevice()->Parent()->_enumerator.get().CompareNoCase(_T("USB")) == 0)
+			//if ((dev->UsbDevice()->Parent()->_compatibleIds.get().MakeUpper().Find(_T("CLASS_09")) >= 0) || (dev->UsbDevice()->Parent()->_description.get().MakeUpper().Find(_T("HUB")) >= 0))
             {
                 //_value = dev->UsbDevice()->Parent()->_path.get();
 				CString hubDriver = dev->UsbDevice()->Parent()->_driver.get();
