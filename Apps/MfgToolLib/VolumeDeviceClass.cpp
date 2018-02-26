@@ -85,7 +85,7 @@ UINT VolumeDeviceClass::InitDriveLettersMap()
 
 }
 
-Device* VolumeDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
+Device* VolumeDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent)
 {
 	Volume* volume = new Volume(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
 	

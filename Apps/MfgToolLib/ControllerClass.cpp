@@ -44,7 +44,7 @@ usb::ControllerClass::~ControllerClass()
 	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("delete ControllerClass"));
 }
 
-Device* usb::ControllerClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
+Device* usb::ControllerClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent)
 {
     return new usb::Controller(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
 }

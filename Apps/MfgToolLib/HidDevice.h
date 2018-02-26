@@ -32,6 +32,7 @@
 
 #include "Device.h"
 #include "StHidApi.h"
+#include "MfgToolLib.h"
 
 extern "C" {
 #include <hidsdi.h>
@@ -40,7 +41,7 @@ extern "C" {
 class HidDevice : public Device
 {
 public:
-	HidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle);
+	HidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle, COpState *pCurrent);
     virtual ~HidDevice(void);
 
     virtual UINT32 SendCommand(StApi& api, UINT8* additionalInfo = NULL);
@@ -50,6 +51,7 @@ public:
                                       LPOVERLAPPED lpOverlapped);        // pointer to structure with I/O information
 	virtual UINT32 ResetChip();
     DWORD GetHabType();
+
 private:
 #pragma pack(1)
     //------------------------------------------------------------------------------

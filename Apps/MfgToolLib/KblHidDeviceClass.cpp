@@ -56,7 +56,7 @@ KblHidDeviceClass::~KblHidDeviceClass(void)
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("delete MxHidDeviceClass"));
 }
 
-Device* KblHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
+Device* KblHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent)
 {
     //Check if the path matches our device pid&vid.
     //An example of value of path: "\\?\hid#vid_413c&pid_2011&mi_01&col02#8&2598dfbd&0&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}"
@@ -87,7 +87,7 @@ Device* KblHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DAT
 	}
 	if(isRightDevice) //OK, find the device
 	{
-		return new MxHidDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
+		return new MxHidDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle, pCurrentState);
 	}
 	else
 	{

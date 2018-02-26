@@ -33,6 +33,7 @@
 
 #include "DeviceClass.h"
 #include "UsbHub.h"
+class COpState;
 
 namespace usb
 {
@@ -42,7 +43,7 @@ namespace usb
 		HubClass(INSTANCE_HANDLE handle);
 		virtual ~HubClass();
 		
-		Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
+		Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent = NULL);
 
 		Hub* FindHubByDriver(LPCTSTR driverName);
 		Hub* FindHubByPath(LPCTSTR pathName);

@@ -32,6 +32,8 @@
 
 #include "DeviceClass.h"
 
+class COpSate;
+
 namespace usb
 {
 	class ControllerClass : public DeviceClass
@@ -40,7 +42,7 @@ namespace usb
 		ControllerClass(INSTANCE_HANDLE handle);
 		virtual ~ControllerClass();
 
-		Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
+		Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent=NULL);
 
 		CString ToString() { return _T("ControllerClass"); }
 	};

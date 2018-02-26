@@ -227,7 +227,6 @@ BOOL DeviceManager::InitInstance()
 	g_devClasses[DeviceClass::DeviceTypeUsbController] = &contClass;
 	contClass.Devices();
 	
-	
 	g_devClasses[DeviceClass::DeviceTypeUsbHub] = &hubclass;
 	hubclass.Devices();
 
@@ -247,7 +246,7 @@ BOOL DeviceManager::InitInstance()
 			{
 				(*stateIt)->romInfo.pDeviceClass->m_pLibHandle = m_pLibHandle;
 				g_devClasses[(*stateIt)->romInfo.pDeviceClass->_deviceClassType] = (*stateIt)->romInfo.pDeviceClass;
-				(*stateIt)->romInfo.pDeviceClass->Devices();
+				(*stateIt)->romInfo.pDeviceClass->Devices((*stateIt));
 			}
 			break;
 		case MX_UPDATER:
@@ -258,7 +257,7 @@ BOOL DeviceManager::InitInstance()
 
 			g_devClasses[DeviceClass::DeviceTypeMsc] = &volClass;
 			g_devClasses[DeviceClass::DeviceTypeMsc]->SetMSCVidPid((*stateIt)->uiVid, (*stateIt)->uiPid);
-			volClass.Devices();
+			volClass.Devices(NULL);
 			break;
 		}
 		
@@ -546,7 +545,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 					DeviceClass::NotifyStruct nsInfo = { 0 };
 					if (pCurrentState->romInfo.pDeviceClass)
 					{
-						nsInfo = pCurrentState->romInfo.pDeviceClass->AddUsbDevice(msg);
+						nsInfo = pCurrentState->romInfo.pDeviceClass->AddUsbDevice(msg, pCurrentState);
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[HidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
 						if (nsInfo.Device)
 						{
@@ -693,7 +692,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 			for ( msgLetterIndex = 0; msgLetterIndex < msg.GetLength(); ++msgLetterIndex )
 			{
 				driveLetterStr = msg.GetAt(msgLetterIndex);
-				DeviceClass::NotifyStruct nsInfo = g_devClasses[DeviceClass::DeviceTypeMsc]->AddUsbDevice(driveLetterStr);
+				DeviceClass::NotifyStruct nsInfo = g_devClasses[DeviceClass::DeviceTypeMsc]->AddUsbDevice(driveLetterStr, NULL);
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT-Disk(%s), Hub:%d-Port:%d"), driveLetterStr, nsInfo.HubIndex, nsInfo.PortIndex);
 				if(nsInfo.Device)
 				{
@@ -753,7 +752,7 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 		} //end case VOLUME_REMOVAL_EVT
 		case HUB_ARRIVAL_EVT:
 			{
-				DeviceClass::NotifyStruct nsInfo = g_devClasses[DeviceClass::DeviceTypeUsbHub]->AddUsbDevice(msg);
+				DeviceClass::NotifyStruct nsInfo = g_devClasses[DeviceClass::DeviceTypeUsbHub]->AddUsbDevice(msg, NULL);
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - HUB_ARRIVAL_EVT"));
 				if ( nsInfo.Device )
 				{

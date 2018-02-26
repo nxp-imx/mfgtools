@@ -32,6 +32,7 @@
 #pragma once
 
 #include "DeviceClass.h"
+class COpState;
 
 class KblHidDeviceClass : public DeviceClass
 {
@@ -39,7 +40,7 @@ public:
 	KblHidDeviceClass(INSTANCE_HANDLE handle);
     virtual ~KblHidDeviceClass(void);
 
-	Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
+	Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent=NULL);
 
     CString ToString() { return _T("KblHidDeviceClass"); }
 };

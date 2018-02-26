@@ -54,7 +54,7 @@ CDCDeviceClass::~CDCDeviceClass(void)
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("delete CDCDeviceClass"));
 }
 
-Device* CDCDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
+Device* CDCDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent)
 {
 	//Check if the path matches our device pid&vid.
 	//An example of value of path: "\\?\cdc#vid_413c&pid_2011&mi_01&col02#8&2598dfbd&0&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}"

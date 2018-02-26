@@ -46,7 +46,7 @@ DiskDeviceClass::~DiskDeviceClass(void)
 {
 }
 
-Device* DiskDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
+Device* DiskDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent)
 {
 	Disk* disk = new Disk(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
 	
@@ -139,7 +139,7 @@ std::list<Device*>& DiskDeviceClass::Refresh()
 //	std::map<CString, SP_DEVINFO_DATA>::iterator enumDevData;
 	for ( enumDevData = enumDevInfo.begin(); enumDevData != enumDevInfo.end(); ++enumDevData )
 	{
-		Device* pDevice = CreateDevice(this, (*enumDevData).second, (*enumDevData).first);
+		Device* pDevice = CreateDevice(this, (*enumDevData).second, (*enumDevData).first, NULL);
 		if ( pDevice && pDevice->IsUsb() )
 		{
 			WaitForSingleObject(devicesMutex, INFINITE);

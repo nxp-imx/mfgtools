@@ -34,7 +34,7 @@
 #include "logmgr.h"
 #include <Assert.h>
 
-HidDevice::HidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle)
+HidDevice::HidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle, COpState *pCurrent)
 : Device(deviceClass, devInst, path, handle)
 , _status(CSW_CMD_PASSED)
 , _pReadReport(NULL)
@@ -49,6 +49,9 @@ HidDevice::HidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, I
     {
         TRACE(_T("HidDevice::InitHidDevie() AllocateIoBuffers fail!\r\n"));
     }
+
+	this->m_ChipName = pCurrent->strDevice;
+	this->m_pRomInfo = &pCurrent->romInfo;
 }
 
 HidDevice::~HidDevice(void)

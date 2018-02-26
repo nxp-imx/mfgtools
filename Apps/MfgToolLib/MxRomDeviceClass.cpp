@@ -49,7 +49,7 @@ MxRomDeviceClass::~MxRomDeviceClass()
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("delete MxRomDeviceClass"));
 }
 
-Device* MxRomDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
+Device* MxRomDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent)
 {
     MxRomDevice* pDev = new MxRomDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
 

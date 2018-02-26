@@ -32,6 +32,7 @@
 #pragma once
 
 #include "DeviceClass.h"
+class COpState;
 
 class CDCDeviceClass : public DeviceClass
 {
@@ -39,7 +40,7 @@ public:
 	CDCDeviceClass(INSTANCE_HANDLE handle);
     virtual ~CDCDeviceClass(void);
 
-	Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
+	Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent=NULL);
 
 	BOOL FindChildPort(SP_DEVINFO_DATA father, PSP_DEVINFO_DATA child);
 

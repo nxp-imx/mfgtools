@@ -33,6 +33,7 @@
 
 #include "DeviceClass.h"
 
+class COpState;
 /// <summary>
 /// The device class for disk devices.
 /// </summary>
@@ -42,7 +43,7 @@ public:
 	DiskDeviceClass(INSTANCE_HANDLE handle);
 	virtual ~DiskDeviceClass(void);
 	virtual std::list<Device*>& Refresh();
-	Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
+	Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent);
 
 public:
 	CString ToString() { return _T("DiskDeviceClass"); }

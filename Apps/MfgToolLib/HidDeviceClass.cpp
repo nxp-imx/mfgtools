@@ -47,36 +47,16 @@ HidDeviceClass::~HidDeviceClass(void)
 
 }
 
-Device* HidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
+Device* HidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent)
 {
 	//Check if the path matches our device pid&vid.
 	//An example of value of path: "\\?\hid#vid_413c&pid_2011&mi_01&col02#8&2598dfbd&0&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}"
 
 	//add filiters
-	OP_STATE_ARRAY *pOpStates = GetOpStates((MFGLIB_VARS *)m_pLibHandle);
-	CString filter;
-	BOOL isRightDevice = FALSE;
-	OP_STATE_ARRAY::iterator it = pOpStates->begin();
-	COpState *pCurrentState = NULL;
-	CString msg = path;
-	for (; it != pOpStates->end(); it++)
-	{
-		filter.Format(_T("vid_%04x&pid_%04x"), (*it)->uiVid, (*it)->uiPid);
-		msg.MakeUpper();
-		filter.MakeUpper();
-		if (msg.Find(filter) != -1)
-		{	//find
-			isRightDevice = TRUE;
-			pCurrentState = (*it);
-			break;
-		}
-	}
-	if (isRightDevice) //OK, find the device
-	{
-		return new HidDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
-	}
+	CString strFiliter;
+	strFiliter.Format(_T("vid_%04x&pid_%04x"), pCurrent->uiVid, pCurrent->uiPid);
+	if (path.MakeLower().Find(strFiliter.MakeUpper()) >= 0)
+		return new HidDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle, pCurrent);
 	else
-	{
 		return NULL;
-	}
 }

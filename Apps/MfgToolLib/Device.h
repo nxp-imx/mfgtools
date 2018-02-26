@@ -38,6 +38,7 @@
 
 class DeviceClass;
 class CMutex;
+struct ROM_INFO;
 
 class Device : public Property
 {
@@ -197,7 +198,9 @@ public:
 	DWORD  m_dwIndex;
 
 	INSTANCE_HANDLE m_pLibHandle;
+
 	CString		m_ChipName;
+	ROM_INFO	*m_pRomInfo;
 };
 
 typedef std::list<Device *> DEVICES_ARRAY;

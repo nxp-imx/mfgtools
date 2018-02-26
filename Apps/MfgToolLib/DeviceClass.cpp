@@ -181,7 +181,7 @@ DWORD DeviceClass::EnumDeviceInterfaceDetails(DWORD index, CString& devPath, PSP
 }
 
 //Enum all devices according to GUID
-DEVICES_ARRAY& DeviceClass::Devices()
+DEVICES_ARRAY& DeviceClass::Devices(COpState *pCurrent)
 {
 	if( _devices.empty() )
 	{
@@ -215,7 +215,7 @@ DEVICES_ARRAY& DeviceClass::Devices()
 			}
 			
 			//find one, so create device
-			Device* device = CreateDevice(this, devData, devPath);
+			Device* device = CreateDevice(this, devData, devPath, pCurrent);
 			// Create device will return NULL if there are filters in place
             // and the device does not match a filter
 			if( device != NULL )
@@ -256,14 +256,14 @@ CString DeviceClass::classDesc::get()
     return _value;
 }
 
-Device* DeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
+Device* DeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent)
 {
     Device* dev = new Device(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
 
 	return dev;
 }
 
-Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListType devListType, const DeviceListAction devListAction )
+Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListType devListType, const DeviceListAction devListAction , COpState *pCurrent)
 {
 	if (pathToFind.IsEmpty())
     {
@@ -342,7 +342,7 @@ Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListTyp
 //				ATLTRACE(_T("%s::FindDeviceByUsbPath()  Enumerated device. %s\r\n"), this->ToString().c_str(), devPath.c_str());
 				if( !(devPath.IsEmpty()) )
 				{
-					pDevice = CreateDevice(this, devData, devPath);
+					pDevice = CreateDevice(this, devData, devPath, pCurrent);
 					if( pDevice && pDevice->IsUsb() )
 					{
 //						ATLTRACE(_T("%s::FindDeviceByUsbPath()  Created device. %s\r\n"), this->ToString().c_str(), devPath.c_str());
@@ -502,7 +502,7 @@ Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListTyp
 #endif
 }
 
-DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path)
+DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path, COpState *pCurrent)
 {
 	NotifyStruct nsInfo = {0};
 	Device * pDevice = NULL;

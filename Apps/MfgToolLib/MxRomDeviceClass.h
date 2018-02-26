@@ -45,6 +45,8 @@
 // {00873FDF-61A8-11D1-AA5E-00C04FB1728B}
 DEFINE_GUID(GUID_DEVINTERFACE_MX_ROM_WDF_USB_BULK_DEVICE, 0x00873FDF, 0x61A8, 0x11D1, 0xAA, 0x5E, 0x00, 0xC0, 0x4F, 0xB1, 0x72, 0x8B);
 
+class COpstate;
+
 class MxRomDeviceClass : public DeviceClass
 {
 public:
@@ -54,7 +56,7 @@ public:
     MxRomDeviceClass(INSTANCE_HANDLE handle);
     virtual ~MxRomDeviceClass();
 
-    Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
+    Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent);
 
 public:
     CString ToString() { return _T("MxRomDeviceClass"); }

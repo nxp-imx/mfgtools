@@ -34,6 +34,7 @@
 //extern "C" {
 //#include <hidsdi.h>
 //}
+class COpState;
 
 class HidDeviceClass : public DeviceClass
 {
@@ -43,7 +44,7 @@ public:
     virtual ~HidDeviceClass(void);
 
 private:
-   Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
+   Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent);
 
 public:
     CString ToString() { return _T("HidDeviceClass"); }

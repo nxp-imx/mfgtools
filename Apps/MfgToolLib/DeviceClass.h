@@ -35,6 +35,8 @@
 #include "Device.h"
 #include "MfgToolLib_Export.h"
 
+class COpState;
+
 /// <summary>
 /// A generic base class for physical device classes.
 /// </summary>
@@ -94,13 +96,13 @@ public:
 	int RefreshPort(const CString hubPath, const int hubIndex);
 	int ClearPort(const CString hubPath, const int hubIndex);
 	
-	virtual DEVICES_ARRAY& Devices();
+	virtual DEVICES_ARRAY& Devices(COpState *pCurrent = NULL);
 	virtual std::list<Device*>& Refresh();
-	virtual Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
+	virtual Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent = NULL);
 
-	virtual NotifyStruct AddUsbDevice(LPCTSTR path);
+	virtual NotifyStruct AddUsbDevice(LPCTSTR path, COpState *pCurrent);
 	virtual NotifyStruct RemoveUsbDevice(LPCTSTR path);
-	virtual Device* FindDeviceByUsbPath(CString pathToFind, const DeviceListType devList, const DeviceListAction devListAction = DeviceListAction_None);
+	virtual Device* FindDeviceByUsbPath(CString pathToFind, const DeviceListType devList, const DeviceListAction devListAction = DeviceListAction_None, COpState *pCurrent=NULL);
 	
 	void RemoveDevice(Device *device);
 

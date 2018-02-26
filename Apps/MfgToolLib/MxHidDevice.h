@@ -38,6 +38,8 @@
 #include "MfgToolLib.h"
 #include "XMLite.h"
 
+class COpState;
+
 #define MAX_SIZE_PER_FLASH_COMMAND					0x200000	/* 50k */
 #define MAX_SIZE_PER_DOWNLOAD_COMMAND			0x200000
 
@@ -103,7 +105,7 @@ enum HAB_t;
 class MxHidDevice : public Device
 {
 public: 
-    MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle);
+    MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle, COpState *pCurrent);
     virtual ~MxHidDevice();
 
 public:
@@ -306,7 +308,6 @@ public:
     _MX_HID_DATA_REPORT		*m_pWriteReport;
 	HIDP_CAPS	m_Capabilities;
 	HANDLE	    m_hid_drive_handle;
-	ROM_INFO	*m_pRomInfo;
 	UINT m_jumpAddr;
 	HAB_t m_habState;
 

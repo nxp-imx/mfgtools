@@ -49,12 +49,12 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle)
+MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle, COpState *pCurrent)
 : Device(deviceClass, devInst, path, handle)
 {
 	m_hid_drive_handle = INVALID_HANDLE_VALUE;
     //m_sync_event_tx = NULL;
-    //m_sync_event_rx = NULL;
+    //m_sync_event_rx = NULL,
     m_pReadReport = NULL;
     m_pWriteReport = NULL;
 /*	if ( path.Find(_T("0054")) != -1 )
@@ -73,26 +73,11 @@ MxHidDevice::MxHidDevice(DeviceClass * deviceClass, DEVINST devInst, CString pat
 	{
 		_chipFamily = MX50;
 	} */
-	CString filter;
-	OP_STATE_ARRAY *pOpStates = GetOpStates((MFGLIB_VARS *)m_pLibHandle);
-	OP_STATE_ARRAY::iterator it = pOpStates->begin();
-	COpState *pCurrentState = NULL;
-	for(; it!=pOpStates->end(); it++)
+	
+	if(pCurrent)
 	{
-		filter.Format(_T("vid_%04x&pid_%04x"), (*it)->uiVid, (*it)->uiPid);
-		path.MakeUpper();
-		filter.MakeUpper();
-		if( path.Find(filter) != -1 )
-		{	//find
-			pCurrentState = (*it);
-			break;
-		}
-	}
-
-	if(pCurrentState)
-	{
-		m_pRomInfo = &pCurrentState->romInfo;
-		m_ChipName = pCurrentState->strDevice;
+		m_pRomInfo = &pCurrent->romInfo;
+		m_ChipName = pCurrent->strDevice;
 	}
 
 	m_habState = HabUnknown;

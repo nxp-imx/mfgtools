@@ -39,7 +39,7 @@ public:
     MxHidDeviceClass(INSTANCE_HANDLE handle);
     virtual ~MxHidDeviceClass(void);
 
-	Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
+	Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent);
 
     CString ToString() { return _T("MxHidDeviceClass"); }
 };

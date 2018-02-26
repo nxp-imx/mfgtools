@@ -46,7 +46,7 @@ usb::HubClass::~HubClass()
 	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("delete HubClass"));
 }
 
-Device* usb::HubClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
+Device* usb::HubClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent)
 {
     usb::Hub* hub = new usb::Hub(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
     

@@ -33,6 +33,8 @@
 #include "DeviceClass.h"
 #include <map>
 
+class COpState;
+
 /// <summary>
 /// The device class for volume devices.
 /// </summary>
@@ -49,7 +51,7 @@ public:
 
 private:
 	UINT InitDriveLettersMap();
-	Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path);
+	Device* CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path, COpState *pCurrent=NULL);
 
 public:
 	CString ToString() { return _T("VolumeDeviceClass"); }
