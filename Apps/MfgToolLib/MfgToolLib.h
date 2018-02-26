@@ -104,6 +104,7 @@ typedef struct _tagCfgParam
 #define ROM_INFO_HID_UID_STRING			  0x80
 #define ROM_INFO_HID_SYSTEM_ADDR_MAP	 0x100     /*MX8QM use system view address map*/
 #define ROM_INFO_HID_ECC_ALIGN			 0x200
+#define ROM_INFO_HID_NO_CMD				 0x400
 
 
 struct ROM_INFO
@@ -139,6 +140,7 @@ public:
 		memset(&romInfo, 0, sizeof(ROM_INFO));
 		uiVid = 0;
 		uiPid = 0;
+		bcdDevice = -1;
 		dwTimeout = -1;
 	};
 	MX_DEVICE_STATE opState;
@@ -147,6 +149,7 @@ public:
 	ROM_INFO romInfo;
 	UINT uiVid;
 	UINT uiPid;
+	INT bcdDevice;
 	DWORD dwTimeout;   // waiting for change to next state(for example: the timeout of find command)
 };
 typedef std::vector<COpState*> OP_STATE_ARRAY;

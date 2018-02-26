@@ -532,68 +532,74 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 			BOOL isRightDevice = FALSE;
 			OP_STATE_ARRAY::iterator it = pOpStates->begin();
 			COpState *pCurrentState = NULL;
+
 			for(; it!=pOpStates->end(); it++)
 			{
 				filter.Format(_T("vid_%04x&pid_%04x"), (*it)->uiVid, (*it)->uiPid);
+				
 				msg.MakeUpper();
 				filter.MakeUpper();
 				if( msg.Find(filter) != -1 )
 				{	//find
-					isRightDevice = TRUE;
 					pCurrentState = (*it);
-					break;
-				}
-			}
-			if(isRightDevice) //OK, find the device
-			{
-				DeviceClass::NotifyStruct nsInfo = {0};
-				if (pCurrentState->romInfo.pDeviceClass)
-				{
-					nsInfo = pCurrentState->romInfo.pDeviceClass->AddUsbDevice(msg);
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[HidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
-				}
 
-				if(nsInfo.Device)
-				{
-					nsInfo.Event = DEVICE_ARRIVAL_EVT;
-
-					//Loop for Volume device as the same HubIndex and PortIndex;
-					std::list<Device*>::iterator deviceIt;
-					int portIndex;
-					CString hubPath;
-					BOOL bExceptionExist = FALSE;
-					
-					if (g_devClasses[DeviceClass::DeviceTypeMsc])
+					DeviceClass::NotifyStruct nsInfo = { 0 };
+					if (pCurrentState->romInfo.pDeviceClass)
 					{
-						for (deviceIt = g_devClasses[DeviceClass::DeviceTypeMsc]->_devices.begin(); deviceIt != g_devClasses[DeviceClass::DeviceTypeMsc]->_devices.end(); ++deviceIt)
+						nsInfo = pCurrentState->romInfo.pDeviceClass->AddUsbDevice(msg);
+						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[HidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
+						if (nsInfo.Device)
 						{
-							portIndex = (*deviceIt)->_hubIndex.get();
-							hubPath = (*deviceIt)->_hub.get();
-							if ((hubPath.CompareNoCase(nsInfo.Hub) == 0) && (portIndex == nsInfo.PortIndex)) //the same Hub-Port has two device
+							if (!nsInfo.Device->IsCorrectDevice((*it)->uiVid, (*it)->uiPid, (*it)->bcdDevice))
 							{
-								bExceptionExist = TRUE;
-								break;
+								nsInfo = { 0 };
+								pCurrentState->romInfo.pDeviceClass->RemoveUsbDevice(msg);
+								continue;
 							}
 						}
 					}
-					if(bExceptionExist)
-					{
-						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceArriveBeforVolumeRemove Exception occurs"));
-						WaitForSingleObject(m_pExpectionHandler->m_hMapMsgMutex, INFINITE);
-						mapMsg[msg] = 1;
-						ReleaseMutex(m_pExpectionHandler->m_hMapMsgMutex);
-						BSTR bstr_msg = msg.AllocSysString();
-						m_pExpectionHandler->PostThreadMessage(WM_MSG_EXCEPTION_EVENT, (WPARAM)(CMyExceptionHandler::DeviceArriveBeforVolumeRemove), (LPARAM)bstr_msg);
-						return;
-					}
 
-					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT, Notify"));
-					Notify(&nsInfo);
-				}
-				else
-				{
-					if (pCurrentState->romInfo.pDeviceClass)
+					if (nsInfo.Device)
 					{
+						nsInfo.Event = DEVICE_ARRIVAL_EVT;
+
+						//Loop for Volume device as the same HubIndex and PortIndex;
+						std::list<Device*>::iterator deviceIt;
+						int portIndex;
+						CString hubPath;
+						BOOL bExceptionExist = FALSE;
+
+						if (g_devClasses[DeviceClass::DeviceTypeMsc])
+						{
+							for (deviceIt = g_devClasses[DeviceClass::DeviceTypeMsc]->_devices.begin(); deviceIt != g_devClasses[DeviceClass::DeviceTypeMsc]->_devices.end(); ++deviceIt)
+							{
+								portIndex = (*deviceIt)->_hubIndex.get();
+								hubPath = (*deviceIt)->_hub.get();
+								if ((hubPath.CompareNoCase(nsInfo.Hub) == 0) && (portIndex == nsInfo.PortIndex)) //the same Hub-Port has two device
+								{
+									bExceptionExist = TRUE;
+									break;
+								}
+							}
+						}
+						if (bExceptionExist)
+						{
+							LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceArriveBeforVolumeRemove Exception occurs"));
+							WaitForSingleObject(m_pExpectionHandler->m_hMapMsgMutex, INFINITE);
+							mapMsg[msg] = 1;
+							ReleaseMutex(m_pExpectionHandler->m_hMapMsgMutex);
+							BSTR bstr_msg = msg.AllocSysString();
+							m_pExpectionHandler->PostThreadMessage(WM_MSG_EXCEPTION_EVENT, (WPARAM)(CMyExceptionHandler::DeviceArriveBeforVolumeRemove), (LPARAM)bstr_msg);
+							return;
+						}
+
+						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT, Notify"));
+						Notify(&nsInfo);
+					}
+					else
+					{
+						if (pCurrentState->romInfo.pDeviceClass)
+						{
 							LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceArriveButEnumFailed Exception occurs"));
 							WaitForSingleObject(m_pExpectionHandler->m_hMapMsgMutex, INFINITE);
 							mapMsg[msg] = 1;
@@ -601,7 +607,9 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 							BSTR bstr_msg = msg.AllocSysString();
 							m_pExpectionHandler->PostThreadMessage(WM_MSG_EXCEPTION_EVENT, (WPARAM)(CMyExceptionHandler::DeviceArriveButEnumFailed), (LPARAM)bstr_msg);
 							return;
+						}
 					}
+					break;
 				}
 			}
 			break;
@@ -621,16 +629,14 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 			COpState *pCurrentState = NULL;
 			for(; it!=pOpStates->end(); it++)
 			{
-				filter.Format(_T("vid_%04x&pid_%04x"), (*it)->uiVid, (*it)->uiPid);
-				msg.MakeUpper();
-				filter.MakeUpper();
-				if( msg.Find(filter) != -1 )
-				{	//find
+				if ((*it)->romInfo.pDeviceClass && (*it)->romInfo.pDeviceClass->FindDeviceByUsbPath(msg.Mid(4), DeviceClass::DeviceListType_Current))
+				{
 					isRightDevice = TRUE;
 					pCurrentState = (*it);
 					break;
 				}
 			}
+
 			if(isRightDevice) //OK, find the device
 			{
 				//check exception handle queue
@@ -658,27 +664,13 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT, Notify"));
 					Notify(&nsInfo);
 
-					//delete device
-					std::list<Device*>::iterator deviceIt;
-					for (deviceIt = pCurrentState->romInfo.pDeviceClass->_devices.begin(); deviceIt != pCurrentState->romInfo.pDeviceClass->_devices.end(); ++deviceIt)
-					{
-						if((*deviceIt) == nsInfo.Device)
-						{
-							break;
-						}
-					}
-
 					//DWORD dwResult = WaitForMultipleObjects(MAX_BOARD_NUMBERS, g_hDevCanDeleteEvts, FALSE, INFINITE);
 					TRACE(_T("Device manager wait for begin\r\n"));
 					DWORD dwResult = WaitForSingleObject(((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[nsInfo.Device->GetDeviceWndIndex()], INFINITE);
 					TRACE(_T("Device manager wait for end\r\n"));
 					//int index = dwResult - WAIT_OBJECT_0;
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent()-DEVICE_REMOVAL_EVT, hDevCanDeleteEvent has been set"));
-					WaitForSingleObject(pCurrentState->romInfo.pDeviceClass->devicesMutex, INFINITE);
-					delete (*deviceIt);
-					pCurrentState->romInfo.pDeviceClass->_devices.erase(deviceIt);
-					//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT Device Object[0x%X] has been delete"), (*deviceIt));
-					ReleaseMutex(pCurrentState->romInfo.pDeviceClass->devicesMutex);
+					pCurrentState->romInfo.pDeviceClass->RemoveDevice(nsInfo.Device);
 				}
 			}
 			break;
@@ -740,16 +732,6 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 					return;
 				}
 
-				//delete device
-				std::list<Device*>::iterator deviceIt;
-				for(deviceIt=g_devClasses[DeviceClass::DeviceTypeMsc]->_devices.begin(); deviceIt!=g_devClasses[DeviceClass::DeviceTypeMsc]->_devices.end(); ++deviceIt)
-				{
-					if((*deviceIt) == nsInfo.Device)
-					{
-						break;
-					}
-				}
-				
 				if(nsInfo.PortIndex == 0)
 				{
 					// at such case, the cmdoperation thread can't get the volume remove event at all
@@ -763,22 +745,9 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 				DWORD dwResult = WaitForSingleObject(((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[nsInfo.Device->GetDeviceWndIndex()], INFINITE);
 				TRACE(_T("Device manager wait for end\r\n"));
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent()-VOLUME_REMOVAL_EVT, hDevCanDeleteEvent has been set"));
-				WaitForSingleObject(g_devClasses[DeviceClass::DeviceTypeMsc]->devicesMutex, INFINITE);
-				//find the corresponding disk device
-				std::list<Device*>::iterator diskIt;
-				for(diskIt=g_devClasses[DeviceClass::DeviceTypeDisk]->_devices.begin(); diskIt!=g_devClasses[DeviceClass::DeviceTypeDisk]->_devices.end(); ++diskIt)
-				{
-					if((dynamic_cast<Volume*>(*deviceIt))->StorageDisk() == (*diskIt))
-					{
-						break;
-					}
-				}
-				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent()-VOLUME_REMOVAL_EVT, delete Disk:%p, Volume:%p"), *diskIt, *deviceIt);
-				delete (*diskIt);
-				g_devClasses[DeviceClass::DeviceTypeDisk]->_devices.erase(diskIt);
-				delete (*deviceIt);
-				g_devClasses[DeviceClass::DeviceTypeMsc]->_devices.erase(deviceIt);
-				ReleaseMutex(g_devClasses[DeviceClass::DeviceTypeMsc]->devicesMutex);
+				
+				g_devClasses[DeviceClass::DeviceTypeDisk]->RemoveDevice((dynamic_cast<Volume*>(nsInfo.Device))->StorageDisk());
+				g_devClasses[DeviceClass::DeviceTypeMsc]->RemoveDevice(nsInfo.Device);
 			}
 			break;
 		} //end case VOLUME_REMOVAL_EVT

@@ -40,6 +40,9 @@
 /// </summary>
 class DeviceClass : public Property
 {
+protected:
+	HANDLE devicesMutex;
+
 public:
 	typedef enum __DeviceClassType
 	{
@@ -99,6 +102,8 @@ public:
 	virtual NotifyStruct RemoveUsbDevice(LPCTSTR path);
 	virtual Device* FindDeviceByUsbPath(CString pathToFind, const DeviceListType devList, const DeviceListAction devListAction = DeviceListAction_None);
 	
+	void RemoveDevice(Device *device);
+
 public:
 	GuidProperty(_classIfaceGuid);	//GUID for a device interface class.
     GuidProperty(_classDevGuid);	//GUID for a device setup class.
@@ -114,8 +119,7 @@ public:
 	HDEVINFO _deviceInfoSet;
 	DEVICES_ARRAY _devices;
 	DEVICES_ARRAY _oldDevices;
-	HANDLE devicesMutex;
-
+	
 	USHORT m_msc_vid;
 	USHORT m_msc_pid;
 	void SetMSCVidPid(USHORT vid, USHORT pid);

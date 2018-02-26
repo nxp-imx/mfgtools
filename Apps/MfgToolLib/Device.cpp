@@ -81,6 +81,7 @@ Device::Device(DeviceClass *deviceClass, DEVINST devInst, CString path, INSTANCE
     _enumerator.describe(this, _T("Enumerator"), _T(""));
     _classStr.describe(this, _T("Class"), _T(""));
     _compatibleIds.describe(this, _T("Compatible Ids"), _T(""));
+	_hardwareIds.describe(this, _T("Hardware Ids"), _T(""));
     _classDesc.describe(this, _T("Class Description"), _T(""));
     _classGuid.describe(this, _T("Device Class GUID"), _T("Describes the device class."));
     _hub.describe(this, _T("USB Hub Path"), _T("Path of Hub USB Device is connected to."));
@@ -475,6 +476,19 @@ CString Device::compatibleIds::get()
 	if (_value.IsEmpty())
 	{
 		_value = (dev->GetProperty(SPDRP_COMPATIBLEIDS, CString(_T(""))));
+	}
+
+	return _value;
+}
+
+CString Device::hardwareIds::get()
+{
+	Device* dev = dynamic_cast<Device*>(_owner);
+	ASSERT(dev);
+
+	if (_value.IsEmpty())
+	{
+		_value = (dev->GetProperty(SPDRP_HARDWAREID, CString(_T(""))));
 	}
 
 	return _value;
@@ -969,4 +983,21 @@ void Device::SetDeviceWndIndex(DWORD dwIndex)
     m_dwIndex = dwIndex;
 }
 
+BOOL Device::IsCorrectDevice(int pid, int vid, int bcdDevice)
+{
+	if (bcdDevice >= 0)
+	{
+		CString hardwareids = _hardwareIds.get();
+		CString filter;
+		filter.Format(_T("vid_%04x&pid_%04x&rev_%04x"), pid, vid, bcdDevice);
+		hardwareids.MakeUpper();
+		filter.MakeUpper();
+		if (hardwareids.Find(filter) < 0)
+		{
+			return false;
+		}
+		return true;
+	}
+	return true;
+}
 

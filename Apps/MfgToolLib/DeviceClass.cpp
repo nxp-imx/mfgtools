@@ -284,7 +284,8 @@ Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListTyp
 				if((*deviceIt)->IsUsb())
 				{
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceClass::FindDeviceByUsbPath--DeviceListType_Current, devInstPathToFind: %s, _deviceInstanceID: %s"), devInstPathToFind, (*deviceIt)->UsbDevice()->_deviceInstanceID.get());
-					if( devInstPathToFind.CompareNoCase( (*deviceIt)->UsbDevice()->_deviceInstanceID.get() ) == 0 )
+					CString str = (*deviceIt)->UsbDevice()->_deviceInstanceID.get();
+					if( devInstPathToFind.CompareNoCase(str) == 0 )
 					{
 						pDevice = (*deviceIt);
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceClass::FindDeviceByUsbPath--DeviceListType_Current, Find the device"));
@@ -653,4 +654,21 @@ int DeviceClass::ClearPort(const CString hubPath, const int hubIndex)
 }
 
 
+void DeviceClass::RemoveDevice(Device *p)
+{
+	std::list<Device*>::iterator deviceIt;
+
+	WaitForSingleObject(devicesMutex, INFINITE);
+
+	for (deviceIt = _devices.begin(); deviceIt != _devices.end(); ++deviceIt)
+	{
+		if ((*deviceIt) == p)
+		{
+			delete (*deviceIt);
+			_devices.erase(deviceIt);
+			break;
+		}
+	}
+	ReleaseMutex(devicesMutex);
+}
 

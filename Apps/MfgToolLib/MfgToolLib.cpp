@@ -91,6 +91,7 @@ ROM_INFO g_RomInfo []=
 	{_T("MX7ULP"),	0x2f018000, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{_T("MX8QM"),	0x2000e400, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD | ROM_INFO_HID_MX8_MULTI_IMAGE | ROM_INFO_HID_SYSTEM_ADDR_MAP| ROM_INFO_HID_ECC_ALIGN },
 	{_T("MX8QXP"),  0x2000e400, &g_MxHidDeviceClass,	ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD | ROM_INFO_HID_MX8_MULTI_IMAGE | ROM_INFO_HID_ECC_ALIGN },
+	{_T("MX8QXPB0"), 0x0,		&g_HidDeviceClass,		ROM_INFO_HID | ROM_INFO_HID_NO_CMD },
 };
 
 static ROM_INFO * SearchCompatiableRom(CString str)
@@ -1081,6 +1082,11 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 			pState->dwTimeout = _tcstol(strTemp, NULL, 10);
 		}
 
+		strTemp = (*state)->GetAttrValue(_T("bcdDevice"));
+		if (!strTemp.IsEmpty())
+		{
+			pState->bcdDevice = _tcstoul(strTemp, NULL, 16);
+		}
 		pLibVars->g_OpStates.push_back(pState);
 	}
 
@@ -2970,7 +2976,7 @@ void DeinitDeviceManager()
 void AutoScanDevice(MFGLIB_VARS *pLibVars, int iPortUsedNums)
 {
 	usb::Port*  pPortMappings[MAX_BOARD_NUMBERS] = {NULL};
-	BYTE portIndex;
+	BYTE portIndex=0;
 	CString strPath;
 	CString strFiliter;
 	OP_STATE_ARRAY *pOpStates = GetOpStates(pLibVars);
@@ -3007,12 +3013,18 @@ void AutoScanDevice(MFGLIB_VARS *pLibVars, int iPortUsedNums)
 				case DeviceClass::DeviceTypeKBLCDC:
 				case DeviceClass::DeviceTypeKBLHID:
 					{
-						strPath = pPort->GetDevice()->_path.get();
+						strPath = pPort->GetDevice()->_hardwareIds.get();
 						strPath.MakeUpper();
 						stateIt = pOpStates->begin();
 						for(; stateIt!=pOpStates->end(); stateIt++)
 						{
-							strFiliter.Format(_T("vid_%04x&pid_%04x"), (*stateIt)->uiVid, (*stateIt)->uiPid);
+							int bcdDevice = (*(stateIt))->bcdDevice;
+
+							if(bcdDevice >= 0)
+								strFiliter.Format(_T("vid_%04x&pid_%04x&rev_%04x"), (*stateIt)->uiVid, (*stateIt)->uiPid, bcdDevice);
+							else
+								strFiliter.Format(_T("vid_%04x&pid_%04x"), (*stateIt)->uiVid, (*stateIt)->uiPid);
+
 							strFiliter.MakeUpper();
 							if(strPath.Find(strFiliter) != -1)
 							{

@@ -165,6 +165,12 @@ public:
 		CString get();
 	}_compatibleIds;
 
+	class hardwareIds : public StringProperty
+	{
+	public:
+		CString get();
+	}_hardwareIds;
+
 	class classDesc : public StringProperty 
 	{ 
 	public: 
@@ -184,6 +190,8 @@ public:
 	HDEVINFO _deviceInfoSet;
 	SP_DEVINFO_DATA _deviceInfoData;
 	CString _classGuidStr;
+
+	BOOL IsCorrectDevice(int pid, int vid, int rev);
 
 	HANDLE m_hDevCanDeleteEvent;
 	DWORD  m_dwIndex;
