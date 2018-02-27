@@ -556,6 +556,12 @@ CString Device::serialId::get()
 	{
 		return _value = dev->GetUSBDeviceStringDescriptor(1, 0x0409);
 	}
+	else
+	{
+		int index = dev->GetUSBDeviceSerialStringIndex();
+		if(index)
+			_value = dev->GetUSBDeviceStringDescriptor(index, 0x0409);
+	}
 	return _value;
 }
 
@@ -1091,4 +1097,37 @@ CString Device::GetUSBDeviceStringDescriptor(UCHAR sIndex, USHORT langID)
 
 	CloseHandle(hHubDevice);
 	return str;
+}
+
+int Device::GetUSBDeviceSerialStringIndex()
+{
+	BOOL success = 0;
+
+	HANDLE hHubDevice = CreateFile(_hub.get(), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+
+	if (hHubDevice == INVALID_HANDLE_VALUE)
+		return 0;
+
+	ULONG nBytes = sizeof(USB_NODE_CONNECTION_INFORMATION) + sizeof(USB_PIPE_INFO) * 30;
+
+	UCHAR connectinfo[sizeof(USB_NODE_CONNECTION_INFORMATION) + sizeof(USB_PIPE_INFO) * 30];
+
+	memset(connectinfo, 0, sizeof(connectinfo));
+
+	USB_NODE_CONNECTION_INFORMATION *pConnInfo = (USB_NODE_CONNECTION_INFORMATION *)connectinfo;
+	pConnInfo->ConnectionIndex = _hubIndex.get();
+
+	success = DeviceIoControl(hHubDevice,
+		IOCTL_USB_GET_NODE_CONNECTION_INFORMATION,
+		pConnInfo,
+		nBytes,
+		pConnInfo,
+		nBytes,
+		&nBytes,
+		NULL);
+
+	if (success)
+		return pConnInfo->DeviceDescriptor.iSerialNumber;
+	
+	return 0;
 }

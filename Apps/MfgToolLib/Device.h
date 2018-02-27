@@ -209,6 +209,7 @@ public:
 	ROM_INFO	*m_pRomInfo;
 
 	CString GetUSBDeviceStringDescriptor(UCHAR descindex, USHORT languageID);
+	int GetUSBDeviceSerialStringIndex();
 };
 
 typedef std::list<Device *> DEVICES_ARRAY;
