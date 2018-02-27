@@ -38,6 +38,7 @@
 #include "DeviceManager.h"
 #include "DeviceClass.h"
 #include "HubClass.h"
+#include "MfgToolLib.h"
 
 //CMutex Device::m_mutex(FALSE, _T("Device.SendCommand"));
 
@@ -546,6 +547,16 @@ CString Device::hub::get()
     return _value;
 }
 
+CString Device::serialId::get()
+{
+	CString str;
+	Device* dev = dynamic_cast<Device*>(_owner);
+	if (dev->m_pRomInfo->flags & ROM_INFO_HID_UID_STRING)
+	{
+
+	}
+	return str;
+}
 int Device::hubIndex::getmsc(USHORT vid, USHORT pid)
 {
 	Device* dev = dynamic_cast<Device*>(_owner);

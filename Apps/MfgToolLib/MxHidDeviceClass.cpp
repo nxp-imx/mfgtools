@@ -62,8 +62,23 @@ Device* MxHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA
     //An example of value of path: "\\?\hid#vid_413c&pid_2011&mi_01&col02#8&2598dfbd&0&0001#{4d1e55b2-f16f-11cf-88cb-001111000030}"
 	CString strFiliter;
 	strFiliter.Format(_T("vid_%04x&pid_%04x"), pCurrent->uiVid, pCurrent->uiPid);
-	if (path.MakeLower().Find(strFiliter.MakeUpper()) >= 0)
-		return new MxHidDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle, pCurrent);
+	if (path.MakeUpper().Find(strFiliter.MakeUpper()) >= 0)
+	{
+		Device *p= new MxHidDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle, pCurrent);
+		if (p == NULL)
+			return p;
+		if(p->IsCorrectDevice(pCurrent->uiVid, pCurrent->uiPid, pCurrent->bcdDevice))
+		{
+			return p;
+		}
+		else
+		{
+			delete p;
+			return NULL;
+		}
+	}
 	else
+	{
 		return NULL;
+	}
 }

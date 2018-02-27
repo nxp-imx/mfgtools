@@ -55,8 +55,24 @@ Device* HidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA d
 	//add filiters
 	CString strFiliter;
 	strFiliter.Format(_T("vid_%04x&pid_%04x"), pCurrent->uiVid, pCurrent->uiPid);
-	if (path.MakeLower().Find(strFiliter.MakeUpper()) >= 0)
-		return new HidDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle, pCurrent);
+	if (path.MakeUpper().Find(strFiliter.MakeUpper()) >= 0)
+	{
+		Device* p= new HidDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle, pCurrent);
+		if (p == NULL)
+			return p;
+
+		if (p->IsCorrectDevice(pCurrent->uiVid, pCurrent->uiPid, pCurrent->bcdDevice))
+		{
+			return p;
+		}
+		else
+		{
+			delete p;
+			return NULL;
+		}
+	}
 	else
+	{
 		return NULL;
+	}
 }

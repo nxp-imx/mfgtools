@@ -340,7 +340,7 @@ Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListTyp
 					}
 				}
 //				ATLTRACE(_T("%s::FindDeviceByUsbPath()  Enumerated device. %s\r\n"), this->ToString().c_str(), devPath.c_str());
-				if( !(devPath.IsEmpty()) )
+				if( !(devPath.IsEmpty()))
 				{
 					pDevice = CreateDevice(this, devData, devPath, pCurrent);
 					if( pDevice && pDevice->IsUsb() )
@@ -372,134 +372,6 @@ Device* DeviceClass::FindDeviceByUsbPath(CString pathToFind, const DeviceListTyp
 	}
 
 	return pDevice;
-
-#if 0
-	if (pathToFind.IsEmpty())
-    {
-        return NULL;
-    }
-
-    Device * pDevice = NULL;
-	CString devInstPathToFind = pathToFind.Left(pathToFind.ReverseFind(_T('#')));
-	devInstPathToFind.Replace(_T('#'), _T('\\'));
-
-	// existing application device list or new OS device list?
-    switch ( devListType )
-	{
-		case DeviceListType_Old:
-		{
-			// Find the Device in our list of OLD devices.
-			std::list<Device*>::iterator device;
-			for ( device=_oldDevices.begin(); device != _oldDevices.end(); ++device )
-			{
-				if ( (*device)->IsUsb() )
-				{
-					if ( devInstPathToFind.CompareNoCase( (*device)->UsbDevice()->_deviceInstanceID.get() ) == 0 )
-					{
-						if ( devListAction == DeviceListAction_Remove )
-						{
-							delete (*device);
-							_oldDevices.erase(device);
-						}
-						break;
-					}
-				}
-			}
-			break;
-		}
-		case DeviceListType_Current:
-		{
-			// Find the Device in our list of CURRENT devices.
-			std::list<Device*>::iterator device;
-			for ( device=_devices.begin(); device != _devices.end(); ++device )
-			{
-				if ( (*device)->IsUsb() )
-				{
-					if ( devInstPathToFind.CompareNoCase( (*device)->UsbDevice()->_deviceInstanceID.get() ) == 0 )
-					{
-						pDevice = (*device);
-
-						if ( devListAction == DeviceListAction_Remove )
-						{
-							WaitForSingleObject(devicesMutex, INFINITE);
-							_oldDevices.push_back(pDevice);
-							_devices.erase(device);
-							ReleaseMutex(devicesMutex);
-						}
-						break;
-					}
-				}
-			}
-			break;
-		}
-		case DeviceListType_New:
-		{
-			// Get a new list of our devices from Windows and see if it is there.
-			DWORD error;
-
-			SP_DEVINFO_DATA devData;
-			devData.cbSize = sizeof(SP_DEVINFO_DATA);
-			CString devPath = _T("");
-
-			GetDevInfoSet();
-			for (int index=0; /*no condition*/; ++index)
-			{
-				if ( *_classIfaceGuid.get() != GUID_NULL /*&&	gWinVersionInfo().IsWinNT()*/ )
-				{
-					error = EnumDeviceInterfaceDetails(index, devPath, &devData);
-					if ( error != ERROR_SUCCESS )
-					{	// No match
-						// Enum() will return ERROR_NO_MORE_ITEMS when done
-						// but regardless, we can't add the device
-						pDevice = NULL;
-						break;
-					}
-				}
-				else
-				{
-					if (!gSetupApi().SetupDiEnumDeviceInfo(_deviceInfoSet, index, &devData))
-					{
-						// Enum() will return ERROR_NO_MORE_ITEMS when done
-						// but regardless, we can't add the device
-						pDevice = NULL;
-						break;
-					}
-				}
-
-//				ATLTRACE(_T("%s::FindDeviceByUsbPath()  Enumerated device. %s\r\n"), this->ToString().c_str(), devPath.c_str());
-				pDevice = CreateDevice(this, devData, devPath);
-				if ( pDevice && pDevice->IsUsb() )
-				{
-//					ATLTRACE(_T("%s::FindDeviceByUsbPath()  Created device. %s\r\n"), this->ToString().c_str(), devPath.c_str());
-					if ( devInstPathToFind.CompareNoCase( pDevice->UsbDevice()->_deviceInstanceID.get() ) == 0 )
-					{
-						// Found what we are looking for
-						if ( devListAction == DeviceListAction_Add )
-						{
-							WaitForSingleObject(devicesMutex, INFINITE);
-							_devices.push_back(pDevice);
-							ReleaseMutex(devicesMutex);
-						}
-						break;
-					}
-				}
-				// if we got here, the device isn't the device we
-				// are looking for, so clean up.
-				if ( pDevice )
-				{
-					delete pDevice;
-					pDevice = NULL;
-				}
-			}
-			break;
-		}  // end case DeviceListNew:
-		
-		default:
-			break;
-	} // end switch (devListType)
-
-	return pDevice;
-#endif
 }
 
 DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path, COpState *pCurrent)
@@ -512,13 +384,13 @@ DeviceClass::NotifyStruct DeviceClass::AddUsbDevice(LPCTSTR path, COpState *pCur
 	while( RetryCount < RETRY_COUNT )
 	{
 		// see if it is already in our list of Devices()
-		pDevice = FindDeviceByUsbPath(pathToFind, DeviceListType_Current, DeviceListAction_None);
+		pDevice = FindDeviceByUsbPath(pathToFind, DeviceListType_Current, DeviceListAction_None, pCurrent);
 		if ( pDevice == NULL )
 		{
 			// it's not in our Collection of constructed devices
 			// so lets get a new list of our devices from Windows
 			// and see if it is there.
-			pDevice = FindDeviceByUsbPath(pathToFind, DeviceListType_New, DeviceListAction_Add);
+			pDevice = FindDeviceByUsbPath(pathToFind, DeviceListType_New, DeviceListAction_Add, pCurrent);
 			if(pDevice != NULL)
 			{
 				//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceClass::AddUsbDevice() successful %s add to current list"), path);

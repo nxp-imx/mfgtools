@@ -178,6 +178,12 @@ public:
 		CString get(); 
 	}_classDesc;
 
+	class serialId : public StringProperty
+	{
+	public:
+		CString get();
+	}_serialId;
+
 	class hub : public StringProperty 
 	{ 
 	public: 
