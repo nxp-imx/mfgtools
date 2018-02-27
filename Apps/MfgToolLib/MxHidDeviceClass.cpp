@@ -69,6 +69,7 @@ Device* MxHidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA
 			return p;
 		if(p->IsCorrectDevice(pCurrent->uiVid, pCurrent->uiPid, pCurrent->bcdDevice))
 		{
+			p->_serialId.get(); //ROM have problem, need buffer seriaID asap. 
 			return p;
 		}
 		else

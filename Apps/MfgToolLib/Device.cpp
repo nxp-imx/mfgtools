@@ -87,6 +87,8 @@ Device::Device(DeviceClass *deviceClass, DEVINST devInst, CString path, INSTANCE
     _classGuid.describe(this, _T("Device Class GUID"), _T("Describes the device class."));
     _hub.describe(this, _T("USB Hub Path"), _T("Path of Hub USB Device is connected to."));
     _hubIndex.describe(this, _T("USB Hub Port"), _T("Hub Port the USB Device is connected to."));
+	_serialId.describe(this, _T("USB Serial ID"), _T(""));
+
     if (Parent() != NULL)
     {
 		_parent->describe(this, _T("Parent"), _T("Parent device in the system DevNode tree."));
@@ -549,14 +551,14 @@ CString Device::hub::get()
 
 CString Device::serialId::get()
 {
-	CString str;
 	Device* dev = dynamic_cast<Device*>(_owner);
-	if (dev->m_pRomInfo->flags & ROM_INFO_HID_UID_STRING)
+	if (_value.IsEmpty() && (dev->m_pRomInfo->flags & ROM_INFO_HID_UID_STRING))
 	{
-
+		return _value = dev->GetUSBDeviceStringDescriptor(1, 0x0409);
 	}
-	return str;
+	return _value;
 }
+
 int Device::hubIndex::getmsc(USHORT vid, USHORT pid)
 {
 	Device* dev = dynamic_cast<Device*>(_owner);
@@ -1012,3 +1014,81 @@ BOOL Device::IsCorrectDevice(int pid, int vid, int bcdDevice)
 	return true;
 }
 
+CString Device::GetUSBDeviceStringDescriptor(UCHAR sIndex, USHORT langID)
+{
+	CString str;
+	HANDLE hHubDevice = CreateFile(_hub.get(), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0,	NULL);
+	if (hHubDevice == INVALID_HANDLE_VALUE)
+		return str;
+
+	BOOL    success = 0;
+	ULONG   nBytes = 0;
+	ULONG   nBytesReturned = 0;
+
+	UCHAR   stringDescReqBuf[sizeof(USB_DESCRIPTOR_REQUEST) +
+		MAXIMUM_USB_STRING_LENGTH];
+
+	PUSB_DESCRIPTOR_REQUEST stringDescReq = NULL;
+	PUSB_STRING_DESCRIPTOR  stringDesc = NULL;
+	
+	nBytes = sizeof(stringDescReqBuf);
+
+	stringDescReq = (PUSB_DESCRIPTOR_REQUEST)stringDescReqBuf;
+	stringDesc = (PUSB_STRING_DESCRIPTOR)(stringDescReq + 1);
+
+	// Zero fill the entire request structure
+	//
+	memset(stringDescReq, 0, nBytes);
+
+	// Indicate the port from which the descriptor will be requested
+	//
+	stringDescReq->ConnectionIndex = _hubIndex.get();
+
+	//
+	// USBHUB uses URB_FUNCTION_GET_DESCRIPTOR_FROM_DEVICE to process this
+	// IOCTL_USB_GET_DESCRIPTOR_FROM_NODE_CONNECTION request.
+	//
+	// USBD will automatically initialize these fields:
+	//     bmRequest = 0x80
+	//     bRequest  = 0x06
+	//
+	// We must inititialize these fields:
+	//     wValue    = Descriptor Type (high) and Descriptor Index (low byte)
+	//     wIndex    = Zero (or Language ID for String Descriptors)
+	//     wLength   = Length of descriptor buffer
+	//
+	stringDescReq->SetupPacket.bmRequest = 0x80;
+	stringDescReq->SetupPacket.bRequest = 0x06;
+
+	stringDescReq->SetupPacket.wValue = (USB_STRING_DESCRIPTOR_TYPE << 8)
+		| sIndex;
+
+	stringDescReq->SetupPacket.wIndex = langID;
+
+	stringDescReq->SetupPacket.wLength = (USHORT)(nBytes - sizeof(USB_DESCRIPTOR_REQUEST));
+
+	// Now issue the get descriptor request.
+	//
+	success = DeviceIoControl(hHubDevice,
+		IOCTL_USB_GET_DESCRIPTOR_FROM_NODE_CONNECTION,
+		stringDescReq,
+		nBytes,
+		stringDescReq,
+		nBytes,
+		&nBytesReturned,
+		NULL);
+	
+	int err;
+
+	if (success)
+	{
+		str.Append(stringDesc->bString, stringDesc->bLength);
+
+	}else
+	{
+		err = GetLastError();
+	}
+
+	CloseHandle(hHubDevice);
+	return str;
+}

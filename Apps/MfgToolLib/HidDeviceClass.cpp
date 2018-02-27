@@ -60,9 +60,10 @@ Device* HidDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA d
 		Device* p= new HidDevice(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle, pCurrent);
 		if (p == NULL)
 			return p;
-
+		
 		if (p->IsCorrectDevice(pCurrent->uiVid, pCurrent->uiPid, pCurrent->bcdDevice))
 		{
+			p->_serialId.get(); //ROM have problem, need buffer seriaID asap. 
 			return p;
 		}
 		else
