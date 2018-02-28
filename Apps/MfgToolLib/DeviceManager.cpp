@@ -829,6 +829,17 @@ void DeviceManager::Notify(DeviceClass::NotifyStruct* pnsInfo)
 				doNotify = TRUE;
 				break;
 			}
+			if (pnsInfo->Device)
+			{
+				CString str;
+				str = pnsInfo->Device->UsbDevice()->_serialId.get();
+				if(!str.IsEmpty())
+					if (str == ((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].SerialId)
+					{
+						doNotify = TRUE;
+						break;
+					}
+			}
 		}
 	}
 	if(i >= MAX_BOARD_NUMBERS)
@@ -841,6 +852,12 @@ void DeviceManager::Notify(DeviceClass::NotifyStruct* pnsInfo)
 				((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].portIndex = pnsInfo->PortIndex;
 				((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].m_bUsed = TRUE;
 				((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].hubIndex = pnsInfo->HubIndex;
+				
+				if (pnsInfo->Device)
+					((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].SerialId = pnsInfo->Device->UsbDevice()->_serialId.get();
+				else
+					((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].SerialId.Empty();
+
 				doNotify = TRUE;
 				break;
 			}

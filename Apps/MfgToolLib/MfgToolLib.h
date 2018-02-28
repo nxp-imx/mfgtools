@@ -348,6 +348,7 @@ typedef struct _PortDevInfo
 	int hubIndex;
 	int portIndex;
 	CString DeviceDesc;
+	CString SerialId;
 } PORT_DEV_INFO;
 
 typedef struct _t_lib_vars
