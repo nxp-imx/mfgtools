@@ -249,7 +249,7 @@ UINT32 HidDevice::SendCommand(StApi& api, UINT8* additionalInfo)
     api.PrepareCommand();
     api.SetTag(++cmdTag);
 
-    if ( !ProcessWriteCommand(hHidDevice, api, nsInfo) ) //CBW
+    if ( (!(m_pRomInfo->flags&ROM_INFO_HID_NO_CMD)) && !ProcessWriteCommand(hHidDevice, api, nsInfo) ) //CBW
     {
         CloseHandle(hHidDevice);
 
@@ -294,7 +294,7 @@ UINT32 HidDevice::SendCommand(StApi& api, UINT8* additionalInfo)
         }
     }
 
-    if(!ProcessReadStatus(hHidDevice, api, nsInfo)) //CSW_REPORT
+    if((!(m_pRomInfo->flags&ROM_INFO_HID_NO_CMD)) && !ProcessReadStatus(hHidDevice, api, nsInfo)) //CSW_REPORT
     {
         CloseHandle(hHidDevice);
 

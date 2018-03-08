@@ -511,12 +511,13 @@ UINT CmdListThreadProc(LPVOID pParam)
 					pOperation->m_dwCmdIndex = 1;
                     bStateCmdFinished = FALSE;
 					
+					chip = pDevice->m_ChipName;
+
 					if(pDevice->GetDeviceType() == DeviceClass::DeviceTypeMxHid)
 					{
-						chip = ((MxHidDevice*)pDevice)->m_ChipName;
 						habstate = ((MxHidDevice*)pDevice)->GetHABState();
 					}
-
+					
 					if ((pDevice->GetDeviceType() == DeviceClass::DeviceTypeKBLHID) || (pDevice->GetDeviceType() == DeviceClass::DeviceTypeKBLCDC))
 					{
 						if (habstate == HAB_t::HabUnknown)

@@ -554,7 +554,7 @@ CString Device::serialId::get()
 	Device* dev = dynamic_cast<Device*>(_owner);
 	if (_value.IsEmpty() && (dev->m_pRomInfo->flags & ROM_INFO_HID_UID_STRING))
 	{
-		return _value = dev->GetUSBDeviceStringDescriptor(1, 0x0409);
+		return _value = dev->GetUSBDeviceStringDescriptor(4, 0x0409);
 	}
 	else
 	{

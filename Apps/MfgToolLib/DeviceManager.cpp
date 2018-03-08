@@ -556,6 +556,8 @@ void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 								continue;
 							}
 						}
+						else
+							continue;
 					}
 
 					if (nsInfo.Device)
@@ -852,12 +854,12 @@ void DeviceManager::Notify(DeviceClass::NotifyStruct* pnsInfo)
 				((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].portIndex = pnsInfo->PortIndex;
 				((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].m_bUsed = TRUE;
 				((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].hubIndex = pnsInfo->HubIndex;
-				
+#if 0				
 				if (pnsInfo->Device)
 					((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].SerialId = pnsInfo->Device->UsbDevice()->_serialId.get();
 				else
 					((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].SerialId.Empty();
-
+#endif
 				doNotify = TRUE;
 				break;
 			}
