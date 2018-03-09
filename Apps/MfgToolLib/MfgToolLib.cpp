@@ -2130,7 +2130,11 @@ void COpCmd_Push::CloseFileMapping()
 UINT COpCmd_Push::ExecuteCommand(int index)
 {
 	CString strMsg;
-	strMsg.Format(_T("ExecuteCommand--Push[WndIndex:%d], Body is %s"), index, m_bodyString);
+	if (m_FileName.IsEmpty())
+		strMsg.Format(_T("ExecuteCommand--Push[WndIndex:%d], Body is %s"), index, m_bodyString);
+	else
+		strMsg.Format(_T("ExecuteCommand--Push[WndIndex:%d], Body is %s, File is %s"), index, m_bodyString, m_FileName);
+
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg);
 
 	UI_UPDATE_INFORMATION _uiInfo;
