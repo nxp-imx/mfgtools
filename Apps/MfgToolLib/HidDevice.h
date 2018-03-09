@@ -34,6 +34,8 @@
 #include "StHidApi.h"
 #include "MfgToolLib.h"
 
+class  CCmdOpreation;
+
 extern "C" {
 #include <hidsdi.h>
 }
@@ -44,7 +46,7 @@ public:
 	HidDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle, COpState *pCurrent);
     virtual ~HidDevice(void);
 
-    virtual UINT32 SendCommand(StApi& api, UINT8* additionalInfo = NULL);
+    virtual UINT32 SendCommand(StApi& api, UINT8* additionalInfo = NULL, int cmdOpIndex=-1);
     virtual CString GetSendCommandErrorStr();
     static void CALLBACK IoCompletion(DWORD dwErrorCode,           // completion code
                                       DWORD dwNumberOfBytesTransfered,  // number of bytes transferred
@@ -133,7 +135,7 @@ private:
 
     bool ProcessWriteCommand(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo);
     bool ProcessReadData(const HANDLE hDevice, StApi* pApi, NotifyStruct& nsInfo);
-    bool ProcessWriteData(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo);
+    bool ProcessWriteData(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo, int);
     bool ProcessReadStatus(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo);
     INT32 ProcessTimeOut(const INT32 timeout);
 
@@ -157,4 +159,5 @@ private:
     HAB_t _habType;
     ChipFamily_t GetChipFamily();
     HAB_t GetHABType(ChipFamily_t chipType);
+	void UpdateUI(int index, int pos, int max);
 };

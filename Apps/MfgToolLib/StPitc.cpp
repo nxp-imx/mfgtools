@@ -56,12 +56,12 @@ StPitc::~StPitc(void)
     // TODO: Unregister w/DeviceManager?
 }
 
-UINT32 StPitc::SendPitcCommand(StApi& api)
+UINT32 StPitc::SendPitcCommand(StApi& api, int cmdOpIndex)
 {
     UINT8 moreInfo = 0;
     UINT32 err;
 
-    err = _pHidDevice->SendCommand(api, &moreInfo);
+    err = _pHidDevice->SendCommand(api, &moreInfo, cmdOpIndex);
     if ( err == ERROR_SUCCESS ) {
         _strResponse = api.ResponseString();
         if ( _strResponse.IsEmpty() )
@@ -100,11 +100,11 @@ UINT32 StPitc::SendPitcCommand(StApi& api)
 //  StFwComponent
 //  std::vector<UINT8>
 //  UINT8*, size
-UINT32 StPitc::DownloadPitc()
+UINT32 StPitc::DownloadPitc(int cmdOpIndex)
 {
     HidDownloadFw api(_pFileDataBuf, _dwFileSize);
 
-    UINT32 ret = SendPitcCommand(api);
+    UINT32 ret = SendPitcCommand(api, cmdOpIndex);
 
     return ret;
 }

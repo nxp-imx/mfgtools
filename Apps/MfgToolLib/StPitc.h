@@ -42,9 +42,9 @@ public:
 
 public:
     //StFwComponent& GetFwComponent() { return _fwComponent; };
-    UINT32 DownloadPitc();
+    UINT32 DownloadPitc(int);
     bool IsPitcLoaded();
-    UINT32 SendPitcCommand(StApi& api);
+    UINT32 SendPitcCommand(StApi& api, int);
     CString GetResponseStr() { return _strResponse; };
 //    const UINT32 Id;
 //    const CStdString FileName;

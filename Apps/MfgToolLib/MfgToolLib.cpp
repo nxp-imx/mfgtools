@@ -1658,7 +1658,7 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 		}
 		StPitc myNewFwCommandSupport(pHidDevice, m_pDataBuf, m_qwFileSize);
 
-		if (myNewFwCommandSupport.DownloadPitc())
+		if (myNewFwCommandSupport.DownloadPitc(index))
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("PortMgrDlg(%d)--HidDevice--Command Boot excute failed"), index);
 			_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];

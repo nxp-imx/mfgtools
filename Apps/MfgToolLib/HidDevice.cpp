@@ -214,8 +214,7 @@ void CALLBACK HidDevice::IoCompletion(DWORD dwErrorCode,                // compl
 
 }
 
-
-UINT32 HidDevice::SendCommand(StApi& api, UINT8* additionalInfo)
+UINT32 HidDevice::SendCommand(StApi& api, UINT8* additionalInfo, int cmdOpIndex)
 {
     _status = CSW_CMD_PASSED;
 
@@ -266,7 +265,7 @@ UINT32 HidDevice::SendCommand(StApi& api, UINT8* additionalInfo)
     {
         if ( api.IsWriteCmd() )
         {
-            if(!ProcessWriteData(hHidDevice, api, nsInfo))
+            if(!ProcessWriteData(hHidDevice, api, nsInfo, cmdOpIndex))
             {
                 CloseHandle(hHidDevice);
 
@@ -441,12 +440,12 @@ bool HidDevice::ProcessReadData(const HANDLE hDevice, StApi* pApi, NotifyStruct&
     return true;
 }
 
-bool HidDevice::ProcessWriteData(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo)
+bool HidDevice::ProcessWriteData(const HANDLE hDevice, const StApi& api, NotifyStruct& nsInfo, int cmdOpIndex)
 {
 //  TRACE(_T(" HidDevice::ProcessWriteData() dev:0x%x, tag:%d\r\n"), this, api.GetTag());
 
     UINT16 writeSize = _Capabilities.OutputReportByteLength;
-
+	int last = 0;
     for ( UINT32 offset=0; offset < api.GetTransferSize(); offset += (writeSize - 1) )
     {
         memset(_pWriteReport, 0xFF, writeSize);
@@ -477,9 +476,31 @@ bool HidDevice::ProcessWriteData(const HANDLE hDevice, const StApi& api, NotifyS
 
         // Update the UI
         nsInfo.position = min(api.GetTransferSize(), offset + (writeSize - 1));
+
+		if (offset - last > 1000000)
+		{
+			last = offset;
+			UpdateUI(cmdOpIndex, nsInfo.position, api.GetTransferSize());
+		}
+
     }
 //  TRACE(_T(" -HidDevice::ProcessWriteData()\r\n"));
     return true;
+}
+
+void HidDevice::UpdateUI(int cmdOpIndex, int position, int maximum)
+{
+	UI_UPDATE_INFORMATION _uiInfo;
+	memset(&_uiInfo, 0, sizeof(_uiInfo));
+
+	_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibHandle)->g_CmdOpThreadID[cmdOpIndex];
+	_uiInfo.bUpdatePhaseProgress = FALSE;
+	_uiInfo.bUpdateCommandsProgress = FALSE;
+	_uiInfo.bUpdateDescription = FALSE;
+	_uiInfo.bUpdateProgressInCommand = TRUE;
+	_uiInfo.ProgressIndexInCommand = position;
+	_uiInfo.ProgressRangeInCommand = maximum;
+	((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex]->ExecuteUIUpdate(&_uiInfo);
 }
 
 INT32 HidDevice::ProcessTimeOut(const INT32 timeout)
