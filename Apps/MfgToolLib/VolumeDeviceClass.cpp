@@ -142,7 +142,7 @@ Device* VolumeDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DAT
 	return NULL;
 }
 
-DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path)
+DeviceClass::NotifyStruct VolumeDeviceClass::AddUsbDevice(LPCTSTR path, COpState *pCurrent)
 {	//path is like 'C', 'D' and so on, only one character
 	Device * pDevice = NULL;
 	NotifyStruct nsInfo = {0};

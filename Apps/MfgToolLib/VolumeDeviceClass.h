@@ -43,7 +43,7 @@ class VolumeDeviceClass : public DeviceClass
 public:
 	VolumeDeviceClass(INSTANCE_HANDLE handle);
 	virtual ~VolumeDeviceClass(void);
-	virtual NotifyStruct AddUsbDevice(LPCTSTR path);
+	virtual NotifyStruct AddUsbDevice(LPCTSTR path, COpState *pCurrent=NULL);
 	virtual NotifyStruct RemoveUsbDevice(LPCTSTR path);
 	virtual std::list<Device*>& Refresh();
 	// Maps Volume Name to Drive Letter. ( ex. "\\?\Volume{1e7c5ed6-1b59-11dc-b682-0013721e2a55}\" , "A:" )
