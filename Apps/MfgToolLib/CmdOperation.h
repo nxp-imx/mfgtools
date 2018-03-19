@@ -94,6 +94,8 @@ public:
 	DWORD m_usb_port_index;
 	usb::Port * m_p_usb_port;
 	UpdateTransportProtocol* m_pUTP;
+	StApi *m_pStApi;
+
 	HANDLE_CALLBACK m_hDeviceChangeCallback;
 
 	HANDLE m_hDevCanDeleteEvent;

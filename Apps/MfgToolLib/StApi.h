@@ -261,6 +261,7 @@ namespace api
 			, _sendDataPtr(NULL)
 			, _responseStr(_T(""))
 			, _responseDataPtr(NULL)
+			, m_bShouldStop(FALSE)
 		{};
         virtual ~StApi(); 
 		const UCHAR IsWriteCmd() const { return _write; };
@@ -519,6 +520,7 @@ namespace api
 	public:
 		SENSE_DATA ScsiSenseData;
 		UCHAR ScsiSenseStatus;
+		volatile BOOL m_bShouldStop;
 	};
 
 	//////////////////////////////////////////////////////////////////////

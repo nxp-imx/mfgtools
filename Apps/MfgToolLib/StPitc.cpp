@@ -100,10 +100,8 @@ UINT32 StPitc::SendPitcCommand(StApi& api, int cmdOpIndex)
 //  StFwComponent
 //  std::vector<UINT8>
 //  UINT8*, size
-UINT32 StPitc::DownloadPitc(int cmdOpIndex)
+UINT32 StPitc::DownloadPitc(StApi& api, int cmdOpIndex)
 {
-    HidDownloadFw api(_pFileDataBuf, _dwFileSize);
-
     UINT32 ret = SendPitcCommand(api, cmdOpIndex);
 
     return ret;

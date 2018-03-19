@@ -459,6 +459,9 @@ bool HidDevice::ProcessWriteData(const HANDLE hDevice, const StApi& api, NotifyS
 //      TRACE(_T(" HidDevice::ProcessWriteData() dev:0x%x, tag:%d, offset:0x%x\r\n"), this, api.GetTag(), offset);
 
         _fileOverlapped.hEvent = this;
+		if (api.m_bShouldStop)
+			return false;
+
         if(!WriteFileEx(hDevice, _pWriteReport, writeSize, &_fileOverlapped, HidDevice::IoCompletion))
         {
             nsInfo.error = GetLastError();

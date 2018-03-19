@@ -1657,9 +1657,18 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
 			return MFGLIB_ERROR_INVALID_VALUE;
 		}
-		StPitc myNewFwCommandSupport(pHidDevice, m_pDataBuf, m_qwFileSize);
 
-		if (myNewFwCommandSupport.DownloadPitc(index))
+		StPitc myNewFwCommandSupport(pHidDevice, m_pDataBuf, m_qwFileSize);
+		StApi *pStApi = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pStApi;
+		if (pStApi == NULL)
+		{
+			pStApi = new HidDownloadFw(m_pDataBuf, m_qwFileSize);
+			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_pStApi = pStApi;
+			if (pStApi == NULL)
+				return MFGLIB_ERROR_INVALID_VALUE;
+		}
+
+		if (myNewFwCommandSupport.DownloadPitc(*pStApi, index))
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("PortMgrDlg(%d)--HidDevice--Command Boot excute failed"), index);
 			_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];

@@ -52,6 +52,7 @@ CCmdOpreation::CCmdOpreation(INSTANCE_HANDLE handle, int WndIndex)
 	m_p_usb_port = NULL;
 	m_usb_port_index = 0;
 	m_pUTP = NULL;
+	m_pStApi = NULL;
 
 	m_pLibHandle = handle;
 
@@ -272,6 +273,10 @@ BOOL CCmdOpreation::OnStart()
 		{
 			m_pUTP->m_bShouldStop = FALSE;
 		}
+		if (m_pStApi != NULL)
+		{
+			m_pStApi->m_bShouldStop = FALSE;
+		}
         SetEvent(m_hRunEvent);
         return TRUE;
     }
@@ -289,6 +294,10 @@ BOOL CCmdOpreation::OnStop()
 		if(m_pUTP != NULL)
 		{
 			m_pUTP->m_bShouldStop = TRUE;
+		}
+		if (m_pStApi != NULL)
+		{
+			m_pStApi->m_bShouldStop = TRUE;
 		}
         SetEvent(m_hStopEvent);
         return TRUE;
