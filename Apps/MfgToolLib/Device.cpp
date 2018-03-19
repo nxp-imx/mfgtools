@@ -70,6 +70,8 @@ Device::Device(DeviceClass *deviceClass, DEVINST devInst, CString path, INSTANCE
 	
 	InitDevInfo();
 
+	m_pRomInfo = NULL;
+
     m_dwIndex = -1;
 	m_hDevCanDeleteEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	
@@ -552,7 +554,7 @@ CString Device::hub::get()
 CString Device::serialId::get()
 {
 	Device* dev = dynamic_cast<Device*>(_owner);
-	if (_value.IsEmpty() && (dev->m_pRomInfo->flags & ROM_INFO_HID_UID_STRING))
+	if (_value.IsEmpty() && dev->m_pRomInfo && (dev->m_pRomInfo->flags & ROM_INFO_HID_UID_STRING))
 	{
 		return _value = dev->GetUSBDeviceStringDescriptor(4, 0x0409);
 	}

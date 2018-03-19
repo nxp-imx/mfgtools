@@ -834,7 +834,7 @@ void DeviceManager::Notify(DeviceClass::NotifyStruct* pnsInfo)
 			if (pnsInfo->Device)
 			{
 				CString str;
-				str = pnsInfo->Device->UsbDevice()->_serialId.get();
+				str = pnsInfo->Device->_serialId.get();
 				if(!str.IsEmpty())
 					if (str == ((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].SerialId)
 					{
