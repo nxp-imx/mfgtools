@@ -30,15 +30,8 @@
  */
 
 #include "stdafx.h"
-//#include <Assert.h>
-//#include <cfgmgr32.h>
-//#include <basetyps.h>
-//#include <setupapi.h>
-//#include <initguid.h>
 extern "C" {
-//#include <hidsdi.h>
 }
-//#include <HidClass.h>
 #include "DeviceClass.h"
 #include "MxHidDevice.h"
 #include "KblHidDeviceClass.h"

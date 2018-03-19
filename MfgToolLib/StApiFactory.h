@@ -37,7 +37,6 @@
 #if !defined(STAPIFACTORY_H__INCLUDED)
 #define STAPIFACTORY_H__INCLUDED
 
-//#include "Common/StdString.h"
 #include "StDdiApi.h"
 #include "StHidApi.h"
 
@@ -61,17 +60,6 @@ namespace api
 			RegisterApi(L"HidDevicePowerDown", HidDevicePowerDown::Create);
 			RegisterApi(L"HidTestUnitReady", HidTestUnitReady::Create);
 			RegisterApi(L"HidPitcRequestSense", HidPitcRequestSense::Create);
-/*			RegisterApi(L"HidInquiry", HidInquiry::Create);
-			RegisterApi(L"HidInquiry", HidInquiry::Create);
-			RegisterApi(L"HidInquiry", HidInquiry::Create);
-			RegisterApi(L"HidInquiry", HidInquiry::Create);
-			RegisterApi(L"HidInquiry", HidInquiry::Create);
-			RegisterApi(L"HidInquiry", HidInquiry::Create);
-			RegisterApi(L"HidInquiry", HidInquiry::Create);
-			RegisterApi(L"HidInquiry", HidInquiry::Create);
-			RegisterApi(L"HidInquiry", HidInquiry::Create);
-			RegisterApi(L"HidInquiry", HidInquiry::Create);
-*/
 		};
 
 		bool RegisterApi(CStdString name, CreateApiCallback createFn)

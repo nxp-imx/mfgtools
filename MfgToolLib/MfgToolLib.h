@@ -35,11 +35,6 @@
 
 #pragma once
 
-//#ifndef __AFXWIN_H__
-//	#error "include 'stdafx.h' before including this file for PCH"
-//#endif
-
-//#include "resource.h"		// main symbols
 
 #include <vector>
 #include <map>
@@ -55,10 +50,9 @@
 // CMfgToolLibApp
 // See MfgToolLib.cpp for the implementation of this class
 //
-//typedef int HINSTANCE;
 extern HINSTANCE dll_module;
 
-class CMfgToolLibApp //: public CWinApp
+class CMfgToolLibApp 
 {
 	public:
 		CMfgToolLibApp();
@@ -69,7 +63,6 @@ class CMfgToolLibApp //: public CWinApp
 	public:
 		virtual BOOL InitInstance();
 
-		//DECLARE_MESSAGE_MAP()
 };
 
 /************************************************************
@@ -256,14 +249,14 @@ public:
 	COpCmd_Blhost();
 	virtual ~COpCmd_Blhost();
 
-	typedef enum KibbleStatusCode
+	enum KibbleStatusCode
 	{
 		KBL_Status_Success = 0x0,
 		KBL_Status_AbortDataPhase = 0x2712,
 		KBL_Status_UnknownProperty = 0x283c,
 	};
 
-	typedef enum ResultBufferSize
+	enum ResultBufferSize
 	{
 		Result_Buffer_Size = 1024,
 	};
@@ -291,18 +284,6 @@ private:
 	void Parse_blhost_output_for_response(CString& jsonStream, BLHOST_RESULT* pblhostResult);
 };
 
-/*
-	 class COpCmd_Burn : public COpCommand
-	 {
-	 public:
-	 COpCmd_Burn();
-	 virtual ~COpCmd_Burn();
-	 virtual UINT ExecuteCommand(int index);
-	 void SetFileName(CString strFile);
-	 private:
-	 CString m_FileName;
-	 };
- */
 typedef std::vector<COpCommand*> OP_COMMAND_ARRAY;
 typedef std::map<MX_DEVICE_STATE, OP_COMMAND_ARRAY> StateCommansMap_t;
 
@@ -334,35 +315,14 @@ typedef struct _t_lib_vars
 } MFGLIB_VARS;
 
 typedef void (*PINTERNALCALLBACK)(INSTANCE_HANDLE handle, DeviceClass::NotifyStruct *pnsinfo);
-/*
-	 typedef struct _port_list
-	 {
-	 CString hubPath;
-	 int hubIndex;
-	 int portIndex;
-	 PORT_ID portID;
-	 Device *pHubDevice;
-	 } USB_PORT_NODE;
- */
+
 /************************************************************
  * Global variables declaration
  ************************************************************/
 extern CMfgToolLibApp* theApp;
-/*
-	 extern CUclXml* g_pXmlHandler;
-	 extern CString g_strPath;
-	 extern CString g_strUclFilename;
-	 extern CFG_PARAMETER g_CfgParam;
-	 extern int g_iMaxBoardNum;
-	 extern std::vector<CCmdOperation*> g_CmdOperationArray;
-	 extern HANDLE g_hDevCanDeleteEvts[MAX_BOARD_NUMBERS];
-	 extern PORT_DEV_INFO g_PortDevInfoArray[MAX_BOARD_NUMBERS];
-	 extern OP_STATE_ARRAY g_OpStates;
-	 extern StateCommansMap_t g_StateCommands;
- */
 extern std::vector<MFGLIB_VARS *> g_LibVarsArray;
 extern HANDLE g_hOneInstance;
-//extern std::vector<USB_PORT_NODE *> g_PortTable;
+
 /************************************************************
  * Function declaration
  ************************************************************/
@@ -389,3 +349,4 @@ BOOL FindLibraryHandle(MFGLIB_VARS *pLibVars);
 int FindOperationIndex(MFGLIB_VARS *pLibVars, pthread_t operationID);
 CString ReplaceKeywords(CString str);
 BOOL  DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved);
+

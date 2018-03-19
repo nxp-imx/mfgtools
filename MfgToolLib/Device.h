@@ -31,7 +31,6 @@
 
 #pragma once
 
-//#include "SetupApi.h"
 #include "Property.h"
 #include <list>
 #include "MfgToolLib_Export.h"
@@ -47,7 +46,7 @@ public:
 
 	static const DWORD MaxTransferSizeInBytes    = 128 * 512; //(128 sectors of 512 bytes each at a time) says who??
 
-	typedef enum DeviceCapabilities
+	enum DeviceCapabilities
     {
         Unknown = 0x00000000,
         // matches cfmgr32.h CM_DEVCAP_* definitions
@@ -67,7 +66,7 @@ public:
 	bool FinishState = false;
 	struct libusb_device_handle *m_libusbdevHandle;
 
-	typedef struct NotifyStruct
+	struct NotifyStruct
 	{
         enum dataDir { dataDir_Off, dataDir_FromDevice, dataDir_ToDevice };
         NotifyStruct(LPCTSTR name, dataDir dir, UINT max)
@@ -180,7 +179,7 @@ public:
 	{
 	public:
 		CString get();
-	}_hub;	//hub��s device path
+	}_hub;	//hub's device path
 
 	DeviceClass* _deviceClass;
 	DeviceCapabilities _capabilities;

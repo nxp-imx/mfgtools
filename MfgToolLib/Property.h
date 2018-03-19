@@ -191,26 +191,6 @@ namespace property
         int Value;
     };
 
-    // macros used to override Property::get() functions
-//  #define INT32_PROPERTY(name) class name : public Int32Property { public: int get(); }_##name
-//  #define UNT32_PROPERTY(name) class name : public Int32Property { public: UINT get(); }_##name
-//  #define STRING_PROPERTY(name) class name : public StringProperty { public: CString get(); }_##name
-//  #define GUID_PROPERTY(name) class name : public GuidProperty { public: LPGUID get(); }_##name
-    // possible macro to be used in Property-derived class if get() override is needed
-    // #define INT32_PROPERTY(name) class name : public Int32Property { public: int get(); }_##name
-    //
-    // declaration: INT32_PROPERTY(myIntProperty);
-    //   creates a member variable: Int32Property _myIntProperty
-    //
-    // instantiation of override:
-    //     int MyPropertyContainerClass::myIntProperty::get()
-    //     {
-    //          MyPropertyContainerClass* container = dynamic_cast<MyPropertyContainerClass*>(_owner);
-    //          ASSERT(container);
-    //
-    //         _value = container->SomeFunction();
-    //         return _value;
-    //     }
 
 } // namespace property
 

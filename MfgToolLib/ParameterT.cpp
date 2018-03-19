@@ -91,46 +91,4 @@ int property::ParseParameterString(LPCTSTR stringToParse, Parameter::ParamMap& p
 
 	return numParamsParsed;
 };
-/*
-template <typename T>
-const CString property::ParameterT<T>::ToString() const
-{
-	CString str, fmt;
-	fmt.Format(_T("0x%%0%dX"), 2*sizeof(T));
 
-	if ( ValueList.empty() )
-	{
-		str.Format(fmt, Value);
-	}
-	else
-	{
-        std::map<T, CString>::const_iterator key;
-        key = ValueList.find(Value);
-        if ( key == ValueList.end() )
-            str = _T("Not found.");
-        else
-            str = key->second;
-	}
-
-	return str;
-}
-
-template <>
-const CString property::ParameterT<__time64_t>::ToString() const
-{
-    CString dateStr;
-    struct tm modTime;
-    if ( Value != 0 )
-    {
-        _gmtime64_s(&modTime, &Value);
-        _tcsftime( dateStr.GetBufferSetLength(_MAX_PATH), _MAX_PATH, _T("%c"), &modTime);
-        dateStr.ReleaseBuffer();
-    }
-    else
-    {
-        dateStr = _T("N/A");
-    }
-
-    return dateStr;
-}
-*/

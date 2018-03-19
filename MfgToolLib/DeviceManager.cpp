@@ -221,7 +221,6 @@ void DeviceManager::Close()
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("Device Manager thread is closed"));
 
 	_bStopped = TRUE;
-	//m_hThread = NULL;
 }
 
 void DeviceManager::SetSelfThreadRunStatus(BOOL bRunning)
@@ -233,11 +232,8 @@ void DeviceManager::SetSelfThreadRunStatus(BOOL bRunning)
 void DeviceManager::DevChangeWnd::DeviceChangeProc(){
 
 	MSG messages;
-	//wchar_t *pString = reinterpret_cast<wchar_t * > (lpParam);
 	WNDCLASSEX wc;
-	//wc.hInstance = inj_hModule;
 	wc.lpszClassName = (LPCWSTR)L"InjectedDLLWindowClass";
-	//wc.lpfnWndProc = DLLWindowProc;
 	wc.style = CS_DBLCLKS;
 	wc.cbSize = sizeof (WNDCLASSEX);
 	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
@@ -249,9 +245,6 @@ void DeviceManager::DevChangeWnd::DeviceChangeProc(){
 	wc.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
 	if (!RegisterClassEx(&wc))
 		return ;
-	//prnt_hWnd = FindWindow(L"Window Injected Into ClassName", L"Window Injected Into Caption");
-	//HWND hwnd = CreateWindowEx(0, L"InjectedDLLWindowClass",_T("thisWindow"), WS_EX_PALETTEWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 400, 300, prnt_hWnd, hMenu, inj_hModule, NULL);
-	//ShowWindow(hwnd, SW_SHOWNORMAL);
 	while (GetMessage(&messages, NULL, 0, 0))
 	{
 		TranslateMessage(&messages);
@@ -276,30 +269,6 @@ BOOL DeviceManager::InitInstance()
 	g_devClasses[DeviceClass::DeviceTypeKBLCDC] = NULL;
 	g_devClasses[DeviceClass::DeviceTypeKBLHID] = NULL;
 
-	// Create a hidden window and register it to receive WM_DEVICECHANGE messages
-	/*
-
-		 if( _DevChangeWnd.CreateEx(WS_EX_TOPMOST, _T("STATIC"), _T("DeviceChangeWnd"), 0, CRect(0,0,5,5), NULL, 0) )
-		 {	//Create DevChangeWnd successfully
-		 DEV_BROADCAST_DEVICEINTERFACE broadcastInterface;
-
-		 broadcastInterface.dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
-		 broadcastInterface.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-
-		 memcpy( &(broadcastInterface.dbcc_classguid),&(GUID_DEVINTERFACE_USB_DEVICE),sizeof(GUID) );
-	// register for usb devices
-	_hUsbDev = RegisterDeviceNotification(_DevChangeWnd.GetSafeHwnd(), &broadcastInterface, DEVICE_NOTIFY_WINDOW_HANDLE);
-
-	memcpy( &(broadcastInterface.dbcc_classguid),&(GUID_DEVINTERFACE_USB_HUB),sizeof(GUID) );
-	// register for usb hubs
-	_hUsbHub=RegisterDeviceNotification(_DevChangeWnd.GetSafeHwnd(), &broadcastInterface, DEVICE_NOTIFY_WINDOW_HANDLE);
-	}
-	else //create window that received WM_DEVICECHANGE message failed
-	{
-	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" *** FAILED TO CREATE WINDOW FOR WM_DEVCHANGE NOTIFICATIONS."));
-	SetSelfThreadRunStatus(FALSE);
-	return FALSE;
-	}*/
 
 	for(int i=0; i<MAX_BOARD_NUMBERS; i++)
 	{
@@ -373,26 +342,7 @@ BOOL DeviceManager::InitInstance()
 				g_devClasses[DeviceClass::DeviceTypeHid] = pDevClass;
 				pDevClass->Devices();
 				break;
-
-				/*		case DEV_MX23:		//Hid
-							case DEV_MX28:
-							break;
-							case DEV_MX25:
-							case DEV_MX35:
-							case DEV_MX51:
-							case DEV_MX53:		//MxRom
-							pDevClass = new MxRomDeviceClass;
-							if(pDevClass == NULL)
-							{
-							LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T(" Failed to create MxRomDeviceClass"));
-							SetSelfThreadRunStatus(FALSE);
-							return FALSE;
-							}
-							g_devClasses[DeviceClass::DeviceTypeMxRom] = pDevClass;
-							pDevClass->Devices();
-							break; */
 			case DEV_HID_MX6Q:	//MxHid
-				//case DEV_MX50:
 			case DEV_HID_MX6D:
 			case DEV_HID_MX6SL:
 			case DEV_HID_MX6SX:
@@ -468,10 +418,6 @@ BOOL DeviceManager::InitInstance()
 	// Init all the USB Ports.
 	((usb::HubClass*)(g_devClasses[DeviceClass::DeviceTypeUsbHub]))->RefreshHubs();
 
-	// resume DeviceManager::Open() function
-	//	m_bSelfThreadRunning = TRUE;
-	//	SetEvent(_hStartEvent);
-	//SetSelfThreadRunStatus(TRUE);
 
 	return TRUE;
 }
@@ -496,14 +442,10 @@ int DeviceManager::ExitInstance()
 	// Messaging support
 	if ( _hUsbDev != INVALID_HANDLE_VALUE )
 		_hUsbDev=_hUsbDev;
-	// UnregisterDeviceNotification(_hUsbDev);
+	
 	if ( _hUsbHub != INVALID_HANDLE_VALUE )
 		_hUsbHub=_hUsbHub;
-	// UnregisterDeviceNotification(_hUsbHub);
 
-	// Windows must be Destroyed in the thread in which they were created.
-	// _DevChangeWnd was created in the DeviceManager thread in InitInstance().
-	//BOOL ret = _DevChangeWnd.DestroyWindow();
 
 	std::map<HANDLE_CALLBACK, CBStruct*>::iterator cbIt = m_callbacks.begin();
 	for(; cbIt!=m_callbacks.end(); cbIt++)
@@ -520,9 +462,6 @@ int DeviceManager::ExitInstance()
 	return 0;
 }
 
-//BEGIN_MESSAGE_MAP(DeviceManager::DevChangeWnd, CWnd)
-//ON_WM_DEVICECHANGE()
-//END_MESSAGE_MAP()
 #ifdef __linux__
 
 int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, libusb_hotplug_event event, void *user_data) {
@@ -598,16 +537,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 							//strMsg looks like the following: "\\?\USB#Vid_15a2&Pid_0054#6&28e0277e&0&3#{a5dcbf10-6530-11d2-901f-00c04fb951ed}", can get Vid&Pid
 							//when MassStorage device arrived, first DEVICE_ARRIVAL_EVT, it's DiskDeviceClass, and the strMsg looks like "\\?\USB#Vid_066f&Pid_37ff#6&28e0277e&0&3#{a5dcbf10-6530-11d2-901f-00c04fb951ed}"
 							//can get the second stage(MassStorage)device's vid&pid(Vid_066f, Pid_37ff)[the pid&vid is specified in ucl.xml]
-							//	CString strDebug;
-							//	strDebug.Format(_T("vid_%04x&pid_%04x"), 0x066f, 0x37ff);
-							//	strMsg.MakeUpper();
-							//	strDebug.MakeUpper();
-							//	if( strMsg.Find(strDebug) != -1 )
-							//	{	//find updater DeviceArrival
-							//		QueryPerformanceFrequency(&g_tc);
-							//		QueryPerformanceCounter(&g_t1);
-							//		break;
-							//	}
 
 							event = DEVICE_ARRIVAL_EVT;
 							LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::DevChangeWnd::OnDeviceChange() - DEVICE_ARRIVAL_EVT(%s)"),strMsg);
@@ -625,9 +554,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 						//strMsg looks like as "G"
 						//the second stage(Updater) first DEVICE Arrive(DiskDeviceClass), then Volume Arrive(VolumeDeviceClass)
 
-						//	QueryPerformanceCounter(&g_t2);
-						//	double dTotalTime = (double)(g_t2.QuadPart-g_t1.QuadPart) / (double)g_tc.QuadPart;
-						//	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DEVICE_ARRIVAL_EVT to VOLUME_ARRIVAL_EVT-Time: %f(S)"), dTotalTime);
 
 						event = VOLUME_ARRIVAL_EVT;
 						LogMsg(LOG_MODULE_MFGTOOL_LIB,LOG_LEVEL_NORMAL_MSG,  _T("DeviceManager::DevChangeWnd::OnDeviceChange() - VOLUME_ARRIVAL_EVT(%s)"), strMsg);
@@ -675,7 +601,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 			//BSTR bstr_msg = strMsg.AllocSysString();
 			if(g_pDeviceManager != NULL)
 			{
-				//g_pDeviceManager->PostThreadMessage(WM_MSG_DEV_EVENT, (WPARAM)event, (LPARAM)bstr_msg);
 			}
 
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::DevChangeWnd::OnDeviceChange() - end"));
@@ -701,9 +626,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 	}
 
 #endif
-	//BEGIN_MESSAGE_MAP(DeviceManager, CWinThread)
-	//   ON_THREAD_MESSAGE(WM_MSG_DEV_EVENT, OnMsgDeviceEvent)
-	//END_MESSAGE_MAP()
 
 	void DeviceManager::OnMsgDeviceEvent(WPARAM eventType, LPARAM desc)
 	{
@@ -713,14 +635,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 
 		// SysFreeString((BSTR)desc);
 		OP_STATE_ARRAY *pOpStates = NULL;
-#if 0
-		if ( eventType == EVENT_KILL )
-		{
-			//PostQuitMessage(0);	//send WM_QUIT to DeviceManager thread message queue, and then end DeviceManager thread, the exit code is 0
-			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - EVENT_KILL"));
-			return;
-		}
-#endif
 		//Skip MSC device message if there is no MSC device required.
 		if(VOLUME_ARRIVAL_EVT == eventType || VOLUME_REMOVAL_EVT == eventType)
 		{
@@ -783,17 +697,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 								LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[HidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
 								break;
 
-								/*	case DEV_MX23:		//Hid
-										case DEV_MX28:
-										break;
-										case DEV_MX25:
-										case DEV_MX35:
-										case DEV_MX51:
-										case DEV_MX53:		//MxRom
-										LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[MxRomDeviceClass] vid_%04x&pid_%04x"), pCurrentState->uiVid, pCurrentState->uiPid);
-										nsInfo = g_devClasses[DeviceClass::DeviceTypeMxRom]->AddUsbDevice(msg);
-										break;
-										case DEV_MX50: */
 							case DEV_HID_MX6D:
 							case DEV_HID_MX6SL:
 							case DEV_HID_MX6SX:
@@ -825,8 +728,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 								// don't look for USB arrival in MSC class, wait for Volume arrival.
 								LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_ARRIVAL_EVT,[Msc,DiskDeviceClass] vid_%04x&pid_%04x, not handled"), pCurrentState->uiVid, pCurrentState->uiPid);
 								nsInfo.pDevice = NULL;
-								//QueryPerformanceFrequency(&g_tc);
-								//QueryPerformanceCounter(&g_t1);
 								break;
 						}
 						if(nsInfo.pDevice)
@@ -855,8 +756,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 								pthread_mutex_lock(m_pExpectionHandler->m_hMapMsgMutex);
 								mapMsg[msg] = 1;
 								pthread_mutex_unlock(m_pExpectionHandler->m_hMapMsgMutex);
-								//BSTR bstr_msg = msg.AllocSysString();
-								//m_pExpectionHandler->PostThreadMessage(WM_MSG_EXCEPTION_EVENT, (WPARAM)(CMyExceptionHandler::DeviceArriveBeforVolumeRemove), (LPARAM)bstr_msg);
 								return;
 							}
 
@@ -867,7 +766,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 						{
 							switch(pCurrentState->opDeviceType)
 							{
-								//case DEV_MX50:
 								case DEV_HID_MX28:
 								case DEV_HID_MX6D:
 								case DEV_HID_MX6SL:
@@ -891,8 +789,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 										pthread_mutex_lock(m_pExpectionHandler->m_hMapMsgMutex);
 										mapMsg[msg] = 1;
 										pthread_mutex_unlock(m_pExpectionHandler->m_hMapMsgMutex);
-										//BSTR bstr_msg = msg.AllocSysString();
-										//m_pExpectionHandler->PostThreadMessage(WM_MSG_EXCEPTION_EVENT, (WPARAM)(CMyExceptionHandler::DeviceArriveButEnumFailed), (LPARAM)bstr_msg);
 										return;
 									}
 									break;
@@ -963,17 +859,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 								class_type = DeviceClass::DeviceTypeHid;
 								LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[HidDeviceClass] vid_%04x&pid_%04x, Hub:%d-Port:%d"), pCurrentState->uiVid, pCurrentState->uiPid, nsInfo.HubIndex, nsInfo.PortIndex);
 								break;
-								/*	case DEV_MX23:		//Hid
-										case DEV_MX28:
-										break;
-										case DEV_MX25:
-										case DEV_MX35:
-										case DEV_MX51:
-										case DEV_MX53:		//MxRom
-										LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT,[MxRomDeviceClass] vid_%04x&pid_%04x"), pCurrentState->uiVid, pCurrentState->uiPid);
-										nsInfo = g_devClasses[DeviceClass::DeviceTypeMxRom]->RemoveUsbDevice(msg);
-										break;
-										case DEV_MX50: */
 							case DEV_HID_MX6Q:	//MxHid
 							case DEV_HID_MX6D:
 							case DEV_HID_MX6SL:
@@ -1050,16 +935,15 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 								}
 							}
 
-							//DWORD dwResult = WaitForMultipleObjects(MAX_BOARD_NUMBERS, g_hDevCanDeleteEvts, FALSE, INFINITE);
+						
 							TRACE(_T("Device manager wait for begin\r\n"));
 							WaitOnEvent(((MFGLIB_VARS *)m_pLibHandle)->g_hDevCanDeleteEvts[nsInfo.pDevice->GetDeviceWndIndex()]);
 							TRACE(_T("Device manager wait for end\r\n"));
-							//int index = dwResult - WAIT_OBJECT_0;
+							
 							LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent()-DEVICE_REMOVAL_EVT, hDevCanDeleteEvent has been set"));
 							pthread_mutex_lock(g_devClasses[class_type]->devicesMutex);// , INFINITE);
 							delete (*deviceIt);
 							g_devClasses[class_type]->_devices.erase(deviceIt);
-							//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - DEVICE_REMOVAL_EVT Device Object[0x%X] has been delete"), (*deviceIt));
 							pthread_mutex_unlock(g_devClasses[class_type]->devicesMutex);
 						}
 					}
@@ -1071,9 +955,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 					CString driveLetterStr;
 					TRACE(_T("Device manager volume arrive %s\r\n"), msg.c_str());
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT(%s)"), msg.c_str());
-					//QueryPerformanceCounter(&g_t2);
-					//double dTotalTime = (double)(g_t2.QuadPart-g_t1.QuadPart) / (double)g_tc.QuadPart;
-					//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DEVICE_ARRIVAL_EVT to VOLUME_ARRIVAL_EVT-Time: %f"), dTotalTime);
 
 					g_devClasses[DeviceClass::DeviceTypeDisk]->Refresh();
 
@@ -1086,8 +967,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT-Disk(%s), Hub:%d-Port:%d"), driveLetterStr.c_str(), nsInfo.HubIndex, nsInfo.PortIndex);
 						if(nsInfo.pDevice)
 						{
-							//QueryPerformanceFrequency(&g_tc);
-							//QueryPerformanceCounter(&g_t1);
 
 							nsInfo.Event = VOLUME_ARRIVAL_EVT;
 							LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT, Notify"));
@@ -1128,8 +1007,6 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 					LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT-Disk(%s), Hub:%d-Port:%d"), driveLetterStr.c_str(), nsInfo.HubIndex, nsInfo.PortIndex);
 					if(nsInfo.pDevice)
 					{
-						//QueryPerformanceFrequency(&g_tc);
-						//QueryPerformanceCounter(&g_t1);
 
 						nsInfo.Event = VOLUME_ARRIVAL_EVT;
 						LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("DeviceManager::OnMsgDeviceEvent() - VOLUME_ARRIVAL_EVT, Notify"));

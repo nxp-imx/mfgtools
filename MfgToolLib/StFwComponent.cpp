@@ -98,9 +98,7 @@ const UINT StFwComponent::size() const
 
 void StFwComponent::clear()
 {
-    //_fileName.clear();
 	_fileName.Empty();
-    //_internalName.clear();
 	_internalName.Empty();
     _id = InvalidId;
     _langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL);
@@ -120,32 +118,11 @@ const CString StFwComponent::GetShortFileName() const
 	TCHAR fname[_MAX_FNAME] = _T("");
 	TCHAR ext[_MAX_EXT];
 	CString shortName;
-#if 0
-	_tsplitpath_s(_fileName, NULL, 0, NULL, 0, fname, _MAX_FNAME, ext,_MAX_EXT);
-#endif
     shortName.Format(_T("%s%s"), fname, ext);
 
 	return shortName;
 }
 
-/*
-const size_t StFwComponent::GetSizeInSectors(const UINT sectorSize) const
-{
-	if( sectorSize )
-	{
-		return 0;
-	}
-
-	size_t sectors = size() / sectorSize;
-
-	if( size() % sectorSize )
-	{
-		sectors += 1;
-	}
-
-	return sectors;
-}
-*/
 const StVersionInfo& StFwComponent::GetProductVersion() const
 {
 	return _productVersion;
@@ -456,39 +433,6 @@ int StFwComponent::LoadFromFile(LPCTSTR fileName)
 int StFwComponent::LoadFromResource(LPCTSTR resourceName, USHORT langId)
 {
     clear();
-#if 0
-    _fileName = resourceName;
-	_langId = langId;
-    _isResource = true;
-	int iResId = GetResourceID(resourceName);
-
-    HRSRC hResInfo = FindResourceEx( GetModuleHandle(NULL), L_STMP_FW_RESTYPE, MAKEINTRESOURCE(iResId), langId );
-    if ( hResInfo == NULL )
-        return ERROR_OPEN_FAILED;
-
-	HGLOBAL hRes = LoadResource(GetModuleHandle(NULL), hResInfo);
-	if ( hRes == NULL )
-        return GetLastError();
-
-	UCHAR * pResourceData = (UCHAR*)LockResource(hRes);
-    if ( pResourceData == NULL )
-        return ERROR_LOCK_FAILED;
-
-    // Get the file size
-    UINT resourceSize = SizeofResource(GetModuleHandle(NULL), hResInfo);
-
-    // Size our vector to accomodate the file size.
-    _data.resize(resourceSize);
-
-	// Put the data from the file in our vector
-    if ( memcpy_s((UCHAR*)&_data[0], _data.size(), pResourceData, resourceSize) != ERROR_SUCCESS )
-        return ERROR_CANNOT_COPY;
-
-    InitVersionInfo( GetFileType().Value );
-
-    // no valid date/time property
-    _fileDate = 0;
-#endif
     return ERROR_SUCCESS;
 }
 
@@ -502,20 +446,7 @@ const CString StFwComponent::toString() const
 
     CString dateStr;
     struct tm modTime;
-#if 0
-    if ( _fileDate.Value != 0 )
-    {
-        _gmtime64_s(&modTime, &_fileDate.Value);
-        _tcsftime( dateStr.GetBufferSetLength(_MAX_PATH), _MAX_PATH, _T("%c"), &modTime);
-        dateStr.ReleaseBuffer();
-    }
-    else
-    {
-#endif
         dateStr = _T("N/A");
-#if 0
-    }
-#endif
     theInfo.AppendFormat(_T("Date modified: %s\r\n"), dateStr.c_str());
 
     theInfo.AppendFormat(_T("Type: %s\r\n"), _fileType.ToString().c_str());
@@ -555,47 +486,5 @@ int StFwComponent::GetResourceID(LPCTSTR _fname)
 		return IDR_OTPACCESS3770_RESID;
 	if (_tcscmp(pFileName, _T("OtpAccessPitc.3780.sb")) == 0)
 		return IDR_OTPACCESS3780_RESID;
-/**
-	// look it up in the resource table
-	PSTFWRESINFO	pFwResInfo = NULL;
-	int				iFwResInfoCount;
-   	HRSRC hResInfo;
-	HGLOBAL hRes;
-	LPVOID pPtr = NULL;
-
-    hResInfo = FindResourceEx( NULL,
-	    					L_STMP_RESINFO_TYPE,
-		    				MAKEINTRESOURCE(IDR_BOUND_RESOURCE_TABLE_LEN),
-			    			MAKELANGID(LANG_INVARIANT, SUBLANG_NEUTRAL));
-	if ( hResInfo )
-    {
-	    hRes = LoadResource( NULL, hResInfo);
-   		if ( hRes )
-	   		pPtr = LockResource(hRes);
-	   	if ( pPtr )
-		{
-       		iFwResInfoCount = *((int *)pPtr);
-
-		    hResInfo = FindResourceEx( NULL,
-								L_STMP_RESINFO_TYPE,
-								MAKEINTRESOURCE(IDR_BOUND_RESOURCE_TABLE),
-								MAKELANGID(LANG_INVARIANT, SUBLANG_NEUTRAL));
-		    if ( hResInfo )
-		    {
-				hRes = LoadResource( NULL, hResInfo);
-	    		if ( hRes )
-   					pFwResInfo = (PSTFWRESINFO)LockResource(hRes);
-
-				if ( pFwResInfo )
-				{
-					for (int i = 0; i < iFwResInfoCount; ++i)
-						if( (pFwResInfo[i].wLangId == langID) &&
-							(_tcscmp( _fname, pFwResInfo[i].szResourceName) == 0) )
-							resId = pFwResInfo[i].iResId;
-				}
-			}
-		}
-   }
-*/
 	return resId;
 }

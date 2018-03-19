@@ -29,7 +29,6 @@
  *
  */
 
-//#define CString std::stringa
 
 
 #ifndef __LNX_DEFS__
@@ -85,7 +84,6 @@
 #define _tcstol strtol
 #define sscanf_s sscanf
 
-//#define .Format =sprintf
 #define TCHAR char
 #define _T(x) x
 #define StringFromIID(x,y)

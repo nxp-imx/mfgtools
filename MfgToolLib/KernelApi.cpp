@@ -32,7 +32,6 @@
 
 #include "stdafx.h"
 #include "KernelApi.h"
-//#include "WindowsVersionInfo.h"
 
 KernelApi::KernelApi(void)
 : GetVolumeNameForVolumeMountPointA(NULL),
@@ -77,19 +76,14 @@ KernelApi::KernelApi(void)
 
 KernelApi::~KernelApi(void)
 {
-//    TRACEC(TRACE_USBENUM, "Enter KernelAPI destructor, hModuleKernel32=%p.\n", hModuleKernel32);
 	if (hModuleKernel32)
 		FreeLibrary(hModuleKernel32);
-//    TRACEC(TRACE_USBENUM, "Leave KernelAPI destructor.\n");
 }
 
 BOOL KernelApi::apiGetVolumeNameForVolumeMountPoint(
 		CString ssVolumeMountPoint,
 		CString& ssVolumeName)
 {
-//	LPCWSTR lpszVolumeMountPoint,
-//	LPWSTR lpszVolumeName,
-//	DWORD cchBufferLength);
 	TCHAR Buffer[MAX_PATH];
 	memset(Buffer, 0, MAX_PATH);
 	BOOL success;

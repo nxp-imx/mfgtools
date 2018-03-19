@@ -31,8 +31,6 @@
 #include "stdafx.h"
 #include "CdcDevice.h"
 #include "LogMgr.h"
-//#include <Assert.h>
-//#include "SetupApi.h"
 
 CDCDevice::CDCDevice(DeviceClass * deviceClass, DEVINST devInst, CString path, INSTANCE_HANDLE handle, CString& commport, CString& friendlyName)
 	: Device(deviceClass, devInst, path, handle)
@@ -53,15 +51,5 @@ CDCDevice::ChipFamily_t CDCDevice::GetChipFamily()
 
 CString CDCDevice::GetProperty(DWORD property, CString defaultValue)
 {
-#if 0
-	if (property == SPDRP_DEVICEDESC)
-	{
-		return m_friendlyName;
-	}
-	else
-	{
-		return Device::GetProperty(property, defaultValue);
-	}
-#endif
-	return defaultValue;
+    return defaultValue;
 }

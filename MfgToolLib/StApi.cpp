@@ -60,8 +60,6 @@ StApi::~StApi()
 // modifies member variables _sendDataPtr and _xferLength
 int StApi::SetCommandData(const UCHAR * const pData, const size_t size)
 {
-//    if ( size == 0 || pData == NULL )
-//        return ERROR_INVALID_PARAMETER;
 
     if ( _sendDataPtr )
     {
@@ -69,7 +67,6 @@ int StApi::SetCommandData(const UCHAR * const pData, const size_t size)
         _sendDataPtr = NULL;
     }
 
-//    size_t arraySize = max(size,_xferLength);
 
     if ( size && pData )
     {
@@ -80,9 +77,6 @@ int StApi::SetCommandData(const UCHAR * const pData, const size_t size)
             _xferLength = 0;
 		    return 8L;//ERROR_NOT_ENOUGH_MEMORY;
         }
-
-	    // set all the allocated memory to 0xFF
-//	    memset(_sendDataPtr, 0xFF, arraySize);
 
         memcpy(_sendDataPtr, pData, size);
     }
@@ -111,13 +105,6 @@ StApiFactory::StApiFactory()
 	RegisterApi(_T("HidPitcInquiry"), HidPitcInquiry::Create);
 	RegisterApi(_T("HidPitcRead"), HidPitcRead::Create);
 	RegisterApi(_T("HidPitcWrite"), HidPitcWrite::Create);
-/*	RegisterApi("HidInquiry", HidInquiry::Create);
-	RegisterApi("HidInquiry", HidInquiry::Create);
-	RegisterApi("HidInquiry", HidInquiry::Create);
-	RegisterApi("HidInquiry", HidInquiry::Create);
-	RegisterApi("HidInquiry", HidInquiry::Create);
-	RegisterApi("HidInquiry", HidInquiry::Create);
-*/
 };
 
 StApi* StApiFactory::CreateApi(CString name, CString paramStr)
@@ -127,7 +114,6 @@ StApi* StApiFactory::CreateApi(CString name, CString paramStr)
 	{
 		// not found
 		std::cerr << "*** ASSERTION FAILED: Line " << __LINE__ << " of file " << __TFILE__ << std::endl;
-		//ATLTRACE(_T("*** ASSERTION FAILED: Line %d of file %s\n"), __LINE__, __TFILE__);
 		throw std::runtime_error("Unknown API name.");
 	}
 	// Invoke the creation function

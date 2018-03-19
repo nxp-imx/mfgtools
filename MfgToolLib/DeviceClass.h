@@ -31,7 +31,6 @@
 
 #pragma once
 
-//#include "SetupApi.h"
 #include "Property.h"
 #include "Device.h"
 #include "MfgToolLib_Export.h"
@@ -56,7 +55,7 @@ public:
 	DeviceTypeKBLCDC,
     } DEV_CLASS_TYPE;
 
-	typedef struct NotifyStruct
+	struct NotifyStruct
 	{
 		int cmdOpIndex;    // specify which CmdOperation
 		Device* pDevice;
@@ -125,3 +124,4 @@ public:
 };
 
 typedef std::map<DWORD, DeviceClass*> DEV_CLASS_ARRAY;
+

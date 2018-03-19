@@ -204,14 +204,6 @@ namespace media
 		{
 			size_t numDrives = 0;
 
-//			std::map<LogicalDriveTag, LogicalDrive>::const_iterator drv;
-//			for ( drv = DriveArray.begin(); drv != DriveArray.end(); ++drv )
-//			{
-//				if ( (*drv).second.Type == drvType )
-//				{
-//					++numDrives;
-//				}
-//			}
 			std::vector<LogicalDrive>::const_iterator drv;
 			for ( drv = DriveArray.begin(); drv != DriveArray.end(); ++drv )
 			{
@@ -225,7 +217,7 @@ namespace media
 
 		MediaAllocationTable MakeAllocationTable(StFwComponent::LoadFlag loadFlag)
 		{
-			/**/
+			
               MediaAllocationTable table;
 			  StFwComponent::LoadFlag src;
 
@@ -267,36 +259,12 @@ namespace media
               }
 
               return table;
-			/**/
-			/*
-			MediaAllocationTable table;
-
-			size_t driveIndex;
-			for ( driveIndex = 0; driveIndex < (*this).Size(); ++driveIndex )
-			{
-				// Skip the updater drive. If you want to put the updater drive on the NAND, use tag DriveTag_UpdaterNand (0xFE).
-				if ( (*this)[driveIndex].Tag == DriveTag_Updater )
-					continue;
-
-				// Determine how much room to ask for
-				UINT bytesToAllocate = (*this)[driveIndex].RequestedKB * 1024;
-				StFwComponent fw((*this)[driveIndex].Name, loadFlag);
-				if ( fw.size() > bytesToAllocate )
-					bytesToAllocate = fw.size();
-
-				// Create the table entry
-				media::MediaAllocationEntry entry(InvalidDriveNumber, (*this)[driveIndex].Type, (*this)[driveIndex].Tag, bytesToAllocate);
-				table.push_back(entry);
-			}
-
-			return table;
-			*/
 		};
 		void AddDrive(const LogicalDrive& drive){ DriveArray.push_back(drive); };
 		void Clear() { DriveArray.erase(DriveArray.begin(), DriveArray.end()); };
 		void Remove (const LogicalDrive& drive) { ( DriveArray.erase(Find(drive.Tag))); };
 		void Insert (const int index, const LogicalDrive& drive) {DriveArray.insert(DriveArray.begin() + index, drive); };
-//		int GetFileListIndex (const LogicalDrive& drive) { return drive.FileListIndex; };
+
 		size_t Size() const { return DriveArray.size(); };
 		LogicalDrive& operator[](size_t position)
 		{
@@ -352,165 +320,6 @@ namespace media
 } // end namespace media
 
 
-/*
-
-
-
-
-
-
-
-
-#include "StBase.h"
-#include "StFwComponent.h"
-#include "Libs/Public/StdString.h"
-
-#define DRIVE_TAG_STMPSYS_S         0x00
-#define DRIVE_TAG_USBMSC_S          0x01
-#define DRIVE_TAG_HOSTLINK_S        0x01
-#define DRIVE_TAG_RESOURCE_BIN      0x02
-#define DRIVE_TAG_EXTRA_S           0x03
-#define DRIVE_TAG_RESOURCE1_BIN     0x04
-#define DRIVE_TAG_OTGHOST_S         0x05
-#define DRIVE_TAG_HOSTRSC_BIN       0x06
-#define DRIVE_TAG_DATA              0x0A
-#define DRIVE_TAG_DATA_HIDDEN       0x0B
-#define DRIVE_TAG_BOOTMANAGER_S     0x50
-#define DRIVE_TAG_UPDATER_S         0xFF
-#define DRIVE_TAG_UNKOWN            0xEF
-
-#define NUM_MEDIA_DRIVE_STR_ELEMENTS 6
-
-class CStMedia :
-    public CStBase
-{
-public:
-    CStMedia(CString _drive_array_str = L"");
-    virtual ~CStMedia(void);
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // Typedefs
-    ///////////////////////////////////////////////////////////////////////////////
-
-    typedef enum PHYSICAL_MEDIA_TYPE {
-        MediaTypeNand = 0,
-        MediaTypeMMC = 1,
-        MediaTypeHDD = 2,
-        MediaTypeRAM = 3
-    }* P_PHYSICAL_MEDIA_TYPE;
-
-    typedef enum LOGICAL_DRIVE_TYPE {
-            DriveTypeInvalid = -1,
-            DriveTypeData = 0,
-            DriveTypeSystem = 1,
-            DriveTypeHiddenData = 2,
-	        DriveTypeNonVolatile = 3,
-            DriveTypeUnknown = 4
-    }* P_LOGICAL_DRIVE_TYPE;
-
-    #pragma pack (1)
-
-    typedef struct MEDIA_ALLOCATION_TABLE_ENTRY {
-        UCHAR DriveNumber;
-        UCHAR Type;
-        UCHAR Tag;
-        ULONGLONG SizeInBytes;
-    }* P_MEDIA_ALLOCATION_TABLE_ENTRY;
-
-    typedef struct MEDIA_ALLOCATION_TABLE {
-        USHORT wNumEntries;
-        MEDIA_ALLOCATION_TABLE_ENTRY Entry[MAX_MEDIA_TABLE_ENTRIES];
-    }MEDIA_ALLOCATION_TABLE, *P_MEDIA_ALLOCATION_TABLE;
-
-    typedef struct _HiddenDataDriveFormat {
-
-        BYTE First16Bytes[16];
-        ULONG JanusSignature0;
-        ULONG JanusSignature1;
-        USHORT JanusFormatID;
-        USHORT JanusBootSectorOffset;
-        ULONG JanusDriveTotalSectors;
-
-    } HIDDEN_DATA_DRIVE_FORMAT, *P_HIDDEN_DATA_DRIVE_FORMAT;
-
-
-
-    typedef vector<CString > StdStrArray;
-
-
-
-
-    #pragma pack ()
-
-    // Drive description class declaration
-    class CStMediaDrive : public CStBase
-    {
-        public:
-	        CStMediaDrive( CString _name=_T(""),
-                        CString _desc=_T(""),
-                        LOGICAL_DRIVE_TYPE _type=DriveTypeInvalid,
-                        UCHAR _tag=0,
-                        bool _crypt=FALSE,
-                        ULONG _mem=0 );
-	        CStMediaDrive(wstring strDriveDesc);
-	        CStMediaDrive(StdStrArray& _driver_desc_strs);
-            ~CStMediaDrive();
-
-            CString m_name;
-            CString m_pathname;
-            CString m_desc;
-            LOGICAL_DRIVE_TYPE m_type;
-            UCHAR m_tag;
-            bool m_encrypted;
-            ULONG m_additional_memory;
-
-            void InitFwComponent();
-            CString ToString();
-            DWORD Validate();
-
-            StFwComponent* GetFwComponent() { return &m_fw_component; }
-
-        private:
-            CString DriveTypeToStr(LOGICAL_DRIVE_TYPE type);
-            StFwComponent m_fw_component;
-    };
-
-    typedef vector<CStMediaDrive>        MediaDriveArray;
-    typedef MediaDriveArray::size_type   MediaDriveIdx;
-
-private:
-    void InitializeObjects(CString _drive_array_str = L"");
-
-    MediaDriveArray m_media_drive_array;
-
-public:
-    size_t GetNumDrives() { return m_media_drive_array.size(); };
-    size_t GetNumSystemDrives();
-    size_t GetNumDataDrives();
-    size_t GetNumHiddenDataDrives();
-
-    LPCTSTR GetDrivePathName(MediaDriveIdx _index);
-    LPCTSTR GetDrivePathName(UCHAR _tag);
-    LPCTSTR GetDriveDescription(MediaDriveIdx _index);
-    LPCTSTR GetDriveDescription(UCHAR _tag);
-    UCHAR GetTag(MediaDriveIdx _index);
-
-    void AddDrive(wstring _media_drive_str);
-    void AddDrive(CString _name,
-                  CString _desc,
-                  LOGICAL_DRIVE_TYPE _type,
-                  UCHAR _tag,
-                  bool _crypt,
-                  ULONG _mem );
-
-    // Firmware component interface
-    StFwComponent* GetFwComponent(MediaDriveIdx _sys_drv_index);
-    StFwComponent* GetFwComponent(UCHAR _tag);
-
-    // Media allocation table built from MediaDriveArray
-    void GetMediaAllocationTable(P_MEDIA_ALLOCATION_TABLE p_media_allocation_table=NULL);
-};
-*/
 /*/////////////// TODO: //////////////////////
     LOGICAL_DRIVE_TYPE GetDriveType(MediaDriveIdx _index);
     UCHAR GetDriveTag(MediaDriveIdx _index);

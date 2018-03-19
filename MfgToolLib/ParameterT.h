@@ -60,7 +60,6 @@ namespace property
 		CString Desc;
 		ParamMap map;
 		bool IsContainer() { return map.size() > 0; };
-//        virtual UINT StructSize() = 0;
 	};
 
 	template <typename T>
@@ -73,22 +72,6 @@ namespace property
             , Default(valDefault)
 		{};
 
-/*		UINT StructSize()
-        {
-            if ( !IsContainer() )
-                return sizeof(Value);
-            else
-            {
-                UINT structSize = 0;
-                ParamMap::iterator iter;
-                for ( iter=map.begin(); iter!=map.end(); ++iter )
-                {
-                    structSize += (*iter).second->StructSize();
-                }
-                return structSize;
-            }
-        }
-*/
         const CString ToString() const
 		{
 			CString str, fmt;
@@ -111,26 +94,6 @@ namespace property
 			return str;
 		}
 
-// this doesn't work because __time64_t resolves to __int64 which is handled by the primary template
-/*        template <__time64_t>
-        const CString ToString() const
-        {
-            CString dateStr;
-            struct tm modTime;
-            if ( Value != 0 )
-            {
-                _gmtime64_s(&modTime, &Value);
-                _tcsftime( dateStr.GetBufferSetLength(_MAX_PATH), _MAX_PATH, _T("%c"), &modTime);
-                dateStr.ReleaseBuffer();
-            }
-            else
-            {
-                dateStr = _T("N/A");
-            }
-
-            return dateStr;
-        }
-*/
         int Parse(CString str)
 		{
 			int ret = FALSE;
@@ -173,59 +136,6 @@ namespace property
 	};
 
 	int ParseParameterString(LPCTSTR stringToParse, Parameter::ParamMap& paramMap);
-/*	{
-		int numParamsParsed = 0;
-
-		// Parameter=Type:Hid,Vid:0x066F,Pid:0x1234,TimeOut:10
-		CString theString(stringToParse);
-
-		// Holder for Key:Value pair, Key part, Value part
-		CString pairStr, keyStr, valueStr;
-
-		// multiple Parameters are sepatated by commas
-		while ( theString.GetLength() )
-		{
-			// get the key:value pair string
-			int commaPos;
-			if ( (commaPos = theString.Find(_T(','))) != -1 )
-			{
-				// get the string part up to the comma (key:value pair)
-				pairStr = theString.Left(commaPos+1);
-				// trime theString for the next round
-				theString = theString.Right(theString.GetLength()-(commaPos+1));
-			}
-			else
-			{
-				// put the whole string in the pairStr
-				pairStr = theString;
-				// done
-				theString.erase();
-			}
-
-			// get the Key and Value strings
-			int colonPos;
-			if ( (colonPos = pairStr.Find(_T(':'))) != -1 )
-			{
-				// get the string part up to the colon (key:value pair)
-				keyStr = pairStr.Left(colonPos+1);
-				// the Value is after the colon
-				valueStr = pairStr.Right(pairStr.GetLength()-(colonPos+1));
-			}
-			else
-			{
-				;// Warning: no Key for this Key:Value pair
-			}
-
-			// Parse the Value into the ParameterT
-			if( !keyStr.IsEmpty() )
-			{
-				numParamsParsed += paramMap[keyStr]->Parse(valueStr);
-			}
-		}
-
-		return numParamsParsed;
-	};
-*/
 } // namespace property
 
 using namespace property;

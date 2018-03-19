@@ -36,15 +36,13 @@
 #include "MfgToolLib.h"
 
 usb::HubClass::HubClass(INSTANCE_HANDLE handle)
-//: DeviceClass(NULL/*&GUID_DEVINTERFACE_USB_HUB*/, &GUID_DEVCLASS_USB, _T("USB"), DeviceTypeUsbHub)
+
 : DeviceClass(NULL,NULL,_T("USB"),DeviceTypeUsbHub,handle)///*NULL*/&GUID_DEVINTERFACE_USB_HUB, &GUID_DEVCLASS_USB, NULL/*_T("USB")*/, DeviceTypeUsbHub, handle)
 {
-	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("new HubClass"));
 }
 
 usb::HubClass::~HubClass()
 {
-	//LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("delete HubClass"));
 }
 
 Device* usb::HubClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA deviceInfoData, CString path)
@@ -60,16 +58,6 @@ Device* usb::HubClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DATA de
     }
 
     hub->_index.put((int)_devices.size()+1);
-/*	for(int i=0; i<hub->GetNumPorts(); i++)
-	{
-		USB_PORT_NODE *pPortNode = new USB_PORT_NODE;
-		pPortNode->pHubDevice = hub;
-		pPortNode->hubPath = hub->_path.get();
-		pPortNode->hubIndex = hub->_index.get();
-		pPortNode->portIndex = (i+1);
-		pPortNode->portID = pPortNode->hubIndex * 1000 + pPortNode->portIndex;
-		g_PortTable.push_back(pPortNode);
-	} */
 
     return hub;
 }
