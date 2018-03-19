@@ -58,6 +58,7 @@
 #include <map>
 //#include "..\MfgTool.exe\gitversion.h"
 #include "UpdateUIInfo.h"
+#include "gitversion.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -186,7 +187,7 @@ BOOL CMfgToolLibApp::InitInstance()
 	g_pLogMgr = NULL;
 	g_hOneInstance = NULL;
 
-	g_strVersion.Format(_T("DLL version: %d.%d.%d"), FSLMFGTOOL_MAJOR_VERSION, FSLMFGTOOL_MINOR_VERSION, FSLMFGTOOL_REVISION);
+	g_strVersion.Format(_T("DLL1 version: %d.%d%s"), FSLMFGTOOL_MAJOR_VERSION, FSLMFGTOOL_MINOR_VERSION, _T(GIT_VERSION));
 
 	return TRUE;
 }
@@ -816,7 +817,7 @@ DWORD MfgLib_UnregisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cb
 DWORD MfgLib_GetLibraryVersion(BYTE_t* version, int maxSize)
 {
 	CString strTemp;
-	strTemp.Format(_T("Library: %d.%d.%d"), FSLMFGTOOL_MAJOR_VERSION, FSLMFGTOOL_MINOR_VERSION, FSLMFGTOOL_REVISION);
+	strTemp.Format(_T("Lib: %d.%d%s"), FSLMFGTOOL_MAJOR_VERSION, FSLMFGTOOL_MINOR_VERSION, _T(GIT_VERSION));
 	if(maxSize < strTemp.GetLength())
 	{
 		return MFGLIB_ERROR_SIZE_IS_SMALL;
