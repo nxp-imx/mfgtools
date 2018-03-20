@@ -814,6 +814,10 @@ void DeviceManager::Notify(DeviceClass::NotifyStruct* pnsInfo)
 	std::map<HANDLE_CALLBACK, CBStruct*>::iterator cbIt;
 	CBStruct* pCallback;
 
+	int max = ((MFGLIB_VARS *)m_pLibHandle)->g_iMaxBoardNum;
+	if (max > MAX_BOARD_NUMBERS)
+		max = MAX_BOARD_NUMBERS;
+	
 	if( (pnsInfo->Event == HUB_ARRIVAL_EVT) || (pnsInfo->Event == HUB_REMOVAL_EVT) )
 	{
 		return;
@@ -821,7 +825,7 @@ void DeviceManager::Notify(DeviceClass::NotifyStruct* pnsInfo)
 
 	BOOL doNotify = FALSE;
 	int i = 0;
-	for(i=0; i<MAX_BOARD_NUMBERS; i++)
+	for(i=0; i<max; i++)
 	{
 		if(((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].m_bUsed)
 		{
@@ -829,24 +833,30 @@ void DeviceManager::Notify(DeviceClass::NotifyStruct* pnsInfo)
 				&& (((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].portIndex == pnsInfo->PortIndex) )
 			{
 				doNotify = TRUE;
+				if (pnsInfo->Device)
+					((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].SerialId = pnsInfo->Device->_serialId.get();
+
 				break;
 			}
-			if (pnsInfo->Device)
+			if (pnsInfo->Device && pnsInfo->Device->GetDeviceType() == DeviceClass::DeviceTypeMsc)
 			{
 				CString str;
 				str = pnsInfo->Device->_serialId.get();
-				if(!str.IsEmpty())
-					if (str == ((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].SerialId)
-					{
+				CString str1;
+				str1 = ((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].SerialId;
+
+				if(!str.IsEmpty() && !str1.IsEmpty())
+					if (str.Left(str1.GetLength()) == str1)
+					{	/* QXPB0 Missed last 4bit serialid*/
 						doNotify = TRUE;
 						break;
 					}
 			}
 		}
 	}
-	if(i >= MAX_BOARD_NUMBERS)
+	if(i >= max)
 	{
-		for(i=0; i<MAX_BOARD_NUMBERS; i++)
+		for(i=0; i<max; i++)
 		{
 			if(!((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].m_bUsed)
 			{
@@ -857,9 +867,7 @@ void DeviceManager::Notify(DeviceClass::NotifyStruct* pnsInfo)
 				
 				if (pnsInfo->Device)
 					((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].SerialId = pnsInfo->Device->_serialId.get();
-				else
-					((MFGLIB_VARS *)m_pLibHandle)->g_PortDevInfoArray[i].SerialId.Empty();
-
+				
 				doNotify = TRUE;
 				break;
 			}
