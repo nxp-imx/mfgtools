@@ -206,10 +206,9 @@ int main (int argc,char* argv[]){
 	TERM_WIDTH = w.ws_col;
 	BAR_WIDTH = 0.8 * TERM_WIDTH;
 
-	char * newpath = "./";
-	char * mylist = "SabreSD";
-	char * myprofile = "Linux";
-
+	std::string newpath = "./";
+	std::string mylist = "SabreSD";
+	std::string myprofile = "Linux";
 
 	std::map<CString, CString> m_uclKeywords;
 	std::map<CString, CString>::const_iterator it;
@@ -234,12 +233,16 @@ int main (int argc,char* argv[]){
 				switch (state)
 				{
 					case 0:
-						myprofile = std::string(str.substr(locBreak + strip, str.size() - locBreak)).data();
+						myprofile = std::string(str.substr(locBreak + strip, str.size() - locBreak));
+						break;
 					case 1:
+						break;
 					case 2:
-						mylist = std::string(str.substr(locBreak + strip, str.size() - locBreak)).data();
+						mylist = std::string(str.substr(locBreak + strip, str.size() - locBreak));
+						break;
 					case 3:
 						m_uclKeywords[str.substr(0, locBreak)] = str.substr(locBreak + strip, str.size() - locBreak);
+						break;
 				}
 			}
 			if (str.compare("[profiles]") == 0)
@@ -355,7 +358,7 @@ int main (int argc,char* argv[]){
 	}
 
 
-	ret = MfgLib_SetProfilePath(lib, (BYTE_t *) newpath);
+	ret = MfgLib_SetProfilePath(lib, (BYTE_t *) newpath.c_str());
 	if(ret != MFGLIB_ERROR_SUCCESS)
 	{
 		printf(_T("Set Profile path failed\n"));
@@ -363,13 +366,13 @@ int main (int argc,char* argv[]){
 	}
 
 	//set profile and list
-	ret = MfgLib_SetProfileName(lib,(BYTE_t *) myprofile);
+	ret = MfgLib_SetProfileName(lib,(BYTE_t *) myprofile.c_str());
 	if(ret != MFGLIB_ERROR_SUCCESS)
 	{
 		printf(_T("Set Profile name failed\n"));
 		return -1;
 	}
-	ret = MfgLib_SetListName(lib, (BYTE_t *) mylist);
+	ret = MfgLib_SetListName(lib, (BYTE_t *) mylist.c_str());
 	if(ret != MFGLIB_ERROR_SUCCESS)
 	{
 		printf(_T("Set List name failed\n"));
