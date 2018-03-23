@@ -1320,7 +1320,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 			BootDataImgAddrIndex = (DWORD *)pIVT2 - pPlugIn;
 			BootDataImgAddrIndex += (pIVT2->BootData - pIVT2->SelfAddr) / sizeof(DWORD);
 			PhyRAMAddr4KRL = pPlugIn[BootDataImgAddrIndex] + IVT_OFFSET - ImgIVTOffset;
-			if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, (PUCHAR)((DWORD)pDataBuf)))
+			if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, pDataBuf))
 			{
 				LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed.\n"),
 					PhyRAMAddr4KRL, dwFileSize, pDataBuf);
@@ -1345,7 +1345,7 @@ BOOL MxHidDevice::RunPlugIn(UCHAR *pFileDataBuf, ULONGLONG dwFileSize)
 		if (this->_chipFamily < MX7D)
 			pIVT->DCDAddress = 0;
 
-		if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, (PUCHAR)((DWORD)pDataBuf)))
+		if (!TransData(PhyRAMAddr4KRL, (unsigned int)dwFileSize, pDataBuf ))
 		{
 			LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("RunPlugIn(): TransData(0x%X, 0x%X,0x%X) failed."),
 				PhyRAMAddr4KRL, dwFileSize, pDataBuf);

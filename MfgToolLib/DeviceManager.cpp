@@ -1018,7 +1018,7 @@ int DevChange_callback(struct libusb_context *ctx, struct libusb_device *dev, li
 								}
 								while (cmdOpIndex < MAX_BOARD_NUMBERS)
 								{
-									if (((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex]->m_pDevice)
+									if (((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex] != nullptr && ((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex]->m_pDevice)
 									{
 										bool b = !mports.CompareNoCase(((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex]->m_pDevice->_hub.get());
 										if (!mports.CompareNoCase(((MFGLIB_VARS *)m_pLibHandle)->g_CmdOperationArray[cmdOpIndex]->m_pDevice->_hub.get()))
