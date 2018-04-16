@@ -649,6 +649,7 @@ BOOL MxHidDevice::Jump(UINT RAMAddress, BOOL isPlugin)
 	else
 	{
 		/* ROM jump to address, no chance send back ACK*/
+		GetHABType();
 	}
 
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("*********MxHidDevice[%p] Jump to Ramkernel successfully!**********"), this);
