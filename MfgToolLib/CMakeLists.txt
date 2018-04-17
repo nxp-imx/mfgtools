@@ -182,4 +182,5 @@ set (CMAKE_CXX_FLAGS "-std=c++11 -O0 -fpic -I/usr/lib/jvm/java-8-oracle/include 
 set(SOURCES ${SOURCES_})
 
 add_library( MfgToolLib SHARED ${SOURCES} )
+add_library( MfgToolLibStatic STATIC ${SOURCES} )
 target_link_libraries(MfgToolLib ${LIBS})
