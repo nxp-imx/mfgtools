@@ -28,61 +28,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#ifndef __libuuu___
-#define __libuuu___
 
-#ifdef __cplusplus
-#define EXT extern "C"
-#else
-#define EXT
-#endif
+#include "../gitversion.h"
+#include "libuuu.h"
 
-/**
- * Get Last error string
- * @return last error string
-*/
-EXT const char * get_last_err_string();
+#define VER_MAJ 0
+#define VER_MIN 0
+#define VER_S   1
 
-/**
-* Get Last error code
-* @return last error code
-*/
-EXT int get_last_err();
+static const char g_version[] = "libuuu-0.0.1" GIT_VERSION;
 
-EXT const char * get_version_string();
-
-/**
- * 1.0.1
- * bit[31:24].bit[23:16].bit[15:0]
- */
-
-EXT int get_version();
-
-enum NOTIFY_TYPE
+const char *get_version_string()
 {
-	CMD_START,	/* str is command name*/
-	CMD_END,	/* status show command finish status. 0 is success. Other failure.*/
-	PHASE_INDEX,/*Current running phase*/
-	CMD_INDEX,  /*Current running command index*/
-	TRANS_SIZE,  /*Total size*/
-	TRANS_POS,   /*Current finished transfer pos*/
-};
+	return g_version;
+}
 
-struct notify
+int get_version()
 {
-	NOTIFY_TYPE type;
-	union
-	{
-		int status;
-		int index;
-		int total;
-		char *str;
-	};
-};
-
-typedef int (*notify_fun)(struct notify, void *data);
-
-int register_notify_callback(notify_fun f, void *data);
-int unregister_notify_callback(notify_fun f);
-
-#endif
+	return VER_MAJ << 24 | VER_MIN << 16 | VER_S;
+}

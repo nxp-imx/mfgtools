@@ -1,4 +1,5 @@
 Debug
 Release
+gitversion.h
 *.user
 .vs

@@ -20,8 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libuuu\error.cpp" />
+    <ClCompile Include="..\libuuu\notify.cpp" />
+    <ClCompile Include="..\libuuu\version.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\libuuu\libcomm.h" />
     <ClInclude Include="..\libuuu\liberror.h" />
     <ClInclude Include="..\libuuu\libuuu.h" />
   </ItemGroup>
@@ -104,6 +107,9 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>createversion.bat ..</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -136,6 +142,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>createversion.bat ..</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

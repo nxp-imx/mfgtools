@@ -28,61 +28,60 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#ifndef __libuuu___
-#define __libuuu___
 
-#ifdef __cplusplus
-#define EXT extern "C"
-#else
-#define EXT
-#endif
+#include <string>
+#include <vector>
 
-/**
- * Get Last error string
- * @return last error string
-*/
-EXT const char * get_last_err_string();
+using namespace std;
 
-/**
-* Get Last error code
-* @return last error code
-*/
-EXT int get_last_err();
+#include "libuuu.h"
+#include "liberror.h"
 
-EXT const char * get_version_string();
-
-/**
- * 1.0.1
- * bit[31:24].bit[23:16].bit[15:0]
- */
-
-EXT int get_version();
-
-enum NOTIFY_TYPE
+struct  notify_map
 {
-	CMD_START,	/* str is command name*/
-	CMD_END,	/* status show command finish status. 0 is success. Other failure.*/
-	PHASE_INDEX,/*Current running phase*/
-	CMD_INDEX,  /*Current running command index*/
-	TRANS_SIZE,  /*Total size*/
-	TRANS_POS,   /*Current finished transfer pos*/
+	notify_fun f;
+	void *data;
 };
 
-struct notify
+static vector<struct notify_map> g_notify_callback_list;
+
+int register_notify_callback(notify_fun f, void *data)
 {
-	NOTIFY_TYPE type;
-	union
+	notify_map a;
+	a.f = f;
+	a.data = data;
+
+	for (size_t i = 0; i < g_notify_callback_list.size(); i++)
 	{
-		int status;
-		int index;
-		int total;
-		char *str;
-	};
-};
+		if (g_notify_callback_list[i].f == f)
+			return 0;
+	}
 
-typedef int (*notify_fun)(struct notify, void *data);
+	g_notify_callback_list.push_back(a);
+	return 0;
+}
 
-int register_notify_callback(notify_fun f, void *data);
-int unregister_notify_callback(notify_fun f);
+int unregister_notify_callback(notify_fun f)
+{
+	vector<struct notify_map>::iterator it=g_notify_callback_list.begin();
 
-#endif
+	for (it;it!=g_notify_callback_list.end();it++)
+	{
+		if (it->f == f)
+		{
+			g_notify_callback_list.erase(it);
+			return 0;
+		}
+	}
+	return 0;
+}
+
+void call_notify(struct notify nf)
+{
+	vector<struct notify_map>::iterator it = g_notify_callback_list.begin();
+
+	for (it; it != g_notify_callback_list.end(); it++)
+	{
+		it->f(nf, it->data);
+	}
+}

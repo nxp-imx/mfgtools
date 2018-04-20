@@ -37,7 +37,7 @@ using namespace std;
 
 int main()
 {
-	cout << "Test";
+	cout << "Test"<<get_version_string();
 	cout << get_last_err_string();
 	return 0;
 }
