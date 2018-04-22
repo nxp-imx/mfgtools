@@ -28,61 +28,50 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#ifndef __libuuu___
-#define __libuuu___
 
-#ifdef __cplusplus
-#define EXT extern "C"
-#else
-#define EXT
-#endif
+#pragma once
 
-/**
- * Get Last error string
- * @return last error string
-*/
-EXT const char * get_last_err_string();
+#include <string>
+#include <vector>
+#include <map>
+#include "liberror.h"
+#include "libcomm.h"
 
-/**
-* Get Last error code
-* @return last error code
-*/
-EXT int get_last_err();
+using namespace std;
 
-EXT const char * get_version_string();
-
-/**
- * 1.0.1
- * bit[31:24].bit[23:16].bit[15:0]
- */
-
-EXT int get_version();
-
-enum NOTIFY_TYPE
+class CmdBase
 {
-	NOTIFY_CMD_START,	/* str is command name*/
-	NOTIFY_CMD_END,	/* status show command finish status. 0 is success. Other failure.*/
-	NOTIFY_PHASE_INDEX,/*Current running phase*/
-	NOTIFY_CMD_INDEX,  /*Current running command index*/
-	NOTIFY_TRANS_SIZE,  /*Total size*/
-	NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
+public:
+	std::string m_cmd;
+	CmdBase(char *p) { m_cmd = p; }
+	virtual int run()=0;
+	virtual void dump() { dbg(m_cmd.c_str()); };
 };
 
-struct notify
+class CmdList : public std::vector<CmdBase *>
 {
-	NOTIFY_TYPE type;
-	union
+public:
+	int run_all(bool dry_run = false);
+};
+
+class CmdMap : public std::map<std::string, CmdList *>
+{
+public:
+	int run_all(std::string protocal, bool dry_run = false)
 	{
-		int status;
-		int index;
-		int total;
-		char *str;
+		if (find(protocal) == end())
+		{
+			set_last_err_id(-1);
+			std::string err;
+			err.append("Uknown Protocal:");
+			err.append(protocal);
+			set_last_err_string(err);
+			return -1;
+		}
+		return at(protocal)->run_all(dry_run);
 	};
 };
 
-typedef int (*notify_fun)(struct notify, void *data);
+string get_next_param(string &cmd, size_t &pos);
 
-int register_notify_callback(notify_fun f, void *data);
-int unregister_notify_callback(notify_fun f);
-
-#endif
+int str_to_int(string &str);

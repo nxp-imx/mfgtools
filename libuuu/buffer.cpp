@@ -28,61 +28,75 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#ifndef __libuuu___
-#define __libuuu___
 
-#ifdef __cplusplus
-#define EXT extern "C"
-#else
-#define EXT
-#endif
+#include <map>
+#include "buffer.h"
+#include <sys/stat.h>
+#include "liberror.h"
+#include <iostream>
+#include <fstream>
 
-/**
- * Get Last error string
- * @return last error string
-*/
-EXT const char * get_last_err_string();
+static map<string, FileBuffer *> g_filebuffer_map;
 
-/**
-* Get Last error code
-* @return last error code
-*/
-EXT int get_last_err();
-
-EXT const char * get_version_string();
-
-/**
- * 1.0.1
- * bit[31:24].bit[23:16].bit[15:0]
- */
-
-EXT int get_version();
-
-enum NOTIFY_TYPE
+uint64_t get_file_timesample(string filename)
 {
-	NOTIFY_CMD_START,	/* str is command name*/
-	NOTIFY_CMD_END,	/* status show command finish status. 0 is success. Other failure.*/
-	NOTIFY_PHASE_INDEX,/*Current running phase*/
-	NOTIFY_CMD_INDEX,  /*Current running command index*/
-	NOTIFY_TRANS_SIZE,  /*Total size*/
-	NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
-};
+	struct stat st;
+	stat(filename.c_str(), &st);
 
-struct notify
+	return st.st_mtime;
+}
+
+FileBuffer * get_file_buffer(string filename)
 {
-	NOTIFY_TYPE type;
-	union
+	if (g_filebuffer_map.find(filename) == g_filebuffer_map.end())
 	{
-		int status;
-		int index;
-		int total;
-		char *str;
-	};
-};
+		FileBuffer *p = new FileBuffer;
+		if (p->reload(filename))
+			return NULL;
+		
+		g_filebuffer_map[filename]=p;
 
-typedef int (*notify_fun)(struct notify, void *data);
+		return p;
+	}
+	else
+	{
+		FileBuffer *p = g_filebuffer_map[filename];
+		if (p->m_timesample != get_file_timesample(filename))
+			if (p->reload(filename))
+			{
+				return NULL;
+			}
+		return p;
+	}
+}
 
-int register_notify_callback(notify_fun f, void *data);
-int unregister_notify_callback(notify_fun f);
+int FileBuffer::reload(string filename)
+{
+	struct stat st;
+	if (stat(filename.c_str(), &st))
+	{
+		string err = "Fail Open File:";
+		err.append(filename);
+		set_last_err_string(err);
+		return -1;
+	}
 
-#endif
+	m_timesample = st.st_mtime;
+	resize(st.st_size);
+
+	ifstream is(filename, ifstream::binary);
+	if (is)
+	{
+		is.read((char*)data(), st.st_size);
+		if (is)
+			return 0;
+		else
+		{
+			string err = "Fail Read File: ";
+			err.append(filename);
+			set_last_err_string(err);
+			return -1;
+		}
+	}
+	return 0;
+}

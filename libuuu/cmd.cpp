@@ -28,61 +28,59 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#ifndef __libuuu___
-#define __libuuu___
 
-#ifdef __cplusplus
-#define EXT extern "C"
-#else
-#define EXT
-#endif
+#include "cmd.h"
+#include "libcomm.h"
+#include "libuuu.h"
 
-/**
- * Get Last error string
- * @return last error string
-*/
-EXT const char * get_last_err_string();
-
-/**
-* Get Last error code
-* @return last error code
-*/
-EXT int get_last_err();
-
-EXT const char * get_version_string();
-
-/**
- * 1.0.1
- * bit[31:24].bit[23:16].bit[15:0]
- */
-
-EXT int get_version();
-
-enum NOTIFY_TYPE
+int CmdList::run_all(bool dry_run)
 {
-	NOTIFY_CMD_START,	/* str is command name*/
-	NOTIFY_CMD_END,	/* status show command finish status. 0 is success. Other failure.*/
-	NOTIFY_PHASE_INDEX,/*Current running phase*/
-	NOTIFY_CMD_INDEX,  /*Current running command index*/
-	NOTIFY_TRANS_SIZE,  /*Total size*/
-	NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
-};
-
-struct notify
-{
-	NOTIFY_TYPE type;
-	union
+	CmdList::iterator it;
+	int ret;
+	for (it = begin(); it != end(); it++)
 	{
-		int status;
-		int index;
-		int total;
-		char *str;
-	};
-};
+		if (dry_run)
+		{
+			(*it)->dump();
+		}
+		else
+		{
+			notify nt;
+			nt.type = NOTIFY_CMD_START;
+			nt.str = (char *)(*it)->m_cmd.c_str();
+			call_notify(nt);
+			ret = (*it)->run();
+			if (ret)
+				return ret;
+		}
+	}
+	return ret;
+}
 
-typedef int (*notify_fun)(struct notify, void *data);
+string get_next_param(string &cmd, size_t &pos)
+{
+	string str;
+	if (pos < 0)
+		return str;
+	if (pos >= cmd.size())
+		return str;
+	
+	size_t end = cmd.find(' ', pos);
+	if (end < 0)
+		end = cmd.size();
 
-int register_notify_callback(notify_fun f, void *data);
-int unregister_notify_callback(notify_fun f);
+	str = cmd.substr(pos, end - pos);
+	pos = end + 1;
 
-#endif
+	return str;
+}
+
+int str_to_int(string &str)
+{
+	if (str.size() > 2)
+	{
+		if (str.substr(0, 2).compare("0x") == 0)
+			return strtol(str.substr(2).c_str(), NULL, 16);
+	}
+	return strtol(str.c_str(), NULL, 10);
+}

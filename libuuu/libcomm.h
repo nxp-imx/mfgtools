@@ -30,3 +30,6 @@
 */
 
 void call_notify(struct notify nf);
+
+#define log printf
+#define dbg printf

@@ -28,61 +28,41 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#ifndef __libuuu___
-#define __libuuu___
+#include <string>
+#include <vector>
+#include "cmd.h"
 
-#ifdef __cplusplus
-#define EXT extern "C"
-#else
-#define EXT
-#endif
+using namespace std;
 
-/**
- * Get Last error string
- * @return last error string
-*/
-EXT const char * get_last_err_string();
+#pragma once
 
-/**
-* Get Last error code
-* @return last error code
-*/
-EXT int get_last_err();
-
-EXT const char * get_version_string();
-
-/**
- * 1.0.1
- * bit[31:24].bit[23:16].bit[15:0]
- */
-
-EXT int get_version();
-
-enum NOTIFY_TYPE
+class ConfigItem
 {
-	NOTIFY_CMD_START,	/* str is command name*/
-	NOTIFY_CMD_END,	/* status show command finish status. 0 is success. Other failure.*/
-	NOTIFY_PHASE_INDEX,/*Current running phase*/
-	NOTIFY_CMD_INDEX,  /*Current running command index*/
-	NOTIFY_TRANS_SIZE,  /*Total size*/
-	NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
-};
-
-struct notify
-{
-	NOTIFY_TYPE type;
-	union
+public:
+	ConfigItem() { m_pid = m_vid = 0; m_bcdVersion = 0xFFFF; };
+	ConfigItem(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t ver = -1)
 	{
-		int status;
-		int index;
-		int total;
-		char *str;
+		m_protocol = pro; m_chip = chip; m_compatible = comp; m_pid = pid; m_vid = vid; m_bcdVersion = ver;
 	};
+	string m_protocol;
+	string m_chip;
+	string m_compatible;
+	uint16_t m_pid;
+	uint16_t m_vid;
+	uint16_t m_bcdVersion;
 };
 
-typedef int (*notify_fun)(struct notify, void *data);
+class Config :public vector<ConfigItem>
+{
+public:
+	Config();
+	ConfigItem *find(uint16_t vid, uint16_t pid, uint16_t ver = -1);
+};
 
-int register_notify_callback(notify_fun f, void *data);
-int unregister_notify_callback(notify_fun f);
+Config * get_config();
 
-#endif
+class CfgCmd :public CmdBase
+{
+public:
+	int run();
+};

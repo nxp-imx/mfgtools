@@ -28,61 +28,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#ifndef __libuuu___
-#define __libuuu___
 
-#ifdef __cplusplus
-#define EXT extern "C"
-#else
-#define EXT
-#endif
+#pragma once
 
-/**
- * Get Last error string
- * @return last error string
-*/
-EXT const char * get_last_err_string();
+#include <vector>
+using namespace std;
 
-/**
-* Get Last error code
-* @return last error code
-*/
-EXT int get_last_err();
-
-EXT const char * get_version_string();
-
-/**
- * 1.0.1
- * bit[31:24].bit[23:16].bit[15:0]
- */
-
-EXT int get_version();
-
-enum NOTIFY_TYPE
+class FileBuffer : public vector<uint8_t>
 {
-	NOTIFY_CMD_START,	/* str is command name*/
-	NOTIFY_CMD_END,	/* status show command finish status. 0 is success. Other failure.*/
-	NOTIFY_PHASE_INDEX,/*Current running phase*/
-	NOTIFY_CMD_INDEX,  /*Current running command index*/
-	NOTIFY_TRANS_SIZE,  /*Total size*/
-	NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
+public:
+	//Read write lock;
+	uint64_t m_timesample;
+	int reload(string filename);
 };
 
-struct notify
-{
-	NOTIFY_TYPE type;
-	union
-	{
-		int status;
-		int index;
-		int total;
-		char *str;
-	};
-};
-
-typedef int (*notify_fun)(struct notify, void *data);
-
-int register_notify_callback(notify_fun f, void *data);
-int unregister_notify_callback(notify_fun f);
-
-#endif
+FileBuffer * get_file_buffer(string filename);

@@ -18,6 +18,15 @@
     <ClInclude Include="..\libuuu\libcomm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\libuuu\cmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libuuu\buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libuuu\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libuuu\error.cpp">
@@ -27,6 +36,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\libuuu\version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuuu\cmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuuu\buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuuu\config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

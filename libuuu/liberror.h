@@ -31,6 +31,6 @@
 
 #pragma once
 
-void set_last_err_string(string &str);
+void set_last_err_string(std::string str);
 void set_last_err_id(int id);
 

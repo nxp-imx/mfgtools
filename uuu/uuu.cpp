@@ -30,15 +30,29 @@
 */
 
 #include <iostream>
-
+#include <stdio.h>
 #include "../libuuu/libuuu.h"
 
 using namespace std;
-
-int main()
+void print_help()
 {
-	cout << "Test"<<get_version_string();
-	cout << get_last_err_string();
+	printf("uuu u-boot.imx\\flash.bin\n");
+	printf("\tDownload u-boot.imx\\flash.bin to board by usb\n");
+}
+void print_version()
+{
+	printf("uuu (universal update utitle) for nxp imx chips -- %s\n\n", get_version_string());
+}
+int main(int argc, char **argv)
+{
+	print_version();
+
+	if (argc == 1)
+		print_help();
+
+	string param;
+	param = argv[1];
+
 	return 0;
 }
 
