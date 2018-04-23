@@ -29,9 +29,12 @@
 *
 */
 
+#include <memory>
+
 #include "cmd.h"
 #include "libcomm.h"
 #include "libuuu.h"
+#include "config.h"
 
 int CmdList::run_all(bool dry_run)
 {
@@ -60,7 +63,7 @@ int CmdList::run_all(bool dry_run)
 string get_next_param(string &cmd, size_t &pos)
 {
 	string str;
-	if (pos < 0)
+	if (pos == string::npos)
 		return str;
 	if (pos >= cmd.size())
 		return str;
@@ -83,4 +86,25 @@ int str_to_int(string &str)
 			return strtol(str.substr(2).c_str(), NULL, 16);
 	}
 	return strtol(str.c_str(), NULL, 10);
+}
+
+shared_ptr<CmdBase> CreateCmdObj(string cmd)
+{
+	size_t pos = cmd.find(": ", 0);
+	if (pos == string::npos)
+		return NULL;
+	
+	string c;
+	c = cmd.substr(0, pos+1);
+	if (c == "cfg:")
+		return shared_ptr<CmdBase>(new CfgCmd((char*)cmd.c_str()));
+
+	return NULL;
+}
+
+int run_cmd(const char * cmd)
+{
+	shared_ptr<CmdBase> p;
+	p = CreateCmdObj(cmd);
+	return p->run();
 }

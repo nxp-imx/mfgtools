@@ -71,14 +71,19 @@ int CfgCmd::run()
 
 	ConfigItem item;
 	param = get_next_param(m_cmd, pos);
+
+	if (param == "cfg:")
+		param = get_next_param(m_cmd, pos);
+
 	if (param.empty())
 	{
 		set_last_err_string("Wrong param");
 		return -1;
 	}
+
 	item.m_protocol = param;
 
-	while (pos >= 0)
+	while (pos < m_cmd.size())
 	{
 		param = get_next_param(m_cmd, pos);
 		if (param == "-pid")

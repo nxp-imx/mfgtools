@@ -85,4 +85,6 @@ typedef int (*notify_fun)(struct notify, void *data);
 int register_notify_callback(notify_fun f, void *data);
 int unregister_notify_callback(notify_fun f);
 
+int run_cmd(const char * cmd);
+
 #endif

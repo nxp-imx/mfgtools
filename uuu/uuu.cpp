@@ -53,6 +53,18 @@ int main(int argc, char **argv)
 	string param;
 	param = argv[1];
 
+	if (param == "cfg:")
+	{
+		string str=param;
+		str += " ";
+
+		for (int i = 2; i < argc; i++)
+		{
+			str.append(argv[i]);
+			str.append(" ");
+		}
+		run_cmd(str.c_str());
+	}
 	return 0;
 }
 

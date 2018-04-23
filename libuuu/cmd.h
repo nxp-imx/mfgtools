@@ -34,6 +34,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
+
 #include "liberror.h"
 #include "libcomm.h"
 
@@ -48,13 +50,13 @@ public:
 	virtual void dump() { dbg(m_cmd.c_str()); };
 };
 
-class CmdList : public std::vector<CmdBase *>
+class CmdList : public std::vector<shared_ptr<CmdBase>>
 {
 public:
 	int run_all(bool dry_run = false);
 };
 
-class CmdMap : public std::map<std::string, CmdList *>
+class CmdMap : public std::map<std::string, shared_ptr<CmdList>>
 {
 public:
 	int run_all(std::string protocal, bool dry_run = false)
@@ -71,6 +73,9 @@ public:
 		return at(protocal)->run_all(dry_run);
 	};
 };
+
+
+shared_ptr<CmdBase> CreateCmdObj(string cmd);
 
 string get_next_param(string &cmd, size_t &pos);
 

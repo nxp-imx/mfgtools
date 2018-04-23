@@ -42,7 +42,12 @@ public:
 	ConfigItem() { m_pid = m_vid = 0; m_bcdVersion = 0xFFFF; };
 	ConfigItem(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t ver = -1)
 	{
-		m_protocol = pro; m_chip = chip; m_compatible = comp; m_pid = pid; m_vid = vid; m_bcdVersion = ver;
+		if(pro) m_protocol = pro; 
+		if(chip) m_chip = chip; 
+		if(comp) m_compatible = comp; 
+		m_pid = pid; 
+		m_vid = vid; 
+		m_bcdVersion = ver;
 	};
 	string m_protocol;
 	string m_chip;
@@ -64,5 +69,7 @@ Config * get_config();
 class CfgCmd :public CmdBase
 {
 public:
+	CfgCmd(char *cmd) :CmdBase(cmd) {};
 	int run();
 };
+
