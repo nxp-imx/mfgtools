@@ -48,10 +48,10 @@ public:
 		size_t len = std::vsnprintf(NULL, 0, fmt, args);
 		va_end(args);
 
-		this->resize(len + 1);
+		this->resize(len);
 		
 		va_start(args, fmt);
-		std::vsnprintf((char*)c_str(), len + 1, fmt, args);
+		std::vsnprintf((char*)c_str(), len+1, fmt, args);
 		va_end(args);
 
 		return 0;

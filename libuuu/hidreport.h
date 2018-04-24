@@ -64,6 +64,12 @@ public:
 	int write(vector<uint8_t> &buff, uint8_t report_id)
 	{
 		size_t off;
+		notify nf;
+
+		nf.type = notify::NOTIFY_TRANS_SIZE;
+		nf.index = buff.size();
+		call_notify(nf);
+
 		for (off = 0; off < buff.size(); off += m_size_out)
 		{
 			m_buff[0] = report_id;

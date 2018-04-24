@@ -46,34 +46,43 @@
 
 static vector<thread> g_running_thread;
 
-static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
+static string get_device_path(libusb_device *dev)
 {
-	notify nt;
-	nt.type = notify::NOFITY_DEV_ATTACH;
 	uint8_t path[8];
-	
+
 	int bus = libusb_get_bus_number(dev);
-	
+
 	string_ex str;
 
 	str.format("%d:", bus);
 
 	int ret = libusb_get_port_numbers(dev, path, sizeof(path));
 	if (ret < 0)
-		return -1;
+		return "";
 
-	for (int j = 0; j < ret; j++)
+	string_ex s;
+	s.format("%d", path[0]);
+	str.append(s);
+
+	for (int j = 1; j < ret; j++)
 	{
-		char buf[10];
-		snprintf(buf, 10, ".%d", path[j]);
-		str += buf;
+		s.format("%d", path[j]);
+		str.append(s);
 	}
+	return str;
+}
+
+static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
+{
+	int ret;
+	notify nt;
+	nt.type = notify::NOFITY_DEV_ATTACH;
 	
-	dbg(str.c_str());
-	nt.str = (char*)str.c_str();
+	nt.str = (char*)get_device_path(dev).c_str();
 	call_notify(nt);
 
 	ret = run_cmds(item->m_protocol.c_str(), dev);
+	return ret;
 }
 
 
@@ -205,12 +214,17 @@ void *get_dev(const char *pro)
 				return NULL;
 			}
 
-			printf("vid %x pid %x bcd %x\n", desc.idVendor, desc.idProduct, desc.bcdDevice);
-
 			ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
-			if (item)
-				if(item->m_protocol == pro)
+			if (item && item->m_protocol == pro)
+				{
+					notify nt;
+					nt.type = notify::NOFITY_DEV_ATTACH;
+
+					string str = get_device_path(dev);
+					nt.str = (char*)str.c_str();
+					call_notify(nt);
 					return dev;
+				}
 		}
 
 		libusb_free_device_list(newlist, 1);

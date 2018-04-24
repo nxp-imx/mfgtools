@@ -111,21 +111,33 @@ int run_cmd(const char * cmd)
 {
 	shared_ptr<CmdBase> p;
 	p = CreateCmdObj(cmd);
-	
+	int ret;
+
+	notify nt;
+	nt.type = notify::NOTIFY_CMD_START;
+	nt.str = (char *)p->m_cmd.c_str();
+	call_notify(nt);
+
 	if (typeid(*p) != typeid(CfgCmd))
 	{
 		size_t pos = 0;
 		string c = cmd;
 		string pro = get_next_param(c, pos);
 		if (p->parser())
-			return -1;
-
-		p->run(get_dev(pro.c_str()));
+			ret = -1;
+		else
+			ret = p->run(get_dev(pro.c_str()));
 	}
 	else
 	{
-		return p->run(NULL);
+		return ret =p->run(NULL);
 	}
+
+	nt.type = notify::NOTIFY_CMD_END;
+	nt.status = ret;
+	call_notify(nt);
+
+	return -1;
 }
 
 

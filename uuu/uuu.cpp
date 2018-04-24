@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <thread>
 #include <atomic>
+#include <iomanip>
+
 #include "../libuuu/libuuu.h"
 
 using namespace std;
@@ -48,20 +50,82 @@ void print_version()
 
 int polling_usb(std::atomic<int>& bexit);
 
-int progress(notify nt, void *)
+class ShowNotify
 {
-	if (nt.type == notify::NOFITY_DEV_ATTACH)
+public:
+	string m_cmd;
+	string m_dev;
+	int	m_trans_size;
+	int m_trans_pos;
+	
+	ShowNotify()
 	{
-		printf("USB: %s attached\n", nt.str);
+		m_trans_size = m_trans_pos = 0;
 	}
-	if (nt.type == notify::NOTIFY_CMD_START)
+
+	void print(notify nt)
 	{
-		printf("Start: %s\n", nt.str);
+		if (nt.type == notify::NOFITY_DEV_ATTACH)
+		{
+			m_dev = nt.str;
+		}
+		if (nt.type == notify::NOTIFY_CMD_START)
+		{
+			m_cmd = nt.str;
+		}
+		if (nt.type == notify::NOTIFY_TRANS_SIZE)
+		{
+			m_trans_size = nt.total;
+		}
+		if (nt.type == notify::NOTIFY_TRANS_POS)
+		{
+			if (m_trans_size == 0)
+				return;
+			
+			if ((nt.index - m_trans_pos) < (m_trans_size / 100))
+				return;
+
+			m_trans_pos = nt.index;
+		}
+
+		cout << m_dev.c_str() << std::setw(8) << "[";
+		int width=40;
+		int s = 0;
+		for (int i = 1; i <= width; i++)
+		{
+			if (m_trans_size == 0)
+			{
+				cout << " ";
+				continue;
+			}
+
+			if (m_trans_pos*width / (m_trans_size*i))
+			{
+				cout << "=";
+				s = 1;
+			}
+			else
+			{
+				if (s)
+				{
+					s = 0;
+					cout << ">";
+				}
+				else
+				{
+					cout << " ";
+				}
+			}
+		}
+
+		cout << "] " << m_cmd.c_str() <<"\r";
 	}
-	if (nt.type == notify::NOTIFY_TRANS_POS)
-	{
-		printf(".");
-	}
+};
+
+int progress(notify nt, void *p)
+{
+	ShowNotify *np = (ShowNotify*)p;
+	np->print(nt);
 	return 0;
 }
 
@@ -72,7 +136,8 @@ int main(int argc, char **argv)
 	if (argc == 1)
 		print_help();
 
-	register_notify_callback(progress, NULL);
+	ShowNotify sn;
+	register_notify_callback(progress, &sn);
 
 	if (run_cmd("SDPS: boot flash_mfg.bin"))
 		printf("Error: %s\n", get_last_err_string());
