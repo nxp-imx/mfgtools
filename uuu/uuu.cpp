@@ -139,7 +139,10 @@ int main(int argc, char **argv)
 	ShowNotify sn;
 	register_notify_callback(progress, &sn);
 
-	if (run_cmd("SDPS: boot flash_mfg.bin"))
+	string cmd = "SDPS: boot ";
+	cmd += argv[1];
+
+	if (run_cmd(cmd.c_str()))
 		printf("Error: %s\n", get_last_err_string());
 	return 0;
 }
