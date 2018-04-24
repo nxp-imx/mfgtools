@@ -3,3 +3,11 @@ Release
 gitversion.h
 *.user
 .vs
+CMakeFiles
+*.cmake
+*.swp
+*.a
+*.so
+uuu/uuu
+Makefile
+CMakeCache.txt

@@ -29,7 +29,7 @@
 *
 */
 
-#include "../gitversion.h"
+#include "gitversion.h"
 #include "libuuu.h"
 
 #define VER_MAJ 0

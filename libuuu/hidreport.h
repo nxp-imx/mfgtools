@@ -33,6 +33,7 @@
 #include "libcomm.h"
 #include "libuuu.h"
 #include "trans.h"
+#include <string.h>
 
 using namespace std;
 
