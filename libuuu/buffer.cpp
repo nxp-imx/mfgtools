@@ -36,7 +36,7 @@
 #include <iostream>
 #include <fstream>
 
-static map<string, FileBuffer *> g_filebuffer_map;
+static map<string, shared_ptr<FileBuffer>> g_filebuffer_map;
 
 uint64_t get_file_timesample(string filename)
 {
@@ -46,11 +46,12 @@ uint64_t get_file_timesample(string filename)
 	return st.st_mtime;
 }
 
-FileBuffer * get_file_buffer(string filename)
+shared_ptr<FileBuffer> get_file_buffer(string filename)
 {
 	if (g_filebuffer_map.find(filename) == g_filebuffer_map.end())
 	{
-		FileBuffer *p = new FileBuffer;
+		shared_ptr<FileBuffer> p(new FileBuffer);
+
 		if (p->reload(filename))
 			return NULL;
 		
@@ -60,7 +61,7 @@ FileBuffer * get_file_buffer(string filename)
 	}
 	else
 	{
-		FileBuffer *p = g_filebuffer_map[filename];
+		shared_ptr<FileBuffer> p = g_filebuffer_map[filename];
 		if (p->m_timesample != get_file_timesample(filename))
 			if (p->reload(filename))
 			{
@@ -75,7 +76,7 @@ int FileBuffer::reload(string filename)
 	struct stat st;
 	if (stat(filename.c_str(), &st))
 	{
-		string err = "Fail Open File:";
+		string err = "Fail Open File: ";
 		err.append(filename);
 		set_last_err_string(err);
 		return -1;

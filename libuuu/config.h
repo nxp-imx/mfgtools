@@ -62,6 +62,7 @@ class Config :public vector<ConfigItem>
 public:
 	Config();
 	ConfigItem *find(uint16_t vid, uint16_t pid, uint16_t ver = -1);
+	Config find(string protocal);
 };
 
 Config * get_config();
@@ -70,6 +71,6 @@ class CfgCmd :public CmdBase
 {
 public:
 	CfgCmd(char *cmd) :CmdBase(cmd) {};
-	int run();
+	int run(void *p);
 };
 

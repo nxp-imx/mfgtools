@@ -29,58 +29,13 @@
 *
 */
 
-#pragma once
+#include "cmd.h"
 
-#include <string>
-#include <vector>
-#include <map>
-#include <memory>
-
-#include "liberror.h"
-#include "libcomm.h"
-
-using namespace std;
-
-class CmdBase
+class SDPSCmd : public CmdBase
 {
 public:
-	std::string m_cmd;
-	CmdBase(char *p) { m_cmd = p; }
-	virtual int parser(char *p = NULL) { if (p)m_cmd = p; return 0; }
-	virtual int run(void *p)=0;
-	virtual void dump() { dbg(m_cmd.c_str()); };
+	string m_filename;
+	SDPSCmd(char *cmd) :CmdBase(cmd) {};
+	int parser(char *cmd = NULL);
+	int run(void *p);
 };
-
-class CmdList : public std::vector<shared_ptr<CmdBase>>
-{
-public:
-	int run_all(void *p, bool dry_run = false);
-};
-
-class CmdMap : public std::map<std::string, shared_ptr<CmdList>>
-{
-public:
-	int run_all(std::string protocal, void *p,  bool dry_run = false)
-	{
-		if (find(protocal) == end())
-		{
-			set_last_err_id(-1);
-			std::string err;
-			err.append("Uknown Protocal:");
-			err.append(protocal);
-			set_last_err_string(err);
-			return -1;
-		}
-		return at(protocal)->run_all(p, dry_run);
-	};
-};
-
-
-shared_ptr<CmdBase> CreateCmdObj(string cmd);
-
-string get_next_param(string &cmd, size_t &pos);
-
-int str_to_int(string &str);
-
-
-int run_cmds(const char *procotal, void *p);

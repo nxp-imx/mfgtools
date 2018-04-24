@@ -31,6 +31,8 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <thread>
+#include <atomic>
 #include "../libuuu/libuuu.h"
 
 using namespace std;
@@ -43,6 +45,26 @@ void print_version()
 {
 	printf("uuu (universal update utitle) for nxp imx chips -- %s\n\n", get_version_string());
 }
+
+int polling_usb(std::atomic<int>& bexit);
+
+int progress(notify nt, void *)
+{
+	if (nt.type == notify::NOFITY_DEV_ATTACH)
+	{
+		printf("USB: %s attached\n", nt.str);
+	}
+	if (nt.type == notify::NOTIFY_CMD_START)
+	{
+		printf("Start: %s\n", nt.str);
+	}
+	if (nt.type == notify::NOTIFY_TRANS_POS)
+	{
+		printf(".");
+	}
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
 	print_version();
@@ -50,21 +72,10 @@ int main(int argc, char **argv)
 	if (argc == 1)
 		print_help();
 
-	string param;
-	param = argv[1];
+	register_notify_callback(progress, NULL);
 
-	if (param == "cfg:")
-	{
-		string str=param;
-		str += " ";
-
-		for (int i = 2; i < argc; i++)
-		{
-			str.append(argv[i]);
-			str.append(" ");
-		}
-		run_cmd(str.c_str());
-	}
+	if (run_cmd("SDPS: boot flash_mfg.bin"))
+		printf("Error: %s\n", get_last_err_string());
 	return 0;
 }
 

@@ -32,6 +32,8 @@
 #pragma once
 
 #include <vector>
+#include <memory>
+
 using namespace std;
 
 class FileBuffer : public vector<uint8_t>
@@ -42,4 +44,4 @@ public:
 	int reload(string filename);
 };
 
-FileBuffer * get_file_buffer(string filename);
+shared_ptr<FileBuffer> get_file_buffer(string filename);

@@ -27,6 +27,15 @@
     <ClInclude Include="..\libuuu\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\libuuu\sdps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libuuu\hidreport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libuuu\trans.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libuuu\error.cpp">
@@ -45,6 +54,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\libuuu\config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuuu\sdps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuuu\trans.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuuu\usbhotplug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

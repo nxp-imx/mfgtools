@@ -31,6 +31,8 @@
 #ifndef __libuuu___
 #define __libuuu___
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 #define EXT extern "C"
 #else
@@ -58,19 +60,23 @@ EXT const char * get_version_string();
 
 EXT int get_version();
 
-enum NOTIFY_TYPE
-{
-	NOTIFY_CMD_START,	/* str is command name*/
-	NOTIFY_CMD_END,	/* status show command finish status. 0 is success. Other failure.*/
-	NOTIFY_PHASE_INDEX,/*Current running phase*/
-	NOTIFY_CMD_INDEX,  /*Current running command index*/
-	NOTIFY_TRANS_SIZE,  /*Total size*/
-	NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
-};
+
 
 struct notify
 {
+	enum NOTIFY_TYPE
+	{
+		NOTIFY_CMD_START,	/* str is command name*/
+		NOTIFY_CMD_END,	    /* status show command finish status. 0 is success. Other failure.*/
+		NOTIFY_PHASE_INDEX, /*Current running phase*/
+		NOTIFY_CMD_INDEX,   /*Current running command index*/
+		NOTIFY_TRANS_SIZE,  /*Total size*/
+		NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
+		NOFITY_DEV_ATTACH,
+	};
+
 	NOTIFY_TYPE type;
+	uint64_t id;
 	union
 	{
 		int status;

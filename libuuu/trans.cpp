@@ -29,58 +29,81 @@
 *
 */
 
-#pragma once
-
-#include <string>
-#include <vector>
-#include <map>
-#include <memory>
-
+#include "trans.h"
+#include "libuuu.h"
 #include "liberror.h"
-#include "libcomm.h"
 
-using namespace std;
-
-class CmdBase
+extern "C"
 {
-public:
-	std::string m_cmd;
-	CmdBase(char *p) { m_cmd = p; }
-	virtual int parser(char *p = NULL) { if (p)m_cmd = p; return 0; }
-	virtual int run(void *p)=0;
-	virtual void dump() { dbg(m_cmd.c_str()); };
-};
+#include "libusb.h"
+}
 
-class CmdList : public std::vector<shared_ptr<CmdBase>>
+int HIDTrans::open(void *p)
 {
-public:
-	int run_all(void *p, bool dry_run = false);
-};
-
-class CmdMap : public std::map<std::string, shared_ptr<CmdList>>
-{
-public:
-	int run_all(std::string protocal, void *p,  bool dry_run = false)
+	if (libusb_open((libusb_device*)p, (libusb_device_handle **)&m_devhandle) < 0)
 	{
-		if (find(protocal) == end())
-		{
-			set_last_err_id(-1);
-			std::string err;
-			err.append("Uknown Protocal:");
-			err.append(protocal);
-			set_last_err_string(err);
-			return -1;
-		}
-		return at(protocal)->run_all(p, dry_run);
-	};
-};
+		set_last_err_string("Failure open usb device");
+		return -1;
+	}
+	return 0;
+}
 
+int HIDTrans::close()
+{
+	libusb_close((libusb_device_handle *)m_devhandle);
+	return 0;
+}
 
-shared_ptr<CmdBase> CreateCmdObj(string cmd);
+int HIDTrans::write(void *buff, size_t size)
+{
+	int ret;
+	uint8_t *p = (uint8_t *)buff;
+	ret = libusb_control_transfer(
+		(libusb_device_handle *)m_devhandle,
+		LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE,
+		m_set_report,
+		(2 << 8) | p[0],
+		0,
+		p,
+		size,
+		1000
+		);
+	
+	if (ret < 0)
+	{
+		set_last_err_string("HID Write failure");
+		return ret;
+	}
 
-string get_next_param(string &cmd, size_t &pos);
+	if (ret != size)
+	{
+		set_last_err_string("HID write size miss matched");
+		return -1;
+	}
 
-int str_to_int(string &str);
+	return 0;
+}
 
+int HIDTrans::read(void *buff, size_t size, size_t *rsize)
+{
+	int ret;
+	int actual;
+	ret = libusb_interrupt_transfer(
+		(libusb_device_handle *)m_devhandle,
+		0x81,
+		(uint8_t*)buff,
+		size,
+		&actual,
+		1000
+	);
 
-int run_cmds(const char *procotal, void *p);
+	*rsize = actual;
+
+	if (ret < 0)
+	{
+		set_last_err_string("HID Read failure");
+		return ret;
+	}
+
+	return 0;
+}

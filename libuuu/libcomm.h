@@ -28,8 +28,32 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
+#include <string>
+#include <stdarg.h>
+
+#pragma once
 
 void call_notify(struct notify nf);
 
 #define log printf
 #define dbg printf
+
+class string_ex : public std::string
+{
+public:
+	int format(const char *fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		size_t len = std::vsnprintf(NULL, 0, fmt, args);
+		va_end(args);
+
+		this->resize(len + 1);
+		
+		va_start(args, fmt);
+		std::vsnprintf((char*)c_str(), len + 1, fmt, args);
+		va_end(args);
+
+		return 0;
+	}
+};

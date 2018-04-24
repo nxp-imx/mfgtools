@@ -24,15 +24,21 @@
     <ClCompile Include="..\libuuu\config.cpp" />
     <ClCompile Include="..\libuuu\error.cpp" />
     <ClCompile Include="..\libuuu\notify.cpp" />
+    <ClCompile Include="..\libuuu\sdps.cpp" />
+    <ClCompile Include="..\libuuu\trans.cpp" />
+    <ClCompile Include="..\libuuu\usbhotplug.cpp" />
     <ClCompile Include="..\libuuu\version.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libuuu\buffer.h" />
     <ClInclude Include="..\libuuu\cmd.h" />
     <ClInclude Include="..\libuuu\config.h" />
+    <ClInclude Include="..\libuuu\hidreport.h" />
     <ClInclude Include="..\libuuu\libcomm.h" />
     <ClInclude Include="..\libuuu\liberror.h" />
     <ClInclude Include="..\libuuu\libuuu.h" />
+    <ClInclude Include="..\libuuu\sdps.h" />
+    <ClInclude Include="..\libuuu\trans.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -108,6 +114,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\libusb\libusb</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,6 +148,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\libusb\libusb</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

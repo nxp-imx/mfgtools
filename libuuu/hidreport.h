@@ -28,59 +28,60 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-
-#pragma once
-
 #include <string>
 #include <vector>
-#include <map>
-#include <memory>
-
-#include "liberror.h"
 #include "libcomm.h"
+#include "libuuu.h"
+#include "trans.h"
 
 using namespace std;
 
-class CmdBase
+class HIDReport
 {
+	int m_size_in;
+	int m_size_out;
+	int m_size_payload;
 public:
-	std::string m_cmd;
-	CmdBase(char *p) { m_cmd = p; }
-	virtual int parser(char *p = NULL) { if (p)m_cmd = p; return 0; }
-	virtual int run(void *p)=0;
-	virtual void dump() { dbg(m_cmd.c_str()); };
-};
-
-class CmdList : public std::vector<shared_ptr<CmdBase>>
-{
-public:
-	int run_all(void *p, bool dry_run = false);
-};
-
-class CmdMap : public std::map<std::string, shared_ptr<CmdList>>
-{
-public:
-	int run_all(std::string protocal, void *p,  bool dry_run = false)
+	TransBase * m_pdev;
+	vector<uint8_t> m_buff;
+	void init()
 	{
-		if (find(protocal) == end())
+		m_size_in = m_size_out = 1024;
+		m_size_payload = 1;
+		m_buff.resize(m_size_in + m_size_payload);
+	}
+	HIDReport()
+	{
+		init();
+	}
+
+	HIDReport(TransBase *trans)
+	{
+		init();
+		m_pdev = trans;
+	}
+	
+	int write(vector<uint8_t> &buff, uint8_t report_id)
+	{
+		size_t off;
+		for (off = 0; off < buff.size(); off += m_size_out)
 		{
-			set_last_err_id(-1);
-			std::string err;
-			err.append("Uknown Protocal:");
-			err.append(protocal);
-			set_last_err_string(err);
-			return -1;
+			m_buff[0] = report_id;
+			
+			size_t sz = buff.size() - off;
+			if (sz > m_size_out)
+				sz = m_size_out;
+
+			memcpy(m_buff.data() + m_size_payload, buff.data() + off, sz);
+
+			if (m_pdev->write(m_buff))
+				return -1;
+
+			notify nf;
+			nf.type = notify::NOTIFY_TRANS_POS;
+			nf.index = off;
+			call_notify(nf);
 		}
-		return at(protocal)->run_all(p, dry_run);
-	};
+		return 0;
+	}
 };
-
-
-shared_ptr<CmdBase> CreateCmdObj(string cmd);
-
-string get_next_param(string &cmd, size_t &pos);
-
-int str_to_int(string &str);
-
-
-int run_cmds(const char *procotal, void *p);

@@ -28,59 +28,55 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-
-#pragma once
-
 #include <string>
-#include <vector>
-#include <map>
-#include <memory>
-
+#include "sdps.h"
+#include "hidreport.h"
 #include "liberror.h"
 #include "libcomm.h"
+#include "buffer.h"
 
-using namespace std;
-
-class CmdBase
+int SDPSCmd::parser(char *cmd)
 {
-public:
-	std::string m_cmd;
-	CmdBase(char *p) { m_cmd = p; }
-	virtual int parser(char *p = NULL) { if (p)m_cmd = p; return 0; }
-	virtual int run(void *p)=0;
-	virtual void dump() { dbg(m_cmd.c_str()); };
-};
+	if (cmd)
+		m_cmd = cmd;
 
-class CmdList : public std::vector<shared_ptr<CmdBase>>
-{
-public:
-	int run_all(void *p, bool dry_run = false);
-};
+	string str;
+	size_t pos = 0;
 
-class CmdMap : public std::map<std::string, shared_ptr<CmdList>>
-{
-public:
-	int run_all(std::string protocal, void *p,  bool dry_run = false)
+	str = get_next_param(m_cmd, pos);
+	if (str == "SDPS:")
 	{
-		if (find(protocal) == end())
-		{
-			set_last_err_id(-1);
-			std::string err;
-			err.append("Uknown Protocal:");
-			err.append(protocal);
-			set_last_err_string(err);
-			return -1;
-		}
-		return at(protocal)->run_all(p, dry_run);
+		str = get_next_param(m_cmd, pos);
+	}
+
+	if (str != "boot")
+	{
+		string err("SDPS: Unknow command: ");
+		err += str;
+		set_last_err_string(err);
+		return -1;
 	};
-};
 
+	str = get_next_param(m_cmd, pos);
 
-shared_ptr<CmdBase> CreateCmdObj(string cmd);
+	shared_ptr<FileBuffer> p = get_file_buffer(str);
+	if (!p)
+		return -1;
 
-string get_next_param(string &cmd, size_t &pos);
+	m_filename = str;
+	return 0;
+}
+int SDPSCmd::run(void *pro)
+{
+	
+	HIDTrans dev;
+	if(dev.open(pro))
+		return -1;
 
-int str_to_int(string &str);
+	shared_ptr<FileBuffer> p = get_file_buffer(m_filename);
+	if (!p)
+		return -1;
 
-
-int run_cmds(const char *procotal, void *p);
+	HIDReport report(&dev);
+	return report.write(*p, 2);
+}

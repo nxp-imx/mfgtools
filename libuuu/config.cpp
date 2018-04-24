@@ -39,8 +39,8 @@ static Config g_config;
 
 Config::Config()
 {
-	push_back(ConfigItem("SDPS", "MX8QXP", NULL, NXP_VID, 0x012F));
-	push_back(ConfigItem("SDP", "MX7D", NULL, FSL_VID, 0x0076));
+	push_back(ConfigItem("SDPS:", "MX8QXP", NULL, NXP_VID, 0x012F, 0x0002));
+	push_back(ConfigItem("SDP:", "MX7D", NULL, FSL_VID, 0x0076));
 }
 
 Config * get_config()
@@ -55,7 +55,7 @@ ConfigItem * Config::find(uint16_t vid, uint16_t pid, uint16_t ver)
 	{
 		if (vid == it->m_vid && pid == it->m_pid)
 		{
-			if (ver == -1)
+			if (it->m_bcdVersion == 0xFFFF)
 				return &(*it);
 			if (ver == it->m_bcdVersion)
 				return &(*it);
@@ -64,7 +64,19 @@ ConfigItem * Config::find(uint16_t vid, uint16_t pid, uint16_t ver)
 	return NULL;
 }
 
-int CfgCmd::run()
+Config Config::find(string pro)
+{
+	Config items;
+	iterator it;
+	for (it = begin(); it != end(); it++)
+	{
+		if (it->m_protocol == pro)
+			items.push_back(*it);
+	}
+	return items;
+}
+
+int CfgCmd::run(void *p)
 {
 	size_t pos = 0;
 	string param;

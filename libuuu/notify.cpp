@@ -36,6 +36,7 @@ using namespace std;
 
 #include "libuuu.h"
 #include "liberror.h"
+#include <thread>
 
 struct  notify_map
 {
@@ -79,6 +80,8 @@ int unregister_notify_callback(notify_fun f)
 void call_notify(struct notify nf)
 {
 	vector<struct notify_map>::iterator it = g_notify_callback_list.begin();
+
+	nf.id = std::hash<std::thread::id>{}(std::this_thread::get_id());
 
 	for (it; it != g_notify_callback_list.end(); it++)
 	{

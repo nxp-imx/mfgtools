@@ -28,59 +28,43 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-
-#pragma once
-
-#include <string>
 #include <vector>
-#include <map>
-#include <memory>
-
-#include "liberror.h"
-#include "libcomm.h"
+#include <string>
 
 using namespace std;
 
-class CmdBase
+class TransBase
 {
 public:
-	std::string m_cmd;
-	CmdBase(char *p) { m_cmd = p; }
-	virtual int parser(char *p = NULL) { if (p)m_cmd = p; return 0; }
-	virtual int run(void *p)=0;
-	virtual void dump() { dbg(m_cmd.c_str()); };
-};
-
-class CmdList : public std::vector<shared_ptr<CmdBase>>
-{
-public:
-	int run_all(void *p, bool dry_run = false);
-};
-
-class CmdMap : public std::map<std::string, shared_ptr<CmdList>>
-{
-public:
-	int run_all(std::string protocal, void *p,  bool dry_run = false)
+	string m_path;
+	void * m_devhandle;
+	TransBase() { m_devhandle = NULL; }
+	~TransBase() { if (m_devhandle) close();  m_devhandle = NULL; }
+	virtual int open(void *) { return 0; };
+	virtual int close() { return 0; };
+	virtual int write(void *buff, size_t size) = 0;
+	virtual int read(void *buff, size_t size, size_t *return_size) = 0;
+	int write(vector<uint8_t> & buff) { return write(buff.data(), buff.size()); }
+	int read(vector<uint8_t> &buff)
 	{
-		if (find(protocal) == end())
-		{
-			set_last_err_id(-1);
-			std::string err;
-			err.append("Uknown Protocal:");
-			err.append(protocal);
-			set_last_err_string(err);
-			return -1;
-		}
-		return at(protocal)->run_all(p, dry_run);
-	};
+		size_t size;
+		int ret = read(buff.data(), buff.size(), &size);
+		if (ret)
+			return ret;
+		buff.resize(size);
+		return ret;
+	}
 };
 
+class HIDTrans : public TransBase
+{
+	int m_set_report;
+public:
+	HIDTrans() { m_set_report = 9; }
+	int write(void *buff, size_t size);
+	int read(void *buff, size_t size, size_t *return_size);
+	int open(void *p);
+	int close();
+};
 
-shared_ptr<CmdBase> CreateCmdObj(string cmd);
-
-string get_next_param(string &cmd, size_t &pos);
-
-int str_to_int(string &str);
-
-
-int run_cmds(const char *procotal, void *p);
+void *get_dev(const char *pro);

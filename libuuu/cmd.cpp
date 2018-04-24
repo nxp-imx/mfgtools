@@ -35,8 +35,12 @@
 #include "libcomm.h"
 #include "libuuu.h"
 #include "config.h"
+#include "trans.h"
+#include "sdps.h"
 
-int CmdList::run_all(bool dry_run)
+static CmdMap g_cmd_map;
+
+int CmdList::run_all(void *p, bool dry_run)
 {
 	CmdList::iterator it;
 	int ret;
@@ -49,10 +53,10 @@ int CmdList::run_all(bool dry_run)
 		else
 		{
 			notify nt;
-			nt.type = NOTIFY_CMD_START;
+			nt.type = notify::NOTIFY_CMD_START;
 			nt.str = (char *)(*it)->m_cmd.c_str();
 			call_notify(nt);
-			ret = (*it)->run();
+			ret = (*it)->run(p);
 			if (ret)
 				return ret;
 		}
@@ -96,9 +100,10 @@ shared_ptr<CmdBase> CreateCmdObj(string cmd)
 	
 	string c;
 	c = cmd.substr(0, pos+1);
-	if (c == "cfg:")
+	if (c == "CFG:")
 		return shared_ptr<CmdBase>(new CfgCmd((char*)cmd.c_str()));
-
+	if (c == "SDPS:")
+		return shared_ptr<CmdBase>(new SDPSCmd((char*)cmd.c_str()));
 	return NULL;
 }
 
@@ -106,5 +111,32 @@ int run_cmd(const char * cmd)
 {
 	shared_ptr<CmdBase> p;
 	p = CreateCmdObj(cmd);
-	return p->run();
+	
+	if (typeid(*p) != typeid(CfgCmd))
+	{
+		size_t pos = 0;
+		string c = cmd;
+		string pro = get_next_param(c, pos);
+		if (p->parser())
+			return -1;
+
+		p->run(get_dev(pro.c_str()));
+	}
+	else
+	{
+		return p->run(NULL);
+	}
+}
+
+
+int run_cmds(const char *procotal, void *p)
+{
+	if (g_cmd_map.find(procotal) == g_cmd_map.end())
+	{
+		string_ex str;
+		str.format("%s:%d Can't find protocal: %s", __FUNCTION__, __LINE__, procotal);
+		set_last_err_string(str.c_str());
+	}
+
+	return g_cmd_map[procotal]->run_all(p);;
 }
