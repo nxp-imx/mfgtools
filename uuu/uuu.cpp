@@ -34,14 +34,25 @@
 #include <thread>
 #include <atomic>
 #include <iomanip>
+#include <map>
 
 #include "../libuuu/libuuu.h"
 
 using namespace std;
 void print_help()
 {
-	printf("uuu u-boot.imx\\flash.bin\n");
+	printf("uuu [-d] u-boot.imx\\flash.bin\n");
 	printf("\tDownload u-boot.imx\\flash.bin to board by usb\n");
+	printf("\t -d      Deamon mode, wait for forever.\n");
+	printf("\t         Start download once detect known device attached\n");
+	printf("\n");
+	printf("uuu SDPS: boot flash.bin\n");
+	printf("\tRun command SPDS: boot flash.bin\n");
+	printf("\n");
+	printf("uuu [-d -s] cmdlist\n");
+	printf("\tRun all commands in file cmdlist\n");
+	printf("\t -d      Deamon mode, wait for forever.\n");
+	printf("\t -s      run command step by step\n");
 }
 void print_version()
 {
@@ -50,6 +61,8 @@ void print_version()
 
 int polling_usb(std::atomic<int>& bexit);
 
+int g_overall_status;
+
 class ShowNotify
 {
 public:
@@ -57,17 +70,28 @@ public:
 	string m_dev;
 	int	m_trans_size;
 	int m_trans_pos;
+	int m_status;
+	int m_cmd_total;
+	int m_cmd_index;
+	string m_last_err;
+	int m_done;
 	
 	ShowNotify()
 	{
 		m_trans_size = m_trans_pos = 0;
+		m_status = 0;
+		m_cmd_total = 0;
+		m_cmd_index = 0;
+		m_done = 0;
 	}
 
-	void print(notify nt)
+	bool update(notify nt)
 	{
 		if (nt.type == notify::NOFITY_DEV_ATTACH)
 		{
 			m_dev = nt.str;
+			m_done = 0;
+			m_status = 0;
 		}
 		if (nt.type == notify::NOTIFY_CMD_START)
 		{
@@ -77,55 +101,109 @@ public:
 		{
 			m_trans_size = nt.total;
 		}
+		if (nt.type == notify::NOTIFY_CMD_TOTAL)
+		{
+			m_cmd_total = nt.total;
+		}
+		if (nt.type == notify::NOTIFY_CMD_INDEX)
+		{
+			m_cmd_index = nt.index;
+		}
+		if (nt.type == notify::NOTIFY_DONE)
+		{
+			m_done = 1;
+		}
+		if (nt.type == notify::NOTIFY_CMD_END)
+		{
+			if(nt.status)
+			{
+				g_overall_status = nt.status;
+				m_last_err = get_last_err_string();
+			}
+			m_status |= nt.status;
+		}
 		if (nt.type == notify::NOTIFY_TRANS_POS)
 		{
 			if (m_trans_size == 0)
-				return;
-			
+				return false;
+
 			if ((nt.index - m_trans_pos) < (m_trans_size / 100))
-				return;
+				return false;
 
 			m_trans_pos = nt.index;
 		}
+		return true;
+	}
 
-		cout << m_dev.c_str() << std::setw(8) << "[";
+	void print()
+	{
+		cout << m_dev.c_str() << std::setw(8);
+		
+		if (m_status)
+		{
+			cout << m_last_err.c_str() << endl;
+			return;
+		}
+
+		cout << m_cmd_index + 1 << "/" << m_cmd_total << std::setw(2);
+
+		cout<< "[";
 		int width=40;
 		int s = 0;
-		for (int i = 1; i <= width; i++)
-		{
-			if (m_trans_size == 0)
-			{
-				cout << " ";
-				continue;
-			}
 
-			if (m_trans_pos*width / (m_trans_size*i))
+		if (m_done)
+		{
+			cout << "Done" << std::setw(width - 3);
+		}else
+		{
+			for (int i = 1; i <= width; i++)
 			{
-				cout << "=";
-				s = 1;
-			}
-			else
-			{
-				if (s)
+				if (m_trans_size == 0)
 				{
-					s = 0;
-					cout << ">";
+					cout << " ";
+					continue;
+				}
+
+				if (m_trans_pos*width / (m_trans_size*i))
+				{
+					cout << "=";
+					s = 1;
 				}
 				else
 				{
-					cout << " ";
+					if (s)
+					{
+						s = 0;
+						cout << ">";
+					}
+					else
+					{
+						cout << " ";
+					}
 				}
 			}
 		}
-
 		cout << "] " << m_cmd.c_str() <<"\r";
 	}
 };
 
+static map<string, ShowNotify> g_map_path_nt;
+
 int progress(notify nt, void *p)
 {
-	ShowNotify *np = (ShowNotify*)p;
-	np->print(nt);
+	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify>*)p;
+	map<string, ShowNotify>::iterator it;
+	
+	if ((*np)[nt.id].update(nt))
+	{
+		g_map_path_nt[(*np)[nt.id].m_dev] = (*np)[nt.id];
+
+		for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
+			it->second.print();
+	}
+	if (nt.type == notify::NOTIFY_THREAD_EXIT)
+		np->erase(nt.id);
+
 	return 0;
 }
 
@@ -135,15 +213,74 @@ int main(int argc, char **argv)
 
 	if (argc == 1)
 		print_help();
+	
+	int deamon = 0;
+	int step = 0;
+	string filename; 
+	string cmd;
+	for (int i = 1; i < argc; i++)
+	{
+		string s = argv[i];
+		if (!s.empty() && s[0] == '-')
+		{
+			if (s == "-d")
+			{
+				deamon = 1;
+			}else if (s == "-s")
+			{
+				step = 1;
+			}
+			else
+			{
+				cout << "Unknown option: " << s.c_str();
+				return -1;
+			}
+		}else if (!s.empty() && s[s.size() - 1] == ':')
+		{
+			for (int j = 0; j < argc; j++)
+			{
+				cmd.append(s);
+				cmd.append(" ");
+			}
+			break;
+		}
+		else
+		{
+			filename = s;
+			break;
+		}
+	}
 
-	ShowNotify sn;
-	register_notify_callback(progress, &sn);
+	if (deamon && step)
+	{
+		printf("Error: -d -s Can't apply at the same time\n");
+		return -1;
+	}
 
-	string cmd = "SDPS: boot ";
-	cmd += argv[1];
+	map<uint64_t, ShowNotify> nt_session;
 
-	if (run_cmd(cmd.c_str()))
-		printf("Error: %s\n", get_last_err_string());
-	return 0;
+	register_notify_callback(progress, &nt_session);
+
+	if (!cmd.empty())
+	{
+		int ret;
+		ret = run_cmd(cmd.c_str());
+		if(ret)
+			printf("\nError: %s\n", get_last_err_string());
+		else
+			printf("Okay");
+
+		return ret;
+	}
+
+	int ret = auto_detect_file(filename.c_str());
+	if (ret)
+	{
+		cout << "Error:" << get_last_err_string();
+		return ret;
+	}
+	wait_uuu_finish(deamon);
+
+	return g_overall_status;
 }
 

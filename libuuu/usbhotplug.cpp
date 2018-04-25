@@ -46,6 +46,8 @@
 
 static vector<thread> g_running_thread;
 
+
+
 static string get_device_path(libusb_device *dev)
 {
 	uint8_t path[8];
@@ -78,18 +80,22 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 	notify nt;
 	nt.type = notify::NOFITY_DEV_ATTACH;
 	
-	nt.str = (char*)get_device_path(dev).c_str();
+	string str;
+	str = get_device_path(dev);
+	nt.str = (char*)str.c_str();
 	call_notify(nt);
 
 	ret = run_cmds(item->m_protocol.c_str(), dev);
+
+	nt.type = notify::NOTIFY_THREAD_EXIT;
+	call_notify(nt);
+
 	return ret;
 }
 
 
 static int usb_add(libusb_device *dev)
 {
-	printf("new usb device added %p\n", dev);
-
 	struct libusb_device_descriptor desc;
 	int r = libusb_get_device_descriptor(dev, &desc);
 	if (r < 0) {

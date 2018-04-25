@@ -30,6 +30,7 @@
 */
 #include <vector>
 #include <string>
+#include <atomic>
 
 using namespace std;
 
@@ -68,3 +69,4 @@ public:
 };
 
 void *get_dev(const char *pro);
+int polling_usb(std::atomic<int>& bexit);

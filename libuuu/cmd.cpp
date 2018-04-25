@@ -37,6 +37,8 @@
 #include "config.h"
 #include "trans.h"
 #include "sdps.h"
+#include <atomic>
+#include "buffer.h"
 
 static CmdMap g_cmd_map;
 
@@ -44,7 +46,15 @@ int CmdList::run_all(void *p, bool dry_run)
 {
 	CmdList::iterator it;
 	int ret;
-	for (it = begin(); it != end(); it++)
+	
+	notify nt;
+	nt.type = notify::NOTIFY_CMD_TOTAL;
+	nt.total = size();
+	call_notify(nt);
+
+	int i = 0;
+
+	for (it = begin(); it != end(); it++, i++)
 	{
 		if (dry_run)
 		{
@@ -53,10 +63,20 @@ int CmdList::run_all(void *p, bool dry_run)
 		else
 		{
 			notify nt;
+			
+			nt.type = notify::NOTIFY_CMD_INDEX;
+			nt.index = i;
+			call_notify(nt);
+
 			nt.type = notify::NOTIFY_CMD_START;
 			nt.str = (char *)(*it)->m_cmd.c_str();
 			call_notify(nt);
+			
 			ret = (*it)->run(p);
+
+			nt.type = notify::NOTIFY_CMD_END;
+			nt.status = ret;
+			call_notify(nt);
 			if (ret)
 				return ret;
 		}
@@ -140,6 +160,13 @@ int run_cmd(const char * cmd)
 	return ret;
 }
 
+int CmdDone::run(void *)
+{
+	notify nt;
+	nt.type = notify::NOTIFY_DONE;
+	call_notify(nt);
+	return 0;
+}
 
 int run_cmds(const char *procotal, void *p)
 {
@@ -148,7 +175,67 @@ int run_cmds(const char *procotal, void *p)
 		string_ex str;
 		str.format("%s:%d Can't find protocal: %s", __FUNCTION__, __LINE__, procotal);
 		set_last_err_string(str.c_str());
+		return -1;
 	}
 
 	return g_cmd_map[procotal]->run_all(p);;
+}
+
+static int added_default_boot_cmd(const char *filename)
+{
+	shared_ptr<CmdList> list(new CmdList);
+
+	string str = "boot ";
+	str += filename;
+	shared_ptr<CmdBase> cmd(new SDPSCmd((char*)str.c_str()));
+	shared_ptr<CmdBase> done(new CmdDone);
+
+	if (cmd->parser())
+	{
+		return -1;
+	}
+
+	list->push_back(cmd);
+	list->push_back(done);
+
+	g_cmd_map["SDPS:"] = list;
+
+	return 0;
+}
+
+int auto_detect_file(const char *filename)
+{
+	shared_ptr<FileBuffer> buffer = get_file_buffer(filename);
+	if (buffer == NULL)
+		return -1;
+
+	string str= "uuu_version";
+	void *p1 = buffer->data();
+	void *p2 = (void*)str.data();
+	if (memcmp(p1, p2, str.size()) == 0)
+	{
+		printf("todo: script\n");
+		return 0;
+	}
+	
+	//flash.bin or uboot.bin
+	return added_default_boot_cmd(filename);
+}
+
+int notify_done(notify nt, void *p)
+{
+	if(nt.type == notify::NOTIFY_DONE)
+		*(std::atomic<int> *) p = 1;
+
+	return 0;
+}
+int wait_uuu_finish(int deamon)
+{
+	std::atomic<int> exit = 0;
+	if(!deamon)
+		register_notify_callback(notify_done, &exit);
+
+	polling_usb(exit);
+
+	return 0;
 }

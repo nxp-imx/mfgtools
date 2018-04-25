@@ -66,13 +66,22 @@ struct notify
 {
 	enum NOTIFY_TYPE
 	{
+		NOTIFY_CMD_TOTAL,	
 		NOTIFY_CMD_START,	/* str is command name*/
 		NOTIFY_CMD_END,	    /* status show command finish status. 0 is success. Other failure.*/
-		NOTIFY_PHASE_INDEX, /*Current running phase*/
 		NOTIFY_CMD_INDEX,   /*Current running command index*/
+
+		NOTIFY_PHASE_TOTAL,
+		NOTIFY_PHASE_INDEX, /*Current running phase*/
+
 		NOTIFY_TRANS_SIZE,  /*Total size*/
 		NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
+		
 		NOFITY_DEV_ATTACH,
+		
+		NOTIFY_THREAD_EXIT,
+		
+		NOTIFY_DONE,
 	};
 
 	NOTIFY_TYPE type;
@@ -92,5 +101,7 @@ int register_notify_callback(notify_fun f, void *data);
 int unregister_notify_callback(notify_fun f);
 
 int run_cmd(const char * cmd);
+int auto_detect_file(const char * filename);
+int wait_uuu_finish(int deamon);
 
 #endif

@@ -45,10 +45,17 @@ class CmdBase
 {
 public:
 	std::string m_cmd;
+	CmdBase() {};
 	CmdBase(char *p) { m_cmd = p; }
 	virtual int parser(char *p = NULL) { if (p)m_cmd = p; return 0; }
 	virtual int run(void *p)=0;
 	virtual void dump() { dbg(m_cmd.c_str()); };
+};
+
+class CmdDone :public CmdBase
+{
+public:
+	int run(void *p);
 };
 
 class CmdList : public std::vector<shared_ptr<CmdBase>>
