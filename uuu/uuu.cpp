@@ -35,6 +35,7 @@
 #include <atomic>
 #include <iomanip>
 #include <map>
+#include <mutex>
 
 #include "../libuuu/libuuu.h"
 
@@ -62,6 +63,8 @@ void print_version()
 int polling_usb(std::atomic<int>& bexit);
 
 int g_overall_status;
+int g_overall_okay;
+int g_overall_failure;
 
 class ShowNotify
 {
@@ -100,17 +103,25 @@ public:
 		if (nt.type == notify::NOTIFY_TRANS_SIZE)
 		{
 			m_trans_size = nt.total;
+			return false;
 		}
 		if (nt.type == notify::NOTIFY_CMD_TOTAL)
 		{
 			m_cmd_total = nt.total;
+			return false;
 		}
 		if (nt.type == notify::NOTIFY_CMD_INDEX)
 		{
 			m_cmd_index = nt.index;
+			return false;
 		}
 		if (nt.type == notify::NOTIFY_DONE)
 		{
+			if (m_status)
+				g_overall_failure++;
+			else
+				g_overall_okay++;
+
 			m_done = 1;
 		}
 		if (nt.type == notify::NOTIFY_CMD_END)
@@ -137,7 +148,7 @@ public:
 
 	void print()
 	{
-		cout << m_dev.c_str() << std::setw(8);
+		cout << m_dev.c_str() << std::setw(10- m_dev.size());
 		
 		if (m_status)
 		{
@@ -183,33 +194,75 @@ public:
 				}
 			}
 		}
-		cout << "] " << m_cmd.c_str() <<"\r";
+		cout << "] " << m_cmd.c_str() << endl;
 	}
 };
 
 static map<string, ShowNotify> g_map_path_nt;
+mutex g_callback_mutex;
 
 int progress(notify nt, void *p)
 {
 	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify>*)p;
 	map<string, ShowNotify>::iterator it;
 	
+	std::lock_guard<std::mutex> lock(g_callback_mutex);
+
 	if ((*np)[nt.id].update(nt))
 	{
 		g_map_path_nt[(*np)[nt.id].m_dev] = (*np)[nt.id];
 
+		cout << "Succues:" << g_overall_okay << "\tFailure:" << g_overall_failure <<endl << endl;;
+
 		for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
 			it->second.print();
+
+		for (int i=0;i<g_map_path_nt.size()+2; i++)
+			cout <<"\x1B[1F";
 	}
 	if (nt.type == notify::NOTIFY_THREAD_EXIT)
 		np->erase(nt.id);
 
 	return 0;
 }
+#ifdef _MSC_VER
+
+#define DEFINE_CONSOLEV2_PROPERTIES
+#include <windows.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+bool enable_vt_mode()
+{
+	// Set output mode to handle virtual terminal sequences
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hOut == INVALID_HANDLE_VALUE)
+	{
+		return false;
+	}
+
+	DWORD dwMode = 0;
+	if (!GetConsoleMode(hOut, &dwMode))
+	{
+		return false;
+	}
+
+	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	if (!SetConsoleMode(hOut, dwMode))
+	{
+		return false;
+	}
+	return true;
+}
+#else
+bool enable_vt_mode() {}
+#endif
 
 int main(int argc, char **argv)
 {
 	print_version();
+
+	enable_vt_mode();
 
 	if (argc == 1)
 		print_help();
