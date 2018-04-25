@@ -137,7 +137,7 @@ int run_cmd(const char * cmd)
 	nt.status = ret;
 	call_notify(nt);
 
-	return -1;
+	return ret;
 }
 
 

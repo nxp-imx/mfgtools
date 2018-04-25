@@ -45,11 +45,19 @@ int HIDTrans::open(void *p)
 		set_last_err_string("Failure open usb device");
 		return -1;
 	}
+
+	int ret = libusb_detach_kernel_driver((libusb_device_handle *)m_devhandle, 0);
+	if(ret<0 && ret != LIBUSB_ERROR_NOT_SUPPORTED)
+	{
+		set_last_err_string("Failure detach kernel driver\n");
+		return -1;
+	}
 	return 0;
 }
 
 int HIDTrans::close()
 {
+	libusb_attach_kernel_driver((libusb_device_handle *)m_devhandle, 0);
 	libusb_close((libusb_device_handle *)m_devhandle);
 	return 0;
 }
