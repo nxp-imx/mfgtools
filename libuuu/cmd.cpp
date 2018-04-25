@@ -30,7 +30,7 @@
 */
 
 #include <memory>
-
+#include <string.h>
 #include "cmd.h"
 #include "libcomm.h"
 #include "libuuu.h"
@@ -231,7 +231,8 @@ int notify_done(notify nt, void *p)
 }
 int wait_uuu_finish(int deamon)
 {
-	std::atomic<int> exit = 0;
+	std::atomic<int> exit;
+	exit = 0;
 	if(!deamon)
 		register_notify_callback(notify_done, &exit);
 
