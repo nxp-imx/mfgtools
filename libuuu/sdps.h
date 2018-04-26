@@ -35,7 +35,10 @@ class SDPSCmd : public CmdBase
 {
 public:
 	string m_filename;
-	SDPSCmd(char *cmd) :CmdBase(cmd) {};
-	int parser(char *cmd = NULL);
-	int run(void *p);
+	SDPSCmd(char *cmd) :CmdBase(cmd) 
+	{
+		insert_param_info("boot", NULL, Param::e_null);
+		insert_param_info("-f", &m_filename, Param::e_string_filename);
+	};
+	int run(CmdCtx *p);
 };

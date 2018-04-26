@@ -35,6 +35,8 @@
 #include "trans.h"
 #include <string.h>
 
+#pragma once
+
 using namespace std;
 
 class HIDReport
@@ -61,27 +63,41 @@ public:
 		init();
 		m_pdev = trans;
 	}
-	
-	int write(vector<uint8_t> &buff, uint8_t report_id)
+
+	int read(vector<uint8_t> &buff)
+	{
+		size_t rs;
+		int ret = m_pdev->read(m_buff.data(), m_size_in + m_size_payload, &rs);
+		if (ret)
+			return ret;
+		buff = m_buff;
+		return ret;
+	}
+
+	int write(void *p, size_t sz, uint8_t report_id)
 	{
 		size_t off;
 		notify nf;
 
+		uint8_t *buff = (uint8_t *)p;
+
 		nf.type = notify::NOTIFY_TRANS_SIZE;
-		nf.index = buff.size();
+		nf.index = sz;
 		call_notify(nf);
 
-		for (off = 0; off < buff.size(); off += m_size_out)
+		for (off = 0; off < sz; off += m_size_out)
 		{
 			m_buff[0] = report_id;
+
+			size_t s = sz - off;
+			if (s > m_size_out)
+				s = m_size_out;
+
+			memcpy(m_buff.data() + m_size_payload, buff + off, s);
+
+			int ret = m_pdev->write(m_buff);
 			
-			size_t sz = buff.size() - off;
-			if (sz > m_size_out)
-				sz = m_size_out;
-
-			memcpy(m_buff.data() + m_size_payload, buff.data() + off, sz);
-
-			if (m_pdev->write(m_buff))
+			if ( ret < 0)
 				return -1;
 
 			notify nf;
@@ -91,4 +107,10 @@ public:
 		}
 		return 0;
 	}
+
+	int write(vector<uint8_t> &buff, uint8_t report_id)
+	{
+		return write(buff.data(), buff.size(), report_id);
+	}
+		
 };

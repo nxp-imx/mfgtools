@@ -83,13 +83,7 @@ int HIDTrans::write(void *buff, size_t size)
 		return ret;
 	}
 
-	if (ret != size)
-	{
-		set_last_err_string("HID write size miss matched");
-		return -1;
-	}
-
-	return 0;
+	return ret;
 }
 
 int HIDTrans::read(void *buff, size_t size, size_t *rsize)

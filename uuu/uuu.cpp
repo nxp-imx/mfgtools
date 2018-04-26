@@ -290,8 +290,9 @@ int main(int argc, char **argv)
 			}
 		}else if (!s.empty() && s[s.size() - 1] == ':')
 		{
-			for (int j = 0; j < argc; j++)
+			for (int j = 1; j < argc; j++)
 			{
+				s = argv[j];
 				cmd.append(s);
 				cmd.append(" ");
 			}

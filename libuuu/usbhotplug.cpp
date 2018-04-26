@@ -85,7 +85,11 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 	nt.str = (char*)str.c_str();
 	call_notify(nt);
 
-	ret = run_cmds(item->m_protocol.c_str(), dev);
+	CmdUsbCtx ctx;
+	ctx.m_config_item = item;
+	ctx.m_dev = dev;
+
+	ret = run_cmds(item->m_protocol.c_str(), &ctx);
 
 	nt.type = notify::NOTIFY_THREAD_EXIT;
 	call_notify(nt);
@@ -196,14 +200,14 @@ int polling_usb(std::atomic<int>& bexit)
 	return 0;
 }
 
-void *get_dev(const char *pro)
+int CmdUsbCtx::look_for_match_device(const char *pro)
 {
 	if (libusb_init(NULL) < 0)
 	{
 		set_last_err_string("Call libusb_init failure");
-		return NULL;
+		return -1;
 	}
-
+	
 	while (1)
 	{
 		libusb_device **newlist = NULL;
@@ -229,7 +233,11 @@ void *get_dev(const char *pro)
 					string str = get_device_path(dev);
 					nt.str = (char*)str.c_str();
 					call_notify(nt);
-					return dev;
+
+					this->m_config_item = item;
+					this->m_dev = dev;
+
+					return 0;
 				}
 		}
 
@@ -237,5 +245,5 @@ void *get_dev(const char *pro)
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
 
-	return NULL;
+	return -1;
 }

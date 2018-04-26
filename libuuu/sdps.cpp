@@ -35,42 +35,11 @@
 #include "libcomm.h"
 #include "buffer.h"
 
-int SDPSCmd::parser(char *cmd)
-{
-	if (cmd)
-		m_cmd = cmd;
-
-	string str;
-	size_t pos = 0;
-
-	str = get_next_param(m_cmd, pos);
-	if (str == "SDPS:")
-	{
-		str = get_next_param(m_cmd, pos);
-	}
-
-	if (str != "boot")
-	{
-		string err("SDPS: Unknow command: ");
-		err += str;
-		set_last_err_string(err);
-		return -1;
-	};
-
-	str = get_next_param(m_cmd, pos);
-
-	shared_ptr<FileBuffer> p = get_file_buffer(str);
-	if (!p)
-		return -1;
-
-	m_filename = str;
-	return 0;
-}
-int SDPSCmd::run(void *pro)
+int SDPSCmd::run(CmdCtx *pro)
 {
 	
 	HIDTrans dev;
-	if(dev.open(pro))
+	if(dev.open(pro->m_dev))
 		return -1;
 
 	shared_ptr<FileBuffer> p = get_file_buffer(m_filename);

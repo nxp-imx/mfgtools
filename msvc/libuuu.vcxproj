@@ -24,6 +24,7 @@
     <ClCompile Include="..\libuuu\config.cpp" />
     <ClCompile Include="..\libuuu\error.cpp" />
     <ClCompile Include="..\libuuu\notify.cpp" />
+    <ClCompile Include="..\libuuu\sdp.cpp" />
     <ClCompile Include="..\libuuu\sdps.cpp" />
     <ClCompile Include="..\libuuu\trans.cpp" />
     <ClCompile Include="..\libuuu\usbhotplug.cpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="..\libuuu\liberror.h" />
     <ClInclude Include="..\libuuu\libuuu.h" />
     <ClInclude Include="..\libuuu\sdps.h" />
+    <ClInclude Include="..\libuuu\sdp.h" />
     <ClInclude Include="..\libuuu\trans.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

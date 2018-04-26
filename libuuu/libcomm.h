@@ -57,3 +57,27 @@ public:
 		return 0;
 	}
 };
+
+inline uint64_t EndianSwap(uint64_t x) {
+	return  (((x & 0x00000000000000ffLL) << 56) |
+		((x & 0x000000000000ff00LL) << 40) |
+		((x & 0x0000000000ff0000LL) << 24) |
+		((x & 0x00000000ff000000LL) << 8) |
+		((x & 0x000000ff00000000LL) >> 8) |
+		((x & 0x0000ff0000000000LL) >> 24) |
+		((x & 0x00ff000000000000LL) >> 40) |
+		((x & 0xff00000000000000LL) >> 56));
+}
+
+inline uint32_t EndianSwap(uint32_t x)
+{
+	return (x >> 24) |
+		((x << 8) & 0x00FF0000) |
+		((x >> 8) & 0x0000FF00) |
+		(x << 24);
+}
+inline uint16_t EndianSwap(uint16_t x)
+{
+	return (x >> 8) |
+		((x << 8) & 0xFF00);
+}

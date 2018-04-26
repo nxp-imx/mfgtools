@@ -32,6 +32,8 @@
 #include <string>
 #include <atomic>
 
+#pragma once
+
 using namespace std;
 
 class TransBase
@@ -68,5 +70,4 @@ public:
 	int close();
 };
 
-void *get_dev(const char *pro);
 int polling_usb(std::atomic<int>& bexit);

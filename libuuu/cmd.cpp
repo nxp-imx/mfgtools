@@ -39,10 +39,78 @@
 #include "sdps.h"
 #include <atomic>
 #include "buffer.h"
+#include "sdp.h"
 
 static CmdMap g_cmd_map;
 
-int CmdList::run_all(void *p, bool dry_run)
+int CmdBase::parser(char *p)
+{
+	if (p != NULL)
+		m_cmd = p;
+
+	size_t pos = 0;
+	string param = get_next_param(m_cmd, pos);
+
+	if (param.find(':') != string::npos)
+		param = get_next_param(m_cmd, pos);
+
+	while (pos < m_cmd.size())
+	{
+		param = get_next_param(m_cmd, pos);
+		
+		struct Param *pp = NULL;
+		for (size_t i = 0; i < m_param.size(); i++)
+		{
+			if (param == m_param[i].key)
+			{
+				pp = &(m_param[i]);
+				break;
+			}
+		}
+		
+		if (pp == NULL)
+		{
+			string err;
+			err = "Unkown Option";
+			err += param;
+			set_last_err_string(err);
+			return -1;
+		}
+
+		if (pp->type == Param::e_int32)
+		{
+			param = get_next_param(m_cmd, pos);
+			*(uint32_t*)pp->pData = str_to_int(param);
+		}
+
+		if (pp->type == Param::e_string_filename)
+		{
+			param = get_next_param(m_cmd, pos);
+			*(string*)pp->pData = param;
+
+			if (get_file_buffer(param) == NULL)
+				return -1;
+		}
+
+		if (pp->type == Param::e_string)
+		{
+			param = get_next_param(m_cmd, pos);
+			*(string*)pp->pData = param;
+		}
+
+		if (pp->type == Param::e_bool)
+		{
+			*(bool*)pp->pData = true;
+		}
+
+		if (pp->type == Param::e_null)
+		{
+		}
+	}
+	return 0;
+}
+
+int CmdList::run_all(CmdCtx *p, bool dry_run)
 {
 	CmdList::iterator it;
 	int ret;
@@ -120,10 +188,24 @@ shared_ptr<CmdBase> CreateCmdObj(string cmd)
 	
 	string c;
 	c = cmd.substr(0, pos+1);
+	pos += 2;
+
 	if (c == "CFG:")
 		return shared_ptr<CmdBase>(new CfgCmd((char*)cmd.c_str()));
 	if (c == "SDPS:")
 		return shared_ptr<CmdBase>(new SDPSCmd((char*)cmd.c_str()));
+	if (c == "SDP:")
+	{
+		string param = get_next_param(cmd, pos);
+		if(param == "dcd")
+			return shared_ptr<CmdBase>(new SDPDcdCmd((char*)cmd.c_str()));
+		if(param == "jump")
+			return shared_ptr<CmdBase>(new SDPJumpCmd((char*)cmd.c_str()));
+		if(param == "write")
+			return shared_ptr<CmdBase>(new SDPWriteCmd((char*)cmd.c_str()));
+		if(param == "status")
+			return shared_ptr<CmdBase>(new SDPStatusCmd((char*)cmd.c_str()));
+	}
 	return NULL;
 }
 
@@ -146,7 +228,13 @@ int run_cmd(const char * cmd)
 		if (p->parser())
 			ret = -1;
 		else
-			ret = p->run(get_dev(pro.c_str()));
+		{
+			CmdUsbCtx ctx;
+			ret = ctx.look_for_match_device(pro.c_str());
+			if (ret)
+				return ret;
+			ret = p->run(&ctx);
+		}
 	}
 	else
 	{
@@ -160,7 +248,7 @@ int run_cmd(const char * cmd)
 	return ret;
 }
 
-int CmdDone::run(void *)
+int CmdDone::run(CmdCtx *)
 {
 	notify nt;
 	nt.type = notify::NOTIFY_DONE;
@@ -168,7 +256,7 @@ int CmdDone::run(void *)
 	return 0;
 }
 
-int run_cmds(const char *procotal, void *p)
+int run_cmds(const char *procotal, CmdCtx *p)
 {
 	if (g_cmd_map.find(procotal) == g_cmd_map.end())
 	{
@@ -177,8 +265,8 @@ int run_cmds(const char *procotal, void *p)
 		set_last_err_string(str.c_str());
 		return -1;
 	}
-
-	return g_cmd_map[procotal]->run_all(p);;
+	
+	return g_cmd_map[procotal]->run_all(p);
 }
 
 static int added_default_boot_cmd(const char *filename)

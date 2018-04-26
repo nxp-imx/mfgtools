@@ -30,7 +30,6 @@
 */
 #include <string>
 #include <vector>
-#include "cmd.h"
 
 using namespace std;
 
@@ -66,11 +65,4 @@ public:
 };
 
 Config * get_config();
-
-class CfgCmd :public CmdBase
-{
-public:
-	CfgCmd(char *cmd) :CmdBase(cmd) {};
-	int run(void *p);
-};
 

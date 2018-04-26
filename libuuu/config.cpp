@@ -31,6 +31,7 @@
 
 #include <vector>
 #include "config.h"
+#include "cmd.h"
 
 static Config g_config;
 
@@ -76,7 +77,7 @@ Config Config::find(string pro)
 	return items;
 }
 
-int CfgCmd::run(void *p)
+int CfgCmd::run(CmdCtx *)
 {
 	size_t pos = 0;
 	string param;
