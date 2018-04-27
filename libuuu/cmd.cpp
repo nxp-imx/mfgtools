@@ -193,7 +193,13 @@ shared_ptr<CmdBase> CreateCmdObj(string cmd)
 	if (c == "CFG:")
 		return shared_ptr<CmdBase>(new CfgCmd((char*)cmd.c_str()));
 	if (c == "SDPS:")
-		return shared_ptr<CmdBase>(new SDPSCmd((char*)cmd.c_str()));
+	{
+		string param = get_next_param(cmd, pos);
+		if(param == "boot")
+			return shared_ptr<CmdBase>(new SDPSCmd((char*)cmd.c_str()));
+		if(param == "done")
+			return shared_ptr<CmdBase>(new CmdDone());
+	}
 	if (c == "SDP:")
 	{
 		string param = get_next_param(cmd, pos);
@@ -205,6 +211,8 @@ shared_ptr<CmdBase> CreateCmdObj(string cmd)
 			return shared_ptr<CmdBase>(new SDPWriteCmd((char*)cmd.c_str()));
 		if(param == "status")
 			return shared_ptr<CmdBase>(new SDPStatusCmd((char*)cmd.c_str()));
+		if (param == "done")
+			return shared_ptr<CmdBase>(new CmdDone());
 	}
 	return NULL;
 }
@@ -269,26 +277,114 @@ int run_cmds(const char *procotal, CmdCtx *p)
 	return g_cmd_map[procotal]->run_all(p);
 }
 
-static int added_default_boot_cmd(const char *filename)
+static int insert_one_cmd(const char * cmd)
 {
-	shared_ptr<CmdList> list(new CmdList);
+	string s = cmd;
+	size_t pos = 0;
 
-	string str = "boot ";
-	str += filename;
-	shared_ptr<CmdBase> cmd(new SDPSCmd((char*)str.c_str()));
-	shared_ptr<CmdBase> done(new CmdDone);
-
-	if (cmd->parser())
-	{
+	string pro = get_next_param(s, pos);
+	shared_ptr<CmdBase> p = CreateCmdObj(s);
+	if (p == NULL)
 		return -1;
+
+	if (p->parser())
+		return -1;
+
+	if (g_cmd_map.find(pro) == g_cmd_map.end())
+	{
+		shared_ptr<CmdList> list(new CmdList);
+		g_cmd_map[pro] = list;
 	}
 
-	list->push_back(cmd);
-	list->push_back(done);
-
-	g_cmd_map["SDPS:"] = list;
+	g_cmd_map[pro]->push_back(p);
 
 	return 0;
+}
+
+
+static int added_default_boot_cmd(const char *filename)
+{
+	string str;
+	str = "SDPS: boot -f ";
+	str += filename;
+
+	int ret = insert_one_cmd(str.c_str());
+	if (ret) return ret;
+
+	insert_one_cmd("SDPS: done");
+
+	str = "SDP: boot -f ";
+	str += filename;
+
+	ret = insert_one_cmd(str.c_str());
+	if (ret) return ret;
+
+	insert_one_cmd("SDPS: done");
+
+	return 0;
+}
+
+int check_version(string str)
+{
+	int x = 0;
+	int ver = 0;
+	for (int i = 0; i < str.size(); i++)
+	{
+		char c = str[i];
+		if (c >= '0' && c <= '9')
+		{
+			x *= 10;
+			x += c - '0';
+		}
+		if (c == '.' || i == str.size()-1 || c == '\n')
+		{
+			ver <<= 8;
+			ver += x;
+			x = 0;
+		}
+	}
+	
+	int cur = get_version();
+
+	if (ver > cur)
+	{
+		string str;
+		str = "Current uuu verison is too low, please download latest one";
+		set_last_err_string(str);
+		return -1;
+	}
+	return 0;
+}
+
+int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff)
+{
+	char uuu_version[] = "uuu_version";
+	string str;
+
+	for (int i = 0; i < pbuff->size(); i++)
+	{
+		uint8_t c = pbuff->at(i);
+		if (c == '\r')
+			continue;
+
+		str.push_back(c);
+		if (c == '\n' || c == 0)
+		{
+			if (str.substr(0, strlen(uuu_version)) == uuu_version)
+			{
+				if (check_version(str.substr(strlen(uuu_version), 10)))
+				{
+					return -1;
+				}
+			}else if (str.size() > 1)
+			{
+				if (str[0] != '#')
+					if (insert_one_cmd(str.c_str()))
+						return -1;
+			}
+			str.clear();
+		}
+	}
 }
 
 int auto_detect_file(const char *filename)
@@ -302,8 +398,7 @@ int auto_detect_file(const char *filename)
 	void *p2 = (void*)str.data();
 	if (memcmp(p1, p2, str.size()) == 0)
 	{
-		printf("todo: script\n");
-		return 0;
+		return parser_cmd_list_file(buffer);
 	}
 	
 	//flash.bin or uboot.bin
