@@ -87,7 +87,16 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 
 	CmdUsbCtx ctx;
 	ctx.m_config_item = item;
-	ctx.m_dev = dev;
+
+	if (libusb_open(dev, (libusb_device_handle **)&(ctx.m_dev)) < 0)
+	{
+		set_last_err_string("Failure open usb device");
+		nt.type = notify::NOTIFY_CMD_END;
+		nt.status = -1;
+		call_notify(nt);
+
+		return -1;
+	}
 
 	ret = run_cmds(item->m_protocol.c_str(), &ctx);
 
@@ -231,11 +240,17 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 					nt.type = notify::NOFITY_DEV_ATTACH;
 
 					string str = get_device_path(dev);
+
+					m_config_item = item;
+
+					if (libusb_open(dev, (libusb_device_handle **)&(m_dev)) < 0)
+					{
+						set_last_err_string("Failure open usb device");
+						return -1;
+					}
+
 					nt.str = (char*)str.c_str();
 					call_notify(nt);
-
-					this->m_config_item = item;
-					this->m_dev = dev;
 
 					return 0;
 				}

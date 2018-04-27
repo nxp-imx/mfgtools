@@ -40,25 +40,22 @@ extern "C"
 
 int HIDTrans::open(void *p)
 {
-	if (libusb_open((libusb_device*)p, (libusb_device_handle **)&m_devhandle) < 0)
-	{
-		set_last_err_string("Failure open usb device");
-		return -1;
-	}
+	m_devhandle = p;
 
-	int ret = libusb_detach_kernel_driver((libusb_device_handle *)m_devhandle, 0);
-	if(ret<0 && ret != LIBUSB_ERROR_NOT_SUPPORTED)
+	if (libusb_kernel_driver_active((libusb_device_handle *)m_devhandle, 0))
 	{
-		set_last_err_string("Failure detach kernel driver\n");
-		return -1;
+		int ret = libusb_detach_kernel_driver((libusb_device_handle *)m_devhandle, 0);
+		if(ret <0 && ret != LIBUSB_ERROR_NOT_SUPPORTED)
+		{
+			set_last_err_string("detach kernel driver failure");
+			return -1;
+		}
 	}
 	return 0;
 }
 
 int HIDTrans::close()
 {
-	libusb_attach_kernel_driver((libusb_device_handle *)m_devhandle, 0);
-	libusb_close((libusb_device_handle *)m_devhandle);
 	return 0;
 }
 

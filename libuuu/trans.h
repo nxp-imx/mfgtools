@@ -42,7 +42,6 @@ public:
 	string m_path;
 	void * m_devhandle;
 	TransBase() { m_devhandle = NULL; }
-	~TransBase() { if (m_devhandle) close();  m_devhandle = NULL; }
 	virtual int open(void *) { return 0; };
 	virtual int close() { return 0; };
 	virtual int write(void *buff, size_t size) = 0;
@@ -64,6 +63,7 @@ class HIDTrans : public TransBase
 	int m_set_report;
 public:
 	HIDTrans() { m_set_report = 9; }
+	~HIDTrans() { if (m_devhandle) close();  m_devhandle = NULL;  }
 	int write(void *buff, size_t size);
 	int read(void *buff, size_t size, size_t *return_size);
 	int open(void *p);
