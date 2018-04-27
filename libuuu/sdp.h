@@ -107,9 +107,10 @@ public:
 
 	int init_cmd() { memset(&m_spdcmd, 0, sizeof(m_spdcmd)); return 0; }
 	int send_cmd(HIDReport *p) { return p->write(&m_spdcmd, sizeof(m_spdcmd), 1); };
-	int get_status(HIDReport *p, uint32_t &status)
+	int get_status(HIDReport *p, uint32_t &status, uint8_t report_id)
 	{
 		m_input.resize(1025);
+		m_input[0] = report_id;
 		int ret = p->read(m_input);
 		if (ret < 0)
 			return -1;
@@ -128,7 +129,7 @@ public:
 	HAB_t get_hab_type(HIDReport *report)
 	{
 		uint32_t status;
-		if (get_status(report, status))
+		if (get_status(report, status, 3))
 			return HabUnknown;
 		
 		if (status == HabEnabled)
@@ -147,7 +148,7 @@ public:
 			return -1;
 	
 		uint32_t status;
-		if (get_status(report, status))
+		if (get_status(report, status, 4))
 			return -1;
 
 		if (ack != status)
@@ -225,5 +226,19 @@ public:
 		m_spdcmd.m_cmd = ROM_KERNEL_CMD_ERROR_STATUS; 
 		insert_param_info("status", NULL, Param::e_null);
 	};
+	int run(CmdCtx *p);
+};
+
+class SDPBootCmd : public SDPCmdBase
+{
+public:
+	bool m_nojump;
+	SDPBootCmd(char *p) : SDPCmdBase(p)
+	{
+		insert_param_info("boot", NULL, Param::e_null);
+		insert_param_info("-f", &m_filename, Param::e_string_filename);
+		insert_param_info("-nojump", &m_nojump, Param::e_bool);
+		m_nojump = false;
+	}
 	int run(CmdCtx *p);
 };

@@ -46,12 +46,13 @@ class HIDReport
 	int m_size_payload;
 public:
 	TransBase * m_pdev;
-	vector<uint8_t> m_buff;
+	vector<uint8_t> m_out_buff;
 	void init()
 	{
-		m_size_in = m_size_out = 1024;
+		m_size_in = 64; 
+		m_size_out = 1024;
 		m_size_payload = 1;
-		m_buff.resize(m_size_in + m_size_payload);
+		m_out_buff.resize(m_size_out + m_size_payload);
 	}
 	HIDReport()
 	{
@@ -67,10 +68,15 @@ public:
 	int read(vector<uint8_t> &buff)
 	{
 		size_t rs;
-		int ret = m_pdev->read(m_buff.data(), m_size_in + m_size_payload, &rs);
+		if (buff.size() < m_size_in + m_size_payload)
+		{
+			set_last_err_string("buffer to small to get a package");
+			return -1;
+		}
+		int ret = m_pdev->read(buff.data(), m_size_in + m_size_payload, &rs);
 		if (ret)
 			return ret;
-		buff = m_buff;
+
 		return ret;
 	}
 
@@ -87,23 +93,26 @@ public:
 
 		for (off = 0; off < sz; off += m_size_out)
 		{
-			m_buff[0] = report_id;
+			m_out_buff[0] = report_id;
 
 			size_t s = sz - off;
 			if (s > m_size_out)
 				s = m_size_out;
 
-			memcpy(m_buff.data() + m_size_payload, buff + off, s);
+			memcpy(m_out_buff.data() + m_size_payload, buff + off, s);
 
-			int ret = m_pdev->write(m_buff);
+			int ret = m_pdev->write(m_out_buff.data(), report_id == 1? s + m_size_payload: m_size_out + m_size_payload);
 			
 			if ( ret < 0)
 				return -1;
 
-			notify nf;
-			nf.type = notify::NOTIFY_TRANS_POS;
-			nf.index = off;
-			call_notify(nf);
+			if (off % 0x1F == 0)
+			{
+				notify nf;
+				nf.type = notify::NOTIFY_TRANS_POS;
+				nf.index = off;
+				call_notify(nf);
+			}
 		}
 		return 0;
 	}

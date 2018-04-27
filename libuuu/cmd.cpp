@@ -161,7 +161,7 @@ string get_next_param(string &cmd, size_t &pos)
 		return str;
 	
 	size_t end = cmd.find(' ', pos);
-	if (end < 0)
+	if (end == cmd.npos)
 		end = cmd.size();
 
 	str = cmd.substr(pos, end - pos);
@@ -211,7 +211,9 @@ shared_ptr<CmdBase> CreateCmdObj(string cmd)
 			return shared_ptr<CmdBase>(new SDPWriteCmd((char*)cmd.c_str()));
 		if(param == "status")
 			return shared_ptr<CmdBase>(new SDPStatusCmd((char*)cmd.c_str()));
-		if (param == "done")
+		if(param == "boot")
+			return shared_ptr<CmdBase>(new SDPBootCmd((char*)cmd.c_str()));
+		if(param == "done")
 			return shared_ptr<CmdBase>(new CmdDone());
 	}
 	return NULL;
@@ -223,7 +225,14 @@ int run_cmd(const char * cmd)
 	p = CreateCmdObj(cmd);
 	int ret;
 
+	if (p == NULL)
+		return -1;
+
 	notify nt;
+	nt.type = notify::NOTIFY_CMD_TOTAL;
+	nt.total = 1;
+	call_notify(nt);
+
 	nt.type = notify::NOTIFY_CMD_START;
 	nt.str = (char *)p->m_cmd.c_str();
 	call_notify(nt);
@@ -241,6 +250,7 @@ int run_cmd(const char * cmd)
 			ret = ctx.look_for_match_device(pro.c_str());
 			if (ret)
 				return ret;
+
 			ret = p->run(&ctx);
 		}
 	}
@@ -319,7 +329,7 @@ static int added_default_boot_cmd(const char *filename)
 	ret = insert_one_cmd(str.c_str());
 	if (ret) return ret;
 
-	insert_one_cmd("SDPS: done");
+	insert_one_cmd("SDP: done");
 
 	return 0;
 }

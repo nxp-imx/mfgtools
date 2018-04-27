@@ -85,7 +85,7 @@ public:
 
 	std::string m_cmd;
 	CmdBase() {};
-	CmdBase(char *p) { m_cmd = p; }
+	CmdBase(char *p) { if(p) m_cmd = p; }
 	void insert_param_info(const char *key, void *pD, Param::Param_Type tp)
 	{
 		m_param.push_back(Param(key, pD, tp));

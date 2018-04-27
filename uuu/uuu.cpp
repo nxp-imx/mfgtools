@@ -132,6 +132,8 @@ public:
 				m_last_err = get_last_err_string();
 			}
 			m_status |= nt.status;
+			if (m_status)
+				g_overall_failure++;
 		}
 		if (nt.type == notify::NOTIFY_TRANS_POS)
 		{
@@ -150,17 +152,17 @@ public:
 	{
 		cout << m_dev.c_str() << std::setw(10- m_dev.size());
 		
-		if (m_status)
-		{
-			cout << m_last_err.c_str() << endl;
-			return;
-		}
-
 		cout << m_cmd_index + 1 << "/" << m_cmd_total << std::setw(2);
 
 		cout<< "[";
 		int width=40;
 		int s = 0;
+
+		if (m_status)
+		{
+			cout << m_last_err.c_str() << endl;
+			return;
+		}
 
 		if (m_done)
 		{
@@ -210,7 +212,8 @@ int progress(notify nt, void *p)
 
 	if ((*np)[nt.id].update(nt))
 	{
-		g_map_path_nt[(*np)[nt.id].m_dev] = (*np)[nt.id];
+		if(!(*np)[nt.id].m_dev.empty())
+			g_map_path_nt[(*np)[nt.id].m_dev] = (*np)[nt.id];
 
 		cout << "Succues:" << g_overall_okay << "\tFailure:" << g_overall_failure <<endl << endl;;
 
@@ -319,6 +322,9 @@ int main(int argc, char **argv)
 	{
 		int ret;
 		ret = run_cmd(cmd.c_str());
+
+		for (int i = 0; i < g_map_path_nt.size()+3; i++)
+			printf("\n");
 		if(ret)
 			printf("\nError: %s\n", get_last_err_string());
 		else
@@ -337,4 +343,3 @@ int main(int argc, char **argv)
 
 	return g_overall_status;
 }
-

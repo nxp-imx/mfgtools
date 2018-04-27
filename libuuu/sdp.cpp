@@ -132,6 +132,9 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 		return -1;
 	}
 
+	if (pIVT->DCDAddress == 0)
+		return 0;
+
 	uint8_t * pdcd = &(buff->at(off + pIVT->DCDAddress - pIVT->SelfAddr));
 
 	if (pdcd[0] != HAB_TAG_DCD)
@@ -142,7 +145,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 		return -1;
 	}
 
-	uint16_t size = (pdcd[1] << 8) | pdcd[2];
+	uint32_t size = (pdcd[1] << 8) | pdcd[2];
 
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_DCD_WRITE;
 	m_spdcmd.m_addr = EndianSwap(rom->free_addr);
@@ -159,7 +162,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 	if (report.write(pdcd, size, 2))
 		return -1;
 
-	if (check_ack(&report, ROM_OK_ACK))
+	if (check_ack(&report, ROM_WRITE_ACK))
 		return -1;
 
 	return 0;
@@ -177,6 +180,37 @@ int SDPSkipDCDCmd::run(CmdCtx*ctx)
 
 	if (check_ack(&report, ROM_OK_ACK))
 		return -1;
+
+	return 0;
+}
+
+int SDPBootCmd::run(CmdCtx *ctx)
+{
+	string str;
+	str = "SDP: dcd -f ";
+	str += m_filename;
+	SDPDcdCmd dcd((char *)str.c_str());
+	if (dcd.parser()) return -1;
+	if (dcd.run(ctx)) return -1;
+
+	str = "SDP: write -f ";
+	str += m_filename;
+	str += " -ivt 0";
+	SDPWriteCmd wr((char *)str.c_str());
+	if (wr.parser()) return -1;
+	if (wr.run(ctx)) return -1;
+
+	str = "SDP: jump -f ";
+	str += m_filename;
+	str += " -ivt";
+
+	SDPJumpCmd jmp((char *)str.c_str());
+	if (!m_nojump)
+	{
+		if (jmp.parser()) return -1;
+		if (jmp.run(ctx)) return -1;
+	}
+	return 0;
 }
 
 int SDPStatusCmd::run(CmdCtx *ctx)
@@ -189,8 +223,14 @@ int SDPStatusCmd::run(CmdCtx *ctx)
 	if (report.write(&m_spdcmd, sizeof(m_spdcmd), 1))
 		return -1;
 
-	if (check_ack(&report, ROM_OK_ACK))
+	if (get_hab_type(&report) == HabUnknown)
 		return -1;
+
+	uint32_t status;
+	if (get_status(&report, status, 4))
+		return -1;
+
+	return 0;
 }
 
 int SDPWriteCmd::run(CmdCtx*ctx)
@@ -251,14 +291,51 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		if (report.write(pbuff, sz, 2))
 			return -1;
 
-		if (check_ack(&report, ROM_OK_ACK))
+		if (check_ack(&report, ROM_STATUS_ACK))
 			return -1;
 	}
 
 	return 0;
 }
 
-int SDPJumpCmd::run(CmdCtx *)
+int SDPJumpCmd::run(CmdCtx *ctx)
 {
+	ROM_INFO * rom;
+	rom = search_rom_info(ctx->m_config_item);
+
+	HIDTrans dev;
+	if (dev.open(ctx->m_dev))
+		return -1;
+
+	HIDReport report(&dev);
+
+	if (rom == NULL)
+	{
+		string_ex err;
+		err.format("%s:%d can't get rom info", __FUNCTION__, __LINE__);
+		set_last_err_string(err);
+		return -1;
+	}
+
+	if (rom->flags & ROM_INFO_HID_SKIP_DCD)
+	{
+		SDPSkipDCDCmd skipcmd(NULL);
+		if (skipcmd.run(ctx))
+			return -1;
+	}
+
+	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
+
+	int off = 0;
+	IvtHeader *pIVT = search_ivt_header(buff, off);
+
+	m_spdcmd.m_addr = EndianSwap(pIVT->SelfAddr);
+
+	if (report.write(&m_spdcmd, sizeof(m_spdcmd), 1))
+		return -1;
+
+	//Omit last return value.
+	check_ack(&report, ROM_OK_ACK);
+
 	return 0;
 }
