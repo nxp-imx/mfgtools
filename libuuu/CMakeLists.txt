@@ -19,6 +19,7 @@ set(SOURCES
 	trans.cpp
 	usbhotplug.cpp
 	version.cpp
+	sdp.cpp
 	gitversion.h
 )
 
