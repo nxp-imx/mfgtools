@@ -193,6 +193,7 @@ public:
 	};
 
 	int run(CmdCtx *p);
+	int run(CmdCtx *p, void *buff, size_t size, uint32_t addr);
 };
 
 class SDPJumpCmd : public SDPCmdBase

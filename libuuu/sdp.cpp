@@ -268,7 +268,11 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		size = fbuff->size() - off;
 		pbuff = (uint8_t*)pIvt;
 	}
+	return run(ctx, pbuff, size, m_download_addr);
+}
 
+int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
+{
 	HIDTrans dev;
 	if (dev.open(ctx->m_dev))
 		return -1;
@@ -282,7 +286,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		if (sz > m_max_download_pre_cmd)
 			sz = m_max_download_pre_cmd;
 
-		m_spdcmd.m_addr = EndianSwap((uint32_t)(m_download_addr + i)); // force use 32bit endian swap function;
+		m_spdcmd.m_addr = EndianSwap((uint32_t)(addr + i)); // force use 32bit endian swap function;
 		m_spdcmd.m_count = EndianSwap((uint32_t)sz); //force use 32bit endian swap function;
 
 		if (report.write(&m_spdcmd, sizeof(m_spdcmd), 1))
@@ -316,6 +320,14 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 		set_last_err_string(err);
 		return -1;
 	}
+	
+	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
+
+	int off = 0;
+	IvtHeader *pIVT = search_ivt_header(buff, off);
+
+	m_spdcmd.m_addr = EndianSwap(pIVT->SelfAddr);
+
 
 	if (rom->flags & ROM_INFO_HID_SKIP_DCD)
 	{
@@ -323,13 +335,17 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 		if (skipcmd.run(ctx))
 			return -1;
 	}
+	else
+	{	/*Clear DCD*/
+		IvtHeader header;
+		header = *pIVT;
 
-	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
+		header.DCDAddress = 0;
 
-	int off = 0;
-	IvtHeader *pIVT = search_ivt_header(buff, off);
-
-	m_spdcmd.m_addr = EndianSwap(pIVT->SelfAddr);
+		SDPWriteCmd writecmd(NULL);
+		if(writecmd.run(ctx, &header, sizeof(header), pIVT->SelfAddr))
+			return -1;
+	}
 
 	if (report.write(&m_spdcmd, sizeof(m_spdcmd), 1))
 		return -1;
