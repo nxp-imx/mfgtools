@@ -30,8 +30,11 @@
 */
 #include <string>
 #include <stdarg.h>
+#include <locale>
 
 #pragma once
+
+using namespace std;
 
 void call_notify(struct notify nf);
 
@@ -80,4 +83,23 @@ inline uint16_t EndianSwap(uint16_t x)
 {
 	return (x >> 8) |
 		((x << 8) & 0xFF00);
+}
+
+inline string str_to_upper(string str)
+{
+	std::locale loc;
+	string s;
+	
+	for (int i = 0; i < str.size(); i++)
+		s.push_back(std::toupper(str[i], loc));
+	
+	return s;
+}
+
+inline bool compare_str(string &str1, string &str2, bool ignore_case)
+{
+	if (ignore_case)
+		return str_to_upper(str1) == str_to_upper(str2);
+	else
+		return str1 == str2;
 }

@@ -176,7 +176,6 @@ int polling_usb(std::atomic<int>& bexit)
 {
 	libusb_device **oldlist = NULL;
 	libusb_device **newlist = NULL;
-	libusb_device *dev;
 
 	if (libusb_init(NULL) < 0)
 	{

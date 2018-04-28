@@ -61,7 +61,8 @@ int CmdBase::parser(char *p)
 		struct Param *pp = NULL;
 		for (size_t i = 0; i < m_param.size(); i++)
 		{
-			if (param == m_param[i].key)
+			string key = string(m_param[i].key);
+			if (compare_str(param, key, m_param[i].ignore_case))
 			{
 				pp = &(m_param[i]);
 				break;
@@ -194,30 +195,32 @@ shared_ptr<CmdBase> CreateCmdObj(string cmd)
 	c = cmd.substr(0, pos+1);
 	pos += 2;
 
+	c = str_to_upper(c);
+
 	if (c == "CFG:")
 		return shared_ptr<CmdBase>(new CfgCmd((char*)cmd.c_str()));
 	if (c == "SDPS:")
 	{
-		string param = get_next_param(cmd, pos);
-		if(param == "boot")
+		string param = str_to_upper(get_next_param(cmd, pos));
+		if(param == "BOOT")
 			return shared_ptr<CmdBase>(new SDPSCmd((char*)cmd.c_str()));
-		if(param == "done")
+		if(param == "DONE")
 			return shared_ptr<CmdBase>(new CmdDone());
 	}
 	if (c == "SDP:")
 	{
-		string param = get_next_param(cmd, pos);
-		if(param == "dcd")
+		string param = str_to_upper(get_next_param(cmd, pos));
+		if(param == "DCD")
 			return shared_ptr<CmdBase>(new SDPDcdCmd((char*)cmd.c_str()));
-		if(param == "jump")
+		if(param == "JUMP")
 			return shared_ptr<CmdBase>(new SDPJumpCmd((char*)cmd.c_str()));
-		if(param == "write")
+		if(param == "WRITE")
 			return shared_ptr<CmdBase>(new SDPWriteCmd((char*)cmd.c_str()));
-		if(param == "status")
+		if(param == "STATUS")
 			return shared_ptr<CmdBase>(new SDPStatusCmd((char*)cmd.c_str()));
-		if(param == "boot")
+		if(param == "BOOT")
 			return shared_ptr<CmdBase>(new SDPBootCmd((char*)cmd.c_str()));
-		if(param == "done")
+		if(param == "DONE")
 			return shared_ptr<CmdBase>(new CmdDone());
 	}
 	return NULL;
@@ -399,6 +402,7 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff)
 			str.clear();
 		}
 	}
+	return 0;
 }
 
 int auto_detect_file(const char *filename)

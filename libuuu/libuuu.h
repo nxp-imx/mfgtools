@@ -89,8 +89,8 @@ struct notify
 	union
 	{
 		int status;
-		int index;
-		int total;
+		size_t index;
+		size_t total;
 		char *str;
 	};
 };

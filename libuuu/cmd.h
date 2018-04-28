@@ -71,10 +71,10 @@ struct Param
 	const char * key;
 	void *pData;
 	int type;
-
-	Param(const char *ky, void *pD, Param_Type tp)
+	bool ignore_case;
+	Param(const char *ky, void *pD, Param_Type tp, bool ignore=true)
 	{
-		key = ky; pData = pD; type = tp;
+		key = ky; pData = pD; type = tp; ignore_case = ignore;
 	}
 };
 
@@ -86,9 +86,9 @@ public:
 	std::string m_cmd;
 	CmdBase() {};
 	CmdBase(char *p) { if(p) m_cmd = p; }
-	void insert_param_info(const char *key, void *pD, Param::Param_Type tp)
+	void insert_param_info(const char *key, void *pD, Param::Param_Type tp, bool ignore_case = true)
 	{
-		m_param.push_back(Param(key, pD, tp));
+		m_param.push_back(Param(key, pD, tp, ignore_case));
 	}
 	virtual int parser(char *p = NULL); 
 	virtual int run(CmdCtx *p)=0;

@@ -275,15 +275,15 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 
 	HIDReport report(&dev);
 	
-	for (uint32_t i=0; i < size; i += m_max_download_pre_cmd)
+	for (size_t i=0; i < size; i += m_max_download_pre_cmd)
 	{
-		uint32_t sz;
+		size_t sz;
 		sz = size - i;
 		if (sz > m_max_download_pre_cmd)
 			sz = m_max_download_pre_cmd;
 
-		m_spdcmd.m_addr = EndianSwap(m_download_addr + i);
-		m_spdcmd.m_count = EndianSwap((uint32_t)sz);
+		m_spdcmd.m_addr = EndianSwap((uint32_t)(m_download_addr + i)); // force use 32bit endian swap function;
+		m_spdcmd.m_count = EndianSwap((uint32_t)sz); //force use 32bit endian swap function;
 
 		if (report.write(&m_spdcmd, sizeof(m_spdcmd), 1))
 			return -1;
