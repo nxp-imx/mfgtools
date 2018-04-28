@@ -40,8 +40,16 @@ static Config g_config;
 
 Config::Config()
 {
-	push_back(ConfigItem("SDPS:", "MX8QXP", NULL, NXP_VID, 0x012F, 0x0002));
-	push_back(ConfigItem("SDP:", "MX7D", NULL, FSL_VID, 0x0076));
+	push_back(ConfigItem("SDPS:", "MX8QXP", NULL,   NXP_VID, 0x012F, 0x0002));
+	push_back(ConfigItem("SDP:", "MX7D",    NULL,   FSL_VID, 0x0076));
+	push_back(ConfigItem("SDP:", "MX6Q",    NULL,   FSL_VID, 0x0054));
+	push_back(ConfigItem("SDP:", "MX6D",    "MX6Q", FSL_VID, 0x0061));
+	push_back(ConfigItem("SDP:", "MX6SL",   "MX6Q", FSL_VID, 0x0063));
+	push_back(ConfigItem("SDP:", "MX6SX",   "MX6Q", FSL_VID, 0x0071));
+	push_back(ConfigItem("SDP:", "MX6UL",   "MX7D", FSL_VID, 0x007D));
+	push_back(ConfigItem("SDP:", "MX6ULL",  "MX7D", FSL_VID, 0x0080));
+	push_back(ConfigItem("SDP:", "MX6SLL",  "MX7D", NXP_VID, 0x0128));
+	push_back(ConfigItem("SDP:", "MX7ULP",   NULL,  NXP_VID, 0x0054));
 }
 
 Config * get_config()
