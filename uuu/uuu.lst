@@ -12,8 +12,8 @@ uuu_version 1.0.0
 #                      boot -f filename 
 # Command CFG: SDP: -chip imx6ull -pid 0x0123 -vid 0x5678 [--bcdversion = 0x0002] [--compatible mx6q]
 
-CFG: SDP: -chip imx6ull -pid 0x1234 -vid 0x5678
-SDP: dcd -f u-boot-dtb.imx
+CFG: SDP:   -chip imx6ull -pid 0x1234 -vid 0x5678
+SDP: dcd   -f  u-boot-dtb.imx1
 SDP: write -f u-boot-dtb.imx -ivt
 SDP: write -f u-boot-dtb.imx -addr 0x84000000
 SDP: jump -f u-boot-dtb.imx -ivt

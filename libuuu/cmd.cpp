@@ -160,6 +160,10 @@ string get_next_param(string &cmd, size_t &pos)
 	if (pos >= cmd.size())
 		return str;
 	
+	//trim left space
+	while (cmd[pos] == ' ' && pos < cmd.size())
+		pos++;
+
 	size_t end = cmd.find(' ', pos);
 	if (end == cmd.npos)
 		end = cmd.size();
