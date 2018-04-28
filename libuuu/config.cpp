@@ -32,6 +32,7 @@
 #include <vector>
 #include "config.h"
 #include "cmd.h"
+#include "libuuu.h"
 
 static Config g_config;
 
@@ -50,6 +51,22 @@ Config::Config()
 	push_back(ConfigItem("SDP:", "MX6ULL",  "MX7D", FSL_VID, 0x0080));
 	push_back(ConfigItem("SDP:", "MX6SLL",  "MX7D", NXP_VID, 0x0128));
 	push_back(ConfigItem("SDP:", "MX7ULP",   NULL,  NXP_VID, 0x0054));
+}
+
+int uuu_for_each_cfg(uuu_show_cfg fn, void *p)
+{
+	for (int i = 0; i < g_config.size(); i++)
+	{
+		if (fn(g_config[i].m_protocol.c_str(),
+			   g_config[i].m_chip.c_str(),
+			   g_config[i].m_compatible.c_str(),
+			   g_config[i].m_vid,
+			   g_config[i].m_pid,
+			   g_config[i].m_bcdVersion,
+			   p))
+			return -1;
+	}
+	return 0;
 }
 
 Config * get_config()

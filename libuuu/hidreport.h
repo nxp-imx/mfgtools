@@ -83,11 +83,11 @@ public:
 	int write(void *p, size_t sz, uint8_t report_id)
 	{
 		size_t off;
-		notify nf;
+		uuu_notify nf;
 
 		uint8_t *buff = (uint8_t *)p;
 
-		nf.type = notify::NOTIFY_TRANS_SIZE;
+		nf.type = uuu_notify::NOTIFY_TRANS_SIZE;
 		nf.index = sz;
 		call_notify(nf);
 
@@ -108,8 +108,8 @@ public:
 
 			if (off % 0x1F == 0)
 			{
-				notify nf;
-				nf.type = notify::NOTIFY_TRANS_POS;
+				uuu_notify nf;
+				nf.type = uuu_notify::NOTIFY_TRANS_POS;
 				nf.index = off;
 				call_notify(nf);
 			}

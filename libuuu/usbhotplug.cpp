@@ -77,8 +77,8 @@ static string get_device_path(libusb_device *dev)
 static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 {
 	int ret;
-	notify nt;
-	nt.type = notify::NOFITY_DEV_ATTACH;
+	uuu_notify nt;
+	nt.type = uuu_notify::NOFITY_DEV_ATTACH;
 	
 	string str;
 	str = get_device_path(dev);
@@ -91,7 +91,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 	if (libusb_open(dev, (libusb_device_handle **)&(ctx.m_dev)) < 0)
 	{
 		set_last_err_string("Failure open usb device");
-		nt.type = notify::NOTIFY_CMD_END;
+		nt.type = uuu_notify::NOTIFY_CMD_END;
 		nt.status = -1;
 		call_notify(nt);
 
@@ -100,7 +100,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 
 	ret = run_cmds(item->m_protocol.c_str(), &ctx);
 
-	nt.type = notify::NOTIFY_THREAD_EXIT;
+	nt.type = uuu_notify::NOTIFY_THREAD_EXIT;
 	call_notify(nt);
 
 	return ret;
@@ -235,8 +235,8 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 			ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
 			if (item && item->m_protocol == pro)
 				{
-					notify nt;
-					nt.type = notify::NOFITY_DEV_ATTACH;
+					uuu_notify nt;
+					nt.type = uuu_notify::NOFITY_DEV_ATTACH;
 
 					string str = get_device_path(dev);
 

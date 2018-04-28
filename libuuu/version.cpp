@@ -38,12 +38,12 @@
 
 static const char g_version[] = "libuuu-1.0.1" GIT_VERSION;
 
-const char *get_version_string()
+const char *uuu_get_version_string()
 {
 	return g_version;
 }
 
-int get_version()
+int uuu_get_version()
 {
 	return (VER_MAJ << 16) | (VER_MIN << 8) | VER_S;
 }

@@ -43,26 +43,26 @@
  * Get Last error string
  * @return last error string
 */
-EXT const char * get_last_err_string();
+EXT const char * uuu_get_last_err_string();
 
 /**
 * Get Last error code
 * @return last error code
 */
-EXT int get_last_err();
+EXT int uuu_get_last_err();
 
-EXT const char * get_version_string();
+EXT const char * uuu_get_version_string();
 
 /**
  * 1.0.1
  * bit[31:24].bit[23:16].bit[15:0]
  */
 
-EXT int get_version();
+EXT int uuu_get_version();
 
 
 
-struct notify
+struct uuu_notify
 {
 	enum NOTIFY_TYPE
 	{
@@ -95,13 +95,16 @@ struct notify
 	};
 };
 
-typedef int (*notify_fun)(struct notify, void *data);
+typedef int (*uuu_notify_fun)(struct uuu_notify, void *data);
 
-int register_notify_callback(notify_fun f, void *data);
-int unregister_notify_callback(notify_fun f);
+int uuu_register_notify_callback(uuu_notify_fun f, void *data);
+int uuu_unregister_notify_callback(uuu_notify_fun f);
 
-int run_cmd(const char * cmd);
-int auto_detect_file(const char * filename);
-int wait_uuu_finish(int deamon);
+typedef int(*uuu_show_cfg)(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t bcdversion,void *p);
+int uuu_for_each_cfg(uuu_show_cfg fn, void *p);
+
+int uuu_run_cmd(const char * cmd);
+int uuu_auto_detect_file(const char * filename);
+int uuu_wait_uuu_finish(int deamon);
 
 #endif

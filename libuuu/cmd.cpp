@@ -116,8 +116,8 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 	CmdList::iterator it;
 	int ret;
 	
-	notify nt;
-	nt.type = notify::NOTIFY_CMD_TOTAL;
+	uuu_notify nt;
+	nt.type = uuu_notify::NOTIFY_CMD_TOTAL;
 	nt.total = size();
 	call_notify(nt);
 
@@ -131,19 +131,19 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 		}
 		else
 		{
-			notify nt;
+			uuu_notify nt;
 			
-			nt.type = notify::NOTIFY_CMD_INDEX;
+			nt.type = uuu_notify::NOTIFY_CMD_INDEX;
 			nt.index = i;
 			call_notify(nt);
 
-			nt.type = notify::NOTIFY_CMD_START;
+			nt.type = uuu_notify::NOTIFY_CMD_START;
 			nt.str = (char *)(*it)->m_cmd.c_str();
 			call_notify(nt);
 			
 			ret = (*it)->run(p);
 
-			nt.type = notify::NOTIFY_CMD_END;
+			nt.type = uuu_notify::NOTIFY_CMD_END;
 			nt.status = ret;
 			call_notify(nt);
 			if (ret)
@@ -226,7 +226,7 @@ shared_ptr<CmdBase> CreateCmdObj(string cmd)
 	return NULL;
 }
 
-int run_cmd(const char * cmd)
+int uuu_run_cmd(const char * cmd)
 {
 	shared_ptr<CmdBase> p;
 	p = CreateCmdObj(cmd);
@@ -235,12 +235,12 @@ int run_cmd(const char * cmd)
 	if (p == NULL)
 		return -1;
 
-	notify nt;
-	nt.type = notify::NOTIFY_CMD_TOTAL;
+	uuu_notify nt;
+	nt.type = uuu_notify::NOTIFY_CMD_TOTAL;
 	nt.total = 1;
 	call_notify(nt);
 
-	nt.type = notify::NOTIFY_CMD_START;
+	nt.type = uuu_notify::NOTIFY_CMD_START;
 	nt.str = (char *)p->m_cmd.c_str();
 	call_notify(nt);
 
@@ -266,7 +266,7 @@ int run_cmd(const char * cmd)
 		return ret =p->run(NULL);
 	}
 
-	nt.type = notify::NOTIFY_CMD_END;
+	nt.type = uuu_notify::NOTIFY_CMD_END;
 	nt.status = ret;
 	call_notify(nt);
 
@@ -275,8 +275,8 @@ int run_cmd(const char * cmd)
 
 int CmdDone::run(CmdCtx *)
 {
-	notify nt;
-	nt.type = notify::NOTIFY_DONE;
+	uuu_notify nt;
+	nt.type = uuu_notify::NOTIFY_DONE;
 	call_notify(nt);
 	return 0;
 }
@@ -361,7 +361,7 @@ int check_version(string str)
 		}
 	}
 	
-	int cur = get_version();
+	int cur = uuu_get_version();
 
 	if (ver > cur)
 	{
@@ -405,7 +405,7 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff)
 	return 0;
 }
 
-int auto_detect_file(const char *filename)
+int uuu_auto_detect_file(const char *filename)
 {
 	shared_ptr<FileBuffer> buffer = get_file_buffer(filename);
 	if (buffer == NULL)
@@ -423,19 +423,19 @@ int auto_detect_file(const char *filename)
 	return added_default_boot_cmd(filename);
 }
 
-int notify_done(notify nt, void *p)
+int notify_done(uuu_notify nt, void *p)
 {
-	if(nt.type == notify::NOTIFY_DONE)
+	if(nt.type == uuu_notify::NOTIFY_DONE)
 		*(std::atomic<int> *) p = 1;
 
 	return 0;
 }
-int wait_uuu_finish(int deamon)
+int uuu_wait_uuu_finish(int deamon)
 {
 	std::atomic<int> exit;
 	exit = 0;
 	if(!deamon)
-		register_notify_callback(notify_done, &exit);
+		uuu_register_notify_callback(notify_done, &exit);
 
 	polling_usb(exit);
 

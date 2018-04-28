@@ -39,7 +39,7 @@ using namespace std;
 static string g_last_error_str;
 static int g_last_err_id;
 
-const char * get_last_err_string()
+const char * uuu_get_last_err_string()
 {
 	return g_last_error_str.c_str();
 }
@@ -49,7 +49,7 @@ void set_last_err_string(string str)
 	g_last_error_str = str;
 }
 
-int get_last_err()
+int uuu_get_last_err()
 {
 	return g_last_err_id;
 }

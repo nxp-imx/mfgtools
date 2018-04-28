@@ -40,13 +40,13 @@ using namespace std;
 
 struct  notify_map
 {
-	notify_fun f;
+	uuu_notify_fun f;
 	void *data;
 };
 
 static vector<struct notify_map> g_notify_callback_list;
 
-int register_notify_callback(notify_fun f, void *data)
+int uuu_register_notify_callback(uuu_notify_fun f, void *data)
 {
 	notify_map a;
 	a.f = f;
@@ -62,7 +62,7 @@ int register_notify_callback(notify_fun f, void *data)
 	return 0;
 }
 
-int unregister_notify_callback(notify_fun f)
+int uuu_unregister_notify_callback(uuu_notify_fun f)
 {
 	vector<struct notify_map>::iterator it=g_notify_callback_list.begin();
 
@@ -77,7 +77,7 @@ int unregister_notify_callback(notify_fun f)
 	return 0;
 }
 
-void call_notify(struct notify nf)
+void call_notify(struct uuu_notify nf)
 {
 	vector<struct notify_map>::iterator it = g_notify_callback_list.begin();
 

@@ -57,7 +57,16 @@ void print_help()
 }
 void print_version()
 {
-	printf("uuu (universal update utitle) for nxp imx chips -- %s\n\n", get_version_string());
+	printf("uuu (universal update utitle) for nxp imx chips -- %s\n\n", uuu_get_version_string());
+}
+
+int print_cfg(const char *pro, const char * chip, const char *compatible, uint16_t pid, uint16_t vid, uint16_t bcdVersion, void *p)
+{
+	if (bcdVersion == 0xFFFF)
+		printf("\t%s\t %s\t 0x%04x\t 0x%04x\n", pro, chip, pid, vid);
+	else
+		printf("\t%s\t %s\t 0x%04x\t 0x%04x\t 0x%04x\n", pro, chip, pid, vid, bcdVersion);
+	return 0;
 }
 
 int polling_usb(std::atomic<int>& bexit);
@@ -88,34 +97,34 @@ public:
 		m_done = 0;
 	}
 
-	bool update(notify nt)
+	bool update(uuu_notify nt)
 	{
-		if (nt.type == notify::NOFITY_DEV_ATTACH)
+		if (nt.type == uuu_notify::NOFITY_DEV_ATTACH)
 		{
 			m_dev = nt.str;
 			m_done = 0;
 			m_status = 0;
 		}
-		if (nt.type == notify::NOTIFY_CMD_START)
+		if (nt.type == uuu_notify::NOTIFY_CMD_START)
 		{
 			m_cmd = nt.str;
 		}
-		if (nt.type == notify::NOTIFY_TRANS_SIZE)
+		if (nt.type == uuu_notify::NOTIFY_TRANS_SIZE)
 		{
 			m_trans_size = nt.total;
 			return false;
 		}
-		if (nt.type == notify::NOTIFY_CMD_TOTAL)
+		if (nt.type == uuu_notify::NOTIFY_CMD_TOTAL)
 		{
 			m_cmd_total = nt.total;
 			return false;
 		}
-		if (nt.type == notify::NOTIFY_CMD_INDEX)
+		if (nt.type == uuu_notify::NOTIFY_CMD_INDEX)
 		{
 			m_cmd_index = nt.index;
 			return false;
 		}
-		if (nt.type == notify::NOTIFY_DONE)
+		if (nt.type == uuu_notify::NOTIFY_DONE)
 		{
 			if (m_status)
 				g_overall_failure++;
@@ -124,18 +133,18 @@ public:
 
 			m_done = 1;
 		}
-		if (nt.type == notify::NOTIFY_CMD_END)
+		if (nt.type == uuu_notify::NOTIFY_CMD_END)
 		{
 			if(nt.status)
 			{
 				g_overall_status = nt.status;
-				m_last_err = get_last_err_string();
+				m_last_err = uuu_get_last_err_string();
 			}
 			m_status |= nt.status;
 			if (m_status)
 				g_overall_failure++;
 		}
-		if (nt.type == notify::NOTIFY_TRANS_POS)
+		if (nt.type == uuu_notify::NOTIFY_TRANS_POS)
 		{
 			if (m_trans_size == 0)
 				return false;
@@ -203,7 +212,7 @@ public:
 static map<string, ShowNotify> g_map_path_nt;
 mutex g_callback_mutex;
 
-int progress(notify nt, void *p)
+int progress(uuu_notify nt, void *p)
 {
 	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify>*)p;
 	map<string, ShowNotify>::iterator it;
@@ -223,7 +232,7 @@ int progress(notify nt, void *p)
 		for (int i=0;i<g_map_path_nt.size()+2; i++)
 			cout <<"\x1B[1F";
 	}
-	if (nt.type == notify::NOTIFY_THREAD_EXIT)
+	if (nt.type == uuu_notify::NOTIFY_THREAD_EXIT)
 		np->erase(nt.id);
 
 	return 0;
@@ -274,6 +283,8 @@ int main(int argc, char **argv)
 	int step = 0;
 	string filename; 
 	string cmd;
+	int verbose = 0;
+
 	for (int i = 1; i < argc; i++)
 	{
 		string s = argv[i];
@@ -286,7 +297,11 @@ int main(int argc, char **argv)
 			{
 				step = 1;
 			}
-			else
+			else if (s == "-v")
+			{
+				verbose = 1;
+
+			}else
 			{
 				cout << "Unknown option: " << s.c_str();
 				return -1;
@@ -314,32 +329,40 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
+	if (verbose)
+	{
+		printf("Build in config:\n");
+		printf("\tPctl\tChip\tPid\tVid\t\BcdVersion\n");
+		printf("\t==========================================\n");
+		uuu_for_each_cfg(print_cfg, NULL);
+	}
+
 	map<uint64_t, ShowNotify> nt_session;
 
-	register_notify_callback(progress, &nt_session);
+	uuu_register_notify_callback(progress, &nt_session);
 
 	if (!cmd.empty())
 	{
 		int ret;
-		ret = run_cmd(cmd.c_str());
+		ret = uuu_run_cmd(cmd.c_str());
 
 		for (int i = 0; i < g_map_path_nt.size()+3; i++)
 			printf("\n");
 		if(ret)
-			printf("\nError: %s\n", get_last_err_string());
+			printf("\nError: %s\n", uuu_get_last_err_string());
 		else
 			printf("Okay");
 
 		return ret;
 	}
 
-	int ret = auto_detect_file(filename.c_str());
+	int ret = uuu_auto_detect_file(filename.c_str());
 	if (ret)
 	{
-		cout << "Error:" << get_last_err_string();
+		cout << "Error:" << uuu_get_last_err_string();
 		return ret;
 	}
-	wait_uuu_finish(deamon);
+	uuu_wait_uuu_finish(deamon);
 
 	return g_overall_status;
 }
