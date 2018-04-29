@@ -6,7 +6,7 @@ uuu_version 1.0.0
 # PRO 
 #          SDPS: Stream download after MX8QXPB0 
 #                     boot -f filename
-#          SDP:    iMX6/iMX7 HID download protocol.
+#          SDP:  iMX6/iMX7 HID download protocol.
 #                      dcd -f filename
 #                      write -f filename [-addr 0x000000] [-ivt 0]
 #                      boot -f filename 
@@ -16,4 +16,4 @@ CFG: SDP:   -chip imx6ull -pid 0x1234 -vid 0x5678
 SDP: dcd   -f  u-boot-dtb.imx1
 SDP: write -f u-boot-dtb.imx -ivt
 SDP: write -f u-boot-dtb.imx -addr 0x84000000
-SDP: jump -f u-boot-dtb.imx -ivt
+SDP: jump  -f u-boot-dtb.imx -ivt

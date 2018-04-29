@@ -55,7 +55,7 @@ class CmdUsbCtx : public CmdCtx
 public:
 	CmdUsbCtx() :CmdCtx() {};
 	int look_for_match_device(const char * procotol);
-};
+}; 
 
 struct Param
 {
@@ -95,9 +95,18 @@ public:
 	virtual void dump() { dbg(m_cmd.c_str()); };
 };
 
+typedef shared_ptr<CmdBase> (*CreateCmdObj) (char *);
+
+class CmdObjCreateMap:public map<string, CreateCmdObj>
+{
+public:
+	CmdObjCreateMap();
+};
+
 class CmdDone :public CmdBase
 {
 public:
+	CmdDone(char *p) :CmdBase(p) {};
 	int run(CmdCtx *p);
 };
 
@@ -132,8 +141,6 @@ public:
 	CfgCmd(char *cmd) :CmdBase(cmd) {};
 	int run(CmdCtx *p);
 };
-
-shared_ptr<CmdBase> CreateCmdObj(string cmd);
 
 string get_next_param(string &cmd, size_t &pos);
 

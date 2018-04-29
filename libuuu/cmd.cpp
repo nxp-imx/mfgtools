@@ -42,6 +42,15 @@
 #include "sdp.h"
 
 static CmdMap g_cmd_map;
+static CmdObjCreateMap g_cmd_create_map;
+
+template <class T>
+void * create_object() { return new T; }
+
+typedef void * (*FN)();
+
+FN g_fn = create_object<int>;
+
 
 int CmdBase::parser(char *p)
 {
@@ -185,51 +194,52 @@ int str_to_int(string &str)
 	return strtol(str.c_str(), NULL, 10);
 }
 
-shared_ptr<CmdBase> CreateCmdObj(string cmd)
+template <class T> shared_ptr<CmdBase> new_cmd_obj(char *p)
 {
-	size_t pos = cmd.find(": ", 0);
-	if (pos == string::npos)
-		return NULL;
+	return shared_ptr<CmdBase>(new T(p)); 
+}
+
+CmdObjCreateMap::CmdObjCreateMap()
+{
+	(*this)["CFG:"] = new_cmd_obj<CfgCmd>;
 	
-	string c;
-	c = cmd.substr(0, pos+1);
-	pos += 2;
+	(*this)["SDPS:BOOT"] = new_cmd_obj<SDPBootCmd>;
+	(*this)["SDPS:DONE"] = new_cmd_obj<CmdDone>;
 
-	c = str_to_upper(c);
+	(*this)["SDP:DCD"] = new_cmd_obj<SDPDcdCmd>;
+	(*this)["SDP:JUMP"] = new_cmd_obj<SDPJumpCmd>;
+	(*this)["SDP:WRITE"] = new_cmd_obj<SDPWriteCmd>;
+	(*this)["SDP:STATUS"] = new_cmd_obj<SDPStatusCmd>;
+	(*this)["SDP:BOOT"] = new_cmd_obj<SDPBootCmd>;
+	(*this)["SDP:DONE"] = new_cmd_obj<CmdDone>;
+}
 
-	if (c == "CFG:")
-		return shared_ptr<CmdBase>(new CfgCmd((char*)cmd.c_str()));
-	if (c == "SDPS:")
+shared_ptr<CmdBase> create_cmd_obj(string cmd)
+{
+	string param;
+	size_t pos = 0;
+	param = get_next_param(cmd, pos);
+	param = str_to_upper(param);
+	if (g_cmd_create_map.find(param) == g_cmd_create_map.end())
 	{
-		string param = str_to_upper(get_next_param(cmd, pos));
-		if(param == "BOOT")
-			return shared_ptr<CmdBase>(new SDPSCmd((char*)cmd.c_str()));
-		if(param == "DONE")
-			return shared_ptr<CmdBase>(new CmdDone());
+		string s = param;
+		param = get_next_param(cmd, pos);
+		s += str_to_upper(param);
+		if (g_cmd_create_map.find(s) != g_cmd_create_map.end())
+			return g_cmd_create_map[s]((char*)cmd.c_str());
 	}
-	if (c == "SDP:")
-	{
-		string param = str_to_upper(get_next_param(cmd, pos));
-		if(param == "DCD")
-			return shared_ptr<CmdBase>(new SDPDcdCmd((char*)cmd.c_str()));
-		if(param == "JUMP")
-			return shared_ptr<CmdBase>(new SDPJumpCmd((char*)cmd.c_str()));
-		if(param == "WRITE")
-			return shared_ptr<CmdBase>(new SDPWriteCmd((char*)cmd.c_str()));
-		if(param == "STATUS")
-			return shared_ptr<CmdBase>(new SDPStatusCmd((char*)cmd.c_str()));
-		if(param == "BOOT")
-			return shared_ptr<CmdBase>(new SDPBootCmd((char*)cmd.c_str()));
-		if(param == "DONE")
-			return shared_ptr<CmdBase>(new CmdDone());
-	}
+
+	string err;
+	err = "Unknow Command:";
+	err += cmd;
+	set_last_err_string(err);
 	return NULL;
 }
 
 int uuu_run_cmd(const char * cmd)
 {
 	shared_ptr<CmdBase> p;
-	p = CreateCmdObj(cmd);
+	p = create_cmd_obj(cmd);
 	int ret;
 
 	if (p == NULL)
@@ -300,7 +310,7 @@ static int insert_one_cmd(const char * cmd)
 	size_t pos = 0;
 
 	string pro = get_next_param(s, pos);
-	shared_ptr<CmdBase> p = CreateCmdObj(s);
+	shared_ptr<CmdBase> p = create_cmd_obj(s);
 	if (p == NULL)
 		return -1;
 

@@ -40,20 +40,20 @@
 #include "../libuuu/libuuu.h"
 
 using namespace std;
+
 void print_help()
 {
-	printf("uuu [-d] u-boot.imx\\flash.bin\n");
+	printf("uuu [-d -v] u-boot.imx\\flash.bin\n");
 	printf("\tDownload u-boot.imx\\flash.bin to board by usb\n");
 	printf("\t -d      Deamon mode, wait for forever.\n");
 	printf("\t         Start download once detect known device attached\n");
+	printf("\t -v      Print build in protocal config informaiton");
 	printf("\n");
-	printf("uuu SDPS: boot flash.bin\n");
-	printf("\tRun command SPDS: boot flash.bin\n");
-	printf("\n");
-	printf("uuu [-d -s] cmdlist\n");
+	printf("uuu [-d -v] cmdlist\n");
 	printf("\tRun all commands in file cmdlist\n");
-	printf("\t -d      Deamon mode, wait for forever.\n");
-	printf("\t -s      run command step by step\n");
+	printf("\n");
+	printf("uuu [-d -v] SDPS: boot flash.bin\n");
+	printf("\tRun command SPDS: boot flash.bin\n");
 }
 void print_version()
 {
@@ -224,7 +224,7 @@ int progress(uuu_notify nt, void *p)
 		if(!(*np)[nt.id].m_dev.empty())
 			g_map_path_nt[(*np)[nt.id].m_dev] = (*np)[nt.id];
 
-		cout << "Succues:" << g_overall_okay << "\tFailure:" << g_overall_failure <<endl << endl;;
+		cout << "Succues:" << g_overall_okay << "\tFailure:" << g_overall_failure <<"\t\tWait for Known USB Device Appear..."<<endl << endl;;
 
 		for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
 			it->second.print();
@@ -308,7 +308,7 @@ int main(int argc, char **argv)
 			}
 		}else if (!s.empty() && s[s.size() - 1] == ':')
 		{
-			for (int j = 1; j < argc; j++)
+			for (int j = i; j < argc; j++)
 			{
 				s = argv[j];
 				cmd.append(s);
@@ -335,6 +335,7 @@ int main(int argc, char **argv)
 		printf("\tPctl\tChip\tPid\tVid\t\BcdVersion\n");
 		printf("\t==========================================\n");
 		uuu_for_each_cfg(print_cfg, NULL);
+		printf("\n");
 	}
 
 	map<uint64_t, ShowNotify> nt_session;
