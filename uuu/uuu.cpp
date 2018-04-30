@@ -234,7 +234,10 @@ public:
 				}
 			}
 		}
-		cout << "] " << m_cmd.c_str() << endl;
+		if(m_cmd.length() > 40)
+			cout << "] " << m_cmd.substr(0, 40).c_str() << "...." << endl;
+		else
+			cout << "] " << m_cmd.c_str() << endl;
 	}
 };
 
@@ -334,7 +337,7 @@ int main(int argc, char **argv)
 			else if (s == "-h")
 			{
 				print_help();
-				return;
+				return 0;
 			}else
 			{
 				cout << "Unknown option: " << s.c_str();

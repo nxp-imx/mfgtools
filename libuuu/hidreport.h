@@ -47,12 +47,18 @@ class HIDReport
 public:
 	TransBase * m_pdev;
 	vector<uint8_t> m_out_buff;
+	size_t m_postion_base;
+	size_t m_notify_total;
+	bool m_skip_notify;
 	void init()
 	{
 		m_size_in = 64; 
 		m_size_out = 1024;
 		m_size_payload = 1;
+		m_postion_base = 0;
+		m_notify_total = 0;
 		m_out_buff.resize(m_size_out + m_size_payload);
+		m_skip_notify = true;
 	}
 	HIDReport()
 	{
@@ -80,16 +86,25 @@ public:
 		return ret;
 	}
 
+	virtual void notify(size_t index, uuu_notify::NOTIFY_TYPE type)
+	{
+		uuu_notify nf;
+		nf.type = type;
+		if(type == uuu_notify::NOTIFY_TRANS_POS)
+			nf.index = index + m_postion_base;
+		if (type == uuu_notify::NOTIFY_TRANS_SIZE)
+		{
+			nf.index = m_notify_total > index ? m_notify_total : index;
+		}
+		call_notify(nf);
+	}
+
 	int write(void *p, size_t sz, uint8_t report_id)
 	{
 		size_t off;
-		uuu_notify nf;
-
 		uint8_t *buff = (uint8_t *)p;
-
-		nf.type = uuu_notify::NOTIFY_TRANS_SIZE;
-		nf.index = sz;
-		call_notify(nf);
+		
+		notify(sz, uuu_notify::NOTIFY_TRANS_SIZE);
 
 		for (off = 0; off < sz; off += m_size_out)
 		{
@@ -108,10 +123,7 @@ public:
 
 			if (off % 0x1F == 0)
 			{
-				uuu_notify nf;
-				nf.type = uuu_notify::NOTIFY_TRANS_POS;
-				nf.index = off;
-				call_notify(nf);
+				notify(off, uuu_notify::NOTIFY_TRANS_POS);
 			}
 		}
 		return 0;

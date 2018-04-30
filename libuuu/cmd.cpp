@@ -87,10 +87,10 @@ int CmdBase::parser(char *p)
 			return -1;
 		}
 
-		if (pp->type == Param::e_int32)
+		if (pp->type == Param::e_uint32)
 		{
 			param = get_next_param(m_cmd, pos);
-			*(uint32_t*)pp->pData = str_to_int(param);
+			*(uint32_t*)pp->pData = str_to_uint(param);
 		}
 
 		if (pp->type == Param::e_string_filename)
@@ -184,14 +184,14 @@ string get_next_param(string &cmd, size_t &pos)
 	return str;
 }
 
-int str_to_int(string &str)
+uint32_t str_to_uint(string &str)
 {
 	if (str.size() > 2)
 	{
 		if (str.substr(0, 2).compare("0x") == 0)
-			return strtol(str.substr(2).c_str(), NULL, 16);
+			return strtoul(str.substr(2).c_str(), NULL, 16);
 	}
-	return strtol(str.c_str(), NULL, 10);
+	return strtoul(str.c_str(), NULL, 10);
 }
 
 template <class T> shared_ptr<CmdBase> new_cmd_obj(char *p)
@@ -393,8 +393,10 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff)
 		uint8_t c = pbuff->at(i);
 		if (c == '\r')
 			continue;
+		
+		if(c != '\n')
+			str.push_back(c);
 
-		str.push_back(c);
 		if (c == '\n' || c == 0)
 		{
 			if (str.substr(0, strlen(uuu_version)) == uuu_version)

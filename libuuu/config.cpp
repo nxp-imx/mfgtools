@@ -127,25 +127,19 @@ int CfgCmd::run(CmdCtx *)
 		if (param == "-pid")
 		{
 			param = get_next_param(m_cmd, pos);
-			item.m_pid = str_to_int(param);
+			item.m_pid = str_to_uint(param);
 			continue;
 		}
 		if (param == "-vid")
 		{
 			param = get_next_param(m_cmd, pos);
-			item.m_vid = str_to_int(param);
-			continue;
-		}
-		if (param == "-vid")
-		{
-			param = get_next_param(m_cmd, pos);
-			item.m_vid = str_to_int(param);
+			item.m_vid = str_to_uint(param);
 			continue;
 		}
 		if (param == "-bcdversion")
 		{
 			param = get_next_param(m_cmd, pos);
-			item.m_bcdVersion = str_to_int(param);
+			item.m_bcdVersion = str_to_uint(param);
 			continue;
 		}
 		if (param == "-chip")

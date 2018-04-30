@@ -278,6 +278,8 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 		return -1;
 
 	HIDReport report(&dev);
+
+	report.m_notify_total = size;
 	
 	for (size_t i=0; i < size; i += m_max_download_pre_cmd)
 	{
@@ -289,10 +291,15 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 		m_spdcmd.m_addr = EndianSwap((uint32_t)(addr + i)); // force use 32bit endian swap function;
 		m_spdcmd.m_count = EndianSwap((uint32_t)sz); //force use 32bit endian swap function;
 
+		report.m_postion_base = i;
+		report.m_skip_notify = true;
+
 		if (report.write(&m_spdcmd, sizeof(m_spdcmd), 1))
 			return -1;
 
-		if (report.write(pbuff, sz, 2))
+		report.m_skip_notify = false;
+		
+		if (report.write(((uint8_t*)pbuff)+i, sz, 2))
 			return -1;
 
 		if (check_ack(&report, ROM_STATUS_ACK))

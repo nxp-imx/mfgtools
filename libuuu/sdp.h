@@ -188,8 +188,8 @@ public:
 
 		insert_param_info("write", NULL, Param::e_null);
 		insert_param_info("-f", &m_filename, Param::e_string_filename);
-		insert_param_info("-ivt", &m_Ivt, Param::e_int32);
-		insert_param_info("-addr", &m_download_addr, Param::e_int32);
+		insert_param_info("-ivt", &m_Ivt, Param::e_uint32);
+		insert_param_info("-addr", &m_download_addr, Param::e_uint32);
 	};
 
 	int run(CmdCtx *p);

@@ -61,7 +61,7 @@ struct Param
 {
 	enum Param_Type
 	{
-		e_int32,
+		e_uint32,
 		e_bool,
 		e_string,
 		e_null,
@@ -144,7 +144,7 @@ public:
 
 string get_next_param(string &cmd, size_t &pos);
 
-int str_to_int(string &str);
+uint32_t str_to_uint(string &str);
 
 
 int run_cmds(const char *procotal, CmdCtx *p);

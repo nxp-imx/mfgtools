@@ -22,9 +22,9 @@ uuu_version 1.0.0
 #          SDP:  boot -f <filename>
 #          CFG: SDP: -chip imx6ull -pid 0x1234 -vid 0x5678
 
-CFG: SDP:   -chip imx6ull -pid 0x1234 -vid 0x5678
-SDP: dcd   -f  u-boot-dtb.imx1
-SDP: write -f u-boot-dtb.imx -ivt
-SDP: write -f u-boot-dtb.imx -addr 0x84000000
-SDP: jump  -f u-boot-dtb.imx -ivt
+SDP: boot -f u-boot-imx7dsabresd_sd.imx -nojump
+SDP: write -f zImage -addr 0x80800000
+SDP: write -f zImage-imx7d-sdb.dtb -addr 0x83000000
+SDP: write -f fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot -addr 0x83800000
+SDP: jump -f u-boot-dtb.imx -ivt
 

@@ -47,5 +47,7 @@ int SDPSCmd::run(CmdCtx *pro)
 		return -1;
 
 	HIDReport report(&dev);
+	report.m_skip_notify = false;
+
 	return report.write(*p, 2);
 }
