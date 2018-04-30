@@ -334,6 +334,7 @@ int main(int argc, char **argv)
 			else if (s == "-h")
 			{
 				print_help();
+				return;
 			}else
 			{
 				cout << "Unknown option: " << s.c_str();
