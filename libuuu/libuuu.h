@@ -32,6 +32,7 @@
 #define __libuuu___
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 #define EXT extern "C"
