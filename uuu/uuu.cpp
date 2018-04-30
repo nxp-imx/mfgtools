@@ -36,8 +36,14 @@
 #include <iomanip>
 #include <map>
 #include <mutex>
+#include <vector>
+#include <sstream>
 
 #include "../libuuu/libuuu.h"
+
+char g_sample_cmd_list[] = {
+#include "uuu.clst"
+};
 
 using namespace std;
 
@@ -54,6 +60,29 @@ void print_help()
 	printf("\n");
 	printf("uuu [-d -v] SDPS: boot flash.bin\n");
 	printf("\tRun command SPDS: boot flash.bin\n");
+	printf("\n");
+
+	size_t start = 0, pos = 0;
+	string str= g_sample_cmd_list;
+	
+	bool bprint = false;
+	while ((pos = str.find('\n',pos)) != str.npos)
+	{
+		string s = str.substr(start, pos - start);
+		if (s.substr(0, 6) == "# ----")
+			bprint = true;
+
+		if (bprint)
+		{
+			if (s[0] == '#')
+			{
+				printf(&(s[1]));
+				printf("\n");
+			}
+		}
+		pos += 1;
+		start = pos;
+	}
 }
 void print_version()
 {
@@ -301,6 +330,10 @@ int main(int argc, char **argv)
 			{
 				verbose = 1;
 
+			}
+			else if (s == "-h")
+			{
+				print_help();
 			}else
 			{
 				cout << "Unknown option: " << s.c_str();

@@ -77,17 +77,21 @@
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <OutDir>$(SolutionDir)\x86\$(Configuration)\</OutDir>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <OutDir>$(SolutionDir)\x86\$(Configuration)\</OutDir>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -103,6 +107,21 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>../$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
+type $(SolutionDir)\..\uuu\uuu.lst &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+</Command>
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(SolutionDir)\c.txt;</Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -118,6 +137,21 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>../$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
+type $(SolutionDir)\..\uuu\uuu.lst &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+</Command>
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(SolutionDir)\c.txt;</Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -137,6 +171,21 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>../$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
+type $(SolutionDir)\..\uuu\uuu.lst &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+</Command>
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(SolutionDir)\c.txt;</Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -156,6 +205,21 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>../$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
+type $(SolutionDir)\..\uuu\uuu.lst &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+</Command>
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(SolutionDir)\c.txt;</Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
