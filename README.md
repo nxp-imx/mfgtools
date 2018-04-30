@@ -1,13 +1,13 @@
 # uuu(universial update utiles). Old name is mfgtools 
 Freescale/NXP I.MX Chip image deploy tools.
-``
-uuu (universal update utitle) for nxp imx chips -- libuuu-1.0.1-gffd9837
 
-Succues:0       Failure:3               Wait for Known USB Device Appear...
+    uuu (universal update utitle) for nxp imx chips -- libuuu-1.0.1-gffd9837
 
-1:11     5/5 [                                        ] SDP: jump -f u-boot-dtb.imx -ivtinitramf....
-2:1      1/5 [===>                                    ] SDP: boot -f u-boot-imx7dsabresd_sd.imx ....
-``
+    Succues:0       Failure:3               Wait for Known USB Device Appear...
+
+    1:11     5/5 [                                        ] SDP: jump -f u-boot-dtb.imx -ivtinitramf....
+    2:1      1/5 [===>                                    ] SDP: boot -f u-boot-imx7dsabresd_sd.imx ....
+
 
 **under developing**
 
