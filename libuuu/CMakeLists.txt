@@ -21,6 +21,7 @@ set(SOURCES
 	version.cpp
 	sdp.cpp
 	gitversion.h
+	fastboot.cpp
 )
 
 add_custom_command(
