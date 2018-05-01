@@ -6,7 +6,7 @@ uuu_version 1.0.0
 # Command Format PROTOCOL COMMAND ARG
 # PROTOCOL
 #          CFG:  Config protocol of specific usb device vid/pid
-#                SDPS|SDP -chip <chip name> -pid <pid> -vid <vid> [-bcdversion <ver>]
+#                SDPS|SDP|FB\Fastboot -chip <chip name> -pid <pid> -vid <vid> [-bcdversion <ver>]
 #          SDPS: Stream download after MX8QXPB0 
 #                      boot  -f  <filename>
 #                      done  #last command for whole flow         
@@ -16,7 +16,10 @@ uuu_version 1.0.0
 #                      jump  -f  <filename> [-ivt 0]
 #                      boot  -f  <filename> [-nojump]
 #                      done  #last command for whole flow   
-#
+#          FB:\Fastboot: android fastboot protocol
+#                      getvar
+#                      ucmd <any uboot command>
+#                      download -f <filename>
 # For example:
 #          SDPS: boot -f <filename>
 #          SDP:  boot -f <filename>
