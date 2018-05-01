@@ -36,6 +36,7 @@
 #include "fastboot.h"
 #include "libcomm.h"
 #include "cmd.h"
+#include "buffer.h"
 
 int FastBoot::Transport(string cmd, void *p, size_t size)
 {
@@ -121,11 +122,16 @@ int FBUCmd::parser(char *p)
 	size_t pos = 0;
 	string s;
 	s = get_next_param(m_cmd, pos);
-	if(s.find(":") == s.npos)
+	if(s.find(":") != s.npos)
 		s = get_next_param(m_cmd, pos);
 
 	if (str_to_upper(s) != "UCMD")
+	{
+		string err = "Unknown command: ";
+		err += s;
+		set_last_err_string(s);
 		return -1;
+	}
 
 	m_uboot_cmd = m_cmd.substr(pos);
 	return 0;
@@ -139,10 +145,31 @@ int FBUCmd::run(CmdCtx *ctx)
 
 	FastBoot fb(&dev);
 	string cmd;
-	cmd = "Runcmd:";
+	cmd = "UCmd:";
 	cmd += m_uboot_cmd;
 
 	if (fb.Transport(cmd, NULL, 0))
+		return -1;
+
+	return 0;
+}
+
+int FBDownload::run(CmdCtx *ctx)
+{
+	BulkTrans dev;
+	if (dev.open(ctx->m_dev))
+		return -1;
+
+	FastBoot fb(&dev);
+
+	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
+	if (buff == NULL)
+		return -1;
+
+	string_ex cmd;
+	cmd.format("download:%08x", buff->size());
+
+	if (fb.Transport(cmd, buff->data(), buff->size()))
 		return -1;
 
 	return 0;

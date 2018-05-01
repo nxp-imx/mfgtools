@@ -218,6 +218,8 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:GETVAR"] = new_cmd_obj<FBGetVar>;
 	(*this)["FB:UCMD"] = new_cmd_obj<FBUCmd>;
 	(*this)["FASTBOOT:UCMD"] = new_cmd_obj<FBUCmd>;
+	(*this)["FB:DOWNLOAD"] = new_cmd_obj<FBDownload>;
+	(*this)["FASTBOOT:DOWNLOAD"] = new_cmd_obj<FBDownload>;
 	(*this)["FB:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["FASTBOOT:DONE"] = new_cmd_obj<CmdDone>;
 }

@@ -31,4 +31,9 @@ uuu_version 1.0.0
 CFG: FB:  -vid 0x18D1 -pid 0x0D02
 SDP: boot -f u-boot-dtb.imx
 FB: getvar version
+FB: ucmd setenv fastboot_buffer 0x80800000
+FB: download -f zImage
+FB: ucmd setenv fastboot_buffer 0x83000000
+FB: download -f zImage-imx7d-sdb.dtb
+FB: ucmd bootz 0x80800000 - 0x83000000 
 

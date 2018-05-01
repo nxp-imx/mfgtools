@@ -72,3 +72,15 @@ public:
 	int parser(char *p = NULL);
 	int run(CmdCtx *ctx);
 };
+
+class FBDownload : public CmdBase
+{
+public:
+	string m_filename;
+	FBDownload(char *p) :CmdBase(p)
+	{
+		insert_param_info("download", NULL, Param::e_null);
+		insert_param_info("-f", &m_filename, Param::e_string_filename);
+	}
+	int run(CmdCtx *ctx);
+};
