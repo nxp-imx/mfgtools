@@ -40,6 +40,7 @@
 #include <atomic>
 #include "buffer.h"
 #include "sdp.h"
+#include "fastboot.h"
 
 static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
@@ -212,6 +213,13 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["SDP:STATUS"] = new_cmd_obj<SDPStatusCmd>;
 	(*this)["SDP:BOOT"] = new_cmd_obj<SDPBootCmd>;
 	(*this)["SDP:DONE"] = new_cmd_obj<CmdDone>;
+
+	(*this)["FB:GETVAR"] = new_cmd_obj<FBGetVar>;
+	(*this)["FASTBOOT:GETVAR"] = new_cmd_obj<FBGetVar>;
+	(*this)["FB:UCMD"] = new_cmd_obj<FBUCmd>;
+	(*this)["FASTBOOT:UCMD"] = new_cmd_obj<FBUCmd>;
+	(*this)["FB:DONE"] = new_cmd_obj<CmdDone>;
+	(*this)["FASTBOOT:DONE"] = new_cmd_obj<CmdDone>;
 }
 
 shared_ptr<CmdBase> create_cmd_obj(string cmd)
@@ -227,6 +235,10 @@ shared_ptr<CmdBase> create_cmd_obj(string cmd)
 		s += str_to_upper(param);
 		if (g_cmd_create_map.find(s) != g_cmd_create_map.end())
 			return g_cmd_create_map[s]((char*)cmd.c_str());
+	}
+	else
+	{
+		return g_cmd_create_map[param]((char*)cmd.c_str());
 	}
 
 	string err;

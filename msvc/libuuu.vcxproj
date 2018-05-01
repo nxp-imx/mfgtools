@@ -23,6 +23,7 @@
     <ClCompile Include="..\libuuu\cmd.cpp" />
     <ClCompile Include="..\libuuu\config.cpp" />
     <ClCompile Include="..\libuuu\error.cpp" />
+    <ClCompile Include="..\libuuu\fastboot.cpp" />
     <ClCompile Include="..\libuuu\notify.cpp" />
     <ClCompile Include="..\libuuu\sdp.cpp" />
     <ClCompile Include="..\libuuu\sdps.cpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="..\libuuu\buffer.h" />
     <ClInclude Include="..\libuuu\cmd.h" />
     <ClInclude Include="..\libuuu\config.h" />
+    <ClInclude Include="..\libuuu\fastboot.h" />
     <ClInclude Include="..\libuuu\hidreport.h" />
     <ClInclude Include="..\libuuu\libcomm.h" />
     <ClInclude Include="..\libuuu\liberror.h" />

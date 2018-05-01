@@ -38,7 +38,7 @@ extern "C"
 #include "libusb.h"
 }
 
-int HIDTrans::open(void *p)
+int USBTrans::open(void *p)
 {
 	m_devhandle = p;
 
@@ -51,11 +51,18 @@ int HIDTrans::open(void *p)
 			return -1;
 		}
 	}
+
+	if (libusb_claim_interface((libusb_device_handle *)m_devhandle, 0))
+	{
+		set_last_err_string("Failure claim interface");
+		return -1;
+	}
 	return 0;
 }
 
-int HIDTrans::close()
+int USBTrans::close()
 {
+	libusb_release_interface((libusb_device_handle *)m_devhandle, 0);
 	return 0;
 }
 
@@ -105,4 +112,52 @@ int HIDTrans::read(void *buff, size_t size, size_t *rsize)
 	}
 
 	return 0;
+}
+
+int BulkTrans::write(void *buff, size_t size)
+{
+	int ret;
+	int actual_lenght;
+	uint8_t *p = (uint8_t *)buff;
+	ret = libusb_bulk_transfer(
+		(libusb_device_handle *)m_devhandle,
+		m_ep_out,
+		p,
+		size,
+		&actual_lenght,
+		1000
+	);
+
+	if (ret < 0)
+	{
+		set_last_err_string("Bulk Write failure");
+		return ret;
+	}
+
+	return ret;
+}
+
+int BulkTrans::read(void *buff, size_t size, size_t *rsize)
+{
+	int ret;
+	int actual_lenght;
+	uint8_t *p = (uint8_t *)buff;
+	ret = libusb_bulk_transfer(
+		(libusb_device_handle *)m_devhandle,
+		m_ep_in,
+		p,
+		size,
+		&actual_lenght,
+		1000
+	);
+
+	*rsize = actual_lenght;
+
+	if (ret < 0)
+	{
+		set_last_err_string("Bulk read failure");
+		return ret;
+	}
+
+	return ret;
 }

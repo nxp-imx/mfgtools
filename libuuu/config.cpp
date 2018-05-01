@@ -110,7 +110,7 @@ int CfgCmd::run(CmdCtx *)
 	ConfigItem item;
 	param = get_next_param(m_cmd, pos);
 
-	if (param == "cfg:")
+	if (str_to_upper(param) == "CFG:")
 		param = get_next_param(m_cmd, pos);
 
 	if (param.empty())
@@ -119,7 +119,7 @@ int CfgCmd::run(CmdCtx *)
 		return -1;
 	}
 
-	item.m_protocol = param;
+	item.m_protocol = str_to_upper(param);
 
 	while (pos < m_cmd.size())
 	{
@@ -156,7 +156,11 @@ int CfgCmd::run(CmdCtx *)
 		}
 	}
 
-	g_config.push_back(item);
+	ConfigItem *pItem= g_config.find(item.m_vid, item.m_pid, item.m_bcdVersion);
+	if (pItem)
+		*pItem = item;
+	else
+		g_config.push_back(item);
 
 	return 0;
 }

@@ -28,61 +28,47 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#include <vector>
-#include <string>
-#include <atomic>
 
-#pragma once
+/*
+Android fastboot protocol define at
+https://android.googlesource.com/platform/system/core/+/master/fastboot/
+*/
+
+#include <string>
+#include <vector>
+
+#include "trans.h"
+#include "cmd.h"
 
 using namespace std;
 
-class TransBase
+class FastBoot
 {
+	TransBase *m_pTrans;
 public:
-	string m_path;
-	void * m_devhandle;
-	TransBase() { m_devhandle = NULL; }
-	virtual int open(void *) { return 0; };
-	virtual int close() { return 0; };
-	virtual int write(void *buff, size_t size) = 0;
-	virtual int read(void *buff, size_t size, size_t *return_size) = 0;
-	int write(vector<uint8_t> & buff) { return write(buff.data(), buff.size()); }
-	int read(vector<uint8_t> &buff)
-	{
-		size_t size;
-		int ret = read(buff.data(), buff.size(), &size);
-		if (ret)
-			return ret;
-		buff.resize(size);
-		return ret;
-	}
+	string m_info;
+
+	FastBoot(TransBase *p) { m_pTrans = p; }
+
+	int Transport(string cmd, void *p = NULL, size_t size = 0);
+	int Transport(string cmd, vector<uint8_t>data) { return Transport(cmd, data.data(), data.size()); };
 };
 
-class USBTrans : public TransBase
+class FBGetVar : public CmdBase
 {
 public:
-	virtual int open(void *p);
-	virtual int close();
-};
-class HIDTrans : public USBTrans
-{
-	int m_set_report;
-public:
-	HIDTrans() { m_set_report = 9; }
-	~HIDTrans() { if (m_devhandle) close();  m_devhandle = NULL;  }
-	int write(void *buff, size_t size);
-	int read(void *buff, size_t size, size_t *return_size);
+	string m_var;
+	string m_val;
+	int parser(char*p=NULL);
+	FBGetVar(char *p) :CmdBase(p) {}
+	int run(CmdCtx *ctx);
 };
 
-class BulkTrans : public USBTrans
+class FBUCmd: public CmdBase
 {
 public:
-	int m_ep_in;
-	int m_ep_out;
-	BulkTrans() { m_ep_in = 0x81; m_ep_out = 2; }
-	~BulkTrans() { if (m_devhandle) close();  m_devhandle = NULL; }
-	int write(void *buff, size_t size);
-	int read(void *buff, size_t size, size_t *return_size);
+	string m_uboot_cmd;
+	FBUCmd(char *p) :CmdBase(p) {}
+	int parser(char *p = NULL);
+	int run(CmdCtx *ctx);
 };
-
-int polling_usb(std::atomic<int>& bexit);

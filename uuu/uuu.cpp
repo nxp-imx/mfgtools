@@ -109,11 +109,11 @@ class ShowNotify
 public:
 	string m_cmd;
 	string m_dev;
-	int	m_trans_size;
-	int m_trans_pos;
+	size_t	m_trans_size;
+	size_t m_trans_pos;
 	int m_status;
-	int m_cmd_total;
-	int m_cmd_index;
+	size_t m_cmd_total;
+	size_t m_cmd_index;
 	string m_last_err;
 	int m_done;
 	
@@ -369,7 +369,7 @@ int main(int argc, char **argv)
 	if (verbose)
 	{
 		printf("Build in config:\n");
-		printf("\tPctl\tChip\tPid\tVid\t\BcdVersion\n");
+		printf("\tPctl\tChip\tPid\tVid\tBcdVersion\n");
 		printf("\t==========================================\n");
 		uuu_for_each_cfg(print_cfg, NULL);
 		printf("\n");

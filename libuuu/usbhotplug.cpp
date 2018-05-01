@@ -183,6 +183,9 @@ int polling_usb(std::atomic<int>& bexit)
 		return -1;
 	}
 	
+	if (run_cmds("CFG:", NULL))
+		return -1;
+
 	while(!bexit)
 	{
 		ssize_t sz = libusb_get_device_list(NULL, &newlist);
@@ -216,6 +219,9 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 		return -1;
 	}
 	
+	if (run_cmds("CFG:", NULL))
+		return -1;
+
 	while (1)
 	{
 		libusb_device **newlist = NULL;
