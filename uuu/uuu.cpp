@@ -47,6 +47,8 @@ char g_sample_cmd_list[] = {
 
 using namespace std;
 
+int g_verbose = 0;
+
 void print_help()
 {
 	printf("uuu [-d -v] u-boot.imx\\flash.bin\n");
@@ -185,8 +187,38 @@ public:
 		}
 		return true;
 	}
+	void print_verbose(uuu_notify*nt)
+	{
+		if (nt->type == uuu_notify::NOFITY_DEV_ATTACH)
+		{
+			cout << "New USB Device Attached at " << nt->str << endl;
+		}
+		if (nt->type == uuu_notify::NOTIFY_CMD_START)
+		{
+			cout << m_dev << ">" << "Start Cmd:" << nt->str << endl;
+		}
+		if (nt->type == uuu_notify::NOTIFY_CMD_END)
+		{
+			if (nt->status)
+			{
+				cout << m_dev << ">" <<"Fail " << uuu_get_last_err_string() << endl;
+			}
+			else
+			{
+				cout << m_dev << ">" << "Okay" << endl;
+			}
+		}
 
-	void print()
+		if (nt->type == uuu_notify::NOTIFY_TRANS_POS)
+		{
+			cout << ".";
+		}
+	}
+	void print(int verbose = 0, uuu_notify*nt=NULL)
+	{
+		verbose ? print_verbose(nt) : print_simple();
+	}
+	void print_simple()
 	{
 		cout << m_dev.c_str() << std::setw(10- m_dev.size());
 		
@@ -256,13 +288,20 @@ int progress(uuu_notify nt, void *p)
 		if(!(*np)[nt.id].m_dev.empty())
 			g_map_path_nt[(*np)[nt.id].m_dev] = (*np)[nt.id];
 
-		cout << "Succues:" << g_overall_okay << "\tFailure:" << g_overall_failure <<"\t\tWait for Known USB Device Appear..."<<endl << endl;;
+		if (g_verbose)
+		{
+			(*np)[nt.id].print(g_verbose, &nt);
+		}
+		else
+		{
+			cout << "Succues:" << g_overall_okay << "\tFailure:" << g_overall_failure << "\t\tWait for Known USB Device Appear..." << endl << endl;;
 
-		for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
-			it->second.print();
+			for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
+				it->second.print();
 
-		for (int i=0;i<g_map_path_nt.size()+2; i++)
-			cout <<"\x1B[1F";
+			for (int i = 0; i < g_map_path_nt.size() + 2; i++)
+				cout << "\x1B[1F";
+		}
 	}
 	if (nt.type == uuu_notify::NOTIFY_THREAD_EXIT)
 		np->erase(nt.id);
@@ -315,7 +354,7 @@ int main(int argc, char **argv)
 	int step = 0;
 	string filename; 
 	string cmd;
-	int verbose = 0;
+	
 
 	for (int i = 1; i < argc; i++)
 	{
@@ -331,7 +370,7 @@ int main(int argc, char **argv)
 			}
 			else if (s == "-v")
 			{
-				verbose = 1;
+				g_verbose = 1;
 
 			}
 			else if (s == "-h")
@@ -366,7 +405,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	if (verbose)
+	if (g_verbose)
 	{
 		printf("Build in config:\n");
 		printf("\tPctl\tChip\tPid\tVid\tBcdVersion\n");
