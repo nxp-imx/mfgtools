@@ -309,6 +309,10 @@ int run_cmds(const char *procotal, CmdCtx *p)
 {
 	if (g_cmd_map.find(procotal) == g_cmd_map.end())
 	{
+		if (procotal == "CFG:")
+		{
+			return 0; //Allow no CFG command
+		}
 		string_ex str;
 		str.format("%s:%d Can't find protocal: %s", __FUNCTION__, __LINE__, procotal);
 		set_last_err_string(str.c_str());
