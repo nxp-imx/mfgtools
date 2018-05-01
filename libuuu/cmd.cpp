@@ -309,7 +309,8 @@ int run_cmds(const char *procotal, CmdCtx *p)
 {
 	if (g_cmd_map.find(procotal) == g_cmd_map.end())
 	{
-		if (procotal == "CFG:")
+		string s = procotal;
+		if (s == "CFG:")
 		{
 			return 0; //Allow no CFG command
 		}
