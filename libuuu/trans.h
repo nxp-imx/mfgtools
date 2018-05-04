@@ -61,6 +61,7 @@ public:
 class USBTrans : public TransBase
 {
 public:
+	vector<int> m_EPs;
 	virtual int open(void *p);
 	virtual int close();
 };
@@ -79,7 +80,12 @@ class BulkTrans : public USBTrans
 public:
 	int m_ep_in;
 	int m_ep_out;
-	BulkTrans() { m_ep_in = 0x81; m_ep_out = 2; }
+	BulkTrans() { m_ep_in = 0; m_ep_out = 0; }
+
+	virtual int open(void *p);
+
+	BulkTrans(int ep_in, int ep_out) { m_ep_in = ep_in; m_ep_out = ep_out; };
+
 	~BulkTrans() { if (m_devhandle) close();  m_devhandle = NULL; }
 	int write(void *buff, size_t size);
 	int read(void *buff, size_t size, size_t *return_size);

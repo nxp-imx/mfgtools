@@ -72,6 +72,8 @@ struct uuu_notify
 		NOTIFY_CMD_END,	    /* status show command finish status. 0 is success. Other failure.*/
 		NOTIFY_CMD_INDEX,   /*Current running command index*/
 
+		NOTIFY_CMD_INFO,	/* Status info string */
+
 		NOTIFY_PHASE_TOTAL,
 		NOTIFY_PHASE_INDEX, /*Current running phase*/
 

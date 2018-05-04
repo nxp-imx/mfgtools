@@ -222,6 +222,9 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:DOWNLOAD"] = new_cmd_obj<FBDownload>;
 	(*this)["FB:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["FASTBOOT:DONE"] = new_cmd_obj<CmdDone>;
+
+	(*this)["FBK:UCMD"] = new_cmd_obj<FBUCmd>;
+	(*this)["FBK:DONE"] = new_cmd_obj<CmdDone>;
 }
 
 shared_ptr<CmdBase> create_cmd_obj(string cmd)

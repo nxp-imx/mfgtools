@@ -41,8 +41,8 @@ extern "C"
 int USBTrans::open(void *p)
 {
 	m_devhandle = p;
-
-	if (libusb_kernel_driver_active((libusb_device_handle *)m_devhandle, 0))
+	libusb_device_handle * handle = (libusb_device_handle *)m_devhandle;
+	if (libusb_kernel_driver_active(handle, 0))
 	{
 		int ret = libusb_detach_kernel_driver((libusb_device_handle *)m_devhandle, 0);
 		if(ret <0 && ret != LIBUSB_ERROR_NOT_SUPPORTED)
@@ -52,11 +52,23 @@ int USBTrans::open(void *p)
 		}
 	}
 
-	if (libusb_claim_interface((libusb_device_handle *)m_devhandle, 0))
+	if (libusb_claim_interface(handle, 0))
 	{
 		set_last_err_string("Failure claim interface");
 		return -1;
 	}
+
+	libusb_config_descriptor *config;
+	if (libusb_get_active_config_descriptor(libusb_get_device(handle), &config))
+	{
+		set_last_err_string("Can't get config descriptor");
+		return -1;
+	}
+	
+	m_EPs.clear();
+	for (int i = 0; i < config->interface[0].altsetting[0].bNumEndpoints; i++)
+		m_EPs.push_back(config->interface[0].altsetting[0].endpoint[i].bEndpointAddress);
+	
 	return 0;
 }
 
@@ -137,6 +149,23 @@ int BulkTrans::write(void *buff, size_t size)
 	return ret;
 }
 
+int BulkTrans::open(void *p)
+{
+	if (USBTrans::open(p))
+		return -1;
+
+	for (int i = 0; i < m_EPs.size(); i++)
+	{
+		if (m_EPs[0] > 0)
+		{
+			if ((m_EPs[0] & 0x80) && m_ep_in == 0)
+				m_ep_in = m_EPs[i];
+			else if (m_ep_out == 0)
+				m_ep_out = m_EPs[i];
+		}
+	}
+	return 0;
+}
 int BulkTrans::read(void *buff, size_t size, size_t *rsize)
 {
 	int ret;

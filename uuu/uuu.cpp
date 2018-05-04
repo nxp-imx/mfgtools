@@ -213,6 +213,9 @@ public:
 		{
 			cout << ".";
 		}
+
+		if (nt->type == uuu_notify::NOTIFY_CMD_INFO)
+			cout << nt->str;
 	}
 	void print(int verbose = 0, uuu_notify*nt=NULL)
 	{

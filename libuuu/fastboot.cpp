@@ -38,6 +38,7 @@
 #include "libcomm.h"
 #include "cmd.h"
 #include "buffer.h"
+#include "libuuu.h"
 
 int FastBoot::Transport(string cmd, void *p, size_t size)
 {
@@ -65,6 +66,10 @@ int FastBoot::Transport(string cmd, void *p, size_t size)
 			string s;
 			s = buff + 4;
 			m_info += s;
+			uuu_notify nt;
+			nt.type = uuu_notify::NOTIFY_CMD_INFO;
+			nt.str = buff + 4;
+			call_notify(nt);
 		}
 	}
 
