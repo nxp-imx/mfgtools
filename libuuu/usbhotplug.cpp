@@ -263,6 +263,11 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 
 		libusb_free_device_list(newlist, 1);
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+		uuu_notify nt;
+		nt.type = nt.NOTIFY_WAIT_FOR;
+		nt.str = (char*)"Wait for Known USB";
+		call_notify(nt);
 	}
 
 	return -1;

@@ -224,6 +224,9 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:DONE"] = new_cmd_obj<CmdDone>;
 
 	(*this)["FBK:UCMD"] = new_cmd_obj<FBUCmd>;
+	(*this)["FBK:ACMD"] = new_cmd_obj<FBACmd>;
+	(*this)["FBK:SYNC"] = new_cmd_obj<FBSyncCmd>;
+	(*this)["FBK:UCP"] = new_cmd_obj<FBCopy>;
 	(*this)["FBK:DONE"] = new_cmd_obj<CmdDone>;
 }
 

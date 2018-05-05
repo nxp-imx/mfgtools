@@ -50,8 +50,8 @@ public:
 
 	FastBoot(TransBase *p) { m_pTrans = p; }
 
-	int Transport(string cmd, void *p = NULL, size_t size = 0);
-	int Transport(string cmd, vector<uint8_t>data) { return Transport(cmd, data.data(), data.size()); };
+	int Transport(string cmd, void *p = NULL, size_t size = 0, vector<uint8_t> *input = NULL);
+	int Transport(string cmd, vector<uint8_t>data, vector<uint8_t> *input=NULL) { return Transport(cmd, data.data(), data.size(), input); };
 };
 
 class FBGetVar : public CmdBase
@@ -64,13 +64,32 @@ public:
 	int run(CmdCtx *ctx);
 };
 
-class FBUCmd: public CmdBase
+class FBCmd: public CmdBase
 {
 public:
+	string m_fb_cmd;
 	string m_uboot_cmd;
-	FBUCmd(char *p) :CmdBase(p) {}
+	FBCmd(char *p) :CmdBase(p) {}
 	int parser(char *p = NULL);
 	int run(CmdCtx *ctx);
+};
+
+class FBUCmd : public FBCmd
+{
+public:
+	FBUCmd(char *p) :FBCmd(p) { m_fb_cmd = "UCmd"; }
+};
+
+class FBACmd : public FBCmd
+{
+public:
+	FBACmd(char *p) :FBCmd(p) { m_fb_cmd = "ACmd"; }
+};
+
+class FBSyncCmd: public FBCmd
+{
+public:
+	FBSyncCmd(char *p) : FBCmd(p) { m_fb_cmd = "Sync"; }
 };
 
 class FBDownload : public CmdBase
@@ -82,5 +101,17 @@ public:
 		insert_param_info("download", NULL, Param::e_null);
 		insert_param_info("-f", &m_filename, Param::e_string_filename);
 	}
+	int run(CmdCtx *ctx);
+};
+
+class FBCopy : public CmdBase
+{
+public:
+	string m_local_file;
+	string m_target_file;
+	bool m_bDownload;
+	int m_Maxsize_pre_cmd;
+	int parser(char *p=NULL);
+	FBCopy(char *p) :CmdBase(p) { m_Maxsize_pre_cmd = 0x100000; };
 	int run(CmdCtx *ctx);
 };

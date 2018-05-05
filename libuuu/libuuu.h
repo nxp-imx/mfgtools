@@ -80,6 +80,7 @@ struct uuu_notify
 		NOTIFY_TRANS_SIZE,  /*Total size*/
 		NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
 		
+		NOTIFY_WAIT_FOR,    
 		NOFITY_DEV_ATTACH,
 		
 		NOTIFY_THREAD_EXIT,

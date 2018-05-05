@@ -38,6 +38,7 @@
 #include <mutex>
 #include <vector>
 #include <sstream>
+#include <fstream>
 
 #include "../libuuu/libuuu.h"
 
@@ -62,6 +63,9 @@ void print_help()
 	printf("\n");
 	printf("uuu [-d -v] SDPS: boot flash.bin\n");
 	printf("\tRun command SPDS: boot flash.bin\n");
+	printf("uuu -s\n");
+	printf("\tEnter shell mode. uuu.inputlog record all input's command\n");
+	printf("\tyou can use \"uuu uuu.inputlog\" next time to run all commands\n");
 	printf("\n");
 
 	size_t start = 0, pos = 0;
@@ -105,6 +109,8 @@ int polling_usb(std::atomic<int>& bexit);
 int g_overall_status;
 int g_overall_okay;
 int g_overall_failure;
+char g_wait[] = "|/-\\";
+int g_wait_index;
 
 class ShowNotify
 {
@@ -216,6 +222,9 @@ public:
 
 		if (nt->type == uuu_notify::NOTIFY_CMD_INFO)
 			cout << nt->str;
+
+		if (nt->type == uuu_notify::NOTIFY_WAIT_FOR)
+			cout << "\r" << nt->str << " "<< g_wait[((g_wait_index++) & 0x3)];
 	}
 	void print(int verbose = 0, uuu_notify*nt=NULL)
 	{
@@ -354,7 +363,7 @@ int main(int argc, char **argv)
 		print_help();
 	
 	int deamon = 0;
-	int step = 0;
+	int shell = 0;
 	string filename; 
 	string cmd;
 	
@@ -369,12 +378,12 @@ int main(int argc, char **argv)
 				deamon = 1;
 			}else if (s == "-s")
 			{
-				step = 1;
+				shell = 1;
+				g_verbose = 1;
 			}
 			else if (s == "-v")
 			{
 				g_verbose = 1;
-
 			}
 			else if (s == "-h")
 			{
@@ -402,7 +411,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (deamon && step)
+	if (deamon && shell)
 	{
 		printf("Error: -d -s Can't apply at the same time\n");
 		return -1;
@@ -420,6 +429,42 @@ int main(int argc, char **argv)
 	map<uint64_t, ShowNotify> nt_session;
 
 	uuu_register_notify_callback(progress, &nt_session);
+
+	if (shell)
+	{
+		cout << "Please input command: " << endl;
+		string cmd;
+		ofstream log("uuu.inputlog", ofstream::binary);
+		log << "uuu_version "
+			<< ((uuu_get_version() & 0xFF0000) >> 16)
+			<< "."
+			<< ((uuu_get_version() & 0xFF00) >> 8)
+			<< "."
+			<< ((uuu_get_version() & 0xFF))
+			<< endl;
+		while (1)
+		{
+			cout << "U>";
+			getline(cin, cmd);
+
+			if (cmd == "help" || cmd == "?")
+			{
+				print_help();
+			}
+			else
+			{
+				log << cmd << endl;
+				log.flush();
+
+				int ret = uuu_run_cmd(cmd.c_str());
+				if (ret)
+					cout << uuu_get_last_err_string() << endl;
+				else
+					cout << "Okay" << endl;
+			}
+		}
+		return 0;
+	}
 
 	if (!cmd.empty())
 	{

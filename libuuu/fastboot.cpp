@@ -39,8 +39,10 @@
 #include "cmd.h"
 #include "buffer.h"
 #include "libuuu.h"
+#include <iostream>
+#include <fstream>
 
-int FastBoot::Transport(string cmd, void *p, size_t size)
+int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
 	if (m_pTrans->write((void*)cmd.data(), cmd.size()))
 		return -1;
@@ -59,8 +61,19 @@ int FastBoot::Transport(string cmd, void *p, size_t size)
 		{
 			size_t sz;
 			sz = strtoul(buff+4, NULL, 16);
-			if (m_pTrans->write(p, sz))
-				return -1;
+			if (input)
+			{
+				input->resize(sz);
+				size_t rz;
+				if (m_pTrans->read(input->data(), sz, &rz))
+					return -1;
+				input->resize(rz);
+			}
+			else
+			{
+				if (m_pTrans->write(p, sz))
+					return -1;
+			}
 		}else
 		{
 			string s;
@@ -120,7 +133,7 @@ int FBGetVar::run(CmdCtx *ctx)
 	return 0;
 }
 
-int FBUCmd::parser(char *p)
+int FBCmd::parser(char *p)
 {
 	if (p)
 		m_cmd = p;
@@ -131,7 +144,7 @@ int FBUCmd::parser(char *p)
 	if(s.find(":") != s.npos)
 		s = get_next_param(m_cmd, pos);
 
-	if (str_to_upper(s) != "UCMD")
+	if (str_to_upper(s) != str_to_upper(m_fb_cmd))
 	{
 		string err = "Unknown command: ";
 		err += s;
@@ -143,7 +156,7 @@ int FBUCmd::parser(char *p)
 	return 0;
 }
 
-int FBUCmd::run(CmdCtx *ctx)
+int FBCmd::run(CmdCtx *ctx)
 {
 	BulkTrans dev;
 	if (dev.open(ctx->m_dev))
@@ -151,7 +164,8 @@ int FBUCmd::run(CmdCtx *ctx)
 
 	FastBoot fb(&dev);
 	string cmd;
-	cmd = "UCmd:";
+	cmd = m_fb_cmd;
+	cmd += ":";
 	cmd += m_uboot_cmd;
 
 	if (fb.Transport(cmd, NULL, 0))
@@ -179,4 +193,149 @@ int FBDownload::run(CmdCtx *ctx)
 		return -1;
 
 	return 0;
+}
+
+int FBCopy::parser(char *p)
+{
+	if (p)
+		m_cmd = p;
+
+	size_t pos = 0;
+	string s;
+	s = get_next_param(m_cmd, pos);
+	if (s.find(":") != s.npos)
+		s = get_next_param(m_cmd, pos);
+
+	if ((str_to_upper(s) != "UCP"))
+	{
+		string err = "Unknown command: ";
+		err += s;
+		set_last_err_string(s);
+		return -1;
+	}
+
+	string source;
+	string dest;
+
+	source = get_next_param(m_cmd, pos);
+	dest = get_next_param(m_cmd, pos);
+
+	if (source.empty())
+	{
+		set_last_err_string("ucp: source missed");
+		return -1;
+	}
+
+	if (dest.empty())
+	{
+		set_last_err_string("ucp: destination missed");
+		return -1;
+	}
+	
+	if (source.find("T:") == 0)
+	{
+		if (dest.find("T:") == 0)
+		{
+			set_last_err_string("ucp just support one is remote file start with R:");
+			return -1;
+		}
+		m_target_file = source.substr(2);
+		m_bDownload = false; //upload a file
+		m_local_file = dest;
+	}
+	else if (dest.find("T:") == 0)
+	{
+		m_target_file = dest.substr(2);
+		m_bDownload = true;
+		m_local_file = source;
+	}
+	else
+	{
+		set_last_err_string("ucp must a remote file name, start with R:<file name>");
+		return -1;
+	}
+	return 0;
+}
+
+int FBCopy::run(CmdCtx *ctx)
+{
+	BulkTrans dev;
+	if (dev.open(ctx->m_dev))
+		return -1;
+
+	FastBoot fb(&dev);
+	string_ex cmd;
+
+	if(m_bDownload)
+	{
+		size_t i;
+		shared_ptr<FileBuffer> buff = get_file_buffer(m_local_file);
+		if (buff == NULL)
+		{
+			return -1;
+		}
+
+		cmd.format("WOpen:%s", m_target_file);
+		if (fb.Transport(cmd, NULL, 0))
+			return -1;
+
+		uuu_notify nt;
+		nt.type = uuu_notify::NOTIFY_CMD_TOTAL;
+		nt.total = buff->size();
+		call_notify(nt);
+
+		for (size_t i = 0; i < buff->size(); i += this->m_Maxsize_pre_cmd)
+		{
+			size_t sz = buff->size() - i;
+			if (sz > m_Maxsize_pre_cmd)
+				sz = m_Maxsize_pre_cmd;
+
+			cmd.format("donwload:%08X", sz);
+			if (fb.Transport(cmd, buff->data() + i, sz))
+				return -1;
+
+			nt.type = uuu_notify::NOTIFY_TRANS_POS;
+			nt.index = i;
+			call_notify(nt);
+		}
+	}
+	else
+	{
+		cmd.format("ROpen:%s", m_target_file);
+		if (fb.Transport(cmd, NULL, 0))
+			return -1;
+		
+		uuu_notify nt;
+		nt.type = uuu_notify::NOTIFY_CMD_TOTAL;
+		size_t total = nt.total = strtoul(fb.m_info.c_str(), NULL, 16);
+		call_notify(nt);
+
+		nt.index = 0;
+		ofstream of;
+		of.open(m_local_file, ofstream::binary);
+
+		if (!of)
+		{
+			string err;
+			err = "Fail to open file";
+			err += m_local_file;
+			set_last_err_string(err);
+		}
+		do
+		{
+			vector<uint8_t> data;
+			if (fb.Transport("upload", NULL, 0, &data))
+				return -1;
+			
+			of.write((const char*)data.data(), data.size());
+
+			nt.type = uuu_notify::NOTIFY_TRANS_POS;
+			nt.index += data.size();
+			call_notify(nt);
+		} while (nt.index < total);
+	}
+
+	cmd.format("Close");
+	if (fb.Transport(cmd, NULL, 0))
+		return -1;
 }

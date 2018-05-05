@@ -6,7 +6,7 @@ uuu_version 1.0.0
 # Command Format PROTOCOL COMMAND ARG
 # PROTOCOL
 #          CFG:  Config protocol of specific usb device vid/pid
-#                SDPS|SDP|FB\Fastboot -chip <chip name> -pid <pid> -vid <vid> [-bcdversion <ver>]
+#                SDPS|SDP|FB\Fastboot|FBK -chip <chip name> -pid <pid> -vid <vid> [-bcdversion <ver>]
 #          SDPS: Stream download after MX8QXPB0 
 #                      boot  -f  <filename>
 #                      done  #last command for whole flow         
@@ -20,16 +20,30 @@ uuu_version 1.0.0
 #                      getvar
 #                      ucmd <any uboot command>
 #                      download -f <filename>
+#          FBK: community with kernel with fastboot protocol. DO NOT compatible with fastboot tools.
+#                      ucmd <any kernel command> and wait for command finish
+#                      acmd <any kernel command> don't wait for command finish
+#                      sync                      wait for acmd processs finish.
+#                      ucp <soure> <destinate>   copy file from/to target
+#                                                T:<filename> means target board file.
+#                                                T:- means copy data to target's stdio pipe. 
+#                                                copy image T:/root/image ;download image to path /root/image
+#                                                copy T:/root/image image ;upload /root/image to file image.
+#
+#                      Example for transfer big file
+#                              acmd tar -            ; run tar background and get data from stdio
+#                              ucp rootfs.tar.gz T:- ; send to target stdio pipe
+#                              sync                  ; wait for tar process exit.
 # For example:
 #          SDPS: boot -f <filename>
 #          SDP:  boot -f <filename>
 #          CFG: SDP: -chip imx6ull -pid 0x1234 -vid 0x5678
 
-#SDP: boot -f u-boot-imx7dsabresd_sd.imx -nojump
-#SDP: write -f zImage -addr 0x80800000
-#SDP: write -f zImage-imx7d-sdb.dtb -addr 0x83000000
-#SDP: write -f fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot -addr 0x83800000
-#SDP: jump -f u-boot-dtb.imx -ivt
+# SDP: boot -f u-boot-imx7dsabresd_sd.imx -nojump
+# SDP: write -f zImage -addr 0x80800000
+# SDP: write -f zImage-imx7d-sdb.dtb -addr 0x83000000
+# SDP: write -f fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot -addr 0x83800000
+# SDP: jump -f u-boot-dtb.imx -ivt
 
 CFG: FB:  -vid 0x18D1 -pid 0x0D02
 SDP: boot -f u-boot-dtb.imx
@@ -39,4 +53,3 @@ FB: download -f zImage
 FB: ucmd setenv fastboot_buffer 0x83000000
 FB: download -f zImage-imx7d-sdb.dtb
 FB: ucmd bootz 0x80800000 - 0x83000000 
-
