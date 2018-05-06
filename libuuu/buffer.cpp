@@ -38,6 +38,13 @@
 
 static map<string, shared_ptr<FileBuffer>> g_filebuffer_map;
 
+string g_current_dir;
+
+void set_current_dir(string dir)
+{
+	g_current_dir = dir;
+}
+
 uint64_t get_file_timesample(string filename)
 {
 	struct stat st;
@@ -48,6 +55,8 @@ uint64_t get_file_timesample(string filename)
 
 shared_ptr<FileBuffer> get_file_buffer(string filename)
 {
+	filename = g_current_dir + filename;
+
 	if (g_filebuffer_map.find(filename) == g_filebuffer_map.end())
 	{
 		shared_ptr<FileBuffer> p(new FileBuffer);

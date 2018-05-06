@@ -92,6 +92,18 @@ public:
 	FBSyncCmd(char *p) : FBCmd(p) { m_fb_cmd = "Sync"; }
 };
 
+class FBFlashCmd : public FBCmd
+{
+public:
+	FBFlashCmd(char *p) : FBCmd(p) { m_fb_cmd = "flash"; }
+};
+
+class FBEraseCmd : public FBCmd
+{
+public:
+	FBEraseCmd(char *p) : FBCmd(p) { m_fb_cmd = "erase"; }
+};
+
 class FBDownload : public CmdBase
 {
 public:

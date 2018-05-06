@@ -45,3 +45,4 @@ public:
 };
 
 shared_ptr<FileBuffer> get_file_buffer(string filename);
+void set_current_dir(string dir);

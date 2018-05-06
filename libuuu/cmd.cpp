@@ -41,6 +41,8 @@
 #include "buffer.h"
 #include "sdp.h"
 #include "fastboot.h"
+#include <sys/stat.h>
+
 
 static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
@@ -204,7 +206,7 @@ CmdObjCreateMap::CmdObjCreateMap()
 {
 	(*this)["CFG:"] = new_cmd_obj<CfgCmd>;
 	
-	(*this)["SDPS:BOOT"] = new_cmd_obj<SDPBootCmd>;
+	(*this)["SDPS:BOOT"] = new_cmd_obj<SDPSCmd>;
 	(*this)["SDPS:DONE"] = new_cmd_obj<CmdDone>;
 
 	(*this)["SDP:DCD"] = new_cmd_obj<SDPDcdCmd>;
@@ -218,8 +220,14 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:GETVAR"] = new_cmd_obj<FBGetVar>;
 	(*this)["FB:UCMD"] = new_cmd_obj<FBUCmd>;
 	(*this)["FASTBOOT:UCMD"] = new_cmd_obj<FBUCmd>;
+	(*this)["FB:ACMD"] = new_cmd_obj<FBACmd>;
+	(*this)["FASTBOOT:ACMD"] = new_cmd_obj<FBACmd>;
 	(*this)["FB:DOWNLOAD"] = new_cmd_obj<FBDownload>;
 	(*this)["FASTBOOT:DOWNLOAD"] = new_cmd_obj<FBDownload>;
+	(*this)["FB:FLASH"] = new_cmd_obj<FBFlashCmd>;
+	(*this)["FASTBOOT:FLASH"] = new_cmd_obj<FBFlashCmd>;
+	(*this)["FB:ERASE"] = new_cmd_obj<FBEraseCmd>;
+	(*this)["FASTBOOT:ERASE"] = new_cmd_obj<FBEraseCmd>;
 	(*this)["FB:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["FASTBOOT:DONE"] = new_cmd_obj<CmdDone>;
 
@@ -444,7 +452,23 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff)
 
 int uuu_auto_detect_file(const char *filename)
 {
-	shared_ptr<FileBuffer> buffer = get_file_buffer(filename);
+	struct stat st;
+	if (stat(filename, &st))
+	{
+		string err;
+		err = "Can't open file ";
+		err + filename;
+		set_last_err_string(err);
+		return -1;
+	}
+
+	string fn = filename;
+	if (S_IFDIR & st.st_mode)
+	{
+		fn.append("auto.uuu");
+	}
+
+	shared_ptr<FileBuffer> buffer = get_file_buffer(fn);
 	if (buffer == NULL)
 		return -1;
 
@@ -453,11 +477,19 @@ int uuu_auto_detect_file(const char *filename)
 	void *p2 = (void*)str.data();
 	if (memcmp(p1, p2, str.size()) == 0)
 	{
+		for (size_t i = 0; i < fn.size(); i++)
+			if (fn[i] == '\\')
+				fn[i] = '/';
+
+		size_t pos = fn.rfind('/');
+		if (pos != string::npos)
+			set_current_dir(fn.substr(0, pos + 1));
+
 		return parser_cmd_list_file(buffer);
 	}
 	
 	//flash.bin or uboot.bin
-	return added_default_boot_cmd(filename);
+	return added_default_boot_cmd(fn.c_str());
 }
 
 int notify_done(uuu_notify nt, void *p)
