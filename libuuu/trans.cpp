@@ -32,6 +32,7 @@
 #include "trans.h"
 #include "libuuu.h"
 #include "liberror.h"
+#include "libusb.h"
 
 extern "C"
 {
@@ -75,6 +76,7 @@ int USBTrans::open(void *p)
 int USBTrans::close()
 {
 	libusb_release_interface((libusb_device_handle *)m_devhandle, 0);
+	libusb_close((libusb_device_handle *)m_devhandle);
 	return 0;
 }
 
