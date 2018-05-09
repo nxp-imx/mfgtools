@@ -124,6 +124,6 @@ public:
 	bool m_bDownload;
 	int m_Maxsize_pre_cmd;
 	int parser(char *p=NULL);
-	FBCopy(char *p) :CmdBase(p) { m_Maxsize_pre_cmd = 0x100000; };
+	FBCopy(char *p) :CmdBase(p) { m_Maxsize_pre_cmd = 0x10000; };
 	int run(CmdCtx *ctx);
 };

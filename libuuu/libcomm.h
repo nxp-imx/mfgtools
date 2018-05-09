@@ -59,6 +59,26 @@ public:
 
 		return 0;
 	}
+	void replace(char a, char b)
+	{
+		for (int i = 0; i < size(); i++)
+			if (at(i) == a)
+				(*this)[i] = b;
+	}
+};
+
+class Path : public string_ex
+{
+public:
+	string get_file_name()
+	{
+		replace('\\', '/');
+		size_t pos;
+		pos = rfind('/');
+		if (pos == string::npos)
+			return *this;
+		return substr(pos + 1);
+	}
 };
 
 inline uint64_t EndianSwap(uint64_t x) {

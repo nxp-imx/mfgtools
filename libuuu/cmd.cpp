@@ -452,25 +452,17 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff)
 
 int uuu_auto_detect_file(const char *filename)
 {
-	struct stat st;
-	if (stat(filename, &st))
-	{
-		string err;
-		err = "Can't open file ";
-		err + filename;
-		set_last_err_string(err);
-		return -1;
-	}
-
 	string fn = filename;
-	if (S_IFDIR & st.st_mode)
-	{
-		fn.append("auto.uuu");
-	}
+	if (fn.empty())
+		fn = "./";
 
-	shared_ptr<FileBuffer> buffer = get_file_buffer(fn);
+	shared_ptr<FileBuffer> buffer = get_file_buffer(fn + "/uuu.auto");
 	if (buffer == NULL)
-		return -1;
+	{
+		buffer = get_file_buffer(fn);
+		if(buffer == NULL)
+			return -1;
+	}
 
 	string str= "uuu_version";
 	void *p1 = buffer->data();
@@ -503,7 +495,7 @@ int uuu_wait_uuu_finish(int deamon)
 {
 	std::atomic<int> exit;
 	exit = 0;
-	if(!deamon)
+	if (!deamon)
 		uuu_register_notify_callback(notify_done, &exit);
 
 	polling_usb(exit);

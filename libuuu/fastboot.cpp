@@ -236,7 +236,7 @@ int FBCopy::parser(char *p)
 	{
 		if (dest.find("T:") == 0)
 		{
-			set_last_err_string("ucp just support one is remote file start with R:");
+			set_last_err_string("ucp just support one is remote file start with T:");
 			return -1;
 		}
 		m_target_file = source.substr(2);
@@ -275,9 +275,25 @@ int FBCopy::run(CmdCtx *ctx)
 			return -1;
 		}
 
-		cmd.format("WOpen:%s", m_target_file);
+		cmd.format("WOpen:%s", m_target_file.c_str());
 		if (fb.Transport(cmd, NULL, 0))
-			return -1;
+		{
+			if (fb.m_info == "DIR")
+			{
+				Path p;
+				p.append(m_local_file);
+				string target = m_target_file;
+				target += "/";
+				target += p.get_file_name();
+
+				cmd.format("WOpen:%s", target.c_str());
+				if (fb.Transport(cmd, NULL, 0))
+					return -1;
+			}
+			else {
+				return -1;
+			}
+		}
 
 		uuu_notify nt;
 		nt.type = uuu_notify::NOTIFY_CMD_TOTAL;
@@ -301,7 +317,7 @@ int FBCopy::run(CmdCtx *ctx)
 	}
 	else
 	{
-		cmd.format("ROpen:%s", m_target_file);
+		cmd.format("ROpen:%s", m_target_file.c_str());
 		if (fb.Transport(cmd, NULL, 0))
 			return -1;
 		
@@ -338,4 +354,6 @@ int FBCopy::run(CmdCtx *ctx)
 	cmd.format("Close");
 	if (fb.Transport(cmd, NULL, 0))
 		return -1;
+
+	return 0;
 }
