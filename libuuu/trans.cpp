@@ -68,8 +68,10 @@ int USBTrans::open(void *p)
 	
 	m_EPs.clear();
 	for (int i = 0; i < config->interface[0].altsetting[0].bNumEndpoints; i++)
-		m_EPs.push_back(config->interface[0].altsetting[0].endpoint[i].bEndpointAddress);
-	
+	{ 
+		m_EPs.push_back(EPInfo(config->interface[0].altsetting[0].endpoint[i].bEndpointAddress,
+							   config->interface[0].altsetting[0].endpoint[i].wMaxPacketSize));
+	};
 	return 0;
 }
 
@@ -132,20 +134,48 @@ int BulkTrans::write(void *buff, size_t size)
 {
 	int ret;
 	int actual_lenght;
-	uint8_t *p = (uint8_t *)buff;
-	ret = libusb_bulk_transfer(
-		(libusb_device_handle *)m_devhandle,
-		m_ep_out,
-		p,
-		size,
-		&actual_lenght,
-		1000
-	);
-
-	if (ret < 0)
+	for (int i = 0; i < size; i += m_MaxTransPreRequest)
 	{
-		set_last_err_string("Bulk Write failure");
-		return ret;
+		uint8_t *p = (uint8_t *)buff;
+		p += i;
+		size_t sz; 
+		sz = size - i;
+		if (sz > m_MaxTransPreRequest)
+			sz = m_MaxTransPreRequest;
+
+		ret = libusb_bulk_transfer(
+			(libusb_device_handle *)m_devhandle,
+			m_ep_out.addr,
+			p,
+			sz,
+			&actual_lenght,
+			1000
+		);
+
+		if (ret < 0)
+		{
+			set_last_err_string("Bulk Write failure");
+			return ret;
+		}
+	}
+
+	//Send zero package
+	if (m_b_send_zero && (size%m_ep_out.package_size == 0))
+	{
+		ret = libusb_bulk_transfer(
+			(libusb_device_handle *)m_devhandle,
+			m_ep_out.addr,
+			NULL,
+			0,
+			&actual_lenght,
+			1000
+		);
+
+		if (ret < 0)
+		{
+			set_last_err_string("Bulk Write failure");
+			return ret;
+		}
 	}
 
 	return ret;
@@ -158,11 +188,11 @@ int BulkTrans::open(void *p)
 
 	for (int i = 0; i < m_EPs.size(); i++)
 	{
-		if (m_EPs[0] > 0)
+		if (m_EPs[i].addr > 0)
 		{
-			if ((m_EPs[0] & 0x80) && m_ep_in == 0)
+			if ((m_EPs[0].addr & 0x80) && m_ep_in.addr == 0)
 				m_ep_in = m_EPs[i];
-			else if (m_ep_out == 0)
+			else if (m_ep_out.addr == 0)
 				m_ep_out = m_EPs[i];
 		}
 	}
@@ -175,7 +205,7 @@ int BulkTrans::read(void *buff, size_t size, size_t *rsize)
 	uint8_t *p = (uint8_t *)buff;
 	ret = libusb_bulk_transfer(
 		(libusb_device_handle *)m_devhandle,
-		m_ep_in,
+		m_ep_in.addr,
 		p,
 		size,
 		&actual_lenght,

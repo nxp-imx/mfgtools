@@ -58,10 +58,19 @@ public:
 	}
 };
 
+class EPInfo
+{
+public:
+	EPInfo() { addr = 0; package_size = 64; }
+	EPInfo(int a, int size) { addr = a; package_size = size; };
+	int addr;
+	int package_size;
+};
+
 class USBTrans : public TransBase
 {
 public:
-	vector<int> m_EPs;
+	vector<EPInfo> m_EPs;
 	virtual int open(void *p);
 	virtual int close();
 };
@@ -77,14 +86,23 @@ public:
 
 class BulkTrans : public USBTrans
 {
+	void Init()
+	{
+		m_MaxTransPreRequest = 0x1000;
+		m_b_send_zero = 1; 
+	}
+
 public:
-	int m_ep_in;
-	int m_ep_out;
-	BulkTrans() { m_ep_in = 0; m_ep_out = 0; }
+	EPInfo m_ep_in;
+	EPInfo m_ep_out;
+	int m_MaxTransPreRequest;
+	int m_b_send_zero;
+	
+	BulkTrans() {
+		Init();
+	}
 
 	virtual int open(void *p);
-
-	BulkTrans(int ep_in, int ep_out) { m_ep_in = ep_in; m_ep_out = ep_out; };
 
 	~BulkTrans() { if (m_devhandle) close();  m_devhandle = NULL; }
 	int write(void *buff, size_t size);

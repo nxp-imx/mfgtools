@@ -151,8 +151,8 @@ int FBCmd::parser(char *p)
 		set_last_err_string(s);
 		return -1;
 	}
-
-	m_uboot_cmd = m_cmd.substr(pos);
+	if(pos!=string::npos && pos < m_cmd.size())
+		m_uboot_cmd = m_cmd.substr(pos);
 	return 0;
 }
 
@@ -232,18 +232,18 @@ int FBCopy::parser(char *p)
 		return -1;
 	}
 	
-	if (source.find("T:") == 0)
+	if (source.find("T:") == 0 || source.find("t:") == 0)
 	{
-		if (dest.find("T:") == 0)
+		if (dest.find("T:") == 0 || dest.find("t:") == 0)
 		{
-			set_last_err_string("ucp just support one is remote file start with T:");
+			set_last_err_string("ucp just support one is remote file start with t:");
 			return -1;
 		}
 		m_target_file = source.substr(2);
 		m_bDownload = false; //upload a file
 		m_local_file = dest;
 	}
-	else if (dest.find("T:") == 0)
+	else if (dest.find("T:") == 0 || dest.find("t:") == 0)
 	{
 		m_target_file = dest.substr(2);
 		m_bDownload = true;
@@ -251,7 +251,7 @@ int FBCopy::parser(char *p)
 	}
 	else
 	{
-		set_last_err_string("ucp must a remote file name, start with R:<file name>");
+		set_last_err_string("ucp must a remote file name, start with t:<file name>");
 		return -1;
 	}
 	return 0;
@@ -328,13 +328,30 @@ int FBCopy::run(CmdCtx *ctx)
 
 		nt.index = 0;
 		ofstream of;
-		of.open(m_local_file, ofstream::binary);
+
+		struct stat st;
+		
+		Path localfile;
+		localfile.append(m_local_file);
+
+		if (stat(localfile.c_str(), &st) == 0)
+		{
+			if (st.st_mode & S_IFDIR)
+			{
+				localfile += "/";
+				Path t;
+				t.append(m_target_file);
+				localfile += t.get_file_name();
+			}
+		}
+
+		of.open(localfile, ofstream::binary);
 
 		if (!of)
 		{
 			string err;
 			err = "Fail to open file";
-			err += m_local_file;
+			err += localfile;
 			set_last_err_string(err);
 		}
 		do
