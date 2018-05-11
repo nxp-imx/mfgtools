@@ -149,7 +149,7 @@ int BulkTrans::write(void *buff, size_t size)
 			p,
 			sz,
 			&actual_lenght,
-			1000
+			2000
 		);
 
 		if (ret < 0)
@@ -168,7 +168,7 @@ int BulkTrans::write(void *buff, size_t size)
 			NULL,
 			0,
 			&actual_lenght,
-			1000
+			2000
 		);
 
 		if (ret < 0)
@@ -209,7 +209,7 @@ int BulkTrans::read(void *buff, size_t size, size_t *rsize)
 		p,
 		size,
 		&actual_lenght,
-		1000
+		2000
 	);
 
 	*rsize = actual_lenght;

@@ -239,7 +239,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 			}
 
 			ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
-			if (item && item->m_protocol == pro)
+			if (item && item->m_protocol == str_to_upper(pro))
 				{
 					uuu_notify nt;
 					nt.type = uuu_notify::NOFITY_DEV_ATTACH;
