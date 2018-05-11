@@ -41,6 +41,7 @@
 #include "libuuu.h"
 #include <iostream>
 #include <fstream>
+#include <sys/stat.h>
 
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
