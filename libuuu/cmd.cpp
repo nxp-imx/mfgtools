@@ -488,6 +488,8 @@ int notify_done(uuu_notify nt, void *p)
 {
 	if(nt.type == uuu_notify::NOTIFY_DONE)
 		*(std::atomic<int> *) p = 1;
+	if (nt.type == uuu_notify::NOTIFY_CMD_END && nt.status)
+		*(std::atomic<int> *) p = 1;
 
 	return 0;
 }

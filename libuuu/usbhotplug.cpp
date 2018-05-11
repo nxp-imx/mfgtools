@@ -119,7 +119,7 @@ static int usb_add(libusb_device *dev)
 	ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
 	if (item)
 	{
-		g_running_thread.push_back(std::thread(run_usb_cmds, item, dev));
+		std::thread(run_usb_cmds, item, dev).detach();
 	}
 	return 0;
 }
