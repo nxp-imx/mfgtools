@@ -78,7 +78,6 @@ int USBTrans::open(void *p)
 int USBTrans::close()
 {
 	libusb_release_interface((libusb_device_handle *)m_devhandle, 0);
-	libusb_close((libusb_device_handle *)m_devhandle);
 	return 0;
 }
 
@@ -160,7 +159,7 @@ int BulkTrans::write(void *buff, size_t size)
 	}
 
 	//Send zero package
-	if (m_b_send_zero && (size%m_ep_out.package_size == 0))
+	if (m_b_send_zero && ( (size%m_ep_out.package_size) == 0))
 	{
 		ret = libusb_bulk_transfer(
 			(libusb_device_handle *)m_devhandle,

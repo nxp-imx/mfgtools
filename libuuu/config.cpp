@@ -53,6 +53,7 @@ Config::Config()
 	push_back(ConfigItem("SDP:", "MX7ULP",   NULL,  NXP_VID, 0x0054));
 	push_back(ConfigItem("FBK:", NULL, NULL, 0x066F, 0x9AFE));
 	push_back(ConfigItem("FB:", NULL, NULL,  0x0525, 0xA4A5));
+	push_back(ConfigItem("FB:", NULL, NULL,  0x18D1, 0x0D02));
 }
 
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p)
