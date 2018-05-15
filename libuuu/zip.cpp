@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-
+#include <string.h>
 #include <iostream>
 #include <fstream>
 #include "libcomm.h"

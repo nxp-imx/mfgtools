@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0>=1.0.16)
+pkg_check_modules(LIBZIP REQUIRED libzip)
 find_package(Threads)
 
 include_directories(${LIBUSB_INCLUDE_DIRS} include)
@@ -22,6 +23,7 @@ set(SOURCES
 	sdp.cpp
 	gitversion.h
 	fastboot.cpp
+	zip.cpp
 )
 
 add_custom_command(
