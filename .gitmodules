@@ -1,3 +1,6 @@
 [submodule "libusb"]
 	path = libusb
 	url = https://github.com/libusb/libusb.git
+[submodule "zlib"]
+	path = zlib
+	url = https://github.com/madler/zlib.git

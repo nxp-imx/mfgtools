@@ -117,6 +117,8 @@ static int usb_add(libusb_device *dev)
 	}
 
 	ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
+	std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
 	if (item)
 	{
 		std::thread(run_usb_cmds, item, dev).detach();
@@ -209,6 +211,15 @@ int polling_usb(std::atomic<int>& bexit)
 		libusb_free_device_list(newlist, 1);
 
 	return 0;
+}
+
+CmdUsbCtx::~CmdUsbCtx()
+{
+	if (m_dev)
+	{
+		libusb_close((libusb_device_handle*)m_dev);
+		m_dev = 0;
+	}
 }
 
 int CmdUsbCtx::look_for_match_device(const char *pro)

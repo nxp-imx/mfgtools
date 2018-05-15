@@ -30,6 +30,7 @@
     <ClCompile Include="..\libuuu\trans.cpp" />
     <ClCompile Include="..\libuuu\usbhotplug.cpp" />
     <ClCompile Include="..\libuuu\version.cpp" />
+    <ClCompile Include="..\libuuu\zip.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libuuu\buffer.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="..\libuuu\sdps.h" />
     <ClInclude Include="..\libuuu\sdp.h" />
     <ClInclude Include="..\libuuu\trans.h" />
+    <ClInclude Include="..\libuuu\zip.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -100,17 +102,21 @@
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\zlib;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\zlib;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\zlib;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\zlib;</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

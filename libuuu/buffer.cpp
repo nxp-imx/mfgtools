@@ -35,6 +35,8 @@
 #include "liberror.h"
 #include <iostream>
 #include <fstream>
+#include "libcomm.h"
+#include "zip.h"
 
 static map<string, shared_ptr<FileBuffer>> g_filebuffer_map;
 
@@ -48,7 +50,15 @@ void set_current_dir(string dir)
 uint64_t get_file_timesample(string filename)
 {
 	struct stat st;
-	stat(filename.c_str(), &st);
+	if (stat(filename.c_str(), &st))
+	{
+		string path = str_to_upper(filename);
+		size_t pos = path.find(".ZIP");
+		if (pos == string::npos)
+			return 0;
+		stat(filename.substr(0, pos + 4).c_str(), &st);
+		return st.st_mtime;
+	}
 
 	return st.st_mtime;
 }
@@ -83,14 +93,40 @@ shared_ptr<FileBuffer> get_file_buffer(string filename)
 int FileBuffer::reload(string filename)
 {
 	struct stat st;
+	size_t pos = 0;
 	if (stat(filename.c_str(), &st))
 	{
-		string err = "Fail Open File: ";
-		err.append(filename);
-		set_last_err_string(err);
-		return -1;
+		string path = str_to_upper(filename);
+		pos = path.find(".ZIP");
+		string zipfile = filename.substr(0, pos + 4);
+		if (pos == string::npos || (stat(zipfile.c_str(), &st)))
+		{
+			string err = "Fail Open File: ";
+			err.append(filename);
+			set_last_err_string(err);
+			return -1;
+		}
 	}
 
+	if (pos)
+	{
+		Zip zip;
+		if (zip.Open(filename.substr(0, pos + 4)))
+		{
+			string err = "Fail Open File: ";
+			err.append(filename.substr(0, pos + 4));
+			set_last_err_string(err);
+			return -1;
+		}
+		string fn = filename.substr(pos + 5);
+		shared_ptr<FileBuffer> p = zip.get_file_buff(fn);
+		if (p == NULL)
+			return -1;
+
+		this->swap(*p);
+		m_timesample = st.st_mtime;
+		return 0;
+	}
 	m_timesample = st.st_mtime;
 	resize(st.st_size);
 

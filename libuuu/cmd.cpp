@@ -459,7 +459,10 @@ int uuu_auto_detect_file(const char *filename)
 	shared_ptr<FileBuffer> buffer = get_file_buffer(fn + "/uuu.auto");
 	if (buffer == NULL)
 	{
-		buffer = get_file_buffer(fn);
+		size_t pos = str_to_upper(fn).find("ZIP");
+		if(pos == string::npos || pos != fn.size() - 3)
+			buffer = get_file_buffer(fn); //we don't try open a zip file here
+
 		if(buffer == NULL)
 			return -1;
 	}

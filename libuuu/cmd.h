@@ -46,6 +46,7 @@ class CmdCtx
 {
 public:
 	CmdCtx() { m_config_item = NULL; m_dev = NULL; };
+	virtual ~CmdCtx() {};
 	ConfigItem *m_config_item;
 	void *m_dev;
 };
@@ -54,6 +55,7 @@ class CmdUsbCtx : public CmdCtx
 {
 public:
 	CmdUsbCtx() :CmdCtx() {};
+	~CmdUsbCtx();
 	int look_for_match_device(const char * procotol);
 }; 
 

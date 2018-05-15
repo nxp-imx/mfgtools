@@ -316,8 +316,10 @@ int progress(uuu_notify nt, void *p)
 		}
 	}
 	if (nt.type == uuu_notify::NOTIFY_THREAD_EXIT)
-		np->erase(nt.id);
-
+	{
+		if(np->find(nt.id) != np->end())
+			np->erase(nt.id);
+	}
 	return 0;
 }
 #ifdef _MSC_VER

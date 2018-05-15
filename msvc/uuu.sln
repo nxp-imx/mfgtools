@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uuu", "uuu.vcxproj", "{2950F8EE-7895-4431-858A-C21EE105C242}"
 	ProjectSection(ProjectDependencies) = postProject
+		{59666402-A775-49AC-A9BD-19FD528F5FD9} = {59666402-A775-49AC-A9BD-19FD528F5FD9}
 		{048A9BD1-EEF8-4119-9DEF-219D7E177AAC} = {048A9BD1-EEF8-4119-9DEF-219D7E177AAC}
+		{349EE8F9-7D25-4909-AAF5-FF3FADE72187} = {349EE8F9-7D25-4909-AAF5-FF3FADE72187}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libuuu", "libuuu.vcxproj", "{048A9BD1-EEF8-4119-9DEF-219D7E177AAC}"
@@ -14,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libuuu", "libuuu.vcxproj", 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libusb-1.0 (static)", "..\libusb\msvc\libusb_static_2017.vcxproj", "{349EE8F9-7D25-4909-AAF5-FF3FADE72187}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "zlib.vcxproj", "{59666402-A775-49AC-A9BD-19FD528F5FD9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +51,14 @@ Global
 		{349EE8F9-7D25-4909-AAF5-FF3FADE72187}.Release|x64.Build.0 = Release|x64
 		{349EE8F9-7D25-4909-AAF5-FF3FADE72187}.Release|x86.ActiveCfg = Release|Win32
 		{349EE8F9-7D25-4909-AAF5-FF3FADE72187}.Release|x86.Build.0 = Release|Win32
+		{59666402-A775-49AC-A9BD-19FD528F5FD9}.Debug|x64.ActiveCfg = Debug|x64
+		{59666402-A775-49AC-A9BD-19FD528F5FD9}.Debug|x64.Build.0 = Debug|x64
+		{59666402-A775-49AC-A9BD-19FD528F5FD9}.Debug|x86.ActiveCfg = Debug|Win32
+		{59666402-A775-49AC-A9BD-19FD528F5FD9}.Debug|x86.Build.0 = Debug|Win32
+		{59666402-A775-49AC-A9BD-19FD528F5FD9}.Release|x64.ActiveCfg = Release|x64
+		{59666402-A775-49AC-A9BD-19FD528F5FD9}.Release|x64.Build.0 = Release|x64
+		{59666402-A775-49AC-A9BD-19FD528F5FD9}.Release|x86.ActiveCfg = Release|Win32
+		{59666402-A775-49AC-A9BD-19FD528F5FD9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
