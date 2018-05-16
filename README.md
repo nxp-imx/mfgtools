@@ -1,4 +1,6 @@
 # uuu(universial update utiles). Old name is mfgtools 
+** original linux version using linux branch, windows version use windows branch **
+
 Freescale/NXP I.MX Chip image deploy tools.
 
     uuu (universal update utitle) for nxp imx chips -- libuuu-1.0.1-gffd9837
