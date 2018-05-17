@@ -25,6 +25,8 @@ Freescale/NXP I.MX Chip image deploy tools.
   
   uuu list.uu               Run all commands in list.uu
   
+  uuu -s                    Enter shell mode. input command. 
+  
   uuu -d u-boot.imx         Once detect known device attach, download boot.imx. 
                             
                             u-boot.imx can be replaced, new file will be download once board reset.
