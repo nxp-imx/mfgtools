@@ -19,6 +19,7 @@ uuu_version 1.0.0
 #          FB:\Fastboot: android fastboot protocol
 #                      getvar
 #                      ucmd <any uboot command>
+#                      acmd <any never returned uboot command, like booti, reboot>
 #                      download -f <filename>
 #          FBK: community with kernel with fastboot protocol. DO NOT compatible with fastboot tools.
 #                      ucmd <any kernel command> and wait for command finish
