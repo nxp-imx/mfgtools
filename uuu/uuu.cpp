@@ -39,16 +39,41 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <stdarg.h>
+#include <time.h>
 
 #include "../libuuu/libuuu.h"
+
+using namespace std;
+
+int get_console_width();
+void print_oneline(string str);
 
 char g_sample_cmd_list[] = {
 #include "uuu.clst"
 };
 
-using namespace std;
-
 int g_verbose = 0;
+
+class string_ex : public std::string
+{
+public:
+	int format(const char *fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		size_t len = std::vsnprintf(NULL, 0, fmt, args);
+		va_end(args);
+
+		this->resize(len);
+
+		va_start(args, fmt);
+		std::vsnprintf((char*)c_str(), len + 1, fmt, args);
+		va_end(args);
+
+		return 0;
+	}
+};
 
 void print_help()
 {
@@ -112,18 +137,76 @@ int g_overall_failure;
 char g_wait[] = "|/-\\";
 int g_wait_index;
 
+#define YELLOW "\x1B[93m"
+#define DEFAULT "\x1B[0m"
+#define GREEN "\x1B[92m"
+#define RED	"\x1B[91m"
+
+string build_process_bar(int width, size_t pos, size_t total)
+{
+	string str;
+	str.resize(width, ' ');
+	str[0] = '[';
+	str[width - 1] = ']';
+
+	if (total == 0)
+		return str;
+	
+	int i;
+
+	if (pos > total)
+		pos = total;
+
+	for (i = 1; i < (width-2) * pos / total; i++)
+	{
+		str[i] = '=';
+	}
+
+	if(i>1)
+		str[i] = '>';
+
+	string_ex per;
+	per.format("%d%%", pos * 100 / total);
+
+	size_t start = (width - per.size()) / 2;
+	str.replace(start, per.size(), per);
+	str.insert(start, YELLOW);
+	str.insert(start + per.size() + strlen(YELLOW), DEFAULT);
+	return str;
+}
+
+void print_auto_scroll(string str, int len, int start)
+{
+	if (str.size() <= len)
+	{
+		str.resize(len, ' ');
+		cout << str;
+		return;
+	}
+
+	if(str.size())
+		start = start % str.size();
+	else
+		start = 0;
+
+	string s = str.substr(start, len);
+	s.resize(len, ' ');
+	cout << s;
+}
 class ShowNotify
 {
 public:
 	string m_cmd;
 	string m_dev;
-	size_t	m_trans_size;
 	size_t m_trans_pos;
 	int m_status;
 	size_t m_cmd_total;
 	size_t m_cmd_index;
 	string m_last_err;
 	int m_done;
+	size_t m_start_pos;
+	size_t	m_trans_size;
+	clock_t m_start_time;
 	
 	ShowNotify()
 	{
@@ -132,6 +215,8 @@ public:
 		m_cmd_total = 0;
 		m_cmd_index = 0;
 		m_done = 0;
+		m_start_pos = 0;
+		m_start_time = clock();
 	}
 
 	bool update(uuu_notify nt)
@@ -144,6 +229,7 @@ public:
 		}
 		if (nt.type == uuu_notify::NOTIFY_CMD_START)
 		{
+			m_start_pos = 0;
 			m_cmd = nt.str;
 		}
 		if (nt.type == uuu_notify::NOTIFY_TRANS_SIZE)
@@ -186,7 +272,8 @@ public:
 			if (m_trans_size == 0)
 				return false;
 
-			if ((nt.index - m_trans_pos) < (m_trans_size / 100))
+			if ((nt.index - m_trans_pos) < (m_trans_size / 100)
+				&& nt.index != m_trans_size)
 				return false;
 
 			m_trans_pos = nt.index;
@@ -207,17 +294,22 @@ public:
 		{
 			if (nt->status)
 			{
-				cout << m_dev << ">" <<"Fail " << uuu_get_last_err_string() << endl;
+				cout << m_dev << ">" << RED <<"Fail " << uuu_get_last_err_string() << DEFAULT << endl;
 			}
 			else
 			{
-				cout << m_dev << ">" << "Okay" << endl;
+				cout << m_dev << ">" << GREEN << "Okay" << DEFAULT << endl;
 			}
 		}
 
 		if (nt->type == uuu_notify::NOTIFY_TRANS_POS)
 		{
-			cout << ".";
+			if (m_trans_size)
+				cout << YELLOW << "\r" << m_trans_pos * 100 / m_trans_size <<"%" << DEFAULT;
+			else
+				cout << ".";
+
+			cout.flush();
 		}
 
 		if (nt->type == uuu_notify::NOTIFY_CMD_INFO)
@@ -230,63 +322,103 @@ public:
 	{
 		verbose ? print_verbose(nt) : print_simple();
 	}
+	string get_print_dev_string()
+	{
+		string str;
+		str = m_dev;
+		str.resize(6, ' ');
+
+		string_ex s;
+		s.format("%2d/%2d", m_cmd_index, m_cmd_total);
+
+		str += s;
+		return str;
+	}
 	void print_simple()
 	{
-		cout << m_dev.c_str() << std::setw(10- m_dev.size());
-		
-		cout << m_cmd_index + 1 << "/" << m_cmd_total << std::setw(2);
+		int width = get_console_width();
 
-		cout<< "[";
-		int width=40;
-		int s = 0;
-
-		if (m_status)
+		if (width <= 45)
 		{
-			cout << m_last_err.c_str() << endl;
-			return;
+			string_ex str;
+			
+			str += get_print_dev_string();
+
+			str += g_wait[(g_wait_index++) & 0x3];
+
+			print_oneline(str);
+			return ;
 		}
+		else
+		{
+			string_ex str;
+			int info, bar;
+			info = 14;
+			bar = 30;
+			str += get_print_dev_string();
 
-		if (m_done)
-		{
-			cout << "Done" << std::setw(width - 3);
-		}else
-		{
-			for (int i = 1; i <= width; i++)
+			str.resize(info, ' ');
+			cout << str;
+
+			if (m_done || m_status)
 			{
-				if (m_trans_size == 0)
+				string str;
+				str.resize(bar, ' ');
+				str[0] = '[';
+				str[str.size() - 1] = ']';
+				string err;
+				if (m_status)
 				{
-					cout << " ";
-					continue;
-				}
-
-				if (m_trans_pos*width / (m_trans_size*i))
-				{
-					cout << "=";
-					s = 1;
+					err = uuu_get_last_err_string();
+					err.resize(bar - 2, ' ');
+					str.replace(1, err.size() - 2, err);
+					str.insert(1, RED);
+					str.insert(1 + strlen(RED) + err.size(), DEFAULT);
 				}
 				else
 				{
-					if (s)
-					{
-						s = 0;
-						cout << ">";
-					}
-					else
-					{
-						cout << " ";
-					}
+					str.replace(1, 4, "Done");
+					str.insert(1, GREEN);
+					str.insert(1 + strlen(GREEN) + strlen("Done"), DEFAULT);
 				}
+				cout << str;
+			} else {
+				cout << build_process_bar(bar, m_trans_pos, m_trans_size);
 			}
+			cout << " ";
+			print_auto_scroll(m_cmd, width - bar - info-1, m_start_pos);
+
+			if(clock() - m_start_time > CLOCKS_PER_SEC/4)
+			{
+				m_start_pos ++;
+				m_start_time = clock();
+			}
+			cout << endl;
+			return;
 		}
-		if(m_cmd.length() > 40)
-			cout << "] " << m_cmd.substr(0, 40).c_str() << "...." << endl;
-		else
-			cout << "] " << m_cmd.c_str() << endl;
 	}
 };
 
 static map<string, ShowNotify> g_map_path_nt;
 mutex g_callback_mutex;
+
+void print_oneline(string str)
+{
+	int w = get_console_width();
+	if (str.size() >= w)
+	{
+		str.resize(w-1);
+		str[str.size() - 1] = '.';
+		str[str.size() - 2] = '.';
+		str[str.size() - 3] = '.';
+	}
+	else
+	{
+		str.resize(w, ' ');
+	}
+	cout << str << endl;
+
+}
 
 int progress(uuu_notify nt, void *p)
 {
@@ -306,15 +438,24 @@ int progress(uuu_notify nt, void *p)
 		}
 		else
 		{
-			cout << "Succues:" << g_overall_okay << "\tFailure:" << g_overall_failure << "\t\tWait for Known USB Device Appear..." << endl << endl;;
+			string_ex str;
+			str.format("Succuess %d    Failure %d", g_overall_okay, g_overall_failure);
+			if (g_map_path_nt.empty())
+				str += "Wait for Known USB Device Appear";
 
+			print_oneline(str);
+			print_oneline("");
+			
 			for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
 				it->second.print();
 
 			for (int i = 0; i < g_map_path_nt.size() + 2; i++)
 				cout << "\x1B[1F";
 		}
+
+		(*np)[nt.id] = g_map_path_nt[(*np)[nt.id].m_dev];
 	}
+
 	if (nt.type == uuu_notify::NOTIFY_THREAD_EXIT)
 	{
 		if(np->find(nt.id) != np->end())
@@ -351,8 +492,21 @@ bool enable_vt_mode()
 	}
 	return true;
 }
+
+int get_console_width()
+{
+	CONSOLE_SCREEN_BUFFER_INFO sbInfo;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &sbInfo);
+	return sbInfo.dwSize.X;
+}
 #else
 bool enable_vt_mode() {}
+int get_console_width()
+{
+	struct winsize w;
+	ioctl(0, TIOCGWINSZ, &w);
+	return w.ws_col;
+}
 #endif
 
 int main(int argc, char **argv)
@@ -422,10 +576,16 @@ int main(int argc, char **argv)
 	if (g_verbose)
 	{
 		printf("Build in config:\n");
-		printf("\tPctl\tChip\tPid\tVid\tBcdVersion\n");
+		printf("\tPctl\tChip\tVid\tPid\tBcdVersion\n");
 		printf("\t==========================================\n");
 		uuu_for_each_cfg(print_cfg, NULL);
+		if(!shell)
+			cout << "Wait for Known USB Device Appear";
 		printf("\n");
+	}
+	else {
+		cout << "Wait for Known USB Device Appear\r";
+		cout << "\x1b[?25l";
 	}
 
 	map<uint64_t, ShowNotify> nt_session;
