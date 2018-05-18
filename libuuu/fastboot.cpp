@@ -297,11 +297,11 @@ int FBCopy::run(CmdCtx *ctx)
 		}
 
 		uuu_notify nt;
-		nt.type = uuu_notify::NOTIFY_CMD_TOTAL;
+		nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
 		nt.total = buff->size();
 		call_notify(nt);
 
-		for (size_t i = 0; i < buff->size(); i += this->m_Maxsize_pre_cmd)
+		for (i = 0; i < buff->size(); i += this->m_Maxsize_pre_cmd)
 		{
 			size_t sz = buff->size() - i;
 			if (sz > m_Maxsize_pre_cmd)
@@ -315,6 +315,10 @@ int FBCopy::run(CmdCtx *ctx)
 			nt.index = i;
 			call_notify(nt);
 		}
+
+		nt.type = uuu_notify::NOTIFY_TRANS_POS;
+		nt.index = i;
+		call_notify(nt);
 	}
 	else
 	{
@@ -323,7 +327,7 @@ int FBCopy::run(CmdCtx *ctx)
 			return -1;
 		
 		uuu_notify nt;
-		nt.type = uuu_notify::NOTIFY_CMD_TOTAL;
+		nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
 		size_t total = nt.total = strtoul(fb.m_info.c_str(), NULL, 16);
 		call_notify(nt);
 
@@ -367,6 +371,9 @@ int FBCopy::run(CmdCtx *ctx)
 			nt.index += data.size();
 			call_notify(nt);
 		} while (nt.index < total);
+
+		nt.type = uuu_notify::NOTIFY_TRANS_POS;
+		call_notify(nt);
 	}
 
 	cmd.format("Close");

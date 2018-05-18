@@ -126,6 +126,7 @@ public:
 				notify(off, uuu_notify::NOTIFY_TRANS_POS);
 			}
 		}
+		notify(off, uuu_notify::NOTIFY_TRANS_POS);
 		return 0;
 	}
 
