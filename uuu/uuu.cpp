@@ -162,8 +162,11 @@ string build_process_bar(int width, size_t pos, size_t total)
 		str[i] = '=';
 	}
 
-	if(i>1)
+	if (i > 1)
 		str[i] = '>';
+
+	if (pos == total)
+		str[str.size() - 2] = '=';
 
 	string_ex per;
 	per.format("%d%%", pos * 100 / total);
@@ -371,7 +374,7 @@ public:
 				{
 					err = uuu_get_last_err_string();
 					err.resize(bar - 2, ' ');
-					str.replace(1, err.size() - 2, err);
+					str.replace(1, err.size(), err);
 					str.insert(1, RED);
 					str.insert(1 + strlen(RED) + err.size(), DEFAULT);
 				}
@@ -394,6 +397,7 @@ public:
 				m_start_time = clock();
 			}
 			cout << endl;
+
 			return;
 		}
 	}
