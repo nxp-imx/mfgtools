@@ -332,7 +332,7 @@ public:
 		str.resize(6, ' ');
 
 		string_ex s;
-		s.format("%2d/%2d", m_cmd_index, m_cmd_total);
+		s.format("%2d/%2d", m_cmd_index+1, m_cmd_total);
 
 		str += s;
 		return str;
