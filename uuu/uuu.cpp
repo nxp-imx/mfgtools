@@ -41,6 +41,7 @@
 #include <fstream>
 #include <stdarg.h>
 #include <time.h>
+#include <string.h>
 
 #include "../libuuu/libuuu.h"
 
@@ -504,6 +505,7 @@ int get_console_width()
 	return sbInfo.dwSize.X;
 }
 #else
+#include <sys/ioctl.h>
 bool enable_vt_mode() {}
 int get_console_width()
 {
