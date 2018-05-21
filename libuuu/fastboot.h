@@ -95,7 +95,11 @@ public:
 class FBFlashCmd : public FBCmd
 {
 public:
+	string m_filename;
+	string m_partition;
 	FBFlashCmd(char *p) : FBCmd(p) { m_fb_cmd = "flash"; }
+	int parser(char *p = NULL);
+	int run(CmdCtx *ctx);
 };
 
 class FBEraseCmd : public FBCmd

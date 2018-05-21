@@ -382,3 +382,62 @@ int FBCopy::run(CmdCtx *ctx)
 
 	return 0;
 }
+
+int FBFlashCmd::parser(char *p)
+{
+	if (FBCmd::parser(p))
+		return -1;
+
+	string subcmd = m_uboot_cmd;
+	size_t pos = 0;
+	m_partition = get_next_param(subcmd, pos);
+	if (pos == string::npos || m_partition.empty())
+	{
+		set_last_err_string("Missed partition name");
+		return -1;
+	}
+	string m_filename = get_next_param(subcmd, pos);
+	if (m_filename.empty())
+	{
+		set_last_err_string("Missed file name");
+		return -1;
+	}
+	
+	shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename);
+	if (pdata == NULL)
+		return -1;
+
+	return 0;
+}
+
+int FBFlashCmd::run(CmdCtx *ctx)
+{
+	FBGetVar getvar((char*)"FB: getvar max-download-size");
+
+	if (getvar.run(ctx))
+		return -1;
+
+	size_t max = str_to_uint(getvar.m_val);
+
+	BulkTrans dev;
+	if (dev.open(ctx->m_dev))
+		return -1;
+
+	FastBoot fb(&dev);
+
+	shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename);
+	if (pdata->size() <= max)
+	{
+		string_ex cmd;
+		cmd.format("download:%08x", pdata->size());
+
+		if (fb.Transport(cmd, pdata->data(), pdata->size()))
+			return -1;
+
+		cmd.format("flash:%s", m_partition);
+		if (fb.Transport(cmd, NULL, 0))
+			return -1;
+	}
+
+
+}
