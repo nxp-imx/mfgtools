@@ -452,9 +452,12 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff)
 
 int uuu_auto_detect_file(const char *filename)
 {
-	string fn = filename;
+	string_ex fn;
+	fn += filename;
+	fn.replace('\\', '/');
+
 	if (fn.empty())
-		fn = "./";
+		fn += "./";
 	
 	string oldfn =fn;
 
@@ -462,7 +465,8 @@ int uuu_auto_detect_file(const char *filename)
 	shared_ptr<FileBuffer> buffer = get_file_buffer(fn);
 	if (buffer == NULL)
 	{
-		fn = oldfn;
+		fn.clear();
+		fn += oldfn;
 		size_t pos = str_to_upper(fn).find("ZIP");
 		if(pos == string::npos || pos != fn.size() - 3)
 			buffer = get_file_buffer(fn); //we don't try open a zip file here
@@ -476,10 +480,6 @@ int uuu_auto_detect_file(const char *filename)
 	void *p2 = (void*)str.data();
 	if (memcmp(p1, p2, str.size()) == 0)
 	{
-		for (size_t i = 0; i < fn.size(); i++)
-			if (fn[i] == '\\')
-				fn[i] = '/';
-
 		size_t pos = fn.rfind('/');
 		if (pos != string::npos)
 			set_current_dir(fn.substr(0, pos + 1));
