@@ -84,7 +84,7 @@ int CmdBase::parser(char *p)
 		if (pp == NULL)
 		{
 			string err;
-			err = "Unkown Option";
+			err = "unknown Option";
 			err += param;
 			set_last_err_string(err);
 			return -1;

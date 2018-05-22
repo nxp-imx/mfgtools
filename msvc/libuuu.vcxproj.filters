@@ -45,6 +45,12 @@
     <ClInclude Include="..\libuuu\zip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\libuuu\sparse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libuuu\sparse_format.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libuuu\error.cpp">

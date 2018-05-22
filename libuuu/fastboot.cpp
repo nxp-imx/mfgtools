@@ -42,6 +42,7 @@
 #include <iostream>
 #include <fstream>
 #include <sys/stat.h>
+#include "sparse.h"
 
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
@@ -396,7 +397,7 @@ int FBFlashCmd::parser(char *p)
 		set_last_err_string("Missed partition name");
 		return -1;
 	}
-	string m_filename = get_next_param(subcmd, pos);
+	m_filename = get_next_param(subcmd, pos);
 	if (m_filename.empty())
 	{
 		set_last_err_string("Missed file name");
@@ -410,10 +411,25 @@ int FBFlashCmd::parser(char *p)
 	return 0;
 }
 
+int FBFlashCmd::flash(FastBoot *fb, vector<uint8_t> *pdata)
+{
+	string_ex cmd;
+	cmd.format("download:%08x", pdata->size());
+
+	if (fb->Transport(cmd, pdata->data(), pdata->size()))
+		return -1;
+
+	cmd.format("flash:%s", m_partition.c_str());
+	if (fb->Transport(cmd, NULL, 0))
+		return -1;
+
+	return 0;
+}
 int FBFlashCmd::run(CmdCtx *ctx)
 {
 	FBGetVar getvar((char*)"FB: getvar max-download-size");
-
+	if (getvar.parser(NULL))
+		return -1;
 	if (getvar.run(ctx))
 		return -1;
 
@@ -426,18 +442,86 @@ int FBFlashCmd::run(CmdCtx *ctx)
 	FastBoot fb(&dev);
 
 	shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename);
+	if (pdata == NULL)
+		return -1;
+
 	if (pdata->size() <= max)
 	{
-		string_ex cmd;
-		cmd.format("download:%08x", pdata->size());
-
-		if (fb.Transport(cmd, pdata->data(), pdata->size()))
-			return -1;
-
-		cmd.format("flash:%s", m_partition);
-		if (fb.Transport(cmd, NULL, 0))
+		if (flash(&fb, &(*pdata)))
 			return -1;
 	}
+	else
+	{
+		size_t pos = 0;
+		sparse_header * pfile = (sparse_header *)pdata->data();
 
+		if (!SparseFile::is_validate_sparse_file(pdata->data(), pdata->size()))
+		{
+			set_last_err_string("Sparse file magic miss matched");
+			return -1;
+		}
 
+		SparseFile sf;
+		size_t startblock;
+		chunk_header_t * pheader = SparseFile::get_next_chunk(pdata->data(), pos);
+
+		uuu_notify nt;
+		nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
+		nt.total = pfile->total_blks;
+		call_notify(nt);
+
+		sf.init_header(pfile->blk_sz, max / pfile->blk_sz);
+		startblock = 0;
+
+		do
+		{
+			size_t sz = sf.push_one_chuck(pheader, pheader + 1);
+			if (sz == pheader->total_sz - sizeof(chunk_header_t))
+			{
+				startblock += pheader->chunk_sz;
+			}
+			else
+			{
+				size_t off = ((uint8_t*)pheader) - pdata->data() + sz + sizeof(chunk_header_t);
+				startblock += sz / pfile->blk_sz;
+
+				do
+				{
+					if (flash(&fb, &sf.m_data))
+						return -1;
+
+					sf.init_header(pfile->blk_sz, max / pfile->blk_sz);
+
+					chunk_header_t ct;
+					ct.chunk_type = CHUNK_TYPE_DONT_CARE;
+					ct.chunk_sz = startblock;
+					ct.reserved1 = 0;
+					ct.total_sz = sizeof(ct);
+
+					sz = sf.push_one_chuck(&ct, NULL);
+
+					sz = sf.push_raw_data(pdata->data() + off, pos - off);
+					off += sz;
+					startblock += sz / pfile->blk_sz;
+
+					uuu_notify nt;
+					nt.type = uuu_notify::NOTIFY_TRANS_POS;
+					nt.total = startblock;
+					call_notify(nt);
+
+				} while (off < pos);
+			}
+			pheader = SparseFile::get_next_chunk(pdata->data(), pos);
+		} while (pos < pdata->size());
+
+		//send last data
+		if (flash(&fb, &sf.m_data))
+			return -1;
+
+		sparse_header * pf = (sparse_header *)sf.m_data.data();
+		nt.type = uuu_notify::NOTIFY_TRANS_POS;
+		nt.total = startblock + pf->total_blks;
+		call_notify(nt);
+	}
+	return 0;
 }
