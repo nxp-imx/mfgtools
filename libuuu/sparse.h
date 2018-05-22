@@ -1,0 +1,154 @@
+/*
+* Copyright 2018 NXP.
+*
+* Redistribution and use in source and binary forms, with or without modification,
+* are permitted provided that the following conditions are met:
+*
+* Redistributions of source code must retain the above copyright notice, this
+* list of conditions and the following disclaimer.
+*
+* Redistributions in binary form must reproduce the above copyright notice, this
+* list of conditions and the following disclaimer in the documentation and/or
+* other materials provided with the distribution.
+*
+* Neither the name of the NXP Semiconductor nor the names of its
+* contributors may be used to endorse or promote products derived from this
+* software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
+#include <vector>
+#include "sparse_format.h"
+#include "sparse_crc32.h"
+#include "liberror.h"
+
+using namespace std;
+
+class SparseFile
+{
+public:
+	vector<uint8_t> m_data;
+	uint32_t *m_pcrc;
+	size_t m_max_size;
+	static bool is_validate_sparse_file(void *p, size_t sz)
+	{
+		sparse_header *pheader = (sparse_header*)p;
+		if (pheader->magic = SPARSE_HEADER_MAGIC)
+			return true;
+		return false;
+	}
+
+	static chunk_header_t * get_next_chunk(uint8_t *p, size_t &pos)
+	{
+		if (pos == 0)
+		{
+			sparse_header *pheader = (sparse_header*)p;
+			if (pheader->magic != SPARSE_HEADER_MAGIC) {
+				set_last_err_string("Sparse heade Magic missed");
+				return NULL;
+			}
+			pos += pheader->file_hdr_sz;
+		}
+		
+		chunk_header_t *pchunk = (chunk_header_t*)(p + pos);
+		pos += pchunk->total_sz;
+		return pchunk;
+	}
+
+	int init_header(size_t blsz, int blcount)
+	{
+		sparse_header header;
+
+		memset(&header, 0, sizeof(header));
+		header.magic = SPARSE_HEADER_MAGIC;
+		header.major_version = 1;
+		header.minor_version = 0;
+		header.file_hdr_sz = sizeof(header);
+		header.chunk_hdr_sz = sizeof(chunk_header);
+		header.blk_sz = blsz;
+
+		if (blcount)
+		{
+			m_data.reserve(blsz*blcount + 0x1000);
+			m_max_size = blsz * blcount;
+		}
+		m_data.clear();
+		push(&header, sizeof(header));
+		m_pcrc = (uint32_t*)(m_data.data() + offsetof(sparse_header, image_checksum));
+		return 0;
+	}
+
+	int push(void *p, size_t sz)
+	{
+		size_t pos = m_data.size();
+		m_data.resize(pos + sz);
+		memcpy(m_data.data() + pos, p, sz);
+		return 0;
+	}
+
+	size_t push_raw_data(void *data, size_t sz)
+	{
+		chunk_header_t cheader;
+		cheader.chunk_type = CHUNK_TYPE_RAW;
+		
+		sparse_header *pheader;
+		pheader = (sparse_header *)m_data.data();
+		
+		cheader.chunk_sz = sz / pheader->blk_sz;
+		cheader.total_sz = cheader.chunk_sz*pheader->blk_sz + sizeof(chunk_header_t);
+		pheader = (sparse_header *)m_data.data();
+
+		return push_one_chuck(&cheader, data);
+	}
+	size_t push_one_chuck(chunk_header_t *p, void *data)
+	{
+		chunk_header_t cheader = *p;
+		sparse_header *pheader;
+		pheader = (sparse_header *)m_data.data();
+
+		size_t sz = p->total_sz - sizeof(chunk_header);
+
+		if (p->total_sz + m_data.size() > m_max_size)
+		{
+			size_t blk = (m_max_size - m_data.size())/pheader->blk_sz;
+			if (blk < 2)
+				return 0;
+			
+			blk -= 2;
+
+			cheader.chunk_sz = blk;
+			sz = blk * pheader->blk_sz;
+			cheader.total_sz = sizeof(chunk_header_t) + sz;
+		}
+		
+		push(&cheader, sizeof(chunk_header));
+		pheader->total_chunks ++;
+		pheader->total_blks += cheader.chunk_sz;
+
+		if (data) {
+			push(data, sz);
+#if 0
+			if (p->chunk_type == CHUNK_TYPE_RAW)
+				pheader->image_checksum = sparse_crc32(pheader->image_checksum, p, sz);
+			if (p->chunk_type == CHUNK_TYPE_FILL)
+			{
+				for(int i=0;i<sz/sizeof(uint32_t);i++)
+					pheader->image_checksum = sparse_crc32(pheader->image_checksum, p, sizeof(uint32_t));
+			}
+#endif
+		}
+
+		return sz;
+	}
+};
