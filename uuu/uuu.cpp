@@ -42,6 +42,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <string.h>
+#include <signal.h>
 
 #include "../libuuu/libuuu.h"
 
@@ -55,6 +56,12 @@ char g_sample_cmd_list[] = {
 };
 
 int g_verbose = 0;
+
+void ctrl_c_handle(int sig)
+{
+	printf("\x1b[?25h\n\n\n");
+	exit(1);
+}
 
 class string_ex : public std::string
 {
@@ -572,6 +579,8 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
+	
+	signal(SIGINT, ctrl_c_handle);
 
 	if (deamon && shell)
 	{
