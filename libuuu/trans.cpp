@@ -148,7 +148,7 @@ int BulkTrans::write(void *buff, size_t size)
 			p,
 			sz,
 			&actual_lenght,
-			2000
+			m_timeout
 		);
 
 		if (ret < 0)
@@ -208,7 +208,7 @@ int BulkTrans::read(void *buff, size_t size, size_t *rsize)
 		p,
 		size,
 		&actual_lenght,
-		2000
+		m_timeout
 	);
 
 	*rsize = actual_lenght;

@@ -430,7 +430,7 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff)
 		if(c != '\n')
 			str.push_back(c);
 
-		if (c == '\n' || c == 0)
+		if (c == '\n' || c == 0 || i == pbuff->size() - 1)
 		{
 			if (str.substr(0, strlen(uuu_version)) == uuu_version)
 			{
