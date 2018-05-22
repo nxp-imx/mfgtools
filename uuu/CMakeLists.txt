@@ -11,7 +11,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wstrict-aliasing -Wextra")
 set(SOURCES
 	uuu.cpp
 	uuu.clst
-	libparse.a
 )
 
 link_directories(../libuuu)
@@ -20,11 +19,6 @@ add_custom_command(
         OUTPUT uuu.clst
         PRE_BUILD
         COMMAND ./gen_txt_include.sh uuu.lst  uuu.clst
-)
-
-add_custom_command(
-   OUTPUT libparse.a
-   COMMAND make -C ../libsparse
 )
 
 add_executable(uuu ${SOURCES})

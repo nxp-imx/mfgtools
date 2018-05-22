@@ -30,7 +30,6 @@
 */
 #include <vector>
 #include "sparse_format.h"
-#include "sparse_crc32.h"
 #include "liberror.h"
 
 using namespace std;
