@@ -46,6 +46,9 @@
 
 static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
+static string g_cmd_list_file;
+
+int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap = NULL);
 
 template <class T>
 void * create_object() { return new T; }
@@ -321,7 +324,23 @@ int CmdDone::run(CmdCtx *)
 
 int run_cmds(const char *procotal, CmdCtx *p)
 {
-	if (g_cmd_map.find(procotal) == g_cmd_map.end())
+	CmdMap cmdmap, *pCmdMap;
+
+	if (!g_cmd_list_file.empty())
+	{
+		shared_ptr<FileBuffer> pbuff = get_file_buffer(g_cmd_list_file);
+		if (pbuff == NULL)
+			return -1;
+		if(parser_cmd_list_file(pbuff, &cmdmap))
+			return -1;
+		pCmdMap = &cmdmap;
+	}
+	else
+	{
+		pCmdMap = &g_cmd_map;
+	}
+
+	if (pCmdMap->find(procotal) == pCmdMap->end())
 	{
 		string s = procotal;
 		if (s == "CFG:")
@@ -334,10 +353,10 @@ int run_cmds(const char *procotal, CmdCtx *p)
 		return -1;
 	}
 	
-	return g_cmd_map[procotal]->run_all(p);
+	return (*pCmdMap)[procotal]->run_all(p);
 }
 
-static int insert_one_cmd(const char * cmd)
+static int insert_one_cmd(const char * cmd, CmdMap *pCmdMap)
 {
 	string s = cmd;
 	size_t pos = 0;
@@ -350,13 +369,13 @@ static int insert_one_cmd(const char * cmd)
 	if (p->parser())
 		return -1;
 
-	if (g_cmd_map.find(pro) == g_cmd_map.end())
+	if (pCmdMap->find(pro) == pCmdMap->end())
 	{
 		shared_ptr<CmdList> list(new CmdList);
-		g_cmd_map[pro] = list;
+		(*pCmdMap)[pro] = list;
 	}
 
-	g_cmd_map[pro]->push_back(p);
+	(*pCmdMap)[pro]->push_back(p);
 
 	return 0;
 }
@@ -368,18 +387,18 @@ static int added_default_boot_cmd(const char *filename)
 	str = "SDPS: boot -f ";
 	str += filename;
 
-	int ret = insert_one_cmd(str.c_str());
+	int ret = insert_one_cmd(str.c_str(), &g_cmd_map);
 	if (ret) return ret;
 
-	insert_one_cmd("SDPS: done");
+	insert_one_cmd("SDPS: done", &g_cmd_map);
 
 	str = "SDP: boot -f ";
 	str += filename;
 
-	ret = insert_one_cmd(str.c_str());
+	ret = insert_one_cmd(str.c_str(), &g_cmd_map);
 	if (ret) return ret;
 
-	insert_one_cmd("SDP: done");
+	insert_one_cmd("SDP: done", &g_cmd_map);
 
 	return 0;
 }
@@ -416,10 +435,15 @@ int check_version(string str)
 	return 0;
 }
 
-int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff)
+int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap)
 {
 	char uuu_version[] = "uuu_version";
 	string str;
+
+	if (pCmdMap == NULL)
+		pCmdMap = &g_cmd_map;
+
+	pCmdMap->clear();
 
 	for (int i = 0; i < pbuff->size(); i++)
 	{
@@ -441,7 +465,7 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff)
 			}else if (str.size() > 1)
 			{
 				if (str[0] != '#')
-					if (insert_one_cmd(str.c_str()))
+					if (insert_one_cmd(str.c_str(), pCmdMap))
 						return -1;
 			}
 			str.clear();
@@ -483,6 +507,8 @@ int uuu_auto_detect_file(const char *filename)
 		size_t pos = fn.rfind('/');
 		if (pos != string::npos)
 			set_current_dir(fn.substr(0, pos + 1));
+		
+		g_cmd_list_file = fn.substr(pos+1);
 
 		return parser_cmd_list_file(buffer);
 	}
