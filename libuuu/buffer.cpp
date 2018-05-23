@@ -38,6 +38,7 @@
 #include "libcomm.h"
 #include "zip.h"
 #include "fat.h"
+#include <string.h>
 
 #ifdef _MSC_VER
 #define stat64 _stat64
@@ -55,13 +56,13 @@ void set_current_dir(string dir)
 uint64_t get_file_timesample(string filename)
 {
 	struct stat64 st;
-	if (_stat64(filename.c_str(), &st))
+	if (stat64(filename.c_str(), &st))
 	{
 		string path = str_to_upper(filename);
 		size_t pos = path.find(".ZIP");
 		if (pos == string::npos)
 			return 0;
-		_stat64(filename.substr(0, pos + 4).c_str(), &st);
+		stat64(filename.substr(0, pos + 4).c_str(), &st);
 		return st.st_mtime;
 	}
 
