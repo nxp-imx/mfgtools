@@ -493,7 +493,11 @@ int uuu_auto_detect_file(const char *filename)
 		fn += oldfn;
 		size_t pos = str_to_upper(fn).find("ZIP");
 		if(pos == string::npos || pos != fn.size() - 3)
-			buffer = get_file_buffer(fn); //we don't try open a zip file here
+		{
+			pos = str_to_upper(fn).find("SDCARD");
+			if (pos == string::npos || pos != fn.size() - 6)
+				buffer = get_file_buffer(fn); //we don't try open a zip file here
+		}
 
 		if(buffer == NULL)
 			return -1;

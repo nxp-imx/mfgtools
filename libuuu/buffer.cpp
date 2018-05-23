@@ -37,6 +37,11 @@
 #include <fstream>
 #include "libcomm.h"
 #include "zip.h"
+#include "fat.h"
+
+#ifdef _MSC_VER
+#define stat64 _stat64
+#endif
 
 static map<string, shared_ptr<FileBuffer>> g_filebuffer_map;
 
@@ -49,14 +54,14 @@ void set_current_dir(string dir)
 
 uint64_t get_file_timesample(string filename)
 {
-	struct stat st;
-	if (stat(filename.c_str(), &st))
+	struct stat64 st;
+	if (_stat64(filename.c_str(), &st))
 	{
 		string path = str_to_upper(filename);
 		size_t pos = path.find(".ZIP");
 		if (pos == string::npos)
 			return 0;
-		stat(filename.substr(0, pos + 4).c_str(), &st);
+		_stat64(filename.substr(0, pos + 4).c_str(), &st);
 		return st.st_mtime;
 	}
 
@@ -92,33 +97,40 @@ shared_ptr<FileBuffer> get_file_buffer(string filename)
 
 int FileBuffer::reload(string filename)
 {
-	struct stat st;
-	size_t pos = 0;
-	if (stat(filename.c_str(), &st))
+	struct stat64 st;
+	size_t pos_zip = string::npos;
+	size_t pos_sdcard = string::npos;
+
+	if (stat64(filename.c_str(), &st))
 	{
 		string path = str_to_upper(filename);
-		pos = path.find(".ZIP");
-		string zipfile = filename.substr(0, pos + 4);
-		if (pos == string::npos || (stat(zipfile.c_str(), &st)))
+		pos_zip = path.find(".ZIP");
+		string zipfile = filename.substr(0, pos_zip + 4);
+		if (pos_zip == string::npos || (stat64(zipfile.c_str(), &st)))
 		{
-			string err = "Fail Open File: ";
-			err.append(filename);
-			set_last_err_string(err);
-			return -1;
+			pos_sdcard = path.find(".SDCARD");
+			string sdcardfile = filename.substr(0, pos_sdcard + strlen(".SDCARD"));
+			if (pos_sdcard == string::npos || (stat64(sdcardfile.c_str(), &st)))
+			{
+				string err = "Fail Open File: ";
+				err.append(filename);
+				set_last_err_string(err);
+				return -1;
+			}
 		}
 	}
 
-	if (pos)
+	if (pos_zip != string::npos)
 	{
 		Zip zip;
-		if (zip.Open(filename.substr(0, pos + 4)))
+		if (zip.Open(filename.substr(0, pos_zip + 4)))
 		{
 			string err = "Fail Open File: ";
-			err.append(filename.substr(0, pos + 4));
+			err.append(filename.substr(0, pos_zip + 4));
 			set_last_err_string(err);
 			return -1;
 		}
-		string fn = filename.substr(pos + 5);
+		string fn = filename.substr(pos_zip + 5);
 		shared_ptr<FileBuffer> p = zip.get_file_buff(fn);
 		if (p == NULL)
 			return -1;
@@ -127,6 +139,27 @@ int FileBuffer::reload(string filename)
 		m_timesample = st.st_mtime;
 		return 0;
 	}
+
+	if (pos_sdcard != string::npos)
+	{
+		Fat fat;
+		if (fat.Open(filename.substr(0, pos_sdcard + strlen(".SDCARD"))))
+		{
+			string err = "Fail Open File: ";
+			err.append(filename.substr(0, pos_sdcard + strlen(".SDCARD")));
+			set_last_err_string(err);
+			return -1;
+		}
+		string fn = filename.substr(pos_sdcard + strlen(".SDCARD") + 1);
+		shared_ptr<FileBuffer> p = fat.get_file_buff(fn);
+		if (p == NULL)
+			return -1;
+
+		this->swap(*p);
+		m_timesample = st.st_mtime;
+		return 0;
+	}
+
 	m_timesample = st.st_mtime;
 	resize(st.st_size);
 

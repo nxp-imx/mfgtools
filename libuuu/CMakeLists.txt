@@ -24,6 +24,7 @@ set(SOURCES
 	gitversion.h
 	fastboot.cpp
 	zip.cpp
+	fat.cpp
 )
 
 add_custom_command(

@@ -24,6 +24,7 @@
     <ClCompile Include="..\libuuu\config.cpp" />
     <ClCompile Include="..\libuuu\error.cpp" />
     <ClCompile Include="..\libuuu\fastboot.cpp" />
+    <ClCompile Include="..\libuuu\fat.cpp" />
     <ClCompile Include="..\libuuu\notify.cpp" />
     <ClCompile Include="..\libuuu\sdp.cpp" />
     <ClCompile Include="..\libuuu\sdps.cpp" />
