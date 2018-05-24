@@ -55,6 +55,8 @@ char g_sample_cmd_list[] = {
 #include "uuu.clst"
 };
 
+vector<string> g_usb_path_filter;
+
 int g_verbose = 0;
 
 void ctrl_c_handle(int sig)
@@ -85,16 +87,18 @@ public:
 
 void print_help()
 {
-	printf("uuu [-d -v] u-boot.imx\\flash.bin\n");
-	printf("\tDownload u-boot.imx\\flash.bin to board by usb\n");
-	printf("\t -d      Deamon mode, wait for forever.\n");
-	printf("\t         Start download once detect known device attached\n");
-	printf("\t -v      Print build in protocal config informaiton");
+	printf("uuu [-d -m -v] u-boot.imx\\flash.bin\n");
+	printf("\tDownload    u-boot.imx\\flash.bin to board by usb\n");
+	printf("\t -d         Deamon mode, wait for forever.\n");
+	printf("\t            Start download once detect known device attached\n");
+	printf("\t -v         Print build in protocal config informaiton");
+	printf("\t -m USBPATH Only monitor these pathes.");
+	printf("\t            -m 1:2 -m 2:3");
 	printf("\n");
-	printf("uuu [-d -v] cmdlist\n");
+	printf("uuu [-d -m -v] cmdlist\n");
 	printf("\tRun all commands in file cmdlist\n");
 	printf("\n");
-	printf("uuu [-d -v] SDPS: boot flash.bin\n");
+	printf("uuu [-d -m -v] SDPS: boot flash.bin\n");
 	printf("\tRun command SPDS: boot flash.bin\n");
 	printf("uuu -s\n");
 	printf("\tEnter shell mode. uuu.inputlog record all input's command\n");
@@ -452,8 +456,16 @@ int progress(uuu_notify nt, void *p)
 		{
 			string_ex str;
 			str.format("Succuess %d    Failure %d", g_overall_okay, g_overall_failure);
+			
 			if (g_map_path_nt.empty())
 				str += "Wait for Known USB Device Appear";
+
+			if (!g_usb_path_filter.empty())
+			{
+				str += " at path ";
+				for (int i = 0; i < g_usb_path_filter.size(); i++)
+					str += g_usb_path_filter[i] + " ";
+			}
 
 			print_oneline(str);
 			print_oneline("");
@@ -521,7 +533,15 @@ int get_console_width()
 	return w.ws_col;
 }
 #endif
-
+void print_usb_filter()
+{
+	if (!g_usb_path_filter.empty())
+	{
+		cout << " at path ";
+		for (int i = 0; i < g_usb_path_filter.size(); i++)
+			cout << g_usb_path_filter[i] << " ";
+	}
+}
 int main(int argc, char **argv)
 {
 	print_version();
@@ -558,7 +578,14 @@ int main(int argc, char **argv)
 			{
 				print_help();
 				return 0;
-			}else
+			}
+			else if (s == "-m")
+			{
+				i++;
+				uuu_add_usbpath_filter(argv[i]);
+				g_usb_path_filter.push_back(argv[i]);
+			}
+			else
 			{
 				cout << "Unknown option: " << s.c_str();
 				return -1;
@@ -594,12 +621,17 @@ int main(int argc, char **argv)
 		printf("\tPctl\tChip\tVid\tPid\tBcdVersion\n");
 		printf("\t==========================================\n");
 		uuu_for_each_cfg(print_cfg, NULL);
-		if(!shell)
+		if (!shell)
 			cout << "Wait for Known USB Device Appear";
+
+		print_usb_filter();
+
 		printf("\n");
 	}
 	else {
-		cout << "Wait for Known USB Device Appear\r";
+		cout << "Wait for Known USB Device Appear";
+		print_usb_filter();
+		cout << "\r";
 		cout << "\x1b[?25l";
 	}
 

@@ -46,7 +46,18 @@
 
 static vector<thread> g_running_thread;
 
+static vector<string> g_filter_usbpath;
 
+static bool is_match_filter(string path)
+{
+	if (g_filter_usbpath.empty())
+		return true;
+	for (int i = 0; i < g_filter_usbpath.size(); i++)
+		if (g_filter_usbpath[i] == path)
+			return true;
+	
+	return false;
+}
 
 static string get_device_path(libusb_device *dev)
 {
@@ -115,6 +126,11 @@ static int usb_add(libusb_device *dev)
 		set_last_err_string("failure get device descrior");
 		return r;
 	}
+
+	string str;
+	str = get_device_path(dev);
+	if (!is_match_filter(str))
+		return -1;
 
 	ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
 	std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -248,6 +264,10 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 				set_last_err_string("failure get device descrior");
 				return NULL;
 			}
+			string str = get_device_path(dev);
+
+			if (!is_match_filter(str))
+				continue;
 
 			ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
 			if (item && item->m_protocol == str_to_upper(pro))
@@ -255,8 +275,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 					uuu_notify nt;
 					nt.type = uuu_notify::NOFITY_DEV_ATTACH;
 
-					string str = get_device_path(dev);
-
+					
 					m_config_item = item;
 
 					if (libusb_open(dev, (libusb_device_handle **)&(m_dev)) < 0)
@@ -282,4 +301,10 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 	}
 
 	return -1;
+}
+
+int uuu_add_usbpath_filter(const char *path)
+{
+	g_filter_usbpath.push_back(path);
+	return 0;
 }
