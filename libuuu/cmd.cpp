@@ -342,15 +342,7 @@ int run_cmds(const char *procotal, CmdCtx *p)
 
 	if (pCmdMap->find(procotal) == pCmdMap->end())
 	{
-		string s = procotal;
-		if (s == "CFG:")
-		{
-			return 0; //Allow no CFG command
-		}
-		string_ex str;
-		str.format("%s:%d Can't find protocal: %s", __FUNCTION__, __LINE__, procotal);
-		set_last_err_string(str.c_str());
-		return -1;
+		return 0;
 	}
 	
 	return (*pCmdMap)[procotal]->run_all(p);
