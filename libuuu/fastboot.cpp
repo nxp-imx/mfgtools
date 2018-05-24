@@ -392,6 +392,12 @@ int FBFlashCmd::parser(char *p)
 	string subcmd = m_uboot_cmd;
 	size_t pos = 0;
 	m_partition = get_next_param(subcmd, pos);
+	if (m_partition == "-raw2sparse")
+	{
+		m_raw2sparse = true;
+		m_partition = get_next_param(subcmd, pos);
+	}
+
 	if (pos == string::npos || m_partition.empty())
 	{
 		set_last_err_string("Missed partition name");
@@ -425,6 +431,54 @@ int FBFlashCmd::flash(FastBoot *fb, vector<uint8_t> *pdata)
 
 	return 0;
 }
+
+int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, int block_size, int max)
+{
+	SparseFile sf;
+	
+	if (max > 0x1000000)
+		 max = 0x1000000;
+
+	sf.init_header(block_size, (max + block_size -1) / block_size);
+
+	uuu_notify nt;
+	nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
+	nt.total = pdata->size();
+	call_notify(nt);
+
+	for (size_t i = 0; i < pdata->size(); i += block_size)
+	{
+		if (sf.push_one_block(pdata->data() + i) || ((i % max) == 0))
+		{
+			if (flash(fb, &sf.m_data))
+				return -1;
+
+			sf.init_header(block_size, (max + block_size - 1) / block_size);
+
+			chunk_header_t ct;
+			ct.chunk_type = CHUNK_TYPE_DONT_CARE;
+			ct.chunk_sz = i / block_size + 1;
+			ct.reserved1 = 0;
+			ct.total_sz = sizeof(ct);
+
+			sf.push_one_chuck(&ct, NULL);
+
+			nt.type = uuu_notify::NOTIFY_TRANS_POS;
+			nt.total = i;
+			call_notify(nt);
+		}
+	}
+
+	if (flash(fb, &sf.m_data))
+		return -1;
+
+	nt.type = uuu_notify::NOTIFY_TRANS_POS;
+	nt.total = pdata->size();
+	call_notify(nt);
+
+	return 0;
+}
+
 int FBFlashCmd::run(CmdCtx *ctx)
 {
 	FBGetVar getvar((char*)"FB: getvar max-download-size");
@@ -435,16 +489,28 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	size_t max = str_to_uint(getvar.m_val);
 
+	if (getvar.parser((char*)"FB: getvar logical-block-size"))
+		return -1;
+	if (getvar.run(ctx))
+		return -1;
+	
+	size_t block_size = str_to_uint(getvar.m_val);
+
 	BulkTrans dev;
 	if (dev.open(ctx->m_dev))
 		return -1;
 
 	FastBoot fb(&dev);
-	dev.m_timeout = 5000;
+	dev.m_timeout = 10000;
 
 	shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename);
 	if (pdata == NULL)
 		return -1;
+
+	if (m_raw2sparse)
+	{
+		return flash_raw2sparse(&fb, pdata, block_size, max);
+	}
 
 	if (pdata->size() <= max)
 	{

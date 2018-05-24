@@ -40,6 +40,8 @@ public:
 	vector<uint8_t> m_data;
 	uint32_t *m_pcrc;
 	size_t m_max_size;
+	size_t m_cur_chunk_header_pos;
+
 	static bool is_validate_sparse_file(void *p, size_t sz)
 	{
 		sparse_header *pheader = (sparse_header*)p;
@@ -76,7 +78,7 @@ public:
 		header.file_hdr_sz = sizeof(header);
 		header.chunk_hdr_sz = sizeof(chunk_header);
 		header.blk_sz = blsz;
-
+		m_cur_chunk_header_pos = 0;
 		if (blcount)
 		{
 			m_data.reserve(blsz*blcount + 0x1000);
@@ -110,6 +112,84 @@ public:
 
 		return push_one_chuck(&cheader, data);
 	}
+
+	bool is_same_value(void *data, size_t sz)
+	{
+		uint32_t *p = (uint32_t *)data;
+		uint32_t val = *p;
+		for (int i = 0; i < sz / sizeof(uint32_t); i++)
+			if (val != p[i])
+				return false;
+		return true;
+	}
+	bool is_append_old_chuck(int type, void *p)
+	{
+		chunk_header_t *pchunk;
+		pchunk = (chunk_header_t *)(m_data.data() + m_cur_chunk_header_pos);
+		
+		if (m_cur_chunk_header_pos == 0)
+			return false;
+
+		if (pchunk->chunk_type != type)
+			return false;
+
+		if (type == CHUNK_TYPE_FILL)
+		{
+			uint32_t a = *(uint32_t*)(pchunk + 1);
+			uint32_t b = *(uint32_t*)p;
+			if (a != b)
+				return false;
+		}
+		return true;
+	}
+	int push_one_block(void *data)
+	{
+		chunk_header_t *pchunk;
+		pchunk = (chunk_header_t *)(m_data.data() + m_cur_chunk_header_pos);
+
+		sparse_header *pheader;
+		pheader = (sparse_header *)m_data.data();
+
+		pheader->total_blks++;
+
+		//int type = is_same_value(data, pheader->blk_sz) ? CHUNK_TYPE_FILL : CHUNK_TYPE_RAW;
+		int type = CHUNK_TYPE_RAW;
+
+		if (!is_append_old_chuck(type, data))
+		{
+			chunk_header_t header;
+			header.chunk_type = type;
+			header.chunk_sz = 1;
+			header.total_sz = (type == CHUNK_TYPE_FILL) ? sizeof(uint32_t) : pheader->blk_sz;
+			header.total_sz += sizeof(chunk_header_t);
+			header.reserved1 = 0;
+
+			pheader->total_chunks++;
+
+			m_cur_chunk_header_pos = m_data.size();
+
+			push(&header, sizeof(chunk_header_t));
+
+			if (type == CHUNK_TYPE_RAW)
+				push(data, pheader->blk_sz);
+			else
+				push(data, sizeof(uint32_t));
+		}
+		else
+		{
+			pchunk->chunk_sz++;
+			if (type == CHUNK_TYPE_RAW)
+			{
+				push(data, pheader->blk_sz);
+				pchunk->total_sz += pheader->blk_sz;
+			}
+		}
+
+		if (m_data.size() + 2 * pheader->blk_sz > m_max_size )
+			return -1;
+
+		return 0;
+	}
 	size_t push_one_chuck(chunk_header_t *p, void *data)
 	{
 		chunk_header_t cheader = *p;
@@ -137,15 +217,6 @@ public:
 
 		if (data) {
 			push(data, sz);
-#if 0
-			if (p->chunk_type == CHUNK_TYPE_RAW)
-				pheader->image_checksum = sparse_crc32(pheader->image_checksum, p, sz);
-			if (p->chunk_type == CHUNK_TYPE_FILL)
-			{
-				for(int i=0;i<sz/sizeof(uint32_t);i++)
-					pheader->image_checksum = sparse_crc32(pheader->image_checksum, p, sizeof(uint32_t));
-			}
-#endif
 		}
 
 		return sz;

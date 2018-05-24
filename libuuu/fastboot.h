@@ -39,6 +39,7 @@ https://android.googlesource.com/platform/system/core/+/master/fastboot/
 
 #include "trans.h"
 #include "cmd.h"
+#include "buffer.h"
 
 using namespace std;
 
@@ -97,10 +98,12 @@ class FBFlashCmd : public FBCmd
 public:
 	string m_filename;
 	string m_partition;
+	bool m_raw2sparse;
 	FBFlashCmd(char *p) : FBCmd(p) { m_fb_cmd = "flash"; }
 	int parser(char *p = NULL);
 	int run(CmdCtx *ctx);
 	int flash(FastBoot *fb, vector<uint8_t> *pdata);
+	int flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> p, int blksz, int max);
 };
 
 class FBEraseCmd : public FBCmd
