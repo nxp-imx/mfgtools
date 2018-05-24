@@ -71,7 +71,10 @@ uint64_t get_file_timesample(string filename)
 
 shared_ptr<FileBuffer> get_file_buffer(string filename)
 {
-	filename = g_current_dir + filename;
+	if (filename == "..")
+		filename = g_current_dir.substr(0, g_current_dir.size() - 2);
+	else
+		filename = g_current_dir + filename;
 
 	if (g_filebuffer_map.find(filename) == g_filebuffer_map.end())
 	{
