@@ -417,12 +417,12 @@ int FBFlashCmd::parser(char *p)
 	return 0;
 }
 
-int FBFlashCmd::flash(FastBoot *fb, vector<uint8_t> *pdata)
+int FBFlashCmd::flash(FastBoot *fb, void * pdata, size_t sz)
 {
 	string_ex cmd;
-	cmd.format("download:%08x", pdata->size());
+	cmd.format("download:%08x", sz);
 
-	if (fb->Transport(cmd, pdata->data(), pdata->size()))
+	if (fb->Transport(cmd, pdata, sz))
 		return -1;
 
 	cmd.format("flash:%s", m_partition.c_str());
@@ -450,7 +450,7 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, int
 	{
 		if (sf.push_one_block(pdata->data() + i) || ((i % max) == 0))
 		{
-			if (flash(fb, &sf.m_data))
+			if (flash(fb, sf.m_data.data(), sf.m_data.size()))
 				return -1;
 
 			sf.init_header(block_size, (max + block_size - 1) / block_size);
@@ -469,7 +469,7 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, int
 		}
 	}
 
-	if (flash(fb, &sf.m_data))
+	if (flash(fb, sf.m_data.data(), sf.m_data.size()))
 		return -1;
 
 	nt.type = uuu_notify::NOTIFY_TRANS_POS;
@@ -514,7 +514,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	if (pdata->size() <= max)
 	{
-		if (flash(&fb, &(*pdata)))
+		if (flash(&fb, pdata->data(), pdata->size()))
 			return -1;
 	}
 	else
@@ -554,7 +554,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 				do
 				{
-					if (flash(&fb, &sf.m_data))
+					if (flash(&fb, sf.m_data.data(), sf.m_data.size()))
 						return -1;
 
 					sf.init_header(pfile->blk_sz, max / pfile->blk_sz);
@@ -582,7 +582,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		} while (pos < pdata->size());
 
 		//send last data
-		if (flash(&fb, &sf.m_data))
+		if (flash(&fb, sf.m_data.data(), sf.m_data.size()))
 			return -1;
 
 		sparse_header * pf = (sparse_header *)sf.m_data.data();

@@ -102,7 +102,7 @@ public:
 	FBFlashCmd(char *p) : FBCmd(p) { m_fb_cmd = "flash"; }
 	int parser(char *p = NULL);
 	int run(CmdCtx *ctx);
-	int flash(FastBoot *fb, vector<uint8_t> *pdata);
+	int flash(FastBoot *fb, void *p, size_t sz);
 	int flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> p, int blksz, int max);
 };
 

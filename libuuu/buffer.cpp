@@ -179,21 +179,11 @@ int FileBuffer::reload(string filename)
 	}
 
 	m_timesample = st.st_mtime;
-	resize(st.st_size);
+	
+	this->unmapfile();
 
-	ifstream is(filename.substr(1), ifstream::binary);
-	if (is)
-	{
-		is.read((char*)data(), st.st_size);
-		if (is)
-			return 0;
-		else
-		{
-			string err = "Fail Read File: ";
-			err.append(filename.substr(1));
-			set_last_err_string(err);
-			return -1;
-		}
-	}
+	if (this->mapfile(filename.substr(1), st.st_size))
+		return -1;
+
 	return 0;
 }

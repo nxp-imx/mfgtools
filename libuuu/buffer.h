@@ -33,12 +33,121 @@
 
 #include <vector>
 #include <memory>
+#include "liberror.h"
+#include <assert.h>
 
+#ifdef _MSC_VER
+#include <Windows.h>
+#else
+#endif
 using namespace std;
 
-class FileBuffer : public vector<uint8_t>
+class FileBuffer
 {
 public:
+	vector<uint8_t> m_data;
+	uint8_t *m_pMapbuffer;
+	size_t m_MapSize;
+
+	FileBuffer()
+	{
+		m_pMapbuffer = NULL;
+		m_MapSize = 0;
+	}
+	~FileBuffer()
+	{
+		unmapfile();
+	}
+
+	uint8_t * data()
+	{
+		return m_pMapbuffer ? m_pMapbuffer : m_data.data();
+	}
+
+	size_t size()
+	{
+		return m_pMapbuffer ? m_MapSize : m_data.size();
+	}
+
+	uint8_t & operator[] (size_t index)
+	{
+		if (m_pMapbuffer) {
+			assert(index < m_MapSize);
+			return *(m_pMapbuffer + index);
+		}
+		else {
+			return m_data[index];
+		}
+	}
+
+	uint8_t & at(size_t index)
+	{
+		return (*this)[index];
+	}
+	void resize(size_t sz)
+	{
+		return m_data.resize(sz);
+	}
+	int swap(FileBuffer & a)
+	{
+		m_data.swap(a.m_data);
+		std::swap(m_pMapbuffer, a.m_pMapbuffer);
+		std::swap(m_MapSize, a.m_MapSize);
+		return 0;
+	}
+
+	int mapfile(string filename, size_t sz)
+	{
+#ifdef _MSC_VER
+		HANDLE file_handle = CreateFile(filename.c_str(),
+			GENERIC_READ,
+			FILE_SHARE_READ,
+			NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS,
+			NULL);
+		if (file_handle == INVALID_HANDLE_VALUE)
+		{
+			string err = "Create File Faiure ";
+			err += filename;
+			set_last_err_string(err);
+			return -1;
+		}
+
+		HANDLE file_map = CreateFileMapping(file_handle,
+			NULL, PAGE_READONLY, 0, 0, NULL);
+
+		if (file_map == INVALID_HANDLE_VALUE)
+		{
+			set_last_err_string("Fail create Map");
+			return -1;
+		}
+
+		m_pMapbuffer = (uint8_t *)MapViewOfFile(file_map, FILE_MAP_READ, 0, 0, sz);
+		m_MapSize = sz;
+		CloseHandle(file_map);
+		CloseHandle(file_handle);
+#else
+#endif
+		if (m_pMapbuffer)
+			return 0;
+
+		set_last_err_string("mmap file failure");
+		return -1;
+	}
+
+	int unmapfile()
+	{
+		if (m_pMapbuffer)
+		{
+#ifdef _MSC_VER
+			UnmapViewOfFile(m_pMapbuffer);
+#else
+#endif
+			m_pMapbuffer = NULL;
+		}
+		return 0;
+	}
 	//Read write lock;
 	uint64_t m_timesample;
 	int reload(string filename);
