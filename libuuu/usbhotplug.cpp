@@ -262,7 +262,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 			int r = libusb_get_device_descriptor(dev, &desc);
 			if (r < 0) {
 				set_last_err_string("failure get device descrior");
-				return NULL;
+				return -1;
 			}
 			string str = get_device_path(dev);
 

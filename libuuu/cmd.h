@@ -94,7 +94,7 @@ public:
 	}
 	virtual int parser(char *p = NULL); 
 	virtual int run(CmdCtx *p)=0;
-	virtual void dump() { dbg(m_cmd.c_str()); };
+	virtual void dump() { /*dbg(m_cmd.c_str());*/ };
 };
 
 typedef shared_ptr<CmdBase> (*CreateCmdObj) (char *);
