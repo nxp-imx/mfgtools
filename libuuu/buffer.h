@@ -39,6 +39,7 @@
 #ifdef _MSC_VER
 #include <Windows.h>
 #else
+#include <sys/mman.h>
 #endif
 using namespace std;
 
@@ -128,6 +129,22 @@ public:
 		CloseHandle(file_map);
 		CloseHandle(file_handle);
 #else
+		int fd = open(filename.c_str(), O_RDONLY);
+		if (fd == -1)
+		{
+			string err;
+			err += "Failure open file: ";
+			err + filename;
+			set_last_err_string(err);
+			return -1;
+		}
+
+		m_pMapbuffer = (uint8_t *)mmap(0, m_MapSize, PROT_READ, MAP_SHARED, fd, 0);
+		if (m_pMapbuffer == MAP_FAILED) {
+			m_pMapbuffer = NULL;
+			set_last_err_string("mmap failure\n");
+			return -1;
+		}
 #endif
 		if (m_pMapbuffer)
 			return 0;
@@ -143,6 +160,7 @@ public:
 #ifdef _MSC_VER
 			UnmapViewOfFile(m_pMapbuffer);
 #else
+			munmap(p, m_MapSize);
 #endif
 			m_pMapbuffer = NULL;
 		}
