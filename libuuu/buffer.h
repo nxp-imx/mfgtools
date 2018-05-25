@@ -40,6 +40,8 @@
 #include <Windows.h>
 #else
 #include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
 #endif
 using namespace std;
 
@@ -133,18 +135,20 @@ public:
 		if (fd == -1)
 		{
 			string err;
-			err += "Failure open file: ";
+			err += "xx Failure open file: ";
 			err + filename;
 			set_last_err_string(err);
 			return -1;
 		}
 
-		m_pMapbuffer = (uint8_t *)mmap(0, m_MapSize, PROT_READ, MAP_SHARED, fd, 0);
+		m_pMapbuffer = (uint8_t *)mmap64(0, sz, PROT_READ, MAP_SHARED, fd, 0);
 		if (m_pMapbuffer == MAP_FAILED) {
 			m_pMapbuffer = NULL;
 			set_last_err_string("mmap failure\n");
 			return -1;
 		}
+		m_MapSize = sz;
+		close(fd);
 #endif
 		if (m_pMapbuffer)
 			return 0;
@@ -160,7 +164,7 @@ public:
 #ifdef _MSC_VER
 			UnmapViewOfFile(m_pMapbuffer);
 #else
-			munmap(p, m_MapSize);
+			munmap(m_pMapbuffer, m_MapSize);
 #endif
 			m_pMapbuffer = NULL;
 		}
