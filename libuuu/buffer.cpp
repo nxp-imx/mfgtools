@@ -46,23 +46,34 @@
 
 static map<string, shared_ptr<FileBuffer>> g_filebuffer_map;
 
-string g_current_dir;
+#define MAGIC_PATH '>'
+
+string g_current_dir = ">";
 
 void set_current_dir(string dir)
 {
-	g_current_dir = dir;
+	g_current_dir = MAGIC_PATH;
+	g_current_dir += dir;
 }
 
 uint64_t get_file_timesample(string filename)
 {
 	struct stat64 st;
-	if (stat64(filename.c_str(), &st))
+	if (stat64(filename.c_str() + 1, &st))
 	{
 		string path = str_to_upper(filename);
 		size_t pos = path.find(".ZIP");
 		if (pos == string::npos)
 			return 0;
-		stat64(filename.substr(0, pos + 4).c_str(), &st);
+		if (stat64(filename.substr(1, pos + 4).c_str(), &st))
+		{
+			string path = str_to_upper(filename);
+			size_t pos = path.find(".SDCARD");
+			if (pos == string::npos)
+				return 0;
+
+			stat64(filename.substr(1, pos + 7).c_str(), &st);
+		}
 		return st.st_mtime;
 	}
 
@@ -71,10 +82,13 @@ uint64_t get_file_timesample(string filename)
 
 shared_ptr<FileBuffer> get_file_buffer(string filename)
 {
-	if (filename == "..")
-		filename = g_current_dir.substr(0, g_current_dir.size() - 2);
-	else
-		filename = g_current_dir + filename;
+	if (!filename.empty() && filename[0] != MAGIC_PATH)
+	{
+		if (filename == "..")
+			filename = g_current_dir.substr(0, g_current_dir.size() - 1);
+		else
+			filename = g_current_dir + filename;
+	}
 
 	if (g_filebuffer_map.find(filename) == g_filebuffer_map.end())
 	{
@@ -105,7 +119,7 @@ int FileBuffer::reload(string filename)
 	size_t pos_zip = string::npos;
 	size_t pos_sdcard = string::npos;
 
-	if (stat64(filename.c_str(), &st))
+	if (stat64(filename.c_str() + 1, &st))
 	{
 		string path = str_to_upper(filename);
 		pos_zip = path.find(".ZIP");
@@ -114,7 +128,7 @@ int FileBuffer::reload(string filename)
 		{
 			pos_sdcard = path.find(".SDCARD");
 			string sdcardfile = filename.substr(0, pos_sdcard + strlen(".SDCARD"));
-			if (pos_sdcard == string::npos || (stat64(sdcardfile.c_str(), &st)))
+			if (pos_sdcard == string::npos || (stat64(sdcardfile.c_str() + 1, &st)))
 			{
 				string err = "Fail Open File: ";
 				err.append(filename);
@@ -150,7 +164,7 @@ int FileBuffer::reload(string filename)
 		if (fat.Open(filename.substr(0, pos_sdcard + strlen(".SDCARD"))))
 		{
 			string err = "Fail Open File: ";
-			err.append(filename.substr(0, pos_sdcard + strlen(".SDCARD")));
+			err.append(filename.substr(1, pos_sdcard + strlen(".SDCARD")));
 			set_last_err_string(err);
 			return -1;
 		}
@@ -167,7 +181,7 @@ int FileBuffer::reload(string filename)
 	m_timesample = st.st_mtime;
 	resize(st.st_size);
 
-	ifstream is(filename, ifstream::binary);
+	ifstream is(filename.substr(1), ifstream::binary);
 	if (is)
 	{
 		is.read((char*)data(), st.st_size);
@@ -176,7 +190,7 @@ int FileBuffer::reload(string filename)
 		else
 		{
 			string err = "Fail Read File: ";
-			err.append(filename);
+			err.append(filename.substr(1));
 			set_last_err_string(err);
 			return -1;
 		}
