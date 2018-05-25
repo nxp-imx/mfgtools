@@ -496,6 +496,12 @@ int FBFlashCmd::run(CmdCtx *ctx)
 	
 	size_t block_size = str_to_uint(getvar.m_val);
 
+	if (block_size == 0)
+	{
+		set_last_err_string("Device report block_size is 0");
+		return -1;
+	}
+
 	BulkTrans dev;
 	if (dev.open(ctx->m_dev))
 		return -1;
