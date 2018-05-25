@@ -13,7 +13,7 @@ set(SOURCES
 	uuu.clst
 )
 
-link_directories(../libuuu)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libuuu)
 
 add_custom_command(
         OUTPUT uuu.clst
