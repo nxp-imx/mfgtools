@@ -1,4 +1,5 @@
 # uuu(universial update utiles), mfgtools 3.0 
+
 **original linux version using "linux" branch, windows version use "windows" branch**
 
 Freescale/NXP I.MX Chip image deploy tools.
