@@ -348,6 +348,40 @@ BOOL CMfgTool_MultiPanelApp::InitInstance()
 			{
 				m_IsAutoStart = TRUE;
 			}
+			else if ((strParamType.CompareNoCase(_T("-u")) == 0)) // parameter specific for hub/port in the format param[hub][port]=value
+			{
+				CString str = szArglist[i + 1];
+				str = str.Trim();
+
+				CString key, param, value;
+				auto hub = 0u;
+				auto port = 0u;
+				int start = 0;
+				key = str.Tokenize(_T("="), start);
+				if (!key.IsEmpty())
+				{
+					if (start > 0)
+					{
+						value = str.Mid(start);
+					}
+
+					start = 0;
+					param = key.Tokenize(_T("["), start);
+					if (start > 0)
+					{
+						key = key.Mid(start);
+						hub = _ttoi(str.Tokenize(_T("]"), start));
+						if (start > 0)
+						{
+							key = str.Tokenize(_T("["), start);
+							start = 0;
+							port = _ttoi(key.Tokenize(_T("]"), start));
+
+							m_usbPortKeywords[std::make_tuple(hub, port, param)] = value;
+						}
+					}
+				}
+			}
 		}
 		LocalFree(szArglist);
 	}
@@ -358,6 +392,19 @@ BOOL CMfgTool_MultiPanelApp::InitInstance()
 		CString key = it->first;
 		CString value = it->second;
 		MfgLib_SetUCLKeyWord(key.GetBuffer(), value.GetBuffer());
+	}
+
+	for (auto it : m_usbPortKeywords)
+	{
+		CString message;
+		auto hub = std::get<0>(it.first);
+		auto index = std::get<1>(it.first);
+		auto param = std::get<2>(it.first);
+		auto value = it.second;
+		message.Format(_T("Assign %s=%s to hub=%u,port=%u"), param, value, hub, index);
+		OutputInformation(message);
+
+		MfgLib_SetUsbPortKeyWord(hub, index, param.GetBuffer(), value.GetBuffer());
 	}
 		
 	CString strMsg;
@@ -698,7 +745,7 @@ BOOL CMfgTool_MultiPanelApp::ParseMyCommandLine(CString strCmdLine)
 		strParameters = strParameters.Right(strParameters.GetLength()-i);
 		strParameters.TrimLeft();
 
-		if ((strParamType.CompareNoCase(_T("-c")) == 0) || (strParamType.CompareNoCase(_T("-l")) == 0) || (strParamType.CompareNoCase(_T("-s")) == 0))
+		if ((strParamType.CompareNoCase(_T("-c")) == 0) || (strParamType.CompareNoCase(_T("-l")) == 0) || (strParamType.CompareNoCase(_T("-s")) == 0) || (strParamType.CompareNoCase(_T("-u")) == 0))
 		{
 			if(strParameters[0] != chQuotes)
 			{

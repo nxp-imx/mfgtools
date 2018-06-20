@@ -39,6 +39,7 @@
 #include "PortMgr.h"
 #include "../MfgToolLib/MfgToolLib_Export.h"
 #include <map>
+#include <tuple>
 
 // CMfgTool_MultiPanelApp:
 // See MfgTool_MultiPanel.cpp for the implementation of this class
@@ -69,6 +70,9 @@ public:
 	CString m_strProfileName;
 	CString m_strListName;
 	std::map<CString, CString> m_uclKeywords;
+	// For usb-port specific parameters, we use as key a tuple <hub, index, parameter name>
+	typedef std::tuple<UINT, UINT, CString> UsbPortKey;
+	std::map<UsbPortKey, CString> m_usbPortKeywords;
 	BOOL m_IsAutoStart;
 	BOOL ParseCfgFile(CString strFilename, BOOL bMsgBox);
 	BOOL IsSectionExist(CString strSection, CString strFilename);
