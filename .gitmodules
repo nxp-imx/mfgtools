@@ -4,6 +4,3 @@
 [submodule "zlib"]
 	path = zlib
 	url = https://github.com/madler/zlib.git
-[submodule "libsparse"]
-	path = libsparse
-	url = https://github.com/anestisb/android-simg2img.git
