@@ -12,7 +12,7 @@ Freescale/NXP I.MX Chip image deploy tools.
     2:1      1/5 [===>                                    ] SDP: boot -f u-boot-imx7dsabresd_sd.imx ....
 
 
-**under developing**
+**under development**
 
 # key feature. 
  - The real cross platform. linux, windows, MacOS(not test yet)
@@ -39,13 +39,13 @@ Freescale/NXP I.MX Chip image deploy tools.
 # Build:
 
 ## windows
-- git clone git@github.com:codeauroraforum/mfgtools.git -b uuu
+- git clone git@github.com:codeauroraforum/mfgtools.git
 - git submodule init
 - git submodule update
 - open msvs/uuu.sln by vs2017
 
 ## linux
-- git clone git@github.com:codeauroraforum/mfgtools.git -b uuu
+- git clone git@github.com:codeauroraforum/mfgtools.git
 - sudo do apt-get install libusb-1.0.0-dev
 - cmake .
 - make
