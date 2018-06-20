@@ -56,6 +56,7 @@
 
 #include <algorithm>
 #include <map>
+#include <tuple>
 //#include "..\MfgTool.exe\gitversion.h"
 #include "UpdateUIInfo.h"
 #include "gitversion.h"
@@ -166,6 +167,8 @@ PORT_DEV_INFO g_PortDevInfoArray[MAX_BOARD_NUMBERS];
 std::vector<MFGLIB_VARS *> g_LibVarsArray;
 //std::vector<USB_PORT_NODE *> g_PortTable;
 std::map<CString, CString> g_UclKeywords;
+typedef std::tuple<UINT, UINT, CString> UsbPortKey;
+std::map<UsbPortKey, CString> g_UsbPortKeywords;
 
 HANDLE g_hOneInstance;
 #define UNIQE_NAME	_T("{1AB792D6-EAF2-3267-9A84-9135681127A4}")
@@ -2928,6 +2931,8 @@ DWORD InitCmdOperation(MFGLIB_VARS *pLibVars, int WndIndex)
 		return MFGLIB_ERROR_NO_MEMORY;
 	}
 
+	ReplaceAllUsbPortKeyWords(pLibVars, WndIndex);
+
 	return (pLibVars->g_CmdOperationArray[WndIndex]->Open());
 }
 
@@ -3269,6 +3274,15 @@ DWORD MfgLib_SetUCLKeyWord(CHAR_t *key, CHAR_t *value)
 	return 0;
 }
 
+DWORD MfgLib_SetUsbPortKeyWord(UINT hub, UINT index, CHAR_t *key, CHAR_t *value)
+{
+	auto usb_key = std::make_tuple(hub, index, CString(key));
+	if (value == NULL)
+		g_UsbPortKeywords.erase(usb_key);
+	g_UsbPortKeywords[usb_key] = CString(value);
+	return 0;
+}
+
 CString ReplaceKeywords(CString str)
 {
 	std::map<CString, CString>::const_iterator it;
@@ -3279,6 +3293,36 @@ CString ReplaceKeywords(CString str)
 		key += _T("%");		
 		CString value = it->second;
 		str.Replace(key, value);		
+	}
+	return str;
+}
+void ReplaceAllUsbPortKeyWords(MFGLIB_VARS *pLibVars, int WndIndex)
+{
+	auto& hub = pLibVars->g_PortDevInfoArray[WndIndex].hubIndex;
+	auto& port = pLibVars->g_PortDevInfoArray[WndIndex].portIndex;
+	if (hub && port)
+	{
+		for (auto& stateIt : pLibVars->g_StateCommands)
+		{
+			for (auto& it : stateIt.second)
+			{
+				it->SetBodyString(ReplaceUsbPortKeywords(it->GetBodyString(), hub, port));
+			}
+		}
+	}
+}
+CString ReplaceUsbPortKeywords(CString str, UINT hub, UINT port)
+{
+	for (auto it : g_UsbPortKeywords)
+	{
+		if (std::get<0>(it.first) == hub && std::get<1>(it.first) == port)
+		{
+			CString key = _T("%");
+			key += std::get<2>(it.first);
+			key += _T("%");
+			CString value = it.second;
+			str.Replace(key, value);
+		}
 	}
 	return str;
 }
