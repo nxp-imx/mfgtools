@@ -65,6 +65,7 @@ ROM_INFO g_RomInfo[] =
 	{ "MX6SLL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{ "MX8MQ",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{ "MX7ULP",	 0x2f018000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	{ "MXRT106X",0x1000,     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{ "MX8QXPB0",0x0,		 ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING },
 };
 
@@ -126,10 +127,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 	IvtHeader *pIVT = search_ivt_header(buff, off);
 	if (pIVT == NULL)
 	{
-		string_ex err;
-		err.format("%s:%d can't found ivt header", __FUNCTION__, __LINE__);
-		set_last_err_string(err);
-		return -1;
+		return 0;
 	}
 
 	if (pIVT->DCDAddress == 0)
@@ -264,7 +262,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		}
 
 		BootData *pDB = (BootData *) &(fbuff->at(off + pIvt->BootData - pIvt->SelfAddr));
-		m_download_addr = pIvt->SelfAddr - off;
+		m_download_addr = pIvt->SelfAddr;
 		size = fbuff->size() - off;
 		pbuff = (uint8_t*)pIvt;
 	}
