@@ -76,22 +76,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>$(SolutionDir)\x86\$(Configuration)\</OutDir>
+    <OutDir>..\$(Platform)\$(Configuration)\dll</OutDir>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
+    <OutDir>..\$(Platform)\$(Configuration)\dll</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>$(SolutionDir)\x86\$(Configuration)\</OutDir>
+    <OutDir>..\$(Platform)\$(Configuration)\dll</OutDir>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
+    <OutDir>..\$(Platform)\$(Configuration)\dll</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
