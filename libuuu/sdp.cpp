@@ -46,6 +46,7 @@
 #define ROM_INFO_HID_MX8_STREAM			  0x40
 #define ROM_INFO_HID_UID_STRING			  0x80
 #define ROM_INFO_HID_NO_CMD				 0x400
+#define ROM_INFO_SPL_JUMP				 0x800
 
 struct ROM_INFO
 {
@@ -67,6 +68,7 @@ ROM_INFO g_RomInfo[] =
 	{ "MX7ULP",	 0x2f018000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{ "MXRT106X",0x1000,     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{ "MX8QXPB0",0x0,		 ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING },
+	{ "SPL",	 0x0,		 ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP }
 };
 
 ROM_INFO * search_rom_info(const char *s)
@@ -235,6 +237,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 {
 	size_t size;
 	uint8_t *pbuff;
+	int offset = 0;
 
 	shared_ptr<FileBuffer> fbuff = get_file_buffer(m_filename);
 
@@ -245,6 +248,9 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 	{
 		pbuff = fbuff->data();
 		size = fbuff->size();
+
+		offset = m_offset;
+		size -= m_offset;
 	}
 	else
 	{
@@ -262,11 +268,14 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		}
 
 		BootData *pDB = (BootData *) &(fbuff->at(off + pIvt->BootData - pIvt->SelfAddr));
+
 		m_download_addr = pIvt->SelfAddr;
-		size = fbuff->size() - off;
+		//size = fbuff->size() - off;
+		size = pDB->ImageSize;
+
 		pbuff = (uint8_t*)pIvt;
 	}
-	return run(ctx, pbuff, size, m_download_addr);
+	return run(ctx, pbuff + offset, size, m_download_addr);
 }
 
 int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
@@ -326,6 +335,17 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 		return -1;
 	}
 	
+	if (rom->flags & ROM_INFO_SPL_JUMP)
+	{
+		m_spdcmd.m_addr = EndianSwap(m_jump_addr);
+		if (report.write(&m_spdcmd, sizeof(m_spdcmd), 1))
+			return -1;
+
+		//Omit last return value.
+		check_ack(&report, ROM_OK_ACK);
+		return 0;
+	}
+
 	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
 
 	int off = 0;

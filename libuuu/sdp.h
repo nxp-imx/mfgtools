@@ -179,17 +179,22 @@ public:
 	int32_t m_Ivt;
 	int m_PlugIn;
 	uint32_t m_max_download_pre_cmd;
+	uint32_t m_offset;
+	bool m_bIvtReserve;
 	
 	SDPWriteCmd(char*p) :SDPCmdBase(p) {
 		m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_FILE; 
 		m_PlugIn = -1; 
 		m_Ivt = -1;
 		m_max_download_pre_cmd = 0x200000;
+		m_offset = 0;
+		m_bIvtReserve = false;
 
 		insert_param_info("write", NULL, Param::e_null);
 		insert_param_info("-f", &m_filename, Param::e_string_filename);
 		insert_param_info("-ivt", &m_Ivt, Param::e_uint32);
 		insert_param_info("-addr", &m_download_addr, Param::e_uint32);
+		insert_param_info("-offset", &m_offset, Param::e_uint32);
 	};
 
 	int run(CmdCtx *p);
@@ -201,13 +206,16 @@ class SDPJumpCmd : public SDPCmdBase
 public:
 	bool m_Ivt;
 	bool m_PlugIn;
+	uint32_t m_jump_addr;
 	SDPJumpCmd(char*p):SDPCmdBase(p)
 	{ 
+		m_jump_addr = 0;
 		m_spdcmd.m_cmd = ROM_KERNEL_CMD_JUMP_ADDR;
 		insert_param_info("jump", NULL, Param::e_null);
 		insert_param_info("-f", &m_filename, Param::e_string_filename);
 		insert_param_info("-ivt", &m_Ivt, Param::e_bool);
 		insert_param_info("-plugin", &m_Ivt, Param::e_bool);
+		insert_param_info("-addr", &m_jump_addr, Param::e_uint32);
 	};
 	int run(CmdCtx *p);
 };

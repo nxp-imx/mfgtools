@@ -218,6 +218,8 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["SDP:STATUS"] = new_cmd_obj<SDPStatusCmd>;
 	(*this)["SDP:BOOT"] = new_cmd_obj<SDPBootCmd>;
 	(*this)["SDP:DONE"] = new_cmd_obj<CmdDone>;
+	(*this)["SDPU:JUMP"] = new_cmd_obj<SDPJumpCmd>;
+	(*this)["SDPU:WRITE"] = new_cmd_obj<SDPWriteCmd>;
 
 	(*this)["FB:GETVAR"] = new_cmd_obj<FBGetVar>;
 	(*this)["FASTBOOT:GETVAR"] = new_cmd_obj<FBGetVar>;
@@ -391,6 +393,13 @@ static int added_default_boot_cmd(const char *filename)
 	if (ret) return ret;
 
 	insert_one_cmd("SDP: done", &g_cmd_map);
+
+	str = "SDPU: write -f ";
+	str += filename;
+	str += " -offset 0x57c00 -addr 0x40800000";
+	insert_one_cmd(str.c_str(), &g_cmd_map);
+	insert_one_cmd("SDPU: jump -addr 0x40800000", &g_cmd_map);
+	insert_one_cmd("SDPU: done", &g_cmd_map);
 
 	return 0;
 }
