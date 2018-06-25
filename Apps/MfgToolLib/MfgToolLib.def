@@ -23,3 +23,4 @@ EXPORTS
     MfgLib_CreateInstanceHandle          @17
     MfgLib_DestoryInstanceHandle         @18
     MfgLib_SetUCLKeyWord                 @19
+    MfgLib_SetUsbPortKeyWord             @20

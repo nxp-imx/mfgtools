@@ -228,6 +228,7 @@ DWORD MfgLib_RegisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbTy
 DWORD MfgLib_UnregisterCallbackFunction(INSTANCE_HANDLE handle, CALLBACK_TYPE cbType, void *pFunc);
 DWORD MfgLib_GetLibraryVersion(BYTE_t* version, int maxSize);
 DWORD MfgLib_SetUCLKeyWord(CHAR_t *key, CHAR_t *value);
+DWORD MfgLib_SetUsbPortKeyWord(UINT hub, UINT index, CHAR_t *key, CHAR_t *value);
 
 
 
