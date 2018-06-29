@@ -59,9 +59,21 @@ vector<string> g_usb_path_filter;
 
 int g_verbose = 0;
 
+class AutoCursor
+{
+public:
+	~AutoCursor()
+	{
+		printf("\x1b[?25h\n\n\n");
+	}
+};
+
 void ctrl_c_handle(int sig)
 {
-	printf("\x1b[?25h\n\n\n");
+	do {
+		AutoCursor a;
+	} while(0);
+
 	exit(1);
 }
 
@@ -544,6 +556,8 @@ void print_usb_filter()
 }
 int main(int argc, char **argv)
 {
+	AutoCursor a;
+
 	print_version();
 
 	enable_vt_mode();
