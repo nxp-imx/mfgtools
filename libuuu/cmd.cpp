@@ -220,6 +220,7 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["SDP:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["SDPU:JUMP"] = new_cmd_obj<SDPJumpCmd>;
 	(*this)["SDPU:WRITE"] = new_cmd_obj<SDPWriteCmd>;
+	(*this)["SDPU:DONE"] = new_cmd_obj<CmdDone>;
 
 	(*this)["FB:GETVAR"] = new_cmd_obj<FBGetVar>;
 	(*this)["FASTBOOT:GETVAR"] = new_cmd_obj<FBGetVar>;
