@@ -525,7 +525,7 @@ int get_console_width()
 }
 #else
 #include <sys/ioctl.h>
-bool enable_vt_mode() {}
+bool enable_vt_mode() { return true; }
 int get_console_width()
 {
 	struct winsize w;
