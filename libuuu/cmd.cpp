@@ -397,9 +397,9 @@ static int added_default_boot_cmd(const char *filename)
 
 	str = "SDPU: write -f ";
 	str += filename;
-	str += " -offset 0x57c00 -addr 0x40800000";
+	str += " -offset 0x57c00";
 	insert_one_cmd(str.c_str(), &g_cmd_map);
-	insert_one_cmd("SDPU: jump -addr 0x40800000", &g_cmd_map);
+	insert_one_cmd("SDPU: jump", &g_cmd_map);
 	insert_one_cmd("SDPU: done", &g_cmd_map);
 
 	return 0;

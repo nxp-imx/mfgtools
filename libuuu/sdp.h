@@ -189,6 +189,7 @@ public:
 		m_max_download_pre_cmd = 0x200000;
 		m_offset = 0;
 		m_bIvtReserve = false;
+		m_download_addr = 0;
 
 		insert_param_info("write", NULL, Param::e_null);
 		insert_param_info("-f", &m_filename, Param::e_string_filename);
