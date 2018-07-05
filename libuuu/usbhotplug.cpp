@@ -48,6 +48,12 @@ static vector<thread> g_running_thread;
 
 static vector<string> g_filter_usbpath;
 
+#ifdef _MSC_VER
+#define TRY_SUDO
+#else
+#define TRY_SUDO ",Try sudo uuu"
+#endif
+
 static bool is_match_filter(string path)
 {
 	if (g_filter_usbpath.empty())
@@ -101,7 +107,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 
 	if (libusb_open(dev, (libusb_device_handle **)&(ctx.m_dev)) < 0)
 	{
-		set_last_err_string("Failure open usb device");
+		set_last_err_string("Failure open usb device" TRY_SUDO);
 		nt.type = uuu_notify::NOTIFY_CMD_END;
 		nt.status = -1;
 		call_notify(nt);
@@ -280,7 +286,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 
 					if (libusb_open(dev, (libusb_device_handle **)&(m_dev)) < 0)
 					{
-						set_last_err_string("Failure open usb device");
+						set_last_err_string("Failure open usb device" TRY_SUDO);
 						return -1;
 					}
 
