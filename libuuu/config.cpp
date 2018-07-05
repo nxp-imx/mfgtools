@@ -50,7 +50,7 @@ Config::Config()
 	push_back(ConfigItem("SDP:", "MX6UL",   "MX7D", FSL_VID, 0x007D));
 	push_back(ConfigItem("SDP:", "MX6ULL",  "MX7D", FSL_VID, 0x0080));
 	push_back(ConfigItem("SDP:", "MX6SLL",  "MX7D", NXP_VID, 0x0128));
-	push_back(ConfigItem("SDP:", "MX7ULP",   NULL,  NXP_VID, 0x0054));
+	push_back(ConfigItem("SDP:", "MX7ULP",   NULL,  NXP_VID, 0x0126));
 	push_back(ConfigItem("SDP:", "MXRT106X", NULL,  NXP_VID, 0x0135));
 	push_back(ConfigItem("SDP:", "MX8MM",   "MX8MQ", NXP_VID, 0x0134));
 	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4));
