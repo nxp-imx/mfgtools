@@ -42,7 +42,7 @@
 #include "sdp.h"
 #include "fastboot.h"
 #include <sys/stat.h>
-
+#include <thread>
 
 static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
@@ -211,6 +211,7 @@ CmdObjCreateMap::CmdObjCreateMap()
 	
 	(*this)["SDPS:BOOT"] = new_cmd_obj<SDPSCmd>;
 	(*this)["SDPS:DONE"] = new_cmd_obj<CmdDone>;
+	(*this)["SDPS:DELAY"] = new_cmd_obj<CmdDelay>;
 
 	(*this)["SDP:DCD"] = new_cmd_obj<SDPDcdCmd>;
 	(*this)["SDP:JUMP"] = new_cmd_obj<SDPJumpCmd>;
@@ -218,9 +219,12 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["SDP:STATUS"] = new_cmd_obj<SDPStatusCmd>;
 	(*this)["SDP:BOOT"] = new_cmd_obj<SDPBootCmd>;
 	(*this)["SDP:DONE"] = new_cmd_obj<CmdDone>;
+	(*this)["SDP:DELAY"] = new_cmd_obj<CmdDelay>;
+
 	(*this)["SDPU:JUMP"] = new_cmd_obj<SDPJumpCmd>;
 	(*this)["SDPU:WRITE"] = new_cmd_obj<SDPWriteCmd>;
 	(*this)["SDPU:DONE"] = new_cmd_obj<CmdDone>;
+	(*this)["SDPU:DELAY"] = new_cmd_obj<CmdDelay>;
 
 	(*this)["FB:GETVAR"] = new_cmd_obj<FBGetVar>;
 	(*this)["FASTBOOT:GETVAR"] = new_cmd_obj<FBGetVar>;
@@ -236,12 +240,16 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:ERASE"] = new_cmd_obj<FBEraseCmd>;
 	(*this)["FB:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["FASTBOOT:DONE"] = new_cmd_obj<CmdDone>;
+	(*this)["FB:DELAY"] = new_cmd_obj<CmdDelay>;
+	(*this)["FASTBOOT:DELAY"] = new_cmd_obj<CmdDelay>;
 
 	(*this)["FBK:UCMD"] = new_cmd_obj<FBUCmd>;
 	(*this)["FBK:ACMD"] = new_cmd_obj<FBACmd>;
 	(*this)["FBK:SYNC"] = new_cmd_obj<FBSyncCmd>;
 	(*this)["FBK:UCP"] = new_cmd_obj<FBCopy>;
 	(*this)["FBK:DONE"] = new_cmd_obj<CmdDone>;
+	(*this)["FBK:DELAY"] = new_cmd_obj<CmdDelay>;
+
 }
 
 shared_ptr<CmdBase> create_cmd_obj(string cmd)
@@ -322,6 +330,33 @@ int CmdDone::run(CmdCtx *)
 	uuu_notify nt;
 	nt.type = uuu_notify::NOTIFY_DONE;
 	call_notify(nt);
+	return 0;
+}
+
+int CmdDelay::parser(char *p)
+{
+	size_t pos = 0;
+	string param = get_next_param(m_cmd, pos);
+
+	if (param.find(':') != string::npos)
+		param = get_next_param(m_cmd, pos);
+
+	if (str_to_upper(param) != "DELAY")
+	{
+		string err = "Uknown Commnd:";
+		err += param;
+		set_last_err_string(err);
+		return -1;
+	}
+
+	string ms = get_next_param(m_cmd, pos);
+	m_ms = str_to_uint(ms);
+	return 0;
+}
+
+int CmdDelay::run(CmdCtx *)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(m_ms));
 	return 0;
 }
 

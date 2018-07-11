@@ -112,6 +112,16 @@ public:
 	int run(CmdCtx *p);
 };
 
+class CmdDelay :public CmdBase
+{
+public:
+	int m_ms;
+	virtual int parser(char *p = NULL);
+	CmdDelay(char *p) :CmdBase(p) { m_ms = 0; };
+	int run(CmdCtx *p);
+};
+
+
 class CmdList : public std::vector<shared_ptr<CmdBase>>
 {
 public:
