@@ -448,7 +448,8 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, int
 
 	for (size_t i = 0; i < pdata->size(); i += block_size)
 	{
-		if (sf.push_one_block(pdata->data() + i) || ((i % max) == 0))
+		int ret = sf.push_one_block(pdata->data() + i);
+		if (ret)
 		{
 			if (flash(fb, sf.m_data.data(), sf.m_data.size()))
 				return -1;
