@@ -48,6 +48,6 @@ Freescale/NXP I.MX Chip image deploy tools.
 
 ## linux
 - git clone git@github.com:codeauroraforum/mfgtools.git
-- sudo do apt-get install libusb-1.0.0-dev
+- sudo apt-get install libusb-1.0.0-dev libzip-dev
 - cmake .
 - make
