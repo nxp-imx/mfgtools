@@ -1,4 +1,4 @@
-# uuu(universial update utiles), mfgtools 3.0 
+# uuu(universial update Utility), mfgtools 3.0 
 
 **original linux version using "linux" branch, windows version use "windows" branch**
 
