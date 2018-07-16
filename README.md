@@ -4,7 +4,7 @@
 
 Freescale/NXP I.MX Chip image deploy tools.
 
-    uuu (universal update utitle) for nxp imx chips -- libuuu-1.0.1-gffd9837
+    uuu (universal update utility) for nxp imx chips -- libuuu-1.0.1-gffd9837
 
     Succues:0       Failure:3               Wait for Known USB Device Appear...
 
