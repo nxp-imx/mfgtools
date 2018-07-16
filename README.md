@@ -22,6 +22,7 @@ Freescale/NXP I.MX Chip image deploy tools.
  - Firmware (uboot/kernel) use WCID to auto load winusb drvier in windows side.
 
 # example:
+```
   uuu u-boot.imx            Download u-boot.imx by HID device
   
   uuu list.uu               Run all commands in list.uu
@@ -35,6 +36,7 @@ Freescale/NXP I.MX Chip image deploy tools.
                             u-boot.imx can be replaced, new file will be download once board reset.
                             
                             Avoid unplug sd, write sd, plug sd card when debug uboot.
+```
 
 # Build:
 
@@ -46,6 +48,6 @@ Freescale/NXP I.MX Chip image deploy tools.
 
 ## linux
 - git clone git@github.com:codeauroraforum/mfgtools.git
-- sudo do apt-get install libusb-1.0.0-dev
+- sudo apt-get install libusb-1.0.0-dev libzip-dev
 - cmake .
 - make
