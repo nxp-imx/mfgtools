@@ -423,6 +423,9 @@ DWORD GetCurrentDeviceDesc(MFGLIB_VARS *pLibVars, int DeviceIndex, TCHAR* desc, 
 BOOL FindLibraryHandle(MFGLIB_VARS *pLibVars);
 int FindOperationIndex(MFGLIB_VARS *pLibVars, DWORD operationID);
 CString ReplaceKeywords(CString str);
+CString ReplaceUsbPortKeywords(CString str, UINT hub, UINT port);
+void ReplaceAllUsbPortKeyWords(MFGLIB_VARS *pLibVars, int WndIndex);
+
 
 
 
