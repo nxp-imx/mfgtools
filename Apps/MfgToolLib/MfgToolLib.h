@@ -168,8 +168,10 @@ public:
 	COpCommand();
 	virtual ~COpCommand();
 	virtual UINT ExecuteCommand(int index);
-	virtual void SetBodyString(CString &str);
-	virtual CString GetBodyString();
+	virtual void SetBodyString(int index, const CString &str);
+	virtual void SetTemplateBodyString(const CString &str);
+	virtual CString GetBodyString(int index) const;
+	virtual CString GetTemplateBodyString() const;
 	virtual void SetDescString(CString &str);
 	virtual CString GetDescString();
 	virtual void SetIfDevString(CString &str);
@@ -179,7 +181,8 @@ public:
 	INSTANCE_HANDLE m_pLibVars;
 
 protected:
-	CString m_bodyString;
+	std::map<int, CString> m_bodyStringMap;
+	CString m_templateBodyString;
 	CString m_descString;
 	CString m_ifdev;
 	CString m_ifhab;
