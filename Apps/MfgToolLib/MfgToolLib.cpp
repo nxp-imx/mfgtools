@@ -56,6 +56,7 @@
 
 #include <algorithm>
 #include <map>
+#include <stdexcept>  // std::out_of_range
 #include <tuple>
 //#include "..\MfgTool.exe\gitversion.h"
 #include "UpdateUIInfo.h"
@@ -1323,7 +1324,7 @@ DWORD ParseUclXml(MFGLIB_VARS *pLibVars)
 
 		strTemp = (*it)->GetAttrValue(_T("body"));
 		strTemp = ReplaceKeywords(strTemp);
-		pOpCmd->SetBodyString(strTemp);
+		pOpCmd->SetTemplateBodyString(strTemp);
 		pOpCmd->SetDescString((*it)->GetText());
 
 		strTemp = (*it)->GetAttrValue(_T("ifdev"));
@@ -1434,15 +1435,34 @@ COpCommand::~COpCommand()
 {
 }
 
-void COpCommand::SetBodyString(CString &str)
+void COpCommand::SetBodyString(int index, const CString &str)
 {
-	m_bodyString = str;
+	m_bodyStringMap[index] = str;
 }
 
-CString COpCommand::GetBodyString()
+void COpCommand::SetTemplateBodyString(const CString &str)
 {
-	return m_bodyString;
+	m_templateBodyString = str;
 }
+
+CString COpCommand::GetBodyString(int index) const
+{
+	try
+	{
+		return m_bodyStringMap.at(index);
+	}
+	catch (const std::out_of_range& oor)
+	{
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_FATAL_ERROR, _T("%s-- index %d not found in m_bodyString."), __func__, index);
+		return m_templateBodyString;
+	}
+}
+
+CString COpCommand::GetTemplateBodyString() const
+{
+	return m_templateBodyString;
+}
+
 
 void COpCommand::SetDescString(CString &str)
 {
@@ -1615,7 +1635,7 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(index), m_FileName);
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1632,7 +1652,7 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(index), m_FileName);
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1654,7 +1674,7 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(index), m_FileName);
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1682,7 +1702,7 @@ UINT COpCmd_Boot::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Boot\" body=\"%s\" error, file=\"%s\""), GetBodyString(index), m_FileName);
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1787,7 +1807,7 @@ UINT COpCmd_Init::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Init\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Init\" body=\"%s\" error, file=\"%s\""), GetBodyString(index), m_FileName);
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -1804,7 +1824,7 @@ UINT COpCmd_Init::ExecuteCommand(int index)
 			_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
 			_uiInfo.bUpdateDescription = TRUE;
 			CString strDesc;
-			strDesc.Format(_T("\"Init\" body=\"%s\" error, file=\"%s\""), GetBodyString(), m_FileName);
+			strDesc.Format(_T("\"Init\" body=\"%s\" error, file=\"%s\""), GetBodyString(index), m_FileName);
 			_tcscpy(_uiInfo.strDescription, strDesc.GetBuffer());
 			strDesc.ReleaseBuffer();
 			((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
@@ -2144,9 +2164,9 @@ UINT COpCmd_Push::ExecuteCommand(int index)
 {
 	CString strMsg;
 	if (m_FileName.IsEmpty())
-		strMsg.Format(_T("ExecuteCommand--Push[WndIndex:%d], Body is %s"), index, m_bodyString);
+		strMsg.Format(_T("ExecuteCommand--Push[WndIndex:%d], Body is %s"), index, GetBodyString(index));
 	else
-		strMsg.Format(_T("ExecuteCommand--Push[WndIndex:%d], Body is %s, File is %s"), index, m_bodyString, m_FileName);
+		strMsg.Format(_T("ExecuteCommand--Push[WndIndex:%d], Body is %s, File is %s"), index, GetBodyString(index), m_FileName);
 
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg);
 
@@ -2164,7 +2184,7 @@ UINT COpCmd_Push::ExecuteCommand(int index)
 	strDesc.ReleaseBuffer();
 	((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
 
-	CString csCmdBody = GetBodyString();
+	CString csCmdBody = GetBodyString(index);
 	CString csCmdText = GetDescString();
 	DWORD retValue = MFGLIB_ERROR_SUCCESS;
 
@@ -2429,7 +2449,7 @@ void COpCmd_Blhost::CloseFileMapping()
 UINT COpCmd_Blhost::ExecuteCommand(int index)
 {
 	CString strMsg;
-	strMsg.Format(_T("ExecuteCommand--Blhost[WndIndex:%d], Body is %s"), index, m_bodyString);
+	strMsg.Format(_T("ExecuteCommand--Blhost[WndIndex:%d], Body is %s"), index, GetBodyString(index));
 	LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg);
 
 	UI_UPDATE_INFORMATION _uiInfo;
@@ -2446,7 +2466,7 @@ UINT COpCmd_Blhost::ExecuteCommand(int index)
 	strDesc.ReleaseBuffer();
 	((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
 
-	CString csCmdBody = GetBodyString();
+	CString csCmdBody = GetBodyString(index);
 	CString csCmdText = GetDescString();
 
 	if (csCmdText.CompareNoCase(_T("Done")) == 0)
@@ -3306,7 +3326,7 @@ void ReplaceAllUsbPortKeyWords(MFGLIB_VARS *pLibVars, int WndIndex)
 		{
 			for (auto& it : stateIt.second)
 			{
-				it->SetBodyString(ReplaceUsbPortKeywords(it->GetBodyString(), hub, port));
+				it->SetBodyString(WndIndex, ReplaceUsbPortKeywords(it->GetTemplateBodyString(), hub, port));
 			}
 		}
 	}
