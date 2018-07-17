@@ -41,13 +41,15 @@ Freescale/NXP I.MX Chip image deploy tools.
 # Build:
 
 ## windows
-- git clone git@github.com:codeauroraforum/mfgtools.git
+- git clone https://github.com/codeauroraforum/mfgtools.git
+- cd mfgtools
 - git submodule init
 - git submodule update
 - open msvs/uuu.sln by vs2017
 
 ## linux
-- git clone git@github.com:codeauroraforum/mfgtools.git
+- git clone https://github.com/codeauroraforum/mfgtools.git
+- cd mfgtools
 - sudo apt-get install libusb-1.0.0-dev libzip-dev
 - cmake .
 - make
