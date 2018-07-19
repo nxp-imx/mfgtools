@@ -25,6 +25,7 @@ set(SOURCES
 	fastboot.cpp
 	zip.cpp
 	fat.cpp
+	rominfo.cpp
 )
 
 add_custom_command(

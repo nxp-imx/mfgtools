@@ -26,6 +26,7 @@
     <ClCompile Include="..\libuuu\fastboot.cpp" />
     <ClCompile Include="..\libuuu\fat.cpp" />
     <ClCompile Include="..\libuuu\notify.cpp" />
+    <ClCompile Include="..\libuuu\rominfo.cpp" />
     <ClCompile Include="..\libuuu\sdp.cpp" />
     <ClCompile Include="..\libuuu\sdps.cpp" />
     <ClCompile Include="..\libuuu\trans.cpp" />
@@ -42,6 +43,7 @@
     <ClInclude Include="..\libuuu\libcomm.h" />
     <ClInclude Include="..\libuuu\liberror.h" />
     <ClInclude Include="..\libuuu\libuuu.h" />
+    <ClInclude Include="..\libuuu\rominfo.h" />
     <ClInclude Include="..\libuuu\sdps.h" />
     <ClInclude Include="..\libuuu\sdp.h" />
     <ClInclude Include="..\libuuu\sparse.h" />

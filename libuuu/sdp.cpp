@@ -36,65 +36,7 @@
 #include "libcomm.h"
 #include "buffer.h"
 #include "sdp.h"
-
-#define ROM_INFO_HID					   0x1
-#define ROM_INFO_HID_MX23				   0x2
-#define ROM_INFO_HID_MX50				   0x4
-#define ROM_INFO_HID_MX6				   0x8
-#define ROM_INFO_HID_SKIP_DCD			  0x10
-#define ROM_INFO_HID_MX8_MULTI_IMAGE	  0x20
-#define ROM_INFO_HID_MX8_STREAM			  0x40
-#define ROM_INFO_HID_UID_STRING			  0x80
-#define ROM_INFO_HID_NO_CMD				 0x400
-#define ROM_INFO_SPL_JUMP				 0x800
-
-struct ROM_INFO
-{
-	const char * m_name;
-	uint32_t    free_addr;
-	uint32_t	flags;
-};
-
-ROM_INFO g_RomInfo[] =
-{
-	{ "MX6Q",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 },
-	{ "MX6D",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 },
-	{ "MX6SL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 },
-	{ "MX7D",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX6UL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX6ULL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX6SLL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX8MQ",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX7ULP",	 0x2f018000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MXRT106X",0x1000,     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX8QXPB0",0x0,		 ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING },
-	{ "SPL",	 0x0,		 ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP }
-};
-
-ROM_INFO * search_rom_info(const char *s)
-{
-	string s1 = s;
-	for (int i = 0; i < sizeof(g_RomInfo) / sizeof(ROM_INFO); i++)
-	{
-		string s2;
-		s2 = g_RomInfo[i].m_name;
-		if (s1 == s2)
-			return g_RomInfo + i;
-	}
-	return 0;
-}
-
-ROM_INFO * search_rom_info(ConfigItem *item)
-{
-	if (item == NULL)
-		return NULL;
-
-	ROM_INFO *p = search_rom_info(item->m_chip.c_str());
-	if (p)
-		return p;
-
-	return search_rom_info(item->m_compatible.c_str());
-}
+#include "rominfo.h"
 
 IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, int &off)
 {

@@ -51,6 +51,9 @@
     <ClInclude Include="..\libuuu\sparse_format.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\libuuu\rominfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libuuu\error.cpp">
@@ -90,6 +93,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\libuuu\fat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuuu\rominfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
