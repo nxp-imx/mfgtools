@@ -24,3 +24,4 @@ EXPORTS
     MfgLib_DestoryInstanceHandle         @18
     MfgLib_SetUCLKeyWord                 @19
     MfgLib_SetUsbPortKeyWord             @20
+    MfgLib_SetCommandTimeout             @21

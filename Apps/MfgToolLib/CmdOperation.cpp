@@ -551,7 +551,7 @@ UINT CmdListThreadProc(LPVOID pParam)
 				COpCommand *pCmd = (*cmdIt);
 				if(pCmd->IsRun(chip) && pCmd->IsRun(habstate))
 				{
-					dwError = pCmd->ExecuteCommand(pOperation->m_WndIndex);
+					dwError = pCmd->ExecuteCommandWithTimeout(pOperation->m_WndIndex, COpCommand::GetCommandTimeout());
 				}else
 				{
 					dwError = MFGLIB_ERROR_SKIP;
