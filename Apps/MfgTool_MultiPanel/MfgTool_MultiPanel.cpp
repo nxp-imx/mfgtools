@@ -382,6 +382,10 @@ BOOL CMfgTool_MultiPanelApp::InitInstance()
 					}
 				}
 			}
+			else if ((strParamType.CompareNoCase(_T("-t")) == 0)) // timeout in minutes before considering a command FAILED. By default INFINITE
+			{
+				MfgLib_SetCommandTimeout(_ttoll(szArglist[i + 1]));
+			}
 		}
 		LocalFree(szArglist);
 	}
@@ -795,6 +799,18 @@ BOOL CMfgTool_MultiPanelApp::ParseMyCommandLine(CString strCmdLine)
 				strParameters = strParameters.Right(strParameters.GetLength()-i);
 				strParameters.TrimLeft();
 			}
+		}
+		else if (strParamType.CompareNoCase(_T("-t")) == 0)
+		{
+			for (i = 1; i<strParameters.GetLength(); i++)
+			{
+				if (strParameters.GetAt(i) == chSpace)
+				{
+					break;
+				}
+			}
+			strParameters = strParameters.Right(strParameters.GetLength() - i);
+			strParameters.TrimLeft();
 		}
 		else if( strParamType.CompareNoCase(_T("-noui"))==0 )
 		{
