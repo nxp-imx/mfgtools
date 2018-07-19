@@ -168,6 +168,7 @@ public:
 	COpCommand();
 	virtual ~COpCommand();
 	virtual UINT ExecuteCommand(int index);
+	virtual UINT ExecuteCommandWithTimeout(int index, DWORD timeout = INFINITE);
 	virtual void SetBodyString(int index, const CString &str);
 	virtual void SetTemplateBodyString(const CString &str);
 	virtual CString GetBodyString(int index) const;
@@ -178,6 +179,9 @@ public:
 	virtual void SetIfHabString(CString &str);
 	virtual bool IsRun(CString &dev);
 	virtual bool IsRun(HAB_t habState);
+	static void SetCommandTimeout(DWORD timeout) { m_commandTimeout = timeout; }
+	static DWORD GetCommandTimeout() { return m_commandTimeout; }
+
 	INSTANCE_HANDLE m_pLibVars;
 
 protected:
@@ -186,6 +190,7 @@ protected:
 	CString m_descString;
 	CString m_ifdev;
 	CString m_ifhab;
+	static DWORD m_commandTimeout;
 };
 
 class COpCmd_Find : public COpCommand

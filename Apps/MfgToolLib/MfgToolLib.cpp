@@ -58,6 +58,9 @@
 #include <map>
 #include <stdexcept>  // std::out_of_range
 #include <tuple>
+#include <future>
+#include <chrono>
+#include <thread>
 //#include "..\MfgTool.exe\gitversion.h"
 #include "UpdateUIInfo.h"
 #include "gitversion.h"
@@ -1426,6 +1429,7 @@ CCommandList* CUclXml::GetCmdListNode(LPCTSTR name)
 /*
 * COpCommand implementation
 */
+DWORD COpCommand::m_commandTimeout = INFINITE;
 COpCommand::COpCommand()
 {
 	m_pLibVars = NULL;
@@ -1477,6 +1481,38 @@ CString COpCommand::GetDescString()
 UINT COpCommand::ExecuteCommand(int index)
 {
 	return 0;
+}
+
+UINT COpCommand::ExecuteCommandWithTimeout(int index, DWORD timeout)
+{
+	UINT result = MFGLIB_ERROR_CMD_EXECUTE_FAILED;
+	auto future_dwError = std::async(std::launch::async, [this, &index]() { return ExecuteCommand(index); });
+	auto status = future_dwError.wait_for(std::chrono::minutes(timeout));
+	if (status == std::future_status::ready)
+	{
+		result = future_dwError.get();
+	}
+	else // timeout
+	{
+		CString strMsg;
+		strMsg.Format(_T("ExecuteCommand--[WndIndex:%d] FAILED after timeout=%u min, Body is %s"), index, timeout, GetBodyString(index));
+		LogMsg(LOG_MODULE_MFGTOOL_LIB, LOG_LEVEL_NORMAL_MSG, _T("%s"), strMsg);
+		// update UI
+		UI_UPDATE_INFORMATION _uiInfo;
+		_uiInfo.CurrentPhaseIndex = (int)(((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_currentState);
+		_uiInfo.OperationID = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOpThreadID[index];
+		_uiInfo.bUpdatePhaseProgress = FALSE;
+		_uiInfo.bUpdateProgressInCommand = FALSE;
+		_uiInfo.bUpdateCommandsProgress = TRUE;
+		_uiInfo.CommandsProgressIndex = ((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->m_dwCmdIndex;
+		_uiInfo.CommandStatus = COMMAND_STATUS_EXECUTE_ERROR;
+		_uiInfo.bUpdateDescription = FALSE;
+		((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->ExecuteUIUpdate(&_uiInfo);
+
+		((MFGLIB_VARS *)m_pLibVars)->g_CmdOperationArray[index]->OnStop();
+	}
+
+	return result;
 }
 
 void COpCommand::SetIfDevString(CString &str)
@@ -3345,4 +3381,10 @@ CString ReplaceUsbPortKeywords(CString str, UINT hub, UINT port)
 		}
 	}
 	return str;
+}
+
+DWORD MfgLib_SetCommandTimeout(DWORD timeout)
+{
+	COpCommand::SetCommandTimeout(timeout);
+	return 0;
 }
