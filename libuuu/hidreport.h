@@ -74,6 +74,11 @@ public:
 		m_out_buff.resize(m_size_out + m_size_payload);
 		m_skip_notify = true;
 	}
+	void set_out_package_size(int sz)
+	{
+		m_size_out = sz;
+		m_out_buff.resize(m_size_out + m_size_payload);
+	}
 	HIDReport()
 	{
 		init();
