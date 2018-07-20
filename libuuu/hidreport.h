@@ -56,6 +56,7 @@ class HIDReport
 	int m_size_in;
 	int m_size_out;
 	int m_size_payload;
+
 public:
 	TransBase * m_pdev;
 	vector<uint8_t> m_out_buff;
@@ -71,6 +72,11 @@ public:
 		m_notify_total = 0;
 		m_out_buff.resize(m_size_out + m_size_payload);
 		m_skip_notify = true;
+	}
+	void set_out_package_size(int sz)
+	{
+		m_size_out = sz;
+		m_out_buff.resize(m_size_out + m_size_payload);
 	}
 	HIDReport()
 	{

@@ -34,11 +34,24 @@
 #include "liberror.h"
 #include "libcomm.h"
 #include "buffer.h"
+#include "rominfo.h"
 
 int SDPSCmd::run(CmdCtx *pro)
 {
-	
+	ROM_INFO * rom;
+	rom = search_rom_info(pro->m_config_item);
+	if (rom == NULL)
+	{
+		string_ex err;
+		err.format("%s:%d can't get rom info", __FUNCTION__, __LINE__);
+		set_last_err_string(err);
+		return -1;
+	}
+
 	HIDTrans dev;
+	if (rom->flags & ROM_INFO_HID_EP1)
+		dev.set_hid_out_ep(1);
+
 	if(dev.open(pro->m_dev))
 		return -1;
 
@@ -48,6 +61,9 @@ int SDPSCmd::run(CmdCtx *pro)
 
 	HIDReport report(&dev);
 	report.m_skip_notify = false;
+
+	if (rom->flags & ROM_INFO_HID_PACK_SIZE_1020)
+		report.set_out_package_size(1020);
 
 	return report.write(p->data(), p->size(),  2);
 }
