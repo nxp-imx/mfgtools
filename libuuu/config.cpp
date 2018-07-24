@@ -42,6 +42,7 @@ static Config g_config;
 Config::Config()
 {
 	push_back(ConfigItem("SDPS:", "MX8QXP", NULL,   NXP_VID, 0x012F, 0x0002));
+	push_back(ConfigItem("SDPS:", "MX8QM",  "MX8QXP",   NXP_VID, 0x0129, 0x0002));
 	push_back(ConfigItem("SDP:", "MX7D",    NULL,   FSL_VID, 0x0076));
 	push_back(ConfigItem("SDP:", "MX6Q",    NULL,   FSL_VID, 0x0054));
 	push_back(ConfigItem("SDP:", "MX6D",    "MX6Q", FSL_VID, 0x0061));
