@@ -28,11 +28,15 @@ set(SOURCES
 	rominfo.cpp
 )
 
+set(generated_files_dir "${CMAKE_BINARY_DIR}/libuuu/gen")
+
 add_custom_command(
 	OUTPUT gitversion.h
 	PRE_BUILD
-	COMMAND ./gen_ver.sh gitversion.h
+	COMMAND mkdir -p ${generated_files_dir}
+	COMMAND sh -c 'cd ${CMAKE_CURRENT_SOURCE_DIR} && ./gen_ver.sh ${generated_files_dir}/gitversion.h'
 )
+include_directories(${generated_files_dir})
 
 add_library( uuc SHARED ${SOURCES} )
 add_library( uuc_s STATIC ${SOURCES} )

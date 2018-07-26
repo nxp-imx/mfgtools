@@ -16,11 +16,16 @@ set(SOURCES
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libuuu)
 
+
+set(generated_files_dir "${CMAKE_BINARY_DIR}/uuu/gen")
+
 add_custom_command(
         OUTPUT uuu.clst
         PRE_BUILD
-        COMMAND ./gen_txt_include.sh uuu.lst  uuu.clst
+		COMMAND mkdir -p ${generated_files_dir}
+        COMMAND sh -c 'cd ${CMAKE_CURRENT_SOURCE_DIR} && ./gen_txt_include.sh uuu.lst ${generated_files_dir}/uuu.clst'
 )
+include_directories(${generated_files_dir})
 
 add_executable(uuu ${SOURCES})
 target_link_libraries(uuu uuc_s  ${LIBUSB_LIBRARIES} ${LIBZIP_LIBRARIES} ${LIBZ_LIBRARIES})
