@@ -140,7 +140,7 @@ public:
 
 	shared_ptr<FileBuffer> get_file_buff(string filename)
 	{
-		if(m_filemap.find(filename) == m_filemap.end()) 
+		if (m_filemap.find(filename) == m_filemap.end())
 		{
 			string err; 
 			err += "Can't find file ";
