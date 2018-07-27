@@ -96,7 +96,7 @@ shared_ptr<FileBuffer> get_file_buffer(string filename)
 
 		if (p->reload(filename))
 			return NULL;
-		
+
 		g_filebuffer_map[filename]=p;
 
 		return p;
@@ -179,7 +179,7 @@ int FileBuffer::reload(string filename)
 	}
 
 	m_timesample = st.st_mtime;
-	
+
 	this->unmapfile();
 
 	if (this->mapfile(filename.substr(1), st.st_size))

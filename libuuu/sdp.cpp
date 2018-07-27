@@ -229,7 +229,7 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 	HIDReport report(&dev);
 
 	report.m_notify_total = size;
-	
+
 	for (size_t i=0; i < size; i += m_max_download_pre_cmd)
 	{
 		size_t sz;
@@ -247,7 +247,7 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 			return -1;
 
 		report.m_skip_notify = false;
-		
+
 		if (report.write(((uint8_t*)pbuff)+i, sz, 2))
 			return -1;
 
@@ -276,7 +276,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 		set_last_err_string(err);
 		return -1;
 	}
-	
+
 	if (rom->flags & ROM_INFO_SPL_JUMP)
 	{
 		m_spdcmd.m_addr = EndianSwap(m_jump_addr);

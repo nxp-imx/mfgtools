@@ -52,7 +52,7 @@ public:
 		va_end(args);
 
 		this->resize(len);
-		
+
 		va_start(args, fmt);
 		std::vsnprintf((char*)c_str(), len+1, fmt, args);
 		va_end(args);
@@ -109,10 +109,10 @@ inline string str_to_upper(string str)
 {
 	std::locale loc;
 	string s;
-	
+
 	for (int i = 0; i < str.size(); i++)
 		s.push_back(std::toupper(str[i], loc));
-	
+
 	return s;
 }
 

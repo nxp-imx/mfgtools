@@ -150,7 +150,7 @@ shared_ptr<FileBuffer>	Zip_file_Info::decompress(Zip *pZip)
 	do {
 		stream.read((char*)source.data(), CHUNK);
 		m_strm.avail_in = stream.gcount();
-		
+
 		if (m_strm.avail_in == 0)
 			break;
 		m_strm.next_in = source.data();
@@ -184,6 +184,6 @@ shared_ptr<FileBuffer>	Zip_file_Info::decompress(Zip *pZip)
 		set_last_err_string("decompress error");
 		return NULL;
 	}
-	
+
 	return p;
 }

@@ -119,7 +119,7 @@ void print_help()
 
 	size_t start = 0, pos = 0;
 	string str= g_sample_cmd_list;
-	
+
 	bool bprint = false;
 	while ((pos = str.find('\n',pos)) != str.npos)
 	{
@@ -174,7 +174,7 @@ string build_process_bar(int width, size_t pos, size_t total)
 
 	if (total == 0)
 		return str;
-	
+
 	int i;
 
 	if (pos > total)
@@ -233,7 +233,7 @@ public:
 	size_t m_start_pos;
 	size_t	m_trans_size;
 	clock_t m_start_time;
-	
+
 	ShowNotify()
 	{
 		m_trans_size = m_trans_pos = 0;
@@ -367,7 +367,7 @@ public:
 		if (width <= 45)
 		{
 			string_ex str;
-			
+
 			str += get_print_dev_string();
 
 			str += g_wait[(g_wait_index++) & 0x3];
@@ -451,7 +451,7 @@ int progress(uuu_notify nt, void *p)
 {
 	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify>*)p;
 	map<string, ShowNotify>::iterator it;
-	
+
 	std::lock_guard<std::mutex> lock(g_callback_mutex);
 
 	if ((*np)[nt.id].update(nt))
@@ -467,7 +467,7 @@ int progress(uuu_notify nt, void *p)
 		{
 			string_ex str;
 			str.format("Succuess %d    Failure %d", g_overall_okay, g_overall_failure);
-			
+
 			if (g_map_path_nt.empty())
 				str += "Wait for Known USB Device Appear";
 
@@ -480,7 +480,7 @@ int progress(uuu_notify nt, void *p)
 
 			print_oneline(str);
 			print_oneline("");
-			
+
 			for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
 				it->second.print();
 
@@ -563,12 +563,12 @@ int main(int argc, char **argv)
 
 	if (argc == 1)
 		print_help();
-	
+
 	int deamon = 0;
 	int shell = 0;
-	string filename; 
+	string filename;
 	string cmd;
-	
+
 
 	for (int i = 1; i < argc; i++)
 	{
@@ -619,7 +619,7 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-	
+
 	signal(SIGINT, ctrl_c_handle);
 
 	if (deamon && shell)
