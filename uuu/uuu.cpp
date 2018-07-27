@@ -131,8 +131,7 @@ void print_help()
 		{
 			if (s[0] == '#')
 			{
-				printf(&(s[1]));
-				printf("\n");
+				printf("%s\n", &(s[1]));
 			}
 		}
 		pos += 1;
