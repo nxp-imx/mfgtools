@@ -61,7 +61,7 @@ static bool is_match_filter(string path)
 	for (int i = 0; i < g_filter_usbpath.size(); i++)
 		if (g_filter_usbpath[i] == path)
 			return true;
-	
+
 	return false;
 }
 
@@ -96,7 +96,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 	int ret;
 	uuu_notify nt;
 	nt.type = uuu_notify::NOFITY_DEV_ATTACH;
-	
+
 	string str;
 	str = get_device_path(dev);
 	nt.str = (char*)str.c_str();
@@ -150,7 +150,7 @@ static int usb_add(libusb_device *dev)
 
 static int usb_remove(libusb_device *dev)
 {
-	
+
 	return 0;
 }
 
@@ -160,7 +160,7 @@ void compare_list(libusb_device ** old, libusb_device **nw)
 	int i = 0;
 
 	if (old == NULL)
-	{	
+	{
 		while ((dev = nw[i++]) != NULL)
 		{
 			usb_add(dev);
@@ -206,7 +206,7 @@ int polling_usb(std::atomic<int>& bexit)
 		set_last_err_string("Call libusb_init failure");
 		return -1;
 	}
-	
+
 	if (run_cmds("CFG:", NULL))
 		return -1;
 
@@ -251,7 +251,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 		set_last_err_string("Call libusb_init failure");
 		return -1;
 	}
-	
+
 	if (run_cmds("CFG:", NULL))
 		return -1;
 
@@ -281,7 +281,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 					uuu_notify nt;
 					nt.type = uuu_notify::NOFITY_DEV_ATTACH;
 
-					
+
 					m_config_item = item;
 
 					if (libusb_open(dev, (libusb_device_handle **)&(m_dev)) < 0)

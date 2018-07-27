@@ -35,7 +35,7 @@ class SDPSCmd : public CmdBase
 {
 public:
 	string m_filename;
-	SDPSCmd(char *cmd) :CmdBase(cmd) 
+	SDPSCmd(char *cmd) :CmdBase(cmd)
 	{
 		insert_param_info("boot", NULL, Param::e_null);
 		insert_param_info("-f", &m_filename, Param::e_string_filename);

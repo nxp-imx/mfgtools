@@ -61,7 +61,7 @@ public:
 			}
 			pos += pheader->file_hdr_sz;
 		}
-		
+
 		chunk_header_t *pchunk = (chunk_header_t*)(p + pos);
 		pos += pchunk->total_sz;
 		return pchunk;
@@ -102,10 +102,10 @@ public:
 	{
 		chunk_header_t cheader;
 		cheader.chunk_type = CHUNK_TYPE_RAW;
-		
+
 		sparse_header *pheader;
 		pheader = (sparse_header *)m_data.data();
-		
+
 		cheader.chunk_sz = sz / pheader->blk_sz;
 		cheader.total_sz = cheader.chunk_sz*pheader->blk_sz + sizeof(chunk_header_t);
 		pheader = (sparse_header *)m_data.data();
@@ -126,7 +126,7 @@ public:
 	{
 		chunk_header_t *pchunk;
 		pchunk = (chunk_header_t *)(m_data.data() + m_cur_chunk_header_pos);
-		
+
 		if (m_cur_chunk_header_pos == 0)
 			return false;
 
@@ -203,14 +203,14 @@ public:
 			size_t blk = (m_max_size - m_data.size())/pheader->blk_sz;
 			if (blk < 2)
 				return 0;
-			
+
 			blk -= 2;
 
 			cheader.chunk_sz = blk;
 			sz = blk * pheader->blk_sz;
 			cheader.total_sz = sizeof(chunk_header_t) + sz;
 		}
-		
+
 		push(&cheader, sizeof(chunk_header));
 		pheader->total_chunks ++;
 		pheader->total_blks += cheader.chunk_sz;

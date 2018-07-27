@@ -67,7 +67,7 @@ struct uuu_notify
 {
 	enum NOTIFY_TYPE
 	{
-		NOTIFY_CMD_TOTAL,	
+		NOTIFY_CMD_TOTAL,
 		NOTIFY_CMD_START,	/* str is command name*/
 		NOTIFY_CMD_END,	    /* status show command finish status. 0 is success. Other failure.*/
 		NOTIFY_CMD_INDEX,   /*Current running command index*/
@@ -79,12 +79,12 @@ struct uuu_notify
 
 		NOTIFY_TRANS_SIZE,  /*Total size*/
 		NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
-		
-		NOTIFY_WAIT_FOR,    
+
+		NOTIFY_WAIT_FOR,
 		NOFITY_DEV_ATTACH,
-		
+
 		NOTIFY_THREAD_EXIT,
-		
+
 		NOTIFY_DONE,
 	};
 

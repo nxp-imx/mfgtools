@@ -72,7 +72,7 @@ int CmdBase::parser(char *p)
 	while (pos < m_cmd.size())
 	{
 		param = get_next_param(m_cmd, pos);
-		
+
 		struct Param *pp = NULL;
 		for (size_t i = 0; i < m_param.size(); i++)
 		{
@@ -83,7 +83,7 @@ int CmdBase::parser(char *p)
 				break;
 			}
 		}
-		
+
 		if (pp == NULL)
 		{
 			string err;
@@ -130,7 +130,7 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 {
 	CmdList::iterator it;
 	int ret;
-	
+
 	uuu_notify nt;
 	nt.type = uuu_notify::NOTIFY_CMD_TOTAL;
 	nt.total = size();
@@ -147,7 +147,7 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 		else
 		{
 			uuu_notify nt;
-			
+
 			nt.type = uuu_notify::NOTIFY_CMD_INDEX;
 			nt.index = i;
 			call_notify(nt);
@@ -155,7 +155,7 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 			nt.type = uuu_notify::NOTIFY_CMD_START;
 			nt.str = (char *)(*it)->m_cmd.c_str();
 			call_notify(nt);
-			
+
 			ret = (*it)->run(p);
 
 			nt.type = uuu_notify::NOTIFY_CMD_END;
@@ -175,7 +175,7 @@ string get_next_param(string &cmd, size_t &pos)
 		return str;
 	if (pos >= cmd.size())
 		return str;
-	
+
 	//trim left space
 	while (cmd[pos] == ' ' && pos < cmd.size())
 		pos++;
@@ -202,13 +202,13 @@ uint32_t str_to_uint(string &str)
 
 template <class T> shared_ptr<CmdBase> new_cmd_obj(char *p)
 {
-	return shared_ptr<CmdBase>(new T(p)); 
+	return shared_ptr<CmdBase>(new T(p));
 }
 
 CmdObjCreateMap::CmdObjCreateMap()
 {
 	(*this)["CFG:"] = new_cmd_obj<CfgCmd>;
-	
+
 	(*this)["SDPS:BOOT"] = new_cmd_obj<SDPSCmd>;
 	(*this)["SDPS:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["SDPS:DELAY"] = new_cmd_obj<CmdDelay>;
@@ -382,7 +382,7 @@ int run_cmds(const char *procotal, CmdCtx *p)
 	{
 		return 0;
 	}
-	
+
 	return (*pCmdMap)[procotal]->run_all(p);
 }
 
@@ -459,7 +459,7 @@ int check_version(string str)
 			x = 0;
 		}
 	}
-	
+
 	int cur = uuu_get_version();
 
 	if (ver > cur)
@@ -487,7 +487,7 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap)
 		uint8_t c = pbuff->at(i);
 		if (c == '\r')
 			continue;
-		
+
 		if(c != '\n')
 			str.push_back(c);
 
@@ -519,7 +519,7 @@ int uuu_auto_detect_file(const char *filename)
 
 	if (fn.empty())
 		fn += "./";
-	
+
 	string oldfn =fn;
 
 	fn += "/uuu.auto";
@@ -548,12 +548,12 @@ int uuu_auto_detect_file(const char *filename)
 		size_t pos = fn.rfind('/');
 		if (pos != string::npos)
 			set_current_dir(fn.substr(0, pos + 1));
-		
+
 		g_cmd_list_file = fn.substr(pos+1);
 
 		return parser_cmd_list_file(buffer);
 	}
-	
+
 	//flash.bin or uboot.bin
 	return added_default_boot_cmd(fn.c_str());
 }

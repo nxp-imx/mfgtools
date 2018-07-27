@@ -91,7 +91,7 @@ public:
 
 	int Open(string filename);
 	shared_ptr<FileBuffer> get_file_buff(string filename);
-	
+
 	int get_next_cluster(shared_ptr<FileBuffer> p, int cluster);
 	void *get_data_buff(shared_ptr<FileBuffer> p, int cluster);
 

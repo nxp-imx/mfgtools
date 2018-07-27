@@ -65,10 +65,10 @@ int USBTrans::open(void *p)
 		set_last_err_string("Can't get config descriptor");
 		return -1;
 	}
-	
+
 	m_EPs.clear();
 	for (int i = 0; i < config->interface[0].altsetting[0].bNumEndpoints; i++)
-	{ 
+	{
 		m_EPs.push_back(EPInfo(config->interface[0].altsetting[0].endpoint[i].bEndpointAddress,
 							   config->interface[0].altsetting[0].endpoint[i].wMaxPacketSize));
 	};
@@ -95,7 +95,7 @@ int HIDTrans::write(void *buff, size_t size)
 		size,
 		1000
 		);
-	
+
 	if (ret < 0)
 	{
 		set_last_err_string("HID Write failure");
@@ -137,7 +137,7 @@ int BulkTrans::write(void *buff, size_t size)
 	{
 		uint8_t *p = (uint8_t *)buff;
 		p += i;
-		size_t sz; 
+		size_t sz;
 		sz = size - i;
 		if (sz > m_MaxTransPreRequest)
 			sz = m_MaxTransPreRequest;

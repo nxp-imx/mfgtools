@@ -91,7 +91,7 @@ struct BootData
 class SDPCmdBase:public CmdBase
 {
 public:
-	
+
 	enum HAB_t
 	{
 		HabUnknown = -1,
@@ -120,7 +120,7 @@ public:
 			set_last_err_string("HID report size is too small");
 			return -1;
 		}
-		
+
 		status = *(uint32_t*)(m_input.data() + 1);
 		return 0;
 	};
@@ -131,7 +131,7 @@ public:
 		uint32_t status;
 		if (get_status(report, status, 3))
 			return HabUnknown;
-		
+
 		if (status == HabEnabled)
 			return HabEnabled;
 
@@ -146,7 +146,7 @@ public:
 	{
 		if (get_hab_type(report) == HabUnknown)
 			return -1;
-	
+
 		uint32_t status;
 		if (get_status(report, status, 4))
 			return -1;
@@ -181,10 +181,10 @@ public:
 	uint32_t m_max_download_pre_cmd;
 	uint32_t m_offset;
 	bool m_bIvtReserve;
-	
+
 	SDPWriteCmd(char*p) :SDPCmdBase(p) {
-		m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_FILE; 
-		m_PlugIn = -1; 
+		m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_FILE;
+		m_PlugIn = -1;
 		m_Ivt = -1;
 		m_max_download_pre_cmd = 0x200000;
 		m_offset = 0;
@@ -209,7 +209,7 @@ public:
 	bool m_PlugIn;
 	uint32_t m_jump_addr;
 	SDPJumpCmd(char*p):SDPCmdBase(p)
-	{ 
+	{
 		m_jump_addr = 0;
 		m_spdcmd.m_cmd = ROM_KERNEL_CMD_JUMP_ADDR;
 		insert_param_info("jump", NULL, Param::e_null);
@@ -231,9 +231,9 @@ public:
 class SDPStatusCmd :public SDPCmdBase
 {
 public:
-	SDPStatusCmd(char *p) : SDPCmdBase(p) 
+	SDPStatusCmd(char *p) : SDPCmdBase(p)
 	{
-		m_spdcmd.m_cmd = ROM_KERNEL_CMD_ERROR_STATUS; 
+		m_spdcmd.m_cmd = ROM_KERNEL_CMD_ERROR_STATUS;
 		insert_param_info("status", NULL, Param::e_null);
 	};
 	int run(CmdCtx *p);

@@ -115,7 +115,7 @@ class Zip;
 class Zip_file_Info
 {
 public:
-	string m_filename;  
+	string m_filename;
 	uint32_t m_timestamp;
 	size_t m_filesize;
 	uint32_t m_offset;
@@ -140,15 +140,15 @@ public:
 
 	shared_ptr<FileBuffer> get_file_buff(string filename)
 	{
-		if(m_filemap.find(filename) == m_filemap.end()) 
+		if (m_filemap.find(filename) == m_filemap.end())
 		{
-			string err; 
+			string err;
 			err += "Can't find file ";
 			err += filename;
 			set_last_err_string(err);
 			return NULL;
 		}
-		
+
 		return m_filemap[filename].decompress(this);
 	}
 };

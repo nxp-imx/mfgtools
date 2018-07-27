@@ -37,7 +37,7 @@
 
 int SDPSCmd::run(CmdCtx *pro)
 {
-	
+
 	HIDTrans dev;
 	if(dev.open(pro->m_dev))
 		return -1;

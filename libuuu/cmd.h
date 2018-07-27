@@ -57,7 +57,7 @@ public:
 	CmdUsbCtx() :CmdCtx() {};
 	~CmdUsbCtx();
 	int look_for_match_device(const char * procotol);
-}; 
+};
 
 struct Param
 {
@@ -92,7 +92,7 @@ public:
 	{
 		m_param.push_back(Param(key, pD, tp, ignore_case));
 	}
-	virtual int parser(char *p = NULL); 
+	virtual int parser(char *p = NULL);
 	virtual int run(CmdCtx *p)=0;
 	virtual void dump() { /*dbg(m_cmd.c_str());*/ };
 };

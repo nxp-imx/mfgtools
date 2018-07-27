@@ -41,11 +41,14 @@ public:
 	ConfigItem() { m_pid = m_vid = 0; m_bcdVersion = 0xFFFF; };
 	ConfigItem(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t ver = -1)
 	{
-		if(pro) m_protocol = pro; 
-		if(chip) m_chip = chip; 
-		if(comp) m_compatible = comp; 
-		m_pid = pid; 
-		m_vid = vid; 
+		if (pro)
+			m_protocol = pro;
+		if (chip)
+			m_chip = chip;
+		if (comp)
+			m_compatible = comp;
+		m_pid = pid;
+		m_vid = vid;
 		m_bcdVersion = ver;
 	};
 	string m_protocol;
