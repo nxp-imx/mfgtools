@@ -58,7 +58,7 @@ static bool is_match_filter(string path)
 {
 	if (g_filter_usbpath.empty())
 		return true;
-	for (int i = 0; i < g_filter_usbpath.size(); i++)
+	for (size_t i = 0; i < g_filter_usbpath.size(); i++)
 		if (g_filter_usbpath[i] == path)
 			return true;
 
@@ -157,7 +157,7 @@ static int usb_add(libusb_device *dev)
 	return 0;
 }
 
-static int usb_remove(libusb_device *dev)
+static int usb_remove(libusb_device * /*dev*/)
 {
 
 	return 0;
@@ -271,7 +271,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 	while (1)
 	{
 		libusb_device **newlist = NULL;
-		ssize_t sz = libusb_get_device_list(NULL, &newlist);
+		libusb_get_device_list(NULL, &newlist);
 		size_t i = 0;
 		libusb_device *dev;
 

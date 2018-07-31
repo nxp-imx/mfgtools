@@ -162,8 +162,8 @@ shared_ptr<FileBuffer> Fat::get_file_buff(string filename)
 
 	int cur = m_filemap[filename].start_cluster;
 
-	size_t off = 0;
-	for (off; off < filesize; off += m_cluster)
+	size_t off;
+	for (off = 0; off < filesize; off += m_cluster)
 	{
 		size_t sz;
 		sz = filesize - off;

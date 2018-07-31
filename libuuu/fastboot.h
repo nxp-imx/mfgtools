@@ -130,7 +130,7 @@ public:
 	string m_local_file;
 	string m_target_file;
 	bool m_bDownload;
-	int m_Maxsize_pre_cmd;
+	size_t m_Maxsize_pre_cmd;
 	int parser(char *p=NULL);
 	FBCopy(char *p) :CmdBase(p) { m_Maxsize_pre_cmd = 0x10000; };
 	int run(CmdCtx *ctx);

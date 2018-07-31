@@ -63,7 +63,7 @@ public:
 	}
 	void replace(char a, char b)
 	{
-		for (int i = 0; i < size(); i++)
+		for (size_t i = 0; i < size(); i++)
 			if (at(i) == a)
 				(*this)[i] = b;
 	}
@@ -112,7 +112,7 @@ inline string str_to_upper(string str)
 	std::locale loc;
 	string s;
 
-	for (int i = 0; i < str.size(); i++)
+	for (size_t i = 0; i < str.size(); i++)
 		s.push_back(std::toupper(str[i], loc));
 
 	return s;

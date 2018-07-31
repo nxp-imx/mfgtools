@@ -66,7 +66,7 @@ int uuu_unregister_notify_callback(uuu_notify_fun f)
 {
 	vector<struct notify_map>::iterator it=g_notify_callback_list.begin();
 
-	for (it;it!=g_notify_callback_list.end();it++)
+	for (;it!=g_notify_callback_list.end();it++)
 	{
 		if (it->f == f)
 		{
@@ -83,7 +83,7 @@ void call_notify(struct uuu_notify nf)
 
 	nf.id = std::hash<std::thread::id>{}(std::this_thread::get_id());
 
-	for (it; it != g_notify_callback_list.end(); it++)
+	for (; it != g_notify_callback_list.end(); it++)
 	{
 		it->f(nf, it->data);
 	}

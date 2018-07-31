@@ -53,9 +53,9 @@ using namespace std;
 
 class HIDReport
 {
-	int m_size_in;
-	int m_size_out;
-	int m_size_payload;
+	size_t m_size_in;
+	size_t m_size_out;
+	size_t m_size_payload;
 public:
 	TransBase * m_pdev;
 	vector<uint8_t> m_out_buff;

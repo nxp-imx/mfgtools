@@ -63,6 +63,9 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 		{
 			size_t sz;
 			sz = strtoul(buff+4, NULL, 16);
+			if (sz > size)
+				sz = size;
+
 			if (input)
 			{
 				input->resize(sz);

@@ -42,10 +42,10 @@ public:
 	size_t m_max_size;
 	size_t m_cur_chunk_header_pos;
 
-	static bool is_validate_sparse_file(void *p, size_t sz)
+	static bool is_validate_sparse_file(void *p, size_t /*sz*/)
 	{
 		sparse_header *pheader = (sparse_header*)p;
-		if (pheader->magic = SPARSE_HEADER_MAGIC)
+		if (pheader->magic == SPARSE_HEADER_MAGIC)
 			return true;
 		return false;
 	}
@@ -117,7 +117,7 @@ public:
 	{
 		uint32_t *p = (uint32_t *)data;
 		uint32_t val = *p;
-		for (int i = 0; i < sz / sizeof(uint32_t); i++)
+		for (size_t i = 0; i < sz / sizeof(uint32_t); i++)
 			if (val != p[i])
 				return false;
 		return true;

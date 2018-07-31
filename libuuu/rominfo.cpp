@@ -57,7 +57,7 @@ ROM_INFO g_RomInfo[] =
 ROM_INFO * search_rom_info(const char *s)
 {
 	string s1 = s;
-	for (int i = 0; i < sizeof(g_RomInfo) / sizeof(ROM_INFO); i++)
+	for (size_t i = 0; i < sizeof(g_RomInfo) / sizeof(ROM_INFO); i++)
 	{
 		string s2;
 		s2 = g_RomInfo[i].m_name;

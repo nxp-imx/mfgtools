@@ -96,7 +96,7 @@ class BulkTrans : public USBTrans
 public:
 	EPInfo m_ep_in;
 	EPInfo m_ep_out;
-	int m_MaxTransPreRequest;
+	size_t m_MaxTransPreRequest;
 	int m_b_send_zero;
 	uint64_t m_timeout;
 

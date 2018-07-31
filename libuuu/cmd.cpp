@@ -333,7 +333,7 @@ int CmdDone::run(CmdCtx *)
 	return 0;
 }
 
-int CmdDelay::parser(char *p)
+int CmdDelay::parser(char * /*p*/)
 {
 	size_t pos = 0;
 	string param = get_next_param(m_cmd, pos);
@@ -444,7 +444,7 @@ int check_version(string str)
 {
 	int x = 0;
 	int ver = 0;
-	for (int i = 0; i < str.size(); i++)
+	for (size_t i = 0; i < str.size(); i++)
 	{
 		char c = str[i];
 		if (c >= '0' && c <= '9')
@@ -482,7 +482,7 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap)
 
 	pCmdMap->clear();
 
-	for (int i = 0; i < pbuff->size(); i++)
+	for (size_t i = 0; i < pbuff->size(); i++)
 	{
 		uint8_t c = pbuff->at(i);
 		if (c == '\r')

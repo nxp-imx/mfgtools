@@ -62,7 +62,7 @@ int Zip::BuildDirInfo()
 	size_t i;
 	Zip_eocd *peocd = NULL;
 
-	for (i = buff.size() - sizeof(Zip_eocd); i >= 0; i--)
+	for (i = buff.size() - sizeof(Zip_eocd); i > 0; i--)
 	{
 		peocd = (Zip_eocd*)(buff.data() + i);
 		if (peocd->sign == EOCD_SIGNATURE)

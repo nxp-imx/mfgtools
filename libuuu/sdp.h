@@ -124,7 +124,7 @@ public:
 		status = *(uint32_t*)(m_input.data() + 1);
 		return 0;
 	};
-	IvtHeader * search_ivt_header(shared_ptr<FileBuffer> data, int &off);
+	IvtHeader * search_ivt_header(shared_ptr<FileBuffer> data, size_t &off);
 
 	HAB_t get_hab_type(HIDReport *report)
 	{

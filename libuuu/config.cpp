@@ -64,7 +64,7 @@ Config::Config()
 
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p)
 {
-	for (int i = 0; i < g_config.size(); i++)
+	for (size_t i = 0; i < g_config.size(); i++)
 	{
 		if (fn(g_config[i].m_protocol.c_str(),
 			   g_config[i].m_chip.c_str(),

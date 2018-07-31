@@ -38,7 +38,7 @@
 #include "sdp.h"
 #include "rominfo.h"
 
-IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, int &off)
+IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &off)
 {
 	for (off = 0; off < data->size(); off += 0x100)
 	{
@@ -67,7 +67,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 
 	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
 
-	int off = 0;
+	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off);
 	if (pIVT == NULL)
 	{
@@ -196,7 +196,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 	}
 	else
 	{
-		int off;
+		size_t off;
 		IvtHeader *pIvt = search_ivt_header(fbuff, off);
 		for (int i = 0; i < m_Ivt; i++)
 		{
@@ -290,7 +290,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 
 	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
 
-	int off = 0;
+	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off);
 
 	m_spdcmd.m_addr = EndianSwap(pIVT->SelfAddr);

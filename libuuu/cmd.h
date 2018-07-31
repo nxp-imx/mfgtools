@@ -149,7 +149,7 @@ public:
 class CfgCmd :public CmdBase
 {
 public:
-	int parser(char *p) { return 0; };
+	int parser(char * /*p*/) { return 0; };
 	CfgCmd(char *cmd) :CmdBase(cmd) {};
 	int run(CmdCtx *p);
 };

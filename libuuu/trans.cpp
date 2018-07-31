@@ -133,7 +133,7 @@ int BulkTrans::write(void *buff, size_t size)
 {
 	int ret;
 	int actual_lenght;
-	for (int i = 0; i < size; i += m_MaxTransPreRequest)
+	for (size_t i = 0; i < size; i += m_MaxTransPreRequest)
 	{
 		uint8_t *p = (uint8_t *)buff;
 		p += i;
@@ -185,7 +185,7 @@ int BulkTrans::open(void *p)
 	if (USBTrans::open(p))
 		return -1;
 
-	for (int i = 0; i < m_EPs.size(); i++)
+	for (size_t i = 0; i < m_EPs.size(); i++)
 	{
 		if (m_EPs[i].addr > 0)
 		{
