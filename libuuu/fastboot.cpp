@@ -435,7 +435,7 @@ int FBFlashCmd::flash(FastBoot *fb, void * pdata, size_t sz)
 	return 0;
 }
 
-int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, int block_size, int max)
+int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, size_t block_size, size_t max)
 {
 	SparseFile sf;
 

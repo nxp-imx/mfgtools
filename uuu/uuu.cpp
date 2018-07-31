@@ -201,7 +201,7 @@ string build_process_bar(size_t width, size_t pos, size_t total)
 	return str;
 }
 
-void print_auto_scroll(string str, size_t len, int start)
+void print_auto_scroll(string str, size_t len, size_t start)
 {
 	if (str.size() <= len)
 	{

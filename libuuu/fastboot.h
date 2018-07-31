@@ -103,7 +103,7 @@ public:
 	int parser(char *p = NULL);
 	int run(CmdCtx *ctx);
 	int flash(FastBoot *fb, void *p, size_t sz);
-	int flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> p, int blksz, int max);
+	int flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> p, size_t blksz, size_t max);
 };
 
 class FBEraseCmd : public FBCmd
