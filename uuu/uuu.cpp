@@ -68,7 +68,7 @@ public:
 	}
 };
 
-void ctrl_c_handle(int sig)
+void ctrl_c_handle(int)
 {
 	do {
 		AutoCursor a;
@@ -143,7 +143,7 @@ void print_version()
 	printf("uuu (Universal Update Utility) for nxp imx chips -- %s\n\n", uuu_get_version_string());
 }
 
-int print_cfg(const char *pro, const char * chip, const char *compatible, uint16_t pid, uint16_t vid, uint16_t bcdVersion, void *p)
+int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, uint16_t pid, uint16_t vid, uint16_t bcdVersion, void * /*p*/)
 {
 	if (bcdVersion == 0xFFFF)
 		printf("\t%s\t %s\t 0x%04x\t 0x%04x\n", pro, chip, pid, vid);
@@ -165,7 +165,7 @@ int g_wait_index;
 #define GREEN "\x1B[92m"
 #define RED	"\x1B[91m"
 
-string build_process_bar(int width, size_t pos, size_t total)
+string build_process_bar(size_t width, size_t pos, size_t total)
 {
 	string str;
 	str.resize(width, ' ');
@@ -175,7 +175,7 @@ string build_process_bar(int width, size_t pos, size_t total)
 	if (total == 0)
 		return str;
 
-	int i;
+	size_t i;
 
 	if (pos > total)
 		pos = total;
@@ -201,7 +201,7 @@ string build_process_bar(int width, size_t pos, size_t total)
 	return str;
 }
 
-void print_auto_scroll(string str, int len, int start)
+void print_auto_scroll(string str, size_t len, int start)
 {
 	if (str.size() <= len)
 	{
@@ -431,7 +431,7 @@ mutex g_callback_mutex;
 
 void print_oneline(string str)
 {
-	int w = get_console_width();
+	size_t w = get_console_width();
 	if (str.size() >= w)
 	{
 		str.resize(w-1);
@@ -474,7 +474,7 @@ int progress(uuu_notify nt, void *p)
 			if (!g_usb_path_filter.empty())
 			{
 				str += " at path ";
-				for (int i = 0; i < g_usb_path_filter.size(); i++)
+				for (size_t i = 0; i < g_usb_path_filter.size(); i++)
 					str += g_usb_path_filter[i] + " ";
 			}
 
@@ -484,7 +484,7 @@ int progress(uuu_notify nt, void *p)
 			for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
 				it->second.print();
 
-			for (int i = 0; i < g_map_path_nt.size() + 2; i++)
+			for (size_t i = 0; i < g_map_path_nt.size() + 2; i++)
 				cout << "\x1B[1F";
 		}
 
@@ -549,7 +549,7 @@ void print_usb_filter()
 	if (!g_usb_path_filter.empty())
 	{
 		cout << " at path ";
-		for (int i = 0; i < g_usb_path_filter.size(); i++)
+		for (size_t i = 0; i < g_usb_path_filter.size(); i++)
 			cout << g_usb_path_filter[i] << " ";
 	}
 }
@@ -698,7 +698,7 @@ int main(int argc, char **argv)
 		int ret;
 		ret = uuu_run_cmd(cmd.c_str());
 
-		for (int i = 0; i < g_map_path_nt.size()+3; i++)
+		for (size_t i = 0; i < g_map_path_nt.size()+3; i++)
 			printf("\n");
 		if(ret)
 			printf("\nError: %s\n", uuu_get_last_err_string());
