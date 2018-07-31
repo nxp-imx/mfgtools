@@ -112,4 +112,10 @@ int uuu_auto_detect_file(const char * filename);
 int uuu_wait_uuu_finish(int deamon);
 int uuu_add_usbpath_filter(const char *path);
 
+/*
+ * bit 0:15 for libusb
+ * bit 16:31 for uuu
+ */
+void uuu_set_debug_level(uint32_t mask);
+
 #endif

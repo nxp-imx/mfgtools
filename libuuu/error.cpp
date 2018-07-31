@@ -39,6 +39,18 @@ using namespace std;
 static string g_last_error_str;
 static int g_last_err_id;
 
+static uint32_t g_debug_level;
+
+void uuu_set_debug_level(uint32_t mask)
+{
+	g_debug_level = mask;
+}
+
+int get_libusb_debug_level()
+{
+	return g_debug_level & 0xFFFF;
+}
+
 const char * uuu_get_last_err_string()
 {
 	return g_last_error_str.c_str();

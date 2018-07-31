@@ -41,6 +41,8 @@ void call_notify(struct uuu_notify nf);
 #define log printf
 #define dbg printf
 
+int get_libusb_debug_level();
+
 class string_ex : public std::string
 {
 public:

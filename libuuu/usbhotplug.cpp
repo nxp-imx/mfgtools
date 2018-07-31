@@ -216,7 +216,7 @@ int polling_usb(std::atomic<int>& bexit)
 		return -1;
 	}
 
-//	libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_WARNING);
+	libusb_set_debug(NULL, get_libusb_debug_level());
 
 	if (run_cmds("CFG:", NULL))
 		return -1;
@@ -262,6 +262,8 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 		set_last_err_string("Call libusb_init failure");
 		return -1;
 	}
+
+	libusb_set_debug(NULL, get_libusb_debug_level());
 
 	if (run_cmds("CFG:", NULL))
 		return -1;

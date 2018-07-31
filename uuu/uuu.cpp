@@ -587,6 +587,11 @@ int main(int argc, char **argv)
 			{
 				g_verbose = 1;
 			}
+			else if (s == "-V")
+			{
+				g_verbose = 1;
+				uuu_set_debug_level(2);
+			}
 			else if (s == "-h")
 			{
 				print_help();
