@@ -140,7 +140,7 @@ void print_help()
 }
 void print_version()
 {
-	printf("uuu (universal update utitle) for nxp imx chips -- %s\n\n", uuu_get_version_string());
+	printf("uuu (Universal Update Utility) for nxp imx chips -- %s\n\n", uuu_get_version_string());
 }
 
 int print_cfg(const char *pro, const char * chip, const char *compatible, uint16_t pid, uint16_t vid, uint16_t bcdVersion, void *p)
