@@ -145,10 +145,16 @@ void print_version()
 
 int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, uint16_t pid, uint16_t vid, uint16_t bcdVersion, void * /*p*/)
 {
-	if (bcdVersion == 0xFFFF)
-		printf("\t%s\t %s\t 0x%04x\t 0x%04x\n", pro, chip, pid, vid);
+	const char *ext;
+	if (strlen(chip) >= 7)
+		ext = "";
 	else
-		printf("\t%s\t %s\t 0x%04x\t 0x%04x\t 0x%04x\n", pro, chip, pid, vid, bcdVersion);
+		ext = "\t";
+
+	if (bcdVersion == 0xFFFF)
+		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\n", pro, chip, ext, pid, vid);
+	else
+		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\t 0x%04x\n", pro, chip, ext, pid, vid, bcdVersion);
 	return 0;
 }
 
@@ -636,8 +642,8 @@ int main(int argc, char **argv)
 	if (g_verbose)
 	{
 		printf("Build in config:\n");
-		printf("\tPctl\tChip\tVid\tPid\tBcdVersion\n");
-		printf("\t==========================================\n");
+		printf("\tPctl\t Chip\t\t Vid\t Pid\t BcdVersion\n");
+		printf("\t==================================================\n");
 		uuu_for_each_cfg(print_cfg, NULL);
 		if (!shell)
 			cout << "Wait for Known USB Device Appear";
