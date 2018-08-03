@@ -5,23 +5,29 @@ uuu_version 1.0.0
 # ---------------------------------------------------------------------
 # Command Format PROTOCOL COMMAND ARG
 # PROTOCOL
+#          ALL protocol supported common command
+#                      done  #last command for whole flow
+#                      delay <ms> # delay ms
+#
 #          CFG:  Config protocol of specific usb device vid/pid
 #                SDPS|SDP|FB\Fastboot|FBK -chip <chip name> -pid <pid> -vid <vid> [-bcdversion <ver>]
+#
 #          SDPS: Stream download after MX8QXPB0
 #                      boot  -f  <filename>
-#                      done  #last command for whole flow
+#
 #          SDP:  iMX6/iMX7 HID download protocol.
 #                      dcd   -f  <filename>
 #                      write -f  <filename> [-addr 0x000000] [-ivt 0]
 #                      jump  -f  <filename> [-ivt 0]
 #                      boot  -f  <filename> [-nojump]
-#                      done  #last command for whole flow
+#
 #          FB:\Fastboot: android fastboot protocol
 #                      getvar
 #                      ucmd <any uboot command>
 #                      acmd <any never returned uboot command, like booti, reboot>
 #                      flash [-raw2sparse] <partition> <filename>
 #                      download -f <filename>
+#
 #          FBK: community with kernel with fastboot protocol. DO NOT compatible with fastboot tools.
 #                      ucmd <any kernel command> and wait for command finish
 #                      acmd <any kernel command> don't wait for command finish
@@ -31,16 +37,16 @@ uuu_version 1.0.0
 #                                                T:- means copy data to target's stdio pipe.
 #                                                copy image T:/root/image ;download image to path /root/image
 #                                                copy T:/root/image image ;upload /root/image to file image.
-#
 #                      Example for transfer big file
 #                              acmd tar -            ; run tar background and get data from stdio
 #                              ucp rootfs.tar.gz T:- ; send to target stdio pipe
 #                              sync                  ; wait for tar process exit.
+#
 # For example:
 #          SDPS: boot -f <filename>
 #          SDP:  boot -f <filename>
 #          CFG: SDP: -chip imx6ull -pid 0x1234 -vid 0x5678
-
+#
 # SDP: boot -f u-boot-imx7dsabresd_sd.imx -nojump
 # SDP: write -f zImage -addr 0x80800000
 # SDP: write -f zImage-imx7d-sdb.dtb -addr 0x83000000
