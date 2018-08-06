@@ -422,6 +422,7 @@ static int insert_one_cmd(const char * cmd, CmdMap *pCmdMap)
 
 	string pro = get_next_param(s, pos, ':');
 	pro = remove_square_brackets(pro);
+	pro += ":";
 
 	shared_ptr<CmdBase> p = create_cmd_obj(s);
 	if (p == NULL)
