@@ -145,9 +145,11 @@ int FBCmd::parser(char *p)
 
 	size_t pos = 0;
 	string s;
+	
+	if (parser_protocal(p, pos))
+		return -1;
+	
 	s = get_next_param(m_cmd, pos);
-	if(s.find(":") != s.npos)
-		s = get_next_param(m_cmd, pos);
 
 	if (str_to_upper(s) != str_to_upper(m_fb_cmd))
 	{
@@ -156,6 +158,7 @@ int FBCmd::parser(char *p)
 		set_last_err_string(s);
 		return -1;
 	}
+
 	if(pos!=string::npos && pos < m_cmd.size())
 		m_uboot_cmd = m_cmd.substr(pos);
 	return 0;
@@ -166,6 +169,8 @@ int FBCmd::run(CmdCtx *ctx)
 	BulkTrans dev;
 	if (dev.open(ctx->m_dev))
 		return -1;
+
+	dev.m_timeout = m_timeout;
 
 	FastBoot fb(&dev);
 	string cmd;

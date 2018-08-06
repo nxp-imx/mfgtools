@@ -168,7 +168,7 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 	return ret;
 }
 
-string get_next_param(string &cmd, size_t &pos)
+string get_next_param(string &cmd, size_t &pos, char sperate)
 {
 	string str;
 	if (pos == string::npos)
@@ -177,10 +177,10 @@ string get_next_param(string &cmd, size_t &pos)
 		return str;
 
 	//trim left space
-	while (cmd[pos] == ' ' && pos < cmd.size())
+	while (cmd[pos] == sperate && pos < cmd.size())
 		pos++;
 
-	size_t end = cmd.find(' ', pos);
+	size_t end = cmd.find(sperate, pos);
 	if (end == cmd.npos)
 		end = cmd.size();
 
@@ -188,6 +188,32 @@ string get_next_param(string &cmd, size_t &pos)
 	pos = end + 1;
 
 	return str;
+}
+
+string remove_square_brackets(string &cmd)
+{
+	size_t sz=cmd.find('[');
+	return cmd.substr(0, sz);
+}
+
+int get_string_in_square_brackets(string &cmd, string &context)
+{
+	size_t start = cmd.find('[');
+	if (start == string::npos)
+	{
+		context.clear();
+		return 0;
+	}
+
+	size_t end = cmd.find(']', start);
+	if (end == string::npos)
+	{
+		set_last_err_string("missed ]");
+		return -1;
+	}
+
+	context = cmd.substr(start + 1, end - start - 1);
+	return 0;
 }
 
 uint32_t str_to_uint(string &str)
@@ -256,8 +282,11 @@ shared_ptr<CmdBase> create_cmd_obj(string cmd)
 {
 	string param;
 	size_t pos = 0;
-	param = get_next_param(cmd, pos);
+	param = get_next_param(cmd, pos, ':');
+	param = remove_square_brackets(param);
+	param += ":";
 	param = str_to_upper(param);
+
 	if (g_cmd_create_map.find(param) == g_cmd_create_map.end())
 	{
 		string s = param;

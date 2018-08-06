@@ -21,7 +21,7 @@ uuu_version 1.0.0
 #                      jump  -f  <filename> [-ivt 0]
 #                      boot  -f  <filename> [-nojump]
 #
-#          FB:\Fastboot: android fastboot protocol
+#          FB[-t timeout]:\Fastboot: android fastboot protocol. unit of timeout is ms
 #                      getvar
 #                      ucmd <any uboot command>
 #                      acmd <any never returned uboot command, like booti, reboot>
