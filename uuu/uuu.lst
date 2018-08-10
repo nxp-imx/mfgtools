@@ -13,7 +13,7 @@ uuu_version 1.0.0
 #                SDPS|SDP|FB\Fastboot|FBK -chip <chip name> -pid <pid> -vid <vid> [-bcdversion <ver>]
 #
 #          SDPS: Stream download after MX8QXPB0
-#                      boot  -f  <filename>
+#                      boot  -f  <filename> [-offset 0x0000]
 #
 #          SDP:  iMX6/iMX7 HID download protocol.
 #                      dcd   -f  <filename>
