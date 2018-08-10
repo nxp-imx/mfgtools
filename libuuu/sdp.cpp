@@ -46,7 +46,14 @@ IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &of
 		if (p->IvtBarker == IVT_BARKER_HEADER)
 			return p;
 		if (p->IvtBarker == IVT_BARKER2_HEADER)
+		{
+			BootData *pDB = (BootData *) &(data->at(off + p->BootData - p->SelfAddr));
+
+			/*Skip HDMI firmware for i.MX8MQ*/
+			if (pDB->PluginFlag & 0xFFFFFFFE)
+				continue;
 			return p;
+		}
 	}
 	off = -1;
 	return NULL;
