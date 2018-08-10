@@ -49,5 +49,11 @@ int SDPSCmd::run(CmdCtx *pro)
 	HIDReport report(&dev);
 	report.m_skip_notify = false;
 
-	return report.write(p->data(), p->size(),  2);
+	if (m_offset >= p->size())
+	{
+		set_last_err_string("Offset bigger than file size");
+		return -1;
+	}
+
+	return report.write(p->data() + m_offset, p->size() - m_offset,  2);
 }
