@@ -755,18 +755,16 @@ int main(int argc, char **argv)
 	}
 
 	if (!cmd_script.empty())
-	{
 		ret = uuu_run_cmd_script(cmd_script.c_str());
-	}
 	else
-	{
 		ret = uuu_auto_detect_file(filename.c_str());
-		if (ret)
-		{
-			cout << "Error:" << uuu_get_last_err_string();
-			return ret;
-		}
+
+	if (ret)
+	{
+		cout << "Error:" << uuu_get_last_err_string();
+		return ret;
 	}
+
 	uuu_wait_uuu_finish(deamon);
 
 	return g_overall_status;
