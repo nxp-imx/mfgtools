@@ -761,7 +761,7 @@ int main(int argc, char **argv)
 
 	if (ret)
 	{
-		cout << "Error:" << uuu_get_last_err_string();
+		cout << RED << "\nError: " << DEFAULT <<  uuu_get_last_err_string();
 		return ret;
 	}
 
