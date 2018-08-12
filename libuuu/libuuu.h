@@ -108,6 +108,8 @@ typedef int(*uuu_show_cfg)(const char *pro, const char *chip, const char *comp, 
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p);
 
 int uuu_run_cmd(const char * cmd);
+int uuu_run_cmd_script(const char *script);
+
 int uuu_auto_detect_file(const char * filename);
 int uuu_wait_uuu_finish(int deamon);
 int uuu_add_usbpath_filter(const char *path);

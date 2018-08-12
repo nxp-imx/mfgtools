@@ -43,6 +43,7 @@
 #include <time.h>
 #include <string.h>
 #include <signal.h>
+#include "buildincmd.h"
 
 #include "../libuuu/libuuu.h"
 
@@ -113,8 +114,18 @@ void print_help()
 	printf("uuu [-d -m -v] SDPS: boot flash.bin\n");
 	printf("\tRun command SPDS: boot flash.bin\n");
 	printf("\nuuu -s\n");
-	printf("\tEnter shell mode. uuu.inputlog record all input's command\n");
+	printf("\tEnter shell mode. uuu.inputlog record all input commands\n");
 	printf("\tyou can use \"uuu uuu.inputlog\" next time to run all commands\n");
+	printf("\n");
+	printf("uuu [-d -m -v] -b[run] ");
+	g_BuildScripts.ShowCmds();
+	printf(" arg...\n");
+	printf("\tRun Built - in scripts\n");
+	g_BuildScripts.ShowAll();
+	printf("\nuuu -bshow ");
+	g_BuildScripts.ShowCmds();
+	printf("\n");
+	printf("\tShow built-in script\n");
 	printf("\n");
 
 	size_t start = 0, pos = 0;
@@ -166,10 +177,6 @@ int g_overall_failure;
 char g_wait[] = "|/-\\";
 int g_wait_index;
 
-#define YELLOW "\x1B[93m"
-#define DEFAULT "\x1B[0m"
-#define GREEN "\x1B[92m"
-#define RED	"\x1B[91m"
 
 string build_process_bar(size_t width, size_t pos, size_t total)
 {
@@ -574,7 +581,9 @@ int main(int argc, char **argv)
 	int shell = 0;
 	string filename;
 	string cmd;
+	int ret;
 
+	string cmd_script;
 
 	for (int i = 1; i < argc; i++)
 	{
@@ -608,6 +617,38 @@ int main(int argc, char **argv)
 				i++;
 				uuu_add_usbpath_filter(argv[i]);
 				g_usb_path_filter.push_back(argv[i]);
+			}
+			else if (s == "-b" || s == "-brun")
+			{
+				if (i + 1 == argc || g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end())
+				{
+					printf("error, must be have script name: ");
+					g_BuildScripts.ShowCmds();
+					printf("\n");
+					return -1;
+				}
+
+				vector<string> args;
+				for (int j = i + 2; j < argc; j++)
+					args.push_back(argv[j]);
+
+				cmd_script = g_BuildScripts[argv[i + 1]].replace_script_args(args);
+				break;
+			}
+			else if (s == "-bshow")
+			{
+				if (i + 1 == argc || g_BuildScripts.find(argv[i+1]) == g_BuildScripts.end())
+				{
+					printf("error, must be have script name: ");
+					g_BuildScripts.ShowCmds();
+					printf("\n");
+					return -1;
+				}
+				else
+				{
+					printf("%s", g_BuildScripts[argv[i + 1]].m_script.c_str());
+					return 0;
+				}
 			}
 			else
 			{
@@ -701,7 +742,6 @@ int main(int argc, char **argv)
 
 	if (!cmd.empty())
 	{
-		int ret;
 		ret = uuu_run_cmd(cmd.c_str());
 
 		for (size_t i = 0; i < g_map_path_nt.size()+3; i++)
@@ -714,11 +754,18 @@ int main(int argc, char **argv)
 		return ret;
 	}
 
-	int ret = uuu_auto_detect_file(filename.c_str());
-	if (ret)
+	if (!cmd_script.empty())
 	{
-		cout << "Error:" << uuu_get_last_err_string();
-		return ret;
+		ret = uuu_run_cmd_script(cmd_script.c_str());
+	}
+	else
+	{
+		ret = uuu_auto_detect_file(filename.c_str());
+		if (ret)
+		{
+			cout << "Error:" << uuu_get_last_err_string();
+			return ret;
+		}
 	}
 	uuu_wait_uuu_finish(deamon);
 

@@ -19,7 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\uuu\buildincmd.cpp" />
     <ClCompile Include="..\uuu\uuu.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\uuu\buildincmd.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -143,6 +147,13 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
       <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
 type $(SolutionDir)\..\uuu\uuu.lst &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+type $(SolutionDir)\..\uuu\emmc_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+type $(SolutionDir)\..\uuu\qspi_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>

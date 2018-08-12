@@ -1,0 +1,16 @@
+uuu_version 1.1.4
+
+SDP: boot -f _flexspi.bin
+# This command will be run when use SPL
+SDPU: delay 1000
+SDPU: write -f _flexspi.bin -offset 0x60000
+SDPU: jump
+# This command will be run when ROM support stream mode
+SDPS: boot -f _flexspi.bin -offset 0x1000
+
+FB: ucmd setenv fastboot_buffer ${loadaddr}
+FB: download -f _flexspi.bin
+FB: ucmd sf probe
+FB[-t 10000]: ucmd sf erase 0 100000
+FB: ucmd sf write ${fastboot_buffer} 0 ${fastboot_bytes}
+FB: done

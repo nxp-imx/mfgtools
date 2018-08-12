@@ -506,6 +506,14 @@ int check_version(string str)
 	return 0;
 }
 
+int uuu_run_cmd_script(const char * buff)
+{
+	shared_ptr<FileBuffer> p(new FileBuffer);
+	p->m_data.resize(strlen(buff));
+	memcpy(p->m_data.data(), buff, strlen(buff));
+	return parser_cmd_list_file(p);
+}
+
 int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap)
 {
 	char uuu_version[] = "uuu_version";
