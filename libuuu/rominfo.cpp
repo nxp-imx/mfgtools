@@ -50,15 +50,16 @@ ROM_INFO g_RomInfo[] =
 	{ "MX8MQ",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{ "MX7ULP",	 0x2f018000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{ "MXRT106X",0x1000,     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX8QXPB0",0x0,		 ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING },
 	{ "MX815",   0x0,		 ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING | ROM_INFO_HID_EP1 | ROM_INFO_HID_PACK_SIZE_1020 },
-	{ "SPL",	 0x0,		 ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP }
+	{ "SPL",	 0x0,		 ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP },
+	{ "MXRT106X",	 0x1000,     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	{ "MX8QXP",      0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING },
 };
 
 ROM_INFO * search_rom_info(const char *s)
 {
 	string s1 = s;
-	for (int i = 0; i < sizeof(g_RomInfo) / sizeof(ROM_INFO); i++)
+	for (size_t i = 0; i < sizeof(g_RomInfo) / sizeof(ROM_INFO); i++)
 	{
 		string s2;
 		s2 = g_RomInfo[i].m_name;

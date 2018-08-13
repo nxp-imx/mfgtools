@@ -53,10 +53,9 @@ using namespace std;
 
 class HIDReport
 {
-	int m_size_in;
-	int m_size_out;
-	int m_size_payload;
-
+	size_t m_size_in;
+	size_t m_size_out;
+	size_t m_size_payload;
 public:
 	TransBase * m_pdev;
 	vector<uint8_t> m_out_buff;
@@ -65,7 +64,7 @@ public:
 	bool m_skip_notify;
 	void init()
 	{
-		m_size_in = 64; 
+		m_size_in = 64;
 		m_size_out = 1024;
 		m_size_payload = 1;
 		m_postion_base = 0;
@@ -121,7 +120,7 @@ public:
 	{
 		size_t off;
 		uint8_t *buff = (uint8_t *)p;
-		
+
 		notify(sz, uuu_notify::NOTIFY_TRANS_SIZE);
 
 		for (off = 0; off < sz; off += m_size_out)
@@ -135,7 +134,7 @@ public:
 			memcpy(m_out_buff.data() + m_size_payload, buff + off, s);
 
 			int ret = m_pdev->write(m_out_buff.data(), report_id == 1? s + m_size_payload: m_size_out + m_size_payload);
-			
+
 			if ( ret < 0)
 				return -1;
 
@@ -152,5 +151,5 @@ public:
 	{
 		return write(buff.data(), buff.size(), report_id);
 	}
-		
+
 };

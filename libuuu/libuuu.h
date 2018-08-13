@@ -67,7 +67,7 @@ struct uuu_notify
 {
 	enum NOTIFY_TYPE
 	{
-		NOTIFY_CMD_TOTAL,	
+		NOTIFY_CMD_TOTAL,
 		NOTIFY_CMD_START,	/* str is command name*/
 		NOTIFY_CMD_END,	    /* status show command finish status. 0 is success. Other failure.*/
 		NOTIFY_CMD_INDEX,   /*Current running command index*/
@@ -79,12 +79,12 @@ struct uuu_notify
 
 		NOTIFY_TRANS_SIZE,  /*Total size*/
 		NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
-		
-		NOTIFY_WAIT_FOR,    
+
+		NOTIFY_WAIT_FOR,
 		NOFITY_DEV_ATTACH,
-		
+
 		NOTIFY_THREAD_EXIT,
-		
+
 		NOTIFY_DONE,
 	};
 
@@ -108,8 +108,16 @@ typedef int(*uuu_show_cfg)(const char *pro, const char *chip, const char *comp, 
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p);
 
 int uuu_run_cmd(const char * cmd);
+int uuu_run_cmd_script(const char *script);
+
 int uuu_auto_detect_file(const char * filename);
 int uuu_wait_uuu_finish(int deamon);
 int uuu_add_usbpath_filter(const char *path);
+
+/*
+ * bit 0:15 for libusb
+ * bit 16:31 for uuu
+ */
+void uuu_set_debug_level(uint32_t mask);
 
 #endif

@@ -30,7 +30,7 @@
 */
 
 /*
- Android fastboot protocol define at 
+ Android fastboot protocol define at
  https://android.googlesource.com/platform/system/core/+/master/fastboot/
 */
 #include <string.h>
@@ -58,11 +58,14 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 		memset(buff, 0, 65);
 		if (m_pTrans->read(buff, 64, &actual))
 			return -1;
-		
+
 		if (strncmp(buff, "DATA",4) == 0)
 		{
 			size_t sz;
 			sz = strtoul(buff+4, NULL, 16);
+			if (sz > size)
+				sz = size;
+
 			if (input)
 			{
 				input->resize(sz);
@@ -142,9 +145,11 @@ int FBCmd::parser(char *p)
 
 	size_t pos = 0;
 	string s;
+	
+	if (parser_protocal(p, pos))
+		return -1;
+	
 	s = get_next_param(m_cmd, pos);
-	if(s.find(":") != s.npos)
-		s = get_next_param(m_cmd, pos);
 
 	if (str_to_upper(s) != str_to_upper(m_fb_cmd))
 	{
@@ -153,6 +158,7 @@ int FBCmd::parser(char *p)
 		set_last_err_string(s);
 		return -1;
 	}
+
 	if(pos!=string::npos && pos < m_cmd.size())
 		m_uboot_cmd = m_cmd.substr(pos);
 	return 0;
@@ -163,6 +169,8 @@ int FBCmd::run(CmdCtx *ctx)
 	BulkTrans dev;
 	if (dev.open(ctx->m_dev))
 		return -1;
+
+	dev.m_timeout = m_timeout;
 
 	FastBoot fb(&dev);
 	string cmd;
@@ -233,7 +241,7 @@ int FBCopy::parser(char *p)
 		set_last_err_string("ucp: destination missed");
 		return -1;
 	}
-	
+
 	if (source.find("T:") == 0 || source.find("t:") == 0)
 	{
 		if (dest.find("T:") == 0 || dest.find("t:") == 0)
@@ -326,7 +334,7 @@ int FBCopy::run(CmdCtx *ctx)
 		cmd.format("ROpen:%s", m_target_file.c_str());
 		if (fb.Transport(cmd, NULL, 0))
 			return -1;
-		
+
 		uuu_notify nt;
 		nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
 		size_t total = nt.total = strtoul(fb.m_info.c_str(), NULL, 16);
@@ -336,7 +344,7 @@ int FBCopy::run(CmdCtx *ctx)
 		ofstream of;
 
 		struct stat st;
-		
+
 		Path localfile;
 		localfile.append(m_local_file);
 
@@ -365,7 +373,7 @@ int FBCopy::run(CmdCtx *ctx)
 			vector<uint8_t> data;
 			if (fb.Transport("upload", NULL, 0, &data))
 				return -1;
-			
+
 			of.write((const char*)data.data(), data.size());
 
 			nt.type = uuu_notify::NOTIFY_TRANS_POS;
@@ -409,7 +417,7 @@ int FBFlashCmd::parser(char *p)
 		set_last_err_string("Missed file name");
 		return -1;
 	}
-	
+
 	shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename);
 	if (pdata == NULL)
 		return -1;
@@ -432,10 +440,10 @@ int FBFlashCmd::flash(FastBoot *fb, void * pdata, size_t sz)
 	return 0;
 }
 
-int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, int block_size, int max)
+int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, size_t block_size, size_t max)
 {
 	SparseFile sf;
-	
+
 	if (max > 0x1000000)
 		 max = 0x1000000;
 
@@ -494,7 +502,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		return -1;
 	if (getvar.run(ctx))
 		return -1;
-	
+
 	size_t block_size = str_to_uint(getvar.m_val);
 
 	if (block_size == 0)

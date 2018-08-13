@@ -101,7 +101,7 @@ int Fat::Open(string filename)
 		string filename;
 		if (entry->attr == 0x8)
 			entry++;
-		
+
 		if (entry->filename[0] == 0)
 			break;
 
@@ -112,7 +112,7 @@ int Fat::Open(string filename)
 			filename.insert(0, lfn2string((FatLFN *)entry));
 			entry++;
 		}
-		
+
 		if (filename.empty())
 		{
 			filename.append((char*)entry->filename, 8);
@@ -159,17 +159,17 @@ shared_ptr<FileBuffer> Fat::get_file_buff(string filename)
 	shared_ptr<FileBuffer> p(new FileBuffer);
 	size_t filesize = m_filemap[filename].file_size;
 	p->resize(filesize);
-	
+
 	int cur = m_filemap[filename].start_cluster;
 
-	size_t off = 0;
-	for (off; off < filesize; off += m_cluster)
+	size_t off;
+	for (off = 0; off < filesize; off += m_cluster)
 	{
 		size_t sz;
 		sz = filesize - off;
 		if (sz > m_cluster)
 			sz = m_cluster;
-		
+
 		if (cur == 0xFFFF)
 		{
 			set_last_err_string("Early finished at fat");

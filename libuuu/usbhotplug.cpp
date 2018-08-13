@@ -58,10 +58,10 @@ static bool is_match_filter(string path)
 {
 	if (g_filter_usbpath.empty())
 		return true;
-	for (int i = 0; i < g_filter_usbpath.size(); i++)
+	for (size_t i = 0; i < g_filter_usbpath.size(); i++)
 		if (g_filter_usbpath[i] == path)
 			return true;
-	
+
 	return false;
 }
 
@@ -96,7 +96,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 	int ret;
 	uuu_notify nt;
 	nt.type = uuu_notify::NOFITY_DEV_ATTACH;
-	
+
 	string str;
 	str = get_device_path(dev);
 	nt.str = (char*)str.c_str();
@@ -105,17 +105,26 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 	CmdUsbCtx ctx;
 	ctx.m_config_item = item;
 
+	/* work around windows open device failure 1/10
+	 * sometime HID device detect need some time, refresh list
+	 * to make sure HID driver installed.
+	 */
+	libusb_device **list = NULL;
+	libusb_get_device_list(NULL, &list);
+
 	if (libusb_open(dev, (libusb_device_handle **)&(ctx.m_dev)) < 0)
 	{
 		set_last_err_string("Failure open usb device" TRY_SUDO);
 		nt.type = uuu_notify::NOTIFY_CMD_END;
 		nt.status = -1;
 		call_notify(nt);
-
+		libusb_free_device_list(list, 1);
 		return -1;
 	}
 
 	ret = run_cmds(item->m_protocol.c_str(), &ctx);
+
+	libusb_free_device_list(list, 1);
 
 	nt.type = uuu_notify::NOTIFY_THREAD_EXIT;
 	call_notify(nt);
@@ -148,9 +157,9 @@ static int usb_add(libusb_device *dev)
 	return 0;
 }
 
-static int usb_remove(libusb_device *dev)
+static int usb_remove(libusb_device * /*dev*/)
 {
-	
+
 	return 0;
 }
 
@@ -160,7 +169,7 @@ void compare_list(libusb_device ** old, libusb_device **nw)
 	int i = 0;
 
 	if (old == NULL)
-	{	
+	{
 		while ((dev = nw[i++]) != NULL)
 		{
 			usb_add(dev);
@@ -206,7 +215,9 @@ int polling_usb(std::atomic<int>& bexit)
 		set_last_err_string("Call libusb_init failure");
 		return -1;
 	}
-	
+
+	libusb_set_debug(NULL, get_libusb_debug_level());
+
 	if (run_cmds("CFG:", NULL))
 		return -1;
 
@@ -251,14 +262,16 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 		set_last_err_string("Call libusb_init failure");
 		return -1;
 	}
-	
+
+	libusb_set_debug(NULL, get_libusb_debug_level());
+
 	if (run_cmds("CFG:", NULL))
 		return -1;
 
 	while (1)
 	{
 		libusb_device **newlist = NULL;
-		ssize_t sz = libusb_get_device_list(NULL, &newlist);
+		libusb_get_device_list(NULL, &newlist);
 		size_t i = 0;
 		libusb_device *dev;
 
@@ -280,16 +293,24 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 				{
 					uuu_notify nt;
 					nt.type = uuu_notify::NOFITY_DEV_ATTACH;
-
-					
 					m_config_item = item;
+
+					/* work around windows open device failure 1/10
+					 * sometime HID device detect need some time, refresh list
+					 * to make sure HID driver installed.
+					 */
+					std::this_thread::sleep_for(std::chrono::milliseconds(200));
+					libusb_device **list = NULL;
+					libusb_get_device_list(NULL, &list);
 
 					if (libusb_open(dev, (libusb_device_handle **)&(m_dev)) < 0)
 					{
 						set_last_err_string("Failure open usb device" TRY_SUDO);
+						libusb_free_device_list(list, 1);
 						return -1;
 					}
 
+					libusb_free_device_list(list, 1);
 					nt.str = (char*)str.c_str();
 					call_notify(nt);
 

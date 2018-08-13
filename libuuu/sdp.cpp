@@ -38,7 +38,7 @@
 #include "sdp.h"
 #include "rominfo.h"
 
-IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, int &off)
+IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &off)
 {
 	for (off = 0; off < data->size(); off += 0x100)
 	{
@@ -46,7 +46,14 @@ IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, int &off)
 		if (p->IvtBarker == IVT_BARKER_HEADER)
 			return p;
 		if (p->IvtBarker == IVT_BARKER2_HEADER)
+		{
+			BootData *pDB = (BootData *) &(data->at(off + p->BootData - p->SelfAddr));
+
+			/*Skip HDMI firmware for i.MX8MQ*/
+			if (pDB->PluginFlag & 0xFFFFFFFE)
+				continue;
 			return p;
+		}
 	}
 	off = -1;
 	return NULL;
@@ -67,7 +74,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 
 	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
 
-	int off = 0;
+	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off);
 	if (pIVT == NULL)
 	{
@@ -196,7 +203,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 	}
 	else
 	{
-		int off;
+		size_t off;
 		IvtHeader *pIvt = search_ivt_header(fbuff, off);
 		for (int i = 0; i < m_Ivt; i++)
 		{
@@ -229,7 +236,7 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 	HIDReport report(&dev);
 
 	report.m_notify_total = size;
-	
+
 	for (size_t i=0; i < size; i += m_max_download_pre_cmd)
 	{
 		size_t sz;
@@ -247,7 +254,7 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 			return -1;
 
 		report.m_skip_notify = false;
-		
+
 		if (report.write(((uint8_t*)pbuff)+i, sz, 2))
 			return -1;
 
@@ -276,7 +283,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 		set_last_err_string(err);
 		return -1;
 	}
-	
+
 	if (rom->flags & ROM_INFO_SPL_JUMP)
 	{
 		m_spdcmd.m_addr = EndianSwap(m_jump_addr);
@@ -290,7 +297,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 
 	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
 
-	int off = 0;
+	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off);
 
 	m_spdcmd.m_addr = EndianSwap(pIVT->SelfAddr);

@@ -18,5 +18,13 @@
     <ClCompile Include="..\uuu\uuu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\uuu\buildincmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\uuu\buildincmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

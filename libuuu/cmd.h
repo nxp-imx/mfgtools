@@ -42,6 +42,11 @@
 
 using namespace std;
 
+string get_next_param(string &cmd, size_t &pos, char sperate = ' ');
+string remove_square_brackets(string &cmd);
+int get_string_in_square_brackets(string &cmd, string &context);
+uint32_t str_to_uint(string &str);
+
 class CmdCtx
 {
 public:
@@ -57,7 +62,7 @@ public:
 	CmdUsbCtx() :CmdCtx() {};
 	~CmdUsbCtx();
 	int look_for_match_device(const char * procotol);
-}; 
+};
 
 struct Param
 {
@@ -84,15 +89,50 @@ class CmdBase
 {
 public:
 	vector<Param> m_param;
-
+	uint64_t m_timeout;
 	std::string m_cmd;
-	CmdBase() {};
-	CmdBase(char *p) { if(p) m_cmd = p; }
+	CmdBase() { m_timeout = 2000; };
+	CmdBase(char *p) { m_timeout = 2000;  if (p) m_cmd = p; }
 	void insert_param_info(const char *key, void *pD, Param::Param_Type tp, bool ignore_case = true)
 	{
 		m_param.push_back(Param(key, pD, tp, ignore_case));
 	}
-	virtual int parser(char *p = NULL); 
+
+	virtual int parser_protocal(char *p, size_t &pos)
+	{
+		if (p)
+			m_cmd = *p;
+
+		string prot = get_next_param(m_cmd, pos, ':');
+		string param;
+		if (get_string_in_square_brackets(prot, param))
+			return -1;
+		
+		if (!param.empty())
+		{
+			size_t param_pos = 0;
+			string s = get_next_param(param, param_pos);
+
+			if (s == "-t")
+			{
+				string timeout;
+				timeout = get_next_param(param, param_pos);
+				m_timeout = str_to_uint(timeout);
+			}
+			else
+			{
+				string err;
+				err = "Unknown option: ";
+				err += s;
+				err += " for protocal: ";
+				err += remove_square_brackets(prot);
+				set_last_err_string(err);
+				return -1;
+			}
+		}
+		return 0;
+	}
+	virtual int parser(char *p = NULL);
 	virtual int run(CmdCtx *p)=0;
 	virtual void dump() { /*dbg(m_cmd.c_str());*/ };
 };
@@ -149,14 +189,9 @@ public:
 class CfgCmd :public CmdBase
 {
 public:
-	int parser(char *p) { return 0; };
+	int parser(char * /*p*/) { return 0; };
 	CfgCmd(char *cmd) :CmdBase(cmd) {};
 	int run(CmdCtx *p);
 };
-
-string get_next_param(string &cmd, size_t &pos);
-
-uint32_t str_to_uint(string &str);
-
 
 int run_cmds(const char *procotal, CmdCtx *p);

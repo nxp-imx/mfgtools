@@ -33,10 +33,10 @@
 #include "libuuu.h"
 
 #define VER_MAJ 1
-#define VER_MIN 0
-#define VER_S   1
+#define VER_MIN 1
+#define VER_S   4
 
-static const char g_version[] = "libuuu-1.0.1" GIT_VERSION;
+static const char g_version[] = "libuuu-1.1.4" GIT_VERSION;
 
 const char *uuu_get_version_string()
 {

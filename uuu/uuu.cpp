@@ -43,6 +43,7 @@
 #include <time.h>
 #include <string.h>
 #include <signal.h>
+#include "buildincmd.h"
 
 #include "../libuuu/libuuu.h"
 
@@ -68,7 +69,7 @@ public:
 	}
 };
 
-void ctrl_c_handle(int sig)
+void ctrl_c_handle(int)
 {
 	do {
 		AutoCursor a;
@@ -97,29 +98,42 @@ public:
 	}
 };
 
-void print_help()
+void print_help(bool detail = false)
 {
-	printf("uuu [-d -m -v] u-boot.imx\\flash.bin\n");
-	printf("\tDownload    u-boot.imx\\flash.bin to board by usb\n");
-	printf("\t -d         Deamon mode, wait for forever.\n");
-	printf("\t            Start download once detect known device attached\n");
-	printf("\t -v         Print build in protocal config informaiton");
-	printf("\t -m USBPATH Only monitor these pathes.");
-	printf("\t            -m 1:2 -m 2:3");
+	const char help[] =
+		"uuu [-d -m -v -V] <" BOLDWHITE "bootloader|cmdlists|cmd" DEFAULT ">\n\n"
+		"    bootloader  download bootloader to board by usb\n"
+		"    cmdlist     run all commands in cmdlist file\n"
+		"                If it is path, search uuu.auto in dir\n"
+		"                If it is zip, search uuu.auto in zip\n"
+		"    cmd         Run one command, use -H see detail\n"
+		"                example: SDPS: boot -f flash.bin\n"
+		"    -d          Deamon mode, wait for forever.\n"
+		"    -v -V       verbose mode, -V enable libusb error\\warning info\n"
+		"    -m          USBPATH Only monitor these pathes.\n"
+		"                    -m 1:2 -m 1:3\n\n"
+		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
+		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
+		"uuu -h -H       show help, -H means detail helps\n\n";
+	
+	printf("%s", help);
+	printf("uuu [-d -m -v] -b[run] ");
+	g_BuildScripts.ShowCmds();
+	printf(" arg...\n");
+	printf("\tRun Built-in scripts\n");
+	g_BuildScripts.ShowAll();
+	printf("\nuuu -bshow ");
+	g_BuildScripts.ShowCmds();
 	printf("\n");
-	printf("uuu [-d -m -v] cmdlist\n");
-	printf("\tRun all commands in file cmdlist\n");
+	printf("\tShow built-in script\n");
 	printf("\n");
-	printf("uuu [-d -m -v] SDPS: boot flash.bin\n");
-	printf("\tRun command SPDS: boot flash.bin\n");
-	printf("uuu -s\n");
-	printf("\tEnter shell mode. uuu.inputlog record all input's command\n");
-	printf("\tyou can use \"uuu uuu.inputlog\" next time to run all commands\n");
-	printf("\n");
+
+	if (detail == false)
+		return;
 
 	size_t start = 0, pos = 0;
 	string str= g_sample_cmd_list;
-	
+
 	bool bprint = false;
 	while ((pos = str.find('\n',pos)) != str.npos)
 	{
@@ -131,8 +145,7 @@ void print_help()
 		{
 			if (s[0] == '#')
 			{
-				printf(&(s[1]));
-				printf("\n");
+				printf("%s\n", &(s[1]));
 			}
 		}
 		pos += 1;
@@ -141,15 +154,21 @@ void print_help()
 }
 void print_version()
 {
-	printf("uuu (universal update utitle) for nxp imx chips -- %s\n\n", uuu_get_version_string());
+	printf("uuu (Universal Update Utility) for nxp imx chips -- %s\n\n", uuu_get_version_string());
 }
 
-int print_cfg(const char *pro, const char * chip, const char *compatible, uint16_t pid, uint16_t vid, uint16_t bcdVersion, void *p)
+int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, uint16_t pid, uint16_t vid, uint16_t bcdVersion, void * /*p*/)
 {
-	if (bcdVersion == 0xFFFF)
-		printf("\t%s\t %s\t 0x%04x\t 0x%04x\n", pro, chip, pid, vid);
+	const char *ext;
+	if (strlen(chip) >= 7)
+		ext = "";
 	else
-		printf("\t%s\t %s\t 0x%04x\t 0x%04x\t 0x%04x\n", pro, chip, pid, vid, bcdVersion);
+		ext = "\t";
+
+	if (bcdVersion == 0xFFFF)
+		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\n", pro, chip, ext, pid, vid);
+	else
+		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\t 0x%04x\n", pro, chip, ext, pid, vid, bcdVersion);
 	return 0;
 }
 
@@ -161,12 +180,8 @@ int g_overall_failure;
 char g_wait[] = "|/-\\";
 int g_wait_index;
 
-#define YELLOW "\x1B[93m"
-#define DEFAULT "\x1B[0m"
-#define GREEN "\x1B[92m"
-#define RED	"\x1B[91m"
 
-string build_process_bar(int width, size_t pos, size_t total)
+string build_process_bar(size_t width, size_t pos, size_t total)
 {
 	string str;
 	str.resize(width, ' ');
@@ -175,8 +190,8 @@ string build_process_bar(int width, size_t pos, size_t total)
 
 	if (total == 0)
 		return str;
-	
-	int i;
+
+	size_t i;
 
 	if (pos > total)
 		pos = total;
@@ -202,7 +217,7 @@ string build_process_bar(int width, size_t pos, size_t total)
 	return str;
 }
 
-void print_auto_scroll(string str, int len, int start)
+void print_auto_scroll(string str, size_t len, size_t start)
 {
 	if (str.size() <= len)
 	{
@@ -234,7 +249,7 @@ public:
 	size_t m_start_pos;
 	size_t	m_trans_size;
 	clock_t m_start_time;
-	
+
 	ShowNotify()
 	{
 		m_trans_size = m_trans_pos = 0;
@@ -368,7 +383,7 @@ public:
 		if (width <= 45)
 		{
 			string_ex str;
-			
+
 			str += get_print_dev_string();
 
 			str += g_wait[(g_wait_index++) & 0x3];
@@ -432,7 +447,7 @@ mutex g_callback_mutex;
 
 void print_oneline(string str)
 {
-	int w = get_console_width();
+	size_t w = get_console_width();
 	if (str.size() >= w)
 	{
 		str.resize(w-1);
@@ -452,7 +467,7 @@ int progress(uuu_notify nt, void *p)
 {
 	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify>*)p;
 	map<string, ShowNotify>::iterator it;
-	
+
 	std::lock_guard<std::mutex> lock(g_callback_mutex);
 
 	if ((*np)[nt.id].update(nt))
@@ -468,24 +483,24 @@ int progress(uuu_notify nt, void *p)
 		{
 			string_ex str;
 			str.format("Succuess %d    Failure %d", g_overall_okay, g_overall_failure);
-			
+
 			if (g_map_path_nt.empty())
 				str += "Wait for Known USB Device Appear";
 
 			if (!g_usb_path_filter.empty())
 			{
 				str += " at path ";
-				for (int i = 0; i < g_usb_path_filter.size(); i++)
+				for (size_t i = 0; i < g_usb_path_filter.size(); i++)
 					str += g_usb_path_filter[i] + " ";
 			}
 
 			print_oneline(str);
 			print_oneline("");
-			
+
 			for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
 				it->second.print();
 
-			for (int i = 0; i < g_map_path_nt.size() + 2; i++)
+			for (size_t i = 0; i < g_map_path_nt.size() + 2; i++)
 				cout << "\x1B[1F";
 		}
 
@@ -550,7 +565,7 @@ void print_usb_filter()
 	if (!g_usb_path_filter.empty())
 	{
 		cout << " at path ";
-		for (int i = 0; i < g_usb_path_filter.size(); i++)
+		for (size_t i = 0; i < g_usb_path_filter.size(); i++)
 			cout << g_usb_path_filter[i] << " ";
 	}
 }
@@ -564,12 +579,14 @@ int main(int argc, char **argv)
 
 	if (argc == 1)
 		print_help();
-	
+
 	int deamon = 0;
 	int shell = 0;
-	string filename; 
+	string filename;
 	string cmd;
-	
+	int ret;
+
+	string cmd_script;
 
 	for (int i = 1; i < argc; i++)
 	{
@@ -588,9 +605,19 @@ int main(int argc, char **argv)
 			{
 				g_verbose = 1;
 			}
+			else if (s == "-V")
+			{
+				g_verbose = 1;
+				uuu_set_debug_level(2);
+			}
 			else if (s == "-h")
 			{
-				print_help();
+				print_help(false);
+				return 0;
+			}
+			else if (s == "-H")
+			{
+				print_help(true);
 				return 0;
 			}
 			else if (s == "-m")
@@ -598,6 +625,38 @@ int main(int argc, char **argv)
 				i++;
 				uuu_add_usbpath_filter(argv[i]);
 				g_usb_path_filter.push_back(argv[i]);
+			}
+			else if (s == "-b" || s == "-brun")
+			{
+				if (i + 1 == argc || g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end())
+				{
+					printf("error, must be have script name: ");
+					g_BuildScripts.ShowCmds();
+					printf("\n");
+					return -1;
+				}
+
+				vector<string> args;
+				for (int j = i + 2; j < argc; j++)
+					args.push_back(argv[j]);
+
+				cmd_script = g_BuildScripts[argv[i + 1]].replace_script_args(args);
+				break;
+			}
+			else if (s == "-bshow")
+			{
+				if (i + 1 == argc || g_BuildScripts.find(argv[i+1]) == g_BuildScripts.end())
+				{
+					printf("error, must be have script name: ");
+					g_BuildScripts.ShowCmds();
+					printf("\n");
+					return -1;
+				}
+				else
+				{
+					printf("%s", g_BuildScripts[argv[i + 1]].m_script.c_str());
+					return 0;
+				}
 			}
 			else
 			{
@@ -620,7 +679,7 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-	
+
 	signal(SIGINT, ctrl_c_handle);
 
 	if (deamon && shell)
@@ -631,10 +690,14 @@ int main(int argc, char **argv)
 
 	if (g_verbose)
 	{
-		printf("Build in config:\n");
-		printf("\tPctl\tChip\tVid\tPid\tBcdVersion\n");
-		printf("\t==========================================\n");
+		printf("%sBuild in config:%s\n", BOLDWHITE, DEFAULT);
+		printf("\tPctl\t Chip\t\t Vid\t Pid\t BcdVersion\n");
+		printf("\t==================================================\n");
 		uuu_for_each_cfg(print_cfg, NULL);
+
+		if (!cmd_script.empty())
+			printf("\n%sRun built-in script:%s\n %s\n\n", BOLDWHITE, DEFAULT, cmd_script.c_str());
+
 		if (!shell)
 			cout << "Wait for Known USB Device Appear";
 
@@ -691,10 +754,9 @@ int main(int argc, char **argv)
 
 	if (!cmd.empty())
 	{
-		int ret;
 		ret = uuu_run_cmd(cmd.c_str());
 
-		for (int i = 0; i < g_map_path_nt.size()+3; i++)
+		for (size_t i = 0; i < g_map_path_nt.size()+3; i++)
 			printf("\n");
 		if(ret)
 			printf("\nError: %s\n", uuu_get_last_err_string());
@@ -704,12 +766,17 @@ int main(int argc, char **argv)
 		return ret;
 	}
 
-	int ret = uuu_auto_detect_file(filename.c_str());
+	if (!cmd_script.empty())
+		ret = uuu_run_cmd_script(cmd_script.c_str());
+	else
+		ret = uuu_auto_detect_file(filename.c_str());
+
 	if (ret)
 	{
-		cout << "Error:" << uuu_get_last_err_string();
+		cout << RED << "\nError: " << DEFAULT <<  uuu_get_last_err_string();
 		return ret;
 	}
+
 	uuu_wait_uuu_finish(deamon);
 
 	return g_overall_status;

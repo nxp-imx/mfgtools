@@ -72,7 +72,7 @@ int CmdBase::parser(char *p)
 	while (pos < m_cmd.size())
 	{
 		param = get_next_param(m_cmd, pos);
-		
+
 		struct Param *pp = NULL;
 		for (size_t i = 0; i < m_param.size(); i++)
 		{
@@ -83,7 +83,7 @@ int CmdBase::parser(char *p)
 				break;
 			}
 		}
-		
+
 		if (pp == NULL)
 		{
 			string err;
@@ -130,7 +130,7 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 {
 	CmdList::iterator it;
 	int ret;
-	
+
 	uuu_notify nt;
 	nt.type = uuu_notify::NOTIFY_CMD_TOTAL;
 	nt.total = size();
@@ -147,7 +147,7 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 		else
 		{
 			uuu_notify nt;
-			
+
 			nt.type = uuu_notify::NOTIFY_CMD_INDEX;
 			nt.index = i;
 			call_notify(nt);
@@ -155,7 +155,7 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 			nt.type = uuu_notify::NOTIFY_CMD_START;
 			nt.str = (char *)(*it)->m_cmd.c_str();
 			call_notify(nt);
-			
+
 			ret = (*it)->run(p);
 
 			nt.type = uuu_notify::NOTIFY_CMD_END;
@@ -168,19 +168,19 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 	return ret;
 }
 
-string get_next_param(string &cmd, size_t &pos)
+string get_next_param(string &cmd, size_t &pos, char sperate)
 {
 	string str;
 	if (pos == string::npos)
 		return str;
 	if (pos >= cmd.size())
 		return str;
-	
+
 	//trim left space
-	while (cmd[pos] == ' ' && pos < cmd.size())
+	while (cmd[pos] == sperate && pos < cmd.size())
 		pos++;
 
-	size_t end = cmd.find(' ', pos);
+	size_t end = cmd.find(sperate, pos);
 	if (end == cmd.npos)
 		end = cmd.size();
 
@@ -188,6 +188,32 @@ string get_next_param(string &cmd, size_t &pos)
 	pos = end + 1;
 
 	return str;
+}
+
+string remove_square_brackets(string &cmd)
+{
+	size_t sz=cmd.find('[');
+	return cmd.substr(0, sz);
+}
+
+int get_string_in_square_brackets(string &cmd, string &context)
+{
+	size_t start = cmd.find('[');
+	if (start == string::npos)
+	{
+		context.clear();
+		return 0;
+	}
+
+	size_t end = cmd.find(']', start);
+	if (end == string::npos)
+	{
+		set_last_err_string("missed ]");
+		return -1;
+	}
+
+	context = cmd.substr(start + 1, end - start - 1);
+	return 0;
 }
 
 uint32_t str_to_uint(string &str)
@@ -202,13 +228,13 @@ uint32_t str_to_uint(string &str)
 
 template <class T> shared_ptr<CmdBase> new_cmd_obj(char *p)
 {
-	return shared_ptr<CmdBase>(new T(p)); 
+	return shared_ptr<CmdBase>(new T(p));
 }
 
 CmdObjCreateMap::CmdObjCreateMap()
 {
 	(*this)["CFG:"] = new_cmd_obj<CfgCmd>;
-	
+
 	(*this)["SDPS:BOOT"] = new_cmd_obj<SDPSCmd>;
 	(*this)["SDPS:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["SDPS:DELAY"] = new_cmd_obj<CmdDelay>;
@@ -256,8 +282,11 @@ shared_ptr<CmdBase> create_cmd_obj(string cmd)
 {
 	string param;
 	size_t pos = 0;
-	param = get_next_param(cmd, pos);
+	param = get_next_param(cmd, pos, ':');
+	param = remove_square_brackets(param);
+	param += ":";
 	param = str_to_upper(param);
+
 	if (g_cmd_create_map.find(param) == g_cmd_create_map.end())
 	{
 		string s = param;
@@ -333,7 +362,7 @@ int CmdDone::run(CmdCtx *)
 	return 0;
 }
 
-int CmdDelay::parser(char *p)
+int CmdDelay::parser(char * /*p*/)
 {
 	size_t pos = 0;
 	string param = get_next_param(m_cmd, pos);
@@ -382,7 +411,7 @@ int run_cmds(const char *procotal, CmdCtx *p)
 	{
 		return 0;
 	}
-	
+
 	return (*pCmdMap)[procotal]->run_all(p);
 }
 
@@ -391,7 +420,12 @@ static int insert_one_cmd(const char * cmd, CmdMap *pCmdMap)
 	string s = cmd;
 	size_t pos = 0;
 
-	string pro = get_next_param(s, pos);
+	string pro = get_next_param(s, pos, ':');
+	pro = remove_square_brackets(pro);
+	pro += ":";
+
+	pro = str_to_upper(pro);
+
 	shared_ptr<CmdBase> p = create_cmd_obj(s);
 	if (p == NULL)
 		return -1;
@@ -444,7 +478,7 @@ int check_version(string str)
 {
 	int x = 0;
 	int ver = 0;
-	for (int i = 0; i < str.size(); i++)
+	for (size_t i = 0; i < str.size(); i++)
 	{
 		char c = str[i];
 		if (c >= '0' && c <= '9')
@@ -459,7 +493,7 @@ int check_version(string str)
 			x = 0;
 		}
 	}
-	
+
 	int cur = uuu_get_version();
 
 	if (ver > cur)
@@ -472,6 +506,14 @@ int check_version(string str)
 	return 0;
 }
 
+int uuu_run_cmd_script(const char * buff)
+{
+	shared_ptr<FileBuffer> p(new FileBuffer);
+	p->m_data.resize(strlen(buff));
+	memcpy(p->m_data.data(), buff, strlen(buff));
+	return parser_cmd_list_file(p);
+}
+
 int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap)
 {
 	char uuu_version[] = "uuu_version";
@@ -482,12 +524,12 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap)
 
 	pCmdMap->clear();
 
-	for (int i = 0; i < pbuff->size(); i++)
+	for (size_t i = 0; i < pbuff->size(); i++)
 	{
 		uint8_t c = pbuff->at(i);
 		if (c == '\r')
 			continue;
-		
+
 		if(c != '\n')
 			str.push_back(c);
 
@@ -519,7 +561,7 @@ int uuu_auto_detect_file(const char *filename)
 
 	if (fn.empty())
 		fn += "./";
-	
+
 	string oldfn =fn;
 
 	fn += "/uuu.auto";
@@ -548,12 +590,12 @@ int uuu_auto_detect_file(const char *filename)
 		size_t pos = fn.rfind('/');
 		if (pos != string::npos)
 			set_current_dir(fn.substr(0, pos + 1));
-		
+
 		g_cmd_list_file = fn.substr(pos+1);
 
 		return parser_cmd_list_file(buffer);
 	}
-	
+
 	//flash.bin or uboot.bin
 	return added_default_boot_cmd(fn.c_str());
 }

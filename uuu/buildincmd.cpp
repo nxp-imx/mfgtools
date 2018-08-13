@@ -28,42 +28,41 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#include <string>
-#include "sdps.h"
-#include "hidreport.h"
-#include "liberror.h"
-#include "libcomm.h"
-#include "buffer.h"
-#include "rominfo.h"
 
-int SDPSCmd::run(CmdCtx *pro)
+#include "buildincmd.h"
+
+BuildCmd g_buildin_cmd[] =
 {
-	ROM_INFO * rom;
-	rom = search_rom_info(pro->m_config_item);
-	if (rom == NULL)
 	{
-		string_ex err;
-		err.format("%s:%d can't get rom info", __FUNCTION__, __LINE__);
-		set_last_err_string(err);
-		return -1;
+		"emmc",
+#include "emmc_burn_loader.clst"
+		,"burn boot loader to eMMC boot partition"
+	},
+	{
+		"emmc_all",
+#include "emmc_burn_all.clst"
+		,"burn whole image to eMMC"
+	},
+	{
+		"qspi",
+#include "qspi_burn_loader.clst"
+		,"burn boot loader to qspi nor flash"
+	},
+	{
+		"sd",
+#include "sd_burn_loader.clst"
+		,"burn boot loader to sd card"
+	},
+	{
+		"spl",
+#include "spl_boot.clst"
+		,"boot spl and uboot"
+	},
+	{
+		NULL,
+		NULL,
+		NULL,
 	}
+};
 
-	HIDTrans dev;
-	if (rom->flags & ROM_INFO_HID_EP1)
-		dev.set_hid_out_ep(1);
-
-	if(dev.open(pro->m_dev))
-		return -1;
-
-	shared_ptr<FileBuffer> p = get_file_buffer(m_filename);
-	if (!p)
-		return -1;
-
-	HIDReport report(&dev);
-	report.m_skip_notify = false;
-
-	if (rom->flags & ROM_INFO_HID_PACK_SIZE_1020)
-		report.set_out_package_size(1020);
-
-	return report.write(p->data() + m_offset, p->size() - m_offset,  2);
-}
+BuildInScriptVector g_BuildScripts(g_buildin_cmd);

@@ -62,7 +62,7 @@ int Zip::BuildDirInfo()
 	size_t i;
 	Zip_eocd *peocd = NULL;
 
-	for (i = buff.size() - sizeof(Zip_eocd); i >= 0; i--)
+	for (i = buff.size() - sizeof(Zip_eocd); i > 0; i--)
 	{
 		peocd = (Zip_eocd*)(buff.data() + i);
 		if (peocd->sign == EOCD_SIGNATURE)
@@ -150,7 +150,7 @@ shared_ptr<FileBuffer>	Zip_file_Info::decompress(Zip *pZip)
 	do {
 		stream.read((char*)source.data(), CHUNK);
 		m_strm.avail_in = stream.gcount();
-		
+
 		if (m_strm.avail_in == 0)
 			break;
 		m_strm.next_in = source.data();
@@ -184,6 +184,6 @@ shared_ptr<FileBuffer>	Zip_file_Info::decompress(Zip *pZip)
 		set_last_err_string("decompress error");
 		return NULL;
 	}
-	
+
 	return p;
 }

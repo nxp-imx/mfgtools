@@ -1,46 +1,52 @@
 uuu_version 1.0.0
-# 
+#
 # uuu(universal update utility) command list file
 # Firstly line must be uuu_version show minimize uuu host version number
 # ---------------------------------------------------------------------
 # Command Format PROTOCOL COMMAND ARG
 # PROTOCOL
+#          ALL protocol supported common command
+#                      done  #last command for whole flow
+#                      delay <ms> # delay ms
+#
 #          CFG:  Config protocol of specific usb device vid/pid
 #                SDPS|SDP|FB\Fastboot|FBK -chip <chip name> -pid <pid> -vid <vid> [-bcdversion <ver>]
-#          SDPS: Stream download after MX8QXPB0 
-#                      boot  -f  <filename>
-#                      done  #last command for whole flow         
+#
+#          SDPS: Stream download after MX8QXPB0
+#                      boot  -f  <filename> [-offset 0x0000]
+#
 #          SDP:  iMX6/iMX7 HID download protocol.
 #                      dcd   -f  <filename>
 #                      write -f  <filename> [-addr 0x000000] [-ivt 0]
 #                      jump  -f  <filename> [-ivt 0]
 #                      boot  -f  <filename> [-nojump]
-#                      done  #last command for whole flow   
-#          FB:\Fastboot: android fastboot protocol
+#
+#          FB[-t timeout]:\Fastboot: android fastboot protocol. unit of timeout is ms
 #                      getvar
 #                      ucmd <any uboot command>
 #                      acmd <any never returned uboot command, like booti, reboot>
 #                      flash [-raw2sparse] <partition> <filename>
 #                      download -f <filename>
+#
 #          FBK: community with kernel with fastboot protocol. DO NOT compatible with fastboot tools.
 #                      ucmd <any kernel command> and wait for command finish
 #                      acmd <any kernel command> don't wait for command finish
 #                      sync                      wait for acmd processs finish.
 #                      ucp <soure> <destinate>   copy file from/to target
 #                                                T:<filename> means target board file.
-#                                                T:- means copy data to target's stdio pipe. 
+#                                                T:- means copy data to target's stdio pipe.
 #                                                copy image T:/root/image ;download image to path /root/image
 #                                                copy T:/root/image image ;upload /root/image to file image.
-#
 #                      Example for transfer big file
 #                              acmd tar -            ; run tar background and get data from stdio
 #                              ucp rootfs.tar.gz T:- ; send to target stdio pipe
 #                              sync                  ; wait for tar process exit.
+#
 # For example:
 #          SDPS: boot -f <filename>
 #          SDP:  boot -f <filename>
 #          CFG: SDP: -chip imx6ull -pid 0x1234 -vid 0x5678
-
+#
 # SDP: boot -f u-boot-imx7dsabresd_sd.imx -nojump
 # SDP: write -f zImage -addr 0x80800000
 # SDP: write -f zImage-imx7d-sdb.dtb -addr 0x83000000
@@ -54,4 +60,4 @@ FB: ucmd setenv fastboot_buffer 0x80800000
 FB: download -f zImage
 FB: ucmd setenv fastboot_buffer 0x83000000
 FB: download -f zImage-imx7d-sdb.dtb
-FB: ucmd bootz 0x80800000 - 0x83000000 
+FB: ucmd bootz 0x80800000 - 0x83000000

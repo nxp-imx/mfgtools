@@ -43,6 +43,7 @@ Config::Config()
 {
 	push_back(ConfigItem("SDPS:", "MX8QXP", NULL,   NXP_VID, 0x012F, 0x0002));
 	push_back(ConfigItem("SDPS:", "MX815",  NULL,   NXP_VID, 0x013E));
+	push_back(ConfigItem("SDPS:", "MX8QM",  "MX8QXP",   NXP_VID, 0x0129, 0x0002));
 	push_back(ConfigItem("SDP:", "MX7D",    NULL,   FSL_VID, 0x0076));
 	push_back(ConfigItem("SDP:", "MX6Q",    NULL,   FSL_VID, 0x0054));
 	push_back(ConfigItem("SDP:", "MX6D",    "MX6Q", FSL_VID, 0x0061));
@@ -52,7 +53,7 @@ Config::Config()
 	push_back(ConfigItem("SDP:", "MX6ULL",  "MX7D", FSL_VID, 0x0080));
 	push_back(ConfigItem("SDP:", "MX6SLL",  "MX7D", NXP_VID, 0x0128));
 	push_back(ConfigItem("SDP:", "MX7ULP",   NULL,  NXP_VID, 0x0126));
-	push_back(ConfigItem("SDP:", "MXRT106X", NULL,  NXP_VID, 0x0135));
+	push_back(ConfigItem("SDP:", "MXRT106X",  NULL,  NXP_VID, 0x0135));
 	push_back(ConfigItem("SDP:", "MX8MM",   "MX8MQ", NXP_VID, 0x0134));
 	push_back(ConfigItem("SDP:", "MX8MQ",   "MX8MQ", NXP_VID, 0x012B));
 	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4));
@@ -64,7 +65,7 @@ Config::Config()
 
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p)
 {
-	for (int i = 0; i < g_config.size(); i++)
+	for (size_t i = 0; i < g_config.size(); i++)
 	{
 		if (fn(g_config[i].m_protocol.c_str(),
 			   g_config[i].m_chip.c_str(),

@@ -91,17 +91,17 @@ class BulkTrans : public USBTrans
 	void Init()
 	{
 		m_MaxTransPreRequest = 0x1000;
-		m_b_send_zero = 0; 
+		m_b_send_zero = 0;
 		m_timeout = 2000;
 	}
 
 public:
 	EPInfo m_ep_in;
 	EPInfo m_ep_out;
-	int m_MaxTransPreRequest;
+	size_t m_MaxTransPreRequest;
 	int m_b_send_zero;
 	uint64_t m_timeout;
-	
+
 	BulkTrans() {
 		Init();
 	}
