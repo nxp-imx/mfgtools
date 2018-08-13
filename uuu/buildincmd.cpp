@@ -39,9 +39,24 @@ BuildCmd g_buildin_cmd[] =
 		,"burn boot loader to eMMC boot partition"
 	},
 	{
+		"emmc_all",
+#include "emmc_burn_all.clst"
+		,"burn whole image to eMMC"
+	},
+	{
 		"qspi",
 #include "qspi_burn_loader.clst"
 		,"burn boot loader to qspi nor flash"
+	},
+	{
+		"sd",
+#include "sd_burn_loader.clst"
+		,"burn boot loader to sd card"
+	},
+	{
+		"spl",
+#include "spl_boot.clst"
+		,"boot spl and uboot"
 	},
 	{
 		NULL,

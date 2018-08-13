@@ -11,7 +11,10 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -pthread -static-libstdc++ -static-libgcc")
 set(LSTS
 	uuu.lst
 	emmc_burn_loader.lst
+	emmc_burn_all.lst
 	qspi_burn_loader.lst
+	sd_burn_loader.lst
+	spl_boot.lst
 )
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libuuu)

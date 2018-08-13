@@ -117,6 +117,21 @@
       <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
 type $(SolutionDir)\..\uuu\uuu.lst &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+type $(SolutionDir)\..\uuu\emmc_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+type $(SolutionDir)\..\uuu\qspi_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+type $(SolutionDir)\..\uuu\sd_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\spl_boot.clst
+type $(SolutionDir)\..\uuu\spl_boot.lst &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+type $(SolutionDir)\..\uuu\emmc_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
@@ -153,7 +168,15 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
 type $(SolutionDir)\..\uuu\qspi_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
-
+echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+type $(SolutionDir)\..\uuu\sd_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\spl_boot.clst
+type $(SolutionDir)\..\uuu\spl_boot.lst &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+type $(SolutionDir)\..\uuu\emmc_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
@@ -188,6 +211,21 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
       <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
 type $(SolutionDir)\..\uuu\uuu.lst &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+type $(SolutionDir)\..\uuu\emmc_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+type $(SolutionDir)\..\uuu\qspi_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+type $(SolutionDir)\..\uuu\sd_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\spl_boot.clst
+type $(SolutionDir)\..\uuu\spl_boot.lst &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+type $(SolutionDir)\..\uuu\emmc_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
@@ -222,6 +260,21 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
       <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
 type $(SolutionDir)\..\uuu\uuu.lst &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\uuu.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+type $(SolutionDir)\..\uuu\emmc_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+type $(SolutionDir)\..\uuu\qspi_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+type $(SolutionDir)\..\uuu\sd_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\spl_boot.clst
+type $(SolutionDir)\..\uuu\spl_boot.lst &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+type $(SolutionDir)\..\uuu\emmc_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
