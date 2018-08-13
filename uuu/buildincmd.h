@@ -41,6 +41,7 @@ using namespace std;
 #define GREEN "\x1B[92m"
 #define RED	"\x1B[91m"
 #define KCYN  "\x1B[36m"
+#define BOLDWHITE "\x1B[97m"
 
 struct BuildCmd
 {
@@ -112,7 +113,7 @@ public:
 
 	void show_cmd()
 	{
-		printf("\t%s%s%s\t%s\n", KCYN, m_cmd.c_str(), DEFAULT,  m_desc.c_str());
+		printf("\t%s%s%s\t%s\n", BOLDWHITE, m_cmd.c_str(), DEFAULT,  m_desc.c_str());
 		for (size_t i=0; i < m_args.size(); i++)
 		{
 			printf("\t\targ%d: %s\n", (int)i, m_args[i].m_arg.c_str());
@@ -157,17 +158,17 @@ public:
 
 	void ShowCmds()
 	{
-		printf("[");
+		printf("<");
 		for (auto iCol = begin(); iCol != end(); ++iCol)
 		{
-			printf("%s%s%s", KCYN, iCol->first.c_str(), DEFAULT);
+			printf("%s%s%s", BOLDWHITE, iCol->first.c_str(), DEFAULT);
 
 			auto i = iCol;
 			i++;
 			if(i != end())
 				printf("|");
 		}
-		printf("]");
+		printf(">");
 	}
 };
 

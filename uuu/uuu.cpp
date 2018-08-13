@@ -98,35 +98,38 @@ public:
 	}
 };
 
-void print_help()
+void print_help(bool detail = false)
 {
-	printf("uuu [-d -m -v] u-boot.imx\\flash.bin\n");
-	printf("\tDownload    u-boot.imx\\flash.bin to board by usb\n");
-	printf("\t -d         Deamon mode, wait for forever.\n");
-	printf("\t            Start download once detect known device attached\n");
-	printf("\t -v         Print build in protocal config informaiton\n");
-	printf("\t -m         USBPATH Only monitor these pathes.\n");
-	printf("\t             -m 1:2 -m 2:3");
-	printf("\n\n");
-	printf("uuu [-d -m -v] cmdlist\n");
-	printf("\tRun all commands in file cmdlist\n");
-	printf("\n\n");
-	printf("uuu [-d -m -v] SDPS: boot flash.bin\n");
-	printf("\tRun command SPDS: boot flash.bin\n");
-	printf("\nuuu -s\n");
-	printf("\tEnter shell mode. uuu.inputlog record all input commands\n");
-	printf("\tyou can use \"uuu uuu.inputlog\" next time to run all commands\n");
-	printf("\n");
+	const char help[] =
+		"uuu [-d -m -v -V] <" BOLDWHITE "bootloader|cmdlists|cmd" DEFAULT ">\n\n"
+		"    bootloader  download bootloader to board by usb\n"
+		"    cmdlist     run all commands in cmdlist file\n"
+		"                If it is path, search uuu.auto in dir\n"
+		"                If it is zip, search uuu.auto in zip\n"
+		"    cmd         Run one command, use -H see detail\n"
+		"                example: SDPS: boot -f flash.bin\n"
+		"    -d          Deamon mode, wait for forever.\n"
+		"    -v -V       verbose mode, -V enable libusb error\\warning info\n"
+		"    -m          USBPATH Only monitor these pathes.\n"
+		"                    -m 1:2 -m 1:3\n\n"
+		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
+		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
+		"uuu -h -H       show help, -H means detail helps\n\n";
+	
+	printf("%s", help);
 	printf("uuu [-d -m -v] -b[run] ");
 	g_BuildScripts.ShowCmds();
 	printf(" arg...\n");
-	printf("\tRun Built - in scripts\n");
+	printf("\tRun Built-in scripts\n");
 	g_BuildScripts.ShowAll();
 	printf("\nuuu -bshow ");
 	g_BuildScripts.ShowCmds();
 	printf("\n");
 	printf("\tShow built-in script\n");
 	printf("\n");
+
+	if (detail == false)
+		return;
 
 	size_t start = 0, pos = 0;
 	string str= g_sample_cmd_list;
@@ -609,7 +612,12 @@ int main(int argc, char **argv)
 			}
 			else if (s == "-h")
 			{
-				print_help();
+				print_help(false);
+				return 0;
+			}
+			else if (s == "-H")
+			{
+				print_help(true);
 				return 0;
 			}
 			else if (s == "-m")
@@ -682,10 +690,14 @@ int main(int argc, char **argv)
 
 	if (g_verbose)
 	{
-		printf("Build in config:\n");
+		printf("%sBuild in config:%s\n", BOLDWHITE, DEFAULT);
 		printf("\tPctl\t Chip\t\t Vid\t Pid\t BcdVersion\n");
 		printf("\t==================================================\n");
 		uuu_for_each_cfg(print_cfg, NULL);
+
+		if (!cmd_script.empty())
+			printf("\n%sRun built-in script:%s\n %s\n\n", BOLDWHITE, DEFAULT, cmd_script.c_str());
+
 		if (!shell)
 			cout << "Wait for Known USB Device Appear";
 
