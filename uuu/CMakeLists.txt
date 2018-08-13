@@ -7,32 +7,46 @@ pkg_check_modules(LIBZ REQUIRED zlib)
 find_package(Threads)
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread -static-libstdc++ -static-libgcc")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wstrict-aliasing -Wextra")
 
-set(SOURCES
-	uuu.cpp
-	buildincmd.cpp
-	uuu.clst
-	emmc_burn_loader.clst
-	qspi_burn_loader.clst
+set(LSTS
+	uuu.lst
+	emmc_burn_loader.lst
+	qspi_burn_loader.lst
 )
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libuuu)
 
-
+set(CLIST_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/gen_txt_include.sh)
 set(generated_files_dir "${CMAKE_BINARY_DIR}/uuu/gen")
 
-add_custom_command(
-        OUTPUT uuu.clst emmc_burn_loader.clst qspi_burn_loader.clst
-        DEPENDS uuu.lst emmc_burn_loader.lst qspi_burn_loader.lst
-	PRE_BUILD
-		COMMAND mkdir -p ${generated_files_dir}
-        COMMAND sh -c 'cd ${CMAKE_CURRENT_SOURCE_DIR} && ./gen_txt_include.sh uuu.lst ${generated_files_dir}/uuu.clst'
-	COMMAND sh -c 'cd ${CMAKE_CURRENT_SOURCE_DIR} && ./gen_txt_include.sh emmc_burn_loader.lst ${generated_files_dir}/emmc_burn_loader.clst'
-	COMMAND sh -c 'cd ${CMAKE_CURRENT_SOURCE_DIR} && ./gen_txt_include.sh qspi_burn_loader.lst ${generated_files_dir}/qspi_burn_loader.clst'
+function(preprocess_clst out_var)
+	set(result)
+	foreach(in_f ${ARGN})
+		set(out_f "${generated_files_dir}/${in_f}")
+		string(REPLACE ".lst" ".clst" out_f ${out_f})
+		add_custom_command(OUTPUT ${out_f}
+			PRE_BUILD
+				COMMAND mkdir -p ${generated_files_dir}
+			COMMAND ${CLIST_EXECUTABLE} ${in_f} ${out_f}
+			DEPENDS ${in_f}
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			COMMENT "Creating preprocessed clst file ${out_f}"
+			VERBATIM
+		)
+		list(APPEND result ${out_f})
+	endforeach()
+	set(${out_var} "${result}" PARENT_SCOPE)
+endfunction()
 
-)
+preprocess_clst(CLSTS ${LSTS})
+
 include_directories(${generated_files_dir})
+
+set(SOURCES
+        uuu.cpp
+        buildincmd.cpp
+        ${CLSTS}
+)
 
 add_executable(uuu ${SOURCES})
 target_link_libraries(uuu uuc_s  ${LIBUSB_LIBRARIES} ${LIBZIP_LIBRARIES} ${LIBZ_LIBRARIES})
