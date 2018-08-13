@@ -13,5 +13,5 @@ FB: ucmd setenv mmcdev ${emmc_dev}
 FB: ucmd mmc dev ${emmc_dev}
 FB: flash -raw2sparse all _rootfs.sdcard
 FB: flash bootloader _flash.bin
-FB: ucmd mmc partconf ${emmc_dev} 1 1 0
+FB: ucmd mmc partconf ${emmc_dev} 0 1 0
 FB: done
