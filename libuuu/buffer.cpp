@@ -65,7 +65,7 @@ uint64_t get_file_timesample(string filename)
 		size_t pos = path.find(".ZIP");
 		if (pos == string::npos)
 			return 0;
-		if (stat64(filename.substr(1, pos + 4).c_str(), &st))
+		if (stat64(filename.substr(1, pos + 3).c_str(), &st))
 		{
 			string path = str_to_upper(filename);
 			size_t pos = path.find(".SDCARD");
@@ -119,12 +119,14 @@ int FileBuffer::reload(string filename)
 	size_t pos_zip = string::npos;
 	size_t pos_sdcard = string::npos;
 
+	printf("reload %s\n", filename.c_str());
+
 	if (stat64(filename.c_str() + 1, &st))
 	{
 		string path = str_to_upper(filename);
 		pos_zip = path.find(".ZIP");
 		string zipfile = filename.substr(0, pos_zip + 4);
-		if (pos_zip == string::npos || (stat64(zipfile.c_str(), &st)))
+		if (pos_zip == string::npos || (stat64(zipfile.c_str() + 1, &st)))
 		{
 			pos_sdcard = path.find(".SDCARD");
 			string sdcardfile = filename.substr(0, pos_sdcard + strlen(".SDCARD"));
@@ -141,10 +143,10 @@ int FileBuffer::reload(string filename)
 	if (pos_zip != string::npos)
 	{
 		Zip zip;
-		if (zip.Open(filename.substr(0, pos_zip + 4)))
+		if (zip.Open(filename.substr(1, pos_zip + 3)))
 		{
 			string err = "Fail Open File: ";
-			err.append(filename.substr(0, pos_zip + 4));
+			err.append(filename.substr(1, pos_zip + 3));
 			set_last_err_string(err);
 			return -1;
 		}
