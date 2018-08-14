@@ -7,7 +7,9 @@ echo #define GIT_VERSION "-unknown" > %1/gitversion.h
 
 call git log -n1 HEAD --pretty=format:"#define GIT_VERSION \"-g%%%%h\"%%%%n"> %1/gitversion.h
 
-if "%APPVEYOR_BUILD_VERSION%" != "" (
+IF "%APPVEYOR_BUILD_VERSION%" == "" (
+echo "not build in appveyor" 
+) ELSE (
 echo #define BUILD_VER "%APPVEYOR_BUILD_VERSION%.%APPVEYOR_BUILD_NUMBER%" >> %1/gitversion.h
 )	
 
