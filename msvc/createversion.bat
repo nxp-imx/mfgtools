@@ -10,7 +10,7 @@ call git log -n1 HEAD --pretty=format:"#define GIT_VERSION \"-g%%%%h\"%%%%n"> %1
 IF "%APPVEYOR_BUILD_VERSION%" == "" (
 echo "not build in appveyor" 
 ) ELSE (
-echo #define BUILD_VER "%APPVEYOR_BUILD_VERSION%.%APPVEYOR_BUILD_NUMBER%" >> %1/gitversion.h
+echo #define BUILD_VER "%APPVEYOR_BUILD_VERSION%" >> %1/gitversion.h
 )	
 
 )

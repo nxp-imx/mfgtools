@@ -28,7 +28,7 @@ if [ "${APPVEYOR_BUILD_VERSION}" = "" ];
 then
 	echo "not build from appveror"
 else
-	echo #define BUILD_VER \"${APPVEYOR_BUILD_VERSION}.${APPVEYOR_BUILD_NUMBER}"\" >> "$file_to_write"
+	echo #define BUILD_VER \"${APPVEYOR_BUILD_VERSION}\" >> "$file_to_write"
 fi
 
 
