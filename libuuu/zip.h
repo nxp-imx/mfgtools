@@ -37,6 +37,7 @@
 #include <memory>
 #include "buffer.h"
 #include "liberror.h"
+#include "libuuu.h"
 
 using namespace std;
 
@@ -148,6 +149,10 @@ public:
 			set_last_err_string(err);
 			return NULL;
 		}
+		uuu_notify ut;
+		ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
+		ut.str = (char*)filename.c_str();
+		call_notify(ut);
 
 		return m_filemap[filename].decompress(this);
 	}

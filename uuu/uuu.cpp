@@ -463,12 +463,35 @@ void print_oneline(string str)
 
 }
 
+int pre_progress(uuu_notify nt)
+{
+	static size_t size = 0;
+	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_START)
+	{
+		printf("\runzip          %s", nt.str);
+		return 1;
+	}
+	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_SIZE)
+	{
+		size = nt.total;
+		return 1;
+	}
+	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
+	{
+		printf("\runzip %3d%%", nt.index *100 / size);
+		return 1;
+	}
+	return 0;
+}
 int progress(uuu_notify nt, void *p)
 {
 	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify>*)p;
 	map<string, ShowNotify>::iterator it;
 
 	std::lock_guard<std::mutex> lock(g_callback_mutex);
+
+	if (pre_progress(nt))
+		return 0;
 
 	if ((*np)[nt.id].update(nt))
 	{
@@ -482,7 +505,7 @@ int progress(uuu_notify nt, void *p)
 		else
 		{
 			string_ex str;
-			str.format("Succuess %d    Failure %d", g_overall_okay, g_overall_failure);
+			str.format("\rSuccuess %d    Failure %d    ", g_overall_okay, g_overall_failure);
 
 			if (g_map_path_nt.empty())
 				str += "Wait for Known USB Device Appear";

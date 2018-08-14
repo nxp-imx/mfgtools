@@ -118,6 +118,12 @@ shared_ptr<FileBuffer>	Zip_file_Info::decompress(Zip *pZip)
 	shared_ptr<FileBuffer> p(new FileBuffer);
 	p->resize(m_filesize);
 
+	uuu_notify ut;
+	ut.type = uuu_notify::NOTIFY_DECOMPRESS_SIZE;
+	ut.total = m_filesize;
+	call_notify(ut);
+	size_t lastpos = 0;
+
 	ifstream stream(pZip->m_filename, ifstream::binary);
 	if (!stream)
 	{
@@ -173,6 +179,14 @@ shared_ptr<FileBuffer>	Zip_file_Info::decompress(Zip *pZip)
 			pos += have;
 		} while (m_strm.avail_out == 0);
 
+		if(pos - lastpos > 100 * 1024 * 1024)
+		{
+			uuu_notify ut;
+			ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
+			ut.index = pos;
+			call_notify(ut);
+			lastpos = pos;
+		}
 		/* done when inflate() says it's done */
 	} while (ret != Z_STREAM_END);
 
@@ -184,6 +198,10 @@ shared_ptr<FileBuffer>	Zip_file_Info::decompress(Zip *pZip)
 		set_last_err_string("decompress error");
 		return NULL;
 	}
+
+	ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
+	ut.index = m_filesize;
+	call_notify(ut);
 
 	return p;
 }
