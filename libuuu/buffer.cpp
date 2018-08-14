@@ -119,8 +119,6 @@ int FileBuffer::reload(string filename)
 	size_t pos_zip = string::npos;
 	size_t pos_sdcard = string::npos;
 
-	printf("reload %s\n", filename.c_str());
-
 	if (stat64(filename.c_str() + 1, &st))
 	{
 		string path = str_to_upper(filename);
