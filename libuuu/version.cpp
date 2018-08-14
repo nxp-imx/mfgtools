@@ -31,12 +31,15 @@
 
 #include "gitversion.h"
 #include "libuuu.h"
+#include <string>
 
-#define VER_MAJ 1
-#define VER_MIN 1
-#define VER_S   4
+using namespace std;
 
-static const char g_version[] = "libuuu-1.1.4" GIT_VERSION;
+#ifndef BUILD_VER
+#define BUILD_VER "1.2.4"
+#endif
+
+static const char g_version[] = "libuuu-" BUILD_VER GIT_VERSION;
 
 const char *uuu_get_version_string()
 {
@@ -45,5 +48,24 @@ const char *uuu_get_version_string()
 
 int uuu_get_version()
 {
-	return (VER_MAJ << 16) | (VER_MIN << 8) | VER_S;
+	string str = g_version;
+	int maj, min, build;
+	str = str.substr(strlen("libuuu-"));
+	size_t pos = 0;
+	
+	string s = str.substr(0, pos=str.find(".", pos));
+
+	maj = stoll(s, 0, 10);
+
+	str = str.substr(pos + 1);
+	s = str.substr(0, pos = str.find(".", pos));
+
+	min = stoll(s, 0, 10);
+
+	str = str.substr(pos + 1);
+	s = str.substr(0, pos = str.find("-", pos));
+
+	build = stoll(s, 0, 10);
+
+	return (maj << 16) | (min << 8) | build;
 }
