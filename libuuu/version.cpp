@@ -32,6 +32,7 @@
 #include "gitversion.h"
 #include "libuuu.h"
 #include <string>
+#include <string.h>
 
 using namespace std;
 

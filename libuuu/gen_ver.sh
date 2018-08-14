@@ -11,7 +11,7 @@ then
 	version=`git log -n1 HEAD --pretty=format:%h`
 else
 	#echo "Not in a repo"
-	version="unknown"
+	version="-unknown"
 fi
 
 #echo "version: [$version]"
@@ -23,3 +23,12 @@ definition="#define GIT_VERSION \"-g$version\""
 
 # Write definition to file
 echo "$definition" > "$file_to_write"
+
+if [ "${APPVEYOR_BUILD_VERSION}" = "" ];
+then
+	echo "not build from appveror"
+else
+	echo #define BUILD_VER \"${APPVEYOR_BUILD_VERSION}.${APPVEYOR_BUILD_NUMBER}"\" >> "$file_to_write"
+fi
+
+
