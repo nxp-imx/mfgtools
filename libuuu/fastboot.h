@@ -99,7 +99,7 @@ public:
 	string m_filename;
 	string m_partition;
 	bool m_raw2sparse;
-	FBFlashCmd(char *p) : FBCmd(p) { m_fb_cmd = "flash"; m_raw2sparse = false; }
+	FBFlashCmd(char *p) : FBCmd(p) { m_timeout = 10000; m_fb_cmd = "flash"; m_raw2sparse = false; }
 	int parser(char *p = NULL);
 	int run(CmdCtx *ctx);
 	int flash(FastBoot *fb, void *p, size_t sz);

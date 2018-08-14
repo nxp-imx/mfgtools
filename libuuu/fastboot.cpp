@@ -516,7 +516,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		return -1;
 
 	FastBoot fb(&dev);
-	dev.m_timeout = 10000;
+	dev.m_timeout = m_timeout;
 
 	shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename);
 	if (pdata == NULL)
