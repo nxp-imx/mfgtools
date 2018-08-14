@@ -779,5 +779,7 @@ int main(int argc, char **argv)
 
 	uuu_wait_uuu_finish(deamon);
 
+	/*Wait for the other thread exit, after send out CMD_DONE*/
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	return g_overall_status;
 }
