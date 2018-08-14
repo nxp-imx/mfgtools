@@ -37,7 +37,7 @@
 using namespace std;
 
 #ifndef BUILD_VER
-#define BUILD_VER "1.2.4"
+#define BUILD_VER "1.1.4"
 #endif
 
 static const char g_version[] = "libuuu-" BUILD_VER GIT_VERSION;
