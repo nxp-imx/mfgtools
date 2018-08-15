@@ -37,6 +37,7 @@
 #include <assert.h>
 #include <mutex>
 #include <atomic>
+#include <thread>
 
 #ifdef _MSC_VER
 #include <Windows.h>
