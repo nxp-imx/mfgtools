@@ -37,6 +37,7 @@ using namespace std;
 #include "libuuu.h"
 #include "liberror.h"
 #include <thread>
+#include <mutex>
 
 struct  notify_map
 {
@@ -45,12 +46,15 @@ struct  notify_map
 };
 
 static vector<struct notify_map> g_notify_callback_list;
+static mutex g_mutex_nofity;
 
 int uuu_register_notify_callback(uuu_notify_fun f, void *data)
 {
 	notify_map a;
 	a.f = f;
 	a.data = data;
+	
+	std::lock_guard<mutex> lock(g_mutex_nofity);
 
 	for (size_t i = 0; i < g_notify_callback_list.size(); i++)
 	{
@@ -66,6 +70,8 @@ int uuu_unregister_notify_callback(uuu_notify_fun f)
 {
 	vector<struct notify_map>::iterator it=g_notify_callback_list.begin();
 
+	std::lock_guard<mutex> lock(g_mutex_nofity);
+
 	for (;it!=g_notify_callback_list.end();it++)
 	{
 		if (it->f == f)
@@ -79,8 +85,10 @@ int uuu_unregister_notify_callback(uuu_notify_fun f)
 
 void call_notify(struct uuu_notify nf)
 {
-	vector<struct notify_map>::iterator it = g_notify_callback_list.begin();
+	//Change RW lock later;
+	std::lock_guard<mutex> lock(g_mutex_nofity);
 
+	vector<struct notify_map>::iterator it = g_notify_callback_list.begin();
 	nf.id = std::hash<std::thread::id>{}(std::this_thread::get_id());
 
 	for (; it != g_notify_callback_list.end(); it++)

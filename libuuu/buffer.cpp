@@ -111,13 +111,19 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 			}
 
 		if (!p->m_loaded && !async)
-			p->m_aync_thread.join();
+		{
+			std::lock_guard<mutex> lock(p->m_async_mutex);
 
+			if(p->m_aync_thread.joinable())
+				p->m_aync_thread.join();
+		}
 		return p;
 	}
 }
 int zip_async_load(string zipfile, string fn, FileBuffer * buff)
 {
+	std::lock_guard<mutex> lock(buff->m_async_mutex);
+
 	Zip zip;
 	if (zip.Open(zipfile))
 		return -1;

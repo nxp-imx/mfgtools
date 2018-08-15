@@ -465,14 +465,9 @@ void print_oneline(string str)
 
 int pre_progress(uuu_notify nt)
 {
-#if 0
 	static size_t size = 0;
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_START)
 	{
-		if(g_verbose)
-			printf("\nunzip>         %s", nt.str);
-		else
-			printf("\runzip          %s", nt.str);
 		return 1;
 	}
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_SIZE)
@@ -482,10 +477,8 @@ int pre_progress(uuu_notify nt)
 	}
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
 	{
-		printf("\runzip> %3d%%", nt.index *100 / size);
 		return 1;
 	}
-#endif
 	return 0;
 }
 int progress(uuu_notify nt, void *p)

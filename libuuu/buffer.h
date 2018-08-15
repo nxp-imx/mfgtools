@@ -53,7 +53,7 @@ public:
 	vector<uint8_t> m_data;
 	uint8_t *m_pMapbuffer;
 	size_t m_MapSize;
-	mutex m_aync_load;
+	mutex m_async_mutex;
 	atomic_bool m_loaded;
 	thread m_aync_thread;
 
