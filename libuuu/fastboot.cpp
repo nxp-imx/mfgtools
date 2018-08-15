@@ -418,8 +418,7 @@ int FBFlashCmd::parser(char *p)
 		return -1;
 	}
 
-	shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename);
-	if (pdata == NULL)
+	if (!check_file_exist(m_filename))
 		return -1;
 
 	return 0;

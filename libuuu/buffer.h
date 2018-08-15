@@ -35,6 +35,8 @@
 #include <memory>
 #include "liberror.h"
 #include <assert.h>
+#include <mutex>
+#include <atomic>
 
 #ifdef _MSC_VER
 #include <Windows.h>
@@ -51,14 +53,20 @@ public:
 	vector<uint8_t> m_data;
 	uint8_t *m_pMapbuffer;
 	size_t m_MapSize;
+	mutex m_aync_load;
+	atomic_bool m_loaded;
+	thread m_aync_thread;
 
 	FileBuffer()
 	{
 		m_pMapbuffer = NULL;
 		m_MapSize = 0;
+		m_loaded = false;
 	}
 	~FileBuffer()
 	{
+		if(m_aync_thread.joinable())
+			m_aync_thread.join();
 		unmapfile();
 	}
 
@@ -172,8 +180,10 @@ public:
 	}
 	//Read write lock;
 	uint64_t m_timesample;
-	int reload(string filename);
+	int reload(string filename, bool async=false);
 };
 
 shared_ptr<FileBuffer> get_file_buffer(string filename);
+bool check_file_exist(string filename, bool start_async_load=true);
+
 void set_current_dir(string dir);
