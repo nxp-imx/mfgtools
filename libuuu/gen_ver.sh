@@ -28,7 +28,10 @@ echo "$definition" > "$file_to_write"
 if [ "${APPVEYOR_BUILD_VERSION}" = "" ];
 then
 	echo "not build from appveror"
-	echo "#define BUILD_VER \"${tag#*_}\"" >> "$file_to_write"
+	tag=${tag#*_}
+	tag=${tag%-*}
+	tag=${tag%-*}
+	echo "#define BUILD_VER \"$tag\"" >> "$file_to_write"
 else
 	echo "build from appveryor"
 	echo "#define BUILD_VER \"${APPVEYOR_BUILD_VERSION}\"" >> "$file_to_write"
