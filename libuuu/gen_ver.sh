@@ -1,4 +1,4 @@
-!/bin/sh
+#!/bin/sh
 
 # Input parameters
 file_to_write="$1"
@@ -16,5 +16,5 @@ then
 	#echo "In a repo"
 	# Get the version of the last commit of the repo
 	version=`git describe --tags --long`
-	echo "#define GIT_VERSION lib$version" > $file_to_write
+	echo "#define GIT_VERSION \"lib$version\"" > $file_to_write
 fi
