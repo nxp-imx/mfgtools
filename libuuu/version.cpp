@@ -36,11 +36,11 @@
 
 using namespace std;
 
-#ifndef BUILD_VER
-#define BUILD_VER "1.1.4"
+#ifndef GIT_VERSION
+#define GIT_VERSION "v1.1.4-unknown"
 #endif
 
-static const char g_version[] = "libuuu-" BUILD_VER GIT_VERSION;
+static const char g_version[] = GIT_VERSION;
 
 const char *uuu_get_version_string()
 {
@@ -51,20 +51,24 @@ int uuu_get_version()
 {
 	string str = g_version;
 	int maj, min, build;
-	str = str.substr(strlen("libuuu-"));
+
 	size_t pos = 0;
-	
-	string s = str.substr(0, pos=str.find(".", pos));
+	pos = str.find(".", pos);
+	size_t vs = str.find_last_not_of("0123456789", pos - 1);
+	vs++;
+
+	string s = str.substr(vs, pos - vs);
 
 	maj = stoll(s, 0, 10);
 
 	str = str.substr(pos + 1);
-	s = str.substr(0, pos = str.find(".", pos));
+	pos = str.find(".");
+	s = str.substr(0, pos);
 
 	min = stoll(s, 0, 10);
 
 	str = str.substr(pos + 1);
-	s = str.substr(0, pos = str.find("-", pos));
+	s = str.substr(0, pos = str.find("-"));
 
 	build = stoll(s, 0, 10);
 
