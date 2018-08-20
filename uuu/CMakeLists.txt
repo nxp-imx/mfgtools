@@ -15,6 +15,7 @@ set(LSTS
 	qspi_burn_loader.lst
 	sd_burn_loader.lst
 	spl_boot.lst
+	sd_burn_all.lst
 )
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libuuu)

@@ -132,6 +132,10 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 type $(SolutionDir)\..\uuu\emmc_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+type $(SolutionDir)\..\uuu\sd_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
@@ -177,6 +181,9 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 type $(SolutionDir)\..\uuu\emmc_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+type $(SolutionDir)\..\uuu\sd_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
@@ -226,6 +233,9 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 type $(SolutionDir)\..\uuu\emmc_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+type $(SolutionDir)\..\uuu\sd_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
@@ -275,6 +285,9 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\spl_boot.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 type $(SolutionDir)\..\uuu\emmc_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+type $(SolutionDir)\..\uuu\sd_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>

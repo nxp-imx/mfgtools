@@ -65,7 +65,7 @@ uint64_t get_file_timesample(string filename)
 		size_t pos = path.find(".ZIP");
 		if (pos == string::npos)
 			return 0;
-		if (stat64(filename.substr(1, pos + 4).c_str(), &st))
+		if (stat64(filename.substr(1, pos + 3).c_str(), &st))
 		{
 			string path = str_to_upper(filename);
 			size_t pos = path.find(".SDCARD");
@@ -80,7 +80,7 @@ uint64_t get_file_timesample(string filename)
 	return st.st_mtime;
 }
 
-shared_ptr<FileBuffer> get_file_buffer(string filename)
+shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 {
 	if (!filename.empty() && filename[0] != MAGIC_PATH)
 	{
@@ -94,7 +94,7 @@ shared_ptr<FileBuffer> get_file_buffer(string filename)
 	{
 		shared_ptr<FileBuffer> p(new FileBuffer);
 
-		if (p->reload(filename))
+		if (p->reload(filename, async))
 			return NULL;
 
 		g_filebuffer_map[filename]=p;
@@ -105,15 +105,39 @@ shared_ptr<FileBuffer> get_file_buffer(string filename)
 	{
 		shared_ptr<FileBuffer> p = g_filebuffer_map[filename];
 		if (p->m_timesample != get_file_timesample(filename))
-			if (p->reload(filename))
+			if (p->reload(filename, async))
 			{
 				return NULL;
 			}
+
+		if (!p->m_loaded && !async)
+		{
+			std::lock_guard<mutex> lock(p->m_async_mutex);
+
+			if(p->m_aync_thread.joinable())
+				p->m_aync_thread.join();
+		}
 		return p;
 	}
 }
+int zip_async_load(string zipfile, string fn, FileBuffer * buff)
+{
+	std::lock_guard<mutex> lock(buff->m_async_mutex);
 
-int FileBuffer::reload(string filename)
+	Zip zip;
+	if (zip.Open(zipfile))
+		return -1;
+
+	shared_ptr<FileBuffer> p = zip.get_file_buff(fn);
+	if (p == NULL)
+		return -1;
+
+	buff->swap(*p);
+	buff->m_loaded = true;
+	return 0;
+}
+
+int FileBuffer::reload(string filename, bool async)
 {
 	struct stat64 st;
 	size_t pos_zip = string::npos;
@@ -124,7 +148,7 @@ int FileBuffer::reload(string filename)
 		string path = str_to_upper(filename);
 		pos_zip = path.find(".ZIP");
 		string zipfile = filename.substr(0, pos_zip + 4);
-		if (pos_zip == string::npos || (stat64(zipfile.c_str(), &st)))
+		if (pos_zip == string::npos || (stat64(zipfile.c_str() + 1, &st)))
 		{
 			pos_sdcard = path.find(".SDCARD");
 			string sdcardfile = filename.substr(0, pos_sdcard + strlen(".SDCARD"));
@@ -141,19 +165,30 @@ int FileBuffer::reload(string filename)
 	if (pos_zip != string::npos)
 	{
 		Zip zip;
-		if (zip.Open(filename.substr(0, pos_zip + 4)))
-		{
-			string err = "Fail Open File: ";
-			err.append(filename.substr(0, pos_zip + 4));
-			set_last_err_string(err);
-			return -1;
-		}
-		string fn = filename.substr(pos_zip + 5);
-		shared_ptr<FileBuffer> p = zip.get_file_buff(fn);
-		if (p == NULL)
+		string zipfile = filename.substr(1, pos_zip + 3);
+		if (zip.Open(zipfile))
 			return -1;
 
-		this->swap(*p);
+		string fn = filename.substr(pos_zip + 5);
+
+		if (!zip.check_file_exist(fn))
+			return -1;
+
+		this->m_loaded = false;
+
+		if (async)
+		{
+			m_aync_thread = thread(zip_async_load, zipfile, fn, this);
+
+		}else
+		{
+			shared_ptr<FileBuffer> p = zip.get_file_buff(fn);
+			if (p == NULL)
+				return -1;
+
+			this->swap(*p);
+			this->m_loaded = true;
+		}
 		m_timesample = st.st_mtime;
 		return 0;
 	}
@@ -184,6 +219,18 @@ int FileBuffer::reload(string filename)
 
 	if (this->mapfile(filename.substr(1), st.st_size))
 		return -1;
+	
+	this->m_loaded = true;
 
 	return 0;
+}
+
+shared_ptr<FileBuffer> get_file_buffer(string filename)
+{
+	return get_file_buffer(filename, false);
+}
+
+bool check_file_exist(string filename, bool start_async_load)
+{
+	return get_file_buffer(filename, true) != NULL;
 }

@@ -54,6 +54,11 @@ BuildCmd g_buildin_cmd[] =
 		,"burn boot loader to sd card"
 	},
 	{
+		"sd_all",
+#include "sd_burn_all.clst"
+		,"burn whole image to sd card"
+	},
+	{
 		"spl",
 #include "spl_boot.clst"
 		,"boot spl and uboot"

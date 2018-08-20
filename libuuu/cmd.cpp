@@ -104,7 +104,7 @@ int CmdBase::parser(char *p)
 			param = get_next_param(m_cmd, pos);
 			*(string*)pp->pData = param;
 
-			if (get_file_buffer(param) == NULL)
+			if (!check_file_exist(param))
 				return -1;
 		}
 
