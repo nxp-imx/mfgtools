@@ -36,6 +36,8 @@ Freescale/NXP I.MX Chip image deploy tools.
                             u-boot.imx can be replaced, new file will be download once board reset.
                             
                             Avoid unplug sd, write sd, plug sd card when debug uboot.
+                            
+  uuu -b emmc u-boot.imx    write u-boot.imx to emmc boot partition. u-boot.imx need enable fastboot
 ```
 
 # Build:
