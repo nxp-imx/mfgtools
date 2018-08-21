@@ -268,6 +268,10 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["FB:DELAY"] = new_cmd_obj<CmdDelay>;
 	(*this)["FASTBOOT:DELAY"] = new_cmd_obj<CmdDelay>;
+	(*this)["FB:OEM"] = new_cmd_obj<FBOemCmd>;
+	(*this)["FASTBOOT:OEM"] = new_cmd_obj<FBOemCmd>;
+	(*this)["FB:FLASHING"] = new_cmd_obj<FBFlashingCmd>;
+	(*this)["FASTBOOT:FLASHING"] = new_cmd_obj<FBFlashingCmd>;
 
 	(*this)["FBK:UCMD"] = new_cmd_obj<FBUCmd>;
 	(*this)["FBK:ACMD"] = new_cmd_obj<FBACmd>;

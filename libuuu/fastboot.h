@@ -93,6 +93,18 @@ public:
 	FBSyncCmd(char *p) : FBCmd(p) { m_fb_cmd = "Sync"; }
 };
 
+class FBFlashingCmd : public FBCmd
+{
+public:
+	FBFlashingCmd(char *p) : FBCmd(p) { m_fb_cmd = "flashing"; }
+};
+
+class FBOemCmd : public FBCmd
+{
+public:
+	FBOemCmd(char *p) : FBCmd(p) { m_fb_cmd = "oem"; }
+};
+
 class FBFlashCmd : public FBCmd
 {
 public:
