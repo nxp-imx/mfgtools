@@ -50,10 +50,30 @@ struct BuildCmd
 	const char *m_desc;
 };
 
-struct Arg
+class Arg
 {
+public:
 	string m_arg;
 	string m_desc;
+	uint32_t m_flags;
+	string m_options;
+	enum
+	{
+		ARG_MUST = 0x1,
+		ARG_OPTION = 0x2,
+		ARG_OPTION_KEY = 0x4,
+	};
+	Arg() {	m_flags = ARG_MUST;	}
+	int parser(string option)
+	{
+		size_t pos;
+		pos = option.find('[');
+		if (pos == string::npos)
+			return 0;
+		m_options = option.substr(pos + 1, option.find(']') - pos - 1);
+		m_flags = ARG_OPTION | ARG_OPTION_KEY;
+		return 0;
+	}
 };
 
 class BuildInScript
@@ -100,7 +120,29 @@ public:
 				{
 					Arg a;
 					a.m_arg = param;
+					a.m_flags = Arg::ARG_MUST;
 					m_args.push_back(a);
+				}
+			}
+		}
+
+		for (size_t i = 0; i < m_args.size(); i++)
+		{
+			size_t pos = 0;
+			string str;
+			str += "@";
+			str += m_args[i].m_arg;
+			pos = m_script.find(str);
+			if (pos != string::npos) {
+				string def;
+				size_t start_descript;
+				start_descript = m_script.find('|', pos);
+				if (start_descript != string::npos)
+				{
+					m_args[i].m_desc = m_script.substr(start_descript + 1, 
+											m_script.find('\n', start_descript) - start_descript - 1);
+					def = m_script.substr(pos, start_descript - pos);
+					m_args[i].parser(def);
 				}
 			}
 		}
@@ -116,8 +158,26 @@ public:
 		printf("\t%s%s%s\t%s\n", BOLDWHITE, m_cmd.c_str(), DEFAULT,  m_desc.c_str());
 		for (size_t i=0; i < m_args.size(); i++)
 		{
-			printf("\t\targ%d: %s\n", (int)i, m_args[i].m_arg.c_str());
+			string desc;
+			desc += m_args[i].m_arg;
+			if (m_args[i].m_flags & Arg::ARG_OPTION)
+			{
+				desc += BOLDWHITE "[Optional]" DEFAULT;
+			}
+			desc += " ";
+			desc += m_args[i].m_desc;
+			printf("\t\targ%d: %s\n", (int)i, desc.c_str());
 		}
+	}
+
+	string replace_str(string str, string key, string replace)
+	{
+		for (size_t j = 0; (j = str.find(key, j)) != string::npos;)
+		{
+			str.replace(j, key.size(), replace);
+			j += key.size();
+		}
+		return str;
 	}
 
 	string replace_script_args(vector<string> args)
@@ -125,12 +185,25 @@ public:
 		string script = m_script;
 		for (size_t i = 0; i < args.size(); i++)
 		{
-			for (size_t j = 0; (j = script.find(m_args[i].m_arg, j)) != string::npos;)
+			script = replace_str(script, m_args[i].m_arg, args[i]);
+		}
+
+		//handle option args;
+		for (size_t i = args.size(); i < m_args.size(); i++)
+		{
+			if (m_args[i].m_flags & Arg::ARG_OPTION_KEY)
 			{
-				script.replace(j, m_args[i].m_arg.size(), args[i]);
-				j += args[i].size();
+				for (size_t j = 0; j < args.size(); j++)
+				{
+					if (m_args[j].m_arg == m_args[i].m_options)
+					{
+						script = replace_str(script, m_args[i].m_arg, args[j]);
+						break;
+					}
+				}
 			}
 		}
+		printf("%s", script.c_str());
 		return script;
 	}
 };

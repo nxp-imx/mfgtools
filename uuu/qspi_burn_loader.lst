@@ -1,5 +1,8 @@
 uuu_version 1.1.4
 
+# @_flexspi.bin            | bootloader
+# @_image   [_flexspi.bin] | image burn to flexspi, default is the same as bootloader
+
 SDP: boot -f _flexspi.bin
 # This command will be run when use SPL
 SDPU: delay 1000
@@ -9,7 +12,7 @@ SDPU: jump
 SDPS: boot -f _flexspi.bin -offset 0x1000
 
 FB: ucmd setenv fastboot_buffer ${loadaddr}
-FB: download -f _flexspi.bin
+FB: download -f _image
 FB: ucmd sf probe
 FB[-t 10000]: ucmd sf erase 0 100000
 FB: ucmd sf write ${fastboot_buffer} 0 ${fastboot_bytes}
