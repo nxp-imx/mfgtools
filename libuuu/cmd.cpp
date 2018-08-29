@@ -246,6 +246,7 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["SDP:BOOT"] = new_cmd_obj<SDPBootCmd>;
 	(*this)["SDP:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["SDP:DELAY"] = new_cmd_obj<CmdDelay>;
+	(*this)["SDP:BLOG"] = new_cmd_obj<SDPBootlogCmd>;
 
 	(*this)["SDPU:JUMP"] = new_cmd_obj<SDPJumpCmd>;
 	(*this)["SDPU:WRITE"] = new_cmd_obj<SDPWriteCmd>;

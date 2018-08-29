@@ -37,6 +37,7 @@
 #include "buffer.h"
 #include "sdp.h"
 #include "rominfo.h"
+#include "libusb.h"
 
 IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &off)
 {
@@ -159,6 +160,10 @@ int SDPBootCmd::run(CmdCtx *ctx)
 		if (jmp.parser()) return -1;
 		if (jmp.run(ctx)) return -1;
 	}
+
+	SDPBootlogCmd log(NULL);
+	log.run(ctx);
+
 	return 0;
 }
 
@@ -327,5 +332,36 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 	//Omit last return value.
 	check_ack(&report, ROM_OK_ACK);
 
+	return 0;
+}
+
+int SDPBootlogCmd::run(CmdCtx *ctx)
+{
+	HIDTrans dev;
+	if (dev.open(ctx->m_dev))
+		return -1;
+
+	HIDReport report(&dev);
+
+	vector<uint8_t> v(65);
+	v[0] = 'I';
+
+	uuu_notify nt;
+	nt.type = uuu_notify::NOTIFY_CMD_INFO;
+	
+	int ret;
+	while (1)
+	{
+		ret = report.read(v);
+		if(ret == 0)
+		{
+			nt.str = (char*)(v.data() + 4);
+			v[5] = 0;
+			call_notify(nt);
+			continue;
+		}
+		if (ret != LIBUSB_ERROR_TIMEOUT)
+			return 0;
+	}
 	return 0;
 }

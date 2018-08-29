@@ -160,6 +160,16 @@ public:
 	}
 };
 
+class SDPBootlogCmd : public SDPCmdBase
+{
+public:
+	SDPBootlogCmd(char *p) :SDPCmdBase(p)
+	{
+		insert_param_info("blog", NULL, Param::e_null);
+	}
+	int run(CmdCtx *);
+};
+
 class SDPDcdCmd : public SDPCmdBase
 {
 public:
