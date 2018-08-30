@@ -758,7 +758,10 @@ int main(int argc, char **argv)
 			{
 				print_help();
 			}
-			else
+			else if (cmd == "q" || cmd == "quit")
+			{
+				return 0;
+			}else
 			{
 				log << cmd << endl;
 				log.flush();
