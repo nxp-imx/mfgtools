@@ -1,4 +1,4 @@
-# uuu(universial update Utility), mfgtools 3.0 
+# uuu(universial update Utility), mfgtools 3.0
 
 **original linux version using "linux" branch, windows version use "windows" branch**
 
@@ -18,7 +18,7 @@ Freescale/NXP I.MX Chip image deploy tools.
  - The real cross platform. linux, windows, MacOS(not test yet)
  - Multi devices program support
  - Daemon mode support.
- - Small depedence (only libusb)
+ - Small depedence (only libusb and zlibc)
  - Firmware (uboot/kernel) use WCID to auto load winusb drvier in windows side.
 
 # example:
