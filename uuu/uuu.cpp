@@ -465,14 +465,12 @@ void print_oneline(string str)
 
 int pre_progress(uuu_notify nt)
 {
-	static size_t size = 0;
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_START)
 	{
 		return 1;
 	}
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_SIZE)
 	{
-		size = nt.total;
 		return 1;
 	}
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
