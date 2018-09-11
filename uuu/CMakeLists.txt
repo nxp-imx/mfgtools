@@ -52,3 +52,5 @@ set(SOURCES
 
 add_executable(uuu ${SOURCES})
 target_link_libraries(uuu uuc_s  ${LIBUSB_LIBRARIES} ${LIBZIP_LIBRARIES} ${LIBZ_LIBRARIES})
+
+install(TARGETS uuu DESTINATION bin)
