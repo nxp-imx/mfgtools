@@ -45,9 +45,9 @@ preprocess_clst(CLSTS ${LSTS})
 include_directories(${generated_files_dir})
 
 set(SOURCES
-        uuu.cpp
-        buildincmd.cpp
-        ${CLSTS}
+	uuu.cpp
+	buildincmd.cpp
+	${CLSTS}
 )
 
 add_executable(uuu ${SOURCES})
