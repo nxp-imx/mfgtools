@@ -88,7 +88,7 @@ class BulkTrans : public USBTrans
 {
 	void Init()
 	{
-		m_MaxTransPreRequest = 0x1000;
+		m_MaxTransPreRequest = 0x100000;
 		m_b_send_zero = 0;
 		m_timeout = 2000;
 	}
