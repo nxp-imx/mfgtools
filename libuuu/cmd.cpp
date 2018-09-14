@@ -236,21 +236,15 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["CFG:"] = new_cmd_obj<CfgCmd>;
 
 	(*this)["SDPS:BOOT"] = new_cmd_obj<SDPSCmd>;
-	(*this)["SDPS:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["SDPS:DELAY"] = new_cmd_obj<CmdDelay>;
 
 	(*this)["SDP:DCD"] = new_cmd_obj<SDPDcdCmd>;
 	(*this)["SDP:JUMP"] = new_cmd_obj<SDPJumpCmd>;
 	(*this)["SDP:WRITE"] = new_cmd_obj<SDPWriteCmd>;
 	(*this)["SDP:STATUS"] = new_cmd_obj<SDPStatusCmd>;
 	(*this)["SDP:BOOT"] = new_cmd_obj<SDPBootCmd>;
-	(*this)["SDP:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["SDP:DELAY"] = new_cmd_obj<CmdDelay>;
 
 	(*this)["SDPU:JUMP"] = new_cmd_obj<SDPJumpCmd>;
 	(*this)["SDPU:WRITE"] = new_cmd_obj<SDPWriteCmd>;
-	(*this)["SDPU:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["SDPU:DELAY"] = new_cmd_obj<CmdDelay>;
 
 	(*this)["FB:GETVAR"] = new_cmd_obj<FBGetVar>;
 	(*this)["FASTBOOT:GETVAR"] = new_cmd_obj<FBGetVar>;
@@ -264,10 +258,6 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:FLASH"] = new_cmd_obj<FBFlashCmd>;
 	(*this)["FB:ERASE"] = new_cmd_obj<FBEraseCmd>;
 	(*this)["FASTBOOT:ERASE"] = new_cmd_obj<FBEraseCmd>;
-	(*this)["FB:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["FASTBOOT:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["FB:DELAY"] = new_cmd_obj<CmdDelay>;
-	(*this)["FASTBOOT:DELAY"] = new_cmd_obj<CmdDelay>;
 	(*this)["FB:OEM"] = new_cmd_obj<FBOemCmd>;
 	(*this)["FASTBOOT:OEM"] = new_cmd_obj<FBOemCmd>;
 	(*this)["FB:FLASHING"] = new_cmd_obj<FBFlashingCmd>;
@@ -277,9 +267,9 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FBK:ACMD"] = new_cmd_obj<FBACmd>;
 	(*this)["FBK:SYNC"] = new_cmd_obj<FBSyncCmd>;
 	(*this)["FBK:UCP"] = new_cmd_obj<FBCopy>;
-	(*this)["FBK:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["FBK:DELAY"] = new_cmd_obj<CmdDelay>;
 
+	(*this)["_ALL:DONE"] = new_cmd_obj<CmdDone>;
+	(*this)["_ALL:DELAY"] = new_cmd_obj<CmdDelay>;
 }
 
 shared_ptr<CmdBase> create_cmd_obj(string cmd)
@@ -298,6 +288,11 @@ shared_ptr<CmdBase> create_cmd_obj(string cmd)
 		s += str_to_upper(param);
 		if (g_cmd_create_map.find(s) != g_cmd_create_map.end())
 			return g_cmd_create_map[s]((char*)cmd.c_str());
+
+		string commoncmd = "_ALL:";
+		commoncmd += str_to_upper(param);
+		if (g_cmd_create_map.find(commoncmd) != g_cmd_create_map.end())
+			return g_cmd_create_map[commoncmd]((char*)cmd.c_str());
 	}
 	else
 	{
