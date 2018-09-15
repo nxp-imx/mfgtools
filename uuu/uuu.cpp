@@ -501,7 +501,7 @@ int progress(uuu_notify nt, void *p)
 		else
 		{
 			string_ex str;
-			str.format("\rSuccuess %d    Failure %d    ", g_overall_okay, g_overall_failure);
+			str.format("\rSuccess %d    Failure %d    ", g_overall_okay, g_overall_failure);
 
 			if (g_map_path_nt.empty())
 				str += "Wait for Known USB Device Appear";
