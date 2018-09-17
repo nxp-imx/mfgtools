@@ -249,6 +249,7 @@ CmdObjCreateMap::CmdObjCreateMap()
 
 	(*this)["SDPU:JUMP"] = new_cmd_obj<SDPJumpCmd>;
 	(*this)["SDPU:WRITE"] = new_cmd_obj<SDPWriteCmd>;
+	(*this)["SDPU:BLOG"] = new_cmd_obj<SDPBootlogCmd>;
 
 	(*this)["FB:GETVAR"] = new_cmd_obj<FBGetVar>;
 	(*this)["FASTBOOT:GETVAR"] = new_cmd_obj<FBGetVar>;
