@@ -421,7 +421,8 @@ int CmdShell::parser(char * p)
 int CmdShell::run(CmdCtx*)
 {
 #ifndef WIN32
-	#define _popen popen	
+	#define _popen popen
+	#define _pclose pclose
 #endif
 	FILE *pipe = _popen(m_shellcmd.c_str(), "rb");
 
