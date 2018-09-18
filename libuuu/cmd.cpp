@@ -44,6 +44,9 @@
 #include <sys/stat.h>
 #include <thread>
 
+#include <stdio.h>  
+#include <stdlib.h>  
+
 static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
 static string g_cmd_list_file;
@@ -270,6 +273,10 @@ CmdObjCreateMap::CmdObjCreateMap()
 
 	(*this)["_ALL:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["_ALL:DELAY"] = new_cmd_obj<CmdDelay>;
+	(*this)["_ALL:SH"] = new_cmd_obj<CmdShell>;
+	(*this)["_ALL:SHELL"] = new_cmd_obj<CmdShell>;
+	(*this)["_ALL:<"] = new_cmd_obj<CmdShell>;
+
 }
 
 shared_ptr<CmdBase> create_cmd_obj(string cmd)
@@ -385,6 +392,88 @@ int CmdDelay::parser(char * /*p*/)
 int CmdDelay::run(CmdCtx *)
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(m_ms));
+	return 0;
+}
+
+int CmdShell::parser(char * p)
+{
+	if (p)
+		m_cmd = p;
+
+	size_t pos = 0;
+	string s;
+
+	if (parser_protocal(p, pos))
+		return -1;
+
+	m_protocal = m_cmd.substr(0, pos);
+
+	s = get_next_param(m_cmd, pos);
+
+	m_dyn = (s == "<");
+
+	if (pos != string::npos && pos < m_cmd.size())
+		m_shellcmd = m_cmd.substr(pos);
+
+	return 0;
+}
+
+int CmdShell::run(CmdCtx*)
+{
+#ifndef WIN32
+	#define _popen popen	
+#endif
+	FILE *pipe = _popen(m_shellcmd.c_str(), "rb");
+
+	if (pipe == NULL)
+	{
+		string err = "failure popen: ";
+		err += m_shellcmd.c_str();
+		set_last_err_string(err);
+	}
+
+	string str;
+	str.resize(256);
+	while (fgets((char*)str.c_str(), str.size(), pipe))
+	{
+		if (m_dyn)
+		{
+			string cmd;
+			cmd = m_protocal;
+			str.resize(strlen(str.c_str()));
+			cmd += ' ';
+			cmd += str;
+			
+			size_t pos = cmd.find_first_of("\r\n");
+			if (pos != string::npos)
+				cmd = cmd.substr(0, pos - 1);
+
+			return uuu_run_cmd(cmd.c_str());
+		}
+		uuu_notify nt;
+		nt.type = uuu_notify::NOTIFY_CMD_INFO;
+		nt.str = (char*)str.c_str();
+		call_notify(nt);
+	}
+
+	/* Close pipe and print return value of pPipe. */
+	if (feof(pipe))
+	{
+		int ret = _pclose(pipe);
+		string_ex str;
+		str.format("\nProcess returned %d\n", ret);;
+		if (ret)
+		{
+			set_last_err_string(str.c_str());
+			return ret;
+		}
+	}
+	else
+	{
+		set_last_err_string("Error: Failed to read the pipe to the end.\n");
+		return -1;
+	}
+
 	return 0;
 }
 
