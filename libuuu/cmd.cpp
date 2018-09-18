@@ -424,13 +424,14 @@ int CmdShell::run(CmdCtx*)
 	#define _popen popen
 	#define _pclose pclose
 #endif
-	FILE *pipe = _popen(m_shellcmd.c_str(), "rb");
+	FILE *pipe = _popen(m_shellcmd.c_str(), "r");
 
 	if (pipe == NULL)
 	{
 		string err = "failure popen: ";
 		err += m_shellcmd.c_str();
 		set_last_err_string(err);
+		return -1;
 	}
 
 	string str;
@@ -447,7 +448,7 @@ int CmdShell::run(CmdCtx*)
 			
 			size_t pos = cmd.find_first_of("\r\n");
 			if (pos != string::npos)
-				cmd = cmd.substr(0, pos - 1);
+				cmd = cmd.substr(0, pos);
 
 			return uuu_run_cmd(cmd.c_str());
 		}
