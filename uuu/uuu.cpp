@@ -115,7 +115,6 @@ void print_help(bool detail = false)
 		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
 		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
 		"uuu -h -H       show help, -H means detail helps\n\n";
-	
 	printf("%s", help);
 	printf("uuu [-d -m -v] -b[run] ");
 	g_BuildScripts.ShowCmds();
@@ -591,6 +590,9 @@ void print_usb_filter()
 
 int runshell(int shell)
 {
+	int uboot_cmd = 0;
+	string prompt = "U>";
+
 	if (shell)
 	{
 		cout << "Please input command: " << endl;
@@ -605,10 +607,23 @@ int runshell(int shell)
 			<< endl;
 		while (1)
 		{
-			cout << "U>";
+			cout << prompt;
 			getline(cin, cmd);
 
-			if (cmd == "help" || cmd == "?")
+			if (cmd == "uboot")
+			{
+				uboot_cmd = 1;
+				prompt = "=>";
+				cout << "Enter into u-boot cmd mode" << endl;
+				cout << "Okay" << endl;
+			}
+			else if (cmd == "exit" && uboot_cmd == 1)
+			{
+				uboot_cmd = 0;
+				prompt = "U>";
+				cout << "Exit u-boot cmd mode" << endl;
+				cout << "Okay" << endl;
+			}else if (cmd == "help" || cmd == "?")
 			{
 				print_help();
 			}
@@ -620,6 +635,9 @@ int runshell(int shell)
 			{
 				log << cmd << endl;
 				log.flush();
+
+				if (uboot_cmd)
+					cmd = "fb:" + cmd;
 
 				int ret = uuu_run_cmd(cmd.c_str());
 				if (ret)
@@ -779,6 +797,7 @@ int main(int argc, char **argv)
 	map<uint64_t, ShowNotify> nt_session;
 
 	uuu_register_notify_callback(progress, &nt_session);
+
 
 	if (!cmd.empty())
 	{
