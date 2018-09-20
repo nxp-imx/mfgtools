@@ -526,6 +526,12 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		return flash_raw2sparse(&fb, pdata, block_size, max);
 	}
 
+	if (SparseFile::is_validate_sparse_file(pdata->data(), pdata->size()))
+	{	/* Limited max size to 16M for sparse file to avoid long timeout at read status*/
+		if (max > 0x1000000)
+			max = 0x1000000;
+	}
+
 	if (pdata->size() <= max)
 	{
 		if (flash(&fb, pdata->data(), pdata->size()))

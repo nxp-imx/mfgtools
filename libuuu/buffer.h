@@ -120,7 +120,7 @@ public:
 			NULL);
 		if (file_handle == INVALID_HANDLE_VALUE)
 		{
-			string err = "Create File Faiure ";
+			string err = "Create File Failure ";
 			err += filename;
 			set_last_err_string(err);
 			return -1;

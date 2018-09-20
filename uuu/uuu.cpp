@@ -465,14 +465,12 @@ void print_oneline(string str)
 
 int pre_progress(uuu_notify nt)
 {
-	static size_t size = 0;
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_START)
 	{
 		return 1;
 	}
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_SIZE)
 	{
-		size = nt.total;
 		return 1;
 	}
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
@@ -503,7 +501,7 @@ int progress(uuu_notify nt, void *p)
 		else
 		{
 			string_ex str;
-			str.format("\rSuccuess %d    Failure %d    ", g_overall_okay, g_overall_failure);
+			str.format("\rSuccess %d    Failure %d    ", g_overall_okay, g_overall_failure);
 
 			if (g_map_path_nt.empty())
 				str += "Wait for Known USB Device Appear";
@@ -758,7 +756,10 @@ int main(int argc, char **argv)
 			{
 				print_help();
 			}
-			else
+			else if (cmd == "q" || cmd == "quit")
+			{
+				return 0;
+			}else
 			{
 				log << cmd << endl;
 				log.flush();

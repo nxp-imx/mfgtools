@@ -98,7 +98,10 @@ int HIDTrans::write(void *buff, size_t size)
 
 	if (ret < 0)
 	{
-		set_last_err_string("HID Write failure");
+		string err;
+		err = "HID(W):";
+		err += libusb_error_name(ret);
+		set_last_err_string(err);
 		return ret;
 	}
 
@@ -122,7 +125,11 @@ int HIDTrans::read(void *buff, size_t size, size_t *rsize)
 
 	if (ret < 0)
 	{
-		set_last_err_string("HID Read failure");
+		string error;
+		string err;
+		err = "HID(R):";
+		err += libusb_error_name(ret);
+		set_last_err_string(err);
 		return ret;
 	}
 
@@ -153,7 +160,11 @@ int BulkTrans::write(void *buff, size_t size)
 
 		if (ret < 0)
 		{
-			set_last_err_string("Bulk Write failure");
+			string error;
+			string err;
+			err = "Bulk(W):";
+			err += libusb_error_name(ret);
+			set_last_err_string(err);
 			return ret;
 		}
 	}
@@ -172,7 +183,11 @@ int BulkTrans::write(void *buff, size_t size)
 
 		if (ret < 0)
 		{
-			set_last_err_string("Bulk Write failure");
+			string error;
+			string err;
+			err = "Bulk(W):";
+			err += libusb_error_name(ret);
+			set_last_err_string(err);
 			return ret;
 		}
 	}
@@ -215,7 +230,11 @@ int BulkTrans::read(void *buff, size_t size, size_t *rsize)
 
 	if (ret < 0)
 	{
-		set_last_err_string("Bulk read failure");
+		string error;
+		string err;
+		err = "Bulk(R):";
+		err += libusb_error_name(ret);
+		set_last_err_string(err);
 		return ret;
 	}
 

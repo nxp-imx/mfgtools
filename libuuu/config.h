@@ -28,12 +28,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
+
+#pragma once
+
 #include <string>
 #include <vector>
 
 using namespace std;
-
-#pragma once
 
 class ConfigItem
 {
@@ -68,4 +69,3 @@ public:
 };
 
 Config * get_config();
-
