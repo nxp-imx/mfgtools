@@ -160,17 +160,11 @@ UINT libusbVolume::SendCommand(HANDLE hDrive, StApi& api, UCHAR* additionalInfo,
 		response = uResponse.bCSWStatus;
 		cont = false;
 
-		if (senseResponse.UTPSenseCode == 0x8002)
+		if (senseResponse.UTPSenseCode == 0x280)
 		{
 			CSW_UTP psResponse;
-			int response = pollDevice(&psResponse, api);
-				if (response == 0 && !&psResponse)
-				{
-					if (psResponse.bCSWStatus == 1)
-						cont = true;
-					else
-						cont = false;
-				}
+			pollDevice(&psResponse, api);
+			cont = true;
 		}
 
 		//Sleep is needed or else the computer will spam the device with requests causing malfunctions
