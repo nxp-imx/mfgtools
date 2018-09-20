@@ -6,8 +6,13 @@ uuu_version 1.0.0
 # Command Format PROTOCOL COMMAND ARG
 # PROTOCOL
 #          ALL protocol supported common command
-#                      done  #last command for whole flow
-#                      delay <ms> # delay ms
+#                      done        #last command for whole flow
+#                      delay <ms>  # delay ms
+#                      sh\shell <any shell command> #Run shell command, such as wget to file from network
+#                      <        <any shell command> #use shell command's output as uuu command
+#                               this command generally used for burn some sequence number, such production id, mac address
+#				for example:   
+#                                      FB:< echo ucmd print
 #
 #          CFG:  Config protocol of specific usb device vid/pid
 #                SDPS|SDP|FB\Fastboot|FBK -chip <chip name> -pid <pid> -vid <vid> [-bcdversion <ver>]
