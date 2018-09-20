@@ -33,6 +33,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <string>
 
 #ifdef __cplusplus
 #define EXT extern "C"
@@ -85,7 +86,7 @@ struct uuu_notify
 
 		NOTIFY_DECOMPRESS_START,
 		NOTIFY_DECOMPRESS_SIZE,
-		NOTIFY_DECOMPRESS_POS, 
+		NOTIFY_DECOMPRESS_POS,
 
 		NOTIFY_THREAD_EXIT,
 
@@ -112,6 +113,7 @@ typedef int(*uuu_show_cfg)(const char *pro, const char *chip, const char *comp, 
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p);
 
 int uuu_run_cmd(const char * cmd);
+int uuu_run_cmd_prefix(std::string & cmd);
 int uuu_run_cmd_script(const char *script);
 
 int uuu_auto_detect_file(const char * filename);

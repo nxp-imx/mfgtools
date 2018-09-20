@@ -315,6 +315,16 @@ shared_ptr<CmdBase> create_cmd_obj(string cmd)
 	return NULL;
 }
 
+int uuu_run_cmd_prefix(string & ucmd)
+{
+	string prefix("FB: UCMD ");
+
+	string cmd = prefix + ucmd;
+
+	return uuu_run_cmd(cmd.c_str());
+
+}
+
 int uuu_run_cmd(const char * cmd)
 {
 	shared_ptr<CmdBase> p;
