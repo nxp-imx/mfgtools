@@ -161,6 +161,17 @@ public:
 	int run(CmdCtx *p);
 };
 
+class CmdShell : public CmdBase
+{
+public:
+	string m_shellcmd;
+	string m_protocal;
+	bool	m_dyn;
+
+	CmdShell(char *p) : CmdBase(p) { m_dyn = false; };
+	virtual int parser(char *p = NULL);
+	int run(CmdCtx *p);
+};
 
 class CmdList : public std::vector<shared_ptr<CmdBase>>
 {

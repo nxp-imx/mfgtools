@@ -115,7 +115,6 @@ void print_help(bool detail = false)
 		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
 		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
 		"uuu -h -H       show help, -H means detail helps\n\n";
-	
 	printf("%s", help);
 	printf("uuu [-d -m -v] -b[run] ");
 	g_BuildScripts.ShowCmds();
@@ -465,14 +464,12 @@ void print_oneline(string str)
 
 int pre_progress(uuu_notify nt)
 {
-	static size_t size = 0;
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_START)
 	{
 		return 1;
 	}
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_SIZE)
 	{
-		size = nt.total;
 		return 1;
 	}
 	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
@@ -503,7 +500,7 @@ int progress(uuu_notify nt, void *p)
 		else
 		{
 			string_ex str;
-			str.format("\rSuccuess %d    Failure %d    ", g_overall_okay, g_overall_failure);
+			str.format("\rSuccess %d    Failure %d    ", g_overall_okay, g_overall_failure);
 
 			if (g_map_path_nt.empty())
 				str += "Wait for Known USB Device Appear";
@@ -741,6 +738,8 @@ int main(int argc, char **argv)
 	{
 		cout << "Please input command: " << endl;
 		string cmd;
+		int uboot_cmd = 0;
+		string prompt = "U>";
 		ofstream log("uuu.inputlog", ofstream::binary);
 		log << "uuu_version "
 			<< ((uuu_get_version() & 0xFF0000) >> 16)
@@ -751,19 +750,37 @@ int main(int argc, char **argv)
 			<< endl;
 		while (1)
 		{
-			cout << "U>";
+			cout << prompt;
 			getline(cin, cmd);
 
-			if (cmd == "help" || cmd == "?")
+			if (cmd == "uboot")
+			{
+				uboot_cmd = 1;
+				prompt = "=>";
+				cout << "Enter into u-boot cmd mode" << endl;
+				cout << "Okay" << endl;
+			} else if (cmd == "exit" && uboot_cmd == 1)
+			{
+				uboot_cmd = 0;
+				prompt = "U>";
+				cout << "Exit u-boot cmd mode" << endl;
+				cout << "Okay" << endl;
+			} else if (cmd == "help" || cmd == "?")
 			{
 				print_help();
 			}
-			else
+			else if (cmd == "q" || cmd == "quit")
 			{
+				return 0;
+			}else
+			{
+				int ret;
 				log << cmd << endl;
 				log.flush();
-
-				int ret = uuu_run_cmd(cmd.c_str());
+				if(uboot_cmd)
+					ret = uuu_run_cmd_prefix(cmd);
+				else
+					ret = uuu_run_cmd(cmd.c_str());
 				if (ret)
 					cout << uuu_get_last_err_string() << endl;
 				else

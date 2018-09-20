@@ -44,6 +44,9 @@
 #include <sys/stat.h>
 #include <thread>
 
+#include <stdio.h>  
+#include <stdlib.h>  
+
 static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
 static string g_cmd_list_file;
@@ -236,22 +239,16 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["CFG:"] = new_cmd_obj<CfgCmd>;
 
 	(*this)["SDPS:BOOT"] = new_cmd_obj<SDPSCmd>;
-	(*this)["SDPS:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["SDPS:DELAY"] = new_cmd_obj<CmdDelay>;
 
 	(*this)["SDP:DCD"] = new_cmd_obj<SDPDcdCmd>;
 	(*this)["SDP:JUMP"] = new_cmd_obj<SDPJumpCmd>;
 	(*this)["SDP:WRITE"] = new_cmd_obj<SDPWriteCmd>;
 	(*this)["SDP:STATUS"] = new_cmd_obj<SDPStatusCmd>;
 	(*this)["SDP:BOOT"] = new_cmd_obj<SDPBootCmd>;
-	(*this)["SDP:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["SDP:DELAY"] = new_cmd_obj<CmdDelay>;
 	(*this)["SDP:BLOG"] = new_cmd_obj<SDPBootlogCmd>;
 
 	(*this)["SDPU:JUMP"] = new_cmd_obj<SDPJumpCmd>;
 	(*this)["SDPU:WRITE"] = new_cmd_obj<SDPWriteCmd>;
-	(*this)["SDPU:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["SDPU:DELAY"] = new_cmd_obj<CmdDelay>;
 	(*this)["SDPU:BLOG"] = new_cmd_obj<SDPBootlogCmd>;
 
 	(*this)["FB:GETVAR"] = new_cmd_obj<FBGetVar>;
@@ -266,10 +263,6 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:FLASH"] = new_cmd_obj<FBFlashCmd>;
 	(*this)["FB:ERASE"] = new_cmd_obj<FBEraseCmd>;
 	(*this)["FASTBOOT:ERASE"] = new_cmd_obj<FBEraseCmd>;
-	(*this)["FB:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["FASTBOOT:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["FB:DELAY"] = new_cmd_obj<CmdDelay>;
-	(*this)["FASTBOOT:DELAY"] = new_cmd_obj<CmdDelay>;
 	(*this)["FB:OEM"] = new_cmd_obj<FBOemCmd>;
 	(*this)["FASTBOOT:OEM"] = new_cmd_obj<FBOemCmd>;
 	(*this)["FB:FLASHING"] = new_cmd_obj<FBFlashingCmd>;
@@ -279,8 +272,12 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FBK:ACMD"] = new_cmd_obj<FBACmd>;
 	(*this)["FBK:SYNC"] = new_cmd_obj<FBSyncCmd>;
 	(*this)["FBK:UCP"] = new_cmd_obj<FBCopy>;
-	(*this)["FBK:DONE"] = new_cmd_obj<CmdDone>;
-	(*this)["FBK:DELAY"] = new_cmd_obj<CmdDelay>;
+
+	(*this)["_ALL:DONE"] = new_cmd_obj<CmdDone>;
+	(*this)["_ALL:DELAY"] = new_cmd_obj<CmdDelay>;
+	(*this)["_ALL:SH"] = new_cmd_obj<CmdShell>;
+	(*this)["_ALL:SHELL"] = new_cmd_obj<CmdShell>;
+	(*this)["_ALL:<"] = new_cmd_obj<CmdShell>;
 
 }
 
@@ -300,6 +297,11 @@ shared_ptr<CmdBase> create_cmd_obj(string cmd)
 		s += str_to_upper(param);
 		if (g_cmd_create_map.find(s) != g_cmd_create_map.end())
 			return g_cmd_create_map[s]((char*)cmd.c_str());
+
+		string commoncmd = "_ALL:";
+		commoncmd += str_to_upper(param);
+		if (g_cmd_create_map.find(commoncmd) != g_cmd_create_map.end())
+			return g_cmd_create_map[commoncmd]((char*)cmd.c_str());
 	}
 	else
 	{
@@ -311,6 +313,16 @@ shared_ptr<CmdBase> create_cmd_obj(string cmd)
 	err += cmd;
 	set_last_err_string(err);
 	return NULL;
+}
+
+int uuu_run_cmd_prefix(string & ucmd)
+{
+	string prefix("FB: UCMD ");
+
+	string cmd = prefix + ucmd;
+
+	return uuu_run_cmd(cmd.c_str());
+
 }
 
 int uuu_run_cmd(const char * cmd)
@@ -392,6 +404,90 @@ int CmdDelay::parser(char * /*p*/)
 int CmdDelay::run(CmdCtx *)
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(m_ms));
+	return 0;
+}
+
+int CmdShell::parser(char * p)
+{
+	if (p)
+		m_cmd = p;
+
+	size_t pos = 0;
+	string s;
+
+	if (parser_protocal(p, pos))
+		return -1;
+
+	m_protocal = m_cmd.substr(0, pos);
+
+	s = get_next_param(m_cmd, pos);
+
+	m_dyn = (s == "<");
+
+	if (pos != string::npos && pos < m_cmd.size())
+		m_shellcmd = m_cmd.substr(pos);
+
+	return 0;
+}
+
+int CmdShell::run(CmdCtx*)
+{
+#ifndef WIN32
+	#define _popen popen
+	#define _pclose pclose
+#endif
+	FILE *pipe = _popen(m_shellcmd.c_str(), "r");
+
+	if (pipe == NULL)
+	{
+		string err = "failure popen: ";
+		err += m_shellcmd.c_str();
+		set_last_err_string(err);
+		return -1;
+	}
+
+	string str;
+	str.resize(256);
+	while (fgets((char*)str.c_str(), str.size(), pipe))
+	{
+		if (m_dyn)
+		{
+			string cmd;
+			cmd = m_protocal;
+			str.resize(strlen(str.c_str()));
+			cmd += ' ';
+			cmd += str;
+			
+			size_t pos = cmd.find_first_of("\r\n");
+			if (pos != string::npos)
+				cmd = cmd.substr(0, pos);
+
+			return uuu_run_cmd(cmd.c_str());
+		}
+		uuu_notify nt;
+		nt.type = uuu_notify::NOTIFY_CMD_INFO;
+		nt.str = (char*)str.c_str();
+		call_notify(nt);
+	}
+
+	/* Close pipe and print return value of pPipe. */
+	if (feof(pipe))
+	{
+		int ret = _pclose(pipe);
+		string_ex str;
+		str.format("\nProcess returned %d\n", ret);;
+		if (ret)
+		{
+			set_last_err_string(str.c_str());
+			return ret;
+		}
+	}
+	else
+	{
+		set_last_err_string("Error: Failed to read the pipe to the end.\n");
+		return -1;
+	}
+
 	return 0;
 }
 
