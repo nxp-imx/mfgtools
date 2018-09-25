@@ -222,6 +222,11 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		//size = fbuff->size() - off;
 		size = pDB->ImageSize;
 
+		//ImageSize may be bigger than Imagesize because ImageSize include IVT offset
+		//Difference boot storage have difference IVT offset. 
+		if (size > fbuff->size() - off)
+			size = fbuff->size() - off;
+
 		pbuff = (uint8_t*)pIvt;
 	}
 	return run(ctx, pbuff + offset, size, m_download_addr);
