@@ -97,8 +97,11 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 		if (p->reload(filename, async))
 			return NULL;
 
-		g_filebuffer_map[filename]=p;
-
+#ifdef WIN32
+		/*Don't buffer file map file because it will be locked in windows to prevent user update it*/
+		if (!p->m_pMapbuffer)
+			g_filebuffer_map[filename] = p;
+#endif
 		return p;
 	}
 	else
@@ -117,11 +120,7 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 			if(p->m_aync_thread.joinable())
 				p->m_aync_thread.join();
 		}
-#ifdef WIN32
-		/*Don't buffer file map file because it will be locked in windows to prevent user update it*/
-		if (p->m_pMapbuffer)
-			g_filebuffer_map.erase(filename);
-#endif
+
 		return p;
 	}
 }
