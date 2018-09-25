@@ -203,7 +203,6 @@ public:
 				}
 			}
 		}
-		printf("%s", script.c_str());
 		return script;
 	}
 };
