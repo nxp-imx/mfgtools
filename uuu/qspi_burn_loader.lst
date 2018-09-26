@@ -14,6 +14,6 @@ SDPS: boot -f _flexspi.bin -offset 0x1000
 FB: ucmd setenv fastboot_buffer ${loadaddr}
 FB: download -f _image
 FB: ucmd sf probe
-FB[-t 40000]: ucmd sf erase 0 100000
+FB[-t 40000]: ucmd sf erase 0 +${fastboot_bytes}
 FB: ucmd sf write ${fastboot_buffer} 0 ${fastboot_bytes}
 FB: done
