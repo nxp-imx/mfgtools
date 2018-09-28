@@ -48,6 +48,11 @@
 #endif
 using namespace std;
 
+#ifdef WIN32
+class FileBuffer;
+int file_overwrite_monitor(string filename, FileBuffer *p);
+#endif 
+
 class FileBuffer
 {
 public:
@@ -57,6 +62,14 @@ public:
 	mutex m_async_mutex;
 	atomic_bool m_loaded;
 	thread m_aync_thread;
+
+#ifdef WIN32
+	OVERLAPPED m_OverLapped;
+	REQUEST_OPLOCK_INPUT_BUFFER m_Request;
+	HANDLE m_file_handle;
+	HANDLE m_file_map;
+	thread m_file_monitor;
+#endif
 
 	FileBuffer()
 	{
@@ -111,14 +124,26 @@ public:
 	int mapfile(string filename, size_t sz)
 	{
 #ifdef _MSC_VER
-		HANDLE file_handle = CreateFile(filename.c_str(),
+		
+		m_Request.StructureVersion = REQUEST_OPLOCK_CURRENT_VERSION;
+		m_Request.StructureLength = sizeof(REQUEST_OPLOCK_INPUT_BUFFER);
+		m_Request.RequestedOplockLevel = (OPLOCK_LEVEL_CACHE_READ | OPLOCK_LEVEL_CACHE_HANDLE);
+		m_Request.Flags = REQUEST_OPLOCK_INPUT_FLAG_REQUEST;
+		
+		REQUEST_OPLOCK_OUTPUT_BUFFER Response;
+
+		m_OverLapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		ResetEvent(m_OverLapped.hEvent);
+
+		m_file_handle = CreateFile(filename.c_str(),
 			GENERIC_READ,
-			FILE_SHARE_READ,
+			FILE_SHARE_READ | FILE_SHARE_WRITE,
 			NULL,
 			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS,
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED,
 			NULL);
-		if (file_handle == INVALID_HANDLE_VALUE)
+
+		if (m_file_handle == INVALID_HANDLE_VALUE)
 		{
 			string err = "Create File Failure ";
 			err += filename;
@@ -126,19 +151,32 @@ public:
 			return -1;
 		}
 
-		HANDLE file_map = CreateFileMapping(file_handle,
+		BOOL bSuccess = DeviceIoControl(m_file_handle,
+			FSCTL_REQUEST_OPLOCK,
+			&m_Request,
+			sizeof(m_Request),
+			&Response,
+			sizeof(Response),
+			NULL,
+			&m_OverLapped);
+
+		if (bSuccess || GetLastError() == ERROR_IO_PENDING)
+		{
+			m_file_monitor = thread(file_overwrite_monitor, filename, this);
+		}
+
+		m_file_map = CreateFileMapping(m_file_handle,
 			NULL, PAGE_READONLY, 0, 0, NULL);
 
-		if (file_map == INVALID_HANDLE_VALUE)
+		if (m_file_map == INVALID_HANDLE_VALUE)
 		{
 			set_last_err_string("Fail create Map");
 			return -1;
 		}
 
-		m_pMapbuffer = (uint8_t *)MapViewOfFile(file_map, FILE_MAP_READ, 0, 0, sz);
+		m_pMapbuffer = (uint8_t *)MapViewOfFile(m_file_map, FILE_MAP_READ, 0, 0, sz);
 		m_MapSize = sz;
-		CloseHandle(file_map);
-		CloseHandle(file_handle);
+		
 #else
 		int fd = open(filename.c_str(), O_RDONLY);
 		if (fd == -1)
@@ -172,6 +210,16 @@ public:
 		{
 #ifdef _MSC_VER
 			UnmapViewOfFile(m_pMapbuffer);
+			m_pMapbuffer = NULL;
+			CloseHandle(m_file_map);
+			CloseHandle(m_file_handle);
+			SetEvent(m_OverLapped.hEvent);
+			
+			if (m_file_monitor.joinable())
+				m_file_monitor.join();
+
+			CloseHandle(m_OverLapped.hEvent);
+			m_OverLapped.hEvent = m_file_map = m_file_handle = INVALID_HANDLE_VALUE;
 #else
 			munmap(m_pMapbuffer, m_MapSize);
 #endif

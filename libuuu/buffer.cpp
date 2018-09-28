@@ -45,6 +45,7 @@
 #endif
 
 static map<string, shared_ptr<FileBuffer>> g_filebuffer_map;
+static mutex g_mutex_map;
 
 #define MAGIC_PATH '>'
 
@@ -90,23 +91,32 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 			filename = g_current_dir + filename;
 	}
 
-	if (g_filebuffer_map.find(filename) == g_filebuffer_map.end())
+	BOOL find;
+	{
+		std::lock_guard<mutex> lock(g_mutex_map);
+		find = (g_filebuffer_map.find(filename) == g_filebuffer_map.end());
+	}
+
+	if (find)
 	{
 		shared_ptr<FileBuffer> p(new FileBuffer);
 
 		if (p->reload(filename, async))
 			return NULL;
 
-#ifdef WIN32
-		/*Don't buffer file map file because it will be locked in windows to prevent user update it*/
-		if (!p->m_pMapbuffer)
+		{
+			std::lock_guard<mutex> lock(g_mutex_map);
 			g_filebuffer_map[filename] = p;
-#endif
+		}
 		return p;
 	}
 	else
 	{
-		shared_ptr<FileBuffer> p = g_filebuffer_map[filename];
+		shared_ptr<FileBuffer> p;
+		{
+			std::lock_guard<mutex> lock(g_mutex_map);
+			p= g_filebuffer_map[filename];
+		}
 		if (p->m_timesample != get_file_timesample(filename))
 			if (p->reload(filename, async))
 			{
@@ -238,3 +248,25 @@ bool check_file_exist(string filename, bool start_async_load)
 {
 	return get_file_buffer(filename, true) != NULL;
 }
+
+#ifdef WIN32
+
+int file_overwrite_monitor(string filename, FileBuffer *p)
+{
+	WaitForSingleObject(p->m_OverLapped.hEvent, INFINITE);
+
+	string str;
+	str = ">";
+	str += filename;
+
+	if(p->m_pMapbuffer)
+	{
+		std::lock_guard<mutex> lock(g_mutex_map);
+		p->m_file_monitor.detach(); /*Detach itself, erase will delete p*/
+		if(g_filebuffer_map.find(str) != g_filebuffer_map.end())
+			g_filebuffer_map.erase(str);
+	}
+
+	return 0;
+}
+#endif
