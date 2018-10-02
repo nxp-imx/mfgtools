@@ -588,6 +588,50 @@ void print_usb_filter()
 			cout << g_usb_path_filter[i] << " ";
 	}
 }
+
+int runshell(int shell)
+{
+	if (shell)
+	{
+		cout << "Please input command: " << endl;
+		string cmd;
+		ofstream log("uuu.inputlog", ofstream::binary);
+		log << "uuu_version "
+			<< ((uuu_get_version() & 0xFF0000) >> 16)
+			<< "."
+			<< ((uuu_get_version() & 0xFF00) >> 8)
+			<< "."
+			<< ((uuu_get_version() & 0xFF))
+			<< endl;
+		while (1)
+		{
+			cout << "U>";
+			getline(cin, cmd);
+
+			if (cmd == "help" || cmd == "?")
+			{
+				print_help();
+			}
+			else if (cmd == "q" || cmd == "quit")
+			{
+				return 0;
+			}
+			else
+			{
+				log << cmd << endl;
+				log.flush();
+
+				int ret = uuu_run_cmd(cmd.c_str());
+				if (ret)
+					cout << uuu_get_last_err_string() << endl;
+				else
+					cout << "Okay" << endl;
+			}
+		}
+		return 0;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	AutoCursor a;
@@ -735,45 +779,6 @@ int main(int argc, char **argv)
 
 	uuu_register_notify_callback(progress, &nt_session);
 
-	if (shell)
-	{
-		cout << "Please input command: " << endl;
-		string cmd;
-		ofstream log("uuu.inputlog", ofstream::binary);
-		log << "uuu_version "
-			<< ((uuu_get_version() & 0xFF0000) >> 16)
-			<< "."
-			<< ((uuu_get_version() & 0xFF00) >> 8)
-			<< "."
-			<< ((uuu_get_version() & 0xFF))
-			<< endl;
-		while (1)
-		{
-			cout << "U>";
-			getline(cin, cmd);
-
-			if (cmd == "help" || cmd == "?")
-			{
-				print_help();
-			}
-			else if (cmd == "q" || cmd == "quit")
-			{
-				return 0;
-			}else
-			{
-				log << cmd << endl;
-				log.flush();
-
-				int ret = uuu_run_cmd(cmd.c_str());
-				if (ret)
-					cout << uuu_get_last_err_string() << endl;
-				else
-					cout << "Okay" << endl;
-			}
-		}
-		return 0;
-	}
-
 	if (!cmd.empty())
 	{
 		ret = uuu_run_cmd(cmd.c_str());
@@ -783,8 +788,9 @@ int main(int argc, char **argv)
 		if(ret)
 			printf("\nError: %s\n", uuu_get_last_err_string());
 		else
-			printf("Okay");
+			printf("Okay\n");
 
+		runshell(shell);
 		return ret;
 	}
 
@@ -795,11 +801,15 @@ int main(int argc, char **argv)
 
 	if (ret)
 	{
+		runshell(shell);
+
 		cout << RED << "\nError: " << DEFAULT <<  uuu_get_last_err_string();
 		return ret;
 	}
 
 	uuu_wait_uuu_finish(deamon);
+
+	runshell(shell);
 
 	/*Wait for the other thread exit, after send out CMD_DONE*/
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
