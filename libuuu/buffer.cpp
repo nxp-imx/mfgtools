@@ -91,7 +91,7 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 			filename = g_current_dir + filename;
 	}
 
-	BOOL find;
+	bool find;
 	{
 		std::lock_guard<mutex> lock(g_mutex_map);
 		find = (g_filebuffer_map.find(filename) == g_filebuffer_map.end());
