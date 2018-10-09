@@ -34,6 +34,7 @@
 #include "liberror.h"
 #include "libcomm.h"
 #include "buffer.h"
+#include "sdp.h"
 
 int SDPSCmd::run(CmdCtx *pro)
 {
@@ -55,5 +56,10 @@ int SDPSCmd::run(CmdCtx *pro)
 		return -1;
 	}
 
-	return report.write(p->data() + m_offset, p->size() - m_offset,  2);
+	int ret = report.write(p->data() + m_offset, p->size() - m_offset,  2);
+
+	SDPBootlogCmd log(NULL);
+	log.run(pro);
+
+	return ret;
 }
