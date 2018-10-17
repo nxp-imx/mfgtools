@@ -15,5 +15,5 @@ FB: ucmd setenv fastboot_buffer ${loadaddr}
 FB: download -f _image
 FB: ucmd sf probe
 FB[-t 40000]: ucmd sf erase 0 +${fastboot_bytes}
-FB: ucmd sf write ${fastboot_buffer} 0 ${fastboot_bytes}
+FB[-t 20000]: ucmd sf write ${fastboot_buffer} 0 ${fastboot_bytes}
 FB: done
