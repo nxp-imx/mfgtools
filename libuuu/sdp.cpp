@@ -316,13 +316,19 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 	}
 	else
 	{	/*Clear DCD*/
-		IvtHeader header;
-		header = *pIVT;
+		vector<uint8_t> buff;
+		/* Need send out whole report size buffer avoid overwrite other data
+		 * Some platform require receive whole package for report id = 2
+		 */
+		buff.resize(report.get_out_package_size());
 
-		header.DCDAddress = 0;
+		memcpy(buff.data(), pIVT, buff.size());
+
+		IvtHeader *header = (IvtHeader *) buff.data();
+		header->DCDAddress = 0;
 
 		SDPWriteCmd writecmd(NULL);
-		if(writecmd.run(ctx, &header, sizeof(header), pIVT->SelfAddr))
+		if(writecmd.run(ctx, header, buff.size(), pIVT->SelfAddr))
 			return -1;
 	}
 

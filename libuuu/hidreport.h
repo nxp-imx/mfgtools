@@ -61,6 +61,7 @@ public:
 	vector<uint8_t> m_out_buff;
 	size_t m_postion_base;
 	size_t m_notify_total;
+	size_t get_out_package_size() { return m_size_out; }
 	bool m_skip_notify;
 	void init()
 	{
