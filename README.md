@@ -19,7 +19,7 @@ Freescale/NXP I.MX Chip image deploy tools.
  - Multi devices program support
  - Daemon mode support.
  - Small depedence (only libusb and zlibc)
- - Firmware (uboot/kernel) use WCID to auto load winusb drvier in windows side.
+ - Firmware (uboot/kernel) use WCID to auto load winusb drvier in windows side. win7 user need install winusb driver. https://zadig.akeo.ie/  win10 will install driver automatically.
 
 # example:
 ```
