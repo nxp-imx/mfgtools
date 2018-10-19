@@ -316,19 +316,25 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 	}
 	else
 	{	/*Clear DCD*/
-		vector<uint8_t> buff;
+		vector<uint8_t> ivt;
 		/* Need send out whole report size buffer avoid overwrite other data
 		 * Some platform require receive whole package for report id = 2
 		 */
-		buff.resize(report.get_out_package_size());
+		ivt.resize(report.get_out_package_size());
 
-		memcpy(buff.data(), pIVT, buff.size());
+		size_t sz = buff->size();
+		sz -= (uint8_t*)pIVT - (uint8_t*)buff->data();
 
-		IvtHeader *header = (IvtHeader *) buff.data();
+		if (sz > ivt.size())
+			sz = ivt.size();
+
+		memcpy(ivt.data(), pIVT, sz);
+
+		IvtHeader *header = (IvtHeader *)ivt.data();
 		header->DCDAddress = 0;
 
 		SDPWriteCmd writecmd(NULL);
-		if(writecmd.run(ctx, header, buff.size(), pIVT->SelfAddr))
+		if(writecmd.run(ctx, header, ivt.size(), pIVT->SelfAddr))
 			return -1;
 	}
 
