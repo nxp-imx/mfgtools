@@ -57,28 +57,258 @@ void set_current_dir(string dir)
 	g_current_dir += dir;
 }
 
-uint64_t get_file_timesample(string filename)
+class FSBasic
 {
-	struct stat64 st;
-	if (stat64(filename.c_str() + 1, &st))
+public:
+	const char * m_ext;
+	FSBasic() { m_ext = NULL; }
+	virtual int get_file_timesample(string filename, uint64_t *ptime)=0;
+	virtual int load(string backfile, string filename, FileBuffer *p, bool async)=0;
+	virtual bool exist(string backfile, string filename)=0;
+	int split(string filename, string *outbackfile, string *outfilename)
 	{
-		string path = str_to_upper(filename);
-		size_t pos = path.find(".ZIP");
-		if (pos == string::npos)
-			return 0;
-		if (stat64(filename.substr(1, pos + 3).c_str(), &st))
+		if (m_ext == NULL || strlen(m_ext) == 0)
 		{
-			string path = str_to_upper(filename);
-			size_t pos = path.find(".SDCARD");
-			if (pos == string::npos)
-				return 0;
-
-			stat64(filename.substr(1, pos + 7).c_str(), &st);
+			*outbackfile = filename;
+			return 0;
 		}
-		return st.st_mtime;
+
+		string path = str_to_upper(filename);
+		size_t pos = path.rfind(m_ext);
+		if (pos == string::npos)
+		{
+			set_last_err_string("can't find ext name in path");
+			return -1;
+		}
+
+		*outbackfile = filename.substr(0, pos + strlen(m_ext));
+		*outfilename = filename.substr(pos + strlen(m_ext) + 1);
+		return 0;
+	}
+};
+
+static class FSFlat: public FSBasic
+{
+public:
+	FSFlat() { m_ext = ""; }
+	int get_file_timesample(string filename, uint64_t *ptime)
+	{
+		struct stat64 st;
+		if (stat64(filename.c_str() + 1, &st))
+		{
+			set_last_err_string("stat64 failure");
+			return -1;
+		}
+
+		*ptime = st.st_mtime;
+
+		return 0;
 	}
 
-	return st.st_mtime;
+	bool exist(string backfile, string filename)
+	{
+		struct stat64 st;
+		return stat64(backfile.c_str() + 1, &st) == 0;
+	}
+
+	int load(string backfile, string filename, FileBuffer *p, bool async)
+	{
+		struct stat64 st;
+		if (stat64(backfile.c_str() + 1, &st))
+		{
+			set_last_err_string("stat64 failure");
+			return -1;
+		}
+		p->unmapfile();
+
+		if (p->mapfile(backfile.substr(1), st.st_size))
+			return -1;
+
+		p->m_loaded = true;
+		return 0;
+	}
+} g_fsflat;
+
+class FSBackFile : public FSBasic
+{
+public:
+	virtual int get_file_timesample(string filename, uint64_t *ptime);
+
+};
+
+static class FSZip : public FSBackFile
+{
+public:
+	FSZip() { m_ext = ".ZIP"; };
+	virtual int load(string backfile, string filename, FileBuffer *p, bool async);
+	virtual bool exist(string backfile, string filename);
+}g_fszip;
+
+static class FSFat : public FSBackFile
+{
+public:
+	FSFat() { m_ext = ".SDCARD"; };
+	virtual int load(string backfile, string filename, FileBuffer *p, bool async);
+	virtual bool exist(string backfile, string filename);
+}g_fsfat;
+
+static class FSBz2 : public FSBackFile
+{
+public:
+	FSBz2() { m_ext = ".BZ2"; };
+	virtual int load(string backfile, string filename, FileBuffer *p, bool async);
+	virtual bool exist(string backfile, string filename);
+}g_fsbz2;
+
+static class FS_DATA
+{
+public:
+	vector<FSBasic *> m_pFs;
+	FS_DATA()
+	{
+		m_pFs.push_back(&g_fsflat);
+		m_pFs.push_back(&g_fszip);
+		m_pFs.push_back(&g_fsfat);
+		m_pFs.push_back(&g_fsbz2);
+	}
+
+	int get_file_timesample(string filename, uint64_t *ptimesame)
+	{
+		if (ptimesame == NULL)
+		{
+			set_last_err_string("ptimesame is null\n");
+			return -1;
+		}
+
+		for (int i = 0; i < m_pFs.size(); i++)
+		{
+			if (!m_pFs[i]->get_file_timesample(filename, ptimesame))
+				return 0;
+		}
+
+		return -1;
+	}
+
+	int load(string filename, FileBuffer *p, bool async)
+	{
+		for (int i = 0; i < m_pFs.size(); i++)
+		{
+			string back, fn;
+			if (m_pFs[i]->split(filename, &back, &fn) == 0)
+				if(m_pFs[i]->load(back, fn, p, async) == 0)
+					return 0;
+		}
+
+		string err;
+		err = "fail open file: ";
+		err += filename;
+		set_last_err_string(err);
+		return -1;
+	}
+}g_fs_data;
+
+int FSBackFile::get_file_timesample(string filename, uint64_t *ptime)
+{
+	string back, file;
+	if (split(filename, &back, &file))
+		return -1;
+	
+	return g_fs_data.get_file_timesample(back, ptime);
+}
+
+bool FSZip::exist(string backfile, string filename)
+{
+	Zip zip;
+	if (zip.Open(backfile.substr(1)))
+		return false;
+
+	return zip.check_file_exist(filename);
+}
+
+int zip_async_load(string zipfile, string fn, FileBuffer * buff)
+{
+	std::lock_guard<mutex> lock(buff->m_async_mutex);
+
+	Zip zip;
+	if (zip.Open(zipfile.substr(1)))
+		return -1;
+
+	shared_ptr<FileBuffer> p = zip.get_file_buff(fn);
+	if (p == NULL)
+		return -1;
+
+	buff->swap(*p);
+	buff->m_loaded = true;
+	return 0;
+}
+
+int FSZip::load(string backfile, string filename, FileBuffer *p, bool async)
+{
+	Zip zip;
+
+	if (zip.Open(backfile.substr(1)))
+		return -1;
+
+	if (!zip.check_file_exist(filename))
+		return -1;
+
+	if (async)
+	{
+		p->m_aync_thread = thread(zip_async_load, backfile, filename, p);
+	}
+	else
+	{
+		shared_ptr<FileBuffer> pzip = zip.get_file_buff(filename);
+		if (pzip == NULL)
+			return -1;
+
+		p->swap(*pzip);
+		p->m_loaded = true;
+	}
+	return 0;
+}
+
+bool FSFat::exist(string backfile, string filename)
+{
+	Fat fat;
+	if (fat.Open(backfile.substr(1)))
+	{
+		return false;
+	}
+	return fat.m_filemap.find(filename) != fat.m_filemap.end();
+}
+
+int FSFat::load(string backfile, string filename, FileBuffer *p, bool async)
+{
+	Fat fat;
+	if (fat.Open(backfile.substr(1)))
+	{
+		return -1;
+	}
+	shared_ptr<FileBuffer> pfat = fat.get_file_buff(filename);
+	if (pfat == NULL)
+		return -1;
+
+	p->swap(*pfat);
+	p->m_loaded = true;
+	return 0;
+}
+
+bool FSBz2::exist(string backfile, string filename)
+{
+	return false;
+}
+
+int FSBz2::load(string backfile, string filename, FileBuffer *p, bool async)
+{
+	return -1;
+}
+
+uint64_t get_file_timesample(string filename)
+{
+	uint64_t time=0;
+	g_fs_data.get_file_timesample(filename, &time);
+	return time;
 }
 
 shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
@@ -134,109 +364,17 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 		return p;
 	}
 }
-int zip_async_load(string zipfile, string fn, FileBuffer * buff)
-{
-	std::lock_guard<mutex> lock(buff->m_async_mutex);
 
-	Zip zip;
-	if (zip.Open(zipfile))
-		return -1;
-
-	shared_ptr<FileBuffer> p = zip.get_file_buff(fn);
-	if (p == NULL)
-		return -1;
-
-	buff->swap(*p);
-	buff->m_loaded = true;
-	return 0;
-}
 
 int FileBuffer::reload(string filename, bool async)
 {
-	struct stat64 st;
-	size_t pos_zip = string::npos;
-	size_t pos_sdcard = string::npos;
-
-	if (stat64(filename.c_str() + 1, &st))
+	m_loaded = false;
+	if (g_fs_data.load(filename, this, async) == 0)
 	{
-		string path = str_to_upper(filename);
-		pos_zip = path.find(".ZIP");
-		string zipfile = filename.substr(0, pos_zip + 4);
-		if (pos_zip == string::npos || (stat64(zipfile.c_str() + 1, &st)))
-		{
-			pos_sdcard = path.find(".SDCARD");
-			string sdcardfile = filename.substr(0, pos_sdcard + strlen(".SDCARD"));
-			if (pos_sdcard == string::npos || (stat64(sdcardfile.c_str() + 1, &st)))
-			{
-				string err = "Fail Open File: ";
-				err.append(filename);
-				set_last_err_string(err);
-				return -1;
-			}
-		}
-	}
-
-	if (pos_zip != string::npos)
-	{
-		Zip zip;
-		string zipfile = filename.substr(1, pos_zip + 3);
-		if (zip.Open(zipfile))
-			return -1;
-
-		string fn = filename.substr(pos_zip + 5);
-
-		if (!zip.check_file_exist(fn))
-			return -1;
-
-		this->m_loaded = false;
-
-		if (async)
-		{
-			m_aync_thread = thread(zip_async_load, zipfile, fn, this);
-
-		}else
-		{
-			shared_ptr<FileBuffer> p = zip.get_file_buff(fn);
-			if (p == NULL)
-				return -1;
-
-			this->swap(*p);
-			this->m_loaded = true;
-		}
-		m_timesample = st.st_mtime;
+		m_timesample = get_file_timesample(filename);
 		return 0;
 	}
-
-	if (pos_sdcard != string::npos)
-	{
-		Fat fat;
-		if (fat.Open(filename.substr(0, pos_sdcard + strlen(".SDCARD"))))
-		{
-			string err = "Fail Open File: ";
-			err.append(filename.substr(1, pos_sdcard + strlen(".SDCARD")));
-			set_last_err_string(err);
-			return -1;
-		}
-		string fn = filename.substr(pos_sdcard + strlen(".SDCARD") + 1);
-		shared_ptr<FileBuffer> p = fat.get_file_buff(fn);
-		if (p == NULL)
-			return -1;
-
-		this->swap(*p);
-		m_timesample = st.st_mtime;
-		return 0;
-	}
-
-	m_timesample = st.st_mtime;
-
-	this->unmapfile();
-
-	if (this->mapfile(filename.substr(1), st.st_size))
-		return -1;
-	
-	this->m_loaded = true;
-
-	return 0;
+	return -1;
 }
 
 shared_ptr<FileBuffer> get_file_buffer(string filename)
