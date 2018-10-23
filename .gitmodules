@@ -4,3 +4,6 @@
 [submodule "zlib"]
 	path = zlib
 	url = https://github.com/madler/zlib.git
+[submodule "bzip2"]
+	path = bzip2
+	url = https://github.com/enthought/bzip2-1.0.6
