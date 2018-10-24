@@ -46,6 +46,7 @@ int get_libusb_debug_level();
 class string_ex : public std::string
 {
 public:
+
 	int format(const char *fmt, ...)
 	{
 		va_list args;

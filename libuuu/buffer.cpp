@@ -39,6 +39,7 @@
 #include "zip.h"
 #include "fat.h"
 #include <string.h>
+#include "bzlib.h"
 
 #ifdef _MSC_VER
 #define stat64 _stat64
@@ -74,7 +75,9 @@ public:
 		}
 
 		string path = str_to_upper(filename);
-		size_t pos = path.rfind(m_ext);
+		string ext = m_ext;
+		ext += "/";
+		size_t pos = path.rfind(ext);
 		if (pos == string::npos)
 		{
 			set_last_err_string("can't find ext name in path");
@@ -108,7 +111,7 @@ public:
 	bool exist(string backfile, string filename)
 	{
 		struct stat64 st;
-		return stat64(backfile.c_str() + 1, &st) == 0;
+		return stat64(backfile.c_str() + 1, &st) == 0 && ((st.st_mode & S_IFDIR) == 0);
 	}
 
 	int load(string backfile, string filename, FileBuffer *p, bool async)
@@ -168,8 +171,8 @@ public:
 	{
 		m_pFs.push_back(&g_fsflat);
 		m_pFs.push_back(&g_fszip);
-		m_pFs.push_back(&g_fsfat);
 		m_pFs.push_back(&g_fsbz2);
+		m_pFs.push_back(&g_fsfat);
 	}
 
 	int get_file_timesample(string filename, uint64_t *ptimesame)
@@ -189,6 +192,17 @@ public:
 		return -1;
 	}
 
+	bool exist(string filename)
+	{
+		for (int i = 0; i < m_pFs.size(); i++)
+		{
+			string back, fn;
+			if (m_pFs[i]->split(filename, &back, &fn) == 0)
+				if (m_pFs[i]->exist(back, fn))
+					return true;
+		}
+		return false;
+	}
 	int load(string filename, FileBuffer *p, bool async)
 	{
 		for (int i = 0; i < m_pFs.size(); i++)
@@ -271,7 +285,7 @@ int FSZip::load(string backfile, string filename, FileBuffer *p, bool async)
 bool FSFat::exist(string backfile, string filename)
 {
 	Fat fat;
-	if (fat.Open(backfile.substr(1)))
+	if (fat.Open(backfile))
 	{
 		return false;
 	}
@@ -281,7 +295,7 @@ bool FSFat::exist(string backfile, string filename)
 int FSFat::load(string backfile, string filename, FileBuffer *p, bool async)
 {
 	Fat fat;
-	if (fat.Open(backfile.substr(1)))
+	if (fat.Open(backfile))
 	{
 		return -1;
 	}
@@ -296,12 +310,157 @@ int FSFat::load(string backfile, string filename, FileBuffer *p, bool async)
 
 bool FSBz2::exist(string backfile, string filename)
 {
+	if (filename == "*")
+		return true;
+
 	return false;
+}
+
+struct bz2_blk
+{
+	size_t start;
+	size_t size;
+	size_t decompress_offset;
+	size_t decompress_size;
+	size_t actual_size;
+	int	error;
+};
+
+int bz2_decompress(shared_ptr<FileBuffer> pbz, FileBuffer *p, vector<bz2_blk> * pblk, size_t start, size_t skip)
+{
+	for (int i = start; i < pblk->size(); i += skip)
+	{
+		unsigned int len;
+		if (i) /*skip first dummy one*/
+		{
+			(*pblk)[i].error = BZ2_bzBuffToBuffDecompress((char*)p->data() + pblk->at(i).decompress_offset,
+				&len,
+				(char*)pbz->data() + pblk->at(i).start,
+				pblk->at(i).size,
+				0,
+				0);
+			(*pblk)[i].actual_size = len;
+		}
+	}
+	return 0;
+}
+
+int bz_async_load(string filename, FileBuffer *p)
+{
+	shared_ptr<FileBuffer> pbz;
+
+	pbz = get_file_buffer(filename);
+	if (pbz == NULL) {
+		string err;
+		err = "Failure get file buffer: ";
+		err += filename;
+		set_last_err_string(err);
+		return -1;
+	}
+
+	vector<bz2_blk> blk;
+	bz2_blk one;
+	memset(&one, 0, sizeof(one));
+	blk.push_back(one);
+	size_t total = 0;
+
+	uint8_t *p1 = &pbz->at(0);
+
+	for (size_t i = 0; i < pbz->size() - 10; i++)
+	{
+		uint16_t *header = (uint16_t *)p1++;
+		if (*header == 0x5a42) //"BZ"
+		{
+			uint32_t *magic1 = (uint32_t *)&pbz->at(i+4);
+			if (*magic1 == 0x26594131) //PI 3.1415926
+			{
+				uint16_t *magic2 = (uint16_t *)&pbz->at(i + 8);
+				if (*magic2 == 0x5953)
+				{     
+					/*which is valude bz2 header*/
+					struct bz2_blk one;
+					one.start = i;
+		
+					blk[blk.size() - 1].size = i - blk[blk.size() - 1].start;
+					one.decompress_offset = blk[blk.size() - 1].decompress_offset + blk[blk.size() - 1].decompress_size;
+					one.decompress_size = (pbz->at(i + 3) - '0') * 100 * 1000; /* not l024 for bz2 */
+
+					blk.push_back(one);
+
+					total += one.decompress_size;
+				}
+			}
+		}
+	}
+
+	if (blk.size() == 1) {
+		set_last_err_string("Can't find validate bz2 magic number");
+		return -1;
+	}
+
+	blk[blk.size() - 1].size = pbz->size() - blk[blk.size() - 1].start;
+
+	int nthread = thread::hardware_concurrency();
+
+	vector<thread> threads;
+	
+	p->resize(total);
+
+	for (int i = 0; i < nthread; i++)
+	{
+		threads.push_back(thread(bz2_decompress, pbz, p, &blk, i, nthread));
+	}
+
+	for (int i = 0; i < nthread; i++)
+	{
+		threads[i].join();
+	}
+
+	for (int i = 1; i < blk.size(); i++)
+	{
+		if (blk[i].error)
+		{
+			set_last_err_string("decompress err");
+			return -1;
+		}
+		if ((blk[i].decompress_size != blk[i].actual_size) && (i != blk.size() - 1))
+		{
+			set_last_err_string("bz2: only support last block less then other block");
+			return -1;
+		}
+	}
+
+	size_t sz =  blk[blk.size() - 1].decompress_size - blk[blk.size() - 1].actual_size;
+
+	p->resize(total - sz);
+	p->m_loaded = true;
+
+	return 0;
 }
 
 int FSBz2::load(string backfile, string filename, FileBuffer *p, bool async)
 {
-	return -1;
+	if (filename != "*")
+	{
+		set_last_err_string("bz just support . decompress itself");
+		return -1;
+	}
+
+	if (!g_fs_data.exist(backfile))
+	{
+		string str;
+		str = "Failure open file:";
+		str += backfile;
+		set_last_err_string(str);
+		return -1;
+	}
+
+	p->m_aync_thread = thread(bz_async_load, backfile, p);
+	
+	if (!async)
+		p->m_aync_thread.join();
+
+	return 0;
 }
 
 uint64_t get_file_timesample(string filename)
@@ -320,6 +479,13 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 		else
 			filename = g_current_dir + filename;
 	}
+
+	string_ex path;
+	path += filename;
+
+	path.replace('\\', '/');
+
+	filename = path;
 
 	bool find;
 	{
