@@ -2,7 +2,6 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0>=1.0.16)
 pkg_check_modules(LIBZIP REQUIRED libzip)
 pkg_check_modules(LIBZ REQUIRED zlib)
-pkg_check_modules(LIBBZ2 REQUIRED libbz2)
 find_package(Threads)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -static-libstdc++ -static-libgcc")
@@ -52,6 +51,6 @@ set(SOURCES
 )
 
 add_executable(uuu ${SOURCES})
-target_link_libraries(uuu uuc_s  ${LIBUSB_LIBRARIES} ${LIBZIP_LIBRARIES} ${LIBZ_LIBRARIES} ${LIBBZ2_LIBRARIES})
+target_link_libraries(uuu uuc_s  ${LIBUSB_LIBRARIES} ${LIBZIP_LIBRARIES} ${LIBZ_LIBRARIES} libbz2.a)
 
 install(TARGETS uuu DESTINATION bin)
