@@ -9,6 +9,9 @@ init:
     sudo apt-get --yes --force-yes install libusb-1.0-0-dev
 
     sudo apt-get --yes --force-yes install libzip-dev
+
+    sudo apt-get --yes --force-yes install libbz2-dev
+
 install:
 - cmd: >-
     echo %APPVEYOR_BUILD_FOLDER%
