@@ -58,3 +58,8 @@ Freescale/NXP I.MX Chip image deploy tools.
 - sudo apt-get install libusb-1.0.0-dev libzip-dev libbz2-dev
 - cmake .
 - make
+
+# Running environment
+ - win10 64bit
+ - linux (ubuntu) 64bit
+ - All 32 bit system will be problem when met big file
