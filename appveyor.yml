@@ -11,6 +11,8 @@ init:
     sudo apt-get --yes --force-yes install libzip-dev
 
     sudo apt-get --yes --force-yes install libbz2-dev
+    
+    sudo apt-get --yes --force-yes install asciidoc
 
 install:
 - cmd: >-
@@ -28,10 +30,17 @@ build_script:
     cmake .
 
     make
+    
+    git clone https://github.com/NXPmicro/mfgtools.wiki.git
+    cd mfgtools.wiki
+    a2x -L UUU
+    
 artifacts:
 - path: uuu.exe
 - path: uuu/uuu
 - path: libusb-1.0.dll
+- path: UUU.pdf
+
 before_deploy:
 - cmd: ''
 deploy:
@@ -39,5 +48,5 @@ deploy:
   description: prebuild for $(APPVEYOR_REPO_COMMIT) \n\n $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
     secure: SWWVkwSfPyVIaPChBBl+uAA3Fau9Rl5iNPQ9VRL8yyggXvc6wPcr/O9iXBMVM7Ju
-  artifact: uuu.exe;  libusb-1.0.dll; uuu/uuu
+  artifact: uuu.exe;  libusb-1.0.dll; uuu/uuu; mfgtools.wiki/UUU.pdf
   draft: true
