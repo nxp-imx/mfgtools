@@ -21,6 +21,12 @@ install:
     echo %APPVEYOR_BUILD_FOLDER%
 
     git submodule update --init
+    
+    cd %APPVEYOR_BUILD_FOLDER%\libusb
+    
+    git am -i ..\msvc\0001-Static-link-C-library.patch
+    
+    cd ..
 
     msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
