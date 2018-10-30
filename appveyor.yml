@@ -54,7 +54,7 @@ artifacts:
 - path: uuu.exe
 - path: uuu/uuu
 - path: libusb-1.0.dll
-- path: UUU.pdf
+- path: mfgtools.wiki/UUU.pdf
 
 before_deploy:
 - cmd: ''
