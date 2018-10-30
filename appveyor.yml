@@ -42,7 +42,9 @@ build_script:
     make
     
     cd mfgtools.wiki
+    
     rename -f 's/\.asciidoc$//' *
+    
     a2x -L UUU
     
 artifacts:
