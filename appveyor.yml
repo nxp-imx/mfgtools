@@ -6,6 +6,8 @@ configuration: Release
 platform: x64
 init:
 - sh: >-
+    sudo apt-get update
+
     sudo apt-get --yes --force-yes install libusb-1.0-0-dev
 
     sudo apt-get --yes --force-yes install libzip-dev
