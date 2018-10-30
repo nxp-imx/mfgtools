@@ -16,6 +16,8 @@ init:
     
     sudo apt-get --yes --force-yes install asciidoc
     
+    sudo apt-get --yes --force-yes install rename
+    
     git clone https://github.com/NXPmicro/mfgtools.wiki.git ${APPVEYOR_BUILD_FOLDER}\mfgtools.wiki
 
 install:
