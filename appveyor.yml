@@ -24,7 +24,7 @@ install:
     
     cd %APPVEYOR_BUILD_FOLDER%\libusb
     
-    git am -i ..\msvc\0001-Static-link-C-library.patch
+    git apply ..\msvc\0001-Static-link-C-library.patch
     
     cd ..
 
