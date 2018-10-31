@@ -11,17 +11,14 @@ Freescale/NXP I.MX Chip image deploy tools.
     1:11     5/5 [                                        ] SDP: jump -f u-boot-dtb.imx -ivtinitramf....
     2:1      1/5 [===>                                    ] SDP: boot -f u-boot-imx7dsabresd_sd.imx ....
 
-
-**under development**
-
-# key feature. 
+# Key feature. 
  - The real cross platform. linux, windows, MacOS(not test yet)
  - Multi devices program support
  - Daemon mode support.
  - Small depedence (only libusb, zlibc, libbz2)
  - Firmware (uboot/kernel) use WCID to auto load winusb drvier in windows side. win7 user need install winusb driver. https://zadig.akeo.ie/  win10 will install driver automatically.
 
-# example:
+# Example:
 ```
   uuu u-boot.imx            Download u-boot.imx by HID device
   
@@ -43,16 +40,20 @@ Freescale/NXP I.MX Chip image deploy tools.
                             decompress sdcard.bz2 file and download whole image into emmc
 ```
 
+# Prebuild Image and pdf document
+
+  https://github.com/NXPmicro/mfgtools/releases
+ 
 # Build:
 
-## windows
+## Windows
 - git clone https://github.com/NXPmicro/mfgtools.git
 - cd mfgtools
 - git submodule init
 - git submodule update
 - open msvs/uuu.sln by vs2017
 
-## linux
+## Linux
 - git clone https://github.com/NXPmicro/mfgtools.git
 - cd mfgtools
 - sudo apt-get install libusb-1.0.0-dev libzip-dev libbz2-dev
