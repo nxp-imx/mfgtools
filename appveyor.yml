@@ -48,7 +48,13 @@ build_script:
     
     rename -f 's/\.asciidoc$//' *
     
-    a2x -L UUU
+    echo "<revhistory>" > UUU-docinfo.xml
+    
+    git log -n25 --reverse --format="format:<revision><revnumber>%h</revnumber><date>%cd</date><authorinitials>%an</authorinitials><revremark>%s%n%b</revremark></revision>" >> UUU-docinfo.xml
+    
+    echo "</revhistory>" >> UUU-docinfo.xml
+    
+    a2x -L -a docinfo UUU
     
 artifacts:
 - path: uuu.exe
