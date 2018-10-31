@@ -42,7 +42,8 @@ Freescale/NXP I.MX Chip image deploy tools.
 
 # Prebuild Image and pdf document
 
-  https://github.com/NXPmicro/mfgtools/releases
+  - https://github.com/NXPmicro/mfgtools/releases
+  - UUU.pdf is snapshot of [wiki](https://github.com/NXPmicro/mfgtools/wiki)
  
 # Build:
 
