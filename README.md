@@ -1,5 +1,7 @@
 # uuu (Universal Update Utility), mfgtools 3.0
 
+![Build status](https://ci.appveyor.com/api/projects/status/github/NXPmicro/mfgtools?svg=true)
+
 **original linux version using "linux" branch, windows version use "windows" branch**
 
 Freescale/NXP I.MX Chip image deploy tools.
