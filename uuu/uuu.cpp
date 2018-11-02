@@ -504,7 +504,7 @@ int progress(uuu_notify nt, void *p)
 			str.format("\rSuccess %d    Failure %d    ", g_overall_okay, g_overall_failure);
 
 			if (g_map_path_nt.empty())
-				str += "Wait for Known USB Device Appear";
+				str += "Wait for Known USB Device Appear...";
 
 			if (!g_usb_path_filter.empty())
 			{
@@ -762,17 +762,18 @@ int main(int argc, char **argv)
 			printf("\n%sRun built-in script:%s\n %s\n\n", BOLDWHITE, DEFAULT, cmd_script.c_str());
 
 		if (!shell)
-			cout << "Wait for Known USB Device Appear";
+			cout << "Wait for Known USB Device Appear...";
 
 		print_usb_filter();
 
 		printf("\n");
 	}
 	else {
-		cout << "Wait for Known USB Device Appear";
+		cout << "Wait for Known USB Device Appear...";
 		print_usb_filter();
 		cout << "\r";
 		cout << "\x1b[?25l";
+		cout.flush();
 	}
 
 	map<uint64_t, ShowNotify> nt_session;
