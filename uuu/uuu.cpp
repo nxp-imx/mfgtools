@@ -659,7 +659,10 @@ int main(int argc, char **argv)
 	enable_vt_mode();
 
 	if (argc == 1)
+	{
 		print_help();
+		return 0;
+	}
 
 	int deamon = 0;
 	int shell = 0;
