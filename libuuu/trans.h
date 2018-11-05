@@ -78,7 +78,8 @@ class HIDTrans : public USBTrans
 {
 	int m_set_report;
 public:
-	HIDTrans() { m_set_report = 9; }
+	int m_read_timeout;
+	HIDTrans() { m_set_report = 9; m_read_timeout = 1000; }
 	~HIDTrans() { if (m_devhandle) close();  m_devhandle = NULL;  }
 	int write(void *buff, size_t size);
 	int read(void *buff, size_t size, size_t *return_size);

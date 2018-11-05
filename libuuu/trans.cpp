@@ -118,7 +118,7 @@ int HIDTrans::read(void *buff, size_t size, size_t *rsize)
 		(uint8_t*)buff,
 		size,
 		&actual,
-		1000
+		m_read_timeout
 	);
 
 	*rsize = actual;

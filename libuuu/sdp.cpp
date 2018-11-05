@@ -355,6 +355,8 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 int SDPBootlogCmd::run(CmdCtx *ctx)
 {
 	HIDTrans dev;
+	dev.m_read_timeout = 2000;
+
 	if (dev.open(ctx->m_dev))
 		return -1;
 
@@ -370,15 +372,15 @@ int SDPBootlogCmd::run(CmdCtx *ctx)
 	while (1)
 	{
 		ret = report.read(v);
-		if(ret == 0)
+		if (ret)
+			return 0;
+		else
 		{
 			nt.str = (char*)(v.data() + 4);
 			v[5] = 0;
 			call_notify(nt);
 			continue;
 		}
-		if (ret != LIBUSB_ERROR_TIMEOUT)
-			return 0;
 	}
 	return 0;
 }
