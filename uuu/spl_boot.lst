@@ -6,6 +6,7 @@ SDPU: delay 1000
 SDPU: write -f _flash.bin -offset 0x57c00
 SDPU: jump
 SDPU: blog
+SDPU: done
 
 # This command will be run when ROM support stream mode
 SDPS: boot -f _flash.bin
