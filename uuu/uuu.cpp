@@ -46,7 +46,8 @@
 #include "buildincmd.h"
 
 #include "../libuuu/libuuu.h"
-#ifndef WIN32
+
+#ifndef _MSC_VER
 #include <unistd.h>
 #include <limits.h>
 #endif
@@ -712,7 +713,7 @@ int main(int argc, char **argv)
 
 	print_version();
 
-#ifndef WIN32
+#ifndef _MSC_VER
 	{
 		cout<<"Enjoy auto [tab] command complete by run below command"<<endl;
 		char result[ PATH_MAX ];
