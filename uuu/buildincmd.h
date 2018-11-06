@@ -248,7 +248,7 @@ public:
 		for (auto iCol = begin(); iCol != end(); ++iCol)
                 {
 			if(iCol->first.substr(0, match.size()) == match)
-				printf("%s\n", iCol->first.c_str());
+				printf("%s \n", iCol->first.c_str());
 		}
 	}
 

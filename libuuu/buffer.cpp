@@ -85,7 +85,7 @@ public:
 					*outfilename = filename;
 				} else {
 					*outbackfile = filename.substr(0, pos);
-					if(filename.size() > pos + 1)
+					if(filename.size() >= pos + 1)
 						*outfilename = filename.substr(pos + 1);
 					else
 						outfilename->clear();
@@ -98,7 +98,8 @@ public:
 		}
 
 		string ext = m_ext;
-		ext += "/";
+		if(!dir)
+			ext += "/";
 		size_t pos = path.rfind(ext);
 		if (pos == string::npos)
 		{
@@ -107,7 +108,11 @@ public:
 		}
 
 		*outbackfile = filename.substr(0, pos + strlen(m_ext));
-		*outfilename = filename.substr(pos + strlen(m_ext) + 1);
+
+		if(filename.size() >= pos + strlen(m_ext) + 1)
+			*outfilename = filename.substr(pos + strlen(m_ext) + 1);
+		else
+			outfilename->clear();
 		return 0;
 	}
 };
@@ -256,12 +261,14 @@ public:
 
 	int for_each_ls(uuu_ls_file fn, string path, void *p)
 	{
-		for (int i = 0; i < m_pFs.size(); i++)
+		for (int i = m_pFs.size() -1; i >= 0; i--)
                 {
                         string back, filename;
                         if (m_pFs[i]->split(path, &back, &filename, true) == 0)
-                                if (m_pFs[i]->for_each_ls(fn, back, filename, p))
-                                        return 0;
+                                if(m_pFs[i]->for_each_ls(fn, back, filename, p)==0)
+				{
+					return 0;
+				}
                 }
 		return 0;
 	}
@@ -434,8 +441,13 @@ bool FSBz2::exist(string backfile, string filename)
 
 int FSBz2::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
 {
+
+	if(!g_fs_data.exist(backfile))
+		return -1;
+
 	string str;
-	str =backfile + "/*";
+	str = backfile + "/*";
+
 	fn(str.c_str() + 1, p);
 	return 0;
 }

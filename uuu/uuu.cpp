@@ -675,7 +675,7 @@ void linux_autocomplete(int argc, char **argv)
 		if(cur.size() == 1)
 			linux_auto_arg();
 		else
-			cout<<cur<<endl;
+			cout<<cur<<" "<<endl;
 	}
 
 	if(last.size()>3)
