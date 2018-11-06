@@ -46,6 +46,10 @@
 #include "buildincmd.h"
 
 #include "../libuuu/libuuu.h"
+#ifndef WIN32
+#include <unistd.h>
+#include <limits.h>
+#endif
 
 using namespace std;
 
@@ -707,6 +711,16 @@ int main(int argc, char **argv)
 	AutoCursor a;
 
 	print_version();
+
+#ifndef WIN32
+	{
+		cout<<"Enjoy auto [tab] command complete by run below command"<<endl;
+		char result[ PATH_MAX ];
+		memset(result, 0, PATH_MAX);
+		ssize_t count = readlink( "/proc/self/exe", result, PATH_MAX );
+		cout<<"  complete -o nospace -C "<< result << " uuu" <<endl<<endl;
+	}
+#endif
 
 	enable_vt_mode();
 
