@@ -641,7 +641,7 @@ int runshell(int shell)
 				log.flush();
 
 				if (uboot_cmd)
-					cmd = "fb:" + cmd;
+					cmd = "fb: ucmd " + cmd;
 
 				int ret = uuu_run_cmd(cmd.c_str());
 				if (ret)
