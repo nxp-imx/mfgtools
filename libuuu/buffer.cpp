@@ -40,9 +40,12 @@
 #include "fat.h"
 #include <string.h>
 #include "bzlib.h"
+#include "stdio.h"
 
 #ifdef _MSC_VER
 #define stat64 _stat64
+#else
+#include "dirent.h"
 #endif
 
 static map<string, shared_ptr<FileBuffer>> g_filebuffer_map;
@@ -66,15 +69,34 @@ public:
 	virtual int get_file_timesample(string filename, uint64_t *ptime)=0;
 	virtual int load(string backfile, string filename, FileBuffer *p, bool async)=0;
 	virtual bool exist(string backfile, string filename)=0;
-	int split(string filename, string *outbackfile, string *outfilename)
+	virtual int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) = 0;
+	int split(string filename, string *outbackfile, string *outfilename, bool dir=false)
 	{
+		string path = str_to_upper(filename);
 		if (m_ext == NULL || strlen(m_ext) == 0)
 		{
-			*outbackfile = filename;
+			if(dir)
+			{
+				size_t pos = path.rfind("/");
+				if(pos == string::npos)
+				{
+					*outbackfile = MAGIC_PATH;
+					*outbackfile += "./";
+					*outfilename = filename;
+				} else {
+					*outbackfile = filename.substr(0, pos);
+					if(filename.size() > pos + 1)
+						*outfilename = filename.substr(pos + 1);
+					else
+						outfilename->clear();
+				}
+			}else
+			{
+				*outbackfile = filename;
+			}
 			return 0;
 		}
 
-		string path = str_to_upper(filename);
 		string ext = m_ext;
 		ext += "/";
 		size_t pos = path.rfind(ext);
@@ -130,6 +152,43 @@ public:
 		p->m_loaded = true;
 		return 0;
 	}
+
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
+	{
+		struct stat64 st;
+
+		if(stat64(backfile.c_str() + 1, &st))
+		{
+			return -1;
+		}
+
+		if(st.st_mode & S_IFDIR)
+		{
+#ifdef WIN32
+#else
+			DIR *dir;
+			dir = opendir(backfile.c_str() + 1);
+			struct dirent *dp;
+			while ((dp=readdir(dir)) != NULL)
+			{
+				string name = dp->d_name;
+				if(name.substr(0, filename.size()) == filename || filename.empty())
+				{
+					string path = backfile + "/" + name;
+					if(dp->d_type == DT_DIR)
+						path += "/";
+					fn(path.c_str() + 1, p);
+				}
+			}
+			closedir(dir);
+			return 0;
+#endif
+		}else
+		{
+			return fn(backfile.c_str() + 1, p);
+		}
+	}
+
 } g_fsflat;
 
 class FSBackFile : public FSBasic
@@ -145,6 +204,7 @@ public:
 	FSZip() { m_ext = ".ZIP"; };
 	virtual int load(string backfile, string filename, FileBuffer *p, bool async);
 	virtual bool exist(string backfile, string filename);
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
 }g_fszip;
 
 static class FSFat : public FSBackFile
@@ -153,6 +213,7 @@ public:
 	FSFat() { m_ext = ".SDCARD"; };
 	virtual int load(string backfile, string filename, FileBuffer *p, bool async);
 	virtual bool exist(string backfile, string filename);
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
 }g_fsfat;
 
 static class FSBz2 : public FSBackFile
@@ -161,6 +222,7 @@ public:
 	FSBz2() { m_ext = ".BZ2"; };
 	virtual int load(string backfile, string filename, FileBuffer *p, bool async);
 	virtual bool exist(string backfile, string filename);
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
 }g_fsbz2;
 
 static class FS_DATA
@@ -190,6 +252,18 @@ public:
 		}
 
 		return -1;
+	}
+
+	int for_each_ls(uuu_ls_file fn, string path, void *p)
+	{
+		for (int i = 0; i < m_pFs.size(); i++)
+                {
+                        string back, filename;
+                        if (m_pFs[i]->split(path, &back, &filename, true) == 0)
+                                if (m_pFs[i]->for_each_ls(fn, back, filename, p))
+                                        return 0;
+                }
+		return 0;
 	}
 
 	bool exist(string filename)
@@ -237,6 +311,27 @@ bool FSZip::exist(string backfile, string filename)
 		return false;
 
 	return zip.check_file_exist(filename);
+}
+
+int FSZip::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
+{
+	Zip zip;
+
+        if (zip.Open(backfile.substr(1)))
+                return -1;
+
+	for(auto it = zip.m_filemap.begin(); it!=zip.m_filemap.end(); ++it)
+	{
+		if(it->first.substr(0, filename.size()) == filename || filename.empty())
+		{
+			string name = backfile;
+			name += "/";
+			name += it->first;
+			fn(name.c_str()+1, p);
+		}
+	}
+
+	return 0;
 }
 
 int zip_async_load(string zipfile, string fn, FileBuffer * buff)
@@ -308,12 +403,41 @@ int FSFat::load(string backfile, string filename, FileBuffer *p, bool async)
 	return 0;
 }
 
+int FSFat::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
+{
+	Fat fat;
+        if (fat.Open(backfile))
+        {
+                return -1;
+        }
+
+	for(auto it = fat.m_filemap.begin(); it != fat.m_filemap.end(); ++it)
+	{
+		if(it->first.substr(0, filename.size()) == filename || filename.empty())
+		{
+			string name = backfile;
+			name += "/";
+			name += it->first;
+			fn(name.c_str()+1, p);
+		}
+	}
+	return 0;
+}
+
 bool FSBz2::exist(string backfile, string filename)
 {
 	if (filename == "*")
 		return true;
 
 	return false;
+}
+
+int FSBz2::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
+{
+	string str;
+	str =backfile + "/*";
+	fn(str.c_str() + 1, p);
+	return 0;
 }
 
 struct bz2_blk
@@ -574,3 +698,28 @@ int file_overwrite_monitor(string filename, FileBuffer *p)
 	return 0;
 }
 #endif
+
+int uuu_for_each_ls_file(uuu_ls_file fn, const char *file_path, void *p)
+{
+	string_ex path;
+	path +=">";
+
+	string f = file_path;
+
+	if(f.size() == 0)
+	{
+		path += "./";
+	}else if( f[0] == '/')
+	{
+		path += "//";
+	}else
+	{
+		path += "./";
+	}
+
+	path+=file_path;
+	path.replace('\\', '/');
+
+	f = path;
+	return g_fs_data.for_each_ls(fn, f, p);
+}

@@ -650,8 +650,60 @@ int runshell(int shell)
 	}
 }
 
+void linux_auto_arg()
+{
+	cout<<"-b "<<endl;
+	cout<<"-v "<<endl;
+	cout<<"-V "<<endl;
+	cout<<"-s "<<endl;
+	cout<<"-d "<<endl;
+}
+
+int linux_autocomplete_ls(const char *path, void *p)
+{
+	cout << path+2 << endl;
+	return 0;
+}
+
+void linux_autocomplete(int argc, char **argv)
+{
+	string last = argv[3];
+	string cur = argv[2];
+
+	if(argv[2][0] == '-')
+	{
+		if(cur.size() == 1)
+			linux_auto_arg();
+		else
+			cout<<cur<<endl;
+	}
+
+	if(last.size()>3)
+	{
+		if(last.substr(last.size()-3) == "uuu")
+			linux_auto_arg();
+	}
+	else if(last == "-b")
+	{
+		return g_BuildScripts.PrintAutoComplete(cur);
+	}
+
+	uuu_for_each_ls_file(linux_autocomplete_ls, cur.c_str(), NULL);
+}
+
 int main(int argc, char **argv)
 {
+	if (argc == 4)
+	{
+		string str=argv[1];
+		if(str.size() >= 3)
+			if(str.substr(str.size() -3) == "uuu")
+			{
+				linux_autocomplete(argc, argv);
+				return 0;
+			}
+	}
+
 	AutoCursor a;
 
 	print_version();

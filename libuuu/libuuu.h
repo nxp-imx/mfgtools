@@ -111,6 +111,9 @@ int uuu_unregister_notify_callback(uuu_notify_fun f);
 typedef int(*uuu_show_cfg)(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t bcdversion,void *p);
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p);
 
+typedef int(*uuu_ls_file)(const char *path, void *p);
+int uuu_for_each_ls_file(uuu_ls_file fn, const char *path, void *p);
+
 int uuu_run_cmd(const char * cmd);
 int uuu_run_cmd_script(const char *script);
 

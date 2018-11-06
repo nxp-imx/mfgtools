@@ -139,7 +139,7 @@ public:
 				start_descript = m_script.find('|', pos);
 				if (start_descript != string::npos)
 				{
-					m_args[i].m_desc = m_script.substr(start_descript + 1, 
+					m_args[i].m_desc = m_script.substr(start_descript + 1,
 											m_script.find('\n', start_descript) - start_descript - 1);
 					def = m_script.substr(pos, start_descript - pos);
 					m_args[i].parser(def);
@@ -242,6 +242,16 @@ public:
 		}
 		printf(">");
 	}
+
+	void PrintAutoComplete(string match)
+	{
+		for (auto iCol = begin(); iCol != end(); ++iCol)
+                {
+			if(iCol->first.substr(0, match.size()) == match)
+				printf("%s\n", iCol->first.c_str());
+		}
+	}
+
 };
 
 extern BuildInScriptVector g_BuildScripts;
