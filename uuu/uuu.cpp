@@ -680,10 +680,13 @@ void linux_autocomplete(int argc, char **argv)
 		if(cur.size() == 1)
 			linux_auto_arg();
 		else
+		{
 			cout<<cur<<" "<<endl;
+			return;
+		}
 	}
 
-	if(last.size()>3)
+	if(last.size()>=3)
 	{
 		if(last.substr(last.size()-3) == "uuu")
 			linux_auto_arg();
