@@ -36,12 +36,12 @@
 
 using namespace std;
 
-#define YELLOW "\x1B[93m"
-#define DEFAULT "\x1B[0m"
-#define GREEN "\x1B[92m"
-#define RED	"\x1B[91m"
-#define KCYN  "\x1B[36m"
-#define BOLDWHITE "\x1B[97m"
+extern char * g_vt_yellow ;
+extern char * g_vt_default ;
+extern char * g_vt_green ;
+extern char * g_vt_red  ;
+extern char * g_vt_kcyn ;
+extern char * g_vt_boldwhite ;
 
 struct BuildCmd
 {
@@ -155,14 +155,16 @@ public:
 
 	void show_cmd()
 	{
-		printf("\t%s%s%s\t%s\n", BOLDWHITE, m_cmd.c_str(), DEFAULT,  m_desc.c_str());
+		printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_cmd.c_str(), g_vt_default,  m_desc.c_str());
 		for (size_t i=0; i < m_args.size(); i++)
 		{
 			string desc;
 			desc += m_args[i].m_arg;
 			if (m_args[i].m_flags & Arg::ARG_OPTION)
 			{
-				desc += BOLDWHITE "[Optional]" DEFAULT;
+				desc += g_vt_boldwhite;
+				desc += "[Optional]";
+				desc += g_vt_default;
 			}
 			desc += " ";
 			desc += m_args[i].m_desc;
@@ -233,7 +235,7 @@ public:
 		printf("<");
 		for (auto iCol = begin(); iCol != end(); ++iCol)
 		{
-			printf("%s%s%s", BOLDWHITE, iCol->first.c_str(), DEFAULT);
+			printf("%s%s%s", g_vt_boldwhite, iCol->first.c_str(), g_vt_default);
 
 			auto i = iCol;
 			i++;

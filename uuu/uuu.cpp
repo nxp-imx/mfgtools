@@ -52,6 +52,23 @@
 #include <limits.h>
 #endif
 
+char * g_vt_yellow = (char*)"\x1B[93m";
+char * g_vt_default = (char*) "\x1B[0m";
+char * g_vt_green = (char*)"\x1B[92m";
+char * g_vt_red = (char*)"\x1B[91m";
+char * g_vt_kcyn = (char*)"\x1B[36m";
+char * g_vt_boldwhite = (char*)"\x1B[97m";
+
+void clean_vt_color()
+{
+	g_vt_yellow = (char*)"";
+	g_vt_default = g_vt_yellow;
+	g_vt_green = g_vt_yellow;
+	g_vt_red = g_vt_yellow;
+	g_vt_kcyn = g_vt_yellow;
+	g_vt_boldwhite = g_vt_yellow;
+}
+
 using namespace std;
 
 int get_console_width();
@@ -106,7 +123,7 @@ public:
 void print_help(bool detail = false)
 {
 	const char help[] =
-		"uuu [-d -m -v -V] <" BOLDWHITE "bootloader|cmdlists|cmd" DEFAULT ">\n\n"
+		"uuu [-d -m -v -V] <" "bootloader|cmdlists|cmd" ">\n\n"
 		"    bootloader  download bootloader to board by usb\n"
 		"    cmdlist     run all commands in cmdlist file\n"
 		"                If it is path, search uuu.auto in dir\n"
@@ -216,8 +233,8 @@ string build_process_bar(size_t width, size_t pos, size_t total)
 
 	size_t start = (width - per.size()) / 2;
 	str.replace(start, per.size(), per);
-	str.insert(start, YELLOW);
-	str.insert(start + per.size() + strlen(YELLOW), DEFAULT);
+	str.insert(start, g_vt_yellow);
+	str.insert(start + per.size() + strlen(g_vt_yellow), g_vt_default);
 	return str;
 }
 
@@ -340,18 +357,18 @@ public:
 		{
 			if (nt->status)
 			{
-				cout << m_dev << ">" << RED <<"Fail " << uuu_get_last_err_string() << DEFAULT << endl;
+				cout << m_dev << ">" << g_vt_red <<"Fail " << uuu_get_last_err_string() << g_vt_default << endl;
 			}
 			else
 			{
-				cout << m_dev << ">" << GREEN << "Okay" << DEFAULT << endl;
+				cout << m_dev << ">" << g_vt_green << "Okay" << g_vt_default << endl;
 			}
 		}
 
 		if (nt->type == uuu_notify::NOTIFY_TRANS_POS)
 		{
 			if (m_trans_size)
-				cout << YELLOW << "\r" << m_trans_pos * 100 / m_trans_size <<"%" << DEFAULT;
+				cout << g_vt_yellow << "\r" << m_trans_pos * 100 / m_trans_size <<"%" << g_vt_default;
 			else
 				cout << ".";
 
@@ -418,14 +435,14 @@ public:
 					err = uuu_get_last_err_string();
 					err.resize(bar - 2, ' ');
 					str.replace(1, err.size(), err);
-					str.insert(1, RED);
-					str.insert(1 + strlen(RED) + err.size(), DEFAULT);
+					str.insert(1, g_vt_red);
+					str.insert(1 + strlen(g_vt_red) + err.size(), g_vt_default);
 				}
 				else
 				{
 					str.replace(1, 4, "Done");
-					str.insert(1, GREEN);
-					str.insert(1 + strlen(GREEN) + strlen("Done"), DEFAULT);
+					str.insert(1, g_vt_green);
+					str.insert(1 + strlen(g_vt_green) + strlen("Done"), g_vt_default);
 				}
 				cout << str;
 			} else {
@@ -550,18 +567,21 @@ bool enable_vt_mode()
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (hOut == INVALID_HANDLE_VALUE)
 	{
+		clean_vt_color();
 		return false;
 	}
 
 	DWORD dwMode = 0;
 	if (!GetConsoleMode(hOut, &dwMode))
 	{
+		clean_vt_color();
 		return false;
 	}
 
 	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 	if (!SetConsoleMode(hOut, dwMode))
 	{
+		clean_vt_color();
 		return false;
 	}
 	return true;
@@ -844,13 +864,13 @@ int main(int argc, char **argv)
 
 	if (g_verbose)
 	{
-		printf("%sBuild in config:%s\n", BOLDWHITE, DEFAULT);
+		printf("%sBuild in config:%s\n", g_vt_boldwhite, g_vt_default);
 		printf("\tPctl\t Chip\t\t Vid\t Pid\t BcdVersion\n");
 		printf("\t==================================================\n");
 		uuu_for_each_cfg(print_cfg, NULL);
 
 		if (!cmd_script.empty())
-			printf("\n%sRun built-in script:%s\n %s\n\n", BOLDWHITE, DEFAULT, cmd_script.c_str());
+			printf("\n%sRun built-in script:%s\n %s\n\n", g_vt_boldwhite, g_vt_default, cmd_script.c_str());
 
 		if (!shell)
 			cout << "Wait for Known USB Device Appear...";
@@ -896,7 +916,7 @@ int main(int argc, char **argv)
 	{
 		runshell(shell);
 
-		cout << RED << "\nError: " << DEFAULT <<  uuu_get_last_err_string();
+		cout << g_vt_red << "\nError: " << g_vt_default <<  uuu_get_last_err_string();
 		return ret;
 	}
 
