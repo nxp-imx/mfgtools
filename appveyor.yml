@@ -5,19 +5,6 @@ image:
 configuration: Release
 platform: x64
 init:
-- sh: >-
-    sudo apt-get update
-
-    sudo apt-get --yes --force-yes install libusb-1.0-0-dev
-
-    sudo apt-get --yes --force-yes install libzip-dev
-
-    sudo apt-get --yes --force-yes install libbz2-dev
-    
-    sudo apt-get --yes --force-yes install asciidoc
-    
-    sudo apt-get --yes --force-yes install rename
-   
 install:
 - cmd: >-
     echo %APPVEYOR_BUILD_FOLDER%
@@ -29,13 +16,29 @@ install:
     git apply ..\msvc\0001-Static-link-C-library.patch
     
     cd ..
+ 
+ - sh: >-
+    sudo apt-get update
 
+    sudo apt-get --yes --force-yes install libusb-1.0-0-dev
+
+    sudo apt-get --yes --force-yes install libzip-dev
+
+    sudo apt-get --yes --force-yes install libbz2-dev
+    
+    sudo apt-get --yes --force-yes install asciidoc
+    
+    sudo apt-get --yes --force-yes install rename
+
+build_script:
+- cmd: >-
+ 
     msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
     copy %PLATFORM%\%CONFIGURATION%\dll\uuu.exe %APPVEYOR_BUILD_FOLDER%\uuu.exe
 
     copy %PLATFORM%\%CONFIGURATION%\dll\libusb-1.0.dll %APPVEYOR_BUILD_FOLDER%\libusb-1.0.dll
-build_script:
+    
 - sh: >-
     cmake .
 
