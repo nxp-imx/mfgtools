@@ -7,8 +7,14 @@ configuration:
 - Debug
 - Release
 
-platform: x64
+platform:
+ - x86
+ - x64
+ 
 init:
+ - sh: if [ "${CONFIGURATION}" = "DEBUG" ] ; then exit 0; fi
+ - sh: if [ "${PLATFORM}" = "x86" ]; then exit 0; fi 
+ 
 install:
 - cmd: echo %APPVEYOR_BUILD_FOLDER%
 
