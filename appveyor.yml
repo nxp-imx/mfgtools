@@ -12,7 +12,7 @@ platform:
  - x64
  
 init:
- - sh: if [ "${CONFIGURATION}" = "DEBUG" ] ; then exit 0; fi
+ - sh: if [ "${CONFIGURATION}" = "Debug" ] ; then exit 0; fi
  - sh: if [ "${PLATFORM}" = "x86" ]; then exit 0; fi 
  
 install:
@@ -42,14 +42,10 @@ build_script:
 
 - cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
-- cmd: copy %PLATFORM%\%CONFIGURATION%\dll\uuu.exe %APPVEYOR_BUILD_FOLDER%\uuu-%PLATFORM%-%CONFIGURATION%.exe
+- cmd: if exist %APPVEYOR_BUILD_FOLDER%\x64\release\dll\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\x64\release\dll\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
 
-- cmd: copy %PLATFORM%\%CONFIGURATION%\dll\libusb-1.0.dll %APPVEYOR_BUILD_FOLDER%\libusb-1.0-%PLATFORM%-%CONFIGURATION%.dll
-
-- cmd: if exist %APPVEYOR_BUILD_FOLDER%\uuu-x64-release.exe copy %APPVEYOR_BUILD_FOLDER%\uuu-x64-release.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
-
-- cmd: if exist %APPVEYOR_BUILD_FOLDER%\libusb-1.0-x64-release.dll copy %APPVEYOR_BUILD_FOLDER%\libusb-1.0-x64-release.dll %APPVEYOR_BUILD_FOLDER%\libusb-1.0.dll
-    
+- cmd: if exist %APPVEYOR_BUILD_FOLDER%\x64\release\dll\libusb-1.0.dll cp %APPVEYOR_BUILD_FOLDER%\x64\release\dll\libusb-1.0.dll  %APPVEYOR_BUILD_FOLDER%\libusb-1.0.dll
+   
 - sh: cmake .
 - sh: make
      
