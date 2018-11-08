@@ -47,11 +47,6 @@
 
 #include "../libuuu/libuuu.h"
 
-#ifndef _MSC_VER
-#include <unistd.h>
-#include <limits.h>
-#endif
-
 char * g_vt_yellow = (char*)"\x1B[93m";
 char * g_vt_default = (char*) "\x1B[0m";
 char * g_vt_green = (char*)"\x1B[92m";
@@ -675,144 +670,18 @@ int runshell(int shell)
 	}
 }
 
-void linux_auto_arg(const char *space = " ", const char * filter = "")
-{
-	string str = filter;
-
-	const char *param[] = { "-b", "-d", "-v", "-V", "-s", NULL };
-	int i = 0;
-
-	for (int i = 0; param[i]; i++)
-	{
-		if (str.find(param[i]) == string::npos)
-			cout << param[i] << space << endl;
-	}
-}
-
-int linux_autocomplete_ls(const char *path, void *p)
-{
-	cout << path+2 << endl;
-	return 0;
-}
-
-void linux_autocomplete(int argc, char **argv)
-{
-	string last = argv[3];
-	string cur = argv[2];
-
-	if(argv[2][0] == '-')
-	{
-		if(cur.size() == 1)
-			linux_auto_arg();
-		else
-		{
-			cout<<cur<<" "<<endl;
-			return;
-		}
-	}
-
-	if(last.size()>=3)
-	{
-		if(last.substr(last.size()-3) == "uuu")
-			linux_auto_arg();
-	}
-	else if(last == "-b")
-	{
-		return g_BuildScripts.PrintAutoComplete(cur);
-	}
-
-	uuu_for_each_ls_file(linux_autocomplete_ls, cur.c_str(), NULL);
-}
-
-string get_next_word(string str, size_t &pos)
-{
-	size_t start = 0;
-	start = str.find(' ', pos);
-	string sub = str.substr(pos, start - pos);
-	pos = start==string::npos? start: start+1;
-	return sub;
-}
-
-void power_shell_autocomplete(const char *p)
-{
-	string pstr = p;
-	size_t pos = 0;
-	
-	string file;
-
-	vector<string> argv; string params;
-	while (pos != string::npos && pos < pstr.size())
-	{
-		file = get_next_word(pstr, pos);
-		argv.push_back(file);
-
-		if (file.size() && file[0] == '-')
-			params += " " + file;
-	}
-	
-	string last = argv[argv.size() - 1];
-	string prev = argv.size() > 1 ? argv[argv.size() - 2] : "";
-	if (last == "-b" || prev == "-b")
-	{
-		string cur;
-		if (prev == "-b")
-			cur = last;
-		
-		if(g_BuildScripts.find(cur)==g_BuildScripts.end())
-			g_BuildScripts.PrintAutoComplete(cur, "");
-
-		last.clear();
-	}
-	else
-	{
-		if(last[0]=='-' || argv.size() == 1)
-			linux_auto_arg("", params.c_str());
-	}
-
-	if (argv.size() == 1)
-		last.clear();
-	
-	uuu_for_each_ls_file(linux_autocomplete_ls, last.c_str(), NULL);
-}
+int auto_complete(int argc, char**argv);
+void print_autocomplete_help();
 
 int main(int argc, char **argv)
 {
-	if (argc == 4)
-	{
-		string str=argv[1];
-		if(str.size() >= 3)
-			if(str.substr(str.size() -3) == "uuu")
-			{
-				linux_autocomplete(argc, argv);
-				return 0;
-			}
-	}
-
-	if (argc >= 2)
-	{
-		string str = argv[1];
-		if (str == "-autocomplete")
-		{
-			
-
-			power_shell_autocomplete(argc == 2 ? "" : argv[2]);
-			return 0;
-		}
-	}
+	if (auto_complete(argc, argv) == 0)
+		return 0;
 
 	AutoCursor a;
 
 	print_version();
-
-#ifndef _MSC_VER
-	{
-		cout<<"Enjoy auto [tab] command complete by run below command"<<endl;
-		char result[ PATH_MAX ];
-		memset(result, 0, PATH_MAX);
-		ssize_t count = readlink( "/proc/self/exe", result, PATH_MAX );
-		cout<<"  complete -o nospace -C "<< result << " uuu" <<endl<<endl;
-	}
-#endif
+	print_autocomplete_help();
 
 	enable_vt_mode();
 

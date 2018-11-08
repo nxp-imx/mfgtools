@@ -47,6 +47,7 @@ include_directories(${generated_files_dir})
 set(SOURCES
 	uuu.cpp
 	buildincmd.cpp
+	autocomplete.cpp
 	${CLSTS}
 )
 
