@@ -245,12 +245,12 @@ public:
 		printf(">");
 	}
 
-	void PrintAutoComplete(string match)
+	void PrintAutoComplete(string match, const char *space=" " )
 	{
 		for (auto iCol = begin(); iCol != end(); ++iCol)
                 {
 			if(iCol->first.substr(0, match.size()) == match)
-				printf("%s \n", iCol->first.c_str());
+				printf("%s%s\n", iCol->first.c_str(), space);
 		}
 	}
 

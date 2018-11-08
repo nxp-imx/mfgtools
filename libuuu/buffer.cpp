@@ -170,6 +170,26 @@ public:
 		if(st.st_mode & S_IFDIR)
 		{
 #ifdef WIN32
+			string str = backfile.substr(1);
+			if (filename.empty())
+				str += "/*";
+			else
+				str += "/" + filename;
+
+			WIN32_FIND_DATA fd;
+			HANDLE handle = FindFirstFile(str.c_str(), &fd);
+			BOOL b = false;
+			do
+			{
+				if (handle == INVALID_HANDLE_VALUE)
+					break;
+				string path = backfile + "/" + fd.cFileName;
+				if(fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+					path += "/";
+				fn(path.c_str() + 1, p);
+			} while (FindNextFile(handle, &fd));
+			CloseHandle(handle);
+			return 0;
 #else
 			DIR *dir;
 			dir = opendir(backfile.c_str() + 1);
@@ -269,7 +289,7 @@ public:
 				{
 					return 0;
 				}
-                }
+        }
 		return 0;
 	}
 
