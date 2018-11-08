@@ -6,58 +6,51 @@ configuration: Release
 platform: x64
 init:
 install:
-- cmd: >-
-    echo %APPVEYOR_BUILD_FOLDER%
+- cmd: echo %APPVEYOR_BUILD_FOLDER%
 
-    git submodule update --init
+- cmd: git submodule update --init
     
-    cd %APPVEYOR_BUILD_FOLDER%\libusb
+- cmd: cd %APPVEYOR_BUILD_FOLDER%\libusb
     
-    git apply ..\msvc\0001-Static-link-C-library.patch
+- cmd:   git apply ..\msvc\0001-Static-link-C-library.patch
     
-    cd ..
+- cmd:    cd ..
  
- - sh: >-
-    sudo apt-get update
+- sh: sudo apt-get update
 
-    sudo apt-get --yes --force-yes install libusb-1.0-0-dev
+- sh: sudo apt-get --yes --force-yes install libusb-1.0-0-dev
 
-    sudo apt-get --yes --force-yes install libzip-dev
+- sh: sudo apt-get --yes --force-yes install libzip-dev
 
-    sudo apt-get --yes --force-yes install libbz2-dev
+- sh: sudo apt-get --yes --force-yes install libbz2-dev
     
-    sudo apt-get --yes --force-yes install asciidoc
+- sh: sudo apt-get --yes --force-yes install asciidoc
     
-    sudo apt-get --yes --force-yes install rename
+- sh: sudo apt-get --yes --force-yes install rename
 
 build_script:
-- cmd: >-
- 
-    msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+- cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
-    copy %PLATFORM%\%CONFIGURATION%\dll\uuu.exe %APPVEYOR_BUILD_FOLDER%\uuu.exe
+- cmd: copy %PLATFORM%\%CONFIGURATION%\dll\uuu.exe %APPVEYOR_BUILD_FOLDER%\uuu.exe
 
-    copy %PLATFORM%\%CONFIGURATION%\dll\libusb-1.0.dll %APPVEYOR_BUILD_FOLDER%\libusb-1.0.dll
+- cmd: copy %PLATFORM%\%CONFIGURATION%\dll\libusb-1.0.dll %APPVEYOR_BUILD_FOLDER%\libusb-1.0.dll
     
-- sh: >-
-    cmake .
-
-    make
-    
+- sh: cmake .
+- sh: make
      
-    git clone https://github.com/NXPmicro/mfgtools.wiki.git
+- sh: git clone https://github.com/NXPmicro/mfgtools.wiki.git
     
-    cd mfgtools.wiki
+- sh: cd mfgtools.wiki
     
-    rename -f 's/\.asciidoc$//' *
+- sh: rename -f 's/\.asciidoc$//' *
     
-    echo "<revhistory>" > UUU-docinfo.xml
+- sh: echo "<revhistory>" > UUU-docinfo.xml
     
-    git log -n25 --reverse --format="format:<revision><revnumber>%h</revnumber><date>%cd</date><authorinitials>%an</authorinitials><revremark>%s%n%b</revremark></revision>" >> UUU-docinfo.xml
+- sh: git log -n25 --reverse --format="format:<revision><revnumber>%h</revnumber><date>%cd</date><authorinitials>%an</authorinitials><revremark>%s%n%b</revremark></revision>" >> UUU-docinfo.xml
     
-    echo "</revhistory>" >> UUU-docinfo.xml
+- sh: echo "</revhistory>" >> UUU-docinfo.xml
     
-    a2x -L -a docinfo UUU
+- sh: a2x -L -a docinfo UUU
     
 artifacts:
 - path: uuu.exe
