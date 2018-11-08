@@ -2,7 +2,11 @@ version: 1.2.{build}
 image:
 - Visual Studio 2017
 - Ubuntu1804
-configuration: Release
+
+configuration: 
+- Debug
+- Release
+
 platform: x64
 init:
 install:
@@ -29,11 +33,16 @@ install:
 - sh: sudo apt-get --yes --force-yes install rename
 
 build_script:
+
 - cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
-- cmd: copy %PLATFORM%\%CONFIGURATION%\dll\uuu.exe %APPVEYOR_BUILD_FOLDER%\uuu.exe
+- cmd: copy %PLATFORM%\%CONFIGURATION%\dll\uuu.exe %APPVEYOR_BUILD_FOLDER%\uuu-%PLATFORM%-%CONFIGURATION%.exe
 
-- cmd: copy %PLATFORM%\%CONFIGURATION%\dll\libusb-1.0.dll %APPVEYOR_BUILD_FOLDER%\libusb-1.0.dll
+- cmd: copy %PLATFORM%\%CONFIGURATION%\dll\libusb-1.0.dll %APPVEYOR_BUILD_FOLDER%\libusb-1.0-%PLATFORM%-%CONFIGURATION%.dll
+
+- cmd: if exist %APPVEYOR_BUILD_FOLDER%\uuu-x64-release.exe copy %APPVEYOR_BUILD_FOLDER%\uuu-x64-release.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
+
+- cmd: if exist %APPVEYOR_BUILD_FOLDER%\libusb-1.0-x64-release.dll copy %APPVEYOR_BUILD_FOLDER%\libusb-1.0-x64-release.dll %APPVEYOR_BUILD_FOLDER%\libusb-1.0.dll
     
 - sh: cmake .
 - sh: make
