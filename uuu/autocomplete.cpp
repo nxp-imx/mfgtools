@@ -91,12 +91,23 @@ void linux_autocomplete(int argc, char **argv)
 
 	if (last.size()>=3)
 	{
-		if (last.substr(last.size() - 3) == "uuu")
+		if (last.substr(last.size() - 3) == "uuu" &&(cur.empty() || cur[0] == '-'))
+		{
 			linux_auto_arg();
+			cout << cur << endl;
+		}
+
+	}else if(last.empty())
+	{
+		linux_auto_arg();
 	}
 	else if (last == "-b")
 	{
 		return g_BuildScripts.PrintAutoComplete(cur);
+
+	}else if(last[0] == '-')
+	{
+		linux_auto_arg();
 	}
 
 	uuu_for_each_ls_file(linux_autocomplete_ls, cur.c_str(), NULL);
