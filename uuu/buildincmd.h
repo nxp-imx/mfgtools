@@ -185,7 +185,7 @@ public:
 	string replace_script_args(vector<string> args)
 	{
 		string script = m_script;
-		for (size_t i = 0; i < args.size(); i++)
+		for (size_t i = 0; i < args.size() && i < m_args.size(); i++)
 		{
 			script = replace_str(script, m_args[i].m_arg, args[i]);
 		}
