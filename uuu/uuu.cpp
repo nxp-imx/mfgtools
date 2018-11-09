@@ -683,7 +683,11 @@ int main(int argc, char **argv)
 	print_version();
 	print_autocomplete_help();
 
-	enable_vt_mode();
+	if (!enable_vt_mode())
+	{
+		cout << "Your console don't support VT mode, fail back to verbose mode" << endl;
+		g_verbose = 1;
+	}
 
 	if (argc == 1)
 	{
