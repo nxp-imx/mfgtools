@@ -209,7 +209,7 @@ void print_autocomplete_help()
 		char path[MAX_PATH];
 		GetModuleFileNameA(hModule, path, MAX_PATH);
 
-		printf("   Register-ArgumentCompleter -CommandName uuu -ScriptBlock {param($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameter); %s -autocomplete $parameterName }\n",
+		printf("   Register-ArgumentCompleter -CommandName uuu -ScriptBlock {param($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameter); %s -autocomplete $parameterName }\n\n",
 			path);
 	}
 #endif
