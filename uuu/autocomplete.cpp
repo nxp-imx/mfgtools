@@ -203,7 +203,7 @@ void print_autocomplete_help()
 	}
 #else
 	{
-		printf("Powershell: Enjoy auto [tab] command complete by run below command\n");
+		printf("Powershell: Enjoy auto [tab] command complete by run below command or put into Documents\\WindowsPowerShell\\Microsoft.PowerShell_profile.ps1\n");
 		
 		HMODULE hModule = GetModuleHandleA(NULL);
 		char path[MAX_PATH];
