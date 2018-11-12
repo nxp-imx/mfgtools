@@ -195,7 +195,7 @@ void print_autocomplete_help()
 
 #ifndef _MSC_VER
 	{
-		cout << "Enjoy auto [tab] command complete by run below command" << endl;
+		cout << "Enjoy auto [tab] command complete by run below command [sudo uuu have some problem]" << endl;
 		char result[PATH_MAX];
 		memset(result, 0, PATH_MAX);
 		ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
