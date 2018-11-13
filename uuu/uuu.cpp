@@ -131,6 +131,7 @@ void print_help(bool detail = false)
 		"                    -m 1:2 -m 1:3\n\n"
 		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
 		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
+		"uuu -udev       linux: show udev rule to avoid sudo each time \n"
 		"uuu -h -H       show help, -H means detail helps\n\n";
 	printf("%s", help);
 	printf("uuu [-d -m -v] -b[run] ");
@@ -185,6 +186,13 @@ int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, u
 		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\n", pro, chip, ext, pid, vid);
 	else
 		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\t 0x%04x\n", pro, chip, ext, pid, vid, bcdVersion);
+	return 0;
+}
+
+int print_udev_rule(const char *pro, const char * chip, const char * /*compatible*/, uint16_t vid, uint16_t pid, uint16_t bcdVersion, void * /*p*/)
+{
+	printf("SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"%04x\", ATTRS{idProduct}==\"%04x\", MODE=\"0666\"\n",
+			vid, pid);
 	return 0;
 }
 
@@ -673,10 +681,29 @@ int runshell(int shell)
 int auto_complete(int argc, char**argv);
 void print_autocomplete_help();
 
+void print_udev()
+{
+	uuu_for_each_cfg(print_udev_rule, NULL);
+	fprintf(stderr, "\n1: put above udev run into /etc/udev/rules.d/99-uuu.rules\n");
+	fprintf(stderr, "\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/99-uuu.rules\"\n");
+	fprintf(stderr, "2: update udev rule\n");
+	fprintf(stderr, "\tsudo udevadm control --reload-rules\n");
+}
+
 int main(int argc, char **argv)
 {
 	if (auto_complete(argc, argv) == 0)
 		return 0;
+
+	if (argc >= 2)
+	{
+		string s = argv[1];
+		if(s == "-udev")
+		{
+			print_udev();
+			return 0;
+		}
+	}
 
 	AutoCursor a;
 
