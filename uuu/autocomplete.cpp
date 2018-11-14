@@ -76,10 +76,19 @@ int linux_autocomplete_ls(const char *path, void *p)
 
 void linux_autocomplete(int argc, char **argv)
 {
-	string last = argv[3];
-	string cur = argv[2];
+	string last;
+	string cur;
 
-	if (argv[2][0] == '-')
+	if (argc == 3)
+	{
+		last = argv[2];
+	}else
+	{
+		cur = argv[2];
+		last = argv[3];
+	}
+
+	if (cur[0] == '-')
 	{
 		if (cur.size() == 1)
 			linux_auto_arg();
@@ -166,7 +175,7 @@ void power_shell_autocomplete(const char *p)
 
 int auto_complete(int argc, char**argv)
 {
-	if (argc == 4)
+	if (argc == 4 || argc == 3)
 	{
 		string str = argv[1];
 		if (str.size() >= 3)
@@ -195,11 +204,16 @@ void print_autocomplete_help()
 
 #ifndef _MSC_VER
 	{
-		cout << "Enjoy auto [tab] command complete by run below command [sudo uuu have some problem]" << endl;
+		cout << "Enjoy auto [tab] command complete by put below script into /etc/bash_completion.d/uuu" << endl;
 		char result[PATH_MAX];
 		memset(result, 0, PATH_MAX);
 		ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-		cout << "  complete -o nospace -C " << result << " uuu" << endl << endl;
+		cout << g_vt_kcyn;
+		cout << "  _uuu_autocomplete()" <<endl;
+		cout << "  {" << endl;
+		cout << "       COMPREPLY=($(" << result << " $1 $2 $3))" << endl;
+		cout << "  }" << endl;
+		cout << "  complete -o nospace -F _uuu_autocomplete  uuu" << g_vt_default << endl << endl;
 	}
 #else
 	{
