@@ -57,7 +57,7 @@ build_script:
     
 - sh: echo "<revhistory>" > UUU-docinfo.xml
     
-- sh: git log -n25 --reverse --format="format:<revision><revnumber>%h</revnumber><date>%cd</date><authorinitials>%an</authorinitials><revremark>%s%n%b</revremark></revision>" >> UUU-docinfo.xml
+- sh: git log -n25 --reverse --format="format:<revision><revnumber>%h</revnumber><date>%cd</date><authorinitials>%an</authorinitials><revremark>%s</revremark></revision>" >> UUU-docinfo.xml
     
 - sh: echo "</revhistory>" >> UUU-docinfo.xml
     
