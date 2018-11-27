@@ -183,7 +183,21 @@ string get_next_param(string &cmd, size_t &pos, char sperate)
 	while (cmd[pos] == sperate && pos < cmd.size())
 		pos++;
 
-	size_t end = cmd.find(sperate, pos);
+	bool quate = false;
+	size_t end = string::npos;
+
+	for (size_t s = pos; s < cmd.size(); s++)
+	{
+		if (cmd[s] == '"')
+			quate = !quate;
+
+		if (!quate && cmd[s] == sperate)
+		{
+			end = s;
+			break;
+		}
+	}
+
 	if (end == cmd.npos)
 		end = cmd.size();
 
@@ -544,8 +558,11 @@ static int insert_one_cmd(const char * cmd, CmdMap *pCmdMap)
 static int added_default_boot_cmd(const char *filename)
 {
 	string str;
+
 	str = "SDPS: boot -f ";
+	str += "\"";
 	str += filename;
+	str += "\"";
 
 	int ret = insert_one_cmd(str.c_str(), &g_cmd_map);
 	if (ret) return ret;
@@ -553,7 +570,9 @@ static int added_default_boot_cmd(const char *filename)
 	insert_one_cmd("SDPS: done", &g_cmd_map);
 
 	str = "SDP: boot -f ";
+	str += "\"";
 	str += filename;
+	str += "\"";
 
 	ret = insert_one_cmd(str.c_str(), &g_cmd_map);
 	if (ret) return ret;
@@ -561,7 +580,9 @@ static int added_default_boot_cmd(const char *filename)
 	insert_one_cmd("SDP: done", &g_cmd_map);
 
 	str = "SDPU: write -f ";
+	str += "\"";
 	str += filename;
+	str += "\"";
 	str += " -offset 0x57c00";
 	insert_one_cmd(str.c_str(), &g_cmd_map);
 	insert_one_cmd("SDPU: jump", &g_cmd_map);
@@ -652,7 +673,7 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap)
 int uuu_auto_detect_file(const char *filename)
 {
 	string_ex fn;
-	fn += filename;
+	fn += remove_quota(filename);
 	fn.replace('\\', '/');
 
 	if (fn.empty())

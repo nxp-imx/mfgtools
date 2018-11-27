@@ -780,7 +780,15 @@ int main(int argc, char **argv)
 
 				vector<string> args;
 				for (int j = i + 2; j < argc; j++)
-					args.push_back(argv[j]);
+				{
+					string s = argv[j];
+					if (s.find(' ') != ' ')
+					{
+						s.insert(s.begin(), '"');
+						s.insert(s.end(), '"');
+					}
+					args.push_back(s);
+				}
 
 				cmd_script = g_BuildScripts[argv[i + 1]].replace_script_args(args);
 				break;
@@ -810,6 +818,11 @@ int main(int argc, char **argv)
 			for (int j = i; j < argc; j++)
 			{
 				s = argv[j];
+				if (s.find(' ') != string::npos)
+				{
+					s.insert(s.begin(), '"');
+					s.insert(s.end(), '"');
+				}
 				cmd.append(s);
 				cmd.append(" ");
 			}

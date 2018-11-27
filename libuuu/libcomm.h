@@ -119,6 +119,20 @@ inline string str_to_upper(string str)
 	return s;
 }
 
+inline string remove_quota(string str)
+{
+	if (!str.empty())
+	{
+		if (str[0] == '"')
+		{
+			str.erase(0, 1);
+			if (!str.empty() && str[str.size() - 1] == '"')
+				str.erase(str.size() - 1, 1);
+		}
+	}
+	return str;
+}
+
 inline bool compare_str(string &str1, string &str2, bool ignore_case)
 {
 	if (ignore_case)

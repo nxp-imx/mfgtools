@@ -628,6 +628,8 @@ uint64_t get_file_timesample(string filename)
 
 shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 {
+	filename = remove_quota(filename);
+
 	if (!filename.empty() && filename[0] != MAGIC_PATH)
 	{
 		if (filename == "..")
