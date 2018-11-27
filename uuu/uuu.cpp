@@ -782,7 +782,7 @@ int main(int argc, char **argv)
 				for (int j = i + 2; j < argc; j++)
 				{
 					string s = argv[j];
-					if (s.find(' ') != ' ')
+					if (s.find(' ') != string::npos)
 					{
 						s.insert(s.begin(), '"');
 						s.insert(s.end(), '"');
