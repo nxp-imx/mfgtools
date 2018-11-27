@@ -337,7 +337,11 @@ int uuu_run_cmd(const char * cmd)
 	{
 		size_t pos = 0;
 		string c = cmd;
-		string pro = get_next_param(c, pos);
+		
+		string pro = get_next_param(c, pos, ':');
+		pro = remove_square_brackets(pro);
+		pro += ":";
+
 		if (p->parser())
 			ret = -1;
 		else
