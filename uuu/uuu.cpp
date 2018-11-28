@@ -818,7 +818,7 @@ int main(int argc, char **argv)
 			for (int j = i; j < argc; j++)
 			{
 				s = argv[j];
-				if (s.find(' ') != string::npos)
+				if (s.find(' ') != string::npos && s[s.size() - 1] != ':')
 				{
 					s.insert(s.begin(), '"');
 					s.insert(s.end(), '"');
