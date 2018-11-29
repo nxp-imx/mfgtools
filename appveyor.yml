@@ -42,9 +42,9 @@ build_script:
 
 - cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
-- cmd: if exist %APPVEYOR_BUILD_FOLDER%\x64\release\dll\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\x64\release\dll\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
+- cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu-static-link.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
-- cmd: if exist %APPVEYOR_BUILD_FOLDER%\x64\release\dll\libusb-1.0.dll cp %APPVEYOR_BUILD_FOLDER%\x64\release\dll\libusb-1.0.dll  %APPVEYOR_BUILD_FOLDER%\libusb-1.0.dll
+- cmd: if exist %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
    
 - sh: cmake .
 - sh: make
@@ -66,7 +66,6 @@ build_script:
 artifacts:
 - path: uuu.exe
 - path: uuu/uuu
-- path: libusb-1.0.dll
 - path: mfgtools.wiki/UUU.pdf
 
 before_deploy:
