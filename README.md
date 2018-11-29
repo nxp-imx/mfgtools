@@ -2,59 +2,59 @@
 
 ![Build status](https://ci.appveyor.com/api/projects/status/github/NXPmicro/mfgtools?svg=true)
 
-**original linux version using "linux" branch, windows version use "windows" branch**
-
 Freescale/NXP I.MX Chip image deploy tools.
+**original linux version uses "linux" branch, windows version uses "windows" branch**
 
     uuu (universal update utility) for nxp imx chips -- libuuu-1.0.1-gffd9837
 
-    Succues:0       Failure:3               Wait for Known USB Device Appear...
+    Succeded:0       Failed:3               Wait for Known USB Devices to Appear...
 
     1:11     5/5 [                                        ] SDP: jump -f u-boot-dtb.imx -ivtinitramf....
     2:1      1/5 [===>                                    ] SDP: boot -f u-boot-imx7dsabresd_sd.imx ....
 
-# Key feature. 
- - The real cross platform. linux, windows, MacOS(not test yet)
+# Key features 
+ - The real cross platform. Linux, Windows, MacOS(not test yet)
  - Multi devices program support
- - Daemon mode support.
- - Small depedence (only libusb, zlibc, libbz2)
- - Firmware (uboot/kernel) use WCID to auto load winusb drvier in windows side. win7 user need install winusb driver. https://zadig.akeo.ie/  win10 will install driver automatically.
+ - Daemon mode support
+ - Few depedencies (only libusb, zlibc, libbz2)
+ - Firmware (uboot/kernel) uses WCID to auto load the winusb drvier on the Windows side. Windows7 users need to install the winusb driver from https://zadig.akeo.ie/  Windows10 will install the driver automatically.
 
-# Example:
+# Examples:
 ```
-  uuu u-boot.imx            Download u-boot.imx by HID device
+  uuu u-boot.imx            Download u-boot.imx via HID device
   
-  uuu list.uu               Run all commands in list.uu
+  uuu list.uu               Run all the commands in list.uu
   
-  uuu -s                    Enter shell mode. input command. 
+  uuu -s                    Enter shell mode. Input command. 
 
   uuu -v u-boot.imx         verbose mode
  
-  uuu -d u-boot.imx         Once detect known device attach, download boot.imx. 
+  uuu -d u-boot.imx         Once it detects the attachement of a known device, download boot.imx. 
                             
                             u-boot.imx can be replaced, new file will be download once board reset.
                             
-                            Avoid unplug sd, write sd, plug sd card when debug uboot.
+                            Do not unplug the SD card, write to the SD card, nor plug in a SD card when debugging uboot.
                             
   uuu -b emmc u-boot.imx    write u-boot.imx to emmc boot partition. u-boot.imx need enable fastboot
   
   uuu -b emmc_all u-boot.imx sdcard.bz2\*
-                            decompress sdcard.bz2 file and download whole image into emmc
+                            decompress sdcard.bz2 file and download the whole image into emmc
 ```
 
-# Prebuild Image and pdf document
+# Prebuilt Image and pdf document
 
+The prebuilt image and document are here:
   - https://github.com/NXPmicro/mfgtools/releases
   - UUU.pdf is snapshot of [wiki](https://github.com/NXPmicro/mfgtools/wiki)
  
-# Build:
+# How to Build:
 
 ## Windows
 - git clone https://github.com/NXPmicro/mfgtools.git
 - cd mfgtools
 - git submodule init
 - git submodule update
-- open msvs/uuu.sln by vs2017
+- open msvs/uuu.sln with Visual Studio 2017
 
 ## Linux
 - git clone https://github.com/NXPmicro/mfgtools.git
@@ -63,7 +63,14 @@ Freescale/NXP I.MX Chip image deploy tools.
 - cmake .
 - make
 
-# Running environment
- - win10 64bit
- - linux (ubuntu) 64bit
- - All 32 bit system will be problem when met big file
+# Run environment
+ - Windows 10 64 bit
+ - Linux (Ubuntu) 64 bit
+ - 32 bit systems will have problems with big files.
+
+uuu is licensed under the BSD license. See LICENSE.
+The BSD licensed prebuilt Windows binary version of uuu is statically linked with the LGPL libusb library, which remains LGPL.
+
+bzip2 (BSD license) is from https://github.com/enthought/bzip2-1.0.6
+zlib  (zlib license) is from https://github.com/madler/zlib.git
+libusb (LGPL-2.1) is from  https://github.com/libusb/libusb.git
