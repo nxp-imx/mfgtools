@@ -260,3 +260,147 @@ int BulkTrans::read(void *buff, size_t size, size_t *rsize)
 
 	return ret;
 }
+
+static void LIBUSB_CALL transfer_cb(struct libusb_transfer *transfer)
+{
+	int *completed = (int *)transfer->user_data;
+	*completed = 1;
+}
+
+int BulkTrans::prepare_multi_request(size_t size, size_t count)
+{
+	m_size_prerequest = size;
+	
+	for (size_t i = 0; i < count; i++)
+	{
+		struct libusb_transfer * transfer_in = libusb_alloc_transfer(0);
+		if (transfer_in == NULL)
+		{
+			set_last_err_string("Allocate transfer failure");
+			return -1;
+		}
+
+		Transfer t;
+		m_vector_transfer.push(t);
+
+		m_vector_transfer.back().libusb_transfer = transfer_in;
+		m_vector_transfer.back().buffer= new uint8_t[size];
+		m_vector_transfer.back().complete = new int;
+		*m_vector_transfer.back().complete = 0;
+
+		libusb_fill_bulk_transfer(transfer_in, (libusb_device_handle *)m_devhandle, m_ep_in.addr,
+			m_vector_transfer.back().buffer, size,
+			transfer_cb, m_vector_transfer.back().complete, m_timeout);
+
+		int r = libusb_submit_transfer(transfer_in);
+		if (r)
+		{
+			set_last_err_string("submit transfer failure");
+			return r;
+		}
+		
+	}
+	return 0;
+}
+
+int BulkTrans::free_multi_request()
+{
+	while(!m_vector_transfer.empty())
+	{
+		if(*m_vector_transfer.front().complete == 0)
+		{
+			libusb_cancel_transfer(m_vector_transfer.front().libusb_transfer);
+
+			int *completed = m_vector_transfer.front().complete;
+
+			while (!*completed) {
+				int ret = libusb_handle_events_completed(NULL, completed);
+				if (ret < 0) {
+					if (ret == LIBUSB_ERROR_INTERRUPTED)
+						continue;
+				}
+			}
+
+		}
+
+		libusb_free_transfer(m_vector_transfer.front().libusb_transfer);
+		delete m_vector_transfer.front().buffer;
+		delete m_vector_transfer.front().complete;
+		m_vector_transfer.pop();
+	}
+	return 0;
+}
+
+int BulkTrans::read_multi_request(void *buff, size_t size, size_t *return_size)
+{
+	int ret = -1;
+
+	if (m_vector_transfer.size() == 0)
+	{
+		set_last_err_string("need call prepare_multi_request before call read_multi_request");
+		return -1;
+	}
+
+	int *completed = m_vector_transfer.front().complete;
+
+	while (!*completed) {
+		int ret = libusb_handle_events_completed(NULL, completed);
+		if (ret < 0) {
+			if (ret == LIBUSB_ERROR_INTERRUPTED)
+				continue;
+		}
+	}
+
+	if (m_vector_transfer.front().libusb_transfer->status == LIBUSB_TRANSFER_COMPLETED)
+	{
+		*return_size = m_vector_transfer.front().libusb_transfer->actual_length;
+		if (*return_size > size)
+			*return_size = size;
+
+		memcpy(buff, m_vector_transfer.front().buffer, *return_size);
+
+		ret = 0;
+	}
+	else
+	{
+		string error;
+		string err;
+		err = "Bulk(R):";
+		err += "Read Error";
+		set_last_err_string(err);
+	}
+
+	libusb_free_transfer(m_vector_transfer.front().libusb_transfer);
+	delete m_vector_transfer.front().buffer;
+	delete m_vector_transfer.front().complete;
+	m_vector_transfer.pop();
+
+	struct libusb_transfer * transfer_in = libusb_alloc_transfer(0);
+	if (transfer_in == NULL)
+	{
+		set_last_err_string("Allocate transfer failure");
+		return -1;
+	}
+
+	Transfer t;
+	m_vector_transfer.push(t);
+
+	size_t last = m_vector_transfer.size() - 1;
+	m_vector_transfer.back().libusb_transfer = transfer_in;
+	m_vector_transfer.back().buffer = new uint8_t[m_size_prerequest];
+	m_vector_transfer.back().complete = new int;
+	*m_vector_transfer.back().complete = 0;
+
+	libusb_fill_bulk_transfer(transfer_in, (libusb_device_handle *)m_devhandle, m_ep_in.addr,
+		m_vector_transfer.back().buffer, m_size_prerequest,
+		transfer_cb, m_vector_transfer.back().complete, m_timeout);
+
+	int r = libusb_submit_transfer(transfer_in);
+	if (r)
+	{
+		set_last_err_string("submit transfer failure");
+		return r;
+	}
+
+	return ret;
+}

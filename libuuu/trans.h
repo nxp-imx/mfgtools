@@ -31,22 +31,36 @@
 #include <vector>
 #include <string>
 #include <atomic>
+#include "libusb.h"
+#include <queue>
 
 #pragma once
 
 using namespace std;
+
+struct Transfer
+{
+	struct libusb_transfer *libusb_transfer;
+	uint8_t * buffer;
+	int		* complete;
+};
 
 class TransBase
 {
 public:
 	string m_path;
 	void * m_devhandle;
+	
+	queue <struct Transfer> m_vector_transfer;
+	size_t m_size_prerequest;
+
 	TransBase() { m_devhandle = NULL; }
 	virtual int open(void *) { return 0; };
 	virtual int close() { return 0; };
 	virtual int write(void *buff, size_t size) = 0;
 	virtual int read(void *buff, size_t size, size_t *return_size) = 0;
 	int write(vector<uint8_t> & buff) { return write(buff.data(), buff.size()); }
+
 	int read(vector<uint8_t> &buff)
 	{
 		size_t size;
@@ -56,6 +70,11 @@ public:
 		buff.resize(size);
 		return ret;
 	}
+
+	virtual int prepare_multi_request(size_t size, size_t count) { return 0; };
+	virtual int free_multi_request() { return 0; };
+	virtual int read_multi_request(void *buff, size_t size, size_t *return_size) { return read(buff, size, return_size); };
+
 };
 
 class EPInfo
@@ -95,7 +114,7 @@ class BulkTrans : public USBTrans
 		m_b_send_zero = 0;
 		m_timeout = 2000;
 	}
-
+	
 public:
 	EPInfo m_ep_in;
 	EPInfo m_ep_out;
@@ -112,6 +131,10 @@ public:
 	~BulkTrans() { if (m_devhandle) close();  m_devhandle = NULL; }
 	int write(void *buff, size_t size);
 	int read(void *buff, size_t size, size_t *return_size);
+	
+	virtual int prepare_multi_request(size_t size, size_t count);
+	virtual int free_multi_request();
+	virtual int read_multi_request(void *buff, size_t size, size_t *return_size);
 };
 
 int polling_usb(std::atomic<int>& bexit);

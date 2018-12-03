@@ -44,6 +44,18 @@
 #include <sys/stat.h>
 #include "sparse.h"
 
+class AutoMulti
+{
+	TransBase *m_data;
+public:
+	AutoMulti(TransBase *p, size_t size, size_t count)
+	{
+		p->prepare_multi_request(size, count);
+		m_data = p;
+	}
+	~AutoMulti() { m_data->free_multi_request(); }
+};
+
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
 	if (m_pTrans->write((void*)cmd.data(), cmd.size()))
@@ -52,11 +64,13 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 	char buff[65];
 	memset(buff, 0, 65);
 
+	AutoMulti multi(m_pTrans, 65, 128);
+
 	while ( strncmp(buff, "OKAY", 4) && strncmp(buff, "FAIL", 4))
 	{
 		size_t actual;
 		memset(buff, 0, 65);
-		if (m_pTrans->read(buff, 64, &actual))
+		if (m_pTrans->read_multi_request(buff, 64, &actual))
 			return -1;
 
 		if (strncmp(buff, "DATA",4) == 0)
@@ -68,7 +82,7 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 			{
 				input->resize(sz);
 				size_t rz;
-				if (m_pTrans->read(input->data(), sz, &rz))
+				if (m_pTrans->read_multi_request(input->data(), sz, &rz))
 					return -1;
 				input->resize(rz);
 			}
