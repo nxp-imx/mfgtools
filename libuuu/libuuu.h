@@ -28,38 +28,32 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#ifndef __libuuu___
-#define __libuuu___
+
+#pragma once
 
 #include <stdint.h>
 #include <stddef.h>
-
-#ifdef __cplusplus
-#define EXT extern "C"
-#else
-#define EXT
-#endif
 
 /**
  * Get Last error string
  * @return last error string
 */
-EXT const char * uuu_get_last_err_string();
+const char * uuu_get_last_err_string();
 
 /**
 * Get Last error code
 * @return last error code
 */
-EXT int uuu_get_last_err();
+int uuu_get_last_err();
 
-EXT const char * uuu_get_version_string();
+const char * uuu_get_version_string();
 
 /**
  * 1.0.1
  * bit[31:24].bit[23:16].bit[15:0]
  */
 
-EXT int uuu_get_version();
+int uuu_get_version();
 
 
 
@@ -85,7 +79,7 @@ struct uuu_notify
 
 		NOTIFY_DECOMPRESS_START,
 		NOTIFY_DECOMPRESS_SIZE,
-		NOTIFY_DECOMPRESS_POS, 
+		NOTIFY_DECOMPRESS_POS,
 
 		NOTIFY_THREAD_EXIT,
 
@@ -126,5 +120,3 @@ int uuu_add_usbpath_filter(const char *path);
  * bit 16:31 for uuu
  */
 void uuu_set_debug_level(uint32_t mask);
-
-#endif
