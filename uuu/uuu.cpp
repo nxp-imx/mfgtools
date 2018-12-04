@@ -289,14 +289,14 @@ public:
 	{
 		if (nt.type == uuu_notify::NOFITY_DEV_ATTACH)
 		{
-			m_dev = nt.str;
+			m_dev = nt.text;
 			m_done = 0;
 			m_status = 0;
 		}
 		if (nt.type == uuu_notify::NOTIFY_CMD_START)
 		{
 			m_start_pos = 0;
-			m_cmd = nt.str;
+			m_cmd = nt.text;
 		}
 		if (nt.type == uuu_notify::NOTIFY_TRANS_SIZE)
 		{
@@ -350,11 +350,11 @@ public:
 	{
 		if (nt->type == uuu_notify::NOFITY_DEV_ATTACH)
 		{
-			cout << "New USB Device Attached at " << nt->str << endl;
+			cout << "New USB Device Attached at " << nt->text << endl;
 		}
 		if (nt->type == uuu_notify::NOTIFY_CMD_START)
 		{
-			cout << m_dev << ">" << "Start Cmd:" << nt->str << endl;
+			cout << m_dev << ">" << "Start Cmd:" << nt->text << endl;
 		}
 		if (nt->type == uuu_notify::NOTIFY_CMD_END)
 		{
@@ -379,10 +379,10 @@ public:
 		}
 
 		if (nt->type == uuu_notify::NOTIFY_CMD_INFO)
-			cout << nt->str;
+			cout << nt->text;
 
 		if (nt->type == uuu_notify::NOTIFY_WAIT_FOR)
-			cout << "\r" << nt->str << " "<< g_wait[((g_wait_index++) & 0x3)];
+			cout << "\r" << nt->text << " "<< g_wait[((g_wait_index++) & 0x3)];
 	}
 	void print(int verbose = 0, uuu_notify*nt=NULL)
 	{

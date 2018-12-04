@@ -228,7 +228,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		size = pDB->ImageSize;
 
 		//ImageSize may be bigger than Imagesize because ImageSize include IVT offset
-		//Difference boot storage have difference IVT offset. 
+		//Difference boot storage have difference IVT offset.
 		if (size > fbuff->size() - off)
 			size = fbuff->size() - off;
 
@@ -367,7 +367,7 @@ int SDPBootlogCmd::run(CmdCtx *ctx)
 
 	uuu_notify nt;
 	nt.type = uuu_notify::NOTIFY_CMD_INFO;
-	
+
 	int ret;
 	while (1)
 	{
@@ -376,8 +376,7 @@ int SDPBootlogCmd::run(CmdCtx *ctx)
 			return 0;
 		else
 		{
-			nt.str = (char*)(v.data() + 4);
-			v[5] = 0;
+			nt.text = std::string(v.data() + 4, v.data() + 5);
 			call_notify(nt);
 			continue;
 		}

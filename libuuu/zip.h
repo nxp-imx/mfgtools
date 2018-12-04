@@ -166,7 +166,7 @@ public:
 
 		uuu_notify ut;
 		ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
-		ut.str = (char*)filename.c_str();
+		ut.text = filename;
 		call_notify(ut);
 
 		return m_filemap[filename].decompress(this);

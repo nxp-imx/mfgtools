@@ -99,7 +99,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 
 	string str;
 	str = get_device_path(dev);
-	nt.str = (char*)str.c_str();
+	nt.text = str;
 	call_notify(nt);
 
 	CmdUsbCtx ctx;
@@ -311,7 +311,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 					}
 
 					libusb_free_device_list(list, 1);
-					nt.str = (char*)str.c_str();
+					nt.text = str;
 					call_notify(nt);
 
 					return 0;
@@ -323,7 +323,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 
 		uuu_notify nt;
 		nt.type = nt.NOTIFY_WAIT_FOR;
-		nt.str = (char*)"Wait for Known USB";
+		nt.text = "Wait for Known USB";
 		call_notify(nt);
 	}
 

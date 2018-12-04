@@ -79,14 +79,13 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 				if (m_pTrans->write(p, sz))
 					return -1;
 			}
-		}else
-		{
+		} else {
 			string s;
 			s = buff + 4;
 			m_info += s;
 			uuu_notify nt;
 			nt.type = uuu_notify::NOTIFY_CMD_INFO;
-			nt.str = buff + 4;
+			nt.text = std::string(buff + 4);
 			call_notify(nt);
 		}
 	}
@@ -145,10 +144,10 @@ int FBCmd::parser(char *p)
 
 	size_t pos = 0;
 	string s;
-	
+
 	if (parser_protocal(p, pos))
 		return -1;
-	
+
 	s = get_next_param(m_cmd, pos);
 
 	if (str_to_upper(s) != str_to_upper(m_fb_cmd))

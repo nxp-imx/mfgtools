@@ -31,8 +31,7 @@
 
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
+#include <string>
 
 /**
  * Get Last error string
@@ -88,12 +87,12 @@ struct uuu_notify
 
 	NOTIFY_TYPE type;
 	uint64_t id;
+	std::string text;
 	union
 	{
 		int status;
 		size_t index;
 		size_t total;
-		char *str;
 	};
 };
 

@@ -44,8 +44,8 @@
 #include <sys/stat.h>
 #include <thread>
 
-#include <stdio.h>  
-#include <stdlib.h>  
+#include <stdio.h>
+#include <stdlib.h>
 
 static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
@@ -156,7 +156,7 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 			call_notify(nt);
 
 			nt.type = uuu_notify::NOTIFY_CMD_START;
-			nt.str = (char *)(*it)->m_cmd.c_str();
+			nt.text = (*it)->m_cmd;
 			call_notify(nt);
 
 			ret = (*it)->run(p);
@@ -344,14 +344,14 @@ int uuu_run_cmd(const char * cmd)
 	call_notify(nt);
 
 	nt.type = uuu_notify::NOTIFY_CMD_START;
-	nt.str = (char *)p->m_cmd.c_str();
+	nt.text = p->m_cmd;
 	call_notify(nt);
 
 	if (typeid(*p) != typeid(CfgCmd))
 	{
 		size_t pos = 0;
 		string c = cmd;
-		
+
 		string pro = get_next_param(c, pos, ':');
 		pro = remove_square_brackets(pro);
 		pro += ":";
@@ -465,7 +465,7 @@ int CmdShell::run(CmdCtx*)
 			str.resize(strlen(str.c_str()));
 			cmd += ' ';
 			cmd += str;
-			
+
 			size_t pos = cmd.find_first_of("\r\n");
 			if (pos != string::npos)
 				cmd = cmd.substr(0, pos);
@@ -474,7 +474,7 @@ int CmdShell::run(CmdCtx*)
 		}
 		uuu_notify nt;
 		nt.type = uuu_notify::NOTIFY_CMD_INFO;
-		nt.str = (char*)str.c_str();
+		nt.text = str;
 		call_notify(nt);
 	}
 
