@@ -38,6 +38,7 @@ using namespace std;
 #include "liberror.h"
 #include <thread>
 #include <mutex>
+#include <iostream>
 
 struct  notify_map
 {
@@ -53,7 +54,7 @@ int uuu_register_notify_callback(uuu_notify_fun f, void *data)
 	notify_map a;
 	a.f = f;
 	a.data = data;
-	
+
 	std::lock_guard<mutex> lock(g_mutex_nofity);
 
 	for (size_t i = 0; i < g_notify_callback_list.size(); i++)
@@ -93,6 +94,10 @@ void call_notify(struct uuu_notify nf)
 
 	for (; it != g_notify_callback_list.end(); it++)
 	{
-		it->f(nf, it->data);
+		try {
+			it->f(nf, it->data);
+		} catch (const std::exception& e) {
+			std::cerr << "notify exception: " << e.what() << std::endl;
+		}
 	}
 }
