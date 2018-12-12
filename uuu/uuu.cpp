@@ -68,6 +68,8 @@ using namespace std;
 
 int get_console_width();
 void print_oneline(string str);
+int auto_complete(int argc, char**argv);
+void print_autocomplete_help();
 
 char g_sample_cmd_list[] = {
 #include "uuu.clst"
@@ -144,6 +146,8 @@ void print_help(bool detail = false)
 	printf("\n");
 	printf("\tShow built-in script\n");
 	printf("\n");
+
+	print_autocomplete_help();
 
 	if (detail == false)
 		return;
@@ -678,9 +682,6 @@ int runshell(int shell)
 	}
 }
 
-int auto_complete(int argc, char**argv);
-void print_autocomplete_help();
-
 void print_udev()
 {
 	uuu_for_each_cfg(print_udev_rule, NULL);
@@ -708,7 +709,6 @@ int main(int argc, char **argv)
 	AutoCursor a;
 
 	print_version();
-	print_autocomplete_help();
 
 	if (!enable_vt_mode())
 	{
