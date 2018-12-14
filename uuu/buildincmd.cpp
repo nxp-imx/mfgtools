@@ -44,6 +44,11 @@ BuildCmd g_buildin_cmd[] =
 		,"burn whole image to eMMC"
 	},
 	{
+		"fat_write",
+#include "fat_write.clst"
+		,"update one file in fat partition, require uboot fastboot running in board"
+	},
+	{
 		"qspi",
 #include "qspi_burn_loader.clst"
 		,"burn boot loader to qspi nor flash"

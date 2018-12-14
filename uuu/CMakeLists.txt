@@ -10,6 +10,7 @@ set(LSTS
 	uuu.lst
 	emmc_burn_loader.lst
 	emmc_burn_all.lst
+	fat_write.lst
 	qspi_burn_loader.lst
 	sd_burn_loader.lst
 	spl_boot.lst

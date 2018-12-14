@@ -1,0 +1,11 @@
+uuu_version 1.1.4
+
+# @_image                | image, which cp to fat partition
+# @_device		 | storage device, mmc\sata
+# @ partition		 | fat partition number, like 1:1
+# @_filename [_image]	 | file name in target fat partition, only support rootdir now
+
+FB: ucmd setenv fastboot_buffer ${loadaddr}
+FB: download -f _image
+FB[-t 20000]: ucmd fatwrite _device _partition ${fastboot_buffer} _filename  ${fastboot_bytes}
+FB: done
