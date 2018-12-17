@@ -140,6 +140,7 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 type $(SolutionDir)\..\uuu\sd_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\fat_write.clst
 type $(SolutionDir)\..\uuu\fat_write.lst &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 </Command>
@@ -190,6 +191,7 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 type $(SolutionDir)\..\uuu\sd_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\fat_write.clst
 type $(SolutionDir)\..\uuu\fat_write.lst &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 </Command>
@@ -245,6 +247,7 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 type $(SolutionDir)\..\uuu\sd_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\fat_write.clst
 type $(SolutionDir)\..\uuu\fat_write.lst &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 </Command>
@@ -300,6 +303,7 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_all.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 type $(SolutionDir)\..\uuu\sd_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\fat_write.clst
 type $(SolutionDir)\..\uuu\fat_write.lst &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 </Command>
