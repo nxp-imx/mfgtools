@@ -55,7 +55,8 @@ Config::Config()
 	push_back(ConfigItem("SDP:", "MXRT106X",  NULL,  NXP_VID, 0x0135));
 	push_back(ConfigItem("SDP:", "MX8MM",   "MX8MQ", NXP_VID, 0x0134));
 	push_back(ConfigItem("SDP:", "MX8MQ",   "MX8MQ", NXP_VID, 0x012B));
-	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4));
+	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4, 0x0221));
+	push_back(ConfigItem("SDPV:", "SPL1",   "SPL",  0x0525, 0xB4A4, 0x0222));
 	push_back(ConfigItem("SDPV:", "SPL1",   "SPL",  0x0525, 0xB4A5));
 	push_back(ConfigItem("FBK:", NULL, NULL, 0x066F, 0x9AFE));
 	push_back(ConfigItem("FBK:", NULL, NULL, 0x066F, 0x9BFF));
