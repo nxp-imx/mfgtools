@@ -55,7 +55,7 @@ Config::Config()
 	push_back(ConfigItem("SDP:", "MXRT106X",  NULL,  NXP_VID, 0x0135));
 	push_back(ConfigItem("SDP:", "MX8MM",   "MX8MQ", NXP_VID, 0x0134));
 	push_back(ConfigItem("SDP:", "MX8MQ",   "MX8MQ", NXP_VID, 0x012B));
-	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4, 0x0221));
+	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4, 0, 0x0221 ));
 	push_back(ConfigItem("SDPV:", "SPL1",   "SPL",  0x0525, 0xB4A4, 0x0222));
 	push_back(ConfigItem("SDPV:", "SPL1",   "SPL",  0x0525, 0xB4A5));
 	push_back(ConfigItem("FBK:", NULL, NULL, 0x066F, 0x9AFE));
@@ -73,7 +73,8 @@ int uuu_for_each_cfg(uuu_show_cfg fn, void *p)
 			   g_config[i].m_compatible.c_str(),
 			   g_config[i].m_vid,
 			   g_config[i].m_pid,
-			   g_config[i].m_bcdVersion,
+			   g_config[i].m_bcdVerMin,
+			   g_config[i].m_bcdVerMax,
 			   p))
 			return -1;
 	}
@@ -92,9 +93,7 @@ ConfigItem * Config::find(uint16_t vid, uint16_t pid, uint16_t ver)
 	{
 		if (vid == it->m_vid && pid == it->m_pid)
 		{
-			if (it->m_bcdVersion == 0xFFFF)
-				return &(*it);
-			if (ver == it->m_bcdVersion)
+			if (ver >= it->m_bcdVerMin && ver <= it->m_bcdVerMax)
 				return &(*it);
 		}
 	}
@@ -150,7 +149,19 @@ int CfgCmd::run(CmdCtx *)
 		if (param == "-bcdversion")
 		{
 			param = get_next_param(m_cmd, pos);
-			item.m_bcdVersion = str_to_uint(param);
+			item.m_bcdVerMin = item.m_bcdVerMax = str_to_uint(param);
+			continue;
+		}
+		if (param == "-bcdmin")
+		{
+			param = get_next_param(m_cmd, pos);
+			item.m_bcdVerMin =  str_to_uint(param);
+			continue;
+		}
+		if (param == "-bcdmax")
+		{
+			param = get_next_param(m_cmd, pos);
+			item.m_bcdVerMax = str_to_uint(param);
 			continue;
 		}
 		if (param == "-chip")
@@ -167,7 +178,7 @@ int CfgCmd::run(CmdCtx *)
 		}
 	}
 
-	ConfigItem *pItem= g_config.find(item.m_vid, item.m_pid, item.m_bcdVersion);
+	ConfigItem *pItem= g_config.find(item.m_vid, item.m_pid, item.m_bcdVerMax);
 	if (pItem)
 		*pItem = item;
 	else

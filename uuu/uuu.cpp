@@ -178,7 +178,7 @@ void print_version()
 	printf("uuu (Universal Update Utility) for nxp imx chips -- %s\n\n", uuu_get_version_string());
 }
 
-int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, uint16_t pid, uint16_t vid, uint16_t bcdVersion, void * /*p*/)
+int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, uint16_t pid, uint16_t vid, uint16_t bcdmin, uint16_t bcdmax, void * /*p*/)
 {
 	const char *ext;
 	if (strlen(chip) >= 7)
@@ -186,14 +186,14 @@ int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, u
 	else
 		ext = "\t";
 
-	if (bcdVersion == 0xFFFF)
+	if (bcdmin == 0 && bcdmax == 0xFFFF)
 		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\n", pro, chip, ext, pid, vid);
 	else
-		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\t 0x%04x\n", pro, chip, ext, pid, vid, bcdVersion);
+		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\t [0x%04x..0x%04x]\n", pro, chip, ext, pid, vid, bcdmin, bcdmax);
 	return 0;
 }
 
-int print_udev_rule(const char *pro, const char * chip, const char * /*compatible*/, uint16_t vid, uint16_t pid, uint16_t bcdVersion, void * /*p*/)
+int print_udev_rule(const char *pro, const char * chip, const char * /*compatible*/, uint16_t vid, uint16_t pid, uint16_t bcdmin, uint16_t bcdmax, void * /*p*/)
 {
 	printf("SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"%04x\", ATTRS{idProduct}==\"%04x\", MODE=\"0666\"\n",
 			vid, pid);

@@ -108,7 +108,7 @@ typedef int (*uuu_notify_fun)(struct uuu_notify, void *data);
 int uuu_register_notify_callback(uuu_notify_fun f, void *data);
 int uuu_unregister_notify_callback(uuu_notify_fun f);
 
-typedef int(*uuu_show_cfg)(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t bcdversion,void *p);
+typedef int(*uuu_show_cfg)(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t bcdlow, uint16_t bcdhigh, void *p);
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p);
 
 typedef int(*uuu_ls_file)(const char *path, void *p);
