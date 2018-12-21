@@ -265,6 +265,10 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["SDPU:WRITE"] = new_cmd_obj<SDPWriteCmd>;
 	(*this)["SDPU:BLOG"] = new_cmd_obj<SDPBootlogCmd>;
 
+	(*this)["SDPV:JUMP"] = new_cmd_obj<SDPJumpCmd>;
+	(*this)["SDPV:WRITE"] = new_cmd_obj<SDPWriteCmd>;
+	(*this)["SDPV:BLOG"] = new_cmd_obj<SDPBootlogCmd>;
+
 	(*this)["FB:GETVAR"] = new_cmd_obj<FBGetVar>;
 	(*this)["FASTBOOT:GETVAR"] = new_cmd_obj<FBGetVar>;
 	(*this)["FB:UCMD"] = new_cmd_obj<FBUCmd>;
@@ -584,6 +588,13 @@ static int added_default_boot_cmd(const char *filename)
 	str += filename;
 	str += "\"";
 	str += " -offset 0x57c00";
+	insert_one_cmd(str.c_str(), &g_cmd_map);
+	insert_one_cmd("SDPU: jump", &g_cmd_map);
+	insert_one_cmd("SDPU: done", &g_cmd_map);
+
+	str = "SDPV: write -f ";
+	str += "\"";
+	str += filename;
 	insert_one_cmd(str.c_str(), &g_cmd_map);
 	insert_one_cmd("SDPU: jump", &g_cmd_map);
 	insert_one_cmd("SDPU: done", &g_cmd_map);

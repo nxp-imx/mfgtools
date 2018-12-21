@@ -29,6 +29,7 @@
 *
 */
 
+#include "buffer.h"
 #include "cmd.h"
 
 class SDPSCmd : public CmdBase
@@ -44,4 +45,5 @@ public:
 		insert_param_info("-offset", &m_offset, Param::e_uint32);
 	};
 	int run(CmdCtx *p);
+	size_t GetActualSize(shared_ptr<FileBuffer> p, size_t offset = 0);
 };
