@@ -59,7 +59,7 @@ The prebuilt image and document are here:
 ## Linux
 - git clone https://github.com/NXPmicro/mfgtools.git
 - cd mfgtools
-- sudo apt-get install libusb-1.0.0-dev libzip-dev libbz2-dev
+- sudo apt-get install libusb-1.0.0-dev libzip-dev libbz2-dev pkg-config
 - cmake .
 - make
 
