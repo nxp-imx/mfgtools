@@ -111,7 +111,7 @@ int FBGetVar::parser(char *p)
 
 	if (str_to_upper(param) != "GETVAR")
 	{
-		string err = "Uknown Commnd:";
+		string err = "Unknown Commnd:";
 		err += param;
 		set_last_err_string(err);
 		return -1;

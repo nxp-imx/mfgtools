@@ -36,7 +36,7 @@ uuu_version 1.0.0
 #          FBK: community with kernel with fastboot protocol. DO NOT compatible with fastboot tools.
 #                      ucmd <any kernel command> and wait for command finish
 #                      acmd <any kernel command> don't wait for command finish
-#                      sync                      wait for acmd processs finish.
+#                      sync                      wait for acmd process finish.
 #                      ucp <soure> <destinate>   copy file from/to target
 #                                                T:<filename> means target board file.
 #                                                T:- means copy data to target's stdio pipe.
