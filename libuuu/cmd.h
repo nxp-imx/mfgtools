@@ -124,7 +124,7 @@ public:
 				string err;
 				err = "Unknown option: ";
 				err += s;
-				err += " for protocal: ";
+				err += " for protocol: ";
 				err += remove_square_brackets(prot);
 				set_last_err_string(err);
 				return -1;
@@ -188,7 +188,7 @@ public:
 		{
 			set_last_err_id(-1);
 			std::string err;
-			err.append("Uknown Protocal:");
+			err.append("Unknown Protocal:");
 			err.append(protocal);
 			set_last_err_string(err);
 			return -1;

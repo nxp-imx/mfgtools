@@ -323,7 +323,7 @@ shared_ptr<CmdBase> create_cmd_obj(string cmd)
 	}
 
 	string err;
-	err = "Unknow Command:";
+	err = "Unknown Command:";
 	err += cmd;
 	set_last_err_string(err);
 	return NULL;
@@ -398,7 +398,7 @@ int CmdDelay::parser(char * /*p*/)
 
 	if (str_to_upper(param) != "DELAY")
 	{
-		string err = "Uknown Commnd:";
+		string err = "Unknown Commnd:";
 		err += param;
 		set_last_err_string(err);
 		return -1;
@@ -616,7 +616,7 @@ int check_version(string str)
 	if (ver > cur)
 	{
 		string str;
-		str = "Current uuu verison is too low, please download latest one";
+		str = "Current uuu version is too low, please download latest one";
 		set_last_err_string(str);
 		return -1;
 	}
