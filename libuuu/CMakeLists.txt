@@ -35,5 +35,5 @@ add_custom_command(
 )
 include_directories(${generated_files_dir})
 
-add_library( uuc SHARED ${SOURCES} )
+#add_library( uuc SHARED ${SOURCES} ))
 add_library( uuc_s STATIC ${SOURCES} )

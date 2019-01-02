@@ -38,6 +38,7 @@
 #include <mutex>
 #include <atomic>
 #include <thread>
+#include <string>
 
 #ifdef _MSC_VER
 #include <Windows.h>
@@ -46,6 +47,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 #endif
+
+#ifdef __APPLE__
+#define mmap64 mmap
+#endif
+
 using namespace std;
 
 #ifdef WIN32

@@ -4,7 +4,12 @@ pkg_check_modules(LIBZIP REQUIRED libzip)
 pkg_check_modules(LIBZ REQUIRED zlib)
 find_package(Threads)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -static-libstdc++ -static-libgcc")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
+if (NOT APPLE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
+endif()
 
 set(LSTS
 	uuu.lst
@@ -17,7 +22,7 @@ set(LSTS
 	sd_burn_all.lst
 )
 
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libuuu)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libuuu ${LIBUSB_LIBRARY_DIRS} ${LIBZIP_LIBRARY_DIRS} ${LIBZ_LIBRARY_DIRS})
 
 set(CLIST_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/gen_txt_include.sh)
 set(generated_files_dir "${CMAKE_BINARY_DIR}/uuu/gen")
