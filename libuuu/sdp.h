@@ -124,7 +124,7 @@ public:
 		status = *(uint32_t*)(m_input.data() + 1);
 		return 0;
 	};
-	IvtHeader * search_ivt_header(shared_ptr<FileBuffer> data, size_t &off);
+	IvtHeader * search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit=-1);
 
 	HAB_t get_hab_type(HIDReport *report)
 	{
@@ -191,6 +191,7 @@ public:
 	uint32_t m_max_download_pre_cmd;
 	uint32_t m_offset;
 	bool m_bIvtReserve;
+	bool m_bskipspl;
 
 	SDPWriteCmd(char*p) :SDPCmdBase(p) {
 		m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_FILE;
@@ -200,12 +201,14 @@ public:
 		m_offset = 0;
 		m_bIvtReserve = false;
 		m_download_addr = 0;
+		m_bskipspl = false;
 
 		insert_param_info("write", NULL, Param::e_null);
 		insert_param_info("-f", &m_filename, Param::e_string_filename);
 		insert_param_info("-ivt", &m_Ivt, Param::e_uint32);
 		insert_param_info("-addr", &m_download_addr, Param::e_uint32);
 		insert_param_info("-offset", &m_offset, Param::e_uint32);
+		insert_param_info("-skipspl", &m_bskipspl, Param::e_bool);
 	};
 
 	int run(CmdCtx *p);

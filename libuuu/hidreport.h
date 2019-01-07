@@ -46,6 +46,7 @@
 #define ROM_INFO_HID_NO_CMD				 0x400
 #define ROM_INFO_SPL_JUMP				 0x800
 #define ROM_INFO_HID_EP1				0x1000
+#define ROM_INFO_AUTO_SCAN_UBOOT_POS	0x2000
 
 #pragma once
 

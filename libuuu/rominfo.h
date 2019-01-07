@@ -56,3 +56,5 @@ struct ROM_INFO
 
 ROM_INFO * search_rom_info(const char *s);
 ROM_INFO * search_rom_info(ConfigItem *item);
+
+size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset = 0);

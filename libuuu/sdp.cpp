@@ -39,9 +39,12 @@
 #include "rominfo.h"
 #include "libusb.h"
 
-IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &off)
+IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit)
 {
-	for (off = 0; off < data->size(); off += 0x100)
+	if (limit < 0)
+		limit = data->size();
+
+	for (; off < limit; off += 0x100)
 	{
 		IvtHeader *p = (IvtHeader*)(data->data() + off);
 		if (p->IvtBarker == IVT_BARKER_HEADER)
@@ -204,11 +207,40 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		size = fbuff->size();
 
 		offset = m_offset;
-		size -= m_offset;
+
+		if (m_bskipspl) {
+			ROM_INFO * rom;
+			rom = search_rom_info(ctx->m_config_item);
+			if(! (rom->flags & ROM_INFO_AUTO_SCAN_UBOOT_POS))
+			{
+				set_last_err_string("SPL doesn't support auto scan uboot position");
+				return -1;
+			}
+
+			size_t off = offset;
+			IvtHeader *pIvt = search_ivt_header(fbuff, off, 0x100);
+			if (pIvt)
+			{
+				BootData *pDB = (BootData *) &(fbuff->at(off + pIvt->BootData - pIvt->SelfAddr));
+				offset += pDB->ImageSize;
+			}
+			else
+			{
+				offset += GetContainerActualSize(fbuff, offset);
+			}
+
+			if (offset >= fbuff->size())
+			{
+				set_last_err_string("Unknown Image type, can't use skipspl format");
+				return -1;
+			}
+		}
+
+		size -= offset;
 	}
 	else
 	{
-		size_t off;
+		size_t off = 0;
 		IvtHeader *pIvt = search_ivt_header(fbuff, off);
 		for (int i = 0; i < m_Ivt; i++)
 		{
