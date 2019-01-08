@@ -595,9 +595,11 @@ static int added_default_boot_cmd(const char *filename)
 	str = "SDPV: write -f ";
 	str += "\"";
 	str += filename;
+	str += "\"";
+	str += " -skipspl";
 	insert_one_cmd(str.c_str(), &g_cmd_map);
-	insert_one_cmd("SDPU: jump", &g_cmd_map);
-	insert_one_cmd("SDPU: done", &g_cmd_map);
+	insert_one_cmd("SDPV: jump", &g_cmd_map);
+	insert_one_cmd("SDPV: done", &g_cmd_map);
 
 	return 0;
 }
