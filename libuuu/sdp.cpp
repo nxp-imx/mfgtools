@@ -222,7 +222,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 			if (pIvt)
 			{
 				BootData *pDB = (BootData *) &(fbuff->at(off + pIvt->BootData - pIvt->SelfAddr));
-				offset += pDB->ImageSize;
+				offset += pDB->ImageSize - (pIvt->SelfAddr - pDB->ImageStartAddr);
 			}
 			else
 			{
@@ -257,7 +257,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 
 		m_download_addr = pIvt->SelfAddr;
 		//size = fbuff->size() - off;
-		size = pDB->ImageSize;
+		size = pDB->ImageSize - (pIvt->SelfAddr - pDB->ImageStartAddr);
 
 		//ImageSize may be bigger than Imagesize because ImageSize include IVT offset
 		//Difference boot storage have difference IVT offset. 
