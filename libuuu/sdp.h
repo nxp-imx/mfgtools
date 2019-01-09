@@ -34,7 +34,7 @@
 #include "cmd.h"
 #include "trans.h"
 #include "hidreport.h"
-
+#include <limits>
 #pragma pack (1)
 struct SDPCmd {
 	uint16_t m_cmd;
@@ -124,7 +124,7 @@ public:
 		status = *(uint32_t*)(m_input.data() + 1);
 		return 0;
 	};
-	IvtHeader * search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit=-1);
+	IvtHeader * search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit=numeric_limits<size_t>::max());
 
 	HAB_t get_hab_type(HIDReport *report)
 	{

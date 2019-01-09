@@ -77,7 +77,9 @@ int USBTrans::open(void *p)
 
 int USBTrans::close()
 {
-	libusb_release_interface((libusb_device_handle *)m_devhandle, 0);
+	/* needn't clean resource here
+	   libusb_close will release all resource when finish running cmd
+	*/
 	return 0;
 }
 

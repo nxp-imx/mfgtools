@@ -41,7 +41,7 @@
 
 IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit)
 {
-	if (limit < 0)
+	if (limit >= data->size())
 		limit = data->size();
 
 	for (; off < limit; off += 0x100)
