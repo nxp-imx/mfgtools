@@ -34,7 +34,8 @@
 #include "cmd.h"
 #include "trans.h"
 #include "hidreport.h"
-#include <limits>
+#include <climits>
+
 #pragma pack (1)
 struct SDPCmd {
 	uint16_t m_cmd;
