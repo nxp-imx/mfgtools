@@ -72,6 +72,9 @@ int USBTrans::open(void *p)
 		m_EPs.push_back(EPInfo(config->interface[0].altsetting[0].endpoint[i].bEndpointAddress,
 							   config->interface[0].altsetting[0].endpoint[i].wMaxPacketSize));
 	};
+
+	libusb_free_config_descriptor(config);
+
 	return 0;
 }
 
