@@ -23,6 +23,7 @@ set(SOURCES
 	zip.cpp
 	fat.cpp
 	rominfo.cpp
+        conf.cpp
 )
 
 set(generated_files_dir "${CMAKE_BINARY_DIR}/libuuu/gen")

@@ -78,8 +78,7 @@ class HIDTrans : public USBTrans
 {
 	int m_set_report;
 public:
-	int m_read_timeout;
-	HIDTrans() { m_set_report = 9; m_read_timeout = 1000; }
+	HIDTrans() { m_set_report = 9;  }
 	~HIDTrans() { if (m_devhandle) close();  m_devhandle = NULL;  }
 	int write(void *buff, size_t size);
 	int read(void *buff, size_t size, size_t *return_size);
@@ -89,17 +88,13 @@ class BulkTrans : public USBTrans
 {
 	void Init()
 	{
-		m_MaxTransPreRequest = 0x100000;
 		m_b_send_zero = 0;
-		m_timeout = 2000;
 	}
 
 public:
 	EPInfo m_ep_in;
 	EPInfo m_ep_out;
-	size_t m_MaxTransPreRequest;
 	int m_b_send_zero;
-	uint64_t m_timeout;
 
 	BulkTrans() {
 		Init();

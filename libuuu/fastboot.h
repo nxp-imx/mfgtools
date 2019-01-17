@@ -136,14 +136,13 @@ public:
 	int run(CmdCtx *ctx);
 };
 
-class FBCopy : public CmdBase
+class FBCopy : public FBCmd
 {
 public:
 	string m_local_file;
 	string m_target_file;
 	bool m_bDownload;
-	size_t m_Maxsize_pre_cmd;
 	int parser(char *p=NULL);
-	FBCopy(char *p) :CmdBase(p) { m_Maxsize_pre_cmd = 0x10000; };
+	FBCopy(char *p) :FBCmd(p) { };
 	int run(CmdCtx *ctx);
 };
