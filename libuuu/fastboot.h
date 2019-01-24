@@ -124,6 +124,12 @@ public:
 	FBEraseCmd(char *p) : FBCmd(p) { m_fb_cmd = "erase"; }
 };
 
+class FBSetActiveCmd : public FBCmd
+{
+public:
+	FBSetActiveCmd(char *p) : FBCmd(p) { m_fb_cmd = "set_active"; }
+};
+
 class FBDownload : public CmdBase
 {
 public:
