@@ -41,6 +41,7 @@
 #include "buffer.h"
 #include "sdp.h"
 #include "fastboot.h"
+#include "conf.h"
 #include <sys/stat.h>
 #include <thread>
 
@@ -235,12 +236,23 @@ int get_string_in_square_brackets(string &cmd, string &context)
 
 uint32_t str_to_uint(string &str)
 {
-	if (str.size() > 2)
+	uint32_t val = 0;
+	const char * start = str.substr(0).c_str();
+	char * endPtr = const_cast<char*>(start);
+	if (str.size() > 2 && 
+	    str.substr(0, 2).compare("0x") == 0)
 	{
-		if (str.substr(0, 2).compare("0x") == 0)
-			return strtoul(str.substr(2).c_str(), NULL, 16);
+		val =  strtoul(start+2, &endPtr, 16);
 	}
-	return strtoul(str.c_str(), NULL, 10);
+	else 
+	{
+		val = strtoul(start, &endPtr, 10);
+	}
+	if (start == endPtr)
+	{
+		throw ("Trying to convert non numeric value to int");
+	}
+	return val;
 }
 
 template <class T> shared_ptr<CmdBase> new_cmd_obj(char *p)
@@ -289,6 +301,7 @@ CmdObjCreateMap::CmdObjCreateMap()
 
 	(*this)["_ALL:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["_ALL:DELAY"] = new_cmd_obj<CmdDelay>;
+        (*this)["_ALL:CONFIG"] = new_cmd_obj<CmdConfig>;
 	(*this)["_ALL:SH"] = new_cmd_obj<CmdShell>;
 	(*this)["_ALL:SHELL"] = new_cmd_obj<CmdShell>;
 	(*this)["_ALL:<"] = new_cmd_obj<CmdShell>;
@@ -414,6 +427,73 @@ int CmdDelay::run(CmdCtx *)
 	std::this_thread::sleep_for(std::chrono::milliseconds(m_ms));
 	return 0;
 }
+
+int CmdConfig::parser(char * /*p*/)
+{
+	try 
+	{
+	    size_t pos = 0;
+	    string param = get_next_param(m_cmd, pos);
+
+	    if (param.find(':') != string::npos)
+		    param = get_next_param(m_cmd, pos);
+
+	    if (str_to_upper(param) != "CONFIG")
+		{
+		    string err = "CmdConfig::parser Uknown Commnd:";
+		    err += param;
+		    set_last_err_string(err);
+		    return -1;
+		}
+
+	    string args = get_next_param(m_cmd, pos);
+	    if (str_to_upper(args) == "USB::HID::MAX_PACKET_SIZE")
+		{
+		    string size = get_next_param(m_cmd, pos);
+		    Conf::GetConf().m_USB.m_HIDMaxTransfer = str_to_uint(size);
+		    cout << "changed USB::HID::MAX_PACKET_SIZE to " << Conf::GetConf().m_USB.m_HIDMaxTransfer << endl;
+		}
+	    else if (str_to_upper(args) == "USB::HID::TIMEOUT" )
+		{
+		    string ms = get_next_param(m_cmd, pos);
+		    Conf::GetConf().m_USB.m_HIDTimeout = str_to_uint(ms);
+		    cout << "changed USB::HID::TIMEOUT to " << Conf::GetConf().m_USB.m_HIDTimeout << endl;
+		}
+	    else if (str_to_upper(args) == "USB::BULK::MAX_PACKET_SIZE" )
+		{
+		    string size = get_next_param(m_cmd, pos);
+		    Conf::GetConf().m_USB.m_BulkMaxTransfer = str_to_uint(size);
+		    cout << "changed USB::BULK::MAX_PACKET_SIZE to " << Conf::GetConf().m_USB.m_BulkMaxTransfer << endl;
+		}
+	    else if (str_to_upper(args) == "USB::BULK::TIMEOUT")
+		{
+		    string ms = get_next_param(m_cmd, pos);
+		    Conf::GetConf().m_USB.m_BulkTimeout = str_to_uint(ms);
+		    cout << "changed CONF::USB::BULK::TIMEOUT to " << Conf::GetConf().m_USB.m_BulkTimeout << endl;
+		}
+	    else
+		{
+		    string err = "CmdConfig::parser invalid parameter:";
+		    err += m_cmd;
+		    set_last_err_string(err);
+		    return -1;
+
+		}
+	}
+	catch (string const& except)
+	{
+		string err(" error at line : ");
+		err += except;
+		throw err;
+	}
+	return 0;
+}
+
+int CmdConfig::run(CmdCtx *)
+{
+	return 0;
+}
+
 
 int CmdShell::parser(char * p)
 {

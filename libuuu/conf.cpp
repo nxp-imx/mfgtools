@@ -36,9 +36,9 @@
 Conf::Conf()
 {
         m_USB.m_BulkMaxTransfer = 0x10000;
-        m_USB.m_BulkTimeout = 9000;
+        m_USB.m_BulkTimeout = 2000;
         m_USB.m_HIDMaxTransfer= 0x10000;
-        m_USB.m_HIDTimeout =  9000;
+        m_USB.m_HIDTimeout =  2000;
 }
 
 Conf& Conf::GetConf()

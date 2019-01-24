@@ -161,6 +161,16 @@ public:
 	int run(CmdCtx *p);
 };
 
+class CmdConfig :public CmdBase
+{
+public:
+	virtual int parser(char *p = NULL);
+	CmdConfig(char *p) :CmdBase(p) {  };
+	int run(CmdCtx *p);
+};
+
+
+
 class CmdShell : public CmdBase
 {
 public:
