@@ -826,7 +826,8 @@ int main(int argc, char **argv)
 					s.insert(s.end(), '"');
 				}
 				cmd.append(s);
-				cmd.append(" ");
+				if(j != (argc -1)) /* Don't add space at last arg */
+					cmd.append(" ");
 			}
 			break;
 		}
