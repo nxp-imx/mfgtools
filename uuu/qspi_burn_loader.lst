@@ -14,7 +14,7 @@ SDPS: boot -f _flexspi.bin -offset 0x1000
 # SDPU will be deprecated. please use SDPV instead of SDPU
 # {
 SDPU: delay 1000
-SDPU: write -f _flexspi.bin-offset 0x60000
+SDPU: write -f _flexspi.bin -offset 0x60000
 SDPU: jump
 # }
 
