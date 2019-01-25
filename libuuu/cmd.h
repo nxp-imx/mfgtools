@@ -90,8 +90,9 @@ class CmdBase
 public:
 	vector<Param> m_param;
 	uint64_t m_timeout;
+	bool m_lastcmd;
 	std::string m_cmd;
-	CmdBase() { m_timeout = 2000; };
+	CmdBase() { m_timeout = 2000; m_lastcmd = false; };
 	CmdBase(char *p) { m_timeout = 2000;  if (p) m_cmd = p; }
 	void insert_param_info(const char *key, void *pD, Param::Param_Type tp, bool ignore_case = true)
 	{
@@ -148,7 +149,7 @@ public:
 class CmdDone :public CmdBase
 {
 public:
-	CmdDone(char *p) :CmdBase(p) {};
+	CmdDone(char *p) :CmdBase(p) { m_lastcmd = true; };
 	int run(CmdCtx *p);
 };
 

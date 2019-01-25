@@ -166,6 +166,9 @@ int CmdList::run_all(CmdCtx *p, bool dry_run)
 			call_notify(nt);
 			if (ret)
 				return ret;
+
+			if ((*it)->m_lastcmd)
+				break;
 		}
 	}
 	return ret;
