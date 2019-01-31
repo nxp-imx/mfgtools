@@ -92,8 +92,11 @@ public:
 	uint64_t m_timeout;
 	bool m_lastcmd;
 	std::string m_cmd;
-	CmdBase() { m_timeout = 2000; m_lastcmd = false; };
-	CmdBase(char *p) { m_timeout = 2000;  if (p) m_cmd = p; }
+
+	void CmdBaseInit() { m_timeout = 2000; m_lastcmd = false;}
+	CmdBase() { CmdBaseInit(); };
+	CmdBase(char *p) { CmdBaseInit(); if (p) m_cmd = p; }
+
 	void insert_param_info(const char *key, void *pD, Param::Param_Type tp, bool ignore_case = true)
 	{
 		m_param.push_back(Param(key, pD, tp, ignore_case));
