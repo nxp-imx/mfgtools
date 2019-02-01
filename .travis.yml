@@ -1,20 +1,20 @@
 matrix:
-    include:
-    - os: osx
+	include:
+	- os: osx
       osx_image: xcode10.1
       compiler: clang
-    - os: osx
+	- os: osx
       osx_image: xcode8
       compiler: gcc
 
 addons:
-    homebrew:
-        update: true
-        brewfile: true
-    apt:
-        packages:
-            - libusb-1.0
-            
- script:
-    - cmake .
-    - make
+  homebrew:
+    update: true
+		brewfile: true
+	apt:
+		packages:
+			- libusb-1.0
+
+script:
+	- cmake .
+	- make
