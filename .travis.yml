@@ -11,7 +11,7 @@ addons:
         update: true
         brewfile: true
         packages:
-            - libusb-1.0
+            - libusb
 
 script:
     - cmake . && make
