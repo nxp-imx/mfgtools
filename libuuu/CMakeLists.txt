@@ -1,3 +1,8 @@
+cmake_minimum_required(VERSION 3.4)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0>=1.0.16)
 pkg_check_modules(LIBZIP REQUIRED libzip)
