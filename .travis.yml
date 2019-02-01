@@ -8,6 +8,8 @@ matrix:
 
 addons:
     homebrew:
+        update: true
+        brewfile: true
         packages:
             - libusb-1.0
 
