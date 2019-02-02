@@ -12,7 +12,7 @@ addons:
         brewfile: true
         packages:
             - libusb
-            - 
+            - libzip
 
 script:
     - cmake . && make
