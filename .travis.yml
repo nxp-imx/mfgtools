@@ -16,4 +16,5 @@ addons:
             - zlib
 
 script:
+    - export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
     - cmake . && make
