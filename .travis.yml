@@ -13,6 +13,7 @@ addons:
         packages:
             - libusb
             - libzip
+            - zlib
 
 script:
     - cmake . && make
