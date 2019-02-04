@@ -45,8 +45,9 @@
 #include <sys/stat.h>
 #include <thread>
 
-#include <stdio.h>  
-#include <stdlib.h>  
+#include <stdio.h>
+#include <stdlib.h>
+#include <sstream>
 
 static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
@@ -237,21 +238,17 @@ int get_string_in_square_brackets(string &cmd, string &context)
 uint32_t str_to_uint(string &str)
 {
 	uint32_t val = 0;
-	const char * start = str.substr(0).c_str();
-	char * endPtr = const_cast<char*>(start);
+        std::stringstream ss;
 	if (str.size() > 2 && 
 	    str.substr(0, 2).compare("0x") == 0)
 	{
-		val =  strtoul(start+2, &endPtr, 16);
+            ss << std::hex << str.substr(2);
 	}
 	else 
 	{
-		val = strtoul(start, &endPtr, 10);
+            ss << std::dec << str;
 	}
-	if (start == endPtr)
-	{
-		throw ("Trying to convert non numeric value to int");
-	}
+        ss >> val;
 	return val;
 }
 
