@@ -133,7 +133,7 @@ size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset)
 		+ sizeof(struct rom_container)
 		+ sizeof(struct rom_bootimg) * (hdr->num_images - 1));
 
-	uint32_t sz = image->size + image->offset + offset + CONTAINER_HDR_ALIGNMENT;
+	uint32_t sz = image->size + image->offset + CONTAINER_HDR_ALIGNMENT;
 
 	sz = round_up(sz, CONTAINER_HDR_ALIGNMENT);
 
