@@ -60,8 +60,11 @@ int SDPSCmd::run(CmdCtx *pro)
 	size_t sz = GetContainerActualSize(p, m_offset);
 	int ret = report.write(p->data() + m_offset, sz,  2);
 
-	SDPBootlogCmd log(NULL);
-	log.run(pro);
+	if (ret ==  0)
+	{
+		SDPBootlogCmd log(NULL);
+		log.run(pro);
+	}
 
 	return ret;
 }
