@@ -36,10 +36,47 @@
 #include "buffer.h"
 #include "sdp.h"
 
+//------------------------------------------------------------------------------
+// HID Command Block Wrapper (CBW)
+//------------------------------------------------------------------------------
+#pragma pack (1)
+
+typedef struct _CDBHIDDOWNLOAD {
+	uint8_t	Command;
+	uint32_t	Length;
+	uint8_t	Reserved[11];
+} CDBHIDDOWNLOAD, *PCDBHIDDOWNLOAD;
+
+
+struct _ST_HID_CBW
+{
+	uint32_t Signature;        // Signature: 0x43544C42:1129598018, o "BLTC" (little endian) for the BLTC CBW
+	uint32_t Tag;              // Tag: to be returned in the csw
+	uint32_t XferLength;       // XferLength: number of bytes to transfer
+	uint8_t Flags;            // Flags:
+	//   Bit 7: direction - device shall ignore this bit if the
+	//     XferLength field is zero, otherwise:
+	//     0 = data-out from the host to the device,
+	//     1 = data-in from the device to the host.
+	//   Bits 6..0: reserved - shall be zero.
+	uint8_t Reserved[2];       // Reserved - shall be zero.
+	CDBHIDDOWNLOAD Cdb;        // cdb: the command descriptor block
+};
+
+#define BLTC_DOWNLOAD_FW					2
+#define HID_BLTC_REPORT_TYPE_DATA_OUT		2
+#define HID_BLTC_REPORT_TYPE_COMMAND_OUT	1
+
+#define CBW_BLTC_SIGNATURE  0x43544C42; // "BLTC" (little endian)
+#define CBW_PITC_SIGNATURE  0x43544950; // "PITC" (little endian)
+// Flags values for _ST_HID_CBW
+#define CBW_DEVICE_TO_HOST_DIR 0x80; // "Data Out"
+#define CBW_HOST_TO_DEVICE_DIR 0x00; // "Data In"
+
+#pragma pack ()
 
 int SDPSCmd::run(CmdCtx *pro)
 {
-
 	HIDTrans dev;
 	if(dev.open(pro->m_dev))
 		return -1;
@@ -47,6 +84,14 @@ int SDPSCmd::run(CmdCtx *pro)
 	shared_ptr<FileBuffer> p = get_file_buffer(m_filename);
 	if (!p)
 		return -1;
+
+	ROM_INFO * rom;
+	rom = search_rom_info(pro->m_config_item);
+	if (rom == NULL)
+	{
+		set_last_err_string("Fail found ROM info");
+		return -1;
+	}
 
 	HIDReport report(&dev);
 	report.m_skip_notify = false;
@@ -58,6 +103,26 @@ int SDPSCmd::run(CmdCtx *pro)
 	}
 
 	size_t sz = GetContainerActualSize(p, m_offset);
+
+	if (!(rom->flags & ROM_INFO_HID_NO_CMD))
+	{
+		_ST_HID_CBW	cbw;
+		uint32_t	length = (uint32_t) sz;
+
+		memset(&cbw, 0, sizeof(_ST_HID_CBW));
+		cbw.Cdb.Command = BLTC_DOWNLOAD_FW;
+		cbw.Cdb.Length = EndianSwap(length);
+
+		++cbw.Tag;
+		cbw.Signature = CBW_BLTC_SIGNATURE;
+		cbw.XferLength = (uint32_t)length;
+		cbw.Flags = CBW_HOST_TO_DEVICE_DIR;
+
+		int ret = report.write(&cbw, sizeof(_ST_HID_CBW), HID_BLTC_REPORT_TYPE_COMMAND_OUT);
+		if (ret)
+			return ret;
+	}
+
 	int ret = report.write(p->data() + m_offset, sz,  2);
 
 	if (ret ==  0)
