@@ -85,10 +85,6 @@ struct BootData
 
 #define HAB_TAG_DCD							0xd2       /**< Device Configuration Data */
 
-#define ROM_WRITE_ACK						0x128A8A12
-#define ROM_STATUS_ACK					0x88888888
-#define ROM_OK_ACK						0x900DD009
-
 class SDPCmdBase:public CmdBase
 {
 public:
