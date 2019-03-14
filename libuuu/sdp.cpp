@@ -307,6 +307,109 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 	return 0;
 }
 
+int SDPReadMemCmd::run(CmdCtx *ctx)
+{
+	HIDTrans dev;
+	if (dev.open(ctx->m_dev))
+		return -1;
+
+	HIDReport report(&dev);
+
+	printf("\nReading address 0x%08X ...\n", m_mem_addr);
+	m_spdcmd.m_addr = EndianSwap(m_mem_addr);
+	m_spdcmd.m_format = m_mem_format;
+	switch (m_mem_format) {
+		case 0x8:
+			m_spdcmd.m_count = EndianSwap((uint32_t)0x1);
+			break;
+		case 0x10:
+			m_spdcmd.m_count = EndianSwap((uint32_t)0x2);
+			break;
+		case 0x20:
+			m_spdcmd.m_count = EndianSwap((uint32_t)0x4);
+			break;
+		default:
+			set_last_err_string("Invalid format, use <8|16|32>");
+			return -1;
+			break;
+	}
+
+	if (report.write(&m_spdcmd, sizeof(m_spdcmd), 1))
+		return -1;
+
+	if (get_hab_type(&report) == HabUnknown)
+		return -1;
+
+	uint32_t mem_value;
+	if (get_status(&report, mem_value, 4) == 0)
+	{
+		printf("\nValue of address 0x%08X: ", m_mem_addr);
+		switch (m_mem_format) {
+			case 0x8:
+				printf("0x%02X\n", mem_value & 0xff);
+				break;
+			case 0x10:
+				printf("0x%04X\n", mem_value & 0xffff);
+				break;
+			case 0x20:
+				printf("0x%08X\n", mem_value);
+				break;
+			default:
+				set_last_err_string("Invalid format, use <8|16|32>");
+				return -1;
+		}
+	}
+
+	return 0;
+}
+
+int SDPWriteMemCmd::run(CmdCtx *ctx)
+{
+	HIDTrans dev;
+	if (dev.open(ctx->m_dev))
+		return -1;
+
+	HIDReport report(&dev);
+
+	printf("\nWriting 0x%08X to address 0x%08X ...\n", m_mem_value, m_mem_addr);
+	m_spdcmd.m_addr = EndianSwap(m_mem_addr);
+	m_spdcmd.m_format = m_mem_format;
+	switch (m_mem_format) {
+		case 0x8:
+			m_spdcmd.m_count = EndianSwap((uint32_t)0x1);
+			break;
+		case 0x10:
+			m_spdcmd.m_count = EndianSwap((uint32_t)0x2);
+			break;
+		case 0x20:
+			m_spdcmd.m_count = EndianSwap((uint32_t)0x4);
+			break;
+		default:
+			set_last_err_string("Invalid format, use <8|16|32>");
+			return -1;
+			break;
+	}
+	m_spdcmd.m_data = EndianSwap(m_mem_value);
+
+	if (report.write(&m_spdcmd, sizeof(m_spdcmd), 1))
+		return -1;
+
+	if (get_hab_type(&report) == HabUnknown)
+		return -1;
+
+	uint32_t status;
+
+	if (get_status(&report, status, 4) < 0 || status != ROM_WRITE_ACK) {
+
+		string_ex err;
+		err.format("%s:%d Failed to write to address 0x%X",
+				__FUNCTION__, __LINE__, m_mem_addr);
+		set_last_err_string(err);
+	}
+
+	return 0;
+}
+
 int SDPJumpCmd::run(CmdCtx *ctx)
 {
 	ROM_INFO * rom;
