@@ -424,7 +424,7 @@ public:
 			string_ex str;
 			int info, bar;
 			info = 14;
-			bar = 30;
+			bar = 40;
 			str += get_print_dev_string();
 
 			str.resize(info, ' ');
