@@ -25,6 +25,8 @@ uuu_version 1.0.0
 #                      write -f  <filename> [-addr 0x000000] [-ivt 0]
 #                      jump  -f  <filename> [-ivt 0]
 #                      boot  -f  <filename> [-nojump]
+#                      rdmem -addr <mem_address> -format <8|16|32>
+#                      wrmem -addr <mem_address> -format <8|16|32> -value <mem_value>
 #
 #          FB[-t timeout]:\Fastboot: android fastboot protocol. unit of timeout is ms
 #                      getvar

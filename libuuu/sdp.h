@@ -180,6 +180,40 @@ public:
 
 };
 
+class SDPReadMemCmd : public SDPCmdBase
+{
+public:
+	uint32_t m_mem_addr;
+	uint8_t m_mem_format;
+
+	SDPReadMemCmd(char*p) :SDPCmdBase(p) {
+		m_spdcmd.m_cmd = ROM_KERNEL_CMD_RD_MEM;
+
+		insert_param_info("rdmem", NULL, Param::e_null);
+		insert_param_info("-addr", &m_mem_addr, Param::e_uint32);
+		insert_param_info("-format", &m_mem_format, Param::e_uint32);
+	}
+	int run(CmdCtx *);
+};
+
+class SDPWriteMemCmd : public SDPCmdBase
+{
+public:
+	uint32_t m_mem_addr;
+	uint8_t m_mem_format;
+	uint32_t m_mem_value;
+
+	SDPWriteMemCmd(char*p) :SDPCmdBase(p) {
+		m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_MEM;
+
+		insert_param_info("wrmem", NULL, Param::e_null);
+		insert_param_info("-addr", &m_mem_addr, Param::e_uint32);
+		insert_param_info("-format", &m_mem_format, Param::e_uint32);
+		insert_param_info("-value", &m_mem_value, Param::e_uint32);
+	}
+	int run(CmdCtx *p);
+};
+
 class SDPWriteCmd : public SDPCmdBase
 {
 public:
