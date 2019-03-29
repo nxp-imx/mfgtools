@@ -33,6 +33,7 @@
     <ClCompile Include="..\libuuu\usbhotplug.cpp" />
     <ClCompile Include="..\libuuu\version.cpp" />
     <ClCompile Include="..\libuuu\zip.cpp" />
+    <ClCompile Include="..\libuuu\conf.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libuuu\buffer.h" />
