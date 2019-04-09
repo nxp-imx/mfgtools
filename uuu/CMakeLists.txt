@@ -10,7 +10,7 @@ pkg_check_modules(LIBZ REQUIRED zlib)
 find_package(Threads)
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O2")
 
 if (NOT APPLE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")

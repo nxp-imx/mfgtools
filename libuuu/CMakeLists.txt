@@ -11,6 +11,7 @@ find_package(Threads)
 include_directories(${LIBUSB_INCLUDE_DIRS} include)
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wstrict-aliasing -Wextra")
+set(CMAKE_CXX_FLAGS "-O2")
 
 set(SOURCES
 	error.cpp
