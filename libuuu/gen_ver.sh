@@ -15,7 +15,7 @@ if [ "${APPVEYOR_BUILD_VERSION}" = "" ];
 then
 	echo build not in appveyor
 else
-	git tag uuu_${APPVEYOR_BUILD_VERSION}
+	git tag -m"uuu ${APPVEYOR_BUILD_VERSION}" uuu_${APPVEYOR_BUILD_VERSION}
 fi
 
 # Test if we are in a repo
