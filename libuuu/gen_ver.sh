@@ -15,6 +15,6 @@ if [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ];
 then
 	#echo "In a repo"
 	# Get the version of the last commit of the repo
-	version=`git describe --tags --long`
+	version=`git describe --long`
 	echo "#define GIT_VERSION \"lib$version\"" > $file_to_write
 fi
