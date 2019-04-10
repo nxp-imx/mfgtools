@@ -32,12 +32,14 @@ set(SOURCES
 )
 
 set(generated_files_dir "${CMAKE_BINARY_DIR}/libuuu/gen")
+set(gitversion_h "${generated_files_dir}/gitversion.h")
 
 add_custom_command(
 	OUTPUT gitversion.h
 	PRE_BUILD
 	COMMAND mkdir -p ${generated_files_dir}
-	COMMAND sh -c 'cd ${CMAKE_CURRENT_SOURCE_DIR} && ./gen_ver.sh ${generated_files_dir}/gitversion.h'
+	COMMAND sh -c 'cd ${CMAKE_CURRENT_SOURCE_DIR} && rm -f ${gitversion_h} && ./gen_ver.sh "${gitversion_h}.tmp" && mv -f "${gitversion_h}.tmp" "${gitversion_h}"'
+
 )
 include_directories(${generated_files_dir})
 
