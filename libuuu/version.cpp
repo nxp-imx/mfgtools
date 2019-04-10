@@ -36,10 +36,6 @@
 
 using namespace std;
 
-#ifndef GIT_VERSION
-#define GIT_VERSION "v1.1.4-unknown"
-#endif
-
 static const char g_version[] = GIT_VERSION;
 
 const char *uuu_get_version_string()
