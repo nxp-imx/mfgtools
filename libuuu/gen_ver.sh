@@ -3,6 +3,8 @@
 # Input parameters
 file_to_write="$1"
 
+set -e
+
 if [ "${APPVEYOR_BUILD_VERSION}" = "" ];
 then
 	echo build not in appveyor
