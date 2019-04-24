@@ -498,19 +498,6 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	size_t max = str_to_uint(getvar.m_val);
 
-	if (getvar.parser((char*)"FB: getvar logical-block-size"))
-		return -1;
-	if (getvar.run(ctx))
-		return -1;
-
-	size_t block_size = str_to_uint(getvar.m_val);
-
-	if (block_size == 0)
-	{
-		set_last_err_string("Device report block_size is 0");
-		return -1;
-	}
-
 	BulkTrans dev;
 	if (dev.open(ctx->m_dev))
 		return -1;
@@ -524,6 +511,19 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	if (m_raw2sparse)
 	{
+		if (getvar.parser((char*)"FB: getvar logical-block-size"))
+			return -1;
+		if (getvar.run(ctx))
+			return -1;
+
+		size_t block_size = str_to_uint(getvar.m_val);
+
+		if (block_size == 0)
+		{
+			set_last_err_string("Device report block_size is 0");
+			return -1;
+		}
+
 		return flash_raw2sparse(&fb, pdata, block_size, max);
 	}
 
