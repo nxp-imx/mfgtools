@@ -396,7 +396,7 @@ public:
 	{
 		string str;
 		str = m_dev;
-		str.resize(6, ' ');
+		str.resize(8, ' ');
 
 		string_ex s;
 		s.format("%2d/%2d", m_cmd_index+1, m_cmd_total);
