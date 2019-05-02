@@ -407,8 +407,11 @@ public:
 	void print_simple()
 	{
 		int width = get_console_width();
+		int info, bar;
+		info = 14;
+		bar = 40;
 
-		if (width <= 45)
+		if (width <= bar + info + 3)
 		{
 			string_ex str;
 
@@ -422,9 +425,6 @@ public:
 		else
 		{
 			string_ex str;
-			int info, bar;
-			info = 14;
-			bar = 40;
 			str += get_print_dev_string();
 
 			str.resize(info, ' ');
@@ -476,6 +476,9 @@ mutex g_callback_mutex;
 void print_oneline(string str)
 {
 	size_t w = get_console_width();
+	if (w <= 3)
+		return;
+
 	if (str.size() >= w)
 	{
 		str.resize(w-1);
