@@ -35,6 +35,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <iostream>
 
 #include "liberror.h"
 #include "libcomm.h"
@@ -111,7 +112,6 @@ public:
 		string param;
 		if (get_string_in_square_brackets(prot, param))
 			return -1;
-		
 		if (!param.empty())
 		{
 			size_t param_pos = 0;
@@ -164,6 +164,16 @@ public:
 	CmdDelay(char *p) :CmdBase(p) { m_ms = 0; };
 	int run(CmdCtx *p);
 };
+
+class CmdConfig :public CmdBase
+{
+public:
+	virtual int parser(char *p = NULL);
+	CmdConfig(char *p) :CmdBase(p) {  };
+	int run(CmdCtx *p);
+};
+
+
 
 class CmdShell : public CmdBase
 {

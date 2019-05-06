@@ -28,11 +28,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-
+#include <iostream>
 #include "trans.h"
 #include "libuuu.h"
 #include "liberror.h"
 #include "libusb.h"
+#include "conf.h"
 
 extern "C"
 {
@@ -117,26 +118,38 @@ int HIDTrans::read(void *buff, size_t size, size_t *rsize)
 {
 	int ret;
 	int actual;
-	ret = libusb_interrupt_transfer(
-		(libusb_device_handle *)m_devhandle,
-		0x81,
-		(uint8_t*)buff,
-		size,
-		&actual,
-		m_read_timeout
-	);
 
-	*rsize = actual;
-
-	if (ret < 0)
+	for (size_t i = 0; i < size; )
 	{
-		string error;
-		string err;
-		err = "HID(R):";
-		err += libusb_error_name(ret);
-		set_last_err_string(err);
-		return ret;
-	}
+		uint8_t *p = (uint8_t *)buff;
+		p += i;
+		size_t sz;
+		sz = size - i;
+		if (sz > Conf::GetConf().m_USB.m_HIDMaxTransfer)
+			sz = Conf::GetConf().m_USB.m_HIDMaxTransfer;
+
+		ret = libusb_interrupt_transfer(
+				(libusb_device_handle *)m_devhandle,
+				0x81,
+				p,
+				sz,
+				&actual,
+				Conf::GetConf().m_USB.m_HIDTimeout
+				);
+
+		*rsize = actual;
+
+		if (ret < 0)
+		    {
+			string error;
+			string err;
+			err = "HID(R):";
+			err += libusb_error_name(ret);
+			set_last_err_string(err);
+			return ret;
+		    }
+		i += sz;
+        }
 
 	return 0;
 }
@@ -145,14 +158,15 @@ int BulkTrans::write(void *buff, size_t size)
 {
 	int ret;
 	int actual_lenght;
-	for (size_t i = 0; i < size; i += m_MaxTransPreRequest)
+	int retries_on_timeout=3;
+	for (size_t i = 0; i < size; )
 	{
 		uint8_t *p = (uint8_t *)buff;
 		p += i;
 		size_t sz;
 		sz = size - i;
-		if (sz > m_MaxTransPreRequest)
-			sz = m_MaxTransPreRequest;
+		if (sz > Conf::GetConf().m_USB.m_BulkMaxTransfer)
+			sz = Conf::GetConf().m_USB.m_BulkMaxTransfer;
 
 		ret = libusb_bulk_transfer(
 			(libusb_device_handle *)m_devhandle,
@@ -160,18 +174,53 @@ int BulkTrans::write(void *buff, size_t size)
 			p,
 			sz,
 			&actual_lenght,
-			m_timeout
+			Conf::GetConf().m_USB.m_BulkTimeout
 		);
 
 		if (ret < 0)
 		{
-			string error;
-			string err;
-			err = "Bulk(W):";
-			err += libusb_error_name(ret);
-			set_last_err_string(err);
-			return ret;
+			if (ret == LIBUSB_ERROR_TIMEOUT && actual_lenght != 0)
+			{
+				cerr << "warning : timeout, transferred :"
+                                     << actual_lenght
+                                     << " on "
+                                     << sz
+                                     << " after "
+                                     << Conf::GetConf().m_USB.m_BulkTimeout
+                                     << " ms"
+                                     << endl;
+				retries_on_timeout = 3;
+			}
+			else if (ret == LIBUSB_ERROR_TIMEOUT && actual_lenght == 0 && retries_on_timeout != 0)
+			{
+				cerr << "warning : timeout, transferred :"
+                                     << actual_lenght
+                                     << " on "
+                                     << sz
+                                     << " after "
+                                     << Conf::GetConf().m_USB.m_BulkTimeout
+                                     << " ms, retry "
+                                     << retries_on_timeout
+                                     << endl;
+				retries_on_timeout --;
+				sz = actual_lenght;
+			}
+			else
+ 			{
+				string error;
+				string err;
+				err = "Bulk(W):";
+				err += libusb_error_name(ret);
+				cerr << " transferred :" << actual_lenght << " on " << sz << endl; 
+				set_last_err_string(err);
+				return ret;
+			}
 		}
+		else
+		{
+				retries_on_timeout = 3;
+		}
+                i += sz;
 	}
 
 	//Send zero package
@@ -228,7 +277,7 @@ int BulkTrans::read(void *buff, size_t size, size_t *rsize)
 		p,
 		size,
 		&actual_lenght,
-		m_timeout
+		Conf::GetConf().m_USB.m_BulkTimeout
 	);
 
 	*rsize = actual_lenght;

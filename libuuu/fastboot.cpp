@@ -43,6 +43,7 @@
 #include <fstream>
 #include <sys/stat.h>
 #include "sparse.h"
+#include "conf.h"
 
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
@@ -171,7 +172,6 @@ int FBCmd::run(CmdCtx *ctx)
 	if (dev.open(ctx->m_dev))
 		return -1;
 
-	dev.m_timeout = m_timeout;
 
 	FastBoot fb(&dev);
 	string cmd;
@@ -213,6 +213,10 @@ int FBCopy::parser(char *p)
 
 	size_t pos = 0;
 	string s;
+
+        if (parser_protocal(p, pos))
+		return -1;
+
 	s = get_next_param(m_cmd, pos);
 	if (s.find(":") != s.npos)
 		s = get_next_param(m_cmd, pos);
@@ -311,11 +315,13 @@ int FBCopy::run(CmdCtx *ctx)
 		nt.total = buff->size();
 		call_notify(nt);
 
-		for (i = 0; i < buff->size(); i += this->m_Maxsize_pre_cmd)
+		for (i = 0;
+                     i < buff->size();
+                     i += Conf::GetConf().m_USB.m_BulkMaxTransfer)
 		{
 			size_t sz = buff->size() - i;
-			if (sz > m_Maxsize_pre_cmd)
-				sz = m_Maxsize_pre_cmd;
+			if (sz > Conf::GetConf().m_USB.m_BulkMaxTransfer)
+				sz = Conf::GetConf().m_USB.m_BulkMaxTransfer;
 
 			cmd.format("donwload:%08X", sz);
 			if (fb.Transport(cmd, buff->data() + i, sz))
@@ -516,7 +522,6 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		return -1;
 
 	FastBoot fb(&dev);
-	dev.m_timeout = m_timeout;
 
 	shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename);
 	if (pdata == NULL)
