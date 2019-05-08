@@ -90,7 +90,10 @@ Device* VolumeDeviceClass::CreateDevice(DeviceClass* deviceClass, SP_DEVINFO_DAT
 	Volume* volume = new Volume(deviceClass, deviceInfoData.DevInst, path, m_pLibHandle);
 	
 	// Only Create USB Volumes
-	if ( volume->IsUsb() )
+	// begin comment out volume->isUsb()
+	// volume->IsUsb() checking is unbelievable, use rest condition check it;
+	// if (volume->IsUsb() )
+	//end	comment out volume->isUsb()
 	{
 		Disk* pdisk;
 		pdisk = volume->StorageDisk();
