@@ -486,7 +486,7 @@ int bz2_decompress(shared_ptr<FileBuffer> pbz, FileBuffer *p, vector<bz2_blk> * 
 {
 	for (int i = start; i < pblk->size(); i += skip)
 	{
-		unsigned int len;
+		unsigned int len = pblk->at(i).decompress_size;
 		if (i) /*skip first dummy one*/
 		{
 			(*pblk)[i].error = BZ2_bzBuffToBuffDecompress((char*)p->data() + pblk->at(i).decompress_offset,
@@ -613,8 +613,13 @@ int FSBz2::load(string backfile, string filename, FileBuffer *p, bool async)
 
 	p->m_aync_thread = thread(bz_async_load, backfile, p);
 	
-	if (!async)
+	if (!async) {
 		p->m_aync_thread.join();
+		if (!p->m_loaded) {
+			set_last_err_string("async data load failure\n");
+			return -1;
+		}
+	}
 
 	return 0;
 }
@@ -683,6 +688,11 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 
 			if(p->m_aync_thread.joinable())
 				p->m_aync_thread.join();
+
+			if(!p->m_loaded)
+			{
+				return NULL;
+			}
 		}
 
 		return p;
