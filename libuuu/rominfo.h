@@ -44,6 +44,7 @@
 #define ROM_INFO_SPL_JUMP				 0x800
 #define ROM_INFO_HID_EP1				0x1000
 #define ROM_INFO_HID_PACK_SIZE_1020		0x2000
+#define ROM_INFO_HID_SDP_NO_MAX_PER_TRANS	0x4000
 
 #include <stdint.h>
 #include <stddef.h>

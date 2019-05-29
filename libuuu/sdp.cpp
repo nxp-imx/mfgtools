@@ -279,12 +279,21 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 
 	report.m_notify_total = size;
 
-	for (size_t i=0; i < size; i += m_max_download_pre_cmd)
+	ROM_INFO * rom;
+	rom = search_rom_info(ctx->m_config_item);
+
+	size_t max = m_max_download_pre_cmd;
+
+	/* SPL needn't split transfer */
+	if (rom && (rom ->flags & ROM_INFO_HID_SDP_NO_MAX_PER_TRANS))
+		max = size;
+
+	for (size_t i=0; i < size; i += max)
 	{
 		size_t sz;
 		sz = size - i;
-		if (sz > m_max_download_pre_cmd)
-			sz = m_max_download_pre_cmd;
+		if (sz > max)
+			sz = max;
 
 		m_spdcmd.m_addr = EndianSwap((uint32_t)(addr + i)); // force use 32bit endian swap function;
 		m_spdcmd.m_count = EndianSwap((uint32_t)sz); //force use 32bit endian swap function;
