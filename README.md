@@ -59,6 +59,10 @@ The prebuilt image and document are here:
 - git submodule update
 - open msvs/uuu.sln with Visual Studio 2017
 
+Visual Studio
+
+Note that, since uuu is an OSI compliant Open Source project, you are entitled to download and use the freely available Visual Studio Community Edition to build, run or develop for uuu. As per the Visual Studio Community Edition license this applies regardless of whether you are an individual or a corporate user.
+
 ## Linux
 - git clone https://github.com/NXPmicro/mfgtools.git
 - cd mfgtools
