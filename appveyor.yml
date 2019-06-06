@@ -46,7 +46,7 @@ build_script:
 
 - cmd: if exist %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
    
-- sh: cmake .
+- sh: cmake -D 'STATIC=1' .
 - sh: make
      
 - sh: git clone https://github.com/NXPmicro/mfgtools.wiki.git
