@@ -28,15 +28,15 @@ install:
  
 - sh: sudo apt-get update
 
-- sh: sudo apt-get DEBIAN_FRONTEND=noninteractive --yes --force-yes install libusb-1.0-0-dev
+- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev
 
-- sh: sudo apt-get DEBIAN_FRONTEND=noninteractive --yes --force-yes install libzip-dev
+- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install libzip-dev
 
-- sh: sudo apt-get DEBIAN_FRONTEND=noninteractive --yes --force-yes install libbz2-dev
+- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install libbz2-dev
     
-- sh: sudo apt-get DEBIAN_FRONTEND=noninteractive --yes --force-yes install asciidoc
+- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install asciidoc
     
-- sh: sudo apt-get DEBIAN_FRONTEND=noninteractive --yes --force-yes install rename
+- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install rename
 
 build_script:
 
