@@ -114,11 +114,11 @@ int uuu_for_each_cfg(uuu_show_cfg fn, void *p);
 typedef int(*uuu_ls_file)(const char *path, void *p);
 int uuu_for_each_ls_file(uuu_ls_file fn, const char *path, void *p);
 
-int uuu_run_cmd(const char * cmd);
-int uuu_run_cmd_script(const char *script);
+int uuu_run_cmd(const char * cmd, int dry);
+int uuu_run_cmd_script(const char *script, int dry);
 
 int uuu_auto_detect_file(const char * filename);
-int uuu_wait_uuu_finish(int deamon);
+int uuu_wait_uuu_finish(int deamon, int dry);
 int uuu_add_usbpath_filter(const char *path);
 
 /*

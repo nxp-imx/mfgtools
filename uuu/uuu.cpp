@@ -129,6 +129,7 @@ void print_help(bool detail = false)
 		"                example: SDPS: boot -f flash.bin\n"
 		"    -d          Daemon mode, wait for forever.\n"
 		"    -v -V       verbose mode, -V enable libusb error\\warning info\n"
+		"    -dry	 Dry run mode, check if script or cmd correct \n"
 		"    -m          USBPATH Only monitor these paths.\n"
 		"                    -m 1:2 -m 1:3\n\n"
 		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
@@ -674,7 +675,7 @@ int runshell(int shell)
 				if (uboot_cmd)
 					cmd = "fb: ucmd " + cmd;
 
-				int ret = uuu_run_cmd(cmd.c_str());
+				int ret = uuu_run_cmd(cmd.c_str(), 0);
 				if (ret)
 					cout << uuu_get_last_err_string() << endl;
 				else
@@ -732,6 +733,7 @@ int main(int argc, char **argv)
 	string filename;
 	string cmd;
 	int ret;
+	int dryrun  = 0;
 
 	string cmd_script;
 
@@ -756,6 +758,10 @@ int main(int argc, char **argv)
 			{
 				g_verbose = 1;
 				uuu_set_debug_level(2);
+			}else if (s == "-dry")
+			{
+				dryrun = 1;
+				g_verbose = 1;
 			}
 			else if (s == "-h")
 			{
@@ -849,6 +855,18 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
+	if (deamon && dryrun)
+	{
+		printf("Error: -d -dry Can't apply at the same time\n");
+		return -1;
+	}
+
+	if (shell && dryrun)
+	{
+		printf("Error: -dry -s Can't apply at the same time\n");
+		return -1;
+	}
+
 	if (g_verbose)
 	{
 		printf("%sBuild in config:%s\n", g_vt_boldwhite, g_vt_default);
@@ -881,7 +899,7 @@ int main(int argc, char **argv)
 
 	if (!cmd.empty())
 	{
-		ret = uuu_run_cmd(cmd.c_str());
+		ret = uuu_run_cmd(cmd.c_str(), dryrun);
 
 		for (size_t i = 0; i < g_map_path_nt.size()+3; i++)
 			printf("\n");
@@ -895,7 +913,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!cmd_script.empty())
-		ret = uuu_run_cmd_script(cmd_script.c_str());
+		ret = uuu_run_cmd_script(cmd_script.c_str(), dryrun);
 	else
 		ret = uuu_auto_detect_file(filename.c_str());
 
@@ -907,7 +925,7 @@ int main(int argc, char **argv)
 		return ret;
 	}
 
-	uuu_wait_uuu_finish(deamon);
+	uuu_wait_uuu_finish(deamon, dryrun);
 
 	runshell(shell);
 
