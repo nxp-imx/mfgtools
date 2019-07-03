@@ -44,18 +44,6 @@
 #include <sys/stat.h>
 #include "sparse.h"
 
-class AutoMulti
-{
-	TransBase *m_data;
-public:
-	AutoMulti(TransBase *p, size_t size, size_t count)
-	{
-		p->prepare_multi_request(size, count);
-		m_data = p;
-	}
-	~AutoMulti() { m_data->free_multi_request(); }
-};
-
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
 	if (m_pTrans->write((void*)cmd.data(), cmd.size()))

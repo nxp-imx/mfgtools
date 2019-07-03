@@ -89,9 +89,13 @@ public:
 class USBTrans : public TransBase
 {
 public:
+	uint64_t m_timeout;
 	vector<EPInfo> m_EPs;
 	virtual int open(void *p);
 	virtual int close();
+	virtual int prepare_multi_request(size_t size, size_t count, uint8_t ep, libusb_transfer_type type);
+	virtual int free_multi_request();
+	virtual int read_multi_request(void *buff, size_t size, size_t *return_size);
 };
 class HIDTrans : public USBTrans
 {
@@ -104,6 +108,8 @@ public:
 	~HIDTrans() { if (m_devhandle) close();  m_devhandle = NULL;  }
 	int write(void *buff, size_t size);
 	int read(void *buff, size_t size, size_t *return_size);
+
+	virtual int prepare_multi_request(size_t size, size_t count) { return USBTrans::prepare_multi_request(size, count, 1, LIBUSB_TRANSFER_TYPE_CONTROL); }
 };
 
 class BulkTrans : public USBTrans
@@ -120,7 +126,6 @@ public:
 	EPInfo m_ep_out;
 	size_t m_MaxTransPreRequest;
 	int m_b_send_zero;
-	uint64_t m_timeout;
 
 	BulkTrans() {
 		Init();
@@ -131,10 +136,21 @@ public:
 	~BulkTrans() { if (m_devhandle) close();  m_devhandle = NULL; }
 	int write(void *buff, size_t size);
 	int read(void *buff, size_t size, size_t *return_size);
+
+	virtual int prepare_multi_request(size_t size, size_t count) { return USBTrans::prepare_multi_request(size, count, m_ep_in.addr, LIBUSB_TRANSFER_TYPE_BULK); }
 	
-	virtual int prepare_multi_request(size_t size, size_t count);
-	virtual int free_multi_request();
-	virtual int read_multi_request(void *buff, size_t size, size_t *return_size);
+};
+
+class AutoMulti
+{
+	TransBase *m_data;
+public:
+	AutoMulti(TransBase *p, size_t size, size_t count)
+	{
+		p->prepare_multi_request(size, count);
+		m_data = p;
+	}
+	~AutoMulti() { m_data->free_multi_request(); }
 };
 
 int polling_usb(std::atomic<int>& bexit);

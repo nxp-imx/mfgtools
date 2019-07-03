@@ -506,16 +506,20 @@ int SDPBootlogCmd::run(CmdCtx *ctx)
 
 	HIDReport report(&dev);
 
+	AutoMulti Multi(&dev, 65, 128);
+
 	vector<uint8_t> v(65);
 	v[0] = 'I';
 
 	uuu_notify nt;
 	nt.type = uuu_notify::NOTIFY_CMD_INFO;
 	
+	size_t return_size;
 	int ret;
+
 	while (1)
 	{
-		ret = report.read(v);
+		ret = dev.read_multi_request(v.data(), v.size(), &return_size);
 		if (ret)
 			return 0;
 		else

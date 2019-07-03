@@ -267,7 +267,7 @@ static void LIBUSB_CALL transfer_cb(struct libusb_transfer *transfer)
 	*completed = 1;
 }
 
-int BulkTrans::prepare_multi_request(size_t size, size_t count)
+int USBTrans::prepare_multi_request(size_t size, size_t count, uint8_t ep, libusb_transfer_type type)
 {
 	m_size_prerequest = size;
 	
@@ -288,9 +288,14 @@ int BulkTrans::prepare_multi_request(size_t size, size_t count)
 		m_vector_transfer.back().complete = new int;
 		*m_vector_transfer.back().complete = 0;
 
-		libusb_fill_bulk_transfer(transfer_in, (libusb_device_handle *)m_devhandle, m_ep_in.addr,
-			m_vector_transfer.back().buffer, size,
-			transfer_cb, m_vector_transfer.back().complete, m_timeout);
+		transfer_in->dev_handle = (libusb_device_handle *)m_devhandle;
+		transfer_in->endpoint = ep;
+		transfer_in->type = type;
+		transfer_in->timeout = m_timeout;
+		transfer_in->buffer = m_vector_transfer.back().buffer;
+		transfer_in->length = size;
+		transfer_in->user_data = m_vector_transfer.back().complete;
+		transfer_in->callback = transfer_cb;
 
 		int r = libusb_submit_transfer(transfer_in);
 		if (r)
@@ -303,7 +308,7 @@ int BulkTrans::prepare_multi_request(size_t size, size_t count)
 	return 0;
 }
 
-int BulkTrans::free_multi_request()
+int USBTrans::free_multi_request()
 {
 	while(!m_vector_transfer.empty())
 	{
@@ -331,7 +336,7 @@ int BulkTrans::free_multi_request()
 	return 0;
 }
 
-int BulkTrans::read_multi_request(void *buff, size_t size, size_t *return_size)
+int USBTrans::read_multi_request(void *buff, size_t size, size_t *return_size)
 {
 	int ret = -1;
 
@@ -391,9 +396,12 @@ int BulkTrans::read_multi_request(void *buff, size_t size, size_t *return_size)
 	m_vector_transfer.back().complete = new int;
 	*m_vector_transfer.back().complete = 0;
 
-	libusb_fill_bulk_transfer(transfer_in, (libusb_device_handle *)m_devhandle, m_ep_in.addr,
-		m_vector_transfer.back().buffer, m_size_prerequest,
-		transfer_cb, m_vector_transfer.back().complete, m_timeout);
+	*transfer_in = *(m_vector_transfer.front().libusb_transfer);
+	
+	transfer_in->buffer = m_vector_transfer.back().buffer;
+	transfer_in->length = size;
+	transfer_in->user_data = m_vector_transfer.back().complete;
+	transfer_in->callback = transfer_cb;
 
 	int r = libusb_submit_transfer(transfer_in);
 	if (r)
