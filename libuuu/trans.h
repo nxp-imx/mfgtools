@@ -109,7 +109,7 @@ public:
 	int write(void *buff, size_t size);
 	int read(void *buff, size_t size, size_t *return_size);
 
-	virtual int prepare_multi_request(size_t size, size_t count) { return USBTrans::prepare_multi_request(size, count, 1, LIBUSB_TRANSFER_TYPE_CONTROL); }
+	virtual int prepare_multi_request(size_t size, size_t count) { return USBTrans::prepare_multi_request(size, count, 0x81, LIBUSB_TRANSFER_TYPE_INTERRUPT); }
 };
 
 class BulkTrans : public USBTrans

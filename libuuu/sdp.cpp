@@ -499,7 +499,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 int SDPBootlogCmd::run(CmdCtx *ctx)
 {
 	HIDTrans dev;
-	dev.m_read_timeout = 2000;
+	dev.m_timeout = dev.m_read_timeout = 2000;
 
 	if (dev.open(ctx->m_dev))
 		return -1;
