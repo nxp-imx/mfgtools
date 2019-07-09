@@ -314,11 +314,11 @@ int USBTrans::free_multi_request()
 	{
 		if(*m_vector_transfer.front().complete == 0)
 		{
-			libusb_cancel_transfer(m_vector_transfer.front().libusb_transfer);
+			int ret = libusb_cancel_transfer(m_vector_transfer.front().libusb_transfer);
+			
+			int * completed = m_vector_transfer.front().complete;
 
-			int *completed = m_vector_transfer.front().complete;
-
-			while (!*completed) {
+			while ((!*completed) && (ret == 0)) {
 				int ret = libusb_handle_events_completed(NULL, completed);
 				if (ret < 0) {
 					if (ret == LIBUSB_ERROR_INTERRUPTED)
@@ -388,27 +388,28 @@ int USBTrans::read_multi_request(void *buff, size_t size, size_t *return_size)
 	}
 
 	Transfer t;
-	m_vector_transfer.push(t);
-
-	size_t last = m_vector_transfer.size() - 1;
-	m_vector_transfer.back().libusb_transfer = transfer_in;
-	m_vector_transfer.back().buffer = new uint8_t[m_size_prerequest];
-	m_vector_transfer.back().complete = new int;
-	*m_vector_transfer.back().complete = 0;
+	
+	t.libusb_transfer = transfer_in;
+	t.buffer = new uint8_t[m_size_prerequest];
+	t.complete = new int(0);
 
 	*transfer_in = *(m_vector_transfer.front().libusb_transfer);
 	
-	transfer_in->buffer = m_vector_transfer.back().buffer;
+	transfer_in->buffer = t.buffer;
 	transfer_in->length = size;
-	transfer_in->user_data = m_vector_transfer.back().complete;
+	transfer_in->user_data = t.complete;
 	transfer_in->callback = transfer_cb;
 
 	int r = libusb_submit_transfer(transfer_in);
 	if (r)
 	{
 		set_last_err_string("submit transfer failure");
+		delete t.buffer;
+		delete t.complete;
 		return r;
 	}
+
+	m_vector_transfer.push(t);
 
 	return ret;
 }
