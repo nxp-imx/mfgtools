@@ -681,8 +681,6 @@ int runshell(int shell)
 				int ret = uuu_run_cmd(cmd.c_str(), 0);
 				if (ret)
 					cout << uuu_get_last_err_string() << endl;
-				else
-					cout << "Okay" << endl;
 			}
 		}
 		return 0;
