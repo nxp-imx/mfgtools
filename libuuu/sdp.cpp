@@ -523,6 +523,7 @@ int SDPBootlogCmd::run(CmdCtx *ctx)
 
 		if(return_size > 5)
 		{
+			nt.type == uuu_notify::NOTIFY_CMD_INFO;
 			nt.str = (char*)(v.data() + 4);
 			v[5] = 0;
 			call_notify(nt);

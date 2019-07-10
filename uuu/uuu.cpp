@@ -384,7 +384,7 @@ public:
 		}
 
 		if (nt->type == uuu_notify::NOTIFY_CMD_INFO)
-			cout << nt->str;
+			cout << g_vt_kcyn << nt->str << g_vt_default;
 
 		if (nt->type == uuu_notify::NOTIFY_WAIT_FOR)
 			cout << "\r" << nt->str << " "<< g_wait[((g_wait_index++) & 0x3)];
