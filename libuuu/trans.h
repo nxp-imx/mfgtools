@@ -38,11 +38,22 @@
 
 using namespace std;
 
-struct Transfer
+class Transfer
 {
-	struct libusb_transfer *libusb_transfer;
-	uint8_t * buffer;
-	int		* complete;
+public:
+	struct libusb_transfer *m_plibusb_transfer;
+	uint8_t * m_pbuffer;
+	int m_complete;
+	uint8_t m_ep;
+	libusb_transfer_type m_type;
+	void * m_devhandle;
+	int m_timeout;
+	size_t m_buffsize;
+
+	bool m_bsuccess;
+
+	Transfer(void *devhandle, uint8_t ep, libusb_transfer_type type, size_t buff_size, int timeout);
+	~Transfer();
 };
 
 class TransBase
@@ -51,7 +62,8 @@ public:
 	string m_path;
 	void * m_devhandle;
 	
-	queue <struct Transfer> m_vector_transfer;
+	queue <shared_ptr<Transfer>> m_vector_transfer;
+
 	size_t m_size_prerequest;
 
 	TransBase() { m_devhandle = NULL; }
@@ -72,7 +84,7 @@ public:
 	}
 
 	virtual int prepare_multi_request(size_t size, size_t count) { return 0; };
-	virtual int free_multi_request() { return 0; };
+	virtual int free_multi_request() { while (!m_vector_transfer.empty()) { m_vector_transfer.pop(); } return 0; };
 	virtual int read_multi_request(void *buff, size_t size, size_t *return_size) { return read(buff, size, return_size); };
 
 };
@@ -94,7 +106,6 @@ public:
 	virtual int open(void *p);
 	virtual int close();
 	virtual int prepare_multi_request(size_t size, size_t count, uint8_t ep, libusb_transfer_type type);
-	virtual int free_multi_request();
 	virtual int read_multi_request(void *buff, size_t size, size_t *return_size);
 };
 class HIDTrans : public USBTrans

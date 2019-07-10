@@ -520,15 +520,17 @@ int SDPBootlogCmd::run(CmdCtx *ctx)
 	while (1)
 	{
 		ret = dev.read_multi_request(v.data(), v.size(), &return_size);
-		if (ret)
-			return 0;
-		else
+
+		if(return_size > 5)
 		{
 			nt.str = (char*)(v.data() + 4);
 			v[5] = 0;
 			call_notify(nt);
 			continue;
 		}
+
+		if (ret && (return_size==0))
+			return 0;
 	}
 	return 0;
 }
