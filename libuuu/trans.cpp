@@ -33,6 +33,7 @@
 #include "libuuu.h"
 #include "liberror.h"
 #include "libusb.h"
+#include <string.h>
 
 extern "C"
 {

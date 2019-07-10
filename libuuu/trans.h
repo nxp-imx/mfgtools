@@ -33,6 +33,7 @@
 #include <atomic>
 #include "libusb.h"
 #include <queue>
+#include <memory>
 
 #pragma once
 
