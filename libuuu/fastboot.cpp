@@ -82,13 +82,23 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 				if (m_pTrans->write(p, sz))
 					return -1;
 			}
+		}
+		else if (strncmp(buff, "FAIL", 4) == 0)
+		{
+			set_last_err_string(buff + 4);
+
 		}else
 		{
 			string s;
 			s = buff + 4;
 			m_info += s;
 			uuu_notify nt;
-			nt.type = uuu_notify::NOTIFY_CMD_INFO;
+
+			if(strncmp(buff, "OKAY", 4) == 0)
+				nt.type = uuu_notify::NOTIFY_CMD_OKAY_STR;
+			else
+				nt.type = uuu_notify::NOTIFY_CMD_INFO;
+
 			nt.str = buff + 4;
 			call_notify(nt);
 		}
@@ -97,7 +107,6 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 	if (strncmp(buff, "OKAY", 4) == 0)
 		return 0;
 
-	set_last_err_string(m_info);
 	return -1;
 }
 

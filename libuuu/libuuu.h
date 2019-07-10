@@ -73,6 +73,8 @@ struct uuu_notify
 		NOTIFY_CMD_INDEX,   /*Current running command index*/
 
 		NOTIFY_CMD_INFO,	/* Status info string */
+		NOTIFY_CMD_OKAY_STR,
+		NOTIFY_CMD_FAIL_STR,
 
 		NOTIFY_PHASE_TOTAL,
 		NOTIFY_PHASE_INDEX, /*Current running phase*/
