@@ -49,6 +49,11 @@ BuildCmd g_buildin_cmd[] =
 		,"update one file in fat partition, require uboot fastboot running in board"
 	},
 	{
+		"nand",
+#include "nand_burn_loader.clst"
+		,"burn boot loader to NAND flash"
+	},
+	{
 		"qspi",
 #include "qspi_burn_loader.clst"
 		,"burn boot loader to qspi nor flash"
