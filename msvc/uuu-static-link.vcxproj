@@ -143,6 +143,9 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\fat_write.clst
 type $(SolutionDir)\..\uuu\fat_write.lst &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
+type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
@@ -194,6 +197,9 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\fat_write.clst
 type $(SolutionDir)\..\uuu\fat_write.lst &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
+type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
@@ -250,6 +256,9 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\fat_write.clst
 type $(SolutionDir)\..\uuu\fat_write.lst &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
+type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
@@ -306,6 +315,9 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\sd_burn_all.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\fat_write.clst
 type $(SolutionDir)\..\uuu\fat_write.lst &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fat_write.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
+type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
