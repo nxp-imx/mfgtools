@@ -8,13 +8,13 @@ SDP: boot -f _flexspi.bin
 
 # This command will be run when ROM support stream mode
 # i.MX8QXP, i.MX8QM, skip QSPI header
-SDPS: boot -f _flexspi.bin -offset 0x1000
+SDPS: boot -f _flexspi.bin -skipfhdr
 
 # These commands will be run when use SPL and will be skipped if no spl
 # SDPU will be deprecated. please use SDPV instead of SDPU
 # {
 SDPU: delay 1000
-SDPU: write -f _flexspi.bin -offset 0x60000
+SDPU: write -f _flexspi.bin -offset 0x10000 -skipfhdr
 SDPU: jump
 # }
 
@@ -22,13 +22,42 @@ SDPU: jump
 # if (SPL support SDPV)
 # {
 SDPV: delay 1000
-SDPV: write -f _flexspi.bin -skipspl -offset 0x1000
+SDPV: write -f _flexspi.bin -skipspl -skipfhdr
 SDPV: jump
 # }
 
 FB: ucmd setenv fastboot_buffer ${loadaddr}
 FB: download -f _image
-FB: ucmd sf probe
-FB[-t 40000]: ucmd sf erase 0 +${fastboot_bytes}
-FB[-t 20000]: ucmd sf write ${fastboot_buffer} 0 ${fastboot_bytes}
+
+# Check Image if include flexspi header
+FB: ucmd setexpr fastboot_blk ${fastboot_bytes} + ${fastboot_buffer}
+FB: ucmd setexpr fastboot_blk ${fastboot_blk} + 0x1FF
+FB: ucmd setexpr fastboot_blk ${fastboot_blk} / 0x200
+FB: ucmd setexpr fastboot_blk ${fastboot_blk} * 0x200
+FB: ucmd setexpr fmagic1 ${fastboot_blk}
+FB: ucmd setexpr fmagic2 ${fastboot_blk} + 0x4
+FB: ucmd mw ${fmagic1} 0xc0ffee01
+FB: ucmd mw ${fmagic2} 0x42464346
+FB: ucmd setexpr ftry ${fastboot_buffer}
+FB: ucmd setenv foundfhdr no
+FB: ucmd if cmp.l ${ftry} ${fmagic1} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
+FB: ucmd if cmp.l ${ftry} ${fmagic2} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
+FB: ucmd setexpr ftry ${fastboot_buffer} + 0x1fc
+FB: ucmd if cmp.l ${ftry} ${fmagic1} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
+FB: ucmd if cmp.l ${ftry} ${fmagic2} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
+FB: ucmd setexpr ftry ${fastboot_buffer} + 0x400
+FB: ucmd if cmp.l ${ftry} ${fmagic1} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
+FB: ucmd if cmp.l ${ftry} ${fmagic2} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
+FB: ucmd setexpr ftry ${fastboot_buffer} + 0x5fc
+FB: ucmd if cmp.l ${ftry} ${fmagic1} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
+FB: ucmd if cmp.l ${ftry} ${fmagic2} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
+FB: ucmd if help qspihdr; then setevn qspihdr_exist yes; else setenv qspihdr_exist no; fi;
+FB: ucmd if test ${foundfhdr} = no && test {qspihdr_exist} = no; then echo "Can not found QSPI boot header or uboot cannot support qspihdr command"; false; else true; fi;
+
+FB: ucmd if test ${qspihdr_exist} = yes; then qspihdr init ${fastboot_buffer} ${fastboot_bytes} safe; else true; fi;
+
+#if uboot can't support qspihdr command, use uboot image to write qspi image, which require image include qspi flash header
+FB: ucmd if test ${qspihdr_exist} = no; then sf probe; else true; fi;
+FB[-t 40000]: ucmd if test ${qspihdr_exist} = no; then sf erase 0 +${fastboot_bytes}; else true; fi;
+FB[-t 20000]: ucmd if test ${qspihdr_exist} = no; then sf write ${fastboot_buffer} 0 ${fastboot_bytes}; else true; fi;
 FB: done

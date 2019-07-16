@@ -224,6 +224,7 @@ public:
 	uint32_t m_offset;
 	bool m_bIvtReserve;
 	bool m_bskipspl;
+	bool m_bskipfhdr;
 
 	SDPWriteCmd(char*p) :SDPCmdBase(p) {
 		m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_FILE;
@@ -241,6 +242,7 @@ public:
 		insert_param_info("-addr", &m_download_addr, Param::e_uint32);
 		insert_param_info("-offset", &m_offset, Param::e_uint32);
 		insert_param_info("-skipspl", &m_bskipspl, Param::e_bool);
+		insert_param_info("-skipfhdr", &m_bskipfhdr, Param::e_bool);
 	};
 
 	int run(CmdCtx *p);

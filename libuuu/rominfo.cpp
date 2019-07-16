@@ -146,3 +146,50 @@ size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset)
 
 	return sz;
 }
+static uint32_t FlashHeaderMagic[] =
+{
+	0xc0ffee01,
+	0x42464346,
+	0
+};
+
+bool CheckHeader(uint32_t *p)
+{
+	int i = 0;
+	while(FlashHeaderMagic[i])
+	{
+		if (*p == FlashHeaderMagic[i])
+			return true;
+		i++;
+	}
+	return false;
+}
+
+size_t GetFlashHeaderSize(shared_ptr<FileBuffer> p, size_t offset)
+{
+	if (p->size() < offset)
+		return 0;
+
+	if (CheckHeader((uint32_t*)(p->data() + offset)))
+		return 0x1000;
+
+	if (p->size() < offset + 0x400)
+		return 0;
+
+	if (CheckHeader((uint32_t*)(p->data() + offset + 0x400)))
+		return 0x1000;
+
+	if (p->size() < offset + 0x1fc)
+		return 0;
+
+	if (CheckHeader((uint32_t*)(p->data() + offset + 0x1fc)))
+		return 0x1000;
+
+	if (p->size() < offset + 0x5fc)
+		return 0;
+
+	if (CheckHeader((uint32_t*)(p->data() + offset + 0x5fc)))
+		return 0x1000;
+
+	return 0;
+}

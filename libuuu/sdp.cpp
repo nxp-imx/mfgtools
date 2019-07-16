@@ -208,6 +208,9 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 
 		offset = m_offset;
 
+		if (m_bskipfhdr)
+			offset += GetFlashHeaderSize(fbuff, offset);
+
 		if (m_bskipspl) {
 			ROM_INFO * rom;
 			rom = search_rom_info(ctx->m_config_item);
