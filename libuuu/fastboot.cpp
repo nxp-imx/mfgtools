@@ -52,7 +52,7 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 	char buff[65];
 	memset(buff, 0, 65);
 
-	AutoMulti multi(m_pTrans, 65, 128);
+	AutoMulti multi(m_pTrans, 65, 200);
 
 	while ( strncmp(buff, "OKAY", 4) && strncmp(buff, "FAIL", 4))
 	{

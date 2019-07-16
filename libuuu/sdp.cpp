@@ -506,7 +506,7 @@ int SDPBootlogCmd::run(CmdCtx *ctx)
 
 	HIDReport report(&dev);
 
-	AutoMulti Multi(&dev, 65, 128);
+	AutoMulti Multi(&dev, 65, 200);
 
 	vector<uint8_t> v(65);
 	v[0] = 'I';

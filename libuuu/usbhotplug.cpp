@@ -243,6 +243,7 @@ int polling_usb(std::atomic<int>& bexit)
 	if(newlist)
 		libusb_free_device_list(newlist, 1);
 
+	libusb_exit(NULL);
 	return 0;
 }
 
@@ -327,6 +328,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 		call_notify(nt);
 	}
 
+	libusb_exit(NULL);
 	return -1;
 }
 
