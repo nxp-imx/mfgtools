@@ -31,6 +31,8 @@ build_script:
 
 - cmd: dir build-log.txt /s /p
 
+- cmd: type "C:\projects\mfgtools-kvqcg\cov-int\build-log.txt"
+
 - cmd: if exist %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
    
 
