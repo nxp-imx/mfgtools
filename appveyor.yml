@@ -42,13 +42,13 @@ build_script:
 
 - cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
-- cmd: cov-configure --msvc
-
 - cmd: cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu-static-link.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 - cmd: 7z a -tzip mfg.zip cov-int
 
 - cmd: curl --form token=VU2hes6TFBF6tFVjQu621A --form email=weilin.cao@nxp.com --form file=@mfg.zip --form version="automation test(static)"  --form description="testing coverity automation" https://scan.coverity.com/builds?project=NXPmicro+mfgtools
+
+- cmd: type C:/projects/mfgtools-kvqcg/cov-int/build-log.txt
 
 - cmd: if exist %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
    
