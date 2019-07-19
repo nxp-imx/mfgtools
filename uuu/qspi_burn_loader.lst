@@ -30,29 +30,7 @@ FB: ucmd setenv fastboot_buffer ${loadaddr}
 FB: download -f _image
 
 # Check Image if include flexspi header
-FB: ucmd setexpr fastboot_blk ${fastboot_bytes} + ${fastboot_buffer}
-FB: ucmd setexpr fastboot_blk ${fastboot_blk} + 0x1FF
-FB: ucmd setexpr fastboot_blk ${fastboot_blk} / 0x200
-FB: ucmd setexpr fastboot_blk ${fastboot_blk} * 0x200
-FB: ucmd setexpr fmagic1 ${fastboot_blk}
-FB: ucmd setexpr fmagic2 ${fastboot_blk} + 0x4
-FB: ucmd mw ${fmagic1} 0xc0ffee01
-FB: ucmd mw ${fmagic2} 0x42464346
-FB: ucmd setexpr ftry ${fastboot_buffer}
-FB: ucmd setenv foundfhdr no
-FB: ucmd if cmp.l ${ftry} ${fmagic1} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
-FB: ucmd if cmp.l ${ftry} ${fmagic2} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
-FB: ucmd setexpr ftry ${fastboot_buffer} + 0x1fc
-FB: ucmd if cmp.l ${ftry} ${fmagic1} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
-FB: ucmd if cmp.l ${ftry} ${fmagic2} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
-FB: ucmd setexpr ftry ${fastboot_buffer} + 0x400
-FB: ucmd if cmp.l ${ftry} ${fmagic1} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
-FB: ucmd if cmp.l ${ftry} ${fmagic2} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
-FB: ucmd setexpr ftry ${fastboot_buffer} + 0x5fc
-FB: ucmd if cmp.l ${ftry} ${fmagic1} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
-FB: ucmd if cmp.l ${ftry} ${fmagic2} 1; then setenv foundfhdr yes; echo "find fdr"; else true; fi;
 FB: ucmd if qspihdr dump ${fastboot_buffer}; then setenv qspihdr_exist yes; else setenv qspihdr_exist no; fi;
-FB: ucmd if test ${foundfhdr} = no && test {qspihdr_exist} = no; then echo "Can not found QSPI boot header or uboot cannot support qspihdr command"; false; else true; fi;
 
 FB[-t 60000]: ucmd if test ${qspihdr_exist} = yes; then qspihdr init ${fastboot_buffer} ${fastboot_bytes} safe; else true; fi;
 
