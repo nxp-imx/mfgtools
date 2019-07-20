@@ -36,6 +36,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include <sstream>
 #include <vector>
 #include <deque>
 
