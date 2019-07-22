@@ -63,11 +63,17 @@ class FileBuffer
 {
 public:
 	vector<uint8_t> m_data;
+	mutex	m_data_mutex;
+
 	uint8_t *m_pMapbuffer;
 	size_t m_MapSize;
 	mutex m_async_mutex;
 	atomic_bool m_loaded;
 	thread m_aync_thread;
+
+	atomic_size_t m_avaible_size;
+	condition_variable m_request_cv;
+	mutex m_requext_cv_mutex;
 
 #ifdef WIN32
 	OVERLAPPED m_OverLapped;
@@ -83,12 +89,25 @@ public:
 		m_MapSize = 0;
 		m_loaded = false;
 	}
+
+	FileBuffer(void*p, size_t sz)
+	{
+		m_pMapbuffer = NULL;
+		m_MapSize = 0;
+		m_loaded = true;
+		m_data.resize(sz);
+		memcpy(m_data.data(), p, sz);
+	}
+
 	~FileBuffer()
 	{
 		if(m_aync_thread.joinable())
 			m_aync_thread.join();
 		unmapfile();
 	}
+
+	int request_data(vector<uint8_t> &data, size_t offset, size_t sz);
+	int request_data(size_t total);
 
 	uint8_t * data()
 	{
@@ -102,6 +121,9 @@ public:
 
 	uint8_t & operator[] (size_t index)
 	{
+		if (!m_loaded)
+			m_aync_thread.join();
+
 		if (m_pMapbuffer) {
 			assert(index < m_MapSize);
 			return *(m_pMapbuffer + index);
@@ -238,7 +260,7 @@ public:
 	int reload(string filename, bool async=false);
 };
 
-shared_ptr<FileBuffer> get_file_buffer(string filename);
+shared_ptr<FileBuffer> get_file_buffer(string filename, bool aysnc=false);
 bool check_file_exist(string filename, bool start_async_load=true);
 
 void set_current_dir(string dir);

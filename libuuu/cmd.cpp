@@ -660,9 +660,8 @@ int check_version(string str)
 
 int uuu_run_cmd_script(const char * buff, int dry)
 {
-	shared_ptr<FileBuffer> p(new FileBuffer);
-	p->m_data.resize(strlen(buff));
-	memcpy(p->m_data.data(), buff, strlen(buff));
+	shared_ptr<FileBuffer> p(new FileBuffer((void*)buff, strlen(buff)));
+	
 	return parser_cmd_list_file(p);
 }
 

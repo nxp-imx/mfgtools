@@ -41,6 +41,7 @@
 #include <string.h>
 #include "bzlib.h"
 #include "stdio.h"
+#include <limits>
 
 #ifdef _MSC_VER
 #define stat64 _stat64
@@ -154,7 +155,9 @@ public:
 		if (p->mapfile(backfile.substr(1), st.st_size))
 			return -1;
 
+		p->m_avaible_size = st.st_size;
 		p->m_loaded = true;
+
 		return 0;
 	}
 
@@ -482,24 +485,103 @@ struct bz2_blk
 	int	error;
 };
 
-int bz2_decompress(shared_ptr<FileBuffer> pbz, FileBuffer *p, vector<bz2_blk> * pblk, size_t start, size_t skip)
+class bz2_blks
 {
-	for (int i = start; i < pblk->size(); i += skip)
+public:
+	vector<bz2_blk> blk;
+	mutex blk_mutex;
+
+	condition_variable cv;
+	mutex con_mutex;
+
+	atomic<size_t> top;
+	atomic<size_t> bottom;
+	bz2_blks() { top = 0; bottom = ULLONG_MAX; }
+};
+
+int bz2_update_available(FileBuffer *p, bz2_blks * pblk)
+{
+	lock_guard<mutex> lock(pblk->blk_mutex);
+	size_t sz = 0;
+	for (int i = 1; i < pblk->blk.size() - 1; i++)
 	{
-		unsigned int len = pblk->at(i).decompress_size;
-		if (i) /*skip first dummy one*/
-		{
-			(*pblk)[i].error = BZ2_bzBuffToBuffDecompress((char*)p->data() + pblk->at(i).decompress_offset,
-				&len,
-				(char*)pbz->data() + pblk->at(i).start,
-				pblk->at(i).size,
-				0,
-				0);
-			(*pblk)[i].actual_size = len;
-		}
+		if (pblk->blk[i].error)
+			break;
+
+		if (!pblk->blk[i].actual_size)
+			break;
+
+		sz += pblk->blk[i].actual_size;
 	}
+
+	p->m_avaible_size = sz;
+	p->m_request_cv.notify_all();
 	return 0;
 }
+
+int bz2_decompress(shared_ptr<FileBuffer> pbz, FileBuffer *p, bz2_blks * pblk)
+{
+	
+
+	bz2_blk one;
+	size_t cur;
+	vector<uint8_t> buff;
+
+	while (pblk->top + 1 < pblk->bottom)
+	{
+		{
+			std::unique_lock<std::mutex> lck(pblk->con_mutex);
+			while (pblk->top + 1 >= pblk->blk.size()) {
+				pblk->cv.wait(lck);
+			}
+		}
+
+		{
+			lock_guard<mutex> lock(pblk->blk_mutex);
+			if (pblk->top < pblk->blk.size() - 1)
+			{
+				cur = pblk->top;
+				one = pblk->blk[pblk->top];
+				pblk->top++;
+			}
+			else
+			{
+				continue;
+			}
+		}
+
+		unsigned int len = one.decompress_size;
+		buff.resize(len);
+		one.error = BZ2_bzBuffToBuffDecompress((char*)buff.data(),
+			&len,
+			(char*)pbz->data() + one.start,
+			one.size,
+			0,
+			0);
+		one.actual_size = len;
+
+		{
+			lock_guard<mutex> lock(pblk->blk_mutex);
+			(*pblk).blk[cur] = one;
+		}
+
+
+		{
+			lock_guard<mutex> lock(p->m_data_mutex);
+			if (p->size() < one.start + one.actual_size)
+				p->resize(one.start + one.actual_size);
+
+			memcpy(p->data() + one.start, buff.data(), one.actual_size);
+		}
+
+		bz2_update_available(p, pblk);
+
+	}
+
+	return 0;
+}
+
+
 
 int bz_async_load(string filename, FileBuffer *p)
 {
@@ -514,13 +596,28 @@ int bz_async_load(string filename, FileBuffer *p)
 		return -1;
 	}
 
-	vector<bz2_blk> blk;
+	bz2_blks blks;
 	bz2_blk one;
 	memset(&one, 0, sizeof(one));
-	blk.push_back(one);
+	blks.blk.push_back(one);
+	blks.top = 1;
+
 	size_t total = 0;
 
 	uint8_t *p1 = &pbz->at(0);
+
+	int nthread = thread::hardware_concurrency();
+
+	vector<thread> threads;
+
+	for (int i = 0; i < nthread; i++)
+	{
+		threads.push_back(thread(bz2_decompress, pbz, p, &blks));
+	}
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+	p->resize(pbz->size() * 5); //estimate uncompressed memory size;
 
 	for (size_t i = 0; i < pbz->size() - 10; i++)
 	{
@@ -535,36 +632,45 @@ int bz_async_load(string filename, FileBuffer *p)
 				{     
 					/*which is valude bz2 header*/
 					struct bz2_blk one;
+					memset(&one, 0, sizeof(one));
+
 					one.start = i;
-		
-					blk[blk.size() - 1].size = i - blk[blk.size() - 1].start;
-					one.decompress_offset = blk[blk.size() - 1].decompress_offset + blk[blk.size() - 1].decompress_size;
-					one.decompress_size = (pbz->at(i + 3) - '0') * 100 * 1000; /* not l024 for bz2 */
+					{
+						lock_guard<mutex> lock(blks.blk_mutex);
 
-					blk.push_back(one);
+						blks.blk.back().size = i - blks.blk.back().start;
+						one.decompress_offset = blks.blk.back().decompress_offset + blks.blk.back().decompress_size;
+						one.decompress_size = (pbz->at(i + 3) - '0') * 100 * 1000; /* not l024 for bz2 */
 
+						blks.blk.push_back(one);
+					}
 					total += one.decompress_size;
+
+					blks.cv.notify_all();
 				}
 			}
 		}
 	}
 
-	if (blk.size() == 1) {
+	if (blks.blk.size() == 1) {
 		set_last_err_string("Can't find validate bz2 magic number");
 		return -1;
 	}
 
-	blk[blk.size() - 1].size = pbz->size() - blk[blk.size() - 1].start;
+	blks.blk.back().size = pbz->size() - blks.blk.back().start;
 
-	int nthread = thread::hardware_concurrency();
-
-	vector<thread> threads;
-	
-	p->resize(total);
-
-	for (int i = 0; i < nthread; i++)
 	{
-		threads.push_back(thread(bz2_decompress, pbz, p, &blk, i, nthread));
+		lock_guard<mutex> lock(p->m_data_mutex);
+		p->resize(total);
+	}
+
+	{
+		lock_guard<mutex> lock(blks.blk_mutex);
+		struct bz2_blk one;
+		memset(&one, 0, sizeof(one));
+		blks.blk.push_back(one);
+		blks.bottom = blks.blk.size();
+		blks.cv.notify_all();
 	}
 
 	for (int i = 0; i < nthread; i++)
@@ -572,23 +678,23 @@ int bz_async_load(string filename, FileBuffer *p)
 		threads[i].join();
 	}
 
-	for (int i = 1; i < blk.size(); i++)
+	for (int i = 1; i < blks.blk.size(); i++)
 	{
-		if (blk[i].error)
+		if (blks.blk[i].error)
 		{
 			set_last_err_string("decompress err");
 			return -1;
 		}
-		if ((blk[i].decompress_size != blk[i].actual_size) && (i != blk.size() - 1))
+		if ((blks.blk[i].decompress_size != blks.blk[i].actual_size) && (i != blks.blk.size() - 2))  /*two dummy blks (one header and other end)*/
 		{
 			set_last_err_string("bz2: only support last block less then other block");
 			return -1;
 		}
 	}
 
-	size_t sz =  blk[blk.size() - 1].decompress_size - blk[blk.size() - 1].actual_size;
+	bz2_update_available(p, &blks);
 
-	p->resize(total - sz);
+	p->resize(p->m_avaible_size);
 	p->m_loaded = true;
 
 	return 0;
@@ -711,9 +817,50 @@ int FileBuffer::reload(string filename, bool async)
 	return -1;
 }
 
-shared_ptr<FileBuffer> get_file_buffer(string filename)
+int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 {
-	return get_file_buffer(filename, false);
+	bool needlock = false;
+
+	if (m_loaded)
+	{
+		if (offset >= this->size())
+		{
+			data.clear();
+			set_last_err_string("request offset execeed memory size");
+			return -1;
+		}
+	}
+	else
+	{
+		std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
+		while ((offset + sz > m_avaible_size) && !m_loaded)
+			m_request_cv.wait(lck);
+
+		if (m_loaded)
+		{
+			if (offset > m_avaible_size)
+			{
+				data.clear();
+				set_last_err_string("request offset execeed memory size");
+				return -1;
+			}
+		}
+		needlock = true;
+	}
+
+	size_t size = sz;
+	if (offset + size >= m_avaible_size)
+		size = m_avaible_size - offset;
+
+	data.resize(size);
+
+	if (needlock) m_data_mutex.lock();
+
+	memcpy(data.data(), this->data() + offset, size);
+
+	if (needlock) m_data_mutex.unlock();
+
+	return 0;
 }
 
 bool check_file_exist(string filename, bool start_async_load)
