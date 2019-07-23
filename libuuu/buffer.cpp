@@ -581,8 +581,6 @@ int bz2_decompress(shared_ptr<FileBuffer> pbz, FileBuffer *p, bz2_blks * pblk)
 	return 0;
 }
 
-
-
 int bz_async_load(string filename, FileBuffer *p)
 {
 	shared_ptr<FileBuffer> pbz;
@@ -621,7 +619,7 @@ int bz_async_load(string filename, FileBuffer *p)
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-	p->resize(pbz->size() * 5); //estimate uncompressed memory size;
+	p->reserve(pbz->size() * 5); //estimate uncompressed memory size;
 
 	for (size_t i = 0; i < pbz->size() - 10; i++)
 	{
@@ -884,7 +882,7 @@ int file_overwrite_monitor(string filename, FileBuffer *p)
 	str = ">";
 	str += filename;
 
-	if(p->m_pMapbuffer)
+	if(p->m_pDatabuffer && p->m_allocate_way == FileBuffer::ALLOCATE_MMAP)
 	{
 		std::lock_guard<mutex> lock(g_mutex_map);
 		p->m_file_monitor.detach(); /*Detach itself, erase will delete p*/
