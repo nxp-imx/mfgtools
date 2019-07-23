@@ -39,14 +39,13 @@ install:
 - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install rename
 
 build_script:
-
-- cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-
-- cmd: cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu-static-link.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+- cmd: cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 - cmd: 7z a -tzip mfg.zip cov-int
 
 - cmd: curl --form token=%coverity_token% --form email=frank.li@nxp.com --form file=@mfg.zip --form version="automation test"  --form description="testing coverity automation" https://scan.coverity.com/builds?project=NXPmicro%2Fmfgtools
+
+- cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu-static-link.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 - cmd: if exist %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
    
@@ -85,3 +84,4 @@ deploy:
 environment:
   coverity_token:
     secure: 5VvyV4fYfI6xPsqaeDHvBamkUmmVNjZj0J5pLLQ6NCw=
+
