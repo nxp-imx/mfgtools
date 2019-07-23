@@ -39,6 +39,8 @@
 #include <atomic>
 #include <thread>
 #include <string>
+#include <condition_variable>
+#include <string.h>
 
 #ifdef _MSC_VER
 #include <Windows.h>
