@@ -568,10 +568,10 @@ int bz2_decompress(shared_ptr<FileBuffer> pbz, FileBuffer *p, bz2_blks * pblk)
 
 		{
 			lock_guard<mutex> lock(p->m_data_mutex);
-			if (p->size() < one.start + one.actual_size)
-				p->resize(one.start + one.actual_size);
+			if (p->size() < one.decompress_offset + one.actual_size)
+				p->resize(one.decompress_offset + one.actual_size);
 
-			memcpy(p->data() + one.start, buff.data(), one.actual_size);
+			memcpy(p->data() + one.decompress_offset, buff.data(), one.actual_size);
 		}
 
 		bz2_update_available(p, pblk);
@@ -613,6 +613,10 @@ int bz_async_load(string filename, FileBuffer *p)
 	for (int i = 0; i < nthread; i++)
 	{
 		threads.push_back(thread(bz2_decompress, pbz, p, &blks));
+#ifdef WIN32
+		if( i!=0 )
+			SetThreadPriority(threads[i].native_handle(), THREAD_PRIORITY_BELOW_NORMAL);
+#endif
 	}
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -718,7 +722,7 @@ int FSBz2::load(string backfile, string filename, FileBuffer *p, bool async)
 	}
 
 	p->m_aync_thread = thread(bz_async_load, backfile, p);
-	
+
 	if (!async) {
 		p->m_aync_thread.join();
 		if (!p->m_loaded) {
@@ -834,7 +838,9 @@ int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 	{
 		std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
 		while ((offset + sz > m_avaible_size) && !m_loaded)
+		{
 			m_request_cv.wait(lck);
+		}
 
 		if (m_loaded)
 		{
