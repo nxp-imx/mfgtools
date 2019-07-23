@@ -218,7 +218,16 @@ string build_process_bar(size_t width, size_t pos, size_t total)
 	str[width - 1] = ']';
 
 	if (total == 0)
+	{
+		if (pos == 0)
+			return str;
+
+		string_ex loc;
+		size_t s = pos / (1024 * 1024);
+		loc.format("%dM", s);
+		str.replace(1, loc.size(), loc);
 		return str;
+	}
 
 	size_t i;
 
@@ -237,13 +246,8 @@ string build_process_bar(size_t width, size_t pos, size_t total)
 		str[str.size() - 2] = '=';
 
 	string_ex per;
-	if (total) {
-		per.format("%d%%", pos * 100 / total);
-	}
-	else {
-		size_t s = pos / (1024 * 1024);
-		per.format("%d", s);
-	}
+	per.format("%d%%", pos * 100 / total);
+	
 	size_t start = (width - per.size()) / 2;
 	str.replace(start, per.size(), per);
 	str.insert(start, g_vt_yellow);
