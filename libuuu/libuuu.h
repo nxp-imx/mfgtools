@@ -94,6 +94,7 @@ struct uuu_notify
 
 	NOTIFY_TYPE type;
 	uint64_t id;
+	uint64_t timestamp;
 	union
 	{
 		int status;

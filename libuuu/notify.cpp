@@ -39,6 +39,7 @@ using namespace std;
 #include <thread>
 #include <mutex>
 #include <iostream>
+#include <time.h>
 
 struct  notify_map
 {
@@ -91,6 +92,7 @@ void call_notify(struct uuu_notify nf)
 
 	vector<struct notify_map>::iterator it = g_notify_callback_list.begin();
 	nf.id = std::hash<std::thread::id>{}(std::this_thread::get_id());
+	nf.timestamp = clock() * 1000 / CLOCKS_PER_SEC;
 
 	for (; it != g_notify_callback_list.end(); it++)
 	{

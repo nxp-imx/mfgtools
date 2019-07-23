@@ -457,7 +457,11 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, siz
 	bool bload = pdata->m_loaded;
 
 	nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
-	nt.total = pdata->size();
+	if (bload)
+		nt.total = pdata->size();
+	else
+		nt.total = 0;
+
 	call_notify(nt);
 	
 

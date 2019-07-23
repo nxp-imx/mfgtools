@@ -237,8 +237,13 @@ string build_process_bar(size_t width, size_t pos, size_t total)
 		str[str.size() - 2] = '=';
 
 	string_ex per;
-	per.format("%d%%", pos * 100 / total);
-
+	if (total) {
+		per.format("%d%%", pos * 100 / total);
+	}
+	else {
+		size_t s = pos / (1024 * 1024);
+		per.format("%d", s);
+	}
 	size_t start = (width - per.size()) / 2;
 	str.replace(start, per.size(), per);
 	str.insert(start, g_vt_yellow);
@@ -278,6 +283,8 @@ public:
 	size_t m_start_pos;
 	size_t	m_trans_size;
 	clock_t m_start_time;
+	uint64_t m_cmd_start_time;
+	uint64_t m_cmd_end_time;
 
 	ShowNotify()
 	{
@@ -302,6 +309,7 @@ public:
 		{
 			m_start_pos = 0;
 			m_cmd = nt.str;
+			m_cmd_start_time = nt.timestamp;
 		}
 		if (nt.type == uuu_notify::NOTIFY_TRANS_SIZE)
 		{
@@ -329,6 +337,7 @@ public:
 		}
 		if (nt.type == uuu_notify::NOTIFY_CMD_END)
 		{
+			m_cmd_end_time = nt.timestamp;
 			if(nt.status)
 			{
 				g_overall_status = nt.status;
@@ -340,9 +349,12 @@ public:
 		}
 		if (nt.type == uuu_notify::NOTIFY_TRANS_POS)
 		{
-			if (m_trans_size == 0)
-				return false;
+			if (m_trans_size == 0) {
 
+				m_trans_pos = nt.index;
+				return true;
+			}
+	
 			if ((nt.index - m_trans_pos) < (m_trans_size / 100)
 				&& nt.index != m_trans_size)
 				return false;
@@ -363,13 +375,15 @@ public:
 		}
 		if (nt->type == uuu_notify::NOTIFY_CMD_END)
 		{
+			double diff = m_cmd_end_time - m_cmd_start_time;
+			diff /= 1000;
 			if (nt->status)
 			{
-				cout << m_dev << ">" << g_vt_red <<"Fail " << uuu_get_last_err_string() << g_vt_default << endl;
+				cout << m_dev << ">" << g_vt_red <<"Fail " << uuu_get_last_err_string() << "("<< std::setprecision(4) << diff << "s)" <<  g_vt_default << endl;
 			}
 			else
 			{
-				cout << m_dev << ">" << g_vt_green << "Okay" << g_vt_default << endl;
+				cout << m_dev << ">" << g_vt_green << "Okay ("<< std::setprecision(4) << diff << "s)" << g_vt_default << endl;
 			}
 		}
 
@@ -378,7 +392,7 @@ public:
 			if (m_trans_size)
 				cout << g_vt_yellow << "\r" << m_trans_pos * 100 / m_trans_size <<"%" << g_vt_default;
 			else
-				cout << ".";
+				cout << "\r" << m_trans_pos;
 
 			cout.flush();
 		}
