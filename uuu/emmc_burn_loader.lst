@@ -16,6 +16,7 @@ SDPS: boot -f _flash.bin
 SDPU: delay 1000
 SDPU: write -f _flash.bin -offset 0x57c00
 SDPU: jump
+SDPV: blog
 # }
 
 # These commands will be run when use SPL and will be skipped if no spl
@@ -24,6 +25,7 @@ SDPU: jump
 SDPV: delay 1000
 SDPV: write -f _flash.bin -skipspl
 SDPV: jump
+SDPV: blog
 # }
 
 FB: ucmd setenv fastboot_dev mmc
