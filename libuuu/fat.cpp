@@ -143,7 +143,7 @@ void *Fat::get_data_buff(shared_ptr<FileBuffer> p, int cluster)
 	return p1;
 }
 
-shared_ptr<FileBuffer> Fat::get_file_buff(string filename)
+int Fat::get_file_buff(string filename, shared_ptr<FileBuffer>p)
 {
 	if (m_filemap.find(filename) == m_filemap.end())
 	{
@@ -151,12 +151,11 @@ shared_ptr<FileBuffer> Fat::get_file_buff(string filename)
 		err = "Can't find file ";
 		err += filename;
 		set_last_err_string(err);
-		return NULL;
+		return -1;
 	}
 
 	shared_ptr<FileBuffer> pbuff = get_file_buffer(m_filename);
 
-	shared_ptr<FileBuffer> p(new FileBuffer);
 	size_t filesize = m_filemap[filename].file_size;
 	p->resize(filesize);
 
@@ -180,5 +179,5 @@ shared_ptr<FileBuffer> Fat::get_file_buff(string filename)
 
 		cur = get_next_cluster(pbuff, cur);
 	}
-	return p;
+	return 0;
 }

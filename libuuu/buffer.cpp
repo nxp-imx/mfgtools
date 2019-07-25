@@ -68,7 +68,7 @@ public:
 	const char * m_ext;
 	FSBasic() { m_ext = NULL; }
 	virtual int get_file_timesample(string filename, uint64_t *ptime)=0;
-	virtual int load(string backfile, string filename, FileBuffer *p, bool async)=0;
+	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)=0;
 	virtual bool exist(string backfile, string filename)=0;
 	virtual int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) = 0;
 	int split(string filename, string *outbackfile, string *outfilename, bool dir=false)
@@ -142,7 +142,7 @@ public:
 		return stat64(backfile.c_str() + 1, &st) == 0 && ((st.st_mode & S_IFDIR) == 0);
 	}
 
-	int load(string backfile, string filename, FileBuffer *p, bool async)
+	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
 	{
 		struct stat64 st;
 		if (stat64(backfile.c_str() + 1, &st))
@@ -230,7 +230,7 @@ static class FSZip : public FSBackFile
 {
 public:
 	FSZip() { m_ext = ".ZIP"; };
-	virtual int load(string backfile, string filename, FileBuffer *p, bool async);
+	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
 	virtual bool exist(string backfile, string filename);
 	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
 }g_fszip;
@@ -239,7 +239,7 @@ static class FSFat : public FSBackFile
 {
 public:
 	FSFat() { m_ext = ".SDCARD"; };
-	virtual int load(string backfile, string filename, FileBuffer *p, bool async);
+	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
 	virtual bool exist(string backfile, string filename);
 	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
 }g_fsfat;
@@ -248,7 +248,7 @@ static class FSBz2 : public FSBackFile
 {
 public:
 	FSBz2() { m_ext = ".BZ2"; };
-	virtual int load(string backfile, string filename, FileBuffer *p, bool async);
+	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
 	virtual bool exist(string backfile, string filename);
 	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
 }g_fsbz2;
@@ -307,7 +307,7 @@ public:
 		}
 		return false;
 	}
-	int load(string filename, FileBuffer *p, bool async)
+	int load(string filename, shared_ptr<FileBuffer> p, bool async)
 	{
 		for (int i = 0; i < m_pFs.size(); i++)
 		{
@@ -364,7 +364,7 @@ int FSZip::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p
 	return 0;
 }
 
-int zip_async_load(string zipfile, string fn, FileBuffer * buff)
+int zip_async_load(string zipfile, string fn, shared_ptr<FileBuffer> buff)
 {
 	std::lock_guard<mutex> lock(buff->m_async_mutex);
 
@@ -372,11 +372,9 @@ int zip_async_load(string zipfile, string fn, FileBuffer * buff)
 	if (zip.Open(zipfile.substr(1)))
 		return -1;
 
-	shared_ptr<FileBuffer> p = zip.get_file_buff(fn);
-	if (p == NULL)
+	if(zip.get_file_buff(fn, buff))
 		return -1;
 
-	buff->swap(*p);
 	buff->m_avaible_size = buff->m_DataSize;
 	buff->m_loaded = true;
 
@@ -384,7 +382,7 @@ int zip_async_load(string zipfile, string fn, FileBuffer * buff)
 	return 0;
 }
 
-int FSZip::load(string backfile, string filename, FileBuffer *p, bool async)
+int FSZip::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
 {
 	Zip zip;
 
@@ -400,11 +398,9 @@ int FSZip::load(string backfile, string filename, FileBuffer *p, bool async)
 	}
 	else
 	{
-		shared_ptr<FileBuffer> pzip = zip.get_file_buff(filename);
-		if (pzip == NULL)
+		if(zip.get_file_buff(filename, p))
 			return -1;
 
-		p->swap(*pzip);
 		p->m_loaded = true;
 	}
 	return 0;
@@ -420,18 +416,17 @@ bool FSFat::exist(string backfile, string filename)
 	return fat.m_filemap.find(filename) != fat.m_filemap.end();
 }
 
-int FSFat::load(string backfile, string filename, FileBuffer *p, bool async)
+int FSFat::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
 {
 	Fat fat;
 	if (fat.Open(backfile))
 	{
 		return -1;
 	}
-	shared_ptr<FileBuffer> pfat = fat.get_file_buff(filename);
-	if (pfat == NULL)
+	
+	if(fat.get_file_buff(filename, p))
 		return -1;
 
-	p->swap(*pfat);
 	p->m_loaded = true;
 	return 0;
 }
@@ -502,7 +497,7 @@ public:
 	bz2_blks() { top = 0; bottom = ULLONG_MAX; }
 };
 
-int bz2_update_available(FileBuffer *p, bz2_blks * pblk)
+int bz2_update_available(shared_ptr<FileBuffer> p, bz2_blks * pblk)
 {
 	lock_guard<mutex> lock(pblk->blk_mutex);
 	size_t sz = 0;
@@ -522,10 +517,8 @@ int bz2_update_available(FileBuffer *p, bz2_blks * pblk)
 	return 0;
 }
 
-int bz2_decompress(shared_ptr<FileBuffer> pbz, FileBuffer *p, bz2_blks * pblk)
+int bz2_decompress(shared_ptr<FileBuffer> pbz, shared_ptr<FileBuffer> p, bz2_blks * pblk)
 {
-	
-
 	bz2_blk one;
 	size_t cur;
 	vector<uint8_t> buff;
@@ -584,7 +577,7 @@ int bz2_decompress(shared_ptr<FileBuffer> pbz, FileBuffer *p, bz2_blks * pblk)
 	return 0;
 }
 
-int bz_async_load(string filename, FileBuffer *p)
+int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 {
 	shared_ptr<FileBuffer> pbz;
 
@@ -620,9 +613,8 @@ int bz_async_load(string filename, FileBuffer *p)
 #endif
 	}
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
 	p->reserve(pbz->size() * 5); //estimate uncompressed memory size;
+	p->m_bknownSize = false;
 
 	for (size_t i = 0; i < pbz->size() - 10; i++)
 	{
@@ -705,7 +697,7 @@ int bz_async_load(string filename, FileBuffer *p)
 	return 0;
 }
 
-int FSBz2::load(string backfile, string filename, FileBuffer *p, bool async)
+int FSBz2::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool async)
 {
 	if (filename != "*")
 	{
@@ -814,7 +806,7 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 int FileBuffer::reload(string filename, bool async)
 {
 	m_loaded = false;
-	if (g_fs_data.load(filename, this, async) == 0)
+	if (g_fs_data.load(filename, shared_from_this(), async) == 0)
 	{
 		m_timesample = get_file_timesample(filename);
 		return 0;

@@ -123,7 +123,7 @@ public:
 	z_stream m_strm;
 	bool m_decompressed;
 
-	shared_ptr<FileBuffer> decompress(Zip *pZip);
+	int decompress(Zip *pZip, shared_ptr<FileBuffer> p);
 	Zip_file_Info();
 	~Zip_file_Info();
 };
@@ -153,7 +153,7 @@ public:
 		return true;
 	}
 
-	shared_ptr<FileBuffer> get_file_buff(string filename)
+	int get_file_buff(string filename, shared_ptr<FileBuffer>p)
 	{
 		if (m_filemap.find(filename) == m_filemap.end())
 		{
@@ -161,7 +161,7 @@ public:
 			err += "Can't find file ";
 			err += filename;
 			set_last_err_string(err);
-			return NULL;
+			return -1;
 		}
 
 		uuu_notify ut;
@@ -169,7 +169,7 @@ public:
 		ut.str = (char*)filename.c_str();
 		call_notify(ut);
 
-		return m_filemap[filename].decompress(this);
+		return m_filemap[filename].decompress(this, p);
 	}
 };
 

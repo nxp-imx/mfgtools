@@ -454,7 +454,7 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, siz
 	data.resize(block_size);
 
 	uuu_notify nt;
-	bool bload = pdata->m_loaded;
+	bool bload = pdata->m_loaded || pdata->m_bknownSize;
 
 	nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
 	if (bload)
@@ -491,7 +491,7 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, siz
 
 		i++;
 
-		if (bload != pdata->m_loaded)
+		if (bload != (pdata->m_loaded || pdata->m_bknownSize))
 		{
 			nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
 			nt.total = pdata->size();

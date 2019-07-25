@@ -61,7 +61,7 @@ class FileBuffer;
 int file_overwrite_monitor(string filename, FileBuffer *p);
 #endif 
 
-class FileBuffer
+class FileBuffer: public enable_shared_from_this<FileBuffer>
 {
 public:
 	mutex	m_data_mutex;
@@ -79,6 +79,7 @@ public:
 
 	mutex m_async_mutex;
 	atomic_bool m_loaded;
+	atomic_bool m_bknownSize;
 	thread m_aync_thread;
 
 	atomic_size_t m_avaible_size;
@@ -99,6 +100,7 @@ public:
 		m_DataSize = 0;
 		m_loaded = false;
 		m_MemSize = 0;
+		m_bknownSize = true;
 		m_allocate_way = ALLOCATE_MALLOC;
 	}
 
@@ -107,6 +109,7 @@ public:
 		m_pDatabuffer = NULL;
 		m_DataSize = 0;
 		m_loaded = true;
+		m_bknownSize = true;
 		m_allocate_way = ALLOCATE_MALLOC;
 		m_MemSize = 0;
 
