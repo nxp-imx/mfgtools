@@ -377,7 +377,10 @@ int zip_async_load(string zipfile, string fn, FileBuffer * buff)
 		return -1;
 
 	buff->swap(*p);
+	buff->m_avaible_size = buff->m_DataSize;
 	buff->m_loaded = true;
+
+	buff->m_request_cv.notify_all();
 	return 0;
 }
 

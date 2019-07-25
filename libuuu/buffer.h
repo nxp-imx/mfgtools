@@ -145,9 +145,6 @@ public:
 
 	uint8_t & operator[] (size_t index)
 	{
-		if (!m_loaded)
-			m_aync_thread.join();
-
 		assert(m_pDatabuffer);
 		assert(index < m_DataSize);
 

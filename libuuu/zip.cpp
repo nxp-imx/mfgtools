@@ -164,7 +164,7 @@ shared_ptr<FileBuffer>	Zip_file_Info::decompress(Zip *pZip)
 		/* run inflate() on input until output buffer not full */
 		do {
 			m_strm.avail_out = CHUNK;
-			m_strm.next_out = &((*p)[pos]);
+			m_strm.next_out = p->data() + pos;
 			ret = inflate(&m_strm, Z_NO_FLUSH);
 			//assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
 			switch (ret) {
