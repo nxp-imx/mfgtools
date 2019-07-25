@@ -61,6 +61,11 @@ class FileBuffer;
 int file_overwrite_monitor(string filename, FileBuffer *p);
 #endif 
 
+//bit 0, data loaded
+//bit 1, data total size known
+#define FILEBUFFER_FLAG_LOADED		0x3 // LOADED must be knownsize
+#define FILEBUFFER_FLAG_KNOWN_SIZE	0x2
+
 class FileBuffer: public enable_shared_from_this<FileBuffer>
 {
 public:
@@ -78,8 +83,9 @@ public:
 
 
 	mutex m_async_mutex;
-	atomic_bool m_loaded;
-	atomic_bool m_bknownSize;
+	
+	atomic_int m_dataflags;
+
 	thread m_aync_thread;
 
 	atomic_size_t m_avaible_size;
@@ -98,18 +104,15 @@ public:
 	{
 		m_pDatabuffer = NULL;
 		m_DataSize = 0;
-		m_loaded = false;
 		m_MemSize = 0;
-		m_bknownSize = true;
 		m_allocate_way = ALLOCATE_MALLOC;
+		m_dataflags = 0;
 	}
 
 	FileBuffer(void*p, size_t sz)
 	{
 		m_pDatabuffer = NULL;
 		m_DataSize = 0;
-		m_loaded = true;
-		m_bknownSize = true;
 		m_allocate_way = ALLOCATE_MALLOC;
 		m_MemSize = 0;
 
@@ -117,6 +120,7 @@ public:
 		m_MemSize = m_DataSize = sz;
 
 		memcpy(m_pDatabuffer, p, sz);
+		m_dataflags = 0;
 	}
 
 	~FileBuffer()
@@ -136,6 +140,15 @@ public:
 	int request_data(vector<uint8_t> &data, size_t offset, size_t sz);
 	int request_data(size_t total);
 
+	bool IsLoaded()
+	{
+		return m_dataflags & FILEBUFFER_FLAG_LOADED;
+	}
+
+	bool IsKnownSize()
+	{
+		return m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE;
+	}
 	uint8_t * data()
 	{
 		return m_pDatabuffer ;

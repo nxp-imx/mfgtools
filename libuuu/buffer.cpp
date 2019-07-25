@@ -156,7 +156,8 @@ public:
 			return -1;
 
 		p->m_avaible_size = st.st_size;
-		p->m_loaded = true;
+		
+		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 
 		return 0;
 	}
@@ -376,7 +377,7 @@ int zip_async_load(string zipfile, string fn, shared_ptr<FileBuffer> buff)
 		return -1;
 
 	buff->m_avaible_size = buff->m_DataSize;
-	buff->m_loaded = true;
+	atomic_fetch_or(&buff->m_dataflags, FILEBUFFER_FLAG_LOADED);
 
 	buff->m_request_cv.notify_all();
 	return 0;
@@ -401,7 +402,7 @@ int FSZip::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool
 		if(zip.get_file_buff(filename, p))
 			return -1;
 
-		p->m_loaded = true;
+		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 	}
 	return 0;
 }
@@ -427,7 +428,8 @@ int FSFat::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool
 	if(fat.get_file_buff(filename, p))
 		return -1;
 
-	p->m_loaded = true;
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+
 	return 0;
 }
 
@@ -614,7 +616,8 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 	}
 
 	p->reserve(pbz->size() * 5); //estimate uncompressed memory size;
-	p->m_bknownSize = false;
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
+
 
 	for (size_t i = 0; i < pbz->size() - 10; i++)
 	{
@@ -692,7 +695,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 	bz2_update_available(p, &blks);
 
 	p->resize(p->m_avaible_size);
-	p->m_loaded = true;
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 
 	return 0;
 }
@@ -718,7 +721,7 @@ int FSBz2::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool 
 
 	if (!async) {
 		p->m_aync_thread.join();
-		if (!p->m_loaded) {
+		if (! p->IsLoaded()) {
 			set_last_err_string("async data load failure\n");
 			return -1;
 		}
@@ -785,14 +788,14 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 				return NULL;
 			}
 
-		if (!p->m_loaded && !async)
+		if (!p->IsLoaded() && !async)
 		{
 			std::lock_guard<mutex> lock(p->m_async_mutex);
 
 			if(p->m_aync_thread.joinable())
 				p->m_aync_thread.join();
 
-			if(!p->m_loaded)
+			if(!p->IsLoaded())
 			{
 				return NULL;
 			}
@@ -805,7 +808,8 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 
 int FileBuffer::reload(string filename, bool async)
 {
-	m_loaded = false;
+	atomic_init(&this->m_dataflags, 0);
+
 	if (g_fs_data.load(filename, shared_from_this(), async) == 0)
 	{
 		m_timesample = get_file_timesample(filename);
@@ -818,7 +822,7 @@ int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 {
 	bool needlock = false;
 
-	if (m_loaded)
+	if (IsLoaded())
 	{
 		if (offset >= this->size())
 		{
@@ -830,12 +834,12 @@ int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 	else
 	{
 		std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
-		while ((offset + sz > m_avaible_size) && !m_loaded)
+		while ((offset + sz > m_avaible_size) && !IsLoaded())
 		{
 			m_request_cv.wait(lck);
 		}
 
-		if (m_loaded)
+		if (IsLoaded())
 		{
 			if (offset > m_avaible_size)
 			{

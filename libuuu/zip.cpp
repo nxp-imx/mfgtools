@@ -116,7 +116,8 @@ Zip_file_Info::~Zip_file_Info()
 int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 {
 	p->resize(m_filesize);
-
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
+	
 	uuu_notify ut;
 	ut.type = uuu_notify::NOTIFY_DECOMPRESS_SIZE;
 	ut.total = m_filesize;
@@ -203,6 +204,7 @@ int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 	}
 
 	p->m_avaible_size = m_filesize;
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 	p->m_request_cv.notify_all();
 
 	ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
