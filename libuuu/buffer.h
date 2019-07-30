@@ -74,13 +74,25 @@ public:
 	uint8_t *m_pDatabuffer;
 	size_t m_DataSize;
 	size_t m_MemSize;
+
+	shared_ptr<FileBuffer> m_ref;
+
 	enum
 	{
 		ALLOCATE_MALLOC,
 		ALLOCATE_MMAP,
+		ALLOCATE_REF,
 		ALLOCATE_VMALLOC,
 	}m_allocate_way;
 
+	int ref_other_buffer(shared_ptr<FileBuffer> p, size_t offset, size_t size)
+	{
+		m_pDatabuffer = p->data() + offset;
+		m_DataSize = m_MemSize = size;
+		m_allocate_way = ALLOCATE_REF;
+		m_ref = p;
+		return 0;
+	}
 
 	mutex m_async_mutex;
 	
@@ -180,7 +192,7 @@ public:
 
 	void reserve(size_t sz)
 	{
-		assert(m_allocate_way != ALLOCATE_MMAP);
+		assert(m_allocate_way == ALLOCATE_MALLOC);
 
 		if (sz > m_MemSize)
 		{
