@@ -29,6 +29,7 @@
     <ClCompile Include="..\libuuu\rominfo.cpp" />
     <ClCompile Include="..\libuuu\sdp.cpp" />
     <ClCompile Include="..\libuuu\sdps.cpp" />
+    <ClCompile Include="..\libuuu\tar.cpp" />
     <ClCompile Include="..\libuuu\trans.cpp" />
     <ClCompile Include="..\libuuu\usbhotplug.cpp" />
     <ClCompile Include="..\libuuu\version.cpp" />
@@ -48,6 +49,7 @@
     <ClInclude Include="..\libuuu\sdp.h" />
     <ClInclude Include="..\libuuu\sparse.h" />
     <ClInclude Include="..\libuuu\sparse_format.h" />
+    <ClInclude Include="..\libuuu\tar.h" />
     <ClInclude Include="..\libuuu\trans.h" />
     <ClInclude Include="..\libuuu\zip.h" />
   </ItemGroup>

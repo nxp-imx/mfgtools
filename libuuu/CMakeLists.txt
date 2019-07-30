@@ -29,6 +29,7 @@ set(SOURCES
 	fastboot.cpp
 	zip.cpp
 	fat.cpp
+	tar.cpp
 	rominfo.cpp
 )
 

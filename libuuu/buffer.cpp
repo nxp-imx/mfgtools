@@ -38,6 +38,7 @@
 #include "libcomm.h"
 #include "zip.h"
 #include "fat.h"
+#include "tar.h"
 #include <string.h>
 #include "bzlib.h"
 #include "stdio.h"
@@ -236,6 +237,16 @@ public:
 	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
 }g_fszip;
 
+static class FSTar: public FSBackFile
+{
+public:
+	FSTar() {m_ext = ".TAR"; };
+	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
+	virtual bool exist(string backfile, string filename);
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
+}g_fstar;
+
+
 static class FSFat : public FSBackFile
 {
 public:
@@ -262,6 +273,7 @@ public:
 	{
 		m_pFs.push_back(&g_fsflat);
 		m_pFs.push_back(&g_fszip);
+		m_pFs.push_back(&g_fstar);
 		m_pFs.push_back(&g_fsbz2);
 		m_pFs.push_back(&g_fsfat);
 	}
@@ -404,6 +416,53 @@ int FSZip::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool
 
 		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 	}
+	return 0;
+}
+
+bool FSTar::exist(string backfile, string filename)
+{
+	Tar tar;
+	if (tar.Open(backfile))
+		return false;
+
+	return tar.check_file_exist(filename);
+}
+
+
+int FSTar::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
+{
+	Tar tar;
+
+        if (tar.Open(backfile))
+                return -1;
+
+	for(auto it = tar.m_filemap.begin(); it!=tar.m_filemap.end(); ++it)
+	{
+		if(it->first.substr(0, filename.size()) == filename || filename.empty())
+		{
+			string name = backfile;
+			name += "/";
+			name += it->first;
+			fn(name.c_str()+1, p);
+		}
+	}
+
+	return 0;
+}
+
+int FSTar::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
+{
+	Tar tar;
+	if (tar.Open(backfile))
+		return -1;
+
+	if (!tar.check_file_exist(filename))
+		return -1;
+
+	if(tar.get_file_buff(filename, p))
+		return -1;
+	p->m_avaible_size = p->m_DataSize;
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 	return 0;
 }
 
