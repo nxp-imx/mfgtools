@@ -86,6 +86,8 @@ struct BootData
 
 #define HAB_TAG_DCD							0xd2       /**< Device Configuration Data */
 
+#define EX_ROM_INFO_MAGIC			0x464E4903
+
 class SDPCmdBase:public CmdBase
 {
 public:
@@ -105,11 +107,40 @@ public:
 
 	int init_cmd() { memset(&m_spdcmd, 0, sizeof(m_spdcmd)); return 0; }
 	int send_cmd(HIDReport *p) { return p->write(&m_spdcmd, sizeof(m_spdcmd), 1); };
+
 	int get_status(HIDReport *p, uint32_t &status, uint8_t report_id)
 	{
 		m_input.resize(1025);
 		m_input[0] = report_id;
-		int ret = p->read(m_input);
+
+		int ret = 0;
+
+		while ( (ret = p->read(m_input)) == 0 )
+		{
+			if (m_input.size() < (1 + sizeof(uint32_t)))
+			{
+				set_last_err_string("HID report size is too small");
+				return -1;
+			}
+
+			uint32_t magic = *(uint32_t*)m_input.data();
+
+			if (magic == EX_ROM_INFO_MAGIC)
+			{
+				uuu_notify nt;
+				char buff[2];
+				buff[0] = m_input[4];
+				buff[1] = 0;
+				nt.type = uuu_notify::NOTIFY_CMD_INFO;
+				nt.str = buff;
+				call_notify(nt);
+			}
+			else
+			{
+				break;
+			}
+		};
+
 		if (ret < 0)
 			return -1;
 
