@@ -682,9 +682,6 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 #endif
 	}
 
-	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
-
-
 	for (size_t i = 0; i < pbz->size() - 10; i++)
 	{
 		uint16_t *header = (uint16_t *)p1++;
@@ -730,6 +727,8 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 		if(p->resize(total))
 			return -1;
 	}
+
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
 
 	{
 		lock_guard<mutex> lock(blks.blk_mutex);
