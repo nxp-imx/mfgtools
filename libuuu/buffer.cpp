@@ -609,6 +609,7 @@ int bz2_decompress(shared_ptr<FileBuffer> pbz, shared_ptr<FileBuffer> p, bz2_blk
 
 		unsigned int len = one.decompress_size;
 		buff.resize(len);
+
 		one.error = BZ2_bzBuffToBuffDecompress((char*)buff.data(),
 			&len,
 			(char*)pbz->data() + one.start,
@@ -626,7 +627,8 @@ int bz2_decompress(shared_ptr<FileBuffer> pbz, shared_ptr<FileBuffer> p, bz2_blk
 		{
 			lock_guard<mutex> lock(p->m_data_mutex);
 			if (p->size() < one.decompress_offset + one.actual_size)
-				p->resize(one.decompress_offset + one.actual_size);
+				if(p->resize(one.decompress_offset + one.actual_size))
+					return -1;
 
 			memcpy(p->data() + one.decompress_offset, buff.data(), one.actual_size);
 		}
@@ -665,6 +667,12 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 
 	vector<thread> threads;
 
+	if (p->reserve(pbz->size() * 5)) //estimate uncompressed memory size;
+	{
+		set_last_err_string("Out of memory");
+		return -1;
+	}
+
 	for (int i = 0; i < nthread; i++)
 	{
 		threads.push_back(thread(bz2_decompress, pbz, p, &blks));
@@ -674,7 +682,6 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 #endif
 	}
 
-	p->reserve(pbz->size() * 5); //estimate uncompressed memory size;
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
 
 
@@ -720,7 +727,8 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 
 	{
 		lock_guard<mutex> lock(p->m_data_mutex);
-		p->resize(total);
+		if(p->resize(total))
+			return -1;
 	}
 
 	{
@@ -753,7 +761,8 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 
 	bz2_update_available(p, &blks);
 
-	p->resize(p->m_avaible_size);
+	if(p->resize(p->m_avaible_size))
+		return -1;
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 
 	return 0;

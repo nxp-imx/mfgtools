@@ -183,14 +183,15 @@ public:
 	{
 		return (*this)[index];
 	}
-	void resize(size_t sz)
+	int resize(size_t sz)
 	{
-		reserve(sz);
+		int ret = reserve(sz);
 
 		m_DataSize = sz;
+		return ret;
 	}
 
-	void reserve(size_t sz)
+	int reserve(size_t sz)
 	{
 		assert(m_allocate_way == ALLOCATE_MALLOC);
 
@@ -198,8 +199,17 @@ public:
 		{
 			m_pDatabuffer = (uint8_t*)realloc(m_pDatabuffer, sz);
 			m_MemSize = sz;
+
+			if (m_pDatabuffer == NULL)
+			{
+				set_last_err_string("Out of memory\n");
+				return -1;
+			}
 		}
+
+		return 0;
 	}
+
 	int swap(FileBuffer & a)
 	{
 		std::swap(m_pDatabuffer, a.m_pDatabuffer);
