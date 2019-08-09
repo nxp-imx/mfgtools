@@ -23,8 +23,6 @@ install:
     
 - cmd: cd %APPVEYOR_BUILD_FOLDER%\libusb
     
-- cmd:   git apply ..\msvc\0001-Static-link-C-library.patch
-    
 - cmd:    cd ..
  
 - sh: sudo apt-get update
