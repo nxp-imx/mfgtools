@@ -110,21 +110,34 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 	 * to make sure HID driver installed.
 	 */
 	libusb_device **list = NULL;
-	libusb_get_device_list(NULL, &list);
+	int retry = 20;
 
-	if (libusb_open(dev, (libusb_device_handle **)&(ctx.m_dev)) < 0)
+	while ((ret = libusb_open(dev, (libusb_device_handle **)&(ctx.m_dev))) < 0)
 	{
-		set_last_err_string("Failure open usb device" TRY_SUDO);
-		nt.type = uuu_notify::NOTIFY_CMD_END;
-		nt.status = -1;
-		call_notify(nt);
-		libusb_free_device_list(list, 1);
-		return -1;
+		if(list)
+			libusb_free_device_list(list, 1);
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+		libusb_get_device_list(NULL, &list);
+
+		retry--;
+		if (retry == 0 || ret != LIBUSB_ERROR_NOT_SUPPORTED) {
+
+			nt.type = uuu_notify::NOTIFY_CMD_END;
+			nt.status = -1;
+			call_notify(nt);
+			libusb_free_device_list(list, 1);
+
+			set_last_err_string("Failure open usb device" TRY_SUDO);
+			return -1;
+		}
 	}
 
 	ret = run_cmds(item->m_protocol.c_str(), &ctx);
 
-	libusb_free_device_list(list, 1);
+	if(list)
+		libusb_free_device_list(list, 1);
 
 	nt.type = uuu_notify::NOTIFY_THREAD_EXIT;
 	call_notify(nt);
@@ -148,7 +161,6 @@ static int usb_add(libusb_device *dev)
 		return -1;
 
 	ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
-	std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
 	if (item)
 	{
