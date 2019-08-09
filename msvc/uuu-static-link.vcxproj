@@ -116,7 +116,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>../$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib</AdditionalDependencies>
+      <AdditionalDependencies>../libusb/$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
@@ -170,7 +170,7 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>../$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib</AdditionalDependencies>
+      <AdditionalDependencies>../libusb/$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
@@ -229,7 +229,7 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>../$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib</AdditionalDependencies>
+      <AdditionalDependencies>../libusb/$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
@@ -288,7 +288,7 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>../$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib</AdditionalDependencies>
+      <AdditionalDependencies>../libusb/$(Platform)/$(Configuration)/lib/libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
