@@ -767,14 +767,85 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 	return 0;
 }
 
+bool is_pbzip2_file(string filename)
+{
+	shared_ptr<FileBuffer> file=get_file_buffer(filename);
+	uint64_t filesize= file->size();
+	uint64_t readsize= (filesize< (1024*1024) )? filesize:(1024*1024); //read at most 1MB, because maximum block size is 900kb
+	int header_num=0;
+	uint8_t* ptr= file->data();
+	for(size_t i =0 ; i < readsize ; i++)
+	{
+		if(ptr[0]=='B'&& ptr[1]=='Z'&& ptr[2]=='h' && ptr[4]=='1'&& ptr[5]=='A' && ptr[6]=='Y' && ptr[7]=='&' && ptr[8]=='S'&& ptr[9]=='Y')
+		{
+			header_num++;
+		}
+		ptr++;
+	}
+	if(header_num>1)
+		return true;
+	else
+		return false;
+}
+
+int decompress_single_thread(string name,shared_ptr<FileBuffer>p)
+{
+	uint8_t* decompressed_file;
+	uint64_t decompressed_size;
+
+	uint8_t* compressed_file;
+	uint64_t compressed_size;
+
+	shared_ptr<FileBuffer> filebuffer=get_file_buffer(name);
+
+	compressed_file=filebuffer->data();
+	compressed_size=filebuffer->size();
+
+	decompressed_file=p->data();
+	decompressed_size=0;
+
+	p->reserve(7*compressed_size);//the usual compressed ratio is about 18%, so 7*18% > 100%
+
+	bz_stream strm;
+	strm.bzalloc  = NULL;
+    strm.bzfree   = NULL;
+	strm.opaque   = NULL;
+
+	int ret;
+	ret = BZ2_bzDecompressInit (&strm,0, 0 );
+	if (ret != BZ_OK)
+		return -1;
+	strm.next_in  = (char*)compressed_file;
+	strm.avail_in = compressed_size;
+
+	uint64_t decompress_amount=5000; //decompress 5000 byte every iteration, choose 5000 only because the pbzip2 also used 5000 in their implementation.
+	while(1)
+	{
+		p->reserve(decompressed_size+1000*decompress_amount);//make sure the space is enough,multiple by 1000 to avoid repeated realloc
+		strm.next_out=(char*)p->data()+decompressed_size;
+		strm.avail_out=decompress_amount;
+
+		ret=BZ2_bzDecompress(&strm);
+		decompressed_size+=decompress_amount;
+
+		if(ret==BZ_STREAM_END)
+		{
+			decompressed_size-= strm.avail_out;
+			break;
+		}
+		else if (ret != BZ_OK)//if it is not bz_ok nor bz_stream_end, decompression failed.
+			return -1;
+
+	}
+	p->resize(decompressed_size);
+	BZ2_bzDecompressEnd(&strm);
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	return 0;
+}
+
+
 int FSBz2::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool async)
 {
-	if (filename != "*")
-	{
-		set_last_err_string("bz just support . decompress itself");
-		return -1;
-	}
-
 	if (!g_fs_data.exist(backfile))
 	{
 		string str;
@@ -783,17 +854,31 @@ int FSBz2::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool 
 		set_last_err_string(str);
 		return -1;
 	}
+	if (filename != "*")
+	{
+		string star ("/*");
+		string decompressed_name= backfile+ star;
+		shared_ptr<FileBuffer> decompressed_file=get_file_buffer(decompressed_name);
+		Tar tar;
+		tar.Open(decompressed_name);
+		tar.get_file_buff(filename,p);
+		p->m_avaible_size = p->m_DataSize;
+	}
+	else
+	{
+		if(is_pbzip2_file(backfile.substr(1))==true)//the bz2 file can be decompressed with multithreading
+			p->m_aync_thread = thread(bz_async_load, backfile, p);
+		else//the bz2 file can only be decompressed using single thread
+			p->m_aync_thread = thread(decompress_single_thread, backfile, p);
 
-	p->m_aync_thread = thread(bz_async_load, backfile, p);
-
-	if (!async) {
-		p->m_aync_thread.join();
-		if (! p->IsLoaded()) {
-			set_last_err_string("async data load failure\n");
-			return -1;
+		if (!async) {
+			p->m_aync_thread.join();
+			if (! p->IsLoaded()) {
+				set_last_err_string("async data load failure\n");
+				return -1;
+			}
 		}
 	}
-
 	return 0;
 }
 
