@@ -256,14 +256,26 @@ public:
 	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
 }g_fsfat;
 
-static class FSBz2 : public FSBackFile
+class FSCompressStream : public FSBackFile
+{
+public:
+	virtual bool exist(string backfile, string filename);
+	virtual int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
+};
+
+static class FSBz2 : public FSCompressStream
 {
 public:
 	FSBz2() { m_ext = ".BZ2"; };
 	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
-	virtual bool exist(string backfile, string filename);
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
 }g_fsbz2;
+
+static class FSGz : public FSCompressStream
+{
+public:
+	FSGz() { m_ext = ".GZ"; };
+	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
+}g_fsgz;
 
 static class FS_DATA
 {
@@ -276,6 +288,7 @@ public:
 		m_pFs.push_back(&g_fstar);
 		m_pFs.push_back(&g_fsbz2);
 		m_pFs.push_back(&g_fsfat);
+		m_pFs.push_back(&g_fsgz);
 	}
 
 	int get_file_timesample(string filename, uint64_t *ptimesame)
@@ -513,7 +526,7 @@ int FSFat::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p
 	return 0;
 }
 
-bool FSBz2::exist(string backfile, string filename)
+bool FSCompressStream::exist(string backfile, string filename)
 {
 	if (filename == "*")
 		return true;
@@ -521,7 +534,7 @@ bool FSBz2::exist(string backfile, string filename)
 	return false;
 }
 
-int FSBz2::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
+int FSCompressStream::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
 {
 
 	if(!g_fs_data.exist(backfile))
@@ -861,7 +874,8 @@ int FSBz2::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool 
 		shared_ptr<FileBuffer> decompressed_file=get_file_buffer(decompressed_name);
 		Tar tar;
 		tar.Open(decompressed_name);
-		tar.get_file_buff(filename,p);
+		if (tar.get_file_buff(filename, p))
+			return -1;
 		p->m_avaible_size = p->m_DataSize;
 	}
 	else
@@ -878,6 +892,65 @@ int FSBz2::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool 
 				return -1;
 			}
 		}
+	}
+	return 0;
+}
+
+int FSGz::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool async)
+{
+	if (!g_fs_data.exist(backfile))
+	{
+		string str;
+		str = "Failure open file:";
+		str += backfile;
+		set_last_err_string(str);
+		return -1;
+	}
+	if (filename != "*")
+	{
+		string star("/*");
+		string decompressed_name = backfile + star;
+		shared_ptr<FileBuffer> decompressed_file = get_file_buffer(decompressed_name);
+		Tar tar;
+		tar.Open(decompressed_name);
+		if (tar.get_file_buff(filename, p))
+			return -1;
+		p->m_avaible_size = p->m_DataSize;
+	}
+	else
+	{
+		gzFile fp = gzopen(backfile.c_str() + 1, "r");
+		if (fp == NULL)
+		{
+			set_last_err_string("Open file failure");
+			return -1;
+		}
+
+		shared_ptr<FileBuffer> pb = get_file_buffer(backfile);
+
+		p->reserve(pb->size() * 4); /* guest uncompress size */
+
+		size_t sz = 0x10000;
+		if (sz > pb->size() * 4)
+			sz = p->size();
+
+		size_t cur = 0;
+		while (!gzeof(fp))
+		{
+			size_t ret = gzread(fp, p->data() + cur, sz);
+			if (sz < 0)
+			{
+				set_last_err_string("decompress error");
+				return -1;
+			}
+			cur += ret;
+			p->reserve(cur + sz);
+		}
+
+		p->resize(cur);
+		p->m_avaible_size = cur;
+		gzclose(fp);
+		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 	}
 	return 0;
 }
