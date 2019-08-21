@@ -315,7 +315,14 @@ public:
 			m_cmd = nt.str;
 			m_cmd_start_time = nt.timestamp;
 		}
-		if (nt.type == uuu_notify::NOTIFY_TRANS_SIZE)
+		if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_START)
+		{
+			m_start_pos = 0;
+			m_cmd = nt.str;
+			m_cmd_start_time = nt.timestamp;
+			m_dev = "untar";
+		}
+		if (nt.type == uuu_notify::NOTIFY_TRANS_SIZE || nt.type == uuu_notify::NOTIFY_DECOMPRESS_SIZE)
 		{
 			m_trans_size = nt.total;
 			return false;
@@ -351,7 +358,7 @@ public:
 			if (m_status)
 				g_overall_failure++;
 		}
-		if (nt.type == uuu_notify::NOTIFY_TRANS_POS)
+		if (nt.type == uuu_notify::NOTIFY_TRANS_POS || nt.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
 		{
 			if (m_trans_size == 0) {
 
@@ -365,6 +372,7 @@ public:
 
 			m_trans_pos = nt.index;
 		}
+
 		return true;
 	}
 	void print_verbose(uuu_notify*nt)
@@ -391,7 +399,7 @@ public:
 			}
 		}
 
-		if (nt->type == uuu_notify::NOTIFY_TRANS_POS)
+		if (nt->type == uuu_notify::NOTIFY_TRANS_POS || nt->type == uuu_notify::NOTIFY_DECOMPRESS_POS)
 		{
 			if (m_trans_size)
 				cout << g_vt_yellow << "\r" << m_trans_pos * 100 / m_trans_size <<"%" << g_vt_default;
@@ -406,6 +414,10 @@ public:
 
 		if (nt->type == uuu_notify::NOTIFY_WAIT_FOR)
 			cout << "\r" << nt->str << " "<< g_wait[((g_wait_index++) & 0x3)];
+
+		if (nt->type == uuu_notify::NOTIFY_DECOMPRESS_START)
+			cout << "Decompress file:" << nt->str << endl;
+
 	}
 	void print(int verbose = 0, uuu_notify*nt=NULL)
 	{
@@ -513,31 +525,12 @@ void print_oneline(string str)
 
 }
 
-int pre_progress(uuu_notify nt)
-{
-	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_START)
-	{
-		return 1;
-	}
-	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_SIZE)
-	{
-		return 1;
-	}
-	if (nt.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
-	{
-		return 1;
-	}
-	return 0;
-}
 int progress(uuu_notify nt, void *p)
 {
 	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify>*)p;
 	map<string, ShowNotify>::iterator it;
 
 	std::lock_guard<std::mutex> lock(g_callback_mutex);
-
-	if (pre_progress(nt))
-		return 0;
 
 	if ((*np)[nt.id].update(nt))
 	{

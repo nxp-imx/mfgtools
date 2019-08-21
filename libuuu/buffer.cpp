@@ -930,9 +930,18 @@ int FSGz::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool a
 
 		p->reserve(pb->size() * 4); /* guest uncompress size */
 
-		size_t sz = 0x10000;
+		size_t sz = 0x100000;
 		if (sz > pb->size() * 4)
 			sz = p->size();
+
+		uuu_notify ut;
+		ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
+		ut.str = (char*)backfile.c_str();
+		call_notify(ut);
+
+		ut.type = uuu_notify::NOTIFY_DECOMPRESS_SIZE;
+		ut.total = pb->size();
+		call_notify(ut);
 
 		size_t cur = 0;
 		while (!gzeof(fp))
@@ -945,10 +954,19 @@ int FSGz::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool a
 			}
 			cur += ret;
 			p->reserve(cur + sz);
+
+			ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
+			ut.index = gzoffset(fp);
+			call_notify(ut);
 		}
 
 		p->resize(cur);
 		p->m_avaible_size = cur;
+
+		ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
+		ut.index = pb->size();
+		call_notify(ut);
+
 		gzclose(fp);
 		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 	}
