@@ -575,7 +575,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 		SparseFile sf;
 		size_t startblock;
-		chunk_header_t * pheader = SparseFile::get_next_chunk(pdata->data(), pos);
+		chunk_header_t * pheader;
 
 		uuu_notify nt;
 		nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
@@ -585,8 +585,10 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		sf.init_header(pfile->blk_sz, max / pfile->blk_sz);
 		startblock = 0;
 
-		do
+		for(size_t nblk=0; nblk < pfile->total_chunks && pos <= pdata->size(); nblk++)
 		{
+			pheader = SparseFile::get_next_chunk(pdata->data(), pos);
+
 			size_t sz = sf.push_one_chuck(pheader, pheader + 1);
 			if (sz == pheader->total_sz - sizeof(chunk_header_t))
 			{
@@ -623,8 +625,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 				} while (off < pos);
 			}
-			pheader = SparseFile::get_next_chunk(pdata->data(), pos);
-		} while (pos < pdata->size());
+		}
 
 		//send last data
 		if (flash(&fb, sf.m_data.data(), sf.m_data.size()))
