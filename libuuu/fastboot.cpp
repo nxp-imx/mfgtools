@@ -380,7 +380,11 @@ int FBCopy::run(CmdCtx *ctx)
 			nt.type = uuu_notify::NOTIFY_TRANS_POS;
 			nt.index += data.size();
 			call_notify(nt);
-		} while (nt.index < total);
+
+			if (data.size() == 0)
+				break;
+
+		} while (nt.index < total ||  total == 0 ); // If total is 0, it is stream
 
 		nt.type = uuu_notify::NOTIFY_TRANS_POS;
 		call_notify(nt);

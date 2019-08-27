@@ -237,6 +237,13 @@ int BulkTrans::read(void *buff, size_t size, size_t *rsize)
 	int ret;
 	int actual_lenght;
 	uint8_t *p = (uint8_t *)buff;
+
+	if (size == 0)
+	{
+		*rsize = 0;
+		return 0;
+	}
+
 	ret = libusb_bulk_transfer(
 		(libusb_device_handle *)m_devhandle,
 		m_ep_in.addr,
