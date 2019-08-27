@@ -319,7 +319,11 @@ int FBCopy::run(CmdCtx *ctx)
 
 			cmd.format("donwload:%08X", sz);
 			if (fb.Transport(cmd, buff->data() + i, sz))
+			{
+				if (fb.m_info == "EPIPE")
+					break;
 				return -1;
+			}
 
 			nt.type = uuu_notify::NOTIFY_TRANS_POS;
 			nt.index = i;
