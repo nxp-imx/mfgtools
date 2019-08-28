@@ -121,7 +121,7 @@ public:
 class FBEraseCmd : public FBCmd
 {
 public:
-	FBEraseCmd(char *p) : FBCmd(p) { m_fb_cmd = "erase"; }
+	FBEraseCmd(char *p) : FBCmd(p) { m_timeout = 60*60*1000;  m_fb_cmd = "erase"; }
 };
 
 class FBSetActiveCmd : public FBCmd
