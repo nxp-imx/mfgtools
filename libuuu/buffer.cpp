@@ -260,31 +260,53 @@ public:
 	virtual int get_file_timesample(string filename, uint64_t *ptime) { return 0; };
 }g_fshttp;
 
-int FSHttp::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
+int http_async_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p)
 {
-	HttpStream http;
-	if (http.HttpGetHeader(backfile, filename))
-		return -1;
+	size_t max = 0x10000;
 
-	size_t sz = http.HttpGetFileSize();
-
-	p->resize(sz);
-	size_t max = 0x100000;
-
-	for (size_t i = 0; i < sz; i += max)
+	for (size_t i = 0; i < p->size(); i += max)
 	{
-
-		size_t s = sz - i;
-
-		if (s > max)
-			s = max;
-
-		if (http.HttpDownload((char*)p->data() + i, s) < 0)
+		size_t sz = p->size() - i;
+		if (sz > max)
+			sz = max;
+		if (http->HttpDownload((char*)(p->data() + i), sz) < 0)
 			return -1;
+
+		p->m_avaible_size = i + sz;
+		p->m_request_cv.notify_all();
 	}
 
-	p->m_avaible_size = p->m_DataSize;
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+
+	return 0;
+}
+
+int FSHttp::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
+{
+	shared_ptr<HttpStream> http = make_shared<HttpStream>();
+
+	if (http->HttpGetHeader(backfile, filename))
+		return -1;
+
+	size_t sz = http->HttpGetFileSize();
+
+	p->resize(sz);
+
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
+
+	if (async)
+	{
+		p->m_aync_thread = thread(http_async_load, http, p);
+	}
+	else
+	{
+		if (http->HttpDownload((char*)p->data(), sz) < 0)
+			return -1;
+
+		p->m_avaible_size = p->m_DataSize;
+		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	}
+
 	return 0;
 }
 
@@ -351,12 +373,12 @@ public:
 	FS_DATA()
 	{
 		m_pFs.push_back(&g_fsflat);
-		m_pFs.push_back(&g_fshttp);
 		m_pFs.push_back(&g_fszip);
 		m_pFs.push_back(&g_fstar);
 		m_pFs.push_back(&g_fsbz2);
 		m_pFs.push_back(&g_fsfat);
 		m_pFs.push_back(&g_fsgz);
+		m_pFs.push_back(&g_fshttp);
 	}
 
 	int get_file_timesample(string filename, uint64_t *ptimesame)
@@ -725,7 +747,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 {
 	shared_ptr<FileBuffer> pbz;
 
-	pbz = get_file_buffer(filename);
+	pbz = get_file_buffer(filename, true);
 	if (pbz == NULL) {
 		string err;
 		err = "Failure get file buffer: ";
@@ -763,8 +785,18 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 #endif
 	}
 
+	size_t requested = 0;
 	for (size_t i = 0; i < pbz->size() - 10; i++)
 	{
+		if(i >= requested)
+		{
+			requested = i + 0x10000;
+			if (requested > pbz->size())
+				requested = pbz->size();
+			if(pbz->request_data(requested))
+				return -1;
+		}
+
 		uint16_t *header = (uint16_t *)p1++;
 		if (*header == 0x5a42) //"BZ"
 		{
@@ -850,9 +882,12 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 
 bool is_pbzip2_file(string filename)
 {
-	shared_ptr<FileBuffer> file=get_file_buffer(filename);
+	shared_ptr<FileBuffer> file=get_file_buffer(filename, true);
 	uint64_t filesize= file->size();
 	uint64_t readsize= (filesize< (1024*1024) )? filesize:(1024*1024); //read at most 1MB, because maximum block size is 900kb
+
+	file->request_data(readsize);
+
 	int header_num=0;
 	uint8_t* ptr= file->data();
 	for(size_t i =0 ; i < readsize ; i++)
@@ -1127,6 +1162,37 @@ int FileBuffer::reload(string filename, bool async)
 		return 0;
 	}
 	return -1;
+}
+
+int FileBuffer::request_data(size_t sz)
+{
+	assert(this->m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT);
+
+	if (IsLoaded())
+	{
+		if (sz > this->size())
+		{
+			set_last_err_string("exceed data size");
+			return -1;
+		}
+	}
+
+	std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
+	while ((sz > m_avaible_size) && !IsLoaded())
+	{
+		m_request_cv.wait(lck);
+	}
+
+	if (IsLoaded())
+	{
+		if (sz > m_avaible_size)
+		{
+			set_last_err_string("request offset execeed memory size");
+			return -1;
+		}
+	}
+
+	return 0;
 }
 
 int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)

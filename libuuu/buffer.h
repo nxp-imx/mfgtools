@@ -63,8 +63,10 @@ int file_overwrite_monitor(string filename, FileBuffer *p);
 
 //bit 0, data loaded
 //bit 1, data total size known
-#define FILEBUFFER_FLAG_LOADED		0x3 // LOADED must be knownsize
-#define FILEBUFFER_FLAG_KNOWN_SIZE	0x2
+#define FILEBUFFER_FLAG_LOADED_BIT		0x1
+#define FILEBUFFER_FLAG_KNOWN_SIZE_BIT  0x2
+#define FILEBUFFER_FLAG_LOADED		(FILEBUFFER_FLAG_LOADED_BIT|FILEBUFFER_FLAG_KNOWN_SIZE_BIT) // LOADED must be knownsize
+#define FILEBUFFER_FLAG_KNOWN_SIZE	FILEBUFFER_FLAG_KNOWN_SIZE_BIT
 
 class FileBuffer: public enable_shared_from_this<FileBuffer>
 {
@@ -154,12 +156,12 @@ public:
 
 	bool IsLoaded()
 	{
-		return m_dataflags & FILEBUFFER_FLAG_LOADED;
+		return m_dataflags & FILEBUFFER_FLAG_LOADED_BIT;
 	}
 
 	bool IsKnownSize()
 	{
-		return m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE;
+		return m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT;
 	}
 	uint8_t * data()
 	{
