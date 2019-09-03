@@ -3,11 +3,18 @@
 #include <windows.h>
 
 #pragma comment(lib, "Ws2_32.lib")
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#define INVALID_SOCKET -1
+#include <unistd.h>
 #endif
 
 #include "http.h"
 #include "libuuu.h"
 #include "liberror.h"
+#include <string.h>
 
 using namespace std;
 
@@ -176,6 +183,10 @@ int HttpStream::HttpDownload(char *buff, size_t sz)
 }
 HttpStream::~HttpStream()
 {
+#ifdef _WIN32
 	closesocket(m_socket);
 	WSACleanup();
+#else
+	close(m_socket);
+#endif
 }

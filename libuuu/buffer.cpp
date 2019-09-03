@@ -223,7 +223,7 @@ public:
 
 } g_fsflat;
 
-static class FSNetwork : public FSBasic
+class FSNetwork : public FSBasic
 {
 public:
 	virtual int split(string filename, string *outbackfile, string *outfilename, bool dir = false)
