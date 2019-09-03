@@ -289,6 +289,7 @@ public:
 	clock_t m_start_time;
 	uint64_t m_cmd_start_time;
 	uint64_t m_cmd_end_time;
+	bool m_IsEmptyLine;
 
 	ShowNotify()
 	{
@@ -298,6 +299,7 @@ public:
 		m_cmd_index = 0;
 		m_done = 0;
 		m_start_pos = 0;
+		m_IsEmptyLine = false;
 		m_start_time = clock();
 	}
 
@@ -321,6 +323,17 @@ public:
 			m_cmd = nt.str;
 			m_cmd_start_time = nt.timestamp;
 			m_dev = "untar";
+		}
+		if (nt.type == uuu_notify::NOTIFY_DOWNLOAD_START)
+		{
+			m_start_pos = 0;
+			m_cmd = nt.str;
+			m_cmd_start_time = nt.timestamp;
+			m_dev = "D"+ to_string(nt.id);
+		}
+		if (nt.type == uuu_notify::NOTIFY_DOWNLOAD_END)
+		{
+			m_IsEmptyLine = true;
 		}
 		if (nt.type == uuu_notify::NOTIFY_TRANS_SIZE || nt.type == uuu_notify::NOTIFY_DECOMPRESS_SIZE)
 		{
@@ -418,6 +431,9 @@ public:
 		if (nt->type == uuu_notify::NOTIFY_DECOMPRESS_START)
 			cout << "Decompress file:" << nt->str << endl;
 
+		if (nt->type == uuu_notify::NOTIFY_DOWNLOAD_START)
+			cout << "Download file:" << nt->str << endl;
+
 	}
 	void print(int verbose = 0, uuu_notify*nt=NULL)
 	{
@@ -442,6 +458,12 @@ public:
 		info = 14;
 		bar = 40;
 
+		if (m_IsEmptyLine)
+		{
+			string str(width, ' ');
+			cout << str;
+			return;
+		}
 		if (width <= bar + info + 3)
 		{
 			string_ex str;

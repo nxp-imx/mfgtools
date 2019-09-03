@@ -260,9 +260,18 @@ public:
 	virtual int get_file_timesample(string filename, uint64_t *ptime) { return 0; };
 }g_fshttp;
 
-int http_async_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p)
+int http_async_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string filename)
 {
 	size_t max = 0x10000;
+
+	uuu_notify ut;
+	ut.type = uuu_notify::NOTIFY_DOWNLOAD_START;
+	ut.str = (char*)filename.c_str();
+	call_notify(ut);
+
+	ut.type = uuu_notify::NOTIFY_TRANS_SIZE;
+	ut.total = p->size();
+	call_notify(ut);
 
 	for (size_t i = 0; i < p->size(); i += max)
 	{
@@ -274,10 +283,17 @@ int http_async_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p)
 
 		p->m_avaible_size = i + sz;
 		p->m_request_cv.notify_all();
+
+		ut.type = uuu_notify::NOTIFY_TRANS_POS;
+		ut.total = i + sz;
+		call_notify(ut);
 	}
 
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 
+	ut.type = uuu_notify::NOTIFY_DOWNLOAD_END;
+	ut.str = (char*)filename.c_str();
+	call_notify(ut);
 	return 0;
 }
 
@@ -296,7 +312,7 @@ int FSHttp::load(string backfile, string filename, shared_ptr<FileBuffer> p, boo
 
 	if (async)
 	{
-		p->m_aync_thread = thread(http_async_load, http, p);
+		p->m_aync_thread = thread(http_async_load, http, p, backfile + filename);
 	}
 	else
 	{
