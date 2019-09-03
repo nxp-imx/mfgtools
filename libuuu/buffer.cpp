@@ -43,6 +43,7 @@
 #include "bzlib.h"
 #include "stdio.h"
 #include <limits>
+#include "http.h"
 
 #ifdef _MSC_VER
 #define stat64 _stat64
@@ -67,12 +68,13 @@ class FSBasic
 {
 public:
 	const char * m_ext;
-	FSBasic() { m_ext = NULL; }
+	const char * m_Prefix;
+	FSBasic() { m_ext = NULL; m_Prefix = NULL; }
 	virtual int get_file_timesample(string filename, uint64_t *ptime)=0;
 	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)=0;
 	virtual bool exist(string backfile, string filename)=0;
 	virtual int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) = 0;
-	int split(string filename, string *outbackfile, string *outfilename, bool dir=false)
+	virtual int split(string filename, string *outbackfile, string *outfilename, bool dir=false)
 	{
 		string path = str_to_upper(filename);
 		if (m_ext == NULL || strlen(m_ext) == 0)
@@ -221,6 +223,71 @@ public:
 
 } g_fsflat;
 
+static class FSNetwork : public FSBasic
+{
+public:
+	virtual int split(string filename, string *outbackfile, string *outfilename, bool dir = false)
+	{
+		if (m_Prefix == NULL)
+			return -1;
+
+		if (filename.size() < strlen(m_Prefix))
+			return -1;
+
+		string path = str_to_upper(filename);
+		if (path.compare(1, strlen(m_Prefix), m_Prefix) == 0)
+		{
+			size_t pos;
+			pos = filename.find('/', 1 + strlen(m_Prefix));
+
+			*outbackfile = filename.substr(1 + strlen(m_Prefix), pos - 1 - strlen(m_Prefix));
+			*outfilename = filename.substr(pos);
+
+			return 0;
+		}
+
+		return -1;
+	}
+};
+
+static class FSHttp : public FSNetwork
+{
+public:
+	FSHttp() { m_Prefix = "HTTP://"; }
+	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
+	virtual bool exist(string backfile, string filename) { return true; };
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) { return 0; };
+	virtual int get_file_timesample(string filename, uint64_t *ptime) { return 0; };
+}g_fshttp;
+
+int FSHttp::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
+{
+	HttpStream http;
+	if (http.HttpGetHeader(backfile, filename))
+		return -1;
+
+	size_t sz = http.HttpGetFileSize();
+
+	p->resize(sz);
+	size_t max = 0x100000;
+
+	for (size_t i = 0; i < sz; i += max)
+	{
+
+		size_t s = sz - i;
+
+		if (s > max)
+			s = max;
+
+		if (http.HttpDownload((char*)p->data() + i, s) < 0)
+			return -1;
+	}
+
+	p->m_avaible_size = p->m_DataSize;
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	return 0;
+}
+
 class FSBackFile : public FSBasic
 {
 public:
@@ -284,6 +351,7 @@ public:
 	FS_DATA()
 	{
 		m_pFs.push_back(&g_fsflat);
+		m_pFs.push_back(&g_fshttp);
 		m_pFs.push_back(&g_fszip);
 		m_pFs.push_back(&g_fstar);
 		m_pFs.push_back(&g_fsbz2);
