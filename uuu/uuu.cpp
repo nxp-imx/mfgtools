@@ -78,6 +78,7 @@ char g_sample_cmd_list[] = {
 vector<string> g_usb_path_filter;
 
 int g_verbose = 0;
+static bool g_start_usb_transfer;
 
 class AutoCursor
 {
@@ -322,14 +323,14 @@ public:
 			m_start_pos = 0;
 			m_cmd = nt.str;
 			m_cmd_start_time = nt.timestamp;
-			m_dev = "untar";
+			m_dev = "Prep";
 		}
 		if (nt.type == uuu_notify::NOTIFY_DOWNLOAD_START)
 		{
 			m_start_pos = 0;
 			m_cmd = nt.str;
 			m_cmd_start_time = nt.timestamp;
-			m_dev = "D"+ to_string(nt.id);
+			m_dev = "Prep";
 		}
 		if (nt.type == uuu_notify::NOTIFY_DOWNLOAD_END)
 		{
@@ -390,6 +391,9 @@ public:
 	}
 	void print_verbose(uuu_notify*nt)
 	{
+		if (this->m_dev == "Prep" && g_start_usb_transfer)
+			return;
+
 		if (nt->type == uuu_notify::NOFITY_DEV_ATTACH)
 		{
 			cout << "New USB Device Attached at " << nt->str << endl;
@@ -511,14 +515,14 @@ public:
 			cout << " ";
 			print_auto_scroll(m_cmd, width - bar - info-1, m_start_pos);
 
-			if(clock() - m_start_time > CLOCKS_PER_SEC/4)
-			{
-				m_start_pos ++;
-				m_start_time = clock();
-			}
-			cout << endl;
+if (clock() - m_start_time > CLOCKS_PER_SEC / 4)
+{
+	m_start_pos++;
+	m_start_time = clock();
+}
+cout << endl;
 
-			return;
+return;
 		}
 	}
 };
@@ -534,7 +538,7 @@ void print_oneline(string str)
 
 	if (str.size() >= w)
 	{
-		str.resize(w-1);
+		str.resize(w - 1);
 		str[str.size() - 1] = '.';
 		str[str.size() - 2] = '.';
 		str[str.size() - 3] = '.';
@@ -547,6 +551,31 @@ void print_oneline(string str)
 
 }
 
+ShowNotify Summary(map<uint64_t, ShowNotify> *np)
+{
+	ShowNotify sn;
+	for (auto it = np->begin(); it != np->end(); it++)
+	{
+		if (it->second.m_dev == "Prep")
+		{
+			sn.m_trans_size += it->second.m_trans_size;
+			sn.m_trans_pos += it->second.m_trans_pos;
+		}
+		else
+		{
+			if (it->second.m_trans_pos || it->second.m_cmd_index)
+				g_start_usb_transfer = true; // Hidden HTTP download when USB start transfer
+		}
+	}
+
+	if(g_start_usb_transfer)
+		sn.m_IsEmptyLine = true; // Hidden HTTP download when USB start transfer
+
+	sn.m_dev = "Prep";
+	sn.m_cmd = "Http Download\\Uncompress";
+	return sn;
+}
+
 int progress(uuu_notify nt, void *p)
 {
 	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify>*)p;
@@ -556,12 +585,16 @@ int progress(uuu_notify nt, void *p)
 
 	if ((*np)[nt.id].update(nt))
 	{
-		if(!(*np)[nt.id].m_dev.empty())
-			g_map_path_nt[(*np)[nt.id].m_dev] = (*np)[nt.id];
+		if (!(*np)[nt.id].m_dev.empty())
+			if ((*np)[nt.id].m_dev != "Prep")
+				g_map_path_nt[(*np)[nt.id].m_dev] = (*np)[nt.id];
 
 		if (g_verbose)
 		{
-			(*np)[nt.id].print(g_verbose, &nt);
+			if((*np)[nt.id].m_dev == "Prep")
+				Summary(np).print(g_verbose, &nt);
+			else
+				(*np)[nt.id].print(g_verbose, &nt);
 		}
 		else
 		{
@@ -580,15 +613,21 @@ int progress(uuu_notify nt, void *p)
 
 			print_oneline(str);
 			print_oneline("");
+			if ((*np)[nt.id].m_dev == "Prep" && !g_start_usb_transfer)
+			{
+				Summary(np).print();
+			}else
+				print_oneline("");
 
 			for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
 				it->second.print();
 
-			for (size_t i = 0; i < g_map_path_nt.size() + 2; i++)
+			for (size_t i = 0; i < g_map_path_nt.size() + 3; i++)
 				cout << "\x1B[1F";
+
 		}
 
-		(*np)[nt.id] = g_map_path_nt[(*np)[nt.id].m_dev];
+		//(*np)[nt.id] = g_map_path_nt[(*np)[nt.id].m_dev];
 	}
 
 	if (nt.type == uuu_notify::NOTIFY_THREAD_EXIT)
