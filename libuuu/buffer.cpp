@@ -279,8 +279,11 @@ int http_async_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, strin
 		if (sz > max)
 			sz = max;
 		if (http->HttpDownload((char*)(p->data() + i), sz) < 0)
+		{
+			atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_ERROR_BIT);
+			p->m_request_cv.notify_all();
 			return -1;
-
+		}
 		p->m_avaible_size = i + sz;
 		p->m_request_cv.notify_all();
 
@@ -313,6 +316,9 @@ int FSHttp::load(string backfile, string filename, shared_ptr<FileBuffer> p, boo
 	if (async)
 	{
 		p->m_aync_thread = thread(http_async_load, http, p, backfile + filename);
+#ifdef WIN32
+		SetThreadPriority(p->m_aync_thread.native_handle(), THREAD_PRIORITY_BELOW_NORMAL);
+#endif
 	}
 	else
 	{
@@ -705,10 +711,15 @@ int bz2_decompress(shared_ptr<FileBuffer> pbz, shared_ptr<FileBuffer> p, bz2_blk
 
 	while (pblk->top + 1 < pblk->bottom)
 	{
+		if (p->IsError())
+			return -1;
+
 		{
 			std::unique_lock<std::mutex> lck(pblk->con_mutex);
 			while (pblk->top + 1 >= pblk->blk.size()) {
 				pblk->cv.wait(lck);
+				if (p->IsError())
+					return -1;
 			}
 		}
 
@@ -809,8 +820,16 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 			requested = i + 0x10000;
 			if (requested > pbz->size())
 				requested = pbz->size();
-			if(pbz->request_data(requested))
+			if (pbz->request_data(requested))
+			{
+				atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_ERROR_BIT);
+				blks.cv.notify_all();
+				for (int i = 0; i < nthread; i++)
+				{
+					threads[i].join();
+				}
 				return -1;
+			}
 		}
 
 		uint16_t *header = (uint16_t *)p1++;
@@ -1196,6 +1215,11 @@ int FileBuffer::request_data(size_t sz)
 	std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
 	while ((sz > m_avaible_size) && !IsLoaded())
 	{
+		if (IsError())
+		{
+			set_last_err_string("Async request data error");
+			return -1;
+		}
 		m_request_cv.wait(lck);
 	}
 
@@ -1229,6 +1253,11 @@ int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 		std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
 		while ((offset + sz > m_avaible_size) && !IsLoaded())
 		{
+			if (IsError())
+			{
+				set_last_err_string("Async request data error");
+				return -1;
+			}
 			m_request_cv.wait(lck);
 		}
 

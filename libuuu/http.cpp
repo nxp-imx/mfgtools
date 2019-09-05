@@ -42,6 +42,16 @@ int HttpStream::HttpGetHeader(std::string host, std::string path)
 
 	m_socket = socket(pAddrInfo->ai_family, pAddrInfo->ai_socktype, pAddrInfo->ai_protocol);
 
+	struct timeval tv;
+	tv.tv_sec = 10;
+	tv.tv_usec = 0;
+
+#ifdef _WIN32
+	DWORD timeout = tv.tv_sec * 1000;
+	setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
+#else
+	setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv));
+#endif
 	if (m_socket == INVALID_SOCKET)
 	{
 		set_last_err_string("Can't get sock");
@@ -163,7 +173,7 @@ int HttpStream::HttpDownload(char *buff, size_t sz)
 
 	if (trim_transfered < sz)
 	{
-		size_t ret = 0;
+		int ret = 0;
 		sz -= trim_transfered;
 		buff += trim_transfered;
 		while ( (ret = recv(m_socket, buff, sz, 0)) > 0)

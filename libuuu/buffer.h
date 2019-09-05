@@ -65,6 +65,8 @@ int file_overwrite_monitor(string filename, FileBuffer *p);
 //bit 1, data total size known
 #define FILEBUFFER_FLAG_LOADED_BIT		0x1
 #define FILEBUFFER_FLAG_KNOWN_SIZE_BIT  0x2
+#define FILEBUFFER_FLAG_ERROR_BIT		0x4
+
 #define FILEBUFFER_FLAG_LOADED		(FILEBUFFER_FLAG_LOADED_BIT|FILEBUFFER_FLAG_KNOWN_SIZE_BIT) // LOADED must be knownsize
 #define FILEBUFFER_FLAG_KNOWN_SIZE	FILEBUFFER_FLAG_KNOWN_SIZE_BIT
 
@@ -162,6 +164,11 @@ public:
 	bool IsKnownSize()
 	{
 		return m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT;
+	}
+
+	bool IsError()
+	{
+		return m_dataflags & FILEBUFFER_FLAG_ERROR_BIT;
 	}
 	uint8_t * data()
 	{
