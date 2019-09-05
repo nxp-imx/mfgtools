@@ -82,6 +82,20 @@ public:
 	int m_read_timeout;
 	HIDTrans() { m_set_report = 9; m_read_timeout = 1000; m_outEP = 0; }
 	void set_hid_out_ep(int ep) { m_outEP = ep; }
+
+	virtual int open(void *p)
+	{
+		if (USBTrans::open(p))
+			return -1;
+
+		for (int i = 0; i < m_EPs.size(); i++)
+		{
+			if (m_EPs[i].addr > 0 && ((m_EPs[i].addr & 0x80) == 0))
+				m_outEP = m_EPs[i].addr;
+		}
+
+		return 0;
+	}
 	~HIDTrans() { if (m_devhandle) close();  m_devhandle = NULL;  }
 	int write(void *buff, size_t size);
 	int read(void *buff, size_t size, size_t *return_size);
