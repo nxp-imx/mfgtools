@@ -88,6 +88,8 @@ public:
 	{
 		init();
 		m_pdev = trans;
+		if (((HIDTrans*)trans)->m_outEP)
+			m_size_out = 1020;
 	}
 
 	int read(vector<uint8_t> &buff)
