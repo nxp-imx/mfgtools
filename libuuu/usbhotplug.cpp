@@ -335,3 +335,41 @@ int uuu_add_usbpath_filter(const char *path)
 	g_filter_usbpath.push_back(path);
 	return 0;
 }
+
+int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
+{
+	if (libusb_init(NULL) < 0)
+	{
+		set_last_err_string("Call libusb_init failure");
+		return -1;
+	}
+
+	libusb_device **newlist = NULL;
+	libusb_get_device_list(NULL, &newlist);
+	size_t i = 0;
+	libusb_device *dev;
+
+	while ((dev = newlist[i++]) != NULL)
+	{
+		struct libusb_device_descriptor desc;
+		int r = libusb_get_device_descriptor(dev, &desc);
+		if (r < 0) {
+			set_last_err_string("failure get device descrior");
+			return -1;
+		}
+		string str = get_device_path(dev);
+
+		ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
+		if (item)
+		{
+			if (fn(str.c_str(), item->m_chip.c_str(), item->m_protocol.c_str(), desc.idVendor, desc.idProduct, desc.bcdDevice, p))
+			{
+				set_last_err_string("call back return error");
+				return -1;
+			}
+		}
+	}
+
+	libusb_free_device_list(newlist, 1);
+	libusb_exit(NULL);
+}

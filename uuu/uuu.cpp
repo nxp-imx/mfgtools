@@ -136,6 +136,7 @@ void print_help(bool detail = false)
 		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
 		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
 		"uuu -udev       linux: show udev rule to avoid sudo each time \n"
+		"uuu -lsusb      List connected know devices\n"
 		"uuu -h -H       show help, -H means detail helps\n\n";
 	printf("%s", help);
 	printf("uuu [-d -m -v] -b[run] ");
@@ -769,6 +770,21 @@ void print_udev()
 	fprintf(stderr, "\tsudo udevadm control --reload-rules\n");
 }
 
+int print_usb_device(const char *path, const char *chip, const char *pro, uint16_t vid, uint16_t pid, uint16_t bcd, void *p)
+{
+	printf("\t%s\t %s\t %s\t 0x%04X\t0x%04X\t 0x%04X\n", path, chip, pro, vid, pid, bcd);
+	return 0;
+}
+
+void print_lsusb()
+{
+	cout << "Connected Known USB Devices\n";
+	printf("\tPath\t Chip\t Pro\t Vid\t Pid\t BcdVersion\n");
+	printf("\t==================================================\n");
+
+	uuu_for_each_devices(print_usb_device, NULL);
+}
+
 int main(int argc, char **argv)
 {
 	if (auto_complete(argc, argv) == 0)
@@ -850,6 +866,11 @@ int main(int argc, char **argv)
 				i++;
 				uuu_add_usbpath_filter(argv[i]);
 				g_usb_path_filter.push_back(argv[i]);
+			}
+			else if (s == "-lsusb")
+			{
+				print_lsusb();
+				return 0;
 			}
 			else if (s == "-b" || s == "-brun")
 			{
