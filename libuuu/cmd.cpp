@@ -779,7 +779,9 @@ int uuu_wait_uuu_finish(int deamon, int dry)
 	if (!deamon)
 		uuu_register_notify_callback(notify_done, &exit);
 
-	polling_usb(exit);
+	if(polling_usb(exit))
+		return -1;
 
 	return 0;
 }
+

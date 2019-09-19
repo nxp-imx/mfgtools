@@ -133,6 +133,7 @@ void print_help(bool detail = false)
 		"    -dry	 Dry run mode, check if script or cmd correct \n"
 		"    -m          USBPATH Only monitor these paths.\n"
 		"                    -m 1:2 -m 1:3\n\n"
+		"    -t          Timeout second for wait known usb device appeared\n"
 		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
 		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
 		"uuu -udev       linux: show udev rule to avoid sudo each time \n"
@@ -867,6 +868,11 @@ int main(int argc, char **argv)
 				uuu_add_usbpath_filter(argv[i]);
 				g_usb_path_filter.push_back(argv[i]);
 			}
+			else if (s == "-t")
+			{
+				i++;
+				uuu_set_wait_timeout(atoll(argv[i]));
+			}
 			else if (s == "-lsusb")
 			{
 				print_lsusb();
@@ -1018,7 +1024,11 @@ int main(int argc, char **argv)
 		return ret;
 	}
 
-	uuu_wait_uuu_finish(deamon, dryrun);
+	if (uuu_wait_uuu_finish(deamon, dryrun))
+	{
+		cout << g_vt_red << "\nError: " << g_vt_default << uuu_get_last_err_string();
+		return -1;
+	}
 
 	runshell(shell);
 
