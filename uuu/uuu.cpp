@@ -44,6 +44,8 @@
 #include <string.h>
 #include <signal.h>
 #include "buildincmd.h"
+#include <string>
+#include <streambuf>
 
 #include "../libuuu/libuuu.h"
 
@@ -880,7 +882,7 @@ int main(int argc, char **argv)
 			}
 			else if (s == "-b" || s == "-brun")
 			{
-				if (i + 1 == argc || g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end())
+				if (i + 1 == argc)
 				{
 					printf("error, must be have script name: ");
 					g_BuildScripts.ShowCmds();
@@ -900,7 +902,35 @@ int main(int argc, char **argv)
 					args.push_back(s);
 				}
 
-				cmd_script = g_BuildScripts[argv[i + 1]].replace_script_args(args);
+				// if script name is not build-in, try to look for a file
+				if (g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end()) {
+					BuildCmd tmpCmd;
+					string tmpCmdFileName = argv[i + 1];
+					tmpCmd.m_cmd = tmpCmdFileName.c_str();
+
+					size_t filesize;
+
+					std::ifstream t(tmpCmdFileName);
+					std::string fileContents((std::istreambuf_iterator<char>(t)),
+						std::istreambuf_iterator<char>());
+
+					if (fileContents.empty()) {
+						printf("%s is not built-in script or fail load external script file", tmpCmdFileName.c_str());
+						return -1;
+					}
+
+					tmpCmd.m_buildcmd = fileContents.c_str();
+
+					tmpCmd.m_desc = "Script loaded from file";
+
+					BuildInScript tmpBuildInScript(&tmpCmd);
+					g_BuildScripts[tmpCmdFileName] = tmpBuildInScript;
+
+					cmd_script = g_BuildScripts[tmpCmdFileName].replace_script_args(args);
+				}
+				else {
+					cmd_script = g_BuildScripts[argv[i + 1]].replace_script_args(args);
+				}
 				break;
 			}
 			else if (s == "-bshow")
