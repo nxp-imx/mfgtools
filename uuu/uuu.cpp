@@ -46,7 +46,6 @@
 #include "buildincmd.h"
 
 #include "../libuuu/libuuu.h"
-#include "../libuuu/buffer.h"
 
 char * g_vt_yellow = (char*)"\x1B[93m";
 char * g_vt_default = (char*) "\x1B[0m";
@@ -907,11 +906,12 @@ int main(int argc, char **argv)
 					string tmpCmdFileName = argv[i + 1];
 					tmpCmd.m_cmd = tmpCmdFileName.c_str();
 
-					shared_ptr<FileBuffer> buffer = get_file_buffer(tmpCmdFileName);
-					if (buffer == NULL)
+					size_t filesize;
+					char* fileContents = (char *) uuu_get_file_buffer(tmpCmdFileName.c_str(), &filesize);
+					if (fileContents == NULL)
 						return -1;
 
-					tmpCmd.m_buildcmd = (char*)buffer->data();
+					tmpCmd.m_buildcmd = fileContents;
 
 					tmpCmd.m_desc = "Script loaded from file";
 
