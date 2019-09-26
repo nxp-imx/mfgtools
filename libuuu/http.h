@@ -9,10 +9,16 @@ class HttpStream
 	std::map<std::string, std::string> m_response;
 	size_t			m_data_start;
 
+#ifdef _WIN32
+	void far * m_hSession;
+	void far * m_hConnect;
+	void far * m_hRequest;
+#endif
+
 	int parser_response(std::string rep);
 public:
 	HttpStream();
-	int HttpGetHeader(std::string host, std::string path);
+	int HttpGetHeader(std::string host, std::string path, int port = 80);
 	size_t HttpGetFileSize();
 	uint64_t HttpGetModifyTime();
 	int HttpDownload(char *buff, size_t sz);
