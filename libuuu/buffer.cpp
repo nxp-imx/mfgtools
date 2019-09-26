@@ -252,13 +252,21 @@ public:
 
 static class FSHttp : public FSNetwork
 {
+protected:
+	int m_Port;
 public:
-	FSHttp() { m_Prefix = "HTTP://"; }
+	FSHttp() { m_Prefix = "HTTP://"; m_Port = 80; }
 	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
 	virtual bool exist(string backfile, string filename) { return true; };
 	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) { return 0; };
 	virtual int get_file_timesample(string filename, uint64_t *ptime) { return 0; };
 }g_fshttp;
+
+static class FSHttps : public FSHttp
+{
+public:
+	FSHttps() { m_Prefix = "HTTPS://"; m_Port = 443; }
+}g_fshttps;
 
 int http_async_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string filename)
 {
@@ -304,7 +312,7 @@ int FSHttp::load(string backfile, string filename, shared_ptr<FileBuffer> p, boo
 {
 	shared_ptr<HttpStream> http = make_shared<HttpStream>();
 
-	if (http->HttpGetHeader(backfile, filename))
+	if (http->HttpGetHeader(backfile, filename, m_Port))
 		return -1;
 
 	size_t sz = http->HttpGetFileSize();
@@ -400,6 +408,7 @@ public:
 		m_pFs.push_back(&g_fsbz2);
 		m_pFs.push_back(&g_fsfat);
 		m_pFs.push_back(&g_fsgz);
+		m_pFs.push_back(&g_fshttps);
 		m_pFs.push_back(&g_fshttp);
 	}
 

@@ -1,8 +1,8 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #include <windows.h>
-
-#pragma comment(lib, "Ws2_32.lib")
+#include <winhttp.h>
+#pragma comment(lib, "Winhttp.lib")
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -15,21 +15,167 @@
 #include "libuuu.h"
 #include "liberror.h"
 #include <string.h>
+#include <locale>
+#include <codecvt>
 
 using namespace std;
+
+#ifdef _WIN32
+/* Win32 implement*/
 
 HttpStream::HttpStream()
 {
 	m_buff.empty();
-#ifdef _WIN32
-	WSADATA wsaData;
-	int result;
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData))
-		set_last_err_string("WSA setup error");
-#endif
+	m_socket = 0;
+	m_hConnect = 0;
+	m_hSession = 0;
+	m_hRequest = 0;
 }
 
-int HttpStream::HttpGetHeader(std::string host, std::string path)
+int HttpStream::HttpGetHeader(std::string host, std::string path, int port)
+{
+
+	m_hSession = WinHttpOpen(L"WinHTTP UUU/1.0",
+		WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+		WINHTTP_NO_PROXY_NAME,
+		WINHTTP_NO_PROXY_BYPASS, 0);
+
+	if (!m_hSession)
+	{
+		set_last_err_string("fail WinHttpOpen");
+		return -1;
+	}
+
+	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+	wstring whost = converter.from_bytes(host);
+
+	if (m_hSession)
+		m_hConnect = WinHttpConnect(m_hSession, whost.c_str(),
+			port, 0);
+
+	if (!m_hConnect)
+	{
+		set_last_err_string("Fail Connection");
+		return -1;
+	}
+
+	wstring wpath = converter.from_bytes(path);
+
+	m_hRequest = WinHttpOpenRequest(m_hConnect, L"GET", wpath.c_str(),
+			NULL, WINHTTP_NO_REFERER,
+			WINHTTP_DEFAULT_ACCEPT_TYPES,
+			port==443?WINHTTP_FLAG_SECURE:0);
+
+	BOOL  bResults = FALSE;
+	if (!m_hRequest)
+	{
+		set_last_err_string("Fail WinHttpOpenRequest");
+		return -1;
+	}
+
+	bResults = WinHttpSendRequest(m_hRequest,
+			WINHTTP_NO_ADDITIONAL_HEADERS, 0,
+			WINHTTP_NO_REQUEST_DATA, 0,
+			0, 0);
+
+	if (!bResults)
+	{
+		set_last_err_string("Fail WinHttpSendRequest");
+		return -1;
+	}
+
+	bResults = WinHttpReceiveResponse(m_hRequest, NULL);
+
+	if (!bResults)
+	{
+		set_last_err_string("Fail WinHttpReceiveResponse");
+		return -1;
+	}
+
+	DWORD status = 0;
+	DWORD dwSize = sizeof(status);
+	WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER,
+		WINHTTP_HEADER_NAME_BY_INDEX, &status,
+		&dwSize, WINHTTP_NO_HEADER_INDEX);
+
+	if (status != HTTP_STATUS_OK)
+	{
+		set_last_err_string("HTTP status is not okay");
+		return -1;
+	}
+	return 0;
+}
+
+size_t HttpStream::HttpGetFileSize()
+{
+	DWORD dwSize = 0;
+	BOOL  bResults = FALSE;
+	wstring out;
+
+	WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_CONTENT_LENGTH,
+		WINHTTP_HEADER_NAME_BY_INDEX, NULL,
+		&dwSize, WINHTTP_NO_HEADER_INDEX);
+
+	// Allocate memory for the buffer.
+	if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+	{
+		out.resize(dwSize / sizeof(WCHAR));
+
+		// Now, use WinHttpQueryHeaders to retrieve the header.
+		bResults = WinHttpQueryHeaders(m_hRequest,
+			WINHTTP_QUERY_CONTENT_LENGTH,
+			WINHTTP_HEADER_NAME_BY_INDEX,
+			(LPVOID)out.c_str(), &dwSize,
+			WINHTTP_NO_HEADER_INDEX);
+	}
+	return _wtoll(out.c_str());
+}
+
+int HttpStream::HttpDownload(char *buff, size_t sz)
+{
+	DWORD dwSize = 0;
+	DWORD dwDownloaded = 0;
+	while (sz)
+	{
+		if (!WinHttpQueryDataAvailable(m_hRequest, &dwSize))
+		{
+			set_last_err_string("WinHttpQueryDataAvailable");
+			return -1;
+		}
+
+		if (dwSize > sz)
+			dwSize = sz;
+
+		if (!WinHttpReadData(m_hRequest, (LPVOID)buff,
+			dwSize, &dwDownloaded))
+		{
+			set_last_err_string("Fail at WinHttpReadData");
+			return -1;
+		}
+		buff += dwDownloaded;
+		sz -= dwDownloaded;
+	}
+	return 0;
+}
+
+HttpStream::~HttpStream()
+{
+	if (m_hRequest)
+		WinHttpCloseHandle(m_hRequest);
+	if (m_hConnect)
+		WinHttpCloseHandle(m_hConnect);
+	if (m_hSession)
+		WinHttpCloseHandle(m_hSession);
+}
+
+#else
+
+HttpStream::HttpStream()
+{
+	m_buff.empty();
+}
+
+int HttpStream::HttpGetHeader(std::string host, std::string path, int port)
 {
 	int ret;
 	addrinfo *pAddrInfo;
@@ -46,12 +192,8 @@ int HttpStream::HttpGetHeader(std::string host, std::string path)
 	tv.tv_sec = 10;
 	tv.tv_usec = 0;
 
-#ifdef _WIN32
-	DWORD timeout = tv.tv_sec * 1000;
-	setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
-#else
 	setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv));
-#endif
+
 	if (m_socket == INVALID_SOCKET)
 	{
 		set_last_err_string("Can't get sock");
@@ -191,12 +333,10 @@ int HttpStream::HttpDownload(char *buff, size_t sz)
 
 	return 0;
 }
+
 HttpStream::~HttpStream()
 {
-#ifdef _WIN32
-	closesocket(m_socket);
-	WSACleanup();
-#else
 	close(m_socket);
-#endif
 }
+
+#endif
