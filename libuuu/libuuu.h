@@ -135,6 +135,4 @@ int uuu_set_wait_timeout(int second);
  */
 void uuu_set_debug_level(uint32_t mask);
 
-void* uuu_get_file_buffer(const char* in_filename, size_t* out_size);
-
 #endif

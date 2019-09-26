@@ -1186,18 +1186,6 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 	}
 }
 
-void *uuu_get_file_buffer(const char *in_filename, size_t *out_size)
-{
-	shared_ptr<FileBuffer> fb = get_file_buffer(in_filename);
-	if (fb == NULL) {
-		return NULL;
-	}
-	else {
-		*out_size = fb->size();
-		return (void*)fb->data();
-	}
-}
-
 int FileBuffer::reload(string filename, bool async)
 {
 	atomic_init(&this->m_dataflags, 0);

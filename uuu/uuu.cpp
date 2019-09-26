@@ -44,6 +44,8 @@
 #include <string.h>
 #include <signal.h>
 #include "buildincmd.h"
+#include <string>
+#include <streambuf>
 
 #include "../libuuu/libuuu.h"
 
@@ -907,11 +909,15 @@ int main(int argc, char **argv)
 					tmpCmd.m_cmd = tmpCmdFileName.c_str();
 
 					size_t filesize;
-					char* fileContents = (char *) uuu_get_file_buffer(tmpCmdFileName.c_str(), &filesize);
-					if (fileContents == NULL)
+					
+					std::ifstream t(tmpCmdFileName);
+					std::string fileContents((std::istreambuf_iterator<char>(t)),
+						std::istreambuf_iterator<char>());
+
+					if (fileContents.empty())
 						return -1;
 
-					tmpCmd.m_buildcmd = fileContents;
+					tmpCmd.m_buildcmd = fileContents.c_str();
 
 					tmpCmd.m_desc = "Script loaded from file";
 
