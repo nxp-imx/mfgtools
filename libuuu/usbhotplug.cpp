@@ -400,6 +400,8 @@ int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 
 	libusb_free_device_list(newlist, 1);
 	libusb_exit(NULL);
+
+	return 0;
 }
 
 int uuu_set_wait_timeout(int second)
