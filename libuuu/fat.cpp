@@ -172,7 +172,7 @@ int Fat::get_file_buff(string filename, shared_ptr<FileBuffer>p)
 		if (cur == 0xFFFF)
 		{
 			set_last_err_string("Early finished at fat");
-			return NULL;
+			return -1;
 		}
 		void *pcluster = get_data_buff(pbuff, cur);
 		memcpy(p->data() + off, pcluster, sz);
