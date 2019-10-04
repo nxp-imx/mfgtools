@@ -15,6 +15,7 @@ class HttpStream
 	void far * m_hRequest;
 #endif
 
+	void * m_ssl;
 	int parser_response(std::string rep);
 public:
 	HttpStream();
@@ -23,4 +24,6 @@ public:
 	uint64_t HttpGetModifyTime();
 	int HttpDownload(char *buff, size_t sz);
 	~HttpStream();
+	int RecvPacket(char *buff, size_t sz);
+	int SendPacket(char *buff, size_t sz);
 };

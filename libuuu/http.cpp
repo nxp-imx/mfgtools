@@ -18,6 +18,29 @@
 #include <locale>
 #include <codecvt>
 
+#ifdef UUUSSL
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+
+class CUUUSSL
+{
+public:
+	CUUUSSL()
+	{
+		SSL_library_init();
+		SSLeay_add_ssl_algorithms();
+		SSL_load_error_strings();
+	}
+	~CUUUSSL()
+	{
+	}
+};
+
+static CUUUSSL g_uuussl;
+
+#endif
+
+
 using namespace std;
 
 #ifdef _WIN32
@@ -173,14 +196,36 @@ HttpStream::~HttpStream()
 HttpStream::HttpStream()
 {
 	m_buff.empty();
+	m_ssl = NULL;
+}
+
+int HttpStream::SendPacket(char *buff, size_t sz)
+{
+#ifdef UUUSSL
+	if(m_ssl)
+		return SSL_write((SSL*)m_ssl, buff, sz);
+#endif
+	return send(m_socket, buff, sz, 0);
+}
+
+
+int HttpStream::RecvPacket(char *buff, size_t sz)
+{
+#ifdef UUUSSL
+	if(m_ssl)
+		return SSL_read((SSL*)m_ssl, buff, sz);
+#endif
+	return recv(m_socket, buff, sz, 0);
 }
 
 int HttpStream::HttpGetHeader(std::string host, std::string path, int port)
 {
 	int ret;
 	addrinfo *pAddrInfo;
+	char s_port[10];
+	snprintf(s_port, 10, "%d", port);
 
-	if (getaddrinfo(host.c_str(), "80", 0, &pAddrInfo))
+	if (getaddrinfo(host.c_str(), s_port, 0, &pAddrInfo))
 	{
 		set_last_err_string("get network address error");
 		return -1;
@@ -206,10 +251,46 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port)
 		return -1;
 	}
 
-	string request = "GET " + path + " HTTP/1/1\nHost: " + host + "\n\n";
+	if(port == 443)
+	{
+#ifdef UUUSSL
 
-	ret = send(m_socket, request.c_str(), request.size(), 0);
+		const SSL_METHOD *meth = TLSv1_2_client_method();
+		if(!meth)
+		{
+			set_last_err_string("Failure at TLSv1_2_client_method\n");
+			return -1;
+		}
+		SSL_CTX *ctx = SSL_CTX_new (meth);
+		if(!ctx)
+		{
+			set_last_err_string("Error create ssl ctx\n");
+			return -1;
+		}
+		m_ssl = SSL_new (ctx);
+		if(!m_ssl)
+		{
+			set_last_err_string("Error create SSL\n");
+			return -1;
+		}
+		SSL_set_fd((SSL*)m_ssl, m_socket);
+		if( SSL_connect((SSL*)m_ssl) <= 0)
+		{
+			set_last_err_string("error build ssl connection");
+			return -1;
+		}
+#else
+		set_last_err_string("Can't support https");
+		return -1;
+#endif
+        }
 
+	if(port == 443)
+		path = "https://" + host + path;
+
+	string request = "GET " + path + " HTTP/1.1\nHost: " + host + "\n\n";
+
+	ret = SendPacket((char*)request.c_str(), request.size());
 	if (ret != request.size())
 	{
 		set_last_err_string("http send error");
@@ -217,9 +298,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port)
 	}
 
 	m_buff.resize(1024);
-
-	ret = recv(m_socket, (char*)m_buff.data(), m_buff.size(), 0);
-
+	ret = RecvPacket((char*)m_buff.data(), m_buff.size());
 	if (ret < 0)
 	{
 		set_last_err_string("http recv Error");
@@ -318,7 +397,7 @@ int HttpStream::HttpDownload(char *buff, size_t sz)
 		int ret = 0;
 		sz -= trim_transfered;
 		buff += trim_transfered;
-		while ( (ret = recv(m_socket, buff, sz, 0)) > 0)
+		while ( (ret = RecvPacket(buff, sz)) > 0)
 		{
 			buff += ret;
 			sz -= ret;
@@ -337,6 +416,13 @@ int HttpStream::HttpDownload(char *buff, size_t sz)
 HttpStream::~HttpStream()
 {
 	close(m_socket);
+#ifdef UUUSSL
+	if(m_ssl)
+	{
+		SSL_CTX_free(SSL_get_SSL_CTX((SSL*)m_ssl));
+		SSL_free((SSL*)m_ssl);
+	}
+#endif
 }
 
 #endif

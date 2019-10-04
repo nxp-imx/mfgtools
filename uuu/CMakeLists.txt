@@ -8,7 +8,7 @@ pkg_check_modules(LIBUSB REQUIRED libusb-1.0>=1.0.16)
 pkg_check_modules(LIBZIP REQUIRED libzip)
 pkg_check_modules(LIBZ REQUIRED zlib)
 find_package(Threads)
-
+find_package(OpenSSL)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O2")
 
@@ -64,6 +64,6 @@ set(SOURCES
 )
 
 add_executable(uuu ${SOURCES})
-target_link_libraries(uuu uuc_s  ${LIBUSB_LIBRARIES} ${LIBZIP_LIBRARIES} ${LIBZ_LIBRARIES} bz2)
+target_link_libraries(uuu uuc_s ${OPENSSL_SSL_LIBRARY} ${OPENSSL_LIBRARIES} ${OPENSSL_CRYPTO_LIBRARY} ${LIBUSB_LIBRARIES} ${LIBZIP_LIBRARIES} ${LIBZ_LIBRARIES} bz2)
 
 install(TARGETS uuu DESTINATION bin)
