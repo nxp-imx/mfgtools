@@ -8,11 +8,16 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0>=1.0.16)
 pkg_check_modules(LIBZIP REQUIRED libzip)
 find_package(Threads)
+find_package(OpenSSL)
 
 include_directories(${LIBUSB_INCLUDE_DIRS} include)
 
-set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wstrict-aliasing -Wextra")
-set(CMAKE_CXX_FLAGS "-O2")
+if(OPENSSL_FOUND)
+set(UUUSSL "-DUUUSSL")
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wstrict-aliasing -Wextra ${UUUSSL}")
+set(CMAKE_CXX_FLAGS "-O2 ${UUUSSL}")
 
 set(SOURCES
 	error.cpp
