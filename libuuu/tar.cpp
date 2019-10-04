@@ -22,6 +22,9 @@ int Tar::Open(string filename)
 	m_tarfilename=filename;
 
 	shared_ptr<FileBuffer> file = get_file_buffer(filename);
+	if(file == NULL)
+		return -1;
+
 	uint8_t* data=file->data();
 	uint64_t block_counter=0;
 	while(!end_of_file)

@@ -1027,6 +1027,8 @@ int FSBz2::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool 
 	}
 	else
 	{
+		if(!check_file_exist(backfile.substr(1)))
+			return -1;
 		if(is_pbzip2_file(backfile.substr(1))==true)//the bz2 file can be decompressed with multithreading
 			p->m_aync_thread = thread(bz_async_load, backfile, p);
 		else//the bz2 file can only be decompressed using single thread
