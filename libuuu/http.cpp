@@ -397,7 +397,7 @@ int HttpStream::HttpDownload(char *buff, size_t sz)
 		int ret = 0;
 		sz -= trim_transfered;
 		buff += trim_transfered;
-		while ( (ret = RecvPacket(buff, sz)) > 0)
+		while (sz && ((ret = RecvPacket(buff, sz)) > 0))
 		{
 			buff += ret;
 			sz -= ret;
