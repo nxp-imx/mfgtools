@@ -475,7 +475,7 @@ int FSBackFile::get_file_timesample(string filename, uint64_t *ptime)
 bool FSZip::exist(string backfile, string filename)
 {
 	Zip zip;
-	if (zip.Open(backfile.substr(1)))
+	if (zip.Open(backfile))
 		return false;
 
 	return zip.check_file_exist(filename);
@@ -485,7 +485,7 @@ int FSZip::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p
 {
 	Zip zip;
 
-        if (zip.Open(backfile.substr(1)))
+        if (zip.Open(backfile))
                 return -1;
 
 	for(auto it = zip.m_filemap.begin(); it!=zip.m_filemap.end(); ++it)
@@ -507,7 +507,7 @@ int zip_async_load(string zipfile, string fn, shared_ptr<FileBuffer> buff)
 	std::lock_guard<mutex> lock(buff->m_async_mutex);
 
 	Zip zip;
-	if (zip.Open(zipfile.substr(1)))
+	if (zip.Open(zipfile))
 		return -1;
 
 	if(zip.get_file_buff(fn, buff))
@@ -524,7 +524,7 @@ int FSZip::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool
 {
 	Zip zip;
 
-	if (zip.Open(backfile.substr(1)))
+	if (zip.Open(backfile))
 		return -1;
 
 	if (!zip.check_file_exist(filename))

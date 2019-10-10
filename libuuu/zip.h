@@ -119,10 +119,10 @@ public:
 	string m_filename;
 	uint32_t m_timestamp;
 	size_t m_filesize;
+	size_t m_compressedsize;
 	uint32_t m_offset;
 	z_stream m_strm;
 	bool m_decompressed;
-	int m_method;
 
 	int decompress(Zip *pZip, shared_ptr<FileBuffer> p);
 	Zip_file_Info();

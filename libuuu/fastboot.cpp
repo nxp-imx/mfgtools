@@ -259,6 +259,7 @@ int FBCopy::parser(char *p)
 		m_target_file = dest.substr(2);
 		m_bDownload = true;
 		m_local_file = source;
+		get_file_buffer(source, true);
 	}
 	else
 	{
