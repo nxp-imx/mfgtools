@@ -268,7 +268,7 @@ public:
 	FSHttps() { m_Prefix = "HTTPS://"; m_Port = 443; }
 }g_fshttps;
 
-int http_async_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string filename)
+int http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string filename)
 {
 	size_t max = 0x10000;
 
@@ -323,14 +323,14 @@ int FSHttp::load(string backfile, string filename, shared_ptr<FileBuffer> p, boo
 
 	if (async)
 	{
-		p->m_aync_thread = thread(http_async_load, http, p, backfile + filename);
+		p->m_aync_thread = thread(http_load, http, p, backfile + filename);
 #ifdef WIN32
 		SetThreadPriority(p->m_aync_thread.native_handle(), THREAD_PRIORITY_BELOW_NORMAL);
 #endif
 	}
 	else
 	{
-		if (http->HttpDownload((char*)p->data(), sz) < 0)
+		if (http_load(http, p, backfile + filename))
 			return -1;
 
 		p->m_avaible_size = p->m_DataSize;
