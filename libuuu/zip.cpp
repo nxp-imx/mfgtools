@@ -96,6 +96,8 @@ int Zip::BuildDirInfo()
 		info.m_offset = pdir->offset;
 		info.m_filesize = pdir->uncompressed_size;
 		info.m_timestamp = (pdir->last_modidfy_date << 16) + pdir->last_modidfy_time;
+		info.m_method = pdir->compress_method;
+
 		i += sizeof(Zip_central_dir) + pdir->extrafield_length + pdir->file_name_length + pdir->file_comment_length;
 		m_filemap[info.m_filename] = info;
 	}
@@ -143,6 +145,25 @@ int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 
 	size_t off = sizeof(file_desc) + file_desc.file_name_length + file_desc.extrafield_length;
 	stream.seekg(m_offset + off, ifstream::beg);
+
+	if (m_method == 0)
+	{
+		stream.read((char*)p->data(), p->size());
+		if (stream.gcount() != p->size())
+		{
+			set_last_err_string("size miss match");
+			return -1;
+		}
+		p->m_avaible_size = m_filesize;
+		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+		return 0;
+	}
+
+	if (m_method != 8)
+	{
+		set_last_err_string("Unsupport compress method");
+		return -1;
+	}
 
 	int CHUNK = 0x10000;
 	vector<uint8_t> source(CHUNK);
