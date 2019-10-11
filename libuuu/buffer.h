@@ -123,6 +123,7 @@ public:
 		m_MemSize = 0;
 		m_allocate_way = ALLOCATE_MALLOC;
 		m_dataflags = 0;
+		m_avaible_size = 0;
 	}
 
 	FileBuffer(void*p, size_t sz)
