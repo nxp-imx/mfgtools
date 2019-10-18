@@ -8,6 +8,11 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0>=1.0.16)
 pkg_check_modules(LIBZIP REQUIRED libzip)
 find_package(Threads)
+
+if (STATIC)
+set(OPENSSL_USE_STATIC_LIBS TRUE)
+endif()
+
 find_package(OpenSSL)
 
 include_directories(${LIBUSB_INCLUDE_DIRS} include)
