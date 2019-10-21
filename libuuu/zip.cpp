@@ -48,17 +48,45 @@ int Zip::BuildDirInfo()
 
 	size_t i;
 	Zip_eocd *peocd = NULL;
+	Zip64_eocd_locator *peocd64_loc = NULL;
+	Zip64_eocd *peocd64 = NULL;
 
 	for (i = zipfile->size() - sizeof(Zip_eocd); i > 0; i--)
 	{
 		peocd = (Zip_eocd*)(zipfile->data() + i);
 		if (peocd->sign == EOCD_SIGNATURE)
 		{
+			if (peocd->offset_of_central_dir == 0xFFFFFFFF)
+			{//zip64
+				for (size_t j = i - sizeof(Zip64_eocd_locator); j > 0; j--)
+				{
+					peocd64_loc = (Zip64_eocd_locator*)(zipfile->data() + j);
+					if (peocd64_loc->sign == EOCD64_LOCATOR_SIGNATURE)
+					{
+						peocd64 = (Zip64_eocd*)(zipfile->data() + peocd64_loc->offset_of_eocd);
+						if (peocd64->sign != EOCD64_SIGNATURE)
+						{
+							set_last_err_string("Can't find EOCD64_SIGNATURE, not a zip64 file");
+							return -1;
+						}
+						break;
+					}
+
+					if (zipfile->size() - j > 0x10000)
+					{
+						set_last_err_string("Can't find EOCD, not a zip file");
+						return -1;
+					}
+				}
+			}
 			break;
 		}
 
 		if (zipfile->size() - i > 0x10000)
-			break;
+		{
+			set_last_err_string("Can't find EOCD, not a zip file");
+			return -1;
+		}
 	}
 
 	if (peocd == 0)
@@ -67,8 +95,11 @@ int Zip::BuildDirInfo()
 		return -1;
 	}
 
-	i = peocd->offset_of_central_dir;
-	while (i < peocd->offset_of_central_dir + peocd->size_of_central_dir)
+	i = peocd64? peocd64->offset:peocd->offset_of_central_dir;
+	size_t total = i;
+	total += peocd64 ? peocd64->size: peocd->size_of_central_dir;
+
+	while (i < total)
 	{
 		Zip_central_dir *pdir = (Zip_central_dir *)(zipfile->data() + i);
 		if (pdir->sign != DIR_SIGNTURE)
@@ -83,6 +114,57 @@ int Zip::BuildDirInfo()
 		info.m_timestamp = (pdir->last_modidfy_date << 16) + pdir->last_modidfy_time;
 		info.m_compressedsize = pdir->compressed_size;
 
+		if (pdir->extrafield_length)
+		{
+			size_t e;
+			for (e = 0; e < pdir->extrafield_length; /*dummy*/)
+			{
+				Zip_ext *ext = (Zip_ext*)(zipfile->data() + e + i + sizeof(Zip_central_dir) + pdir->file_name_length);
+
+				if (ext->tag == 0x1)
+				{
+					size_t cur64 = 0;
+					if (info.m_filesize == 0xFFFFFFFF)
+					{
+						info.m_filesize = *((uint64_t*)(((uint8_t*)ext) + sizeof(Zip_ext) + cur64));
+						cur64 += 8;
+					}
+
+					if (cur64 > ext->size)
+					{
+						set_last_err_string("error pass zip64");
+						return -1;
+					}
+
+					if (info.m_compressedsize == 0xFFFFFFFF)
+					{
+						info.m_compressedsize = *((uint64_t*)(((uint8_t*)ext) + sizeof(Zip_ext) + cur64));
+						cur64 += 8;
+					}
+
+					if (cur64 > ext->size)
+					{
+						set_last_err_string("error pass zip64");
+						return -1;
+					}
+
+					if (info.m_offset == 0xFFFFFFFF)
+					{
+						info.m_offset = *((uint64_t*)(((uint8_t*)ext) + sizeof(Zip_ext) + cur64));
+						cur64 += 8;
+					}
+
+					if (cur64 > ext->size)
+					{
+						set_last_err_string("error pass zip64");
+						return -1;
+					}
+
+					break;
+				}
+				e += ext->size + sizeof(Zip_ext);
+			}
+		}
 		i += sizeof(Zip_central_dir) + pdir->extrafield_length + pdir->file_name_length + pdir->file_comment_length;
 		m_filemap[info.m_filename] = info;
 	}
