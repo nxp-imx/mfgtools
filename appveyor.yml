@@ -2,7 +2,7 @@ version: 1.3.{build}
 image:
 - Visual Studio 2019
 - Visual Studio 2017
-- Ubuntu1804
+- Ubuntu1604
 
 configuration: 
 - Debug
