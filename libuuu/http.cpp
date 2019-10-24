@@ -1,4 +1,5 @@
 #ifdef _WIN32
+//	request += "Connection: Keep-Alive\n";
 #include <ws2tcpip.h>
 #include <windows.h>
 #include <winhttp.h>
@@ -288,7 +289,8 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port)
 	if(port == 443)
 		path = "https://" + host + path;
 
-	string request = "GET " + path + " HTTP/1.1\nHost: " + host + "\n\n";
+	string request = "GET " + path + " HTTP/1.1\r\n";
+	request += "Host: " + host + "\r\n\r\n";
 
 	ret = SendPacket((char*)request.c_str(), request.size());
 	if (ret != request.size())
