@@ -15,11 +15,13 @@ endif()
 
 find_package(OpenSSL)
 
-include_directories(${LIBUSB_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR} include)
-
 if(OPENSSL_FOUND)
 set(UUUSSL "-DUUUSSL")
+set(UUUOPENSLL_INCLUDE_DIR ${OPENSSL_INCLUDE_DIR})
 endif()
+
+include_directories(${LIBUSB_INCLUDE_DIRS} ${UUUOPENSLL_INCLUDE_DIR} include)
+
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wstrict-aliasing -Wextra ${UUUSSL}")
 set(CMAKE_CXX_FLAGS "-O2 ${UUUSSL}")
