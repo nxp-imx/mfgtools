@@ -15,7 +15,7 @@ endif()
 
 find_package(OpenSSL)
 
-include_directories(${LIBUSB_INCLUDE_DIRS} include)
+include_directories(${LIBUSB_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR} include)
 
 if(OPENSSL_FOUND)
 set(UUUSSL "-DUUUSSL")
