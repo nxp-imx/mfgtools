@@ -301,6 +301,8 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:FLASHING"] = new_cmd_obj<FBFlashingCmd>;
 	(*this)["FB:SET_ACTIVE"] = new_cmd_obj<FBSetActiveCmd>;
 	(*this)["FASTBOOT:SET_ACTIVE"] = new_cmd_obj<FBSetActiveCmd>;
+	(*this)["FB:CONTINUE"] = new_cmd_obj<FBContinueCmd>;
+	(*this)["FASTBOOT:CONTINUE"] = new_cmd_obj<FBContinueCmd>;
 
 	(*this)["FBK:UCMD"] = new_cmd_obj<FBUCmd>;
 	(*this)["FBK:ACMD"] = new_cmd_obj<FBACmd>;
