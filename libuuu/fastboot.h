@@ -135,3 +135,9 @@ public:
 	FBCopy(char *p) :CmdBase(p) { m_Maxsize_pre_cmd = 0x10000; };
 	int run(CmdCtx *ctx);
 };
+
+class FBContinueCmd : public FBCmd
+{
+public:
+	FBContinueCmd(char *p) : FBCmd(p) { m_fb_cmd = "continue"; }
+};

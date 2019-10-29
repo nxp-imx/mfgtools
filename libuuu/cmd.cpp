@@ -242,6 +242,8 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["FB:DELAY"] = new_cmd_obj<CmdDelay>;
 	(*this)["FASTBOOT:DELAY"] = new_cmd_obj<CmdDelay>;
+	(*this)["FB:CONTINUE"] = new_cmd_obj<FBContinueCmd>;
+	(*this)["FASTBOOT:CONTINUE"] = new_cmd_obj<FBContinueCmd>;
 
 	(*this)["FBK:UCMD"] = new_cmd_obj<FBUCmd>;
 	(*this)["FBK:ACMD"] = new_cmd_obj<FBACmd>;
