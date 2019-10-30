@@ -28,9 +28,14 @@ class CUUUSSL
 public:
 	CUUUSSL()
 	{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 		SSL_library_init();
 		SSLeay_add_ssl_algorithms();
 		SSL_load_error_strings();
+#else
+		OPENSSL_init_ssl(0, NULL);
+		SSLeay_add_ssl_algorithms();
+#endif
 	}
 	~CUUUSSL()
 	{

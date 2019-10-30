@@ -15,7 +15,7 @@ endif()
 
 find_package(OpenSSL)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O2 -no-pie")
 
 if (STATIC)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
