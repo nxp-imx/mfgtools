@@ -160,6 +160,8 @@ int SDPBootCmd::run(CmdCtx *ctx)
 	str = "SDP: jump -f ";
 	str += m_filename;
 	str += " -ivt";
+	if (m_clear_dcd)
+		str += " -cleardcd";
 
 	SDPJumpCmd jmp((char *)str.c_str());
 	if (!m_nojump)
@@ -464,7 +466,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 	m_spdcmd.m_addr = EndianSwap(pIVT->SelfAddr);
 
 
-	if (rom->flags & ROM_INFO_HID_SKIP_DCD)
+	if (rom->flags & ROM_INFO_HID_SKIP_DCD && !m_clear_dcd)
 	{
 		SDPSkipDCDCmd skipcmd(NULL);
 		if (skipcmd.run(ctx))
