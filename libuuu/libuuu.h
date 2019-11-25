@@ -129,6 +129,8 @@ int uuu_add_usbpath_filter(const char *path);
 
 /*Set timeout wait for known devices appeared*/
 int uuu_set_wait_timeout(int second);
+/*Set usb device polling period */
+void uuu_set_poll_period(int msecond);
 /*
  * bit 0:15 for libusb
  * bit 16:31 for uuu

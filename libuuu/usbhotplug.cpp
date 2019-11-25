@@ -50,6 +50,7 @@ static vector<thread> g_running_thread;
 static vector<string> g_filter_usbpath;
 
 static int g_wait_usb_timeout = -1;
+static int g_usb_poll_period = 0;
 
 static int g_known_device_appeared;
 
@@ -153,7 +154,8 @@ static int usb_add(libusb_device *dev)
 		return -1;
 
 	ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
-	std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	int poll = g_usb_poll_period ? g_usb_poll_period : 200;
+	std::this_thread::sleep_for(std::chrono::milliseconds(poll));
 
 	if (item)
 	{
@@ -245,7 +247,8 @@ int polling_usb(std::atomic<int>& bexit)
 
 		oldlist = newlist;
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		int poll = g_usb_poll_period ? g_usb_poll_period : 200;
+		std::this_thread::sleep_for(std::chrono::milliseconds(poll));
 
 		if (g_wait_usb_timeout >= 0 && !g_known_device_appeared)
 		{
@@ -408,4 +411,9 @@ int uuu_set_wait_timeout(int second)
 {
 	g_wait_usb_timeout = second;
 	return 0;
+}
+
+void uuu_set_poll_period(int msecond)
+{
+	g_usb_poll_period = msecond;
 }
