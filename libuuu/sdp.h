@@ -171,10 +171,13 @@ public:
 class SDPDcdCmd : public SDPCmdBase
 {
 public:
+	uint32_t m_dcd_addr;
 	SDPDcdCmd(char *p):SDPCmdBase(p)
 	{
 		insert_param_info("dcd", NULL, Param::e_null);
 		insert_param_info("-f", &m_filename, Param::e_string_filename);
+		insert_param_info("-dcdaddr", &m_dcd_addr, Param::e_uint32);
+		m_dcd_addr = 0;
 	}
 	int run(CmdCtx *);
 
@@ -290,12 +293,15 @@ class SDPBootCmd : public SDPCmdBase
 {
 public:
 	bool m_nojump;
+	uint32_t m_dcd_addr;
 	SDPBootCmd(char *p) : SDPCmdBase(p)
 	{
 		insert_param_info("boot", NULL, Param::e_null);
 		insert_param_info("-f", &m_filename, Param::e_string_filename);
 		insert_param_info("-nojump", &m_nojump, Param::e_bool);
+		insert_param_info("-dcdaddr", &m_dcd_addr, Param::e_uint32);
 		m_nojump = false;
+		m_dcd_addr = 0;
 	}
 	int run(CmdCtx *p);
 };
