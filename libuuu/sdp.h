@@ -254,16 +254,19 @@ class SDPJumpCmd : public SDPCmdBase
 public:
 	bool m_Ivt;
 	bool m_PlugIn;
+	bool m_clear_dcd;
 	uint32_t m_jump_addr;
 	SDPJumpCmd(char*p):SDPCmdBase(p)
 	{
 		m_jump_addr = 0;
 		m_spdcmd.m_cmd = ROM_KERNEL_CMD_JUMP_ADDR;
+		m_clear_dcd = false;
 		insert_param_info("jump", NULL, Param::e_null);
 		insert_param_info("-f", &m_filename, Param::e_string_filename);
 		insert_param_info("-ivt", &m_Ivt, Param::e_bool);
 		insert_param_info("-plugin", &m_Ivt, Param::e_bool);
 		insert_param_info("-addr", &m_jump_addr, Param::e_uint32);
+		insert_param_info("-cleardcd", &m_clear_dcd, Param::e_bool);
 	};
 	int run(CmdCtx *p);
 };
@@ -290,12 +293,15 @@ class SDPBootCmd : public SDPCmdBase
 {
 public:
 	bool m_nojump;
+	bool m_clear_dcd;
 	SDPBootCmd(char *p) : SDPCmdBase(p)
 	{
 		insert_param_info("boot", NULL, Param::e_null);
 		insert_param_info("-f", &m_filename, Param::e_string_filename);
 		insert_param_info("-nojump", &m_nojump, Param::e_bool);
+		insert_param_info("-cleardcd", &m_clear_dcd, Param::e_bool);
 		m_nojump = false;
+		m_clear_dcd = false;
 	}
 	int run(CmdCtx *p);
 };
