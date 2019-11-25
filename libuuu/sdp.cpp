@@ -101,7 +101,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 	uint32_t size = (pdcd[1] << 8) | pdcd[2];
 
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_DCD_WRITE;
-	m_spdcmd.m_addr = EndianSwap(rom->free_addr);
+	m_spdcmd.m_addr = EndianSwap(m_dcd_addr ? m_dcd_addr : rom->free_addr);
 	m_spdcmd.m_count = EndianSwap(size);
 
 	HIDTrans dev;
@@ -142,6 +142,10 @@ int SDPBootCmd::run(CmdCtx *ctx)
 	string str;
 	str = "SDP: dcd -f ";
 	str += m_filename;
+	if (m_dcd_addr) {
+		str += " -dcdaddr ";
+		str += std::to_string(m_dcd_addr);
+	}
 	SDPDcdCmd dcd((char *)str.c_str());
 	if (dcd.parser()) return -1;
 	if (dcd.run(ctx)) return -1;
