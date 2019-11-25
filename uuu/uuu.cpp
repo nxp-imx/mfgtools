@@ -136,6 +136,7 @@ void print_help(bool detail = false)
 		"    -m          USBPATH Only monitor these paths.\n"
 		"                    -m 1:2 -m 1:3\n\n"
 		"    -t          Timeout second for wait known usb device appeared\n"
+		"    -pp         usb polling period in milliseconds\n"
 		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
 		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
 		"uuu -udev       linux: show udev rule to avoid sudo each time \n"
@@ -874,6 +875,11 @@ int main(int argc, char **argv)
 			{
 				i++;
 				uuu_set_wait_timeout(atoll(argv[i]));
+			}
+			else if (s == "-pp")
+			{
+				i++;
+				uuu_set_poll_period(atoll(argv[i]));
 			}
 			else if (s == "-lsusb")
 			{
