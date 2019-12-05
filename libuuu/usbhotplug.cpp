@@ -160,7 +160,7 @@ static int usb_add(libusb_device *dev)
 	if (item)
 	{
 		g_known_device_appeared = 1;
-		std::thread(run_usb_cmds, item, dev).detach();
+		std::thread(run_usb_cmds, item, dev).join();
 	}
 	return 0;
 }
