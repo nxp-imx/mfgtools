@@ -38,6 +38,7 @@ static Config g_config;
 
 #define FSL_VID 0x15A2
 #define NXP_VID 0x1FC9
+#define BD_VID 0x3016
 
 Config::Config()
 {
@@ -62,6 +63,8 @@ Config::Config()
 	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4, 0,      0x04FF));
 	push_back(ConfigItem("SDPV:", "SPL1",   "SPL",  0x0525, 0xB4A4, 0x0500, 0x9998));
 	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4, 0x9999, 0x9999)); /*old i.MX8 MQEVk use bcd 9999*/
+	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  BD_VID, 0x1001, 0,      0x04FF));
+	push_back(ConfigItem("SDPV:", "SPL1",   "SPL",  BD_VID, 0x1001, 0x0500, 0x9998));
 	push_back(ConfigItem("FBK:", NULL, NULL, 0x066F, 0x9AFE));
 	push_back(ConfigItem("FBK:", NULL, NULL, 0x066F, 0x9BFF));
 	push_back(ConfigItem("FB:", NULL, NULL,  0x0525, 0xA4A5));
