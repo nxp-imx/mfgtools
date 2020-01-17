@@ -1,5 +1,8 @@
 uuu_version 1.2.39
 
+# @_flash.bin            | bootloader
+# @_image   [_flash.bin] | image burn to emmc, default is the same as bootloader
+
 # This command will be run when i.MX6/7 i.MX8MM, i.MX8MQ
 SDP: boot -f _flash.bin
 
@@ -26,5 +29,5 @@ SDPV: jump
 FB: ucmd setenv fastboot_dev mmc
 FB: ucmd setenv mmcdev ${sd_dev}
 FB: ucmd mmc dev ${sd_dev}
-FB: flash bootloader _flash.bin
+FB: flash bootloader _image
 FB: Done
