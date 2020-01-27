@@ -51,6 +51,7 @@ ROM_INFO g_RomInfo[] =
 	{ "MX7ULP",	 0x2f018000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{ "MXRT106X",	 0x1000,     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{ "MX8QXP",      0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING },
+	{ "MX8DXL",      0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING | ROM_INO_3CONTAINER },
 	{ "MX28",	 0x0,        ROM_INFO_HID},
 	{ "MX815",       0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING | ROM_INFO_HID_EP1 | ROM_INFO_HID_PACK_SIZE_1020 },
 	{ "SPL",	 0x0,	     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP | ROM_INFO_HID_SDP_NO_MAX_PER_TRANS},
@@ -122,20 +123,22 @@ inline uint32_t round_up(uint32_t x, uint32_t align)
 	return (x + mask) & ~mask;
 }
 
-size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset)
+size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset, int numofcontainer)
 {
 	struct rom_container *hdr;
 
-	hdr = (struct rom_container *)(p->data() + offset + CONTAINER_HDR_ALIGNMENT);
+	int cindex = numofcontainer - 1;
+
+	hdr = (struct rom_container *)(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT);
 	if (hdr->tag != CONTAINER_TAG)
 		return p->size() - offset;
 
 	struct rom_bootimg *image;
-	image = (struct rom_bootimg *)(p->data() + offset + CONTAINER_HDR_ALIGNMENT
+	image = (struct rom_bootimg *)(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT
 		+ sizeof(struct rom_container)
 		+ sizeof(struct rom_bootimg) * (hdr->num_images - 1));
 
-	uint32_t sz = image->size + image->offset + CONTAINER_HDR_ALIGNMENT;
+	uint32_t sz = image->size + image->offset + cindex * CONTAINER_HDR_ALIGNMENT;
 
 	sz = round_up(sz, CONTAINER_HDR_ALIGNMENT);
 

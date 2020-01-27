@@ -235,7 +235,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 			}
 			else
 			{
-				offset += GetContainerActualSize(fbuff, offset);
+				offset += GetContainerActualSize(fbuff, offset, rom->flags & ROM_INO_3CONTAINER? 3: 2);
 			}
 
 			if (offset >= fbuff->size())
