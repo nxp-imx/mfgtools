@@ -105,11 +105,16 @@ public:
 		for (size_t i = 1; i < m_script.size(); i++)
 		{
 			size_t off;
+			size_t off_tab;
 			string param;
-			if (m_script[i] == '_' && m_script[i - 1] == ' ')
+			if (m_script[i] == '_' 
+				&& (m_script[i - 1] == '@' || m_script[i - 1] == ' '))
 			{
 				off = m_script.find(' ', i);
+				off_tab = m_script.find('\t', i);
 				size_t ofn = m_script.find('\n', i);
+				if (off_tab < off)
+					off = off_tab;
 				if (ofn < off)
 					off = ofn;
 
