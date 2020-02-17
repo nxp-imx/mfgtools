@@ -35,20 +35,6 @@
 #include "trans.h"
 #include <string.h>
 
-#define ROM_INFO_HID					   0x1
-#define ROM_INFO_HID_MX23				   0x2
-#define ROM_INFO_HID_MX50				   0x4
-#define ROM_INFO_HID_MX6				   0x8
-#define ROM_INFO_HID_SKIP_DCD			  0x10
-#define ROM_INFO_HID_MX8_MULTI_IMAGE	  0x20
-#define ROM_INFO_HID_MX8_STREAM			  0x40
-#define ROM_INFO_HID_UID_STRING			  0x80
-#define ROM_INFO_HID_NO_CMD				 0x400
-#define ROM_INFO_SPL_JUMP				 0x800
-#define ROM_INFO_HID_EP1				0x1000
-#define ROM_INFO_AUTO_SCAN_UBOOT_POS	0x2000
-#define ROM_INO_3CONTAINER				0x4000
-
 #pragma once
 
 using namespace std;
