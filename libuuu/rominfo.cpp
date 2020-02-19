@@ -51,7 +51,6 @@ ROM_INFO g_RomInfo[] =
 	{ "MX7ULP",	 0x2f018000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{ "MXRT106X",	 0x1000,     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	{ "MX8QXP",      0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING },
-	{ "MX8DXL",      0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING | ROM_INFO_3CONTAINER },
 	{ "MX28",	 0x0,        ROM_INFO_HID},
 	{ "MX815",       0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING | ROM_INFO_HID_EP1 | ROM_INFO_HID_PACK_SIZE_1020 },
 	{ "SPL",	 0x0,	     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP | ROM_INFO_HID_SDP_NO_MAX_PER_TRANS},
@@ -115,6 +114,9 @@ struct rom_bootimg {
 	uint8_t  iv[IV_MAX_LEN];
 };
 
+
+#define IMG_V2X		0x0B
+
 #pragma pack ()
 
 inline uint32_t round_up(uint32_t x, uint32_t align)
@@ -123,17 +125,29 @@ inline uint32_t round_up(uint32_t x, uint32_t align)
 	return (x + mask) & ~mask;
 }
 
-size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset, int numofcontainer)
+size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset)
 {
 	struct rom_container *hdr;
+	int cindex = 1;
 
-	int cindex = numofcontainer - 1;
-
-	hdr = (struct rom_container *)(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT);
+	hdr = (struct rom_container *)(p->data() + offset + CONTAINER_HDR_ALIGNMENT);
 	if (hdr->tag != CONTAINER_TAG)
 		return p->size() - offset;
 
 	struct rom_bootimg *image;
+
+	/* Check if include V2X container*/
+	image = (struct rom_bootimg *)(p->data() + offset + CONTAINER_HDR_ALIGNMENT
+		+ sizeof(struct rom_container));
+
+	if ((image->flags & 0xF) == IMG_V2X)
+	{
+		cindex = 2;
+		hdr = (struct rom_container *)(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT);
+		if (hdr->tag != CONTAINER_TAG)
+			return p->size() - offset;
+	}
+
 	image = (struct rom_bootimg *)(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT
 		+ sizeof(struct rom_container)
 		+ sizeof(struct rom_bootimg) * (hdr->num_images - 1));

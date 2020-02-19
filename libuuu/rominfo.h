@@ -46,7 +46,6 @@
 #define ROM_INFO_HID_PACK_SIZE_1020		0x2000
 #define ROM_INFO_HID_SDP_NO_MAX_PER_TRANS	0x4000
 #define ROM_INFO_AUTO_SCAN_UBOOT_POS		0x8000
-#define ROM_INFO_3CONTAINER			0x10000
 
 #include <stdint.h>
 #include <stddef.h>
@@ -61,5 +60,5 @@ struct ROM_INFO
 ROM_INFO * search_rom_info(const char *s);
 ROM_INFO * search_rom_info(ConfigItem *item);
 
-size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset, int numofcontainer );
+size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset);
 size_t GetFlashHeaderSize(shared_ptr<FileBuffer> p, size_t offset = 0);

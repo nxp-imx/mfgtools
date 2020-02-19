@@ -43,7 +43,7 @@ Config::Config()
 {
 	push_back(ConfigItem("SDPS:", "MX8QXP", NULL,   NXP_VID, 0x012F, 0x0002));
 	push_back(ConfigItem("SDPS:", "MX8QM",  "MX8QXP",   NXP_VID, 0x0129, 0x0002));
-	push_back(ConfigItem("SDPS:", "MX8DXL", "MX8DXL",   NXP_VID, 0x0147));
+	push_back(ConfigItem("SDPS:", "MX8DXL", "MX8QXP",   NXP_VID, 0x0147));
 	push_back(ConfigItem("SDPS:", "MX28",   NULL,   FSL_VID, 0x004f));
 	push_back(ConfigItem("SDPS:", "MX815",  NULL,   NXP_VID, 0x013E));
 	push_back(ConfigItem("SDPS:", "MX865",  "MX815",   NXP_VID, 0x0146));
