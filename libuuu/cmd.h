@@ -76,12 +76,13 @@ struct Param
 	};
 
 	const char * key;
+	const char * Error;
 	void *pData;
 	int type;
 	bool ignore_case;
-	Param(const char *ky, void *pD, Param_Type tp, bool ignore=true)
+	Param(const char *ky, void *pD, Param_Type tp, bool ignore=true, const char *error = NULL)
 	{
-		key = ky; pData = pD; type = tp; ignore_case = ignore;
+		key = ky; pData = pD; type = tp; ignore_case = ignore; Error = error;
 	}
 };
 
@@ -92,14 +93,16 @@ public:
 	uint64_t m_timeout;
 	bool m_lastcmd;
 	std::string m_cmd;
+	bool m_NoKeyParam;
+	bool m_bCheckTotalParam;
 
-	void CmdBaseInit() { m_timeout = 2000; m_lastcmd = false;}
+	void CmdBaseInit() { m_timeout = 2000; m_lastcmd = false; m_NoKeyParam = false; m_bCheckTotalParam = false; }
 	CmdBase() { CmdBaseInit(); };
 	CmdBase(char *p) { CmdBaseInit(); if (p) m_cmd = p; }
 
-	void insert_param_info(const char *key, void *pD, Param::Param_Type tp, bool ignore_case = true)
+	void insert_param_info(const char *key, void *pD, Param::Param_Type tp, bool ignore_case = true, const char* err = NULL)
 	{
-		m_param.push_back(Param(key, pD, tp, ignore_case));
+		m_param.push_back(Param(key, pD, tp, ignore_case, err));
 	}
 
 	virtual int parser_protocal(char *p, size_t &pos)

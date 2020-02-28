@@ -185,6 +185,44 @@ int FBCmd::run(CmdCtx *ctx)
 	return 0;
 }
 
+int FBPartNumber::run(CmdCtx *ctx)
+{
+	BulkTrans dev;
+	if (dev.open(ctx->m_dev))
+		return -1;
+
+	dev.m_timeout = m_timeout;
+
+	FastBoot fb(&dev);
+
+	string_ex cmd;
+	cmd.format("%s:%s:%08x", m_fb_cmd.c_str(), m_partition_name.c_str(), (uint32_t)m_Size);
+
+	if (fb.Transport(cmd, NULL, 0))
+		return -1;
+
+	return 0;
+}
+
+int FBUpdateSuper::run(CmdCtx *ctx)
+{
+	BulkTrans dev;
+	if (dev.open(ctx->m_dev))
+		return -1;
+
+	dev.m_timeout = m_timeout;
+
+	FastBoot fb(&dev);
+
+	string_ex cmd;
+	cmd.format("%s:%s:%s", m_fb_cmd.c_str(), m_partition_name.c_str(), m_opt.c_str());
+
+	if (fb.Transport(cmd, NULL, 0))
+		return -1;
+
+	return 0;
+}
+
 int FBDownload::run(CmdCtx *ctx)
 {
 	BulkTrans dev;

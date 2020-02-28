@@ -72,18 +72,34 @@ int CmdBase::parser(char *p)
 	if (param.find(':') != string::npos)
 		param = get_next_param(m_cmd, pos);
 
+	int index = 0;
+
 	while (pos < m_cmd.size())
 	{
 		param = get_next_param(m_cmd, pos);
 
 		struct Param *pp = NULL;
-		for (size_t i = 0; i < m_param.size(); i++)
+
+		if (m_NoKeyParam)
 		{
-			string key = string(m_param[i].key);
-			if (compare_str(param, key, m_param[i].ignore_case))
+			if (index > m_param.size())
 			{
-				pp = &(m_param[i]);
-				break;
+				set_last_err_string("More parameter then expected");
+				return -1;
+			}
+			pp = &(m_param[index]);
+			index++;
+		}
+		else
+		{
+			for (size_t i = 0; i < m_param.size(); i++)
+			{
+				string key = string(m_param[i].key);
+				if (compare_str(param, key, m_param[i].ignore_case))
+				{
+					pp = &(m_param[i]);
+					break;
+				}
 			}
 		}
 
@@ -98,13 +114,15 @@ int CmdBase::parser(char *p)
 
 		if (pp->type == Param::e_uint32)
 		{
-			param = get_next_param(m_cmd, pos);
+			if (!m_NoKeyParam)
+				param = get_next_param(m_cmd, pos);
 			*(uint32_t*)pp->pData = str_to_uint(param);
 		}
 
 		if (pp->type == Param::e_string_filename)
 		{
-			param = get_next_param(m_cmd, pos);
+			if (!m_NoKeyParam)
+				param = get_next_param(m_cmd, pos);
 			*(string*)pp->pData = param;
 
 			if (!check_file_exist(param))
@@ -113,7 +131,8 @@ int CmdBase::parser(char *p)
 
 		if (pp->type == Param::e_string)
 		{
-			param = get_next_param(m_cmd, pos);
+			if (!m_NoKeyParam)
+				param = get_next_param(m_cmd, pos);
 			*(string*)pp->pData = param;
 		}
 
@@ -124,6 +143,18 @@ int CmdBase::parser(char *p)
 
 		if (pp->type == Param::e_null)
 		{
+		}
+	}
+
+	if (m_bCheckTotalParam)
+	{
+		if (index < m_param.size())
+		{
+			string str;
+			str += "Missed: ";
+			str += m_param[index].Error;
+			set_last_err_string(str);
+			return -1;
 		}
 	}
 	return 0;
@@ -303,6 +334,15 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:SET_ACTIVE"] = new_cmd_obj<FBSetActiveCmd>;
 	(*this)["FB:CONTINUE"] = new_cmd_obj<FBContinueCmd>;
 	(*this)["FASTBOOT:CONTINUE"] = new_cmd_obj<FBContinueCmd>;
+
+	(*this)["FB:UPDATE-SUPER"] = new_cmd_obj<FBUpdateSuper>;
+	(*this)["FASTBOOT:UPDATE-SUPER"] = new_cmd_obj<FBUpdateSuper>;
+	(*this)["FB:CREATE-LOGICAL-PARTITION"] = new_cmd_obj<FBCreatePartition>;
+	(*this)["FASTBOOT:CREATE-LOGICAL-PARTITION"] = new_cmd_obj<FBCreatePartition>;
+	(*this)["FB:DELETE-LOGICAL-PARTITION"] = new_cmd_obj<FBDelPartition>;
+	(*this)["FASTBOOT:DELETE-LOGICAL-PARTITION"] = new_cmd_obj<FBDelPartition>;
+	(*this)["FB:RESIZE-LOGICAL-PARTITION"] = new_cmd_obj<FBResizePartition>;
+	(*this)["FASTBOOT:RESIZE-LOGICAL-PARTITION"] = new_cmd_obj<FBResizePartition>;
 
 	(*this)["FBK:UCMD"] = new_cmd_obj<FBUCmd>;
 	(*this)["FBK:ACMD"] = new_cmd_obj<FBACmd>;

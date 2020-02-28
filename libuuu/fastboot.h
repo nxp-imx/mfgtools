@@ -118,6 +118,64 @@ public:
 	int flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> p, size_t blksz, size_t max);
 };
 
+class FBDelPartition : public FBCmd
+{
+public:
+	FBDelPartition(char*p) : FBCmd(p) { m_fb_cmd = "delete-logical-partition"; }
+};
+
+class FBPartNumber : public CmdBase
+{
+public:
+	string m_partition_name;
+	string m_fb_cmd;
+	uint32_t m_Size;
+
+	FBPartNumber(char *p) :CmdBase(p)
+	{
+		m_Size = 0;
+		m_bCheckTotalParam = true;
+		m_NoKeyParam = true;
+		insert_param_info(NULL, &m_partition_name, Param::e_string, false, "partition name");
+		insert_param_info(NULL, &m_Size, Param::e_uint32, false, "partition size");
+	}
+	int run(CmdCtx *ctx);
+};
+
+class FBCreatePartition : public FBPartNumber
+{
+public:
+	FBCreatePartition(char*p) :FBPartNumber(p) {
+		m_fb_cmd = "create-logical-partition";
+	}
+};
+
+class FBResizePartition : public FBPartNumber
+{
+public:
+	FBResizePartition(char*p) :FBPartNumber(p) {
+		m_fb_cmd = "resize-logical-partition";
+	}
+};
+
+class FBUpdateSuper : public CmdBase
+{
+public:
+	string m_partition_name;
+	string m_fb_cmd;
+	string m_opt;
+
+	FBUpdateSuper(char *p) :CmdBase(p)
+	{
+		m_bCheckTotalParam = true;
+		m_NoKeyParam = true;
+		insert_param_info(NULL, &m_partition_name, Param::e_string, false, "partition name");
+		insert_param_info(NULL, &m_opt, Param::e_string, false, "partition size");
+		m_fb_cmd = "update-super";
+	}
+	int run(CmdCtx *ctx);
+};
+
 class FBEraseCmd : public FBCmd
 {
 public:
