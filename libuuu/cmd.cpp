@@ -286,6 +286,16 @@ uint32_t str_to_uint(string &str)
 	return strtoul(str.c_str(), NULL, 10);
 }
 
+uint64_t str_to_uint64(string &str)
+{
+	if (str.size() > 2)
+	{
+		if (str.substr(0, 2).compare("0x") == 0)
+			return strtoull(str.substr(2).c_str(), NULL, 16);
+	}
+	return strtoull(str.c_str(), NULL, 10);
+}
+
 template <class T> shared_ptr<CmdBase> new_cmd_obj(char *p)
 {
 	return shared_ptr<CmdBase>(new T(p));

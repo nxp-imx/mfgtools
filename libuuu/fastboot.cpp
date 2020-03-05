@@ -43,6 +43,8 @@
 #include <fstream>
 #include <sys/stat.h>
 #include "sparse.h"
+#include "ffu_format.h"
+#include "libcomm.h"
 
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
@@ -585,6 +587,18 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		return -1;
 	}
 
+	string str;
+	str = "FB: getvar partition-size:";
+	str += m_partition;
+
+	if (getvar.parser((char*)str.c_str()))
+		return -1;
+
+	if (getvar.run(ctx))
+		return -1;
+
+	m_totalsize = str_to_uint64(getvar.m_val);
+
 	BulkTrans dev;
 	if (dev.open(ctx->m_dev))
 		return -1;
@@ -595,6 +609,10 @@ int FBFlashCmd::run(CmdCtx *ctx)
 	if (m_raw2sparse)
 	{
 		shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename, true);
+
+		if (isffu(pdata))
+			return flash_ffu(&fb, pdata);
+
 		return flash_raw2sparse(&fb, pdata, block_size, max);
 	}
 
@@ -687,5 +705,131 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		nt.total = startblock + pf->total_blks;
 		call_notify(nt);
 	}
+	return 0;
+}
+
+bool FBFlashCmd::isffu(shared_ptr<FileBuffer> p)
+{
+	p->request_data(sizeof(FFU_SECURITY_HEADER));
+	FFU_SECURITY_HEADER *h = (FFU_SECURITY_HEADER*)p->data();
+	if (strncmp((const char*)h->signature, FFU_SECURITY_SIGNATURE, sizeof(h->signature)) == 0)
+		return true;
+	else
+		return false;
+}
+
+int FBFlashCmd::flash_ffu_oneblk(FastBoot *fb, shared_ptr<FileBuffer> p, size_t off, size_t blksz, size_t blkindex)
+{
+	SparseFile sf;
+
+	sf.init_header(blksz, 10);
+
+	p->request_data(off + blksz);
+	
+	chunk_header_t ct;
+	ct.chunk_type = CHUNK_TYPE_DONT_CARE;
+	ct.chunk_sz = blkindex;
+	ct.reserved1 = 0;
+	ct.total_sz = sizeof(ct);
+
+	sf.push_one_chuck(&ct, NULL);
+
+	if (sf.push_one_block(p->data() + off))
+		return -1;
+
+	return flash(fb, sf.m_data.data(), sf.m_data.size());
+}
+
+int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> p)
+{
+	p->request_data(sizeof(FFU_SECURITY_HEADER));
+	FFU_SECURITY_HEADER *h = (FFU_SECURITY_HEADER*)p->data();
+	if (strncmp((const char*)h->signature, FFU_SECURITY_SIGNATURE, sizeof(h->signature)) != 0)
+	{
+		set_last_err_string("Invalidate FFU Security header signature");
+		return -1;
+	}
+
+	size_t off;
+	off = h->dwCatalogSize + h->dwHashTableSize;
+	off = round_up(off, (size_t)h->dwChunkSizeInKb * 1024);
+
+	p->request_data(off + sizeof(FFU_IMAGE_HEADER));
+	FFU_IMAGE_HEADER *pIh = (FFU_IMAGE_HEADER *)(p->data() + off);
+
+	if (strncmp((const char*)pIh->Signature, FFU_SIGNATURE, sizeof(pIh->Signature)) != 0)
+	{
+		set_last_err_string("Invalidate FFU Security header signature");
+		return -1;
+	}
+
+	off += pIh->ManifestLength + pIh->cbSize;
+	off = round_up(off, (size_t)h->dwChunkSizeInKb * 1024);
+
+	p->request_data(off + sizeof(FFU_STORE_HEADER));
+	FFU_STORE_HEADER *pIs = (FFU_STORE_HEADER*) (p->data() + off);
+
+	if(pIs->MajorVersion == 1)
+		off += pIs->dwValidateDescriptorLength + offsetof(FFU_STORE_HEADER, NumOfStores);
+	else
+		off += pIs->dwValidateDescriptorLength + sizeof(FFU_STORE_HEADER);
+
+	p->request_data(off + pIs->dwWriteDescriptorLength);
+
+	size_t block_off = off + pIs->dwWriteDescriptorLength;
+	block_off = round_up(block_off, (size_t)h->dwChunkSizeInKb * 1024);
+
+	uuu_notify nt;
+	nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
+	nt.total = pIs->dwWriteDescriptorCount;
+	call_notify(nt);
+
+	size_t currrent_block = 0;
+	size_t i;
+	for (i = 0; i < pIs->dwWriteDescriptorCount; i++)
+	{
+		FFU_BLOCK_DATA_ENTRY *entry = (FFU_BLOCK_DATA_ENTRY*)(p->data() + off);
+		
+		off += sizeof(FFU_BLOCK_DATA_ENTRY) + (entry->dwLocationCount -1) * sizeof(_DISK_LOCATION);
+
+		if (currrent_block >= pIs->dwInitialTableIndex && currrent_block < pIs->dwInitialTableIndex + pIs->dwInitialTableCount)
+		{
+			//Skip Init Block
+		}
+		else
+		{
+			for (uint32_t loc = 0; loc < entry->dwLocationCount; loc++)
+			{
+				//printf("block 0x%x write to 0x%x seek %d\n", currrent_block, entry->rgDiskLocations[loc].dwBlockIndex, entry->rgDiskLocations[loc].dwDiskAccessMethod);
+				uint32_t access = entry->rgDiskLocations[loc].dwDiskAccessMethod;
+				uint32_t blockindex;
+				if (entry->rgDiskLocations[loc].dwDiskAccessMethod == DISK_BEGIN)
+					blockindex = entry->rgDiskLocations[loc].dwBlockIndex;
+				else
+					blockindex = m_totalsize / pIs->dwBlockSizeInBytes - 1 - entry->rgDiskLocations[loc].dwBlockIndex;
+
+				for (uint32_t blk = 0; blk < entry->dwBlockCount; blk++)
+				{
+					if (flash_ffu_oneblk(fb,
+							p,
+							block_off + (currrent_block + blk) * pIs->dwBlockSizeInBytes,
+							pIs->dwBlockSizeInBytes,
+							blockindex + blk))
+						return -1;
+				}
+			}
+		}
+
+		nt.type = uuu_notify::NOTIFY_TRANS_POS;
+		nt.total = i;
+		call_notify(nt);
+
+		currrent_block += entry->dwBlockCount;
+	}
+
+	nt.type = uuu_notify::NOTIFY_TRANS_POS;
+	nt.total = i;
+	call_notify(nt);
+
 	return 0;
 }

@@ -119,11 +119,6 @@ struct rom_bootimg {
 
 #pragma pack ()
 
-inline uint32_t round_up(uint32_t x, uint32_t align)
-{
-	uint32_t mask = align - 1;
-	return (x + mask) & ~mask;
-}
 
 size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset)
 {
@@ -154,7 +149,7 @@ size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset)
 
 	uint32_t sz = image->size + image->offset + cindex * CONTAINER_HDR_ALIGNMENT;
 
-	sz = round_up(sz, CONTAINER_HDR_ALIGNMENT);
+	sz = round_up(sz, (uint32_t)CONTAINER_HDR_ALIGNMENT);
 
 	if (sz > (p->size() - offset))
 		return p->size() - offset;

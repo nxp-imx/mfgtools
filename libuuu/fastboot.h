@@ -110,12 +110,16 @@ class FBFlashCmd : public FBCmd
 public:
 	string m_filename;
 	string m_partition;
+	uint64_t m_totalsize;
 	bool m_raw2sparse;
 	FBFlashCmd(char *p) : FBCmd(p) { m_timeout = 10000; m_fb_cmd = "flash"; m_raw2sparse = false; }
 	int parser(char *p = NULL);
 	int run(CmdCtx *ctx);
 	int flash(FastBoot *fb, void *p, size_t sz);
 	int flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> p, size_t blksz, size_t max);
+	bool isffu(shared_ptr<FileBuffer> p);
+	int flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> p);
+	int flash_ffu_oneblk(FastBoot *fb, shared_ptr<FileBuffer> p, size_t off, size_t blksz, size_t blkindex);
 };
 
 class FBDelPartition : public FBCmd
