@@ -78,7 +78,7 @@ typedef struct _STORE_HEADER
 	uint32_t dwFinalTableCount; // number of blocks in the real GPT
 	uint16_t NumOfStores; // Total number of stores (V2 only)
 	uint16_t StoreIndex; // Current store index, 1-based (V2 only)
-	UINT64 StorePayloadSize; // Payload data only, excludes padding (V2 only)
+	uint64_t StorePayloadSize; // Payload data only, excludes padding (V2 only)
 	uint16_t DevicePathLength; // Length of the device path (V2 only)
 	uint16_t DevicePath[1]; // Device path has no NUL at then end (V2 only)
 } FFU_STORE_HEADER;
