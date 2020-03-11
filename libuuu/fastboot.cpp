@@ -710,8 +710,11 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 bool FBFlashCmd::isffu(shared_ptr<FileBuffer> p)
 {
-	p->request_data(sizeof(FFU_SECURITY_HEADER));
-	FFU_SECURITY_HEADER *h = (FFU_SECURITY_HEADER*)p->data();
+	vector<uint8_t> data;
+	data.resize(sizeof(FFU_SECURITY_HEADER));
+	p->request_data(data, 0, sizeof(FFU_SECURITY_HEADER));
+
+	FFU_SECURITY_HEADER *h = (FFU_SECURITY_HEADER*)data.data();
 	if (strncmp((const char*)h->signature, FFU_SECURITY_SIGNATURE, sizeof(h->signature)) == 0)
 		return true;
 	else
