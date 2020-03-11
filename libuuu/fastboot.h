@@ -70,7 +70,8 @@ class FBCmd: public CmdBase
 public:
 	string m_fb_cmd;
 	string m_uboot_cmd;
-	FBCmd(char *p) :CmdBase(p) {}
+	char m_separator;
+	FBCmd(char *p) :CmdBase(p), m_separator(':') {}
 	int parser(char *p = NULL);
 	int run(CmdCtx *ctx);
 };
@@ -102,7 +103,7 @@ public:
 class FBOemCmd : public FBCmd
 {
 public:
-	FBOemCmd(char *p) : FBCmd(p) { m_fb_cmd = "oem"; }
+	FBOemCmd(char *p) : FBCmd(p) { m_fb_cmd = "oem"; m_separator = ' ';}
 };
 
 class FBFlashCmd : public FBCmd

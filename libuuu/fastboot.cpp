@@ -178,7 +178,7 @@ int FBCmd::run(CmdCtx *ctx)
 	FastBoot fb(&dev);
 	string cmd;
 	cmd = m_fb_cmd;
-	cmd += ":";
+	cmd += m_separator;
 	cmd += m_uboot_cmd;
 
 	if (fb.Transport(cmd, NULL, 0))
