@@ -46,6 +46,8 @@
 #include "ffu_format.h"
 #include "libcomm.h"
 
+static constexpr size_t SparseLimit{0x1000000};
+
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
 	if (m_pTrans->write((void*)cmd.data(), cmd.size()))
@@ -495,8 +497,8 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, siz
 
 	vector<uint8_t> data;
 
-	if (max > 0x1000000)
-		 max = 0x1000000;
+	if (max > SparseLimit)
+		 max = SparseLimit;
 
 	sf.init_header(block_size, (max + block_size -1) / block_size);
 
@@ -572,20 +574,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 	if (getvar.run(ctx))
 		return -1;
 
-	size_t max = str_to_uint(getvar.m_val);
-
-	if (getvar.parser((char*)"FB: getvar logical-block-size"))
-		return -1;
-	if (getvar.run(ctx))
-		return -1;
-
-	size_t block_size = str_to_uint(getvar.m_val);
-
-	if (block_size == 0)
-	{
-		set_last_err_string("Device report block_size is 0");
-		return -1;
-	}
+	size_t max = getvar.m_val.empty() ? SparseLimit : str_to_uint(getvar.m_val);
 
 	string str;
 	str = "FB: getvar partition-size:";
@@ -608,6 +597,19 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	if (m_raw2sparse)
 	{
+		if (getvar.parser((char*)"FB: getvar logical-block-size"))
+			return -1;
+		if (getvar.run(ctx))
+			return -1;
+
+		size_t block_size = str_to_uint(getvar.m_val);
+
+		if (block_size == 0)
+		{
+			set_last_err_string("Device report block_size is 0");
+			return -1;
+		}
+
 		shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename, true);
 
 		if (isffu(pdata))
@@ -622,8 +624,8 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	if (SparseFile::is_validate_sparse_file(pdata->data(), pdata->size()))
 	{	/* Limited max size to 16M for sparse file to avoid long timeout at read status*/
-		if (max > 0x1000000)
-			max = 0x1000000;
+		if (max > SparseLimit)
+			max = SparseLimit;
 	}
 
 	if (pdata->size() <= max)
