@@ -69,6 +69,7 @@ Config::Config()
 	push_back(ConfigItem("FBK:", NULL, NULL, 0x066F, 0x9BFF));
 	push_back(ConfigItem("FB:", NULL, NULL,  0x0525, 0xA4A5));
 	push_back(ConfigItem("FB:", NULL, NULL,  0x18D1, 0x0D02));
+	push_back(ConfigItem("FB:", NULL, NULL,  BD_VID, 0x0001));
 }
 
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p)
