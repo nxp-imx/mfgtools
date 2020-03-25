@@ -213,7 +213,7 @@ public:
 	bool m_bDownload;
 	size_t m_Maxsize_pre_cmd;
 	int parser(char *p=NULL);
-	FBCopy(char *p) :CmdBase(p) { m_Maxsize_pre_cmd = 0x10000; };
+	FBCopy(char *p) :CmdBase(p) { m_Maxsize_pre_cmd = 0x1000; };
 	int run(CmdCtx *ctx);
 };
 
