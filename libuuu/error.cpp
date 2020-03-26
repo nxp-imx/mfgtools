@@ -29,8 +29,6 @@
 *
 */
 
-#include <string>
-
 using namespace std;
 
 #include "libuuu.h"
@@ -56,7 +54,7 @@ const char * uuu_get_last_err_string()
 	return g_last_error_str.c_str();
 }
 
-void set_last_err_string(string str)
+void set_last_err_string(const string &str)
 {
 	g_last_error_str = str;
 }
