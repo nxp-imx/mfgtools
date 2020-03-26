@@ -68,10 +68,10 @@ public:
 class FBCmd: public CmdBase
 {
 public:
-	string m_fb_cmd;
+	const string m_fb_cmd;
 	string m_uboot_cmd;
-	char m_separator;
-	FBCmd(char *p) :CmdBase(p), m_separator(':') {}
+	const char m_separator = ':';
+	FBCmd(char *p, std::string &&fb_cmd, char separator =':') :CmdBase(p), m_fb_cmd{std::move(fb_cmd)}, m_separator(separator) {}
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
 };
@@ -79,31 +79,31 @@ public:
 class FBUCmd : public FBCmd
 {
 public:
-	FBUCmd(char *p) :FBCmd(p) { m_fb_cmd = "UCmd"; }
+	FBUCmd(char *p) :FBCmd(p, "UCmd") {}
 };
 
 class FBACmd : public FBCmd
 {
 public:
-	FBACmd(char *p) :FBCmd(p) { m_fb_cmd = "ACmd"; }
+	FBACmd(char *p) :FBCmd(p, "ACmd") {}
 };
 
 class FBSyncCmd: public FBCmd
 {
 public:
-	FBSyncCmd(char *p) : FBCmd(p) { m_fb_cmd = "Sync"; }
+	FBSyncCmd(char *p) : FBCmd(p, "Sync") {}
 };
 
 class FBFlashingCmd : public FBCmd
 {
 public:
-	FBFlashingCmd(char *p) : FBCmd(p) { m_fb_cmd = "flashing"; }
+	FBFlashingCmd(char *p) : FBCmd(p, "flashing") {}
 };
 
 class FBOemCmd : public FBCmd
 {
 public:
-	FBOemCmd(char *p) : FBCmd(p) { m_fb_cmd = "oem"; m_separator = ' ';}
+	FBOemCmd(char *p) : FBCmd(p, "oem", ' ') {}
 };
 
 class FBFlashCmd : public FBCmd
@@ -113,7 +113,7 @@ public:
 	string m_partition;
 	uint64_t m_totalsize;
 	bool m_raw2sparse = false;
-	FBFlashCmd(char *p) : FBCmd(p) { m_timeout = 10000; m_fb_cmd = "flash"; }
+	FBFlashCmd(char *p) : FBCmd(p, "flash") { m_timeout = 10000; }
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
 	int flash(FastBoot *fb, void *p, size_t sz);
@@ -126,17 +126,17 @@ public:
 class FBDelPartition : public FBCmd
 {
 public:
-	FBDelPartition(char*p) : FBCmd(p) { m_fb_cmd = "delete-logical-partition"; }
+	FBDelPartition(char*p) : FBCmd(p, "delete-logical-partition") {}
 };
 
 class FBPartNumber : public CmdBase
 {
 public:
 	string m_partition_name;
-	string m_fb_cmd;
+	const string m_fb_cmd;
 	uint32_t m_Size;
 
-	FBPartNumber(char *p) :CmdBase(p)
+	FBPartNumber(char *p, std::string &&fb_cmd) :CmdBase(p), m_fb_cmd{std::move(fb_cmd)}
 	{
 		m_Size = 0;
 		m_bCheckTotalParam = true;
@@ -150,17 +150,13 @@ public:
 class FBCreatePartition : public FBPartNumber
 {
 public:
-	FBCreatePartition(char*p) :FBPartNumber(p) {
-		m_fb_cmd = "create-logical-partition";
-	}
+	FBCreatePartition(char*p) :FBPartNumber(p, "create-logical-partition") {}
 };
 
 class FBResizePartition : public FBPartNumber
 {
 public:
-	FBResizePartition(char*p) :FBPartNumber(p) {
-		m_fb_cmd = "resize-logical-partition";
-	}
+	FBResizePartition(char*p) :FBPartNumber(p, "resize-logical-partition") {}
 };
 
 class FBUpdateSuper : public CmdBase
@@ -183,13 +179,13 @@ public:
 class FBEraseCmd : public FBCmd
 {
 public:
-	FBEraseCmd(char *p) : FBCmd(p) { m_fb_cmd = "erase"; }
+	FBEraseCmd(char *p) : FBCmd(p, "erase") {}
 };
 
 class FBSetActiveCmd : public FBCmd
 {
 public:
-	FBSetActiveCmd(char *p) : FBCmd(p) { m_fb_cmd = "set_active"; }
+	FBSetActiveCmd(char *p) : FBCmd(p, "set_active") {}
 };
 
 class FBDownload : public CmdBase
@@ -219,5 +215,5 @@ public:
 class FBContinueCmd : public FBCmd
 {
 public:
-	FBContinueCmd(char *p) : FBCmd(p) { m_fb_cmd = "continue"; }
+	FBContinueCmd(char *p) : FBCmd(p, "continue") {}
 };
