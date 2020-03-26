@@ -88,19 +88,19 @@ class CmdBase
 {
 public:
 	vector<Param> m_param;
-	uint64_t m_timeout;
-	bool m_lastcmd;
+	uint64_t m_timeout = 2000;
+	bool m_lastcmd = false;
 	std::string m_cmd;
-	bool m_NoKeyParam;
-	bool m_bCheckTotalParam;
+	bool m_NoKeyParam = false;
+	bool m_bCheckTotalParam = false;
 
-	void CmdBaseInit() { m_timeout = 2000; m_lastcmd = false; m_NoKeyParam = false; m_bCheckTotalParam = false; }
-	CmdBase() { CmdBaseInit(); };
-	CmdBase(char *p) { CmdBaseInit(); if (p) m_cmd = p; }
+	CmdBase() = default;
+	CmdBase(char *p) { if (p) m_cmd = p; }
+	virtual ~CmdBase();
 
-	void insert_param_info(const char *key, void *pD, Param::Type tp, bool ignore_case = true, const char* err = NULL)
+	void insert_param_info(const char *key, void *pD, Param::Type tp, bool ignore_case = true, const char* err = nullptr)
 	{
-		m_param.push_back(Param(key, pD, tp, ignore_case, err));
+		m_param.emplace_back(Param{key, pD, tp, ignore_case, err});
 	}
 
 	virtual int parser_protocal(char *p, size_t &pos)
@@ -137,8 +137,8 @@ public:
 		}
 		return 0;
 	}
-	virtual int parser(char *p = NULL);
-	virtual int run(CmdCtx *p)=0;
+	virtual int parser(char *p = nullptr);
+	virtual int run(CmdCtx *p) = 0;
 	virtual int dump();
 };
 

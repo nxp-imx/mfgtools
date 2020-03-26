@@ -64,6 +64,10 @@ CmdCtx::~CmdCtx()
 {
 }
 
+CmdBase::~CmdBase()
+{
+}
+
 int CmdBase::parser(char *p)
 {
 	if (p != NULL)
