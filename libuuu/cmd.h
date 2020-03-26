@@ -73,14 +73,14 @@ struct Param
 		e_string_filename,
 	};
 
-	const char * key;
-	const char * Error;
+	const char * const key;
+	const char * const Error;
 	void *pData;
-	int type;
-	bool ignore_case;
-	Param(const char *ky, void *pD, Param_Type tp, bool ignore=true, const char *error = NULL)
+	const int type;
+	const bool ignore_case;
+	Param(const char *ky, void *pD, Param_Type tp, bool ignore = true, const char *error = nullptr) :
+		key{ky}, Error{error}, pData{pD}, type{tp}, ignore_case{ignore}
 	{
-		key = ky; pData = pD; type = tp; ignore_case = ignore; Error = error;
 	}
 };
 
