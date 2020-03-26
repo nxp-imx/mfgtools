@@ -142,7 +142,7 @@ public:
 	virtual int dump();
 };
 
-typedef shared_ptr<CmdBase> (*CreateCmdObj) (char *);
+using CreateCmdObj = shared_ptr<CmdBase> (*) (char *);
 
 class CmdObjCreateMap:public map<string, CreateCmdObj>
 {
@@ -153,17 +153,17 @@ public:
 class CmdDone :public CmdBase
 {
 public:
-	CmdDone(char *p) :CmdBase(p) { m_lastcmd = true; };
-	int run(CmdCtx *p);
+	CmdDone(char *p) :CmdBase(p) { m_lastcmd = true; }
+	int run(CmdCtx *p) override;
 };
 
 class CmdDelay :public CmdBase
 {
 public:
-	int m_ms;
-	virtual int parser(char *p = NULL);
-	CmdDelay(char *p) :CmdBase(p) { m_ms = 0; };
-	int run(CmdCtx *p);
+	int m_ms = 0;
+	CmdDelay(char *p) :CmdBase(p) {}
+	int parser(char *p = nullptr) override;
+	int run(CmdCtx *p) override;
 };
 
 class CmdShell : public CmdBase
@@ -171,11 +171,11 @@ class CmdShell : public CmdBase
 public:
 	string m_shellcmd;
 	string m_protocal;
-	bool	m_dyn;
+	bool	m_dyn = false;
 
-	CmdShell(char *p) : CmdBase(p) { m_dyn = false; };
-	virtual int parser(char *p = NULL);
-	int run(CmdCtx *p);
+	CmdShell(char *p) : CmdBase(p) {}
+	int parser(char *p = nullptr) override;
+	int run(CmdCtx *p) override;
 };
 
 class CmdList : public std::vector<shared_ptr<CmdBase>>
@@ -187,7 +187,7 @@ public:
 class CmdMap : public std::map<std::string, shared_ptr<CmdList>>
 {
 public:
-	int run_all(std::string protocal, CmdCtx *p,  bool dry_run = false)
+	int run_all(const std::string &protocal, CmdCtx *p,  bool dry_run = false)
 	{
 		if (find(protocal) == end())
 		{
@@ -205,9 +205,9 @@ public:
 class CfgCmd :public CmdBase
 {
 public:
-	int parser(char * /*p*/) { return 0; };
-	CfgCmd(char *cmd) :CmdBase(cmd) {};
-	int run(CmdCtx *p);
+	CfgCmd(char *cmd) :CmdBase(cmd) {}
+	int parser(char * /*p*/) override { return 0; }
+	int run(CmdCtx *p) override;
 };
 
 int run_cmds(const char *procotal, CmdCtx *p);
