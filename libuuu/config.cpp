@@ -29,7 +29,6 @@
 *
 */
 
-#include <vector>
 #include "config.h"
 #include "cmd.h"
 #include "libuuu.h"
@@ -108,7 +107,7 @@ ConfigItem * Config::find(uint16_t vid, uint16_t pid, uint16_t ver)
 	return NULL;
 }
 
-Config Config::find(string pro)
+Config Config::find(const string &pro)
 {
 	Config items;
 	iterator it;
