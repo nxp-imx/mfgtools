@@ -35,68 +35,67 @@
 
 static Config g_config;
 
-#define FSL_VID 0x15A2
-#define NXP_VID 0x1FC9
-#define BD_VID 0x3016
+constexpr uint16_t FSL_VID = 0x15A2;
+constexpr uint16_t NXP_VID = 0x1FC9;
+constexpr uint16_t BD_VID = 0x3016;
 
 Config::Config()
 {
-	push_back(ConfigItem("SDPS:", "MX8QXP", NULL,   NXP_VID, 0x012F, 0x0002));
-	push_back(ConfigItem("SDPS:", "MX8QM",  "MX8QXP",   NXP_VID, 0x0129, 0x0002));
-	push_back(ConfigItem("SDPS:", "MX8DXL", "MX8QXP",   NXP_VID, 0x0147));
-	push_back(ConfigItem("SDPS:", "MX28",   NULL,   FSL_VID, 0x004f));
-	push_back(ConfigItem("SDPS:", "MX815",  NULL,   NXP_VID, 0x013E));
-	push_back(ConfigItem("SDPS:", "MX865",  "MX815",   NXP_VID, 0x0146));
-	push_back(ConfigItem("SDP:", "MX7D",    NULL,   FSL_VID, 0x0076));
-	push_back(ConfigItem("SDP:", "MX6Q",    NULL,   FSL_VID, 0x0054));
-	push_back(ConfigItem("SDP:", "MX6D",    "MX6Q", FSL_VID, 0x0061));
-	push_back(ConfigItem("SDP:", "MX6SL",   "MX6Q", FSL_VID, 0x0063));
-	push_back(ConfigItem("SDP:", "MX6SX",   "MX6Q", FSL_VID, 0x0071));
-	push_back(ConfigItem("SDP:", "MX6UL",   "MX7D", FSL_VID, 0x007D));
-	push_back(ConfigItem("SDP:", "MX6ULL",  "MX7D", FSL_VID, 0x0080));
-	push_back(ConfigItem("SDP:", "MX6SLL",  "MX7D", NXP_VID, 0x0128));
-	push_back(ConfigItem("SDP:", "MX7ULP",   NULL,  NXP_VID, 0x0126));
-	push_back(ConfigItem("SDP:", "MXRT106X",  NULL,  NXP_VID, 0x0135));
-	push_back(ConfigItem("SDP:", "MX8MM",   "MX8MQ", NXP_VID, 0x0134));
-	push_back(ConfigItem("SDP:", "MX8MQ",   "MX8MQ", NXP_VID, 0x012B));
-	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4, 0,      0x04FF));
-	push_back(ConfigItem("SDPV:", "SPL1",   "SPL",  0x0525, 0xB4A4, 0x0500, 0x9998));
-	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4, 0x9999, 0x9999)); /*old i.MX8 MQEVk use bcd 9999*/
-	push_back(ConfigItem("SDPU:", "SPL",    "SPL",  BD_VID, 0x1001, 0,      0x04FF));
-	push_back(ConfigItem("SDPV:", "SPL1",   "SPL",  BD_VID, 0x1001, 0x0500, 0x9998));
-	push_back(ConfigItem("FBK:", NULL, NULL, 0x066F, 0x9AFE));
-	push_back(ConfigItem("FBK:", NULL, NULL, 0x066F, 0x9BFF));
-	push_back(ConfigItem("FB:", NULL, NULL,  0x0525, 0xA4A5));
-	push_back(ConfigItem("FB:", NULL, NULL,  0x18D1, 0x0D02));
-	push_back(ConfigItem("FB:", NULL, NULL,  BD_VID, 0x0001));
+	emplace_back(ConfigItem{"SDPS:", "MX8QXP", nullptr,   NXP_VID, 0x012F, 0x0002});
+	emplace_back(ConfigItem{"SDPS:", "MX8QM",  "MX8QXP",   NXP_VID, 0x0129, 0x0002});
+	emplace_back(ConfigItem{"SDPS:", "MX8DXL", "MX8QXP",   NXP_VID, 0x0147});
+	emplace_back(ConfigItem{"SDPS:", "MX28",   nullptr,   FSL_VID, 0x004f});
+	emplace_back(ConfigItem{"SDPS:", "MX815",  nullptr,   NXP_VID, 0x013E});
+	emplace_back(ConfigItem{"SDPS:", "MX865",  "MX815",   NXP_VID, 0x0146});
+	emplace_back(ConfigItem{"SDP:", "MX7D",    nullptr,   FSL_VID, 0x0076});
+	emplace_back(ConfigItem{"SDP:", "MX6Q",    nullptr,   FSL_VID, 0x0054});
+	emplace_back(ConfigItem{"SDP:", "MX6D",    "MX6Q", FSL_VID, 0x0061});
+	emplace_back(ConfigItem{"SDP:", "MX6SL",   "MX6Q", FSL_VID, 0x0063});
+	emplace_back(ConfigItem{"SDP:", "MX6SX",   "MX6Q", FSL_VID, 0x0071});
+	emplace_back(ConfigItem{"SDP:", "MX6UL",   "MX7D", FSL_VID, 0x007D});
+	emplace_back(ConfigItem{"SDP:", "MX6ULL",  "MX7D", FSL_VID, 0x0080});
+	emplace_back(ConfigItem{"SDP:", "MX6SLL",  "MX7D", NXP_VID, 0x0128});
+	emplace_back(ConfigItem{"SDP:", "MX7ULP",   nullptr,  NXP_VID, 0x0126});
+	emplace_back(ConfigItem{"SDP:", "MXRT106X",  nullptr,  NXP_VID, 0x0135});
+	emplace_back(ConfigItem{"SDP:", "MX8MM",   "MX8MQ", NXP_VID, 0x0134});
+	emplace_back(ConfigItem{"SDP:", "MX8MQ",   "MX8MQ", NXP_VID, 0x012B});
+	emplace_back(ConfigItem{"SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4, 0,      0x04FF});
+	emplace_back(ConfigItem{"SDPV:", "SPL1",   "SPL",  0x0525, 0xB4A4, 0x0500, 0x9998});
+	emplace_back(ConfigItem{"SDPU:", "SPL",    "SPL",  0x0525, 0xB4A4, 0x9999, 0x9999}); /*old i.MX8 MQEVk use bcd 9999*/
+	emplace_back(ConfigItem{"SDPU:", "SPL",    "SPL",  BD_VID, 0x1001, 0,      0x04FF});
+	emplace_back(ConfigItem{"SDPV:", "SPL1",   "SPL",  BD_VID, 0x1001, 0x0500, 0x9998});
+	emplace_back(ConfigItem{"FBK:", nullptr, nullptr, 0x066F, 0x9AFE});
+	emplace_back(ConfigItem{"FBK:", nullptr, nullptr, 0x066F, 0x9BFF});
+	emplace_back(ConfigItem{"FB:", nullptr, nullptr,  0x0525, 0xA4A5});
+	emplace_back(ConfigItem{"FB:", nullptr, nullptr,  0x18D1, 0x0D02});
+	emplace_back(ConfigItem{"FB:", nullptr, nullptr,  BD_VID, 0x0001});
 }
 
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p)
 {
-	for (size_t i = 0; i < g_config.size(); i++)
+	for (const auto &configItem : g_config)
 	{
-		if (fn(g_config[i].m_protocol.c_str(),
-			   g_config[i].m_chip.c_str(),
-			   g_config[i].m_compatible.c_str(),
-			   g_config[i].m_vid,
-			   g_config[i].m_pid,
-			   g_config[i].m_bcdVerMin,
-			   g_config[i].m_bcdVerMax,
+		if (fn(configItem.m_protocol.c_str(),
+			   configItem.m_chip.c_str(),
+			   configItem.m_compatible.c_str(),
+			   configItem.m_vid,
+			   configItem.m_pid,
+			   configItem.m_bcdVerMin,
+			   configItem.m_bcdVerMax,
 			   p))
 			return -1;
 	}
 	return 0;
 }
 
-Config * get_config()
+Config * get_config() noexcept
 {
 	return &g_config;
 }
 
 ConfigItem * Config::find(uint16_t vid, uint16_t pid, uint16_t ver)
 {
-	iterator it;
-	for (it = begin(); it != end(); it++)
+	for (auto it = begin(); it != end(); it++)
 	{
 		if (vid == it->m_vid && pid == it->m_pid)
 		{
@@ -104,17 +103,16 @@ ConfigItem * Config::find(uint16_t vid, uint16_t pid, uint16_t ver)
 				return &(*it);
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Config Config::find(const string &pro)
 {
 	Config items;
-	iterator it;
-	for (it = begin(); it != end(); it++)
+	for (auto it = begin(); it != end(); it++)
 	{
 		if (it->m_protocol == pro)
-			items.push_back(*it);
+			items.emplace_back(*it);
 	}
 	return items;
 }
@@ -189,7 +187,7 @@ int CfgCmd::run(CmdCtx *)
 	if (pItem)
 		*pItem = item;
 	else
-		g_config.push_back(item);
+		g_config.emplace_back(item);
 
 	return 0;
 }

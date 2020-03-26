@@ -68,4 +68,4 @@ public:
 	Config find(const string &protocal);
 };
 
-Config * get_config();
+Config * get_config() noexcept;
