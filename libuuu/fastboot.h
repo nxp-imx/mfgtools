@@ -45,14 +45,14 @@ using namespace std;
 
 class FastBoot
 {
-	TransBase *m_pTrans;
+	TransBase *const m_pTrans = nullptr;
 public:
 	string m_info;
 
-	FastBoot(TransBase *p) { m_pTrans = p; }
+	FastBoot(TransBase *p) : m_pTrans{p} {}
 
-	int Transport(string cmd, void *p = NULL, size_t size = 0, vector<uint8_t> *input = NULL);
-	int Transport(string cmd, vector<uint8_t>data, vector<uint8_t> *input=NULL) { return Transport(cmd, data.data(), data.size(), input); };
+	int Transport(string cmd, void *p = nullptr, size_t size = 0, vector<uint8_t> *input = nullptr);
+	int Transport(string cmd, vector<uint8_t> data, vector<uint8_t> *input = nullptr) { return Transport(cmd, data.data(), data.size(), input); }
 };
 
 class FBGetVar : public CmdBase
