@@ -60,9 +60,9 @@ class FBGetVar : public CmdBase
 public:
 	string m_var;
 	string m_val;
-	int parser(char*p=NULL);
 	FBGetVar(char *p) :CmdBase(p) {}
-	int run(CmdCtx *ctx);
+	int parser(char *p = nullptr) override;
+	int run(CmdCtx *ctx) override;
 };
 
 class FBCmd: public CmdBase
@@ -72,8 +72,8 @@ public:
 	string m_uboot_cmd;
 	char m_separator;
 	FBCmd(char *p) :CmdBase(p), m_separator(':') {}
-	int parser(char *p = NULL);
-	int run(CmdCtx *ctx);
+	int parser(char *p = nullptr) override;
+	int run(CmdCtx *ctx) override;
 };
 
 class FBUCmd : public FBCmd
@@ -112,10 +112,10 @@ public:
 	string m_filename;
 	string m_partition;
 	uint64_t m_totalsize;
-	bool m_raw2sparse;
-	FBFlashCmd(char *p) : FBCmd(p) { m_timeout = 10000; m_fb_cmd = "flash"; m_raw2sparse = false; }
-	int parser(char *p = NULL);
-	int run(CmdCtx *ctx);
+	bool m_raw2sparse = false;
+	FBFlashCmd(char *p) : FBCmd(p) { m_timeout = 10000; m_fb_cmd = "flash"; }
+	int parser(char *p = nullptr) override;
+	int run(CmdCtx *ctx) override;
 	int flash(FastBoot *fb, void *p, size_t sz);
 	int flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> p, size_t blksz, size_t max);
 	bool isffu(shared_ptr<FileBuffer> p);
@@ -141,10 +141,10 @@ public:
 		m_Size = 0;
 		m_bCheckTotalParam = true;
 		m_NoKeyParam = true;
-		insert_param_info(NULL, &m_partition_name, Param::Type::e_string, false, "partition name");
-		insert_param_info(NULL, &m_Size, Param::Type::e_uint32, false, "partition size");
+		insert_param_info(nullptr, &m_partition_name, Param::Type::e_string, false, "partition name");
+		insert_param_info(nullptr, &m_Size, Param::Type::e_uint32, false, "partition size");
 	}
-	int run(CmdCtx *ctx);
+	int run(CmdCtx *ctx) override;
 };
 
 class FBCreatePartition : public FBPartNumber
@@ -167,18 +167,17 @@ class FBUpdateSuper : public CmdBase
 {
 public:
 	string m_partition_name;
-	string m_fb_cmd;
+	const string m_fb_cmd = "update-super";
 	string m_opt;
 
 	FBUpdateSuper(char *p) :CmdBase(p)
 	{
 		m_bCheckTotalParam = true;
 		m_NoKeyParam = true;
-		insert_param_info(NULL, &m_partition_name, Param::Type::e_string, false, "partition name");
-		insert_param_info(NULL, &m_opt, Param::Type::e_string, false, "partition size");
-		m_fb_cmd = "update-super";
+		insert_param_info(nullptr, &m_partition_name, Param::Type::e_string, false, "partition name");
+		insert_param_info(nullptr, &m_opt, Param::Type::e_string, false, "partition size");
 	}
-	int run(CmdCtx *ctx);
+	int run(CmdCtx *ctx) override;
 };
 
 class FBEraseCmd : public FBCmd
@@ -199,10 +198,10 @@ public:
 	string m_filename;
 	FBDownload(char *p) :CmdBase(p)
 	{
-		insert_param_info("download", NULL, Param::Type::e_null);
+		insert_param_info("download", nullptr, Param::Type::e_null);
 		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
 	}
-	int run(CmdCtx *ctx);
+	int run(CmdCtx *ctx) override;
 };
 
 class FBCopy : public CmdBase
@@ -211,10 +210,10 @@ public:
 	string m_local_file;
 	string m_target_file;
 	bool m_bDownload;
-	size_t m_Maxsize_pre_cmd;
-	int parser(char *p=NULL);
-	FBCopy(char *p) :CmdBase(p) { m_Maxsize_pre_cmd = 0x10000; };
-	int run(CmdCtx *ctx);
+	size_t m_Maxsize_pre_cmd = 0x10000;
+	FBCopy(char *p) :CmdBase(p) {}
+	int parser(char *p = nullptr) override;
+	int run(CmdCtx *ctx) override;
 };
 
 class FBContinueCmd : public FBCmd
