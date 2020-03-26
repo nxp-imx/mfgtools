@@ -61,10 +61,10 @@ public:
 class EPInfo
 {
 public:
-	EPInfo() { addr = 0; package_size = 64; }
-	EPInfo(int a, int size) { addr = a; package_size = size; };
-	int addr;
-	int package_size;
+	constexpr EPInfo() = default;
+	constexpr EPInfo(int a, int size) : addr{a}, package_size{size} {}
+	int addr = 0;
+	int package_size = 64;
 };
 
 class USBTrans : public TransBase
