@@ -284,30 +284,20 @@ class ShowNotify
 public:
 	string m_cmd;
 	string m_dev;
-	size_t m_trans_pos;
-	int m_status;
-	size_t m_cmd_total;
-	size_t m_cmd_index;
+	size_t m_trans_pos = 0;
+	int m_status = 0;
+	size_t m_cmd_total = 0;
+	size_t m_cmd_index = 0;
 	string m_last_err;
-	int m_done;
-	size_t m_start_pos;
-	size_t	m_trans_size;
+	int m_done = 0;
+	size_t m_start_pos = 0;
+	size_t	m_trans_size = 0;
 	clock_t m_start_time;
 	uint64_t m_cmd_start_time;
 	uint64_t m_cmd_end_time;
-	bool m_IsEmptyLine;
+	bool m_IsEmptyLine = false;
 
-	ShowNotify()
-	{
-		m_trans_size = m_trans_pos = 0;
-		m_status = 0;
-		m_cmd_total = 0;
-		m_cmd_index = 0;
-		m_done = 0;
-		m_start_pos = 0;
-		m_IsEmptyLine = false;
-		m_start_time = clock();
-	}
+	ShowNotify() : m_start_time{clock()} {}
 
 	bool update(uuu_notify nt)
 	{
