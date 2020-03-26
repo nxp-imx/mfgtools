@@ -29,8 +29,13 @@
 *
 */
 
-
 #pragma once
+
+#include <cstdint>
+#include <memory>
+
+class ConfigItem;
+class FileBuffer;
 
 #define ROM_INFO_HID					   0x1
 #define ROM_INFO_HID_MX23				   0x2
@@ -47,9 +52,6 @@
 #define ROM_INFO_HID_SDP_NO_MAX_PER_TRANS	0x4000
 #define ROM_INFO_AUTO_SCAN_UBOOT_POS		0x8000
 
-#include <stdint.h>
-#include <stddef.h>
-
 struct ROM_INFO
 {
 	const char * m_name;
@@ -60,5 +62,5 @@ struct ROM_INFO
 const ROM_INFO * search_rom_info(const char *s);
 const ROM_INFO * search_rom_info(const ConfigItem *item);
 
-size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset);
-size_t GetFlashHeaderSize(shared_ptr<FileBuffer> p, size_t offset = 0);
+size_t GetContainerActualSize(std::shared_ptr<FileBuffer> p, size_t offset);
+size_t GetFlashHeaderSize(std::shared_ptr<FileBuffer> p, size_t offset = 0);
