@@ -50,17 +50,15 @@ uint32_t str_to_uint(string &str);
 class CmdCtx
 {
 public:
-	CmdCtx() { m_config_item = NULL; m_dev = NULL; };
-	virtual ~CmdCtx() {};
-	ConfigItem *m_config_item;
-	void *m_dev;
+	virtual ~CmdCtx();
+	ConfigItem *m_config_item = nullptr;
+	void *m_dev = nullptr;
 };
 
 class CmdUsbCtx : public CmdCtx
 {
 public:
-	CmdUsbCtx() :CmdCtx() {};
-	~CmdUsbCtx();
+	~CmdUsbCtx() override;
 	int look_for_match_device(const char * procotol);
 };
 

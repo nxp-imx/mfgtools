@@ -60,6 +60,9 @@ typedef void * (*FN)();
 
 FN g_fn = create_object<int>;
 
+CmdCtx::~CmdCtx()
+{
+}
 
 int CmdBase::parser(char *p)
 {
