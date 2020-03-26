@@ -115,14 +115,14 @@ int CmdBase::parser(char *p)
 			return -1;
 		}
 
-		if (pp->type == Param::e_uint32)
+		if (pp->type == Param::Type::e_uint32)
 		{
 			if (!m_NoKeyParam)
 				param = get_next_param(m_cmd, pos);
 			*(uint32_t*)pp->pData = str_to_uint(param);
 		}
 
-		if (pp->type == Param::e_string_filename)
+		if (pp->type == Param::Type::e_string_filename)
 		{
 			if (!m_NoKeyParam)
 				param = get_next_param(m_cmd, pos);
@@ -132,19 +132,19 @@ int CmdBase::parser(char *p)
 				return -1;
 		}
 
-		if (pp->type == Param::e_string)
+		if (pp->type == Param::Type::e_string)
 		{
 			if (!m_NoKeyParam)
 				param = get_next_param(m_cmd, pos);
 			*(string*)pp->pData = param;
 		}
 
-		if (pp->type == Param::e_bool)
+		if (pp->type == Param::Type::e_bool)
 		{
 			*(bool*)pp->pData = true;
 		}
 
-		if (pp->type == Param::e_null)
+		if (pp->type == Param::Type::e_null)
 		{
 		}
 	}

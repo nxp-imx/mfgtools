@@ -64,7 +64,7 @@ public:
 
 struct Param
 {
-	enum Param_Type
+	enum class Type
 	{
 		e_uint32,
 		e_bool,
@@ -76,9 +76,9 @@ struct Param
 	const char * const key;
 	const char * const Error;
 	void *pData;
-	const int type;
+	const Type type;
 	const bool ignore_case;
-	Param(const char *ky, void *pD, Param_Type tp, bool ignore = true, const char *error = nullptr) :
+	Param(const char *ky, void *pD, Type tp, bool ignore = true, const char *error = nullptr) :
 		key{ky}, Error{error}, pData{pD}, type{tp}, ignore_case{ignore}
 	{
 	}
@@ -98,7 +98,7 @@ public:
 	CmdBase() { CmdBaseInit(); };
 	CmdBase(char *p) { CmdBaseInit(); if (p) m_cmd = p; }
 
-	void insert_param_info(const char *key, void *pD, Param::Param_Type tp, bool ignore_case = true, const char* err = NULL)
+	void insert_param_info(const char *key, void *pD, Param::Type tp, bool ignore_case = true, const char* err = NULL)
 	{
 		m_param.push_back(Param(key, pD, tp, ignore_case, err));
 	}

@@ -163,7 +163,7 @@ class SDPBootlogCmd : public SDPCmdBase
 public:
 	SDPBootlogCmd(char *p) :SDPCmdBase(p)
 	{
-		insert_param_info("blog", NULL, Param::e_null);
+		insert_param_info("blog", NULL, Param::Type::e_null);
 	}
 	int run(CmdCtx *);
 };
@@ -174,9 +174,9 @@ public:
 	uint32_t m_dcd_addr;
 	SDPDcdCmd(char *p):SDPCmdBase(p)
 	{
-		insert_param_info("dcd", NULL, Param::e_null);
-		insert_param_info("-f", &m_filename, Param::e_string_filename);
-		insert_param_info("-dcdaddr", &m_dcd_addr, Param::e_uint32);
+		insert_param_info("dcd", NULL, Param::Type::e_null);
+		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
+		insert_param_info("-dcdaddr", &m_dcd_addr, Param::Type::e_uint32);
 		m_dcd_addr = 0;
 	}
 	int run(CmdCtx *);
@@ -192,9 +192,9 @@ public:
 	SDPReadMemCmd(char*p) :SDPCmdBase(p) {
 		m_spdcmd.m_cmd = ROM_KERNEL_CMD_RD_MEM;
 
-		insert_param_info("rdmem", NULL, Param::e_null);
-		insert_param_info("-addr", &m_mem_addr, Param::e_uint32);
-		insert_param_info("-format", &m_mem_format, Param::e_uint32);
+		insert_param_info("rdmem", NULL, Param::Type::e_null);
+		insert_param_info("-addr", &m_mem_addr, Param::Type::e_uint32);
+		insert_param_info("-format", &m_mem_format, Param::Type::e_uint32);
 	}
 	int run(CmdCtx *);
 };
@@ -209,10 +209,10 @@ public:
 	SDPWriteMemCmd(char*p) :SDPCmdBase(p) {
 		m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_MEM;
 
-		insert_param_info("wrmem", NULL, Param::e_null);
-		insert_param_info("-addr", &m_mem_addr, Param::e_uint32);
-		insert_param_info("-format", &m_mem_format, Param::e_uint32);
-		insert_param_info("-value", &m_mem_value, Param::e_uint32);
+		insert_param_info("wrmem", NULL, Param::Type::e_null);
+		insert_param_info("-addr", &m_mem_addr, Param::Type::e_uint32);
+		insert_param_info("-format", &m_mem_format, Param::Type::e_uint32);
+		insert_param_info("-value", &m_mem_value, Param::Type::e_uint32);
 	}
 	int run(CmdCtx *p);
 };
@@ -239,13 +239,13 @@ public:
 		m_download_addr = 0;
 		m_bskipspl = false;
 
-		insert_param_info("write", NULL, Param::e_null);
-		insert_param_info("-f", &m_filename, Param::e_string_filename);
-		insert_param_info("-ivt", &m_Ivt, Param::e_uint32);
-		insert_param_info("-addr", &m_download_addr, Param::e_uint32);
-		insert_param_info("-offset", &m_offset, Param::e_uint32);
-		insert_param_info("-skipspl", &m_bskipspl, Param::e_bool);
-		insert_param_info("-skipfhdr", &m_bskipfhdr, Param::e_bool);
+		insert_param_info("write", NULL, Param::Type::e_null);
+		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
+		insert_param_info("-ivt", &m_Ivt, Param::Type::e_uint32);
+		insert_param_info("-addr", &m_download_addr, Param::Type::e_uint32);
+		insert_param_info("-offset", &m_offset, Param::Type::e_uint32);
+		insert_param_info("-skipspl", &m_bskipspl, Param::Type::e_bool);
+		insert_param_info("-skipfhdr", &m_bskipfhdr, Param::Type::e_bool);
 	};
 
 	int run(CmdCtx *p);
@@ -264,12 +264,12 @@ public:
 		m_jump_addr = 0;
 		m_spdcmd.m_cmd = ROM_KERNEL_CMD_JUMP_ADDR;
 		m_clear_dcd = false;
-		insert_param_info("jump", NULL, Param::e_null);
-		insert_param_info("-f", &m_filename, Param::e_string_filename);
-		insert_param_info("-ivt", &m_Ivt, Param::e_bool);
-		insert_param_info("-plugin", &m_Ivt, Param::e_bool);
-		insert_param_info("-addr", &m_jump_addr, Param::e_uint32);
-		insert_param_info("-cleardcd", &m_clear_dcd, Param::e_bool);
+		insert_param_info("jump", NULL, Param::Type::e_null);
+		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
+		insert_param_info("-ivt", &m_Ivt, Param::Type::e_bool);
+		insert_param_info("-plugin", &m_Ivt, Param::Type::e_bool);
+		insert_param_info("-addr", &m_jump_addr, Param::Type::e_uint32);
+		insert_param_info("-cleardcd", &m_clear_dcd, Param::Type::e_bool);
 	};
 	int run(CmdCtx *p);
 };
@@ -287,7 +287,7 @@ public:
 	SDPStatusCmd(char *p) : SDPCmdBase(p)
 	{
 		m_spdcmd.m_cmd = ROM_KERNEL_CMD_ERROR_STATUS;
-		insert_param_info("status", NULL, Param::e_null);
+		insert_param_info("status", NULL, Param::Type::e_null);
 	};
 	int run(CmdCtx *p);
 };
@@ -300,11 +300,11 @@ public:
 	uint32_t m_dcd_addr;
 	SDPBootCmd(char *p) : SDPCmdBase(p)
 	{
-		insert_param_info("boot", NULL, Param::e_null);
-		insert_param_info("-f", &m_filename, Param::e_string_filename);
-		insert_param_info("-nojump", &m_nojump, Param::e_bool);
-		insert_param_info("-cleardcd", &m_clear_dcd, Param::e_bool);
-		insert_param_info("-dcdaddr", &m_dcd_addr, Param::e_uint32);
+		insert_param_info("boot", NULL, Param::Type::e_null);
+		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
+		insert_param_info("-nojump", &m_nojump, Param::Type::e_bool);
+		insert_param_info("-cleardcd", &m_clear_dcd, Param::Type::e_bool);
+		insert_param_info("-dcdaddr", &m_dcd_addr, Param::Type::e_uint32);
 
 		m_nojump = false;
 		m_clear_dcd = false;

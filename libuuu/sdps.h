@@ -43,10 +43,10 @@ public:
 	SDPSCmd(char *cmd) :CmdBase(cmd)
 	{
 		m_offset = 0;
-		insert_param_info("boot", NULL, Param::e_null);
-		insert_param_info("-f", &m_filename, Param::e_string_filename);
-		insert_param_info("-offset", &m_offset, Param::e_uint32);
-		insert_param_info("-skipfhdr", &m_bskipflashheader, Param::e_bool);
+		insert_param_info("boot", NULL, Param::Type::e_null);
+		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
+		insert_param_info("-offset", &m_offset, Param::Type::e_uint32);
+		insert_param_info("-skipfhdr", &m_bskipflashheader, Param::Type::e_bool);
 	};
 	int run(CmdCtx *p);
 };

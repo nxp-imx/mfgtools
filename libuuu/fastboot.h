@@ -141,8 +141,8 @@ public:
 		m_Size = 0;
 		m_bCheckTotalParam = true;
 		m_NoKeyParam = true;
-		insert_param_info(NULL, &m_partition_name, Param::e_string, false, "partition name");
-		insert_param_info(NULL, &m_Size, Param::e_uint32, false, "partition size");
+		insert_param_info(NULL, &m_partition_name, Param::Type::e_string, false, "partition name");
+		insert_param_info(NULL, &m_Size, Param::Type::e_uint32, false, "partition size");
 	}
 	int run(CmdCtx *ctx);
 };
@@ -174,8 +174,8 @@ public:
 	{
 		m_bCheckTotalParam = true;
 		m_NoKeyParam = true;
-		insert_param_info(NULL, &m_partition_name, Param::e_string, false, "partition name");
-		insert_param_info(NULL, &m_opt, Param::e_string, false, "partition size");
+		insert_param_info(NULL, &m_partition_name, Param::Type::e_string, false, "partition name");
+		insert_param_info(NULL, &m_opt, Param::Type::e_string, false, "partition size");
 		m_fb_cmd = "update-super";
 	}
 	int run(CmdCtx *ctx);
@@ -199,8 +199,8 @@ public:
 	string m_filename;
 	FBDownload(char *p) :CmdBase(p)
 	{
-		insert_param_info("download", NULL, Param::e_null);
-		insert_param_info("-f", &m_filename, Param::e_string_filename);
+		insert_param_info("download", NULL, Param::Type::e_null);
+		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
 	}
 	int run(CmdCtx *ctx);
 };
