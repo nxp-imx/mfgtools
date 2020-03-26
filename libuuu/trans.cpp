@@ -39,6 +39,10 @@ extern "C"
 #include "libusb.h"
 }
 
+TransBase::~TransBase()
+{
+}
+
 int USBTrans::open(void *p)
 {
 	m_devhandle = p;

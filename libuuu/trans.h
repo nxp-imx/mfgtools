@@ -28,11 +28,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#include <vector>
-#include <string>
-#include <atomic>
-
 #pragma once
+
+#include <atomic>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -40,17 +40,17 @@ class TransBase
 {
 public:
 	string m_path;
-	void * m_devhandle;
-	TransBase() { m_devhandle = NULL; }
-	virtual int open(void *) { return 0; };
-	virtual int close() { return 0; };
+	void * m_devhandle = nullptr;
+	virtual ~TransBase();
+	virtual int open(void *) { return 0; }
+	virtual int close() { return 0; }
 	virtual int write(void *buff, size_t size) = 0;
 	virtual int read(void *buff, size_t size, size_t *return_size) = 0;
 	int write(vector<uint8_t> & buff) { return write(buff.data(), buff.size()); }
 	int read(vector<uint8_t> &buff)
 	{
 		size_t size;
-		int ret = read(buff.data(), buff.size(), &size);
+		const auto ret = read(buff.data(), buff.size(), &size);
 		if (ret)
 			return ret;
 		buff.resize(size);
@@ -71,61 +71,49 @@ class USBTrans : public TransBase
 {
 public:
 	vector<EPInfo> m_EPs;
-	virtual int open(void *p);
-	virtual int close();
+	int open(void *p) override;
+	int close() override;
 };
 class HIDTrans : public USBTrans
 {
-	int m_set_report;
-	int m_outEP;
+	int m_set_report = 9;
+	int m_outEP = 0;
 public:
-	int m_read_timeout;
-	HIDTrans() { m_set_report = 9; m_read_timeout = 1000; m_outEP = 0; }
-	void set_hid_out_ep(int ep) { m_outEP = ep; }
+	int m_read_timeout = 1000;
+	void set_hid_out_ep(int ep) noexcept { m_outEP = ep; }
 
-	virtual int open(void *p)
+	int open(void *p) override
 	{
 		if (USBTrans::open(p))
 			return -1;
 
-		for (int i = 0; i < m_EPs.size(); i++)
+		for (const auto &ep : m_EPs)
 		{
-			if (m_EPs[i].addr > 0 && ((m_EPs[i].addr & 0x80) == 0))
-				m_outEP = m_EPs[i].addr;
+			if (ep.addr > 0 && ((ep.addr & 0x80) == 0))
+				m_outEP = ep.addr;
 		}
 
 		return 0;
 	}
-	~HIDTrans() { if (m_devhandle) close();  m_devhandle = NULL;  }
-	int write(void *buff, size_t size);
-	int read(void *buff, size_t size, size_t *return_size);
+	~HIDTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
+	int write(void *buff, size_t size) override;
+	int read(void *buff, size_t size, size_t *return_size) override;
 };
 
 class BulkTrans : public USBTrans
 {
-	void Init()
-	{
-		m_MaxTransPreRequest = 0x100000;
-		m_b_send_zero = 0;
-		m_timeout = 2000;
-	}
-
 public:
 	EPInfo m_ep_in;
 	EPInfo m_ep_out;
-	size_t m_MaxTransPreRequest;
-	int m_b_send_zero;
-	uint64_t m_timeout;
+	size_t m_MaxTransPreRequest = 0x100000;
+	int m_b_send_zero = 0;
+	uint64_t m_timeout = 2000;
 
-	BulkTrans() {
-		Init();
-	}
+	int open(void *p) override;
 
-	virtual int open(void *p);
-
-	~BulkTrans() { if (m_devhandle) close();  m_devhandle = NULL; }
-	int write(void *buff, size_t size);
-	int read(void *buff, size_t size, size_t *return_size);
+	~BulkTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
+	int write(void *buff, size_t size) override;
+	int read(void *buff, size_t size, size_t *return_size) override;
 };
 
 int polling_usb(std::atomic<int>& bexit);
