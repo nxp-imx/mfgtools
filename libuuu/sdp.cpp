@@ -65,8 +65,7 @@ IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &of
 
 int SDPDcdCmd::run(CmdCtx*ctx)
 {
-	ROM_INFO * rom;
-	rom = search_rom_info(ctx->m_config_item);
+	const ROM_INFO * rom = search_rom_info(ctx->m_config_item);
 	if (rom == NULL)
 	{
 		string_ex err;
@@ -218,8 +217,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 			offset += GetFlashHeaderSize(fbuff, offset);
 
 		if (m_bskipspl) {
-			ROM_INFO * rom;
-			rom = search_rom_info(ctx->m_config_item);
+			const ROM_INFO * rom = search_rom_info(ctx->m_config_item);
 			if(! (rom->flags & ROM_INFO_AUTO_SCAN_UBOOT_POS))
 			{
 				set_last_err_string("SPL doesn't support auto scan uboot position");
@@ -288,8 +286,7 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 
 	report.m_notify_total = size;
 
-	ROM_INFO * rom;
-	rom = search_rom_info(ctx->m_config_item);
+	const ROM_INFO * rom = search_rom_info(ctx->m_config_item);
 
 	size_t max = m_max_download_pre_cmd;
 
@@ -430,8 +427,7 @@ int SDPWriteMemCmd::run(CmdCtx *ctx)
 
 int SDPJumpCmd::run(CmdCtx *ctx)
 {
-	ROM_INFO * rom;
-	rom = search_rom_info(ctx->m_config_item);
+	const ROM_INFO * rom = search_rom_info(ctx->m_config_item);
 
 	HIDTrans dev;
 	if (dev.open(ctx->m_dev))

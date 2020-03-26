@@ -79,8 +79,7 @@ struct _ST_HID_CBW
 
 int SDPSCmd::run(CmdCtx *pro)
 {
-	ROM_INFO * rom;
-	rom = search_rom_info(pro->m_config_item);
+	const ROM_INFO * rom = search_rom_info(pro->m_config_item);
 	if (rom == NULL)
 	{
 		string_ex err;

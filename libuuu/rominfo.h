@@ -57,8 +57,8 @@ struct ROM_INFO
 	uint32_t	flags;
 };
 
-ROM_INFO * search_rom_info(const char *s);
-ROM_INFO * search_rom_info(ConfigItem *item);
+const ROM_INFO * search_rom_info(const char *s);
+const ROM_INFO * search_rom_info(const ConfigItem *item);
 
 size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset);
 size_t GetFlashHeaderSize(shared_ptr<FileBuffer> p, size_t offset = 0);

@@ -29,6 +29,7 @@
 *
 */
 
+#include <array>
 #include <string>
 #include "sdps.h"
 #include "hidreport.h"
@@ -38,26 +39,26 @@
 #include "sdp.h"
 #include "rominfo.h"
 
-ROM_INFO g_RomInfo[] =
+static constexpr std::array<ROM_INFO, 15> g_RomInfo
 {
-	{ "MX6Q",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 },
-	{ "MX6D",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 },
-	{ "MX6SL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 },
-	{ "MX7D",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX6UL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX6ULL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX6SLL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX8MQ",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX7ULP",	 0x2f018000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MXRT106X",	 0x1000,     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
-	{ "MX8QXP",      0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING },
-	{ "MX28",	 0x0,        ROM_INFO_HID},
-	{ "MX815",       0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING | ROM_INFO_HID_EP1 | ROM_INFO_HID_PACK_SIZE_1020 },
-	{ "SPL",	 0x0,	     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP | ROM_INFO_HID_SDP_NO_MAX_PER_TRANS},
-	{ "SPL1",	 0x0,	     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP | ROM_INFO_HID_SDP_NO_MAX_PER_TRANS | ROM_INFO_AUTO_SCAN_UBOOT_POS},
+	ROM_INFO{ "MX6Q",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 },
+	ROM_INFO{ "MX6D",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 },
+	ROM_INFO{ "MX6SL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 },
+	ROM_INFO{ "MX7D",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	ROM_INFO{ "MX6UL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	ROM_INFO{ "MX6ULL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	ROM_INFO{ "MX6SLL",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	ROM_INFO{ "MX8MQ",	 0x00910000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	ROM_INFO{ "MX7ULP",	 0x2f018000, ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	ROM_INFO{ "MXRT106X",	 0x1000,     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
+	ROM_INFO{ "MX8QXP",      0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING },
+	ROM_INFO{ "MX28",	 0x0,        ROM_INFO_HID},
+	ROM_INFO{ "MX815",       0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING | ROM_INFO_HID_EP1 | ROM_INFO_HID_PACK_SIZE_1020 },
+	ROM_INFO{ "SPL",	 0x0,	     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP | ROM_INFO_HID_SDP_NO_MAX_PER_TRANS},
+	ROM_INFO{ "SPL1",	 0x0,	     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP | ROM_INFO_HID_SDP_NO_MAX_PER_TRANS | ROM_INFO_AUTO_SCAN_UBOOT_POS},
 };
 
-ROM_INFO * search_rom_info(const char *s)
+const ROM_INFO * search_rom_info(const char *s)
 {
 	string s1 = s;
 	for (size_t i = 0; i < sizeof(g_RomInfo) / sizeof(ROM_INFO); i++)
@@ -65,17 +66,17 @@ ROM_INFO * search_rom_info(const char *s)
 		string s2;
 		s2 = g_RomInfo[i].m_name;
 		if (s1 == s2)
-			return g_RomInfo + i;
+			return &g_RomInfo[i];
 	}
 	return 0;
 }
 
-ROM_INFO * search_rom_info(ConfigItem *item)
+const ROM_INFO * search_rom_info(const ConfigItem *item)
 {
-	if (item == NULL)
-		return NULL;
+	if (item == nullptr)
+		return nullptr;
 
-	ROM_INFO *p = search_rom_info(item->m_chip.c_str());
+	const ROM_INFO *p = search_rom_info(item->m_chip.c_str());
 	if (p)
 		return p;
 
