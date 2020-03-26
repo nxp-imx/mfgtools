@@ -37,20 +37,22 @@
 class ConfigItem;
 class FileBuffer;
 
-#define ROM_INFO_HID					   0x1
-#define ROM_INFO_HID_MX23				   0x2
-#define ROM_INFO_HID_MX50				   0x4
-#define ROM_INFO_HID_MX6				   0x8
-#define ROM_INFO_HID_SKIP_DCD			  0x10
-#define ROM_INFO_HID_MX8_MULTI_IMAGE	  0x20
-#define ROM_INFO_HID_MX8_STREAM			  0x40
-#define ROM_INFO_HID_UID_STRING			  0x80
-#define ROM_INFO_HID_NO_CMD				 0x400
-#define ROM_INFO_SPL_JUMP				 0x800
-#define ROM_INFO_HID_EP1				0x1000
-#define ROM_INFO_HID_PACK_SIZE_1020		0x2000
-#define ROM_INFO_HID_SDP_NO_MAX_PER_TRANS	0x4000
-#define ROM_INFO_AUTO_SCAN_UBOOT_POS		0x8000
+constexpr uint32_t ROM_INFO_HID = 0x1;
+constexpr uint32_t ROM_INFO_HID_MX23 = 0x2;
+constexpr uint32_t ROM_INFO_HID_MX50 = 0x4;
+constexpr uint32_t ROM_INFO_HID_MX6 = 0x8;
+constexpr uint32_t ROM_INFO_HID_SKIP_DCD = 0x10;
+constexpr uint32_t ROM_INFO_HID_MX8_MULTI_IMAGE = 0x20;
+constexpr uint32_t ROM_INFO_HID_MX8_STREAM = 0x40;
+constexpr uint32_t ROM_INFO_HID_UID_STRING = 0x80;
+// Omitted value: 0x100
+// Omitted value: 0x200
+constexpr uint32_t ROM_INFO_HID_NO_CMD = 0x400;
+constexpr uint32_t ROM_INFO_SPL_JUMP = 0x800;
+constexpr uint32_t ROM_INFO_HID_EP1 = 0x1000;
+constexpr uint32_t ROM_INFO_HID_PACK_SIZE_1020 = 0x2000;
+constexpr uint32_t ROM_INFO_HID_SDP_NO_MAX_PER_TRANS = 0x4000;
+constexpr uint32_t ROM_INFO_AUTO_SCAN_UBOOT_POS = 0x8000;
 
 struct ROM_INFO
 {
