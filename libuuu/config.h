@@ -50,7 +50,7 @@ public:
 			m_chip = chip;
 		if (comp)
 			m_compatible = comp;
-	};
+	}
 	string m_protocol;
 	string m_chip;
 	string m_compatible;
@@ -64,8 +64,8 @@ class Config :public vector<ConfigItem>
 {
 public:
 	Config();
-	ConfigItem *find(uint16_t vid, uint16_t pid, uint16_t ver = -1);
-	Config find(string protocal);
+	ConfigItem *find(uint16_t vid, uint16_t pid, uint16_t ver);
+	Config find(const string &protocal);
 };
 
 Config * get_config();
