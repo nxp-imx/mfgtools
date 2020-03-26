@@ -108,7 +108,7 @@ inline uint16_t EndianSwap(uint16_t x)
 		((x << 8) & 0xFF00);
 }
 
-inline string str_to_upper(string str)
+inline string str_to_upper(const string &str)
 {
 	std::locale loc;
 	string s;
@@ -133,7 +133,7 @@ inline string remove_quota(string str)
 	return str;
 }
 
-inline bool compare_str(string &str1, string &str2, bool ignore_case)
+inline bool compare_str(const string &str1, const string &str2, bool ignore_case)
 {
 	if (ignore_case)
 		return str_to_upper(str1) == str_to_upper(str2);
@@ -141,8 +141,8 @@ inline bool compare_str(string &str1, string &str2, bool ignore_case)
 		return str1 == str2;
 }
 
-uint32_t str_to_uint(string &str);
-uint64_t str_to_uint64(string &str);
+uint32_t str_to_uint(const string &str);
+uint64_t str_to_uint64(const string &str);
 
 template <class T>
 inline T round_up(T x, T align)

@@ -221,7 +221,7 @@ int CmdList::run_all(CmdCtx *p, bool dry)
 	return ret;
 }
 
-string get_next_param(string &cmd, size_t &pos, char sperate)
+string get_next_param(const string &cmd, size_t &pos, char sperate)
 {
 	string str;
 	if (pos == string::npos)
@@ -257,13 +257,13 @@ string get_next_param(string &cmd, size_t &pos, char sperate)
 	return str;
 }
 
-string remove_square_brackets(string &cmd)
+string remove_square_brackets(const string &cmd)
 {
 	size_t sz=cmd.find('[');
 	return cmd.substr(0, sz);
 }
 
-int get_string_in_square_brackets(string &cmd, string &context)
+int get_string_in_square_brackets(const string &cmd, string &context)
 {
 	size_t start = cmd.find('[');
 	if (start == string::npos)
@@ -283,7 +283,7 @@ int get_string_in_square_brackets(string &cmd, string &context)
 	return 0;
 }
 
-uint32_t str_to_uint(string &str)
+uint32_t str_to_uint(const string &str)
 {
 	if (str.size() > 2)
 	{
@@ -293,7 +293,7 @@ uint32_t str_to_uint(string &str)
 	return strtoul(str.c_str(), NULL, 10);
 }
 
-uint64_t str_to_uint64(string &str)
+uint64_t str_to_uint64(const string &str)
 {
 	if (str.size() > 2)
 	{

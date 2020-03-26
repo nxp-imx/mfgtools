@@ -42,10 +42,10 @@
 
 using namespace std;
 
-string get_next_param(string &cmd, size_t &pos, char sperate = ' ');
-string remove_square_brackets(string &cmd);
-int get_string_in_square_brackets(string &cmd, string &context);
-uint32_t str_to_uint(string &str);
+string get_next_param(const string &cmd, size_t &pos, char sperate = ' ');
+string remove_square_brackets(const string &cmd);
+int get_string_in_square_brackets(const string &cmd, string &context);
+uint32_t str_to_uint(const string &str);
 
 class CmdCtx
 {
