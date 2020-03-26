@@ -31,6 +31,7 @@
 
 #pragma once
 
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -39,8 +40,9 @@ using namespace std;
 class ConfigItem
 {
 public:
-	ConfigItem() { m_pid = m_vid = 0; m_bcdVerMin = 0;  m_bcdVerMax = 0xFFFF; };
-	ConfigItem(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t verLow = 0, uint16_t verUp = 0xFFFF)
+	ConfigItem() = default;
+	ConfigItem(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t verLow = 0, uint16_t verUp = std::numeric_limits<uint16_t>::max()) :
+		m_pid{pid}, m_vid{vid}, m_bcdVerMin{verLow}, m_bcdVerMax{verUp}
 	{
 		if (pro)
 			m_protocol = pro;
@@ -48,18 +50,14 @@ public:
 			m_chip = chip;
 		if (comp)
 			m_compatible = comp;
-		m_pid = pid;
-		m_vid = vid;
-		m_bcdVerMin = verLow;
-		m_bcdVerMax = verUp;
 	};
 	string m_protocol;
 	string m_chip;
 	string m_compatible;
-	uint16_t m_pid;
-	uint16_t m_vid;
-	uint16_t m_bcdVerMin;
-	uint16_t m_bcdVerMax;
+	uint16_t m_pid = 0;
+	uint16_t m_vid = 0;
+	uint16_t m_bcdVerMin = 0;
+	uint16_t m_bcdVerMax = std::numeric_limits<uint16_t>::max();
 };
 
 class Config :public vector<ConfigItem>
