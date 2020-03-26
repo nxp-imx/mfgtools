@@ -29,24 +29,21 @@
 *
 */
 
-#include "buffer.h"
 #include "cmd.h"
-#include "rominfo.h"
 
 class SDPSCmd : public CmdBase
 {
 public:
-	uint32_t m_offset;
+	uint32_t m_offset = 0;
 	string m_filename;
 	bool m_bskipflashheader;
 
 	SDPSCmd(char *cmd) :CmdBase(cmd)
 	{
-		m_offset = 0;
-		insert_param_info("boot", NULL, Param::Type::e_null);
+		insert_param_info("boot", nullptr, Param::Type::e_null);
 		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
 		insert_param_info("-offset", &m_offset, Param::Type::e_uint32);
 		insert_param_info("-skipfhdr", &m_bskipflashheader, Param::Type::e_bool);
-	};
-	int run(CmdCtx *p);
+	}
+	int run(CmdCtx *p) override;
 };
