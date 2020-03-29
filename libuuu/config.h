@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include <limits>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -41,7 +41,7 @@ class ConfigItem
 {
 public:
 	ConfigItem() = default;
-	ConfigItem(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t verLow = 0, uint16_t verUp = std::numeric_limits<uint16_t>::max()) :
+	ConfigItem(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t verLow = 0, uint16_t verUp = UINT16_MAX) :
 		m_pid{pid}, m_vid{vid}, m_bcdVerMin{verLow}, m_bcdVerMax{verUp}
 	{
 		if (pro)
@@ -57,7 +57,7 @@ public:
 	uint16_t m_pid = 0;
 	uint16_t m_vid = 0;
 	uint16_t m_bcdVerMin = 0;
-	uint16_t m_bcdVerMax = std::numeric_limits<uint16_t>::max();
+	uint16_t m_bcdVerMax = UINT16_MAX;
 };
 
 class Config :public vector<ConfigItem>
