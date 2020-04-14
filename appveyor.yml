@@ -108,7 +108,7 @@ deploy:
   description: prebuild for $(APPVEYOR_REPO_COMMIT) \n\n $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
     secure: SWWVkwSfPyVIaPChBBl+uAA3Fau9Rl5iNPQ9VRL8yyggXvc6wPcr/O9iXBMVM7Ju
-  artifact: uuu.exe;  libusb-1.0.dll; uuu/uuu; mfgtools.wiki/UUU.pdf
+  artifact: uuu.exe;  libusb-1.0.dll; uuu/uuu; mfgtools.wiki/UUU.pdf; uuu-${APPVEYOR_BUILD_VERSION}.tar.gz
   draft: true
 
 environment:
