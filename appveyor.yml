@@ -80,7 +80,7 @@ build_script:
 - sh: mkdir uuu-${APPVEYOR_BUILD_VERSION}; git describe --tags --long >uuu_source-${APPVEYOR_BUILD_VERSION}/.tarball-version
 - sh: tar -r uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version -f uuu_source-${APPVEYOR_BUILD_VERSION}.tar
 - sh: gzip uuu_source-${APPVEYOR_BUILD_VERSION}.tar
-uuu_source
+
 - sh: git clone https://github.com/NXPmicro/mfgtools.wiki.git
     
 - sh: cd mfgtools.wiki
