@@ -77,9 +77,10 @@ build_script:
 - sh: git submodule update
 - sh: git archive --prefix "uuu_source-${APPVEYOR_BUILD_VERSION}/" -o "uuu_source-${APPVEYOR_BUILD_VERSION}.tar" HEAD
 - sh: git submodule foreach --recursive "git archive --prefix=uuu-${APPVEYOR_BUILD_VERSION}/\$path/ --output=\$sha1.tar HEAD && tar --concatenate --file=$(pwd)/uuu_source-${APPVEYOR_BUILD_VERSION}.tar \$sha1.tar && rm \$sha1.tar"
-- sh: mkdir uuu-${APPVEYOR_BUILD_VERSION}; git describe --tags --long >uuu_source-${APPVEYOR_BUILD_VERSION}/.tarball-version
+- sh: mkdir uuu-${APPVEYOR_BUILD_VERSION}; git describe --tags --long >uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version
 - sh: tar -r uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version -f uuu_source-${APPVEYOR_BUILD_VERSION}.tar
 - sh: gzip uuu_source-${APPVEYOR_BUILD_VERSION}.tar
+- sh: tar xzf uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz && zip uuu_source-${APPVEYOR_BUILD_VERSION}.zip $(tar tf uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz)
 
 - sh: git clone https://github.com/NXPmicro/mfgtools.wiki.git
     
@@ -100,6 +101,7 @@ artifacts:
 - path: uuu/uuu
 - path: mfgtools.wiki/UUU.pdf
 - path: uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz
+- path: uuu_source-${APPVEYOR_BUILD_VERSION}.zip
 
 before_deploy:
 - cmd: ''
@@ -108,7 +110,7 @@ deploy:
   description: prebuild for $(APPVEYOR_REPO_COMMIT) \n\n $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
     secure: SWWVkwSfPyVIaPChBBl+uAA3Fau9Rl5iNPQ9VRL8yyggXvc6wPcr/O9iXBMVM7Ju
-  artifact: uuu.exe;  libusb-1.0.dll; uuu/uuu; mfgtools.wiki/UUU.pdf; uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz
+  artifact: uuu.exe;  libusb-1.0.dll; uuu/uuu; mfgtools.wiki/UUU.pdf; uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz; uuu_source-${APPVEYOR_BUILD_VERSION}.zip
   draft: true
 
 environment:
