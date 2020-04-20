@@ -16,6 +16,8 @@ init:
  - sh: if [ "${CONFIGURATION}" = "Debug" ] ; then exit 0; fi
  - sh: if [ "${PLATFORM}" = "x86" ]; then exit 0; fi 
  
+skip_tags: true
+
 install:
 - cmd: echo %APPVEYOR_BUILD_FOLDER%
 
