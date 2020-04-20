@@ -75,7 +75,7 @@ build_script:
 
 - sh: git submodule init
 - sh: git submodule update
-- sh: git archive --prefix "uuu_source-${APPVEYOR_BUILD_VERSION}/" -o "uuu_source-${APPVEYOR_BUILD_VERSION}.tar" HEAD
+- sh: git archive --prefix "uuu-${APPVEYOR_BUILD_VERSION}/" -o "uuu_source-${APPVEYOR_BUILD_VERSION}.tar" HEAD
 - sh: git submodule foreach --recursive "git archive --prefix=uuu-${APPVEYOR_BUILD_VERSION}/\$path/ --output=\$sha1.tar HEAD && tar --concatenate --file=$(pwd)/uuu_source-${APPVEYOR_BUILD_VERSION}.tar \$sha1.tar && rm \$sha1.tar"
 - sh: mkdir uuu-${APPVEYOR_BUILD_VERSION}; git describe --tags --long >uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version
 - sh: tar -r uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version -f uuu_source-${APPVEYOR_BUILD_VERSION}.tar
