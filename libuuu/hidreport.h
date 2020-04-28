@@ -57,10 +57,6 @@ public:
 		m_size_out = sz;
 		m_out_buff.resize(m_size_out + m_size_payload);
 	}
-	HIDReport()
-	{
-		init();
-	}
 
 	HIDReport(TransBase *trans)
 	{
