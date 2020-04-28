@@ -45,6 +45,7 @@ using namespace std;
 string get_next_param(const string &cmd, size_t &pos, char sperate = ' ');
 string remove_square_brackets(const string &cmd);
 int get_string_in_square_brackets(const string &cmd, string &context);
+uint16_t str_to_uint16(const std::string &str, bool &conversion_suceeded);
 uint32_t str_to_uint(const string &str);
 
 class CmdCtx

@@ -136,37 +136,43 @@ int CfgCmd::run(CmdCtx *)
 
 	item.m_protocol = str_to_upper(param);
 
+	bool conversion_succeeded = false;
 	while (pos < m_cmd.size())
 	{
 		param = get_next_param(m_cmd, pos);
 		if (param == "-pid")
 		{
 			param = get_next_param(m_cmd, pos);
-			item.m_pid = str_to_uint(param);
+			item.m_pid = str_to_uint16(param, conversion_succeeded);
+			if (!conversion_succeeded) return -1;
 			continue;
 		}
 		if (param == "-vid")
 		{
 			param = get_next_param(m_cmd, pos);
-			item.m_vid = str_to_uint(param);
+			item.m_vid = str_to_uint16(param, conversion_succeeded);
+			if (!conversion_succeeded) return -1;
 			continue;
 		}
 		if (param == "-bcdversion")
 		{
 			param = get_next_param(m_cmd, pos);
-			item.m_bcdVerMin = item.m_bcdVerMax = str_to_uint(param);
+			item.m_bcdVerMin = item.m_bcdVerMax = str_to_uint16(param, conversion_succeeded);
+			if (!conversion_succeeded) return -1;
 			continue;
 		}
 		if (param == "-bcdmin")
 		{
 			param = get_next_param(m_cmd, pos);
-			item.m_bcdVerMin =  str_to_uint(param);
+			item.m_bcdVerMin =  str_to_uint16(param, conversion_succeeded);
+			if (!conversion_succeeded) return -1;
 			continue;
 		}
 		if (param == "-bcdmax")
 		{
 			param = get_next_param(m_cmd, pos);
-			item.m_bcdVerMax = str_to_uint(param);
+			item.m_bcdVerMax = str_to_uint16(param, conversion_succeeded);
+			if (!conversion_succeeded) return -1;
 			continue;
 		}
 		if (param == "-chip")
