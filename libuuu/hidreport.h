@@ -28,19 +28,38 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#include <string>
-#include <vector>
-#include "libcomm.h"
-#include "libuuu.h"
-#include "trans.h"
-#include <string.h>
-
 #pragma once
 
-using namespace std;
+#include "libuuu.h"
+#include "trans.h"
 
 class HIDReport
 {
+public:
+	HIDReport(TransBase *trans) : m_pdev{trans}
+	{
+		m_out_buff.resize(m_size_out + m_size_payload);
+	}
+	virtual ~HIDReport();
+
+	size_t get_out_package_size() noexcept { return m_size_out; }
+	virtual void notify(size_t index, uuu_notify::NOTIFY_TYPE type);
+	int read(vector<uint8_t> &buff);
+	void set_notify_total(size_t notify_total) noexcept { m_notify_total = notify_total; }
+	void set_out_package_size(int sz)
+	{
+		m_size_out = sz;
+		m_out_buff.resize(m_size_out + m_size_payload);
+	}
+	void set_position_base(size_t position_base) noexcept { m_postion_base = position_base; }
+	void set_skip_notify(bool skip_notify) noexcept { m_skip_notify = skip_notify; }
+	int write(void *p, size_t sz, uint8_t report_id);
+	int write(vector<uint8_t> &buff, uint8_t report_id)
+	{
+		return write(buff.data(), buff.size(), report_id);
+	}
+
+private:
 	size_t m_notify_total = 0;
 	vector<uint8_t> m_out_buff;
 	TransBase * const m_pdev = nullptr;
@@ -49,32 +68,4 @@ class HIDReport
 	size_t m_size_out = 1024;
 	size_t m_size_payload = 1;
 	bool m_skip_notify = true;
-public:
-	size_t get_out_package_size() { return m_size_out; }
-	void init();
-	void set_out_package_size(int sz)
-	{
-		m_size_out = sz;
-		m_out_buff.resize(m_size_out + m_size_payload);
-	}
-
-	HIDReport(TransBase *trans) : m_pdev{trans}
-	{
-		m_out_buff.resize(m_size_out + m_size_payload);
-	}
-
-	int read(vector<uint8_t> &buff);
-
-	virtual void notify(size_t index, uuu_notify::NOTIFY_TYPE type);
-
-	int write(void *p, size_t sz, uint8_t report_id);
-
-	int write(vector<uint8_t> &buff, uint8_t report_id)
-	{
-		return write(buff.data(), buff.size(), report_id);
-	}
-	void set_position_base(size_t position_base) noexcept { m_postion_base = position_base; }
-	void set_notify_total(size_t notify_total) noexcept { m_notify_total = notify_total; }
-	void set_skip_notify(bool skip_notify) noexcept { m_skip_notify = skip_notify; }
-
 };
