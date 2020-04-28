@@ -31,9 +31,10 @@
 
 //ref: https://docs.microsoft.com/en-us/windows-hardware/manufacture/mobile/ffu-image-format
 
-#ifndef _LIBSPARSE_FFU_FORMAT_H_
-#define _LIBSPARSE_FFU_FORMAT_H_
+#ifndef LIBSPARSE_FFU_FORMAT_H
+#define LIBSPARSE_FFU_FORMAT_H
 
+#include <cstdint>
 
 #define FFU_SECURITY_SIGNATURE "SignedImage "
 
@@ -65,7 +66,7 @@ typedef struct _STORE_HEADER
 	uint16_t MajorVersion, MinorVersion; // used to validate struct
 	uint16_t FullFlashMajorVersion, FullFlashMinorVersion; // FFU version, i.e. the image format
 	uint8_t szPlatformId[192]; // string which indicates what device this FFU is intended to be written to
-	uint32_t dwBlockSizeInBytes; // size of an image block in bytes ¨C the device¡¯s actual sector size may differ
+	uint32_t dwBlockSizeInBytes; // size of an image block in bytes - the device's actual sector size may differ
 	uint32_t dwWriteDescriptorCount; // number of write descriptors to iterate through
 	uint32_t dwWriteDescriptorLength; // total size of all the write descriptors, in bytes (included so they can be read out up front and interpreted later)
 	uint32_t dwValidateDescriptorCount; // number of validation descriptors to check
@@ -111,4 +112,4 @@ typedef struct _BLOCK_DATA_ENTRY
 } FFU_BLOCK_DATA_ENTRY;
 #pragma pack()
 
-#endif
+#endif // LIBSPARSE_FFU_FORMAT_H
