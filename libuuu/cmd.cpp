@@ -283,6 +283,33 @@ int get_string_in_square_brackets(const string &cmd, string &context)
 	return 0;
 }
 
+uint16_t str_to_uint16(const std::string &str, bool &conversion_suceeded)
+{
+	conversion_suceeded = false;
+
+	int base = 10;
+	if (str.size() > 2)
+	{
+		if (str.substr(0, 2).compare("0x") == 0)
+		{
+			base = 16;
+		}
+	}
+
+	try {
+		const auto tmp_val = std::stoul(str, nullptr, base);
+		if (tmp_val <= UINT16_MAX)
+		{
+			conversion_suceeded = true;
+			return static_cast<uint16_t>(tmp_val);
+		}
+	}  catch (const std::invalid_argument &) {
+	} catch (const std::out_of_range &) {
+	}
+
+	return UINT16_MAX;
+}
+
 uint32_t str_to_uint(const string &str)
 {
 	if (str.size() > 2)
