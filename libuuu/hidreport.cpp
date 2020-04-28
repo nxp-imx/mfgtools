@@ -1,17 +1,6 @@
 #include "hidreport.h"
 #include "liberror.h"
 
-void HIDReport::init()
-{
-	m_size_in = 64;
-	m_size_out = 1024;
-	m_size_payload = 1;
-	m_postion_base = 0;
-	m_notify_total = 0;
-	m_out_buff.resize(m_size_out + m_size_payload);
-	m_skip_notify = true;
-}
-
 void HIDReport::notify(size_t index, uuu_notify::NOTIFY_TYPE type)
 {
 	uuu_notify nf;

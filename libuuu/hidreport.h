@@ -41,16 +41,16 @@ using namespace std;
 
 class HIDReport
 {
-	size_t m_size_in;
-	size_t m_size_out;
-	size_t m_size_payload;
+	size_t m_size_in = 64;
+	size_t m_size_out = 1024;
+	size_t m_size_payload = 1;
 public:
-	TransBase * m_pdev;
+	TransBase * const m_pdev = nullptr;
 	vector<uint8_t> m_out_buff;
-	size_t m_postion_base;
-	size_t m_notify_total;
+	size_t m_postion_base = 0;
+	size_t m_notify_total = 0;
 	size_t get_out_package_size() { return m_size_out; }
-	bool m_skip_notify;
+	bool m_skip_notify = true;
 	void init();
 	void set_out_package_size(int sz)
 	{
@@ -58,10 +58,9 @@ public:
 		m_out_buff.resize(m_size_out + m_size_payload);
 	}
 
-	HIDReport(TransBase *trans)
+	HIDReport(TransBase *trans) : m_pdev{trans}
 	{
-		init();
-		m_pdev = trans;
+		m_out_buff.resize(m_size_out + m_size_payload);
 	}
 
 	int read(vector<uint8_t> &buff);
