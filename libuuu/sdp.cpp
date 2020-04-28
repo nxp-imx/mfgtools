@@ -284,7 +284,7 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 
 	HIDReport report(&dev);
 
-	report.m_notify_total = size;
+	report.set_notify_total(size);
 
 	const ROM_INFO * rom = search_rom_info(ctx->m_config_item);
 
@@ -304,13 +304,13 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 		m_spdcmd.m_addr = EndianSwap((uint32_t)(addr + i)); // force use 32bit endian swap function;
 		m_spdcmd.m_count = EndianSwap((uint32_t)sz); //force use 32bit endian swap function;
 
-		report.m_postion_base = i;
-		report.m_skip_notify = true;
+		report.set_position_base(i);
+		report.set_skip_notify(true);
 
 		if (report.write(&m_spdcmd, sizeof(m_spdcmd), 1))
 			return -1;
 
-		report.m_skip_notify = false;
+		report.set_skip_notify(false);
 
 		if (report.write(((uint8_t*)pbuff)+i, sz, 2))
 			return -1;
