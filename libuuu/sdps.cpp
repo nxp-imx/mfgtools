@@ -100,7 +100,7 @@ int SDPSCmd::run(CmdCtx *pro)
 		return -1;
 
 	HIDReport report(&dev);
-	report.m_skip_notify = false;
+	report.set_skip_notify(false);
 
 	size_t offset = m_offset;
 
