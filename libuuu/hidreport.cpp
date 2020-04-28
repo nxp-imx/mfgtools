@@ -1,5 +1,12 @@
 #include "hidreport.h"
+#include "libcomm.h"
 #include "liberror.h"
+
+#include <cstring>
+
+HIDReport::~HIDReport()
+{
+}
 
 void HIDReport::notify(size_t index, uuu_notify::NOTIFY_TYPE type)
 {
