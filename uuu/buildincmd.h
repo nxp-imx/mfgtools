@@ -37,12 +37,12 @@
 
 using namespace std;
 
-extern char * g_vt_yellow ;
-extern char * g_vt_default ;
-extern char * g_vt_green ;
-extern char * g_vt_red  ;
-extern char * g_vt_kcyn ;
-extern char * g_vt_boldwhite ;
+extern const char * g_vt_yellow ;
+extern const char * g_vt_default ;
+extern const char * g_vt_green ;
+extern const char * g_vt_red  ;
+extern const char * g_vt_kcyn ;
+extern const char * g_vt_boldwhite ;
 
 struct BuildCmd
 {
