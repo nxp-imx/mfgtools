@@ -49,16 +49,16 @@
 
 #include "../libuuu/libuuu.h"
 
-char * g_vt_yellow = (char*)"\x1B[93m";
-char * g_vt_default = (char*) "\x1B[0m";
-char * g_vt_green = (char*)"\x1B[92m";
-char * g_vt_red = (char*)"\x1B[91m";
-char * g_vt_kcyn = (char*)"\x1B[36m";
-char * g_vt_boldwhite = (char*)"\x1B[97m";
+const char * g_vt_yellow = "\x1B[93m";
+const char * g_vt_default = "\x1B[0m";
+const char * g_vt_green = "\x1B[92m";
+const char * g_vt_red = "\x1B[91m";
+const char * g_vt_kcyn = "\x1B[36m";
+const char * g_vt_boldwhite = "\x1B[97m";
 
-void clean_vt_color()
+void clean_vt_color() noexcept
 {
-	g_vt_yellow = (char*)"";
+	g_vt_yellow = "";
 	g_vt_default = g_vt_yellow;
 	g_vt_green = g_vt_yellow;
 	g_vt_red = g_vt_yellow;
