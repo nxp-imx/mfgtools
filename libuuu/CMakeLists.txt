@@ -44,6 +44,7 @@ set(SOURCES
 	tar.cpp
 	rominfo.cpp
 	http.cpp
+	hidreport.cpp
 )
 
 set(generated_files_dir "${CMAKE_BINARY_DIR}/libuuu/gen")
