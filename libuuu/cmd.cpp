@@ -123,7 +123,7 @@ int CmdBase::parser(char *p)
 		{
 			if (!m_NoKeyParam)
 				param = get_next_param(m_cmd, pos);
-			*(uint32_t*)pp->pData = str_to_uint(param);
+			*(uint32_t*)pp->pData = str_to_uint32(param);
 		}
 
 		if (pp->type == Param::Type::e_string_filename)
@@ -283,9 +283,10 @@ int get_string_in_square_brackets(const string &cmd, string &context)
 	return 0;
 }
 
-uint16_t str_to_uint16(const std::string &str, bool &conversion_suceeded)
+template<typename T, uint64_t MAX_VAL>
+T str_to_uint(const std::string &str, bool * conversion_succeeded)
 {
-	conversion_suceeded = false;
+	if (conversion_succeeded) *conversion_succeeded = false;
 
 	int base = 10;
 	if (str.size() > 2)
@@ -297,37 +298,34 @@ uint16_t str_to_uint16(const std::string &str, bool &conversion_suceeded)
 	}
 
 	try {
-		const auto tmp_val = std::stoul(str, nullptr, base);
-		if (tmp_val <= UINT16_MAX)
+		const auto tmp_val = std::stoull(str, nullptr, base);
+		if (tmp_val <= MAX_VAL)
 		{
-			conversion_suceeded = true;
-			return static_cast<uint16_t>(tmp_val);
+			if (conversion_succeeded) *conversion_succeeded = true;
+			return static_cast<T>(tmp_val);
 		}
 	}  catch (const std::invalid_argument &) {
 	} catch (const std::out_of_range &) {
 	}
 
-	return UINT16_MAX;
+	set_last_err_string("Conversion of string to unsigned failed");
+
+	return MAX_VAL;
 }
 
-uint32_t str_to_uint(const string &str)
+uint16_t str_to_uint16(const string &str, bool * conversion_suceeded)
 {
-	if (str.size() > 2)
-	{
-		if (str.substr(0, 2).compare("0x") == 0)
-			return strtoul(str.substr(2).c_str(), NULL, 16);
-	}
-	return strtoul(str.c_str(), NULL, 10);
+	return str_to_uint<uint16_t, UINT16_MAX>(str, conversion_suceeded);
 }
 
-uint64_t str_to_uint64(const string &str)
+uint32_t str_to_uint32(const string &str, bool * conversion_suceeded)
 {
-	if (str.size() > 2)
-	{
-		if (str.substr(0, 2).compare("0x") == 0)
-			return strtoull(str.substr(2).c_str(), NULL, 16);
-	}
-	return strtoull(str.c_str(), NULL, 10);
+	return str_to_uint<uint32_t, UINT32_MAX>(str, conversion_suceeded);
+}
+
+uint64_t str_to_uint64(const string &str, bool * conversion_suceeded)
+{
+	return str_to_uint<uint64_t, UINT64_MAX>(str, conversion_suceeded);
 }
 
 template <class T> shared_ptr<CmdBase> new_cmd_obj(char *p)
@@ -517,7 +515,7 @@ int CmdDelay::parser(char * /*p*/)
 	}
 
 	string ms = get_next_param(m_cmd, pos);
-	m_ms = str_to_uint(ms);
+	m_ms = str_to_uint32(ms);
 	return 0;
 }
 

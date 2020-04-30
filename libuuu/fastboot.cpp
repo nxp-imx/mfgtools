@@ -574,7 +574,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 	if (getvar.run(ctx))
 		return -1;
 
-	size_t max = getvar.m_val.empty() ? SparseLimit : str_to_uint(getvar.m_val);
+	size_t max = getvar.m_val.empty() ? SparseLimit : str_to_uint32(getvar.m_val);
 
 	string str;
 	str = "FB: getvar partition-size:";
@@ -602,7 +602,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		if (getvar.run(ctx))
 			return -1;
 
-		size_t block_size = str_to_uint(getvar.m_val);
+		size_t block_size = str_to_uint32(getvar.m_val);
 
 		if (block_size == 0)
 		{
