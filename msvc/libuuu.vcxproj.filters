@@ -107,6 +107,9 @@
     <ClCompile Include="..\libuuu\tar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\libuuu\hidreport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\libuuu\http.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
