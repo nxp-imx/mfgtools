@@ -25,6 +25,7 @@
     <ClCompile Include="..\libuuu\error.cpp" />
     <ClCompile Include="..\libuuu\fastboot.cpp" />
     <ClCompile Include="..\libuuu\fat.cpp" />
+    <ClCompile Include="..\libuuu\hidreport.cpp" />
     <ClCompile Include="..\libuuu\http.cpp" />
     <ClCompile Include="..\libuuu\notify.cpp" />
     <ClCompile Include="..\libuuu\rominfo.cpp" />
