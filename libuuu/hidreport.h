@@ -46,7 +46,7 @@ public:
 	virtual void notify(size_t index, uuu_notify::NOTIFY_TYPE type);
 	int read(std::vector<uint8_t> &buff);
 	void set_notify_total(size_t notify_total) noexcept { m_notify_total = notify_total; }
-	void set_out_package_size(std::vector<uint8_t>::size_type sz)
+	void set_out_package_size(size_t sz)
 	{
 		m_size_out = sz;
 		m_out_buff.resize(m_size_out + m_size_payload);
