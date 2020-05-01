@@ -28,32 +28,33 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#include <vector>
-#include "sparse_format.h"
-#include "liberror.h"
+#pragma once
 
-using namespace std;
+#include "liberror.h"
+#include "sparse_format.h"
+
+#include <vector>
 
 class SparseFile
 {
 public:
-	vector<uint8_t> m_data;
-	uint32_t *m_pcrc;
-	size_t m_max_size;
-	size_t m_cur_chunk_header_pos;
-
-	static bool is_validate_sparse_file(void *p, size_t sz);
+	std::vector<uint8_t> m_data;
 
 	static chunk_header_t * get_next_chunk(uint8_t *p, size_t &pos);
 
 	int init_header(size_t blsz, int blcount);
 
-	int push(void *p, size_t sz);
-
-	size_t push_raw_data(void *data, size_t sz);
-
-	bool is_same_value(void *data, size_t sz);
 	bool is_append_old_chuck(int type, void *p);
+	bool is_same_value(void *data, size_t sz);
+	static bool is_validate_sparse_file(void *p, size_t sz);
+
+	int push(void *p, size_t sz);
 	int push_one_block(void *data);
 	size_t push_one_chuck(chunk_header_t *p, void *data);
+	size_t push_raw_data(void *data, size_t sz);
+
+private:
+	size_t m_cur_chunk_header_pos;
+	size_t m_max_size;
+	uint32_t *m_pcrc;
 };
