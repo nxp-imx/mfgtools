@@ -102,40 +102,7 @@ public:
 		m_param.emplace_back(Param{key, pD, tp, ignore_case, err});
 	}
 
-	virtual int parser_protocal(char *p, size_t &pos)
-	{
-		if (p)
-			m_cmd = *p;
-
-		string prot = get_next_param(m_cmd, pos, ':');
-		string param;
-		if (get_string_in_square_brackets(prot, param))
-			return -1;
-		
-		if (!param.empty())
-		{
-			size_t param_pos = 0;
-			string s = get_next_param(param, param_pos);
-
-			if (s == "-t")
-			{
-				string timeout;
-				timeout = get_next_param(param, param_pos);
-				m_timeout = str_to_uint32(timeout);
-			}
-			else
-			{
-				string err;
-				err = "Unknown option: ";
-				err += s;
-				err += " for protocol: ";
-				err += remove_square_brackets(prot);
-				set_last_err_string(err);
-				return -1;
-			}
-		}
-		return 0;
-	}
+	virtual int parser_protocal(char *p, size_t &pos);
 	virtual int parser(char *p = nullptr);
 	virtual int run(CmdCtx *p) = 0;
 	virtual int dump();
@@ -186,19 +153,7 @@ public:
 class CmdMap : public std::map<std::string, shared_ptr<CmdList>>
 {
 public:
-	int run_all(const std::string &protocal, CmdCtx *p,  bool dry_run = false)
-	{
-		if (find(protocal) == end())
-		{
-			set_last_err_id(-1);
-			std::string err;
-			err.append("Unknown Protocal:");
-			err.append(protocal);
-			set_last_err_string(err);
-			return -1;
-		}
-		return at(protocal)->run_all(p, dry_run);
-	};
+	int run_all(const std::string &protocal, CmdCtx *p,  bool dry_run = false);
 };
 
 class CfgCmd :public CmdBase

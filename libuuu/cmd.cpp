@@ -167,6 +167,41 @@ int CmdBase::parser(char *p)
 	return 0;
 }
 
+int CmdBase::parser_protocal(char *p, size_t &pos)
+{
+	if (p)
+		m_cmd = *p;
+
+	string prot = get_next_param(m_cmd, pos, ':');
+	string param;
+	if (get_string_in_square_brackets(prot, param))
+		return -1;
+
+	if (!param.empty())
+	{
+		size_t param_pos = 0;
+		string s = get_next_param(param, param_pos);
+
+		if (s == "-t")
+		{
+			string timeout;
+			timeout = get_next_param(param, param_pos);
+			m_timeout = str_to_uint32(timeout);
+		}
+		else
+		{
+			string err;
+			err = "Unknown option: ";
+			err += s;
+			err += " for protocol: ";
+			err += remove_square_brackets(prot);
+			set_last_err_string(err);
+			return -1;
+		}
+	}
+	return 0;
+}
+
 int CmdBase::dump()
 {
 	uuu_notify nt;
@@ -219,6 +254,20 @@ int CmdList::run_all(CmdCtx *p, bool dry)
 				break;
 	}
 	return ret;
+}
+
+int CmdMap::run_all(const std::string &protocol, CmdCtx *p, bool dry_run)
+{
+	if (find(protocol) == end())
+	{
+		set_last_err_id(-1);
+		std::string err;
+		err.append("Unknown Protocal:");
+		err.append(protocol);
+		set_last_err_string(err);
+		return -1;
+	}
+	return at(protocol)->run_all(p, dry_run);
 }
 
 string get_next_param(const string &cmd, size_t &pos, char sperate)
