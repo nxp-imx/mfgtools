@@ -105,66 +105,18 @@ public:
 
 	int init_cmd() { memset(&m_spdcmd, 0, sizeof(m_spdcmd)); return 0; }
 	int send_cmd(HIDReport *p) { return p->write(&m_spdcmd, sizeof(m_spdcmd), 1); };
-	int get_status(HIDReport *p, uint32_t &status, uint8_t report_id)
-	{
-		m_input.resize(1025);
-		m_input[0] = report_id;
-		int ret = p->read(m_input);
-		if (ret < 0)
-			return -1;
-
-		if (m_input.size() < (1 + sizeof(uint32_t)))
-		{
-			set_last_err_string("HID report size is too small");
-			return -1;
-		}
-
-		status = *(uint32_t*)(m_input.data() + 1);
-		return 0;
-	};
+	int get_status(HIDReport *p, uint32_t &status, uint8_t report_id);
 	IvtHeader * search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit=ULLONG_MAX);
 
-	HAB_t get_hab_type(HIDReport *report)
-	{
-		uint32_t status;
-		if (get_status(report, status, 3))
-			return HabUnknown;
+	HAB_t get_hab_type(HIDReport *report);
 
-		if (status == HabEnabled)
-			return HabEnabled;
-
-		if (status == HabDisabled)
-			return HabDisabled;
-
-		set_last_err_string("unknown hab type");
-		return HabUnknown;
-	}
-
-	int check_ack(HIDReport *report, uint32_t ack)
-	{
-		if (get_hab_type(report) == HabUnknown)
-			return -1;
-
-		uint32_t status;
-		if (get_status(report, status, 4))
-			return -1;
-
-		if (ack != status)
-		{
-			set_last_err_string("Status Miss matched");
-			return -1;
-		}
-		return 0;
-	}
+	int check_ack(HIDReport *report, uint32_t ack);
 };
 
 class SDPBootlogCmd : public SDPCmdBase
 {
 public:
-	SDPBootlogCmd(char *p) :SDPCmdBase(p)
-	{
-		insert_param_info("blog", NULL, Param::Type::e_null);
-	}
+	SDPBootlogCmd(char *p);
 	int run(CmdCtx *);
 };
 
@@ -172,13 +124,7 @@ class SDPDcdCmd : public SDPCmdBase
 {
 public:
 	uint32_t m_dcd_addr;
-	SDPDcdCmd(char *p):SDPCmdBase(p)
-	{
-		insert_param_info("dcd", NULL, Param::Type::e_null);
-		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
-		insert_param_info("-dcdaddr", &m_dcd_addr, Param::Type::e_uint32);
-		m_dcd_addr = 0;
-	}
+	SDPDcdCmd(char *p);
 	int run(CmdCtx *);
 
 };
@@ -189,13 +135,7 @@ public:
 	uint32_t m_mem_addr;
 	uint8_t m_mem_format;
 
-	SDPReadMemCmd(char*p) :SDPCmdBase(p) {
-		m_spdcmd.m_cmd = ROM_KERNEL_CMD_RD_MEM;
-
-		insert_param_info("rdmem", NULL, Param::Type::e_null);
-		insert_param_info("-addr", &m_mem_addr, Param::Type::e_uint32);
-		insert_param_info("-format", &m_mem_format, Param::Type::e_uint32);
-	}
+	SDPReadMemCmd(char*p);
 	int run(CmdCtx *);
 };
 
@@ -206,14 +146,7 @@ public:
 	uint8_t m_mem_format;
 	uint32_t m_mem_value;
 
-	SDPWriteMemCmd(char*p) :SDPCmdBase(p) {
-		m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_MEM;
-
-		insert_param_info("wrmem", NULL, Param::Type::e_null);
-		insert_param_info("-addr", &m_mem_addr, Param::Type::e_uint32);
-		insert_param_info("-format", &m_mem_format, Param::Type::e_uint32);
-		insert_param_info("-value", &m_mem_value, Param::Type::e_uint32);
-	}
+	SDPWriteMemCmd(char*p);
 	int run(CmdCtx *p);
 };
 
@@ -229,24 +162,7 @@ public:
 	bool m_bskipspl;
 	bool m_bskipfhdr;
 
-	SDPWriteCmd(char*p) :SDPCmdBase(p) {
-		m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_FILE;
-		m_PlugIn = -1;
-		m_Ivt = -1;
-		m_max_download_pre_cmd = 0x200000;
-		m_offset = 0;
-		m_bIvtReserve = false;
-		m_download_addr = 0;
-		m_bskipspl = false;
-
-		insert_param_info("write", NULL, Param::Type::e_null);
-		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
-		insert_param_info("-ivt", &m_Ivt, Param::Type::e_uint32);
-		insert_param_info("-addr", &m_download_addr, Param::Type::e_uint32);
-		insert_param_info("-offset", &m_offset, Param::Type::e_uint32);
-		insert_param_info("-skipspl", &m_bskipspl, Param::Type::e_bool);
-		insert_param_info("-skipfhdr", &m_bskipfhdr, Param::Type::e_bool);
-	};
+	SDPWriteCmd(char*p);
 
 	int run(CmdCtx *p);
 	int run(CmdCtx *p, void *buff, size_t size, uint32_t addr);
@@ -259,36 +175,21 @@ public:
 	bool m_PlugIn;
 	bool m_clear_dcd;
 	uint32_t m_jump_addr;
-	SDPJumpCmd(char*p):SDPCmdBase(p)
-	{
-		m_jump_addr = 0;
-		m_spdcmd.m_cmd = ROM_KERNEL_CMD_JUMP_ADDR;
-		m_clear_dcd = false;
-		insert_param_info("jump", NULL, Param::Type::e_null);
-		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
-		insert_param_info("-ivt", &m_Ivt, Param::Type::e_bool);
-		insert_param_info("-plugin", &m_Ivt, Param::Type::e_bool);
-		insert_param_info("-addr", &m_jump_addr, Param::Type::e_uint32);
-		insert_param_info("-cleardcd", &m_clear_dcd, Param::Type::e_bool);
-	};
+	SDPJumpCmd(char*p);
 	int run(CmdCtx *p);
 };
 
 class SDPSkipDCDCmd :public SDPCmdBase
 {
 public:
-	SDPSkipDCDCmd(char *p) :SDPCmdBase(p) { m_spdcmd.m_cmd = ROM_KERNEL_CMD_SKIP_DCD_HEADER; };
+	SDPSkipDCDCmd(char *p);
 	int run(CmdCtx *p);
 };
 
 class SDPStatusCmd :public SDPCmdBase
 {
 public:
-	SDPStatusCmd(char *p) : SDPCmdBase(p)
-	{
-		m_spdcmd.m_cmd = ROM_KERNEL_CMD_ERROR_STATUS;
-		insert_param_info("status", NULL, Param::Type::e_null);
-	};
+	SDPStatusCmd(char *p);
 	int run(CmdCtx *p);
 };
 
@@ -298,17 +199,6 @@ public:
 	bool m_nojump;
 	bool m_clear_dcd;
 	uint32_t m_dcd_addr;
-	SDPBootCmd(char *p) : SDPCmdBase(p)
-	{
-		insert_param_info("boot", NULL, Param::Type::e_null);
-		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
-		insert_param_info("-nojump", &m_nojump, Param::Type::e_bool);
-		insert_param_info("-cleardcd", &m_clear_dcd, Param::Type::e_bool);
-		insert_param_info("-dcdaddr", &m_dcd_addr, Param::Type::e_uint32);
-
-		m_nojump = false;
-		m_clear_dcd = false;
-		m_dcd_addr = 0;
-	}
+	SDPBootCmd(char *p);
 	int run(CmdCtx *p);
 };

@@ -39,6 +39,57 @@
 #include "rominfo.h"
 #include "libusb.h"
 
+int SDPCmdBase::check_ack(HIDReport *report, uint32_t ack)
+{
+	if (get_hab_type(report) == HabUnknown)
+		return -1;
+
+	uint32_t status;
+	if (get_status(report, status, 4))
+		return -1;
+
+	if (ack != status)
+	{
+		set_last_err_string("Status Miss matched");
+		return -1;
+	}
+	return 0;
+}
+
+SDPCmdBase::HAB_t SDPCmdBase::get_hab_type(HIDReport *report)
+{
+	uint32_t status;
+	if (get_status(report, status, 3))
+		return HabUnknown;
+
+	if (status == HabEnabled)
+		return HabEnabled;
+
+	if (status == HabDisabled)
+		return HabDisabled;
+
+	set_last_err_string("unknown hab type");
+	return HabUnknown;
+}
+
+int SDPCmdBase::get_status(HIDReport *p, uint32_t &status, uint8_t report_id)
+{
+	m_input.resize(1025);
+	m_input[0] = report_id;
+	int ret = p->read(m_input);
+	if (ret < 0)
+		return -1;
+
+	if (m_input.size() < (1 + sizeof(uint32_t)))
+	{
+		set_last_err_string("HID report size is too small");
+		return -1;
+	}
+
+	status = *(uint32_t*)(m_input.data() + 1);
+	return 0;
+}
+
 IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit)
 {
 	if (limit >= data->size())
@@ -61,6 +112,14 @@ IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &of
 	}
 	off = -1;
 	return NULL;
+}
+
+SDPDcdCmd::SDPDcdCmd(char *p) : SDPCmdBase(p)
+{
+	insert_param_info("dcd", NULL, Param::Type::e_null);
+	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
+	insert_param_info("-dcdaddr", &m_dcd_addr, Param::Type::e_uint32);
+	m_dcd_addr = 0;
 }
 
 int SDPDcdCmd::run(CmdCtx*ctx)
@@ -120,6 +179,11 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 	return 0;
 }
 
+SDPSkipDCDCmd::SDPSkipDCDCmd(char *p) : SDPCmdBase(p)
+{
+	m_spdcmd.m_cmd = ROM_KERNEL_CMD_SKIP_DCD_HEADER;
+}
+
 int SDPSkipDCDCmd::run(CmdCtx*ctx)
 {
 	HIDTrans dev;
@@ -134,6 +198,19 @@ int SDPSkipDCDCmd::run(CmdCtx*ctx)
 		return -1;
 
 	return 0;
+}
+
+SDPBootCmd::SDPBootCmd(char *p) : SDPCmdBase(p)
+{
+	insert_param_info("boot", NULL, Param::Type::e_null);
+	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
+	insert_param_info("-nojump", &m_nojump, Param::Type::e_bool);
+	insert_param_info("-cleardcd", &m_clear_dcd, Param::Type::e_bool);
+	insert_param_info("-dcdaddr", &m_dcd_addr, Param::Type::e_uint32);
+
+	m_nojump = false;
+	m_clear_dcd = false;
+	m_dcd_addr = 0;
 }
 
 int SDPBootCmd::run(CmdCtx *ctx)
@@ -175,6 +252,12 @@ int SDPBootCmd::run(CmdCtx *ctx)
 	return 0;
 }
 
+SDPStatusCmd::SDPStatusCmd(char *p) : SDPCmdBase(p)
+{
+	m_spdcmd.m_cmd = ROM_KERNEL_CMD_ERROR_STATUS;
+	insert_param_info("status", NULL, Param::Type::e_null);
+}
+
 int SDPStatusCmd::run(CmdCtx *ctx)
 {
 	HIDTrans dev;
@@ -193,6 +276,26 @@ int SDPStatusCmd::run(CmdCtx *ctx)
 		return -1;
 
 	return 0;
+}
+
+SDPWriteCmd::SDPWriteCmd(char *p) : SDPCmdBase(p)
+{
+	m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_FILE;
+	m_PlugIn = -1;
+	m_Ivt = -1;
+	m_max_download_pre_cmd = 0x200000;
+	m_offset = 0;
+	m_bIvtReserve = false;
+	m_download_addr = 0;
+	m_bskipspl = false;
+
+	insert_param_info("write", NULL, Param::Type::e_null);
+	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
+	insert_param_info("-ivt", &m_Ivt, Param::Type::e_uint32);
+	insert_param_info("-addr", &m_download_addr, Param::Type::e_uint32);
+	insert_param_info("-offset", &m_offset, Param::Type::e_uint32);
+	insert_param_info("-skipspl", &m_bskipspl, Param::Type::e_bool);
+	insert_param_info("-skipfhdr", &m_bskipfhdr, Param::Type::e_bool);
 }
 
 int SDPWriteCmd::run(CmdCtx*ctx)
@@ -322,6 +425,15 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 	return 0;
 }
 
+SDPReadMemCmd::SDPReadMemCmd(char *p) : SDPCmdBase(p)
+{
+	m_spdcmd.m_cmd = ROM_KERNEL_CMD_RD_MEM;
+
+	insert_param_info("rdmem", NULL, Param::Type::e_null);
+	insert_param_info("-addr", &m_mem_addr, Param::Type::e_uint32);
+	insert_param_info("-format", &m_mem_format, Param::Type::e_uint32);
+}
+
 int SDPReadMemCmd::run(CmdCtx *ctx)
 {
 	HIDTrans dev;
@@ -378,6 +490,16 @@ int SDPReadMemCmd::run(CmdCtx *ctx)
 	return 0;
 }
 
+SDPWriteMemCmd::SDPWriteMemCmd(char *p) : SDPCmdBase(p)
+{
+	m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_MEM;
+
+	insert_param_info("wrmem", NULL, Param::Type::e_null);
+	insert_param_info("-addr", &m_mem_addr, Param::Type::e_uint32);
+	insert_param_info("-format", &m_mem_format, Param::Type::e_uint32);
+	insert_param_info("-value", &m_mem_value, Param::Type::e_uint32);
+}
+
 int SDPWriteMemCmd::run(CmdCtx *ctx)
 {
 	HIDTrans dev;
@@ -423,6 +545,19 @@ int SDPWriteMemCmd::run(CmdCtx *ctx)
 	}
 
 	return 0;
+}
+
+SDPJumpCmd::SDPJumpCmd(char *p) : SDPCmdBase(p)
+{
+	m_jump_addr = 0;
+	m_spdcmd.m_cmd = ROM_KERNEL_CMD_JUMP_ADDR;
+	m_clear_dcd = false;
+	insert_param_info("jump", NULL, Param::Type::e_null);
+	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
+	insert_param_info("-ivt", &m_Ivt, Param::Type::e_bool);
+	insert_param_info("-plugin", &m_Ivt, Param::Type::e_bool);
+	insert_param_info("-addr", &m_jump_addr, Param::Type::e_uint32);
+	insert_param_info("-cleardcd", &m_clear_dcd, Param::Type::e_bool);
 }
 
 int SDPJumpCmd::run(CmdCtx *ctx)
@@ -499,6 +634,11 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 	check_ack(&report, ROM_OK_ACK);
 
 	return 0;
+}
+
+SDPBootlogCmd::SDPBootlogCmd(char *p) : SDPCmdBase(p)
+{
+	insert_param_info("blog", NULL, Param::Type::e_null);
 }
 
 int SDPBootlogCmd::run(CmdCtx *ctx)
