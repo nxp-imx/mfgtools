@@ -17,6 +17,8 @@
 #ifndef _LIBSPARSE_SPARSE_FORMAT_H_
 #define _LIBSPARSE_SPARSE_FORMAT_H_
 
+#include <cstdint>
+
 typedef uint32_t __le32;
 typedef uint16_t __le16;
 

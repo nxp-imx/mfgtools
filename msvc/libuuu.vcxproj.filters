@@ -83,6 +83,9 @@
     <ClCompile Include="..\libuuu\sdps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\libuuu\sparse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\libuuu\trans.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
