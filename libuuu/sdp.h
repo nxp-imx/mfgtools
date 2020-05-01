@@ -103,7 +103,7 @@ public:
 	vector<uint8_t> m_input;
 	shared_ptr<FileBuffer> m_filebuff;
 
-	int init_cmd() { memset(&m_spdcmd, 0, sizeof(m_spdcmd)); return 0; }
+	int init_cmd();
 	int send_cmd(HIDReport *p) { return p->write(&m_spdcmd, sizeof(m_spdcmd), 1); };
 	int get_status(HIDReport *p, uint32_t &status, uint8_t report_id);
 	IvtHeader * search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit=ULLONG_MAX);
