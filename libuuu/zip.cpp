@@ -172,6 +172,45 @@ int Zip::BuildDirInfo()
 	return 0;
 }
 
+bool Zip::check_file_exist(string filename)
+{
+	if (m_filemap.find(filename) == m_filemap.end())
+	{
+		string err;
+		err += "Can't find file ";
+		err += filename;
+		set_last_err_string(err);
+		return false;
+	}
+
+	return true;
+}
+
+int Zip::get_file_buff(string filename, shared_ptr<FileBuffer> p)
+{
+	if (m_filemap.find(filename) == m_filemap.end())
+	{
+		string err;
+		err += "Can't find file ";
+		err += filename;
+		set_last_err_string(err);
+		return -1;
+	}
+
+	uuu_notify ut;
+	ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
+	ut.str = (char*)filename.c_str();
+	call_notify(ut);
+
+	return m_filemap[filename].decompress(this, p);
+}
+
+int Zip::Open(string filename)
+{
+	m_filename = filename;
+	return BuildDirInfo();
+}
+
 Zip_file_Info::Zip_file_Info()
 {
 
