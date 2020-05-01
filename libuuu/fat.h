@@ -95,27 +95,5 @@ public:
 	int get_next_cluster(shared_ptr<FileBuffer> p, int cluster);
 	void *get_data_buff(shared_ptr<FileBuffer> p, int cluster);
 
-	string lfn2string(FatLFN *p)
-	{
-		string str;
-		for (int i = 0; i < 10; i += 2)
-			if (p->name1[i] == 0)
-				return str;
-			else
-				str += p->name1[i];
-
-		for (int i = 0; i < 12; i += 2)
-			if (p->name2[i] == 0)
-				return str;
-			else
-				str += p->name2[i];
-
-		for (int i = 0; i < 4; i += 2)
-			if (p->name3[i] == 0)
-				return str;
-			else
-				str += p->name3[i];
-
-		return str;
-	}
+	string lfn2string(FatLFN *p);
 };

@@ -181,3 +181,27 @@ int Fat::get_file_buff(string filename, shared_ptr<FileBuffer>p)
 	}
 	return 0;
 }
+
+std::string Fat::lfn2string(FatLFN *p)
+{
+	string str;
+	for (int i = 0; i < 10; i += 2)
+		if (p->name1[i] == 0)
+			return str;
+		else
+			str += p->name1[i];
+
+	for (int i = 0; i < 12; i += 2)
+		if (p->name2[i] == 0)
+			return str;
+		else
+			str += p->name2[i];
+
+	for (int i = 0; i < 4; i += 2)
+		if (p->name3[i] == 0)
+			return str;
+		else
+			str += p->name3[i];
+
+	return str;
+}
