@@ -47,15 +47,7 @@ public:
 	virtual int write(void *buff, size_t size) = 0;
 	virtual int read(void *buff, size_t size, size_t *return_size) = 0;
 	int write(vector<uint8_t> & buff) { return write(buff.data(), buff.size()); }
-	int read(vector<uint8_t> &buff)
-	{
-		size_t size;
-		const auto ret = read(buff.data(), buff.size(), &size);
-		if (ret)
-			return ret;
-		buff.resize(size);
-		return ret;
-	}
+	int read(vector<uint8_t> &buff);
 };
 
 class EPInfo
@@ -82,19 +74,7 @@ public:
 	int m_read_timeout = 1000;
 	void set_hid_out_ep(int ep) noexcept { m_outEP = ep; }
 
-	int open(void *p) override
-	{
-		if (USBTrans::open(p))
-			return -1;
-
-		for (const auto &ep : m_EPs)
-		{
-			if (ep.addr > 0 && ((ep.addr & 0x80) == 0))
-				m_outEP = ep.addr;
-		}
-
-		return 0;
-	}
+	int open(void *p) override;
 	~HIDTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
 	int write(void *buff, size_t size) override;
 	int read(void *buff, size_t size, size_t *return_size) override;
