@@ -43,6 +43,16 @@ TransBase::~TransBase()
 {
 }
 
+int TransBase::read(vector<uint8_t> &buff)
+{
+	size_t size;
+	const auto ret = read(buff.data(), buff.size(), &size);
+	if (ret)
+		return ret;
+	buff.resize(size);
+	return ret;
+}
+
 int USBTrans::open(void *p)
 {
 	m_devhandle = p;
@@ -87,6 +97,20 @@ int USBTrans::close()
 	/* needn't clean resource here
 	   libusb_close will release all resource when finish running cmd
 	*/
+	return 0;
+}
+
+int HIDTrans::open(void *p)
+{
+	if (USBTrans::open(p))
+		return -1;
+
+	for (const auto &ep : m_EPs)
+	{
+		if (ep.addr > 0 && ((ep.addr & 0x80) == 0))
+			m_outEP = ep.addr;
+	}
+
 	return 0;
 }
 
