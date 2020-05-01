@@ -31,16 +31,13 @@
 
 #pragma once
 
-#include <vector>
-#include <memory>
-#include "liberror.h"
-#include <assert.h>
-#include <mutex>
 #include <atomic>
-#include <thread>
-#include <string>
+#include <cassert>
 #include <condition_variable>
-#include <string.h>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <vector>
 
 #ifdef _MSC_VER
 #include <Windows.h>

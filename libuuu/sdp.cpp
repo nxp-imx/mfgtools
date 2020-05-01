@@ -39,6 +39,8 @@
 #include "rominfo.h"
 #include "libusb.h"
 
+#include <cstring>
+
 int SDPCmdBase::check_ack(HIDReport *report, uint32_t ack)
 {
 	if (get_hab_type(report) == HabUnknown)
@@ -88,6 +90,11 @@ int SDPCmdBase::get_status(HIDReport *p, uint32_t &status, uint8_t report_id)
 
 	status = *(uint32_t*)(m_input.data() + 1);
 	return 0;
+}
+
+int SDPCmdBase::init_cmd()
+{
+	memset(&m_spdcmd, 0, sizeof(m_spdcmd)); return 0;
 }
 
 IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit)
