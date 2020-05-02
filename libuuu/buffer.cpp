@@ -70,7 +70,7 @@ class FSBasic
 public:
 	const char * m_ext;
 	const char * m_Prefix;
-	FSBasic() { m_ext = NULL; m_Prefix = NULL; }
+	FSBasic() { m_ext = nullptr; m_Prefix = nullptr; }
 	virtual int get_file_timesample(string filename, uint64_t *ptime)=0;
 	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)=0;
 	virtual bool exist(string backfile, string filename)=0;
@@ -78,7 +78,7 @@ public:
 	virtual int split(string filename, string *outbackfile, string *outfilename, bool dir=false)
 	{
 		string path = str_to_upper(filename);
-		if (m_ext == NULL || strlen(m_ext) == 0)
+		if (m_ext == nullptr || strlen(m_ext) == 0)
 		{
 			if(dir)
 			{
@@ -202,7 +202,7 @@ public:
 			DIR *dir;
 			dir = opendir(backfile.c_str() + 1);
 			struct dirent *dp;
-			while ((dp=readdir(dir)) != NULL)
+			while ((dp=readdir(dir)) != nullptr)
 			{
 				string name = dp->d_name;
 				if(name.substr(0, filename.size()) == filename || filename.empty())
@@ -229,7 +229,7 @@ class FSNetwork : public FSBasic
 public:
 	virtual int split(string filename, string *outbackfile, string *outfilename, bool dir = false)
 	{
-		if (m_Prefix == NULL)
+		if (m_Prefix == nullptr)
 			return -1;
 
 		if (filename.size() < strlen(m_Prefix))
@@ -415,7 +415,7 @@ public:
 
 	int get_file_timesample(string filename, uint64_t *ptimesame)
 	{
-		if (ptimesame == NULL)
+		if (ptimesame == nullptr)
 		{
 			set_last_err_string("ptimesame is null\n");
 			return -1;
@@ -785,7 +785,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 	shared_ptr<FileBuffer> pbz;
 
 	pbz = get_file_buffer(filename, true);
-	if (pbz == NULL) {
+	if (pbz == nullptr) {
 		string err;
 		err = "Failure get file buffer: ";
 		err += filename;
@@ -968,9 +968,9 @@ int decompress_single_thread(string name,shared_ptr<FileBuffer>p)
 	p->reserve(7*compressed_size);//the usual compressed ratio is about 18%, so 7*18% > 100%
 
 	bz_stream strm;
-	strm.bzalloc  = NULL;
-    strm.bzfree   = NULL;
-	strm.opaque   = NULL;
+	strm.bzalloc  = nullptr;
+	strm.bzfree   = nullptr;
+	strm.opaque   = nullptr;
 
 	int ret;
 	ret = BZ2_bzDecompressInit (&strm,0, 0 );
@@ -1070,7 +1070,7 @@ int FSGz::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool a
 	else
 	{
 		gzFile fp = gzopen(backfile.c_str() + 1, "r");
-		if (fp == NULL)
+		if (fp == nullptr)
 		{
 			set_last_err_string("Open file failure");
 			return -1;
@@ -1160,7 +1160,7 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 		shared_ptr<FileBuffer> p(new FileBuffer);
 
 		if (p->reload(filename, async))
-			return NULL;
+			return nullptr;
 
 		{
 			std::lock_guard<mutex> lock(g_mutex_map);
@@ -1178,7 +1178,7 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 		if (p->m_timesample != get_file_timesample(filename))
 			if (p->reload(filename, async))
 			{
-				return NULL;
+				return nullptr;
 			}
 
 		if (!p->IsLoaded() && !async)
@@ -1190,7 +1190,7 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 
 			if(!p->IsLoaded())
 			{
-				return NULL;
+				return nullptr;
 			}
 		}
 
@@ -1200,7 +1200,7 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 
 FileBuffer::FileBuffer()
 {
-	m_pDatabuffer = NULL;
+	m_pDatabuffer = nullptr;
 	m_DataSize = 0;
 	m_MemSize = 0;
 	m_allocate_way = ALLOCATE_MALLOC;
@@ -1210,7 +1210,7 @@ FileBuffer::FileBuffer()
 
 FileBuffer::FileBuffer(void *p, size_t sz)
 {
-	m_pDatabuffer = NULL;
+	m_pDatabuffer = nullptr;
 	m_DataSize = 0;
 	m_allocate_way = ALLOCATE_MALLOC;
 	m_MemSize = 0;
@@ -1247,16 +1247,16 @@ int FileBuffer::mapfile(string filename, size_t sz)
 
 		REQUEST_OPLOCK_OUTPUT_BUFFER Response;
 
-		m_OverLapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		m_OverLapped.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 		ResetEvent(m_OverLapped.hEvent);
 
 		m_file_handle = CreateFile(filename.c_str(),
 			GENERIC_READ,
 			FILE_SHARE_READ | FILE_SHARE_WRITE,
-			NULL,
+			nullptr,
 			OPEN_EXISTING,
 			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED,
-			NULL);
+			nullptr);
 
 		if (m_file_handle == INVALID_HANDLE_VALUE)
 		{
@@ -1272,7 +1272,7 @@ int FileBuffer::mapfile(string filename, size_t sz)
 			sizeof(m_Request),
 			&Response,
 			sizeof(Response),
-			NULL,
+			nullptr,
 			&m_OverLapped);
 
 		if (bSuccess || GetLastError() == ERROR_IO_PENDING)
@@ -1281,7 +1281,7 @@ int FileBuffer::mapfile(string filename, size_t sz)
 		}
 
 		m_file_map = CreateFileMapping(m_file_handle,
-			NULL, PAGE_READONLY, 0, 0, NULL);
+			nullptr, PAGE_READONLY, 0, 0, nullptr);
 
 		if (m_file_map == INVALID_HANDLE_VALUE)
 		{
@@ -1307,7 +1307,7 @@ int FileBuffer::mapfile(string filename, size_t sz)
 
 		m_pDatabuffer = (uint8_t *)mmap64(0, sz, PROT_READ, MAP_SHARED, fd, 0);
 		if (m_pDatabuffer == MAP_FAILED) {
-			m_pDatabuffer = NULL;
+			m_pDatabuffer = nullptr;
 			set_last_err_string("mmap failure\n");
 			return -1;
 		}
@@ -1442,7 +1442,7 @@ int FileBuffer::reserve(size_t sz)
 		m_pDatabuffer = (uint8_t*)realloc(m_pDatabuffer, sz);
 		m_MemSize = sz;
 
-		if (m_pDatabuffer == NULL)
+		if (m_pDatabuffer == nullptr)
 		{
 			set_last_err_string("Out of memory\n");
 			return -1;
@@ -1476,7 +1476,7 @@ int FileBuffer::unmapfile()
 	{
 #ifdef _MSC_VER
 		UnmapViewOfFile(m_pDatabuffer);
-		m_pDatabuffer = NULL;
+		m_pDatabuffer = nullptr;
 		CloseHandle(m_file_map);
 		CloseHandle(m_file_handle);
 		SetEvent(m_OverLapped.hEvent);
@@ -1489,14 +1489,14 @@ int FileBuffer::unmapfile()
 #else
 		munmap(m_pDatabuffer, m_DataSize);
 #endif
-		m_pDatabuffer = NULL;
+		m_pDatabuffer = nullptr;
 	}
 	return 0;
 }
 
 bool check_file_exist(string filename, bool start_async_load)
 {
-	return get_file_buffer(filename, true) != NULL;
+	return get_file_buffer(filename, true) != nullptr;
 }
 
 #ifdef WIN32

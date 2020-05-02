@@ -68,7 +68,7 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 		if (strncmp(buff, "DATA",4) == 0)
 		{
 			size_t sz;
-			sz = strtoul(buff+4, NULL, 16);
+			sz = strtoul(buff+4, nullptr, 16);
 
 			if (input)
 			{
@@ -138,7 +138,7 @@ int FBGetVar::run(CmdCtx *ctx)
 	cmd = "getvar:";
 	cmd += m_var;
 
-	if (fb.Transport(cmd, NULL, 0))
+	if (fb.Transport(cmd, nullptr, 0))
 		return -1;
 
 	m_val = fb.m_info;
@@ -185,7 +185,7 @@ int FBCmd::run(CmdCtx *ctx)
 	cmd += m_separator;
 	cmd += m_uboot_cmd;
 
-	if (fb.Transport(cmd, NULL, 0))
+	if (fb.Transport(cmd, nullptr, 0))
 		return -1;
 
 	return 0;
@@ -204,7 +204,7 @@ int FBPartNumber::run(CmdCtx *ctx)
 	string_ex cmd;
 	cmd.format("%s:%s:%08x", m_fb_cmd.c_str(), m_partition_name.c_str(), (uint32_t)m_Size);
 
-	if (fb.Transport(cmd, NULL, 0))
+	if (fb.Transport(cmd, nullptr, 0))
 		return -1;
 
 	return 0;
@@ -223,7 +223,7 @@ int FBUpdateSuper::run(CmdCtx *ctx)
 	string_ex cmd;
 	cmd.format("%s:%s:%s", m_fb_cmd.c_str(), m_partition_name.c_str(), m_opt.c_str());
 
-	if (fb.Transport(cmd, NULL, 0))
+	if (fb.Transport(cmd, nullptr, 0))
 		return -1;
 
 	return 0;
@@ -238,7 +238,7 @@ int FBDownload::run(CmdCtx *ctx)
 	FastBoot fb(&dev);
 
 	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
-	if (buff == NULL)
+	if (buff == nullptr)
 		return -1;
 
 	string_ex cmd;
@@ -326,13 +326,13 @@ int FBCopy::run(CmdCtx *ctx)
 	{
 		size_t i;
 		shared_ptr<FileBuffer> buff = get_file_buffer(m_local_file);
-		if (buff == NULL)
+		if (buff == nullptr)
 		{
 			return -1;
 		}
 
 		cmd.format("WOpen:%s", m_target_file.c_str());
-		if (fb.Transport(cmd, NULL, 0))
+		if (fb.Transport(cmd, nullptr, 0))
 		{
 			if (fb.m_info == "DIR")
 			{
@@ -343,7 +343,7 @@ int FBCopy::run(CmdCtx *ctx)
 				target += p.get_file_name();
 
 				cmd.format("WOpen:%s", target.c_str());
-				if (fb.Transport(cmd, NULL, 0))
+				if (fb.Transport(cmd, nullptr, 0))
 					return -1;
 			}
 			else {
@@ -382,12 +382,12 @@ int FBCopy::run(CmdCtx *ctx)
 	else
 	{
 		cmd.format("ROpen:%s", m_target_file.c_str());
-		if (fb.Transport(cmd, NULL, 0))
+		if (fb.Transport(cmd, nullptr, 0))
 			return -1;
 
 		uuu_notify nt;
 		nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
-		size_t total = nt.total = strtoul(fb.m_info.c_str(), NULL, 16);
+		size_t total = nt.total = strtoul(fb.m_info.c_str(), nullptr, 16);
 		call_notify(nt);
 
 		nt.index = 0;
@@ -421,7 +421,7 @@ int FBCopy::run(CmdCtx *ctx)
 		do
 		{
 			vector<uint8_t> data;
-			if (fb.Transport("upload", NULL, 0, &data))
+			if (fb.Transport("upload", nullptr, 0, &data))
 				return -1;
 
 			of.write((const char*)data.data(), data.size());
@@ -440,7 +440,7 @@ int FBCopy::run(CmdCtx *ctx)
 	}
 
 	cmd.format("Close");
-	if (fb.Transport(cmd, NULL, 0))
+	if (fb.Transport(cmd, nullptr, 0))
 		return -1;
 
 	return 0;
@@ -487,7 +487,7 @@ int FBFlashCmd::flash(FastBoot *fb, void * pdata, size_t sz)
 		return -1;
 
 	cmd.format("flash:%s", m_partition.c_str());
-	if (fb->Transport(cmd, NULL, 0))
+	if (fb->Transport(cmd, nullptr, 0))
 		return -1;
 
 	return 0;
@@ -535,7 +535,7 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, siz
 			ct.reserved1 = 0;
 			ct.total_sz = sizeof(ct);
 
-			sf.push_one_chuck(&ct, NULL);
+			sf.push_one_chuck(&ct, nullptr);
 
 			nt.type = uuu_notify::NOTIFY_TRANS_POS;
 			nt.total = i * block_size;
@@ -571,7 +571,7 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, siz
 int FBFlashCmd::run(CmdCtx *ctx)
 {
 	FBGetVar getvar((char*)"FB: getvar max-download-size");
-	if (getvar.parser(NULL))
+	if (getvar.parser(nullptr))
 		return -1;
 	if (getvar.run(ctx))
 		return -1;
@@ -621,7 +621,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 	}
 
 	shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename);
-	if (pdata == NULL)
+	if (pdata == nullptr)
 		return -1;
 
 	if (SparseFile::is_validate_sparse_file(pdata->data(), pdata->size()))
@@ -685,7 +685,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 					ct.reserved1 = 0;
 					ct.total_sz = sizeof(ct);
 
-					sz = sf.push_one_chuck(&ct, NULL);
+					sz = sf.push_one_chuck(&ct, nullptr);
 
 					sz = sf.push_raw_data(pdata->data() + off, pos - off);
 					off += sz;
@@ -739,7 +739,7 @@ int FBFlashCmd::flash_ffu_oneblk(FastBoot *fb, shared_ptr<FileBuffer> p, size_t 
 	ct.reserved1 = 0;
 	ct.total_sz = sizeof(ct);
 
-	sf.push_one_chuck(&ct, NULL);
+	sf.push_one_chuck(&ct, nullptr);
 
 	if (sf.push_one_block(p->data() + off))
 		return -1;

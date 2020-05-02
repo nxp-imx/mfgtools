@@ -52,7 +52,7 @@ static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
 static string g_cmd_list_file;
 
-int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap = NULL);
+int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap = nullptr);
 
 template <class T>
 void * create_object() { return new T; }
@@ -71,7 +71,7 @@ CmdBase::~CmdBase()
 
 int CmdBase::parser(char *p)
 {
-	if (p != NULL)
+	if (p != nullptr)
 		m_cmd = p;
 
 	size_t pos = 0;
@@ -86,7 +86,7 @@ int CmdBase::parser(char *p)
 	{
 		param = get_next_param(m_cmd, pos);
 
-		struct Param *pp = NULL;
+		struct Param *pp = nullptr;
 
 		if (m_NoKeyParam)
 		{
@@ -111,7 +111,7 @@ int CmdBase::parser(char *p)
 			}
 		}
 
-		if (pp == NULL)
+		if (pp == nullptr)
 		{
 			string err;
 			err = "unknown Option";
@@ -480,7 +480,7 @@ shared_ptr<CmdBase> create_cmd_obj(string cmd)
 	err = "Unknown Command:";
 	err += cmd;
 	set_last_err_string(err);
-	return NULL;
+	return nullptr;
 }
 
 int uuu_run_cmd(const char * cmd, int dry)
@@ -489,7 +489,7 @@ int uuu_run_cmd(const char * cmd, int dry)
 	p = create_cmd_obj(cmd);
 	int ret;
 
-	if (p == NULL)
+	if (p == nullptr)
 		return -1;
 
 	uuu_notify nt;
@@ -530,7 +530,7 @@ int uuu_run_cmd(const char * cmd, int dry)
 	}
 	else
 	{
-		return ret = dry? p->dump() : p->run(NULL);
+		return ret = dry? p->dump() : p->run(nullptr);
 	}
 
 	nt.type = uuu_notify::NOTIFY_CMD_END;
@@ -606,7 +606,7 @@ int CmdShell::run(CmdCtx*)
 #endif
 	FILE *pipe = _popen(m_shellcmd.c_str(), "r");
 
-	if (pipe == NULL)
+	if (pipe == nullptr)
 	{
 		string err = "failure popen: ";
 		err += m_shellcmd.c_str();
@@ -666,7 +666,7 @@ int run_cmds(const char *procotal, CmdCtx *p)
 	if (!g_cmd_list_file.empty())
 	{
 		shared_ptr<FileBuffer> pbuff = get_file_buffer(g_cmd_list_file);
-		if (pbuff == NULL)
+		if (pbuff == nullptr)
 			return -1;
 		if(parser_cmd_list_file(pbuff, &cmdmap))
 			return -1;
@@ -697,7 +697,7 @@ static int insert_one_cmd(const char * cmd, CmdMap *pCmdMap)
 	pro = str_to_upper(pro);
 
 	shared_ptr<CmdBase> p = create_cmd_obj(s);
-	if (p == NULL)
+	if (p == nullptr)
 		return -1;
 
 	if (p->parser())
@@ -804,7 +804,7 @@ int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap)
 	char uuu_version[] = "uuu_version";
 	string str;
 
-	if (pCmdMap == NULL)
+	if (pCmdMap == nullptr)
 		pCmdMap = &g_cmd_map;
 
 	pCmdMap->clear();
@@ -851,7 +851,7 @@ int uuu_auto_detect_file(const char *filename)
 
 	fn += "/uuu.auto";
 	shared_ptr<FileBuffer> buffer = get_file_buffer(fn);
-	if (buffer == NULL)
+	if (buffer == nullptr)
 	{
 		fn.clear();
 		fn += oldfn;
@@ -863,7 +863,7 @@ int uuu_auto_detect_file(const char *filename)
 				buffer = get_file_buffer(fn); //we don't try open a zip file here
 		}
 
-		if(buffer == NULL)
+		if(buffer == nullptr)
 			return -1;
 	}
 

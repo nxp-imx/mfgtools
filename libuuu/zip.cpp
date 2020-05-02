@@ -42,15 +42,15 @@
 int Zip::BuildDirInfo()
 {
 	shared_ptr<FileBuffer> zipfile = get_file_buffer(m_filename);
-	if (zipfile == NULL)
+	if (zipfile == nullptr)
 	{
 		return -1;
 	}
 
 	size_t i;
-	Zip_eocd *peocd = NULL;
-	Zip64_eocd_locator *peocd64_loc = NULL;
-	Zip64_eocd *peocd64 = NULL;
+	Zip_eocd *peocd = nullptr;
+	Zip64_eocd_locator *peocd64_loc = nullptr;
+	Zip64_eocd *peocd64 = nullptr;
 
 	for (i = zipfile->size() - sizeof(Zip_eocd); i > 0; i--)
 	{
@@ -234,7 +234,7 @@ int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 	size_t lastpos = 0;
 
 	shared_ptr<FileBuffer> zipfile = get_file_buffer(pZip->m_filename);
-	if (zipfile == NULL)
+	if (zipfile == nullptr)
 		return -1;
 
 	Zip_file_desc *file_desc=(Zip_file_desc *)(zipfile->data() + m_offset);

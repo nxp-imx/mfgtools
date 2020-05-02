@@ -115,8 +115,8 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 	 * sometime HID device detect need some time, refresh list
 	 * to make sure HID driver installed.
 	 */
-	libusb_device **list = NULL;
-	libusb_get_device_list(NULL, &list);
+	libusb_device **list = nullptr;
+	libusb_get_device_list(nullptr, &list);
 
 	if (libusb_open(dev, (libusb_device_handle **)&(ctx.m_dev)) < 0)
 	{
@@ -176,20 +176,20 @@ void compare_list(libusb_device ** old, libusb_device **nw)
 	libusb_device * dev;
 	int i = 0;
 
-	if (old == NULL)
+	if (old == nullptr)
 	{
-		while ((dev = nw[i++]) != NULL)
+		while ((dev = nw[i++]) != nullptr)
 		{
 			usb_add(dev);
 		}
 		return;
 	}
 
-	while ((dev = nw[i++]) != NULL)
+	while ((dev = nw[i++]) != nullptr)
 	{
 		libusb_device * p;
 		int j = 0;
-		while ((p = old[j++]) != NULL)
+		while ((p = old[j++]) != nullptr)
 		{
 			if (p == dev)
 				break;//find it.
@@ -199,11 +199,11 @@ void compare_list(libusb_device ** old, libusb_device **nw)
 	}
 
 	i = 0;
-	while ((dev = old[i++]) != NULL)
+	while ((dev = old[i++]) != nullptr)
 	{
 		libusb_device * p;
 		int j = 0;
-		while ((p = nw[j++]) != NULL)
+		while ((p = nw[j++]) != nullptr)
 		{
 			if (p == dev)
 				break;//find it.
@@ -215,25 +215,25 @@ void compare_list(libusb_device ** old, libusb_device **nw)
 
 int polling_usb(std::atomic<int>& bexit)
 {
-	libusb_device **oldlist = NULL;
-	libusb_device **newlist = NULL;
+	libusb_device **oldlist = nullptr;
+	libusb_device **newlist = nullptr;
 
-	if (libusb_init(NULL) < 0)
+	if (libusb_init(nullptr) < 0)
 	{
 		set_last_err_string("Call libusb_init failure");
 		return -1;
 	}
 
-	libusb_set_debug(NULL, get_libusb_debug_level());
+	libusb_set_debug(nullptr, get_libusb_debug_level());
 
-	if (run_cmds("CFG:", NULL))
+	if (run_cmds("CFG:", nullptr))
 		return -1;
 
 	time_t start = time(0);
 
 	while(!bexit)
 	{
-		ssize_t sz = libusb_get_device_list(NULL, &newlist);
+		ssize_t sz = libusb_get_device_list(nullptr, &newlist);
 		if (sz < 0)
 		{
 			set_last_err_string("Call libusb_get_device_list failure");
@@ -277,27 +277,27 @@ CmdUsbCtx::~CmdUsbCtx()
 
 int CmdUsbCtx::look_for_match_device(const char *pro)
 {
-	if (libusb_init(NULL) < 0)
+	if (libusb_init(nullptr) < 0)
 	{
 		set_last_err_string("Call libusb_init failure");
 		return -1;
 	}
 
-	libusb_set_debug(NULL, get_libusb_debug_level());
+	libusb_set_debug(nullptr, get_libusb_debug_level());
 
-	if (run_cmds("CFG:", NULL))
+	if (run_cmds("CFG:", nullptr))
 		return -1;
 
 	time_t start = time(0);
 
 	while (1)
 	{
-		libusb_device **newlist = NULL;
-		libusb_get_device_list(NULL, &newlist);
+		libusb_device **newlist = nullptr;
+		libusb_get_device_list(nullptr, &newlist);
 		size_t i = 0;
 		libusb_device *dev;
 
-		while ((dev = newlist[i++]) != NULL)
+		while ((dev = newlist[i++]) != nullptr)
 		{
 			struct libusb_device_descriptor desc;
 			int r = libusb_get_device_descriptor(dev, &desc);
@@ -322,8 +322,8 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 					 * to make sure HID driver installed.
 					 */
 					std::this_thread::sleep_for(std::chrono::milliseconds(200));
-					libusb_device **list = NULL;
-					libusb_get_device_list(NULL, &list);
+					libusb_device **list = nullptr;
+					libusb_get_device_list(nullptr, &list);
 
 					if (libusb_open(dev, (libusb_device_handle **)&(m_dev)) < 0)
 					{
@@ -369,18 +369,18 @@ int uuu_add_usbpath_filter(const char *path)
 
 int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 {
-	if (libusb_init(NULL) < 0)
+	if (libusb_init(nullptr) < 0)
 	{
 		set_last_err_string("Call libusb_init failure");
 		return -1;
 	}
 
-	libusb_device **newlist = NULL;
-	libusb_get_device_list(NULL, &newlist);
+	libusb_device **newlist = nullptr;
+	libusb_get_device_list(nullptr, &newlist);
 	size_t i = 0;
 	libusb_device *dev;
 
-	while ((dev = newlist[i++]) != NULL)
+	while ((dev = newlist[i++]) != nullptr)
 	{
 		struct libusb_device_descriptor desc;
 		int r = libusb_get_device_descriptor(dev, &desc);
@@ -402,7 +402,7 @@ int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 	}
 
 	libusb_free_device_list(newlist, 1);
-	libusb_exit(NULL);
+	libusb_exit(nullptr);
 
 	return 0;
 }

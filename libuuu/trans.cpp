@@ -223,7 +223,7 @@ int BulkTrans::write(void *buff, size_t size)
 		ret = libusb_bulk_transfer(
 			(libusb_device_handle *)m_devhandle,
 			m_ep_out.addr,
-			NULL,
+			nullptr,
 			0,
 			&actual_lenght,
 			2000

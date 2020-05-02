@@ -43,7 +43,7 @@ int Fat::Open(string filename)
 	m_filename = filename;
 
 	shared_ptr<FileBuffer> pbuff = get_file_buffer(m_filename);
-	if (pbuff == NULL)
+	if (pbuff == nullptr)
 		return -1;
 	if (pbuff->size() < 512)
 	{

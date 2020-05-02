@@ -65,7 +65,7 @@ public:
 		SSLeay_add_ssl_algorithms();
 		SSL_load_error_strings();
 #else
-		OPENSSL_init_ssl(0, NULL);
+		OPENSSL_init_ssl(0, nullptr);
 		SSLeay_add_ssl_algorithms();
 #endif
 	}
@@ -123,7 +123,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port)
 	wstring wpath = converter.from_bytes(path);
 
 	m_hRequest = WinHttpOpenRequest(m_hConnect, L"GET", wpath.c_str(),
-			NULL, WINHTTP_NO_REFERER,
+			nullptr, WINHTTP_NO_REFERER,
 			WINHTTP_DEFAULT_ACCEPT_TYPES,
 			port==443?WINHTTP_FLAG_SECURE:0);
 
@@ -145,7 +145,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port)
 		return -1;
 	}
 
-	bResults = WinHttpReceiveResponse(m_hRequest, NULL);
+	bResults = WinHttpReceiveResponse(m_hRequest, nullptr);
 
 	if (!bResults)
 	{
@@ -174,7 +174,7 @@ size_t HttpStream::HttpGetFileSize()
 	wstring out;
 
 	WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_CONTENT_LENGTH,
-		WINHTTP_HEADER_NAME_BY_INDEX, NULL,
+		WINHTTP_HEADER_NAME_BY_INDEX, nullptr,
 		&dwSize, WINHTTP_NO_HEADER_INDEX);
 
 	// Allocate memory for the buffer.
@@ -234,7 +234,7 @@ HttpStream::~HttpStream()
 HttpStream::HttpStream()
 {
 	m_buff.empty();
-	m_ssl = NULL;
+	m_ssl = nullptr;
 }
 
 int HttpStream::SendPacket(char *buff, size_t sz)
