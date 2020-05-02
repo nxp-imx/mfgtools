@@ -30,9 +30,9 @@
 */
 #pragma once
 
-#include "liberror.h"
 #include "sparse_format.h"
 
+#include <cstddef>
 #include <vector>
 
 class SparseFile
