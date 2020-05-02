@@ -11,7 +11,7 @@ chunk_header_t * SparseFile::get_next_chunk(uint8_t *p, size_t &pos)
 		sparse_header *pheader = (sparse_header*)p;
 		if (pheader->magic != SPARSE_HEADER_MAGIC) {
 			set_last_err_string("Sparse heade Magic missed");
-			return NULL;
+			return nullptr;
 		}
 		pos += pheader->file_hdr_sz;
 	}

@@ -51,7 +51,7 @@ public:
 	{
 		va_list args;
 		va_start(args, fmt);
-		size_t len = std::vsnprintf(NULL, 0, fmt, args);
+		size_t len = std::vsnprintf(nullptr, 0, fmt, args);
 		va_end(args);
 
 		this->resize(len);

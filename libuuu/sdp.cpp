@@ -119,7 +119,7 @@ IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &of
 		}
 	}
 	off = -1;
-	return NULL;
+	return nullptr;
 }
 
 int SDPCmdBase::send_cmd(HIDReport *p)
@@ -129,7 +129,7 @@ int SDPCmdBase::send_cmd(HIDReport *p)
 
 SDPDcdCmd::SDPDcdCmd(char *p) : SDPCmdBase(p)
 {
-	insert_param_info("dcd", NULL, Param::Type::e_null);
+	insert_param_info("dcd", nullptr, Param::Type::e_null);
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
 	insert_param_info("-dcdaddr", &m_dcd_addr, Param::Type::e_uint32);
 	m_dcd_addr = 0;
@@ -138,7 +138,7 @@ SDPDcdCmd::SDPDcdCmd(char *p) : SDPCmdBase(p)
 int SDPDcdCmd::run(CmdCtx*ctx)
 {
 	const ROM_INFO * rom = search_rom_info(ctx->m_config_item);
-	if (rom == NULL)
+	if (rom == nullptr)
 	{
 		string_ex err;
 		err.format("%s:%d can't get rom info", __FUNCTION__, __LINE__);
@@ -151,7 +151,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 
 	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off);
-	if (pIVT == NULL)
+	if (pIVT == nullptr)
 	{
 		return 0;
 	}
@@ -215,7 +215,7 @@ int SDPSkipDCDCmd::run(CmdCtx*ctx)
 
 SDPBootCmd::SDPBootCmd(char *p) : SDPCmdBase(p)
 {
-	insert_param_info("boot", NULL, Param::Type::e_null);
+	insert_param_info("boot", nullptr, Param::Type::e_null);
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
 	insert_param_info("-nojump", &m_nojump, Param::Type::e_bool);
 	insert_param_info("-cleardcd", &m_clear_dcd, Param::Type::e_bool);
@@ -259,7 +259,7 @@ int SDPBootCmd::run(CmdCtx *ctx)
 		if (jmp.run(ctx)) return -1;
 	}
 
-	SDPBootlogCmd log(NULL);
+	SDPBootlogCmd log(nullptr);
 	log.run(ctx);
 
 	return 0;
@@ -268,7 +268,7 @@ int SDPBootCmd::run(CmdCtx *ctx)
 SDPStatusCmd::SDPStatusCmd(char *p) : SDPCmdBase(p)
 {
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_ERROR_STATUS;
-	insert_param_info("status", NULL, Param::Type::e_null);
+	insert_param_info("status", nullptr, Param::Type::e_null);
 }
 
 int SDPStatusCmd::run(CmdCtx *ctx)
@@ -302,7 +302,7 @@ SDPWriteCmd::SDPWriteCmd(char *p) : SDPCmdBase(p)
 	m_download_addr = 0;
 	m_bskipspl = false;
 
-	insert_param_info("write", NULL, Param::Type::e_null);
+	insert_param_info("write", nullptr, Param::Type::e_null);
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
 	insert_param_info("-ivt", &m_Ivt, Param::Type::e_uint32);
 	insert_param_info("-addr", &m_download_addr, Param::Type::e_uint32);
@@ -319,7 +319,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 
 	shared_ptr<FileBuffer> fbuff = get_file_buffer(m_filename);
 
-	if (fbuff == NULL)
+	if (fbuff == nullptr)
 		return -1;
 
 	if (m_Ivt < 0)
@@ -370,7 +370,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 			off += 0x100;
 			pIvt = search_ivt_header(fbuff, off);
 		}
-		if (pIvt == NULL)
+		if (pIvt == nullptr)
 		{
 			set_last_err_string("Can find validate IVT header");
 			return -1;
@@ -442,7 +442,7 @@ SDPReadMemCmd::SDPReadMemCmd(char *p) : SDPCmdBase(p)
 {
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_RD_MEM;
 
-	insert_param_info("rdmem", NULL, Param::Type::e_null);
+	insert_param_info("rdmem", nullptr, Param::Type::e_null);
 	insert_param_info("-addr", &m_mem_addr, Param::Type::e_uint32);
 	insert_param_info("-format", &m_mem_format, Param::Type::e_uint32);
 }
@@ -507,7 +507,7 @@ SDPWriteMemCmd::SDPWriteMemCmd(char *p) : SDPCmdBase(p)
 {
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_MEM;
 
-	insert_param_info("wrmem", NULL, Param::Type::e_null);
+	insert_param_info("wrmem", nullptr, Param::Type::e_null);
 	insert_param_info("-addr", &m_mem_addr, Param::Type::e_uint32);
 	insert_param_info("-format", &m_mem_format, Param::Type::e_uint32);
 	insert_param_info("-value", &m_mem_value, Param::Type::e_uint32);
@@ -565,7 +565,7 @@ SDPJumpCmd::SDPJumpCmd(char *p) : SDPCmdBase(p)
 	m_jump_addr = 0;
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_JUMP_ADDR;
 	m_clear_dcd = false;
-	insert_param_info("jump", NULL, Param::Type::e_null);
+	insert_param_info("jump", nullptr, Param::Type::e_null);
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
 	insert_param_info("-ivt", &m_Ivt, Param::Type::e_bool);
 	insert_param_info("-plugin", &m_Ivt, Param::Type::e_bool);
@@ -583,7 +583,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 
 	HIDReport report(&dev);
 
-	if (rom == NULL)
+	if (rom == nullptr)
 	{
 		string_ex err;
 		err.format("%s:%d can't get rom info", __FUNCTION__, __LINE__);
@@ -612,7 +612,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 
 	if (rom->flags & ROM_INFO_HID_SKIP_DCD && !m_clear_dcd)
 	{
-		SDPSkipDCDCmd skipcmd(NULL);
+		SDPSkipDCDCmd skipcmd(nullptr);
 		if (skipcmd.run(ctx))
 			return -1;
 	}
@@ -635,7 +635,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 		IvtHeader *header = (IvtHeader *)ivt.data();
 		header->DCDAddress = 0;
 
-		SDPWriteCmd writecmd(NULL);
+		SDPWriteCmd writecmd(nullptr);
 		if(writecmd.run(ctx, header, ivt.size(), pIVT->SelfAddr))
 			return -1;
 	}
@@ -651,7 +651,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 
 SDPBootlogCmd::SDPBootlogCmd(char *p) : SDPCmdBase(p)
 {
-	insert_param_info("blog", NULL, Param::Type::e_null);
+	insert_param_info("blog", nullptr, Param::Type::e_null);
 }
 
 int SDPBootlogCmd::run(CmdCtx *ctx)

@@ -83,7 +83,7 @@ struct _ST_HID_CBW
 int SDPSCmd::run(CmdCtx *pro)
 {
 	const ROM_INFO * rom = search_rom_info(pro->m_config_item);
-	if (rom == NULL)
+	if (rom == nullptr)
 	{
 		string_ex err;
 		err.format("%s:%d can't get rom info", __FUNCTION__, __LINE__);
@@ -144,7 +144,7 @@ int SDPSCmd::run(CmdCtx *pro)
 
 	if (ret ==  0)
 	{
-		SDPBootlogCmd log(NULL);
+		SDPBootlogCmd log(nullptr);
 		log.run(pro);
 	}
 

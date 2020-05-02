@@ -22,7 +22,7 @@ int Tar::Open(const std::string &filename)
 	m_tarfilename=filename;
 
 	shared_ptr<FileBuffer> file = get_file_buffer(filename);
-	if(file == NULL)
+	if(file == nullptr)
 		return -1;
 
 	uint8_t* data=file->data();
