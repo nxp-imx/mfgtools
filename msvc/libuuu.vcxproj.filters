@@ -9,6 +9,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\libuuu\backfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\libuuu\liberror.h">
       <Filter>Header Files</Filter>
     </ClInclude>

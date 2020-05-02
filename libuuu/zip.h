@@ -38,6 +38,7 @@
 #include "buffer.h"
 #include "liberror.h"
 #include "libuuu.h"
+#include "backfile.h"
 
 using namespace std;
 
@@ -156,12 +157,6 @@ struct Zip_ext
 #define EOCD64_LOCATOR_SIGNATURE 0x07064b50
 #define EOCD64_SIGNATURE 0x06064b50
 
-class Backfile
-{
-public:
-	uint64_t m_timesampe;
-	string m_filename;
-};
 class Zip;
 
 class Zip_file_Info
