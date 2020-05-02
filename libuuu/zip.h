@@ -29,18 +29,16 @@
 *
 */
 #pragma once
-#include <stdint.h>
-#include <map>
-#include <string>
-#include <vector>
-#include "zlib.h"
-#include <memory>
-#include "buffer.h"
-#include "liberror.h"
-#include "libuuu.h"
+
 #include "backfile.h"
 
-using namespace std;
+#include "zlib.h"
+
+#include <cstdint>
+#include <map>
+#include <memory>
+
+class FileBuffer;
 
 #pragma pack(1)
 struct Zip_data_desc
@@ -162,7 +160,7 @@ class Zip;
 class Zip_file_Info
 {
 public:
-	string m_filename;
+	std::string m_filename;
 	uint32_t m_timestamp;
 	size_t m_filesize;
 	size_t m_compressedsize;
@@ -179,11 +177,11 @@ class Zip : public Backfile
 {
 public:
 	int BuildDirInfo();
-	bool check_file_exist(string filename);
-	int get_file_buff(string filename, shared_ptr<FileBuffer>p);
-	int Open(string filename);
+	bool check_file_exist(std::string filename);
+	int get_file_buff(std::string filename, std::shared_ptr<FileBuffer>p);
+	int Open(std::string filename);
 
-	map<string, Zip_file_Info> m_filemap;
+	std::map<std::string, Zip_file_Info> m_filemap;
 };
 
 
