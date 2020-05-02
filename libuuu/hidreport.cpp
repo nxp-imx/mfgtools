@@ -1,6 +1,7 @@
 #include "hidreport.h"
 #include "libcomm.h"
 #include "liberror.h"
+#include "trans.h"
 
 #include <cstring>
 

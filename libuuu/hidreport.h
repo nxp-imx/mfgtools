@@ -31,7 +31,10 @@
 #pragma once
 
 #include "libuuu.h"
-#include "trans.h"
+
+#include <vector>
+
+class TransBase;
 
 class HIDReport
 {
