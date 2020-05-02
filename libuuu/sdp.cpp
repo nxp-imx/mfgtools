@@ -121,6 +121,11 @@ IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &of
 	return NULL;
 }
 
+int SDPCmdBase::send_cmd(HIDReport *p)
+{
+	return p->write(&m_spdcmd, sizeof(m_spdcmd), 1);
+}
+
 SDPDcdCmd::SDPDcdCmd(char *p) : SDPCmdBase(p)
 {
 	insert_param_info("dcd", NULL, Param::Type::e_null);

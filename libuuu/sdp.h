@@ -32,9 +32,10 @@
 #pragma once
 
 #include "cmd.h"
-#include "trans.h"
-#include "hidreport.h"
+
 #include <climits>
+
+class HIDReport;
 
 #pragma pack (1)
 struct SDPCmd {
@@ -99,12 +100,12 @@ public:
 
 	SDPCmdBase(char *p) :CmdBase(p) { init_cmd(); }
 	SDPCmd m_spdcmd;
-	string m_filename;
+	std::string m_filename;
 	vector<uint8_t> m_input;
 	shared_ptr<FileBuffer> m_filebuff;
 
 	int init_cmd();
-	int send_cmd(HIDReport *p) { return p->write(&m_spdcmd, sizeof(m_spdcmd), 1); };
+	int send_cmd(HIDReport *p);
 	int get_status(HIDReport *p, uint32_t &status, uint8_t report_id);
 	IvtHeader * search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit=ULLONG_MAX);
 
