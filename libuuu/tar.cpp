@@ -14,7 +14,7 @@
 #include <iostream>
 using namespace std;
 
-int Tar::Open(string filename)
+int Tar::Open(const std::string &filename)
 {
 	bool end_of_file=false;
 	char end_of_file_blocks[2*TAR_BLOCK_SIZE];
@@ -56,7 +56,7 @@ int Tar::Open(string filename)
 	return 0;
 }
 
-bool Tar::check_file_exist(string filename)
+bool Tar::check_file_exist(const std::string &filename)
 {
 
 	if (m_filemap.find(filename) == m_filemap.end())
@@ -72,7 +72,7 @@ bool Tar::check_file_exist(string filename)
 }
 
 
-int Tar::get_file_buff(string filename, shared_ptr<FileBuffer> p )
+int Tar::get_file_buff(const string &filename, shared_ptr<FileBuffer> p )
 {
 
 	if (m_filemap.find(filename) == m_filemap.end())

@@ -1,16 +1,11 @@
-#include <stdint.h>
-#include <map>
-#include <string>
-#include <vector>
-#include "zlib.h"
-#include <memory>
-#include "buffer.h"
-#include "liberror.h"
-#include "libuuu.h"
-#include <stdio.h>
-#include <string.h>
+#pragma once
 
-using namespace std;
+#include <cstdint>
+#include <map>
+#include <memory>
+#include <string>
+
+class FileBuffer;
 
 #define TAR_BLOCK_SIZE 512
 
@@ -39,20 +34,19 @@ struct Tar_header
 class Tar_file_Info
 {
 public:
-	string filename;
+	std::string filename;
 	uint64_t offset;
 	uint64_t size;
-
 };
 
 
 class Tar
 {
-	string m_tarfilename;
+	std::string m_tarfilename;
 
 public:
-	map<string, Tar_file_Info> m_filemap;
-	int Open(string filename);
-	bool check_file_exist(string filename);
-	int get_file_buff(string filename, shared_ptr<FileBuffer> p );
+	std::map<std::string, Tar_file_Info> m_filemap;
+	int Open(const std::string &filename);
+	bool check_file_exist(const std::string &filename);
+	int get_file_buff(const std::string &filename, std::shared_ptr<FileBuffer> p);
 };
