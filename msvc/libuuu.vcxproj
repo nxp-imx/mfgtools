@@ -39,6 +39,7 @@
     <ClCompile Include="..\libuuu\zip.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\libuuu\backfile.h" />
     <ClInclude Include="..\libuuu\buffer.h" />
     <ClInclude Include="..\libuuu\cmd.h" />
     <ClInclude Include="..\libuuu\config.h" />

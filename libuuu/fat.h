@@ -28,8 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#include <stdint.h>
-#include "zip.h"
+#include "backfile.h"
+#include "buffer.h"
+
+#include <map>
 
 #pragma pack(1)
 struct Partition
