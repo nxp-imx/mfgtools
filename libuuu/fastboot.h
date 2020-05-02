@@ -29,37 +29,37 @@
 *
 */
 
+#pragma once
+
+#include "cmd.h"
+
+#include <cstdint>
+
+class FileBuffer;
+class TransBase;
+
 /*
 Android fastboot protocol define at
 https://android.googlesource.com/platform/system/core/+/master/fastboot/
 */
 
-#include <string>
-#include <vector>
-
-#include "trans.h"
-#include "cmd.h"
-#include "buffer.h"
-
-using namespace std;
-
 class FastBoot
 {
 	TransBase *const m_pTrans = nullptr;
 public:
-	string m_info;
+	std::string m_info;
 
 	FastBoot(TransBase *p) : m_pTrans{p} {}
 
-	int Transport(string cmd, void *p = nullptr, size_t size = 0, vector<uint8_t> *input = nullptr);
-	int Transport(string cmd, vector<uint8_t> data, vector<uint8_t> *input = nullptr) { return Transport(cmd, data.data(), data.size(), input); }
+	int Transport(std::string cmd, void *p = nullptr, size_t size = 0, std::vector<uint8_t> *input = nullptr);
+	int Transport(std::string cmd, std::vector<uint8_t> data, std::vector<uint8_t> *input = nullptr) { return Transport(cmd, data.data(), data.size(), input); }
 };
 
 class FBGetVar : public CmdBase
 {
 public:
-	string m_var;
-	string m_val;
+	std::string m_var;
+	std::string m_val;
 	FBGetVar(char *p) :CmdBase(p) {}
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
@@ -68,8 +68,8 @@ public:
 class FBCmd: public CmdBase
 {
 public:
-	const string m_fb_cmd;
-	string m_uboot_cmd;
+	const std::string m_fb_cmd;
+	std::string m_uboot_cmd;
 	const char m_separator = ':';
 	FBCmd(char *p, std::string &&fb_cmd, char separator =':') :CmdBase(p), m_fb_cmd{std::move(fb_cmd)}, m_separator(separator) {}
 	int parser(char *p = nullptr) override;
@@ -109,18 +109,18 @@ public:
 class FBFlashCmd : public FBCmd
 {
 public:
-	string m_filename;
-	string m_partition;
+	std::string m_filename;
+	std::string m_partition;
 	uint64_t m_totalsize;
 	bool m_raw2sparse = false;
 	FBFlashCmd(char *p) : FBCmd(p, "flash") { m_timeout = 10000; }
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
 	int flash(FastBoot *fb, void *p, size_t sz);
-	int flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> p, size_t blksz, size_t max);
-	bool isffu(shared_ptr<FileBuffer> p);
-	int flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> p);
-	int flash_ffu_oneblk(FastBoot *fb, shared_ptr<FileBuffer> p, size_t off, size_t blksz, size_t blkindex);
+	int flash_raw2sparse(FastBoot *fb, std::shared_ptr<FileBuffer> p, size_t blksz, size_t max);
+	bool isffu(std::shared_ptr<FileBuffer> p);
+	int flash_ffu(FastBoot *fb, std::shared_ptr<FileBuffer> p);
+	int flash_ffu_oneblk(FastBoot *fb, std::shared_ptr<FileBuffer> p, size_t off, size_t blksz, size_t blkindex);
 };
 
 class FBDelPartition : public FBCmd
@@ -132,8 +132,8 @@ public:
 class FBPartNumber : public CmdBase
 {
 public:
-	string m_partition_name;
-	const string m_fb_cmd;
+	std::string m_partition_name;
+	const std::string m_fb_cmd;
 	uint32_t m_Size;
 
 	FBPartNumber(char *p, std::string &&fb_cmd) :CmdBase(p), m_fb_cmd{std::move(fb_cmd)}
@@ -162,9 +162,9 @@ public:
 class FBUpdateSuper : public CmdBase
 {
 public:
-	string m_partition_name;
-	const string m_fb_cmd = "update-super";
-	string m_opt;
+	std::string m_partition_name;
+	const std::string m_fb_cmd = "update-super";
+	std::string m_opt;
 
 	FBUpdateSuper(char *p) :CmdBase(p)
 	{
@@ -191,7 +191,7 @@ public:
 class FBDownload : public CmdBase
 {
 public:
-	string m_filename;
+	std::string m_filename;
 	FBDownload(char *p) :CmdBase(p)
 	{
 		insert_param_info("download", nullptr, Param::Type::e_null);
@@ -203,8 +203,8 @@ public:
 class FBCopy : public CmdBase
 {
 public:
-	string m_local_file;
-	string m_target_file;
+	std::string m_local_file;
+	std::string m_target_file;
 	bool m_bDownload;
 	size_t m_Maxsize_pre_cmd = 0x10000;
 	FBCopy(char *p) :CmdBase(p) {}

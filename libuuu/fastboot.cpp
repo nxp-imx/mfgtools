@@ -46,6 +46,7 @@
 #include "sparse.h"
 #include "ffu_format.h"
 #include "libcomm.h"
+#include "trans.h"
 
 static constexpr size_t SparseLimit{0x1000000};
 
