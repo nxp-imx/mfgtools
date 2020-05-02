@@ -31,6 +31,7 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
+#include "buffer.h"
 #include "libcomm.h"
 #include "libuuu.h"
 #include "liberror.h"

@@ -36,6 +36,7 @@
 #include <iostream>
 #include <fstream>
 #include "libcomm.h"
+#include "libuuu.h"
 #include "zip.h"
 #include "fat.h"
 #include "tar.h"
