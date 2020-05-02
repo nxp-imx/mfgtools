@@ -38,6 +38,7 @@
 #include "libcomm.h"
 #include "cmd.h"
 #include "buffer.h"
+#include "liberror.h"
 #include "libuuu.h"
 #include <iostream>
 #include <fstream>

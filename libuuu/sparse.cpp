@@ -1,4 +1,5 @@
 #include "sparse.h"
+#include "liberror.h"
 
 #include <cstddef>
 #include <cstring>
