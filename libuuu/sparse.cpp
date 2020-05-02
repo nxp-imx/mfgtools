@@ -1,5 +1,6 @@
 #include "sparse.h"
 
+#include <cstddef>
 #include <cstring>
 
 chunk_header_t * SparseFile::get_next_chunk(uint8_t *p, size_t &pos)
