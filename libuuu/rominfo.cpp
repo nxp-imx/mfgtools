@@ -32,6 +32,7 @@
 #include <array>
 #include <string>
 #include "sdps.h"
+#include "config.h"
 #include "hidreport.h"
 #include "liberror.h"
 #include "libcomm.h"
