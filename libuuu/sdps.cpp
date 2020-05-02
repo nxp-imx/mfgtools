@@ -35,6 +35,7 @@
 #include "libcomm.h"
 #include "buffer.h"
 #include "sdp.h"
+#include "trans.h"
 
 #include <cstring>
 

@@ -38,6 +38,7 @@
 #include "sdp.h"
 #include "rominfo.h"
 #include "libusb.h"
+#include "trans.h"
 
 #include <cstring>
 
