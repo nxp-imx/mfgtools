@@ -31,20 +31,16 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
 #include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
-#include "liberror.h"
-#include "libcomm.h"
-#include "config.h"
+class ConfigItem;
 
-using namespace std;
-
-string get_next_param(const string &cmd, size_t &pos, char sperate = ' ');
-string remove_square_brackets(const string &cmd);
-int get_string_in_square_brackets(const string &cmd, string &context);
+std::string get_next_param(const std::string &cmd, size_t &pos, char sperate = ' ');
+std::string remove_square_brackets(const std::string &cmd);
+int get_string_in_square_brackets(const std::string &cmd, std::string &context);
 
 class CmdCtx
 {
@@ -86,7 +82,7 @@ struct Param
 class CmdBase
 {
 public:
-	vector<Param> m_param;
+	std::vector<Param> m_param;
 	uint64_t m_timeout = 2000;
 	bool m_lastcmd = false;
 	std::string m_cmd;
@@ -108,9 +104,9 @@ public:
 	virtual int dump();
 };
 
-using CreateCmdObj = shared_ptr<CmdBase> (*) (char *);
+using CreateCmdObj = std::shared_ptr<CmdBase> (*) (char *);
 
-class CmdObjCreateMap:public map<string, CreateCmdObj>
+class CmdObjCreateMap:public std::map<std::string, CreateCmdObj>
 {
 public:
 	CmdObjCreateMap();
@@ -135,8 +131,8 @@ public:
 class CmdShell : public CmdBase
 {
 public:
-	string m_shellcmd;
-	string m_protocal;
+	std::string m_shellcmd;
+	std::string m_protocal;
 	bool	m_dyn = false;
 
 	CmdShell(char *p) : CmdBase(p) {}
@@ -144,13 +140,13 @@ public:
 	int run(CmdCtx *p) override;
 };
 
-class CmdList : public std::vector<shared_ptr<CmdBase>>
+class CmdList : public std::vector<std::shared_ptr<CmdBase>>
 {
 public:
 	int run_all(CmdCtx *p, bool dry_run = false);
 };
 
-class CmdMap : public std::map<std::string, shared_ptr<CmdList>>
+class CmdMap : public std::map<std::string, std::shared_ptr<CmdList>>
 {
 public:
 	int run_all(const std::string &protocal, CmdCtx *p,  bool dry_run = false);

@@ -31,6 +31,8 @@
 
 #include "config.h"
 #include "cmd.h"
+#include "libcomm.h"
+#include "liberror.h"
 #include "libuuu.h"
 
 static Config g_config;

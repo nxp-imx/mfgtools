@@ -33,6 +33,7 @@
 #include <string.h>
 #include "cmd.h"
 #include "libcomm.h"
+#include "liberror.h"
 #include "libuuu.h"
 #include "config.h"
 #include "trans.h"

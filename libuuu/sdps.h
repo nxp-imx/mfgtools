@@ -35,7 +35,7 @@ class SDPSCmd : public CmdBase
 {
 public:
 	uint32_t m_offset = 0;
-	string m_filename;
+	std::string m_filename;
 	bool m_bskipflashheader;
 
 	SDPSCmd(char *cmd) :CmdBase(cmd)
