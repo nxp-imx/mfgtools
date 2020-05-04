@@ -114,26 +114,26 @@ public:
 	int request_data(vector<uint8_t> &data, size_t offset, size_t sz);
 	int request_data(size_t total);
 
-	bool IsLoaded()
+	bool IsLoaded() const noexcept
 	{
 		return m_dataflags & FILEBUFFER_FLAG_LOADED_BIT;
 	}
 
-	bool IsKnownSize()
+	bool IsKnownSize() const noexcept
 	{
 		return m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT;
 	}
 
-	bool IsError()
+	bool IsError() const noexcept
 	{
 		return m_dataflags & FILEBUFFER_FLAG_ERROR_BIT;
 	}
-	uint8_t * data()
+	uint8_t * data() noexcept
 	{
 		return m_pDatabuffer ;
 	}
 
-	size_t size()
+	size_t size() const noexcept
 	{
 		return m_DataSize;
 	}
