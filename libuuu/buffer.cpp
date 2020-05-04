@@ -71,9 +71,9 @@ public:
 	const char * m_ext;
 	const char * m_Prefix;
 	FSBasic() { m_ext = nullptr; m_Prefix = nullptr; }
-	virtual int get_file_timesample(string filename, uint64_t *ptime)=0;
-	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)=0;
-	virtual bool exist(string backfile, string filename)=0;
+	virtual int get_file_timesample(string filename, uint64_t *ptime) = 0;
+	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) = 0;
+	virtual bool exist(string backfile, string filename) = 0;
 	virtual int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) = 0;
 	virtual int split(string filename, string *outbackfile, string *outfilename, bool dir=false)
 	{
@@ -126,7 +126,7 @@ static class FSFlat: public FSBasic
 {
 public:
 	FSFlat() { m_ext = ""; }
-	int get_file_timesample(string filename, uint64_t *ptime)
+	int get_file_timesample(string filename, uint64_t *ptime) override
 	{
 		struct stat64 st;
 		if (stat64(filename.c_str() + 1, &st))
@@ -140,13 +140,13 @@ public:
 		return 0;
 	}
 
-	bool exist(string backfile, string filename)
+	bool exist(string backfile, string filename) override
 	{
 		struct stat64 st;
 		return stat64(backfile.c_str() + 1, &st) == 0 && ((st.st_mode & S_IFDIR) == 0);
 	}
 
-	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
+	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override
 	{
 		struct stat64 st;
 		if (stat64(backfile.c_str() + 1, &st))
@@ -166,7 +166,7 @@ public:
 		return 0;
 	}
 
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override
 	{
 		struct stat64 st;
 
@@ -227,7 +227,7 @@ public:
 class FSNetwork : public FSBasic
 {
 public:
-	virtual int split(string filename, string *outbackfile, string *outfilename, bool dir = false)
+	int split(string filename, string *outbackfile, string *outfilename, bool dir = false) override
 	{
 		if (m_Prefix == nullptr)
 			return -1;
@@ -257,10 +257,10 @@ protected:
 	int m_Port;
 public:
 	FSHttp() { m_Prefix = "HTTP://"; m_Port = 80; }
-	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
-	virtual bool exist(string backfile, string filename) { return true; };
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) { return 0; };
-	virtual int get_file_timesample(string filename, uint64_t *ptime) { return 0; };
+	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
+	virtual bool exist(string backfile, string filename) override { return true; };
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override { return 0; };
+	int get_file_timesample(string filename, uint64_t *ptime) override { return 0; };
 }g_fshttp;
 
 static class FSHttps : public FSHttp
@@ -344,7 +344,7 @@ int FSHttp::load(string backfile, string filename, shared_ptr<FileBuffer> p, boo
 class FSBackFile : public FSBasic
 {
 public:
-	virtual int get_file_timesample(string filename, uint64_t *ptime);
+	int get_file_timesample(string filename, uint64_t *ptime) override;
 
 };
 
@@ -352,18 +352,18 @@ static class FSZip : public FSBackFile
 {
 public:
 	FSZip() { m_ext = ".ZIP"; };
-	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
-	virtual bool exist(string backfile, string filename);
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
+	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
+	bool exist(string backfile, string filename) override;
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override;
 }g_fszip;
 
 static class FSTar: public FSBackFile
 {
 public:
 	FSTar() {m_ext = ".TAR"; };
-	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
-	virtual bool exist(string backfile, string filename);
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
+	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
+	bool exist(string backfile, string filename) override;
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override;
 }g_fstar;
 
 
@@ -371,30 +371,30 @@ static class FSFat : public FSBackFile
 {
 public:
 	FSFat() { m_ext = ".SDCARD"; };
-	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
-	virtual bool exist(string backfile, string filename);
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
+	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
+	bool exist(string backfile, string filename) override;
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override;
 }g_fsfat;
 
 class FSCompressStream : public FSBackFile
 {
 public:
-	virtual bool exist(string backfile, string filename);
-	virtual int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p);
+	bool exist(string backfile, string filename) override;
+	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override;
 };
 
 static class FSBz2 : public FSCompressStream
 {
 public:
 	FSBz2() { m_ext = ".BZ2"; };
-	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
+	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
 }g_fsbz2;
 
 static class FSGz : public FSCompressStream
 {
 public:
 	FSGz() { m_ext = ".GZ"; };
-	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async);
+	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
 }g_fsgz;
 
 static class FS_DATA
