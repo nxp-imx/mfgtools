@@ -166,4 +166,4 @@ public:
 shared_ptr<FileBuffer> get_file_buffer(string filename, bool aysnc=false);
 bool check_file_exist(string filename, bool start_async_load=true);
 
-void set_current_dir(string dir);
+void set_current_dir(const std::string &dir);
