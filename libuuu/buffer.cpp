@@ -59,7 +59,7 @@ static mutex g_mutex_map;
 
 string g_current_dir = ">";
 
-void set_current_dir(string dir)
+void set_current_dir(const std::string &dir)
 {
 	g_current_dir = MAGIC_PATH;
 	g_current_dir += dir;
@@ -68,14 +68,11 @@ void set_current_dir(string dir)
 class FSBasic
 {
 public:
-	const char * m_ext;
-	const char * m_Prefix;
-	FSBasic() { m_ext = nullptr; m_Prefix = nullptr; }
-	virtual int get_file_timesample(string filename, uint64_t *ptime) = 0;
-	virtual int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) = 0;
-	virtual bool exist(string backfile, string filename) = 0;
-	virtual int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) = 0;
-	virtual int split(string filename, string *outbackfile, string *outfilename, bool dir=false)
+	virtual int get_file_timesample(const std::string &filename, uint64_t *ptime) = 0;
+	virtual int load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async) = 0;
+	virtual bool exist(const std::string &backfile, const std::string &filename) = 0;
+	virtual int for_each_ls(uuu_ls_file fn, const std::string &backfile, const std::string &filename, void *p) = 0;
+	virtual int split(const std::string &filename, string *outbackfile, string *outfilename, bool dir=false)
 	{
 		string path = str_to_upper(filename);
 		if (m_ext == nullptr || strlen(m_ext) == 0)
@@ -120,13 +117,17 @@ public:
 			outfilename->clear();
 		return 0;
 	}
+
+protected:
+	const char * m_ext = nullptr;
+	const char * m_Prefix = nullptr;
 };
 
 static class FSFlat: public FSBasic
 {
 public:
 	FSFlat() { m_ext = ""; }
-	int get_file_timesample(string filename, uint64_t *ptime) override
+	int get_file_timesample(const std::string &filename, uint64_t *ptime) override
 	{
 		struct stat64 st;
 		if (stat64(filename.c_str() + 1, &st))
@@ -140,13 +141,13 @@ public:
 		return 0;
 	}
 
-	bool exist(string backfile, string filename) override
+	bool exist(const std::string &backfile, const std::string &filename) override
 	{
 		struct stat64 st;
 		return stat64(backfile.c_str() + 1, &st) == 0 && ((st.st_mode & S_IFDIR) == 0);
 	}
 
-	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override
+	int load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async) override
 	{
 		struct stat64 st;
 		if (stat64(backfile.c_str() + 1, &st))
@@ -166,7 +167,7 @@ public:
 		return 0;
 	}
 
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override
+	int for_each_ls(uuu_ls_file fn, const std::string &backfile, const std::string &filename, void *p) override
 	{
 		struct stat64 st;
 
@@ -227,7 +228,7 @@ public:
 class FSNetwork : public FSBasic
 {
 public:
-	int split(string filename, string *outbackfile, string *outfilename, bool dir = false) override
+	int split(const std::string &filename, string *outbackfile, string *outfilename, bool dir = false) override
 	{
 		if (m_Prefix == nullptr)
 			return -1;
@@ -257,10 +258,10 @@ protected:
 	int m_Port;
 public:
 	FSHttp() { m_Prefix = "HTTP://"; m_Port = 80; }
-	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
-	virtual bool exist(string backfile, string filename) override { return true; };
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override { return 0; };
-	int get_file_timesample(string filename, uint64_t *ptime) override { return 0; };
+	int load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async) override;
+	virtual bool exist(const std::string &backfile, const std::string &filename) override { return true; };
+	int for_each_ls(uuu_ls_file fn, const std::string &backfile, const std::string &filename, void *p) override { return 0; };
+	int get_file_timesample(const std::string &filename, uint64_t *ptime) override { return 0; };
 }g_fshttp;
 
 static class FSHttps : public FSHttp
@@ -309,7 +310,7 @@ int http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string file
 	return 0;
 }
 
-int FSHttp::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
+int FSHttp::load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async)
 {
 	shared_ptr<HttpStream> http = make_shared<HttpStream>();
 
@@ -344,7 +345,7 @@ int FSHttp::load(string backfile, string filename, shared_ptr<FileBuffer> p, boo
 class FSBackFile : public FSBasic
 {
 public:
-	int get_file_timesample(string filename, uint64_t *ptime) override;
+	int get_file_timesample(const std::string &filename, uint64_t *ptime) override;
 
 };
 
@@ -352,18 +353,18 @@ static class FSZip : public FSBackFile
 {
 public:
 	FSZip() { m_ext = ".ZIP"; };
-	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
-	bool exist(string backfile, string filename) override;
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override;
+	int load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async) override;
+	bool exist(const std::string &backfile, const std::string &filename) override;
+	int for_each_ls(uuu_ls_file fn, const std::string &backfile, const std::string &filename, void *p) override;
 }g_fszip;
 
 static class FSTar: public FSBackFile
 {
 public:
 	FSTar() {m_ext = ".TAR"; };
-	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
-	bool exist(string backfile, string filename) override;
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override;
+	int load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async) override;
+	bool exist(const std::string &backfile, const std::string &filename) override;
+	int for_each_ls(uuu_ls_file fn, const std::string &backfile, const std::string &filename, void *p) override;
 }g_fstar;
 
 
@@ -371,30 +372,30 @@ static class FSFat : public FSBackFile
 {
 public:
 	FSFat() { m_ext = ".SDCARD"; };
-	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
-	bool exist(string backfile, string filename) override;
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override;
+	int load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async) override;
+	bool exist(const std::string &backfile, const std::string &filename) override;
+	int for_each_ls(uuu_ls_file fn, const std::string &backfile, const std::string &filename, void *p) override;
 }g_fsfat;
 
 class FSCompressStream : public FSBackFile
 {
 public:
-	bool exist(string backfile, string filename) override;
-	int for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p) override;
+	bool exist(const std::string &backfile, const std::string &filename) override;
+	int for_each_ls(uuu_ls_file fn, const std::string &backfile, const std::string &filename, void *p) override;
 };
 
 static class FSBz2 : public FSCompressStream
 {
 public:
 	FSBz2() { m_ext = ".BZ2"; };
-	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
+	int load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async) override;
 }g_fsbz2;
 
 static class FSGz : public FSCompressStream
 {
 public:
 	FSGz() { m_ext = ".GZ"; };
-	int load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async) override;
+	int load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async) override;
 }g_fsgz;
 
 static class FS_DATA
@@ -413,7 +414,7 @@ public:
 		m_pFs.push_back(&g_fshttp);
 	}
 
-	int get_file_timesample(string filename, uint64_t *ptimesame)
+	int get_file_timesample(const std::string &filename, uint64_t *ptimesame)
 	{
 		if (ptimesame == nullptr)
 		{
@@ -444,7 +445,7 @@ public:
 		return 0;
 	}
 
-	bool exist(string filename)
+	bool exist(const std::string &filename)
 	{
 		for (int i = 0; i < m_pFs.size(); i++)
 		{
@@ -455,7 +456,7 @@ public:
 		}
 		return false;
 	}
-	int load(string filename, shared_ptr<FileBuffer> p, bool async)
+	int load(const std::string &filename, shared_ptr<FileBuffer> p, bool async)
 	{
 		for (int i = 0; i < m_pFs.size(); i++)
 		{
@@ -473,7 +474,7 @@ public:
 	}
 }g_fs_data;
 
-int FSBackFile::get_file_timesample(string filename, uint64_t *ptime)
+int FSBackFile::get_file_timesample(const std::string &filename, uint64_t *ptime)
 {
 	string back, file;
 	if (split(filename, &back, &file))
@@ -482,7 +483,7 @@ int FSBackFile::get_file_timesample(string filename, uint64_t *ptime)
 	return g_fs_data.get_file_timesample(back, ptime);
 }
 
-bool FSZip::exist(string backfile, string filename)
+bool FSZip::exist(const std::string &backfile, const std::string &filename)
 {
 	Zip zip;
 	if (zip.Open(backfile))
@@ -491,7 +492,7 @@ bool FSZip::exist(string backfile, string filename)
 	return zip.check_file_exist(filename);
 }
 
-int FSZip::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
+int FSZip::for_each_ls(uuu_ls_file fn, const std::string &backfile, const std::string &filename, void *p)
 {
 	Zip zip;
 
@@ -530,7 +531,7 @@ int zip_async_load(string zipfile, string fn, shared_ptr<FileBuffer> buff)
 	return 0;
 }
 
-int FSZip::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
+int FSZip::load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async)
 {
 	Zip zip;
 
@@ -554,7 +555,7 @@ int FSZip::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool
 	return 0;
 }
 
-bool FSTar::exist(string backfile, string filename)
+bool FSTar::exist(const std::string &backfile, const std::string &filename)
 {
 	Tar tar;
 	if (tar.Open(backfile))
@@ -564,7 +565,7 @@ bool FSTar::exist(string backfile, string filename)
 }
 
 
-int FSTar::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
+int FSTar::for_each_ls(uuu_ls_file fn, const std::string &backfile, const std::string &filename, void *p)
 {
 	Tar tar;
 
@@ -585,7 +586,7 @@ int FSTar::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p
 	return 0;
 }
 
-int FSTar::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
+int FSTar::load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async)
 {
 	Tar tar;
 	if (tar.Open(backfile))
@@ -601,7 +602,7 @@ int FSTar::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool
 	return 0;
 }
 
-bool FSFat::exist(string backfile, string filename)
+bool FSFat::exist(const std::string &backfile, const std::string &filename)
 {
 	Fat fat;
 	if (fat.Open(backfile))
@@ -611,7 +612,7 @@ bool FSFat::exist(string backfile, string filename)
 	return fat.m_filemap.find(filename) != fat.m_filemap.end();
 }
 
-int FSFat::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool async)
+int FSFat::load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer> p, bool async)
 {
 	Fat fat;
 	if (fat.Open(backfile))
@@ -627,7 +628,7 @@ int FSFat::load(string backfile, string filename, shared_ptr<FileBuffer> p, bool
 	return 0;
 }
 
-int FSFat::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
+int FSFat::for_each_ls(uuu_ls_file fn, const std::string &backfile, const std::string &filename, void *p)
 {
 	Fat fat;
         if (fat.Open(backfile))
@@ -648,7 +649,7 @@ int FSFat::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p
 	return 0;
 }
 
-bool FSCompressStream::exist(string backfile, string filename)
+bool FSCompressStream::exist(const std::string &backfile, const std::string &filename)
 {
 	if (filename == "*")
 		return true;
@@ -656,7 +657,7 @@ bool FSCompressStream::exist(string backfile, string filename)
 	return false;
 }
 
-int FSCompressStream::for_each_ls(uuu_ls_file fn, string backfile, string filename, void *p)
+int FSCompressStream::for_each_ls(uuu_ls_file fn, const std::string &backfile, const std::string &filename, void *p)
 {
 
 	if(!g_fs_data.exist(backfile))
@@ -1005,7 +1006,7 @@ int decompress_single_thread(string name,shared_ptr<FileBuffer>p)
 }
 
 
-int FSBz2::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool async)
+int FSBz2::load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer>p, bool async)
 {
 	if (!g_fs_data.exist(backfile))
 	{
@@ -1046,7 +1047,7 @@ int FSBz2::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool 
 	return 0;
 }
 
-int FSGz::load(string backfile, string filename, shared_ptr<FileBuffer>p, bool async)
+int FSGz::load(const std::string &backfile, const std::string &filename, shared_ptr<FileBuffer>p, bool async)
 {
 	if (!g_fs_data.exist(backfile))
 	{
