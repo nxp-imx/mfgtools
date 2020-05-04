@@ -70,6 +70,14 @@ int file_overwrite_monitor(string filename, FileBuffer *p);
 class FileBuffer: public enable_shared_from_this<FileBuffer>
 {
 public:
+	enum class ALLOCATION_WAYS
+	{
+		MALLOC,
+		MMAP,
+		REF,
+		VMALLOC,
+	};
+
 	mutex	m_data_mutex;
 
 	uint8_t *m_pDatabuffer;
@@ -77,14 +85,6 @@ public:
 	size_t m_MemSize;
 
 	shared_ptr<FileBuffer> m_ref;
-
-	enum
-	{
-		ALLOCATE_MALLOC,
-		ALLOCATE_MMAP,
-		ALLOCATE_REF,
-		ALLOCATE_VMALLOC,
-	}m_allocate_way;
 
 	int ref_other_buffer(shared_ptr<FileBuffer> p, size_t offset, size_t size);
 
@@ -110,6 +110,7 @@ public:
 	FileBuffer(void*p, size_t sz);
 	~FileBuffer();
 
+	ALLOCATION_WAYS get_m_allocate_way() const noexcept { return m_allocate_way; }
 	int request_data(vector<uint8_t> &data, size_t offset, size_t sz);
 	int request_data(size_t total);
 
@@ -161,6 +162,9 @@ public:
 	//Read write lock;
 	uint64_t m_timesample;
 	int reload(string filename, bool async=false);
+
+private:
+	ALLOCATION_WAYS m_allocate_way = ALLOCATION_WAYS::MALLOC;
 };
 
 shared_ptr<FileBuffer> get_file_buffer(string filename, bool aysnc=false);

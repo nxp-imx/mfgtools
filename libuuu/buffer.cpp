@@ -1204,7 +1204,6 @@ FileBuffer::FileBuffer()
 	m_pDatabuffer = nullptr;
 	m_DataSize = 0;
 	m_MemSize = 0;
-	m_allocate_way = ALLOCATE_MALLOC;
 	m_dataflags = 0;
 	m_avaible_size = 0;
 }
@@ -1213,7 +1212,6 @@ FileBuffer::FileBuffer(void *p, size_t sz)
 {
 	m_pDatabuffer = nullptr;
 	m_DataSize = 0;
-	m_allocate_way = ALLOCATE_MALLOC;
 	m_MemSize = 0;
 
 	m_pDatabuffer = (uint8_t*)malloc(sz);
@@ -1230,9 +1228,9 @@ FileBuffer::~FileBuffer()
 
 	if (m_pDatabuffer)
 	{
-		if(m_allocate_way == ALLOCATE_MMAP)
+		if(m_allocate_way == ALLOCATION_WAYS::MMAP)
 			unmapfile();
-		if(m_allocate_way == ALLOCATE_MALLOC)
+		if(m_allocate_way == ALLOCATION_WAYS::MALLOC)
 			free(m_pDatabuffer);
 	}
 }
@@ -1293,7 +1291,7 @@ int FileBuffer::mapfile(string filename, size_t sz)
 		m_pDatabuffer = (uint8_t *)MapViewOfFile(m_file_map, FILE_MAP_READ, 0, 0, sz);
 		m_DataSize = sz;
 		m_MemSize = sz;
-		m_allocate_way = ALLOCATE_MMAP;
+		m_allocate_way = ALLOCATION_WAYS::MMAP;
 
 #else
 		int fd = open(filename.c_str(), O_RDONLY);
@@ -1314,7 +1312,7 @@ int FileBuffer::mapfile(string filename, size_t sz)
 		}
 		m_DataSize = sz;
 		m_MemSize = sz;
-		m_allocate_way = ALLOCATE_MMAP;
+		m_allocate_way = ALLOCATION_WAYS::MMAP;
 		close(fd);
 #endif
 		if (m_pDatabuffer)
@@ -1328,7 +1326,7 @@ int FileBuffer::ref_other_buffer(shared_ptr<FileBuffer> p, size_t offset, size_t
 {
 	m_pDatabuffer = p->data() + offset;
 	m_DataSize = m_MemSize = size;
-	m_allocate_way = ALLOCATE_REF;
+	m_allocate_way = ALLOCATION_WAYS::REF;
 	m_ref = p;
 	return 0;
 }
@@ -1436,7 +1434,7 @@ int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 
 int FileBuffer::reserve(size_t sz)
 {
-	assert(m_allocate_way == ALLOCATE_MALLOC);
+	assert(m_allocate_way == ALLOCATION_WAYS::MALLOC);
 
 	if (sz > m_MemSize)
 	{
@@ -1510,7 +1508,7 @@ int file_overwrite_monitor(string filename, FileBuffer *p)
 	str = ">";
 	str += filename;
 
-	if(p->m_pDatabuffer && p->m_allocate_way == FileBuffer::ALLOCATE_MMAP)
+	if(p->m_pDatabuffer && p->get_m_allocate_way() == FileBuffer::ALLOCATION_WAYS::MMAP)
 	{
 		std::lock_guard<mutex> lock(g_mutex_map);
 		p->m_file_monitor.detach(); /*Detach itself, erase will delete p*/
