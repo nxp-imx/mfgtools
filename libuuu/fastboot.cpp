@@ -578,18 +578,6 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	size_t max = getvar.m_val.empty() ? SparseLimit : str_to_uint32(getvar.m_val);
 
-	string str;
-	str = "FB: getvar partition-size:";
-	str += m_partition;
-
-	if (getvar.parser((char*)str.c_str()))
-		return -1;
-
-	if (getvar.run(ctx))
-		return -1;
-
-	m_totalsize = str_to_uint64(getvar.m_val);
-
 	BulkTrans dev;
 	if (dev.open(ctx->m_dev))
 		return -1;
@@ -615,7 +603,21 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename, true);
 
 		if (isffu(pdata))
+		{
+			string str;
+			str = "FB: getvar partition-size:";
+			str += m_partition;
+
+			if (getvar.parser((char*)str.c_str()))
+				return -1;
+
+			if (getvar.run(ctx))
+				return -1;
+
+			m_totalsize = str_to_uint64(getvar.m_val);
+
 			return flash_ffu(&fb, pdata);
+		}
 
 		return flash_raw2sparse(&fb, pdata, block_size, max);
 	}
