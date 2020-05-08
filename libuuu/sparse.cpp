@@ -33,12 +33,15 @@ int SparseFile::init_header(size_t blsz, int blcount)
 	header.chunk_hdr_sz = sizeof(chunk_header);
 	header.blk_sz = blsz;
 	m_cur_chunk_header_pos = 0;
+
+	m_data.clear();
+
 	if (blcount)
 	{
 		m_data.reserve(blsz*blcount + 0x1000);
 		m_max_size = blsz * blcount;
 	}
-	m_data.clear();
+	
 	push(&header, sizeof(header));
 	m_pcrc = (uint32_t*)(m_data.data() + offsetof(sparse_header, image_checksum));
 	return 0;

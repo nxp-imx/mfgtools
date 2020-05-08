@@ -187,8 +187,14 @@ int HIDTrans::read(void *buff, size_t size, size_t *rsize)
 int BulkTrans::write(void *buff, size_t size)
 {
 	int ret;
-	int actual_lenght;
-	for (size_t i = 0; i < size; i += m_MaxTransPreRequest)
+	int retry = 0;
+	int actual_lenght = 0;
+	char * bouce = nullptr;
+	
+	if (size > 1000)
+		printf("buffer %p \n", buff);
+
+	for (size_t i = 0; i < size; i += actual_lenght)
 	{
 		uint8_t *p = (uint8_t *)buff;
 		p += i;
@@ -196,7 +202,10 @@ int BulkTrans::write(void *buff, size_t size)
 		sz = size - i;
 		if (sz > m_MaxTransPreRequest)
 			sz = m_MaxTransPreRequest;
-
+		if (*(unsigned short*)p == 0xFFFF)
+		{
+			printf("find 0xffff\n");
+		}
 		ret = libusb_bulk_transfer(
 			(libusb_device_handle *)m_devhandle,
 			m_ep_out.addr,
@@ -208,6 +217,15 @@ int BulkTrans::write(void *buff, size_t size)
 
 		if (ret < 0)
 		{
+			printf("failure happen retry\n\n");
+			retry++;
+			for (int i = -512; i < 512; i++)
+				printf("0x%02x,", ((unsigned char*)p)[i]);
+		}
+
+		if (ret < 0 && retry > 3)
+		{
+			retry++;
 			string error;
 			string err;
 			err = "Bulk(W):";
