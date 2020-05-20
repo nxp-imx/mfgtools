@@ -68,5 +68,5 @@ int uuu_get_version()
 
 	build = stoll(s, 0, 10);
 
-	return (maj << 16) | (min << 8) | build;
+	return (maj << 24) | (min << 12) | build;
 }

@@ -774,7 +774,7 @@ int check_version(string str)
 		}
 		if (c == '.' || i == str.size()-1 || c == '\n')
 		{
-			ver <<= 8;
+			ver <<= 12;
 			ver += x;
 			x = 0;
 		}

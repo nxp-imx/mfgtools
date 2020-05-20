@@ -56,7 +56,7 @@ EXT const char * uuu_get_version_string();
 
 /**
  * 1.0.1
- * bit[31:24].bit[23:16].bit[15:0]
+ * bit[31:24].bit[23:12].bit[11:0]
  */
 
 EXT int uuu_get_version();
