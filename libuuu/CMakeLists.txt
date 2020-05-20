@@ -24,7 +24,7 @@ include_directories(${LIBUSB_INCLUDE_DIRS} ${UUUOPENSLL_INCLUDE_DIR} include)
 
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wstrict-aliasing -Wextra ${UUUSSL}")
-set(CMAKE_CXX_FLAGS "-O2 ${UUUSSL}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 ${UUUSSL}")
 
 set(SOURCES
 	error.cpp
