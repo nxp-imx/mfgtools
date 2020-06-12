@@ -54,6 +54,8 @@ static int g_usb_poll_period = 0;
 
 static int g_known_device_appeared;
 
+static int g_libusb_init;
+
 #ifdef _MSC_VER
 #define TRY_SUDO
 #else
@@ -218,13 +220,16 @@ int polling_usb(std::atomic<int>& bexit)
 	libusb_device **oldlist = nullptr;
 	libusb_device **newlist = nullptr;
 
-	if (libusb_init(nullptr) < 0)
+	if (!g_libusb_init)
 	{
-		set_last_err_string("Call libusb_init failure");
-		return -1;
+		if (libusb_init(nullptr) < 0)
+		{
+			set_last_err_string("Call libusb_init failure");
+			return -1;
+		}
+		g_libusb_init = true;
+		libusb_set_debug(nullptr, get_libusb_debug_level());
 	}
-
-	libusb_set_debug(nullptr, get_libusb_debug_level());
 
 	if (run_cmds("CFG:", nullptr))
 		return -1;
@@ -277,13 +282,18 @@ CmdUsbCtx::~CmdUsbCtx()
 
 int CmdUsbCtx::look_for_match_device(const char *pro)
 {
-	if (libusb_init(nullptr) < 0)
+	if (!g_libusb_init)
 	{
-		set_last_err_string("Call libusb_init failure");
-		return -1;
-	}
+		if (libusb_init(nullptr) < 0)
+		{
+			set_last_err_string("Call libusb_init failure");
+			return -1;
+		}
 
-	libusb_set_debug(nullptr, get_libusb_debug_level());
+		libusb_set_debug(nullptr, get_libusb_debug_level());
+
+		g_libusb_init = true;
+	}
 
 	if (run_cmds("CFG:", nullptr))
 		return -1;
@@ -369,12 +379,15 @@ int uuu_add_usbpath_filter(const char *path)
 
 int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 {
-	if (libusb_init(nullptr) < 0)
+	if (!g_libusb_init)
 	{
-		set_last_err_string("Call libusb_init failure");
-		return -1;
+		if (libusb_init(nullptr) < 0)
+		{
+			set_last_err_string("Call libusb_init failure");
+			return -1;
+		}
+		g_libusb_init = true;
 	}
-
 	libusb_device **newlist = nullptr;
 	libusb_get_device_list(nullptr, &newlist);
 	size_t i = 0;

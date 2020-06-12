@@ -485,6 +485,11 @@ shared_ptr<CmdBase> create_cmd_obj(string cmd)
 
 int uuu_run_cmd(const char * cmd, int dry)
 {
+	return run_cmd(nullptr, cmd, dry);
+}
+
+int run_cmd(CmdCtx *pCtx, const char * cmd, int dry)
+{
 	shared_ptr<CmdBase> p;
 	p = create_cmd_obj(cmd);
 	int ret;
@@ -520,11 +525,16 @@ int uuu_run_cmd(const char * cmd, int dry)
 			}else
 			{
 				CmdUsbCtx ctx;
-				ret = ctx.look_for_match_device(pro.c_str());
-				if (ret)
-					return ret;
+				if (pCtx == nullptr)
+				{
+					ret = ctx.look_for_match_device(pro.c_str());
+					if (ret)
+						return ret;
 
-				ret = p->run(&ctx);
+					pCtx = &ctx;
+				}
+
+				ret = p->run(pCtx);
 			}
 		}
 	}
@@ -598,7 +608,7 @@ int CmdShell::parser(char * p)
 	return 0;
 }
 
-int CmdShell::run(CmdCtx*)
+int CmdShell::run(CmdCtx*pCtx)
 {
 #ifndef WIN32
 	#define _popen popen
@@ -630,7 +640,7 @@ int CmdShell::run(CmdCtx*)
 			if (pos != string::npos)
 				cmd = cmd.substr(0, pos);
 
-			return uuu_run_cmd(cmd.c_str(), 0);
+			return run_cmd(pCtx, cmd.c_str(), 0);
 		}
 		uuu_notify nt;
 		nt.type = uuu_notify::NOTIFY_CMD_INFO;

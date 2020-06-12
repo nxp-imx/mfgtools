@@ -161,3 +161,4 @@ public:
 };
 
 int run_cmds(const char *procotal, CmdCtx *p);
+int run_cmd(CmdCtx *pCtx, const char * cmd, int dry);
