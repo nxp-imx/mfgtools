@@ -113,6 +113,7 @@ public:
 	std::string m_partition;
 	uint64_t m_totalsize;
 	bool m_raw2sparse = false;
+	size_t m_sparse_limit = 0x1000000;
 	FBFlashCmd(char *p) : FBCmd(p, "flash") { m_timeout = 10000; }
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
