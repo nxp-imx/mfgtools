@@ -48,8 +48,6 @@
 #include "libcomm.h"
 #include "trans.h"
 
-static constexpr size_t SparseLimit{0x1000000};
-
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
 	if (m_pTrans->write((void*)cmd.data(), cmd.size()))
@@ -459,6 +457,18 @@ int FBFlashCmd::parser(char *p)
 		m_raw2sparse = true;
 		m_partition = get_next_param(subcmd, pos);
 	}
+	else if (m_partition == "-S")
+	{
+		m_partition = get_next_param(subcmd, pos);
+		bool conversion_success = false;
+		m_sparse_limit = str_to_uint64(m_partition, &conversion_success);
+		if (!conversion_success)
+		{
+			set_last_err_string("FB: flash failed to parse size argument given to -S: "s + m_partition);
+			return -1;
+		}
+		m_partition = get_next_param(subcmd, pos);
+	}
 
 	if (pos == string::npos || m_partition.empty())
 	{
@@ -499,8 +509,8 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, siz
 
 	vector<uint8_t> data;
 
-	if (max > SparseLimit)
-		 max = SparseLimit;
+	if (max > m_sparse_limit)
+		 max = m_sparse_limit;
 
 	sf.init_header(block_size, (max + block_size -1) / block_size);
 
@@ -576,7 +586,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 	if (getvar.run(ctx))
 		return -1;
 
-	size_t max = getvar.m_val.empty() ? SparseLimit : str_to_uint32(getvar.m_val);
+	size_t max = getvar.m_val.empty() ? m_sparse_limit : str_to_uint32(getvar.m_val);
 
 	BulkTrans dev;
 	if (dev.open(ctx->m_dev))
@@ -628,8 +638,8 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	if (SparseFile::is_validate_sparse_file(pdata->data(), pdata->size()))
 	{	/* Limited max size to 16M for sparse file to avoid long timeout at read status*/
-		if (max > SparseLimit)
-			max = SparseLimit;
+		if (max > m_sparse_limit)
+			max = m_sparse_limit;
 	}
 
 	if (pdata->size() <= max)
