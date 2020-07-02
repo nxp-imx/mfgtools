@@ -39,6 +39,8 @@ extern "C"
 #include "libusb.h"
 }
 
+using namespace std;
+
 TransBase::~TransBase()
 {
 }

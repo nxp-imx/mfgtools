@@ -34,8 +34,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 class TransBase
 {
 public:
@@ -44,8 +42,8 @@ public:
 	virtual int close() { return 0; }
 	virtual int write(void *buff, size_t size) = 0;
 	virtual int read(void *buff, size_t size, size_t *return_size) = 0;
-	int write(vector<uint8_t> & buff) { return write(buff.data(), buff.size()); }
-	int read(vector<uint8_t> &buff);
+	int write(std::vector<uint8_t> & buff) { return write(buff.data(), buff.size()); }
+	int read(std::vector<uint8_t> &buff);
 
 protected:
 	void * m_devhandle = nullptr;
@@ -67,7 +65,7 @@ public:
 	int close() override;
 
 protected:
-	vector<EPInfo> m_EPs;
+	std::vector<EPInfo> m_EPs;
 };
 class HIDTrans : public USBTrans
 {
