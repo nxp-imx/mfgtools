@@ -36,6 +36,8 @@
 class Backfile
 {
 public:
+	const std::string& get_filename() const noexcept { return m_filename; }
+
+protected:
 	std::string m_filename;
-	uint64_t m_timesampe;
 };
