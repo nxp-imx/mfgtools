@@ -135,11 +135,12 @@ private:
 class SDPReadMemCmd : public SDPCmdBase
 {
 public:
+	SDPReadMemCmd(char*p);
+	int run(CmdCtx *) override;
+
+private:
 	uint32_t m_mem_addr;
 	uint8_t m_mem_format;
-
-	SDPReadMemCmd(char*p);
-	int run(CmdCtx *);
 };
 
 class SDPWriteMemCmd : public SDPCmdBase
