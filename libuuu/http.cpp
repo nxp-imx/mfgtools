@@ -234,7 +234,6 @@ HttpStream::~HttpStream()
 HttpStream::HttpStream()
 {
 	m_buff.empty();
-	m_ssl = nullptr;
 }
 
 int HttpStream::SendPacket(char *buff, size_t sz)
