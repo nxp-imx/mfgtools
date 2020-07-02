@@ -143,12 +143,13 @@ public:
 class SDPWriteMemCmd : public SDPCmdBase
 {
 public:
+	SDPWriteMemCmd(char*p);
+	int run(CmdCtx *p) override;
+
+private:
 	uint32_t m_mem_addr;
 	uint8_t m_mem_format;
 	uint32_t m_mem_value;
-
-	SDPWriteMemCmd(char*p);
-	int run(CmdCtx *p);
 };
 
 class SDPWriteCmd : public SDPCmdBase
