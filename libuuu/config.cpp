@@ -35,6 +35,8 @@
 #include "liberror.h"
 #include "libuuu.h"
 
+using namespace std;
+
 static Config g_config;
 
 constexpr uint16_t FSL_VID = 0x15A2;
