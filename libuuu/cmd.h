@@ -43,7 +43,11 @@ std::string get_next_param(const std::string &cmd, size_t &pos, char sperate = '
 class CmdCtx
 {
 public:
+	CmdCtx() = default;
+	CmdCtx(const CmdCtx&) = delete;
+	CmdCtx& operator=(const CmdCtx&) = delete;
 	virtual ~CmdCtx();
+
 	ConfigItem *m_config_item = nullptr;
 	void *m_dev = nullptr;
 };
