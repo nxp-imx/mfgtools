@@ -52,7 +52,9 @@ static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
 static string g_cmd_list_file;
 
+int get_string_in_square_brackets(const std::string &cmd, std::string &context);
 int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap = nullptr);
+std::string remove_square_brackets(const std::string &cmd);
 
 template <class T>
 void * create_object() { return new T; }

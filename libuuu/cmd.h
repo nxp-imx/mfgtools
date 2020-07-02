@@ -39,8 +39,6 @@
 class ConfigItem;
 
 std::string get_next_param(const std::string &cmd, size_t &pos, char sperate = ' ');
-std::string remove_square_brackets(const std::string &cmd);
-int get_string_in_square_brackets(const std::string &cmd, std::string &context);
 
 class CmdCtx
 {
