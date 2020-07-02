@@ -35,7 +35,7 @@
 class HttpStream
 {
 	std::vector<uint8_t> m_buff;
-	uintptr_t	m_socket;
+	int m_socket = -1;
 	std::map<std::string, std::string> m_response;
 	size_t			m_data_start;
 

@@ -87,7 +87,6 @@ using namespace std;
 HttpStream::HttpStream()
 {
 	m_buff.empty();
-	m_socket = 0;
 	m_hConnect = 0;
 	m_hSession = 0;
 	m_hRequest = 0;
