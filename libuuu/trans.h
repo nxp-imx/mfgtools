@@ -37,7 +37,11 @@
 class TransBase
 {
 public:
+	TransBase() = default;
+	TransBase(const TransBase&) = delete;
+	TransBase& operator=(const TransBase&) = delete;
 	virtual ~TransBase();
+
 	virtual int open(void *) { return 0; }
 	virtual int close() { return 0; }
 	virtual int write(void *buff, size_t size) = 0;
