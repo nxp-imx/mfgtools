@@ -35,8 +35,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 class ConfigItem
 {
 public:
@@ -51,21 +49,21 @@ public:
 		if (comp)
 			m_compatible = comp;
 	}
-	string m_protocol;
-	string m_chip;
-	string m_compatible;
+	std::string m_protocol;
+	std::string m_chip;
+	std::string m_compatible;
 	uint16_t m_pid = 0;
 	uint16_t m_vid = 0;
 	uint16_t m_bcdVerMin = 0;
 	uint16_t m_bcdVerMax = UINT16_MAX;
 };
 
-class Config :public vector<ConfigItem>
+class Config :public std::vector<ConfigItem>
 {
 public:
 	Config();
 	ConfigItem *find(uint16_t vid, uint16_t pid, uint16_t ver);
-	Config find(const string &protocal);
+	Config find(const std::string &protocal);
 };
 
 Config * get_config() noexcept;
