@@ -558,9 +558,7 @@ int SDPWriteMemCmd::run(CmdCtx *ctx)
 
 SDPJumpCmd::SDPJumpCmd(char *p) : SDPCmdBase(p)
 {
-	m_jump_addr = 0;
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_JUMP_ADDR;
-	m_clear_dcd = false;
 	insert_param_info("jump", nullptr, Param::Type::e_null);
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
 	insert_param_info("-ivt", &m_Ivt, Param::Type::e_bool);
