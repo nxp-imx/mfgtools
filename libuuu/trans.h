@@ -39,7 +39,6 @@ using namespace std;
 class TransBase
 {
 public:
-	void * m_devhandle = nullptr;
 	virtual ~TransBase();
 	virtual int open(void *) { return 0; }
 	virtual int close() { return 0; }
@@ -47,6 +46,9 @@ public:
 	virtual int read(void *buff, size_t size, size_t *return_size) = 0;
 	int write(vector<uint8_t> & buff) { return write(buff.data(), buff.size()); }
 	int read(vector<uint8_t> &buff);
+
+protected:
+	void * m_devhandle = nullptr;
 };
 
 class EPInfo
