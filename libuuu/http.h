@@ -51,9 +51,10 @@ public:
 	HttpStream();
 	int HttpGetHeader(std::string host, std::string path, int port = 80);
 	size_t HttpGetFileSize();
-	uint64_t HttpGetModifyTime();
 	int HttpDownload(char *buff, size_t sz);
 	~HttpStream();
+
+private:
 	int RecvPacket(char *buff, size_t sz);
 	int SendPacket(char *buff, size_t sz);
 };
