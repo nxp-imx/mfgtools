@@ -125,10 +125,11 @@ public:
 class SDPDcdCmd : public SDPCmdBase
 {
 public:
-	uint32_t m_dcd_addr;
 	SDPDcdCmd(char *p);
-	int run(CmdCtx *);
+	int run(CmdCtx *) override;
 
+private:
+	uint32_t m_dcd_addr;
 };
 
 class SDPReadMemCmd : public SDPCmdBase
