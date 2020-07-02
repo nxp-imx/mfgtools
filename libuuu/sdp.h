@@ -118,7 +118,7 @@ class SDPBootlogCmd : public SDPCmdBase
 {
 public:
 	SDPBootlogCmd(char *p);
-	int run(CmdCtx *);
+	int run(CmdCtx *) override;
 };
 
 class SDPDcdCmd : public SDPCmdBase
@@ -184,14 +184,14 @@ class SDPSkipDCDCmd :public SDPCmdBase
 {
 public:
 	SDPSkipDCDCmd(char *p);
-	int run(CmdCtx *p);
+	int run(CmdCtx *p) override;
 };
 
 class SDPStatusCmd :public SDPCmdBase
 {
 public:
 	SDPStatusCmd(char *p);
-	int run(CmdCtx *p);
+	int run(CmdCtx *p) override;
 };
 
 class SDPBootCmd : public SDPCmdBase
