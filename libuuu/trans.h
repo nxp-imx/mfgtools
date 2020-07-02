@@ -71,16 +71,19 @@ protected:
 };
 class HIDTrans : public USBTrans
 {
-	int m_set_report = 9;
-	int m_outEP = 0;
 public:
-	int m_read_timeout = 1000;
-	void set_hid_out_ep(int ep) noexcept { m_outEP = ep; }
+	HIDTrans(int read_timeout = 1000) : m_read_timeout{read_timeout} {}
+	~HIDTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
 
 	int open(void *p) override;
-	~HIDTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
+	void set_hid_out_ep(int ep) noexcept { m_outEP = ep; }
 	int write(void *buff, size_t size) override;
 	int read(void *buff, size_t size, size_t *return_size) override;
+
+private:
+	int m_outEP = 0;
+	const int m_read_timeout = 1000;
+	int m_set_report = 9;
 };
 
 class BulkTrans : public USBTrans
