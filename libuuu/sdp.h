@@ -100,19 +100,21 @@ public:
 	};
 
 	SDPCmdBase(char *p) :CmdBase(p) { init_cmd(); }
-	SDPCmd m_spdcmd;
-	std::string m_filename;
-	std::vector<uint8_t> m_input;
-	std::shared_ptr<FileBuffer> m_filebuff;
 
-	int init_cmd();
-	int send_cmd(HIDReport *p);
+protected:
+	int check_ack(HIDReport *report, uint32_t ack);
+	HAB_t get_hab_type(HIDReport *report);
 	int get_status(HIDReport *p, uint32_t &status, uint8_t report_id);
+	int init_cmd();
 	IvtHeader * search_ivt_header(std::shared_ptr<FileBuffer> data, size_t &off, size_t limit=ULLONG_MAX);
 
-	HAB_t get_hab_type(HIDReport *report);
+	std::string m_filename;
+	SDPCmd m_spdcmd;
 
-	int check_ack(HIDReport *report, uint32_t ack);
+private:
+	int send_cmd(HIDReport *p);
+
+	std::vector<uint8_t> m_input;
 };
 
 class SDPBootlogCmd : public SDPCmdBase
