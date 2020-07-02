@@ -197,9 +197,11 @@ public:
 class SDPBootCmd : public SDPCmdBase
 {
 public:
-	bool m_nojump;
-	bool m_clear_dcd;
-	uint32_t m_dcd_addr;
 	SDPBootCmd(char *p);
-	int run(CmdCtx *p);
+	int run(CmdCtx *p) override;
+
+private:
+	bool m_clear_dcd = false;
+	uint32_t m_dcd_addr = 0;
+	bool m_nojump = false;
 };

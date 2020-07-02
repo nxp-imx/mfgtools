@@ -220,10 +220,6 @@ SDPBootCmd::SDPBootCmd(char *p) : SDPCmdBase(p)
 	insert_param_info("-nojump", &m_nojump, Param::Type::e_bool);
 	insert_param_info("-cleardcd", &m_clear_dcd, Param::Type::e_bool);
 	insert_param_info("-dcdaddr", &m_dcd_addr, Param::Type::e_uint32);
-
-	m_nojump = false;
-	m_clear_dcd = false;
-	m_dcd_addr = 0;
 }
 
 int SDPBootCmd::run(CmdCtx *ctx)
