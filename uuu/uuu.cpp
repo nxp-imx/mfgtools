@@ -200,7 +200,8 @@ int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, u
 	return 0;
 }
 
-int print_udev_rule(const char *pro, const char * chip, const char * /*compatible*/, uint16_t vid, uint16_t pid, uint16_t bcdmin, uint16_t bcdmax, void * /*p*/)
+int print_udev_rule(const char * /*pro*/, const char * /*chip*/, const char * /*compatible*/,
+	uint16_t vid, uint16_t pid, uint16_t /*bcdmin*/, uint16_t /*bcdmax*/, void * /*p*/)
 {
 	printf("SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"%04x\", ATTRS{idProduct}==\"%04x\", MODE=\"0666\"\n",
 			vid, pid);
@@ -764,7 +765,7 @@ void print_udev()
 	fprintf(stderr, "\tsudo udevadm control --reload-rules\n");
 }
 
-int print_usb_device(const char *path, const char *chip, const char *pro, uint16_t vid, uint16_t pid, uint16_t bcd, void *p)
+int print_usb_device(const char *path, const char *chip, const char *pro, uint16_t vid, uint16_t pid, uint16_t bcd, void * /*p*/)
 {
 	printf("\t%s\t %s\t %s\t 0x%04X\t0x%04X\t 0x%04X\n", path, chip, pro, vid, pid, bcd);
 	return 0;
@@ -903,8 +904,6 @@ int main(int argc, char **argv)
 					BuildCmd tmpCmd;
 					string tmpCmdFileName = argv[i + 1];
 					tmpCmd.m_cmd = tmpCmdFileName.c_str();
-
-					size_t filesize;
 
 					std::ifstream t(tmpCmdFileName);
 					std::string fileContents((std::istreambuf_iterator<char>(t)),
