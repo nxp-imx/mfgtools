@@ -171,11 +171,9 @@ int FBCmd::parser(char *p)
 
 int FBCmd::run(CmdCtx *ctx)
 {
-	BulkTrans dev;
+	BulkTrans dev{m_timeout};
 	if (dev.open(ctx->m_dev))
 		return -1;
-
-	dev.m_timeout = m_timeout;
 
 	FastBoot fb(&dev);
 	string cmd;
@@ -191,11 +189,9 @@ int FBCmd::run(CmdCtx *ctx)
 
 int FBPartNumber::run(CmdCtx *ctx)
 {
-	BulkTrans dev;
+	BulkTrans dev{m_timeout};
 	if (dev.open(ctx->m_dev))
 		return -1;
-
-	dev.m_timeout = m_timeout;
 
 	FastBoot fb(&dev);
 
@@ -210,11 +206,9 @@ int FBPartNumber::run(CmdCtx *ctx)
 
 int FBUpdateSuper::run(CmdCtx *ctx)
 {
-	BulkTrans dev;
+	BulkTrans dev{m_timeout};
 	if (dev.open(ctx->m_dev))
 		return -1;
-
-	dev.m_timeout = m_timeout;
 
 	FastBoot fb(&dev);
 
@@ -588,12 +582,11 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	size_t max = getvar.m_val.empty() ? m_sparse_limit : str_to_uint32(getvar.m_val);
 
-	BulkTrans dev;
+	BulkTrans dev{m_timeout};
 	if (dev.open(ctx->m_dev))
 		return -1;
 
 	FastBoot fb(&dev);
-	dev.m_timeout = m_timeout;
 
 	if (m_raw2sparse)
 	{
