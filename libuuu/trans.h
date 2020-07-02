@@ -63,9 +63,11 @@ public:
 class USBTrans : public TransBase
 {
 public:
-	vector<EPInfo> m_EPs;
 	int open(void *p) override;
 	int close() override;
+
+protected:
+	vector<EPInfo> m_EPs;
 };
 class HIDTrans : public USBTrans
 {
