@@ -45,7 +45,7 @@ class HttpStream
 	void far * m_hRequest;
 #endif
 
-	void * m_ssl;
+	void * m_ssl = nullptr;
 	int parser_response(std::string rep);
 public:
 	HttpStream();
