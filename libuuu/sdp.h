@@ -158,6 +158,12 @@ private:
 class SDPWriteCmd : public SDPCmdBase
 {
 public:
+	SDPWriteCmd(char*p);
+
+	int run(CmdCtx *p) override;
+	int run(CmdCtx *p, void *buff, size_t size, uint32_t addr);
+
+private:
 	uint32_t m_download_addr;
 	int32_t m_Ivt;
 	int m_PlugIn;
@@ -166,11 +172,6 @@ public:
 	bool m_bIvtReserve;
 	bool m_bskipspl;
 	bool m_bskipfhdr;
-
-	SDPWriteCmd(char*p);
-
-	int run(CmdCtx *p);
-	int run(CmdCtx *p, void *buff, size_t size, uint32_t addr);
 };
 
 class SDPJumpCmd : public SDPCmdBase
