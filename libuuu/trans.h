@@ -89,17 +89,19 @@ private:
 class BulkTrans : public USBTrans
 {
 public:
-	EPInfo m_ep_in;
-	EPInfo m_ep_out;
-	size_t m_MaxTransPreRequest = 0x100000;
-	int m_b_send_zero = 0;
-	uint64_t m_timeout = 2000;
+	BulkTrans(uint64_t timeout = 2000) : m_timeout{timeout} {}
+	~BulkTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
 
 	int open(void *p) override;
-
-	~BulkTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
 	int write(void *buff, size_t size) override;
 	int read(void *buff, size_t size, size_t *return_size) override;
+
+private:
+	size_t m_MaxTransPreRequest = 0x100000;
+	int m_b_send_zero = 0;
+	EPInfo m_ep_in;
+	EPInfo m_ep_out;
+	uint64_t m_timeout = 2000;
 };
 
 int polling_usb(std::atomic<int>& bexit);
