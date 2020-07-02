@@ -233,7 +233,7 @@ int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 	call_notify(ut);
 	size_t lastpos = 0;
 
-	shared_ptr<FileBuffer> zipfile = get_file_buffer(pZip->m_filename);
+	shared_ptr<FileBuffer> zipfile = get_file_buffer(pZip->get_filename());
 	if (zipfile == nullptr)
 		return -1;
 
