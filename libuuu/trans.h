@@ -39,7 +39,6 @@ using namespace std;
 class TransBase
 {
 public:
-	string m_path;
 	void * m_devhandle = nullptr;
 	virtual ~TransBase();
 	virtual int open(void *) { return 0; }
