@@ -172,12 +172,14 @@ public:
 class SDPJumpCmd : public SDPCmdBase
 {
 public:
-	bool m_Ivt;
-	bool m_PlugIn;
-	bool m_clear_dcd;
-	uint32_t m_jump_addr;
 	SDPJumpCmd(char*p);
-	int run(CmdCtx *p);
+	int run(CmdCtx *p) override;
+
+private:
+	bool m_clear_dcd = false;
+	bool m_Ivt;
+	uint32_t m_jump_addr = 0;
+	bool m_PlugIn;
 };
 
 class SDPSkipDCDCmd :public SDPCmdBase
