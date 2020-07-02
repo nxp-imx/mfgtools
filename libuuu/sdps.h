@@ -34,10 +34,6 @@
 class SDPSCmd : public CmdBase
 {
 public:
-	uint32_t m_offset = 0;
-	std::string m_filename;
-	bool m_bskipflashheader;
-
 	SDPSCmd(char *cmd) :CmdBase(cmd)
 	{
 		insert_param_info("boot", nullptr, Param::Type::e_null);
@@ -46,4 +42,9 @@ public:
 		insert_param_info("-skipfhdr", &m_bskipflashheader, Param::Type::e_bool);
 	}
 	int run(CmdCtx *p) override;
+
+private:
+	bool m_bskipflashheader;
+	std::string m_filename;
+	uint32_t m_offset = 0;
 };
