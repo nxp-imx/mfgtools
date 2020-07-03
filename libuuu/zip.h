@@ -160,6 +160,12 @@ class Zip;
 class Zip_file_Info
 {
 public:
+	Zip_file_Info();
+	~Zip_file_Info();
+
+	int decompress(Zip *pZip, std::shared_ptr<FileBuffer> p);
+
+private:
 	std::string m_filename;
 	uint32_t m_timestamp;
 	size_t m_filesize;
@@ -168,9 +174,7 @@ public:
 	z_stream m_strm;
 	bool m_decompressed;
 
-	int decompress(Zip *pZip, shared_ptr<FileBuffer> p);
-	Zip_file_Info();
-	~Zip_file_Info();
+	friend Zip;
 };
 
 class Zip : public Backfile
