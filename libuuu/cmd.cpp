@@ -239,7 +239,7 @@ int CmdList::run_all(CmdCtx *p, bool dry)
 		call_notify(nt);
 
 		nt.type = uuu_notify::NOTIFY_CMD_START;
-		nt.str = (char *)(*it)->m_cmd.c_str();
+		nt.str = (char *)(*it)->get_cmd().c_str();
 		call_notify(nt);
 
 		if (dry)
@@ -253,7 +253,7 @@ int CmdList::run_all(CmdCtx *p, bool dry)
 		if (ret)
 			return ret;
 
-		if ((*it)->m_lastcmd)
+		if ((*it)->get_lastcmd())
 				break;
 	}
 	return ret;
@@ -505,7 +505,7 @@ int run_cmd(CmdCtx *pCtx, const char * cmd, int dry)
 	call_notify(nt);
 
 	nt.type = uuu_notify::NOTIFY_CMD_START;
-	nt.str = (char *)p->m_cmd.c_str();
+	nt.str = (char *)p->get_cmd().c_str();
 	call_notify(nt);
 
 	if (typeid(*p) != typeid(CfgCmd))

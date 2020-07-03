@@ -84,26 +84,30 @@ struct Param
 class CmdBase
 {
 public:
-	std::vector<Param> m_param;
-	uint64_t m_timeout = 2000;
-	bool m_lastcmd = false;
-	std::string m_cmd;
-	bool m_NoKeyParam = false;
-	bool m_bCheckTotalParam = false;
-
 	CmdBase() = default;
 	CmdBase(char *p) { if (p) m_cmd = p; }
 	virtual ~CmdBase();
 
+	virtual int dump();
+	const std::string& get_cmd() const noexcept { return m_cmd; }
+	bool get_lastcmd() const noexcept { return m_lastcmd; }
 	void insert_param_info(const char *key, void *pD, Param::Type tp, bool ignore_case = true, const char* err = nullptr)
 	{
 		m_param.emplace_back(Param{key, pD, tp, ignore_case, err});
 	}
-
 	virtual int parser_protocal(char *p, size_t &pos);
 	virtual int parser(char *p = nullptr);
 	virtual int run(CmdCtx *p) = 0;
-	virtual int dump();
+
+protected:
+	bool m_bCheckTotalParam = false;
+	std::string m_cmd;
+	bool m_lastcmd = false;
+	bool m_NoKeyParam = false;
+	uint64_t m_timeout = 2000;
+
+private:
+	std::vector<Param> m_param;
 };
 
 using CreateCmdObj = std::shared_ptr<CmdBase> (*) (char *);
