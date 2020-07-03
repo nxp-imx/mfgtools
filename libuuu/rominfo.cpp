@@ -185,28 +185,36 @@ bool CheckHeader(uint32_t *p)
 
 size_t GetFlashHeaderSize(shared_ptr<FileBuffer> p, size_t offset)
 {
+	static constexpr std::array<size_t, 4> offsets
+	{
+		0,
+		0x400,
+		0x1fc,
+		0x5fc
+	};
+
 	if (p->size() < offset)
 		return 0;
 
-	if (CheckHeader((uint32_t*)(p->data() + offset)))
+	if (CheckHeader((uint32_t*)(p->data() + offset + offsets[0])))
 		return 0x1000;
 
 	if (p->size() < offset + 0x400)
 		return 0;
 
-	if (CheckHeader((uint32_t*)(p->data() + offset + 0x400)))
+	if (CheckHeader((uint32_t*)(p->data() + offset + offsets[1])))
 		return 0x1000;
 
 	if (p->size() < offset + 0x1fc)
 		return 0;
 
-	if (CheckHeader((uint32_t*)(p->data() + offset + 0x1fc)))
+	if (CheckHeader((uint32_t*)(p->data() + offset + offsets[2])))
 		return 0x1000;
 
 	if (p->size() < offset + 0x5fc)
 		return 0;
 
-	if (CheckHeader((uint32_t*)(p->data() + offset + 0x5fc)))
+	if (CheckHeader((uint32_t*)(p->data() + offset + offsets[3])))
 		return 0x1000;
 
 	return 0;
