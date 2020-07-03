@@ -29,10 +29,10 @@
 *
 */
 
-using namespace std;
-
-#include "libuuu.h"
 #include "liberror.h"
+#include "libuuu.h"
+
+using namespace std;
 
 static string g_last_error_str;
 static int g_last_err_id;
@@ -44,7 +44,7 @@ void uuu_set_debug_level(uint32_t mask)
 	g_debug_level = mask;
 }
 
-int get_libusb_debug_level()
+int get_libusb_debug_level() noexcept
 {
 	return g_debug_level & 0xFFFF;
 }
