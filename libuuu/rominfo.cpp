@@ -193,29 +193,15 @@ size_t GetFlashHeaderSize(shared_ptr<FileBuffer> p, size_t offset)
 		0x5fc
 	};
 
-	if (p->size() < offset)
-		return 0;
+	for (const auto test_offset : offsets) {
+		if (p->size() < (offset + test_offset)) {
+			return 0;
+		}
 
-	if (CheckHeader((uint32_t*)(p->data() + offset + offsets[0])))
-		return 0x1000;
-
-	if (p->size() < offset + 0x400)
-		return 0;
-
-	if (CheckHeader((uint32_t*)(p->data() + offset + offsets[1])))
-		return 0x1000;
-
-	if (p->size() < offset + 0x1fc)
-		return 0;
-
-	if (CheckHeader((uint32_t*)(p->data() + offset + offsets[2])))
-		return 0x1000;
-
-	if (p->size() < offset + 0x5fc)
-		return 0;
-
-	if (CheckHeader((uint32_t*)(p->data() + offset + offsets[3])))
-		return 0x1000;
+		if (CheckHeader(reinterpret_cast<uint32_t*>(p->data() + offset + test_offset))) {
+			return 0x1000;
+		}
+	}
 
 	return 0;
 }
