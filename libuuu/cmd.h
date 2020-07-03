@@ -122,28 +122,34 @@ class CmdDone :public CmdBase
 {
 public:
 	CmdDone(char *p) :CmdBase(p) { m_lastcmd = true; }
+
 	int run(CmdCtx *p) override;
 };
 
 class CmdDelay :public CmdBase
 {
 public:
-	int m_ms = 0;
 	CmdDelay(char *p) :CmdBase(p) {}
+
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *p) override;
+
+private:
+	int m_ms = 0;
 };
 
 class CmdShell : public CmdBase
 {
 public:
-	std::string m_shellcmd;
-	std::string m_protocal;
-	bool	m_dyn = false;
-
 	CmdShell(char *p) : CmdBase(p) {}
+
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *p) override;
+
+private:
+	bool m_dyn = false;
+	std::string m_protocal;
+	std::string m_shellcmd;
 };
 
 class CmdList : public std::vector<std::shared_ptr<CmdBase>>
@@ -162,6 +168,7 @@ class CfgCmd :public CmdBase
 {
 public:
 	CfgCmd(char *cmd) :CmdBase(cmd) {}
+
 	int parser(char * /*p*/) override { return 0; }
 	int run(CmdCtx *p) override;
 };
