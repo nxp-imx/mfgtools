@@ -163,22 +163,23 @@ size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset)
 
 	return sz;
 }
-static uint32_t FlashHeaderMagic[] =
-{
-	0xc0ffee01,
-	0x42464346,
-	0
-};
 
 bool CheckHeader(uint32_t *p)
 {
-	int i = 0;
-	while(FlashHeaderMagic[i])
+	static constexpr std::array <uint32_t, 2> FlashHeaderMagic
 	{
-		if (*p == FlashHeaderMagic[i])
+		0xc0ffee01,
+		0x42464346
+	};
+
+	for (const auto magic_val : FlashHeaderMagic)
+	{
+		if (*p == magic_val)
+		{
 			return true;
-		i++;
+		}
 	}
+
 	return false;
 }
 
