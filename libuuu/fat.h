@@ -28,6 +28,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
+
+#pragma once
+
 #include "backfile.h"
 #include "buffer.h"
 
@@ -82,20 +85,19 @@ struct FatLFN
 class Fat : public Backfile
 {
 public:
-	uint64_t m_fat_part_start;
-	uint64_t m_fat_table_offset;
-	uint64_t m_root_dir_offset;
-	uint64_t m_logical_sector_perfat;
-	uint64_t m_cluster;
-	int m_num_of_rootdir;
+	void *get_data_buff(shared_ptr<FileBuffer> p, int cluster);
+	int get_file_buff(string filename, shared_ptr<FileBuffer>p);
+	int get_next_cluster(shared_ptr<FileBuffer> p, int cluster);
+	string lfn2string(FatLFN *p);
+	int Open(string filename);
 
 	map<string, FatDirEntry> m_filemap;
 
-	int Open(string filename);
-	int get_file_buff(string filename, shared_ptr<FileBuffer>p);
-
-	int get_next_cluster(shared_ptr<FileBuffer> p, int cluster);
-	void *get_data_buff(shared_ptr<FileBuffer> p, int cluster);
-
-	string lfn2string(FatLFN *p);
+private:
+	uint64_t m_cluster;
+	uint64_t m_fat_part_start;
+	uint64_t m_fat_table_offset;
+	uint64_t m_logical_sector_perfat;
+	int m_num_of_rootdir;
+	uint64_t m_root_dir_offset;
 };
