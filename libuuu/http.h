@@ -28,6 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+#pragma once
+
 #include <string>
 #include <vector>
 #include <map>
