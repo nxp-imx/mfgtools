@@ -61,15 +61,19 @@ static constexpr std::array<ROM_INFO, 15> g_RomInfo
 
 const ROM_INFO * search_rom_info(const char *s)
 {
-	string s1 = s;
-	for (size_t i = 0; i < sizeof(g_RomInfo) / sizeof(ROM_INFO); i++)
-	{
-		string s2;
-		s2 = g_RomInfo[i].m_name;
-		if (s1 == s2)
-			return &g_RomInfo[i];
+	if (s == nullptr) {
+		return nullptr;
 	}
-	return 0;
+
+	const string s1{s};
+	for (const auto &rom_info : g_RomInfo) {
+		if (s1 == rom_info.m_name)
+		{
+			return &rom_info;
+		}
+	}
+
+	return nullptr;
 }
 
 const ROM_INFO * search_rom_info(const ConfigItem *item)
