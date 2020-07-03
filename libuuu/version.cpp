@@ -31,12 +31,12 @@
 
 #include "gitversion.h"
 #include "libuuu.h"
+
 #include <string>
-#include <string.h>
 
 using namespace std;
 
-static const char g_version[] = GIT_VERSION;
+static constexpr auto g_version = GIT_VERSION;
 
 const char *uuu_get_version_string()
 {
@@ -45,28 +45,26 @@ const char *uuu_get_version_string()
 
 int uuu_get_version()
 {
-	string str = g_version;
-	int maj, min, build;
+	string version_str{g_version};
 
-	size_t pos = 0;
-	pos = str.find(".", pos);
-	size_t vs = str.find_last_not_of("0123456789", pos - 1);
-	vs++;
+	// Find first dot because major version number must be before it
+	auto pos = version_str.find(".");
+	// Find the position of the character right before the start of the number
+	auto vs = version_str.find_last_not_of("0123456789", pos - 1);
+	// Let "vs" point exactly to the first character of the major version number
+	++vs;
 
-	string s = str.substr(vs, pos - vs);
+	string temp_num_str = version_str.substr(vs, pos - vs);
+	const auto maj = static_cast<int>(stoll(temp_num_str, nullptr, 10));
 
-	maj = stoll(s, 0, 10);
+	version_str = version_str.substr(pos + 1);
+	pos = version_str.find(".");
+	temp_num_str = version_str.substr(0, pos);
+	const auto min = static_cast<int>(stoll(temp_num_str, nullptr, 10));
 
-	str = str.substr(pos + 1);
-	pos = str.find(".");
-	s = str.substr(0, pos);
-
-	min = stoll(s, 0, 10);
-
-	str = str.substr(pos + 1);
-	s = str.substr(0, pos = str.find("-"));
-
-	build = stoll(s, 0, 10);
+	version_str = version_str.substr(pos + 1);
+	temp_num_str = version_str.substr(0, pos = version_str.find("-"));
+	const auto build = static_cast<int>(stoll(temp_num_str, nullptr, 10));
 
 	return (maj << 24) | (min << 12) | build;
 }
