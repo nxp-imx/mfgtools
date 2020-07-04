@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+std::string build_progress_bar(size_t width, size_t pos, size_t total,
+	const char * vt_default, const char * vt_yellow);
 void print_auto_scroll(std::string str, size_t len, size_t start);
 int print_cfg(const char *pro, const char * chip, const char * /*compatible*/,
         uint16_t pid, uint16_t vid, uint16_t bcdmin, uint16_t bcdmax, void * /*p*/);

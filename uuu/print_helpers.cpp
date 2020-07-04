@@ -1,5 +1,6 @@
 #include "print_helpers.h"
 
+#include "libcomm.h"
 #include "libuuu.h"
 
 #include <cstdio>
@@ -7,6 +8,52 @@
 #include <iostream>
 
 using namespace std;
+
+string build_progress_bar(size_t width, size_t pos, size_t total,
+	const char * vt_default, const char * vt_yellow)
+{
+	string str;
+	str.resize(width, ' ');
+	str[0] = '[';
+	str[width - 1] = ']';
+
+	if (total == 0)
+	{
+		if (pos == 0)
+			return str;
+
+		string_ex loc;
+		size_t s = pos / (1024 * 1024);
+		loc.format("%dM", s);
+		str.replace(1, loc.size(), loc);
+		return str;
+	}
+
+	size_t i;
+
+	if (pos > total)
+		pos = total;
+
+	for (i = 1; i < (width-2) * pos / total; i++)
+	{
+		str[i] = '=';
+	}
+
+	if (i > 1)
+		str[i] = '>';
+
+	if (pos == total)
+		str[str.size() - 2] = '=';
+
+	string_ex per;
+	per.format("%d%%", pos * 100 / total);
+
+	size_t start = (width - per.size()) / 2;
+	str.replace(start, per.size(), per);
+	str.insert(start, vt_yellow);
+	str.insert(start + per.size() + strlen(vt_yellow), vt_default);
+	return str;
+}
 
 void print_auto_scroll(string str, size_t len, size_t start)
 {
