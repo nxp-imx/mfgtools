@@ -33,6 +33,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
 
 class ConfigItem;
 class FileBuffer;
@@ -61,7 +62,7 @@ struct ROM_INFO
 	uint32_t	flags;
 };
 
-const ROM_INFO * search_rom_info(const char *s);
+const ROM_INFO * search_rom_info(const std::string &s);
 const ROM_INFO * search_rom_info(const ConfigItem *item);
 
 size_t GetContainerActualSize(std::shared_ptr<FileBuffer> p, size_t offset);
