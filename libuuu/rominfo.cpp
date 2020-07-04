@@ -29,16 +29,14 @@
 *
 */
 
-#include <array>
-#include <string>
-#include "sdps.h"
-#include "config.h"
-#include "hidreport.h"
-#include "liberror.h"
-#include "libcomm.h"
-#include "buffer.h"
-#include "sdp.h"
 #include "rominfo.h"
+#include "buffer.h"
+#include "config.h"
+#include "libcomm.h"
+
+#include <array>
+
+using namespace std;
 
 static constexpr std::array<ROM_INFO, 15> g_RomInfo
 {
@@ -92,7 +90,7 @@ const ROM_INFO * search_rom_info(const ConfigItem *item)
 #define HASH_MAX_LEN	64
 
 #define CONTAINER_HDR_ALIGNMENT 0x400
-#define CONTAINER_TAG 0x87
+static constexpr uint8_t CONTAINER_TAG = 0x87;
 
 #pragma pack (1)
 struct rom_container {
@@ -120,46 +118,46 @@ struct rom_bootimg {
 };
 
 
-#define IMG_V2X		0x0B
+static constexpr uint32_t IMG_V2X = 0x0B;
 
 #pragma pack ()
 
 
 size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset)
 {
-	struct rom_container *hdr;
-	int cindex = 1;
-
-	hdr = (struct rom_container *)(p->data() + offset + CONTAINER_HDR_ALIGNMENT);
+	auto hdr = reinterpret_cast<struct rom_container *>(p->data() + offset + CONTAINER_HDR_ALIGNMENT);
 	if (hdr->tag != CONTAINER_TAG)
+	{
 		return p->size() - offset;
-
-	struct rom_bootimg *image;
+	}
 
 	/* Check if include V2X container*/
-	image = (struct rom_bootimg *)(p->data() + offset + CONTAINER_HDR_ALIGNMENT
+	auto image = reinterpret_cast<struct rom_bootimg *>(p->data() + offset + CONTAINER_HDR_ALIGNMENT
 		+ sizeof(struct rom_container));
 
+	unsigned int cindex = 1;
 	if ((image->flags & 0xF) == IMG_V2X)
 	{
 		cindex = 2;
-		hdr = (struct rom_container *)(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT);
+		hdr = reinterpret_cast<struct rom_container *>(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT);
 		if (hdr->tag != CONTAINER_TAG)
+		 {
 			return p->size() - offset;
+		}
 	}
 
-	image = (struct rom_bootimg *)(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT
+	image = reinterpret_cast<struct rom_bootimg *>(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT
 		+ sizeof(struct rom_container)
 		+ sizeof(struct rom_bootimg) * (hdr->num_images - 1));
 
 	uint32_t sz = image->size + image->offset + cindex * CONTAINER_HDR_ALIGNMENT;
 
-	sz = round_up(sz, (uint32_t)CONTAINER_HDR_ALIGNMENT);
+	sz = round_up(sz, static_cast<uint32_t>(CONTAINER_HDR_ALIGNMENT));
 
 	if (sz > (p->size() - offset))
+	{
 		return p->size() - offset;
-
-	hdr = (struct rom_container *)(p->data() + offset + sz);
+	}
 
 	return sz;
 }
