@@ -71,13 +71,13 @@ int get_console_width();
 int auto_complete(int argc, char**argv);
 void print_autocomplete_help();
 
-char g_sample_cmd_list[] = {
+static char g_sample_cmd_list[] = {
 #include "uuu.clst"
 };
 
-vector<string> g_usb_path_filter;
+static vector<string> g_usb_path_filter;
 
-int g_verbose = 0;
+static int g_verbose = 0;
 static bool g_start_usb_transfer;
 
 class AutoCursor
@@ -105,7 +105,7 @@ public:
 	{
 		va_list args;
 		va_start(args, fmt);
-		size_t len = std::vsnprintf(NULL, 0, fmt, args);
+		size_t len = std::vsnprintf(nullptr, 0, fmt, args);
 		va_end(args);
 
 		this->resize(len);
@@ -182,11 +182,11 @@ void print_help(bool detail = false)
 
 int polling_usb(std::atomic<int>& bexit);
 
-int g_overall_status;
-int g_overall_okay;
-int g_overall_failure;
-char g_wait[] = "|/-\\";
-int g_wait_index;
+static int g_overall_status;
+static int g_overall_okay;
+static int g_overall_failure;
+static char g_wait[] = "|/-\\";
+static int g_wait_index;
 
 
 string build_process_bar(size_t width, size_t pos, size_t total)
@@ -388,7 +388,7 @@ public:
 			cout << "Download file:" << nt->str << endl;
 
 	}
-	void print(int verbose = 0, uuu_notify*nt=NULL)
+	void print(int verbose = 0, uuu_notify*nt = nullptr)
 	{
 		verbose ? print_verbose(nt) : print_simple();
 	}
@@ -477,7 +477,7 @@ return;
 };
 
 static map<string, ShowNotify> g_map_path_nt;
-mutex g_callback_mutex;
+static mutex g_callback_mutex;
 
 ShowNotify Summary(map<uint64_t, ShowNotify> *np)
 {
@@ -506,7 +506,7 @@ ShowNotify Summary(map<uint64_t, ShowNotify> *np)
 
 int progress(uuu_notify nt, void *p)
 {
-	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify>*)p;
+	map<uint64_t, ShowNotify> *np = reinterpret_cast<map<uint64_t, ShowNotify>*>(p);
 	map<string, ShowNotify>::iterator it;
 
 	std::lock_guard<std::mutex> lock(g_callback_mutex);
@@ -908,7 +908,7 @@ int main(int argc, char **argv)
 		printf("%sBuild in config:%s\n", g_vt_boldwhite, g_vt_default);
 		printf("\tPctl\t Chip\t\t Vid\t Pid\t BcdVersion\n");
 		printf("\t==================================================\n");
-		uuu_for_each_cfg(print_cfg, NULL);
+		uuu_for_each_cfg(print_cfg, nullptr);
 
 		if (!cmd_script.empty())
 			printf("\n%sRun built-in script:%s\n %s\n\n", g_vt_boldwhite, g_vt_default, cmd_script.c_str());
