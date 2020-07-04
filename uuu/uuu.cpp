@@ -168,52 +168,6 @@ static int g_overall_okay;
 static int g_overall_failure;
 static char g_wait[] = "|/-\\";
 static int g_wait_index;
-
-
-string build_process_bar(size_t width, size_t pos, size_t total)
-{
-	string str;
-	str.resize(width, ' ');
-	str[0] = '[';
-	str[width - 1] = ']';
-
-	if (total == 0)
-	{
-		if (pos == 0)
-			return str;
-
-		string_ex loc;
-		size_t s = pos / (1024 * 1024);
-		loc.format("%dM", s);
-		str.replace(1, loc.size(), loc);
-		return str;
-	}
-
-	size_t i;
-
-	if (pos > total)
-		pos = total;
-
-	for (i = 1; i < (width-2) * pos / total; i++)
-	{
-		str[i] = '=';
-	}
-
-	if (i > 1)
-		str[i] = '>';
-
-	if (pos == total)
-		str[str.size() - 2] = '=';
-
-	string_ex per;
-	per.format("%d%%", pos * 100 / total);
-	
-	size_t start = (width - per.size()) / 2;
-	str.replace(start, per.size(), per);
-	str.insert(start, g_vt_yellow);
-	str.insert(start + per.size() + strlen(g_vt_yellow), g_vt_default);
-	return str;
-}
 class ShowNotify
 {
 public:
@@ -440,7 +394,7 @@ public:
 				}
 				cout << str;
 			} else {
-				cout << build_process_bar(bar, m_trans_pos, m_trans_size);
+				cout << build_progress_bar(bar, m_trans_pos, m_trans_size, g_vt_yellow, g_vt_default);
 			}
 			cout << " ";
 			print_auto_scroll(m_cmd, width - bar - info-1, m_start_pos);
