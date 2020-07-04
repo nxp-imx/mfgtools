@@ -4,6 +4,12 @@
 #include <string>
 #include <vector>
 
+class AutoReactivateCursor
+{
+public:
+	~AutoReactivateCursor();
+};
+
 std::string build_progress_bar(size_t width, size_t pos, size_t total,
 	const char * vt_default, const char * vt_yellow);
 void print_auto_scroll(std::string str, size_t len, size_t start);
