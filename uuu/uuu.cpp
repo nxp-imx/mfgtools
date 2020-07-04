@@ -46,7 +46,7 @@
 #include "buildincmd.h"
 #include <streambuf>
 
-#include "../libuuu/libuuu.h"
+#include "libuuu.h"
 
 const char * g_vt_yellow = "\x1B[93m";
 const char * g_vt_default = "\x1B[0m";

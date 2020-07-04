@@ -1,5 +1,6 @@
 #include "print_helpers.h"
-#include "../libuuu/libuuu.h"
+
+#include "libuuu.h"
 
 #include <cstdio>
 #include <cstring>

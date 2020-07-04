@@ -48,7 +48,7 @@
     <ClInclude Include="..\libuuu\http.h" />
     <ClInclude Include="..\libuuu\libcomm.h" />
     <ClInclude Include="..\libuuu\liberror.h" />
-    <ClInclude Include="..\libuuu\libuuu.h" />
+    <ClInclude Include="..\libuuu\include\libuuu.h" />
     <ClInclude Include="..\libuuu\rominfo.h" />
     <ClInclude Include="..\libuuu\sdps.h" />
     <ClInclude Include="..\libuuu\sdp.h" />

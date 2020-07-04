@@ -45,7 +45,7 @@
 #include <signal.h>
 #include "buildincmd.h"
 
-#include "../libuuu/libuuu.h"
+#include "libuuu.h"
 
 #ifndef _MSC_VER
 #include <unistd.h>
