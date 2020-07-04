@@ -46,6 +46,7 @@
 #include "buildincmd.h"
 #include <streambuf>
 
+#include "libcomm.h"
 #include "libuuu.h"
 
 const char * g_vt_yellow = "\x1B[93m";
@@ -97,26 +98,6 @@ void ctrl_c_handle(int)
 
 	exit(1);
 }
-
-class string_ex : public std::string
-{
-public:
-	int format(const char *fmt, ...)
-	{
-		va_list args;
-		va_start(args, fmt);
-		size_t len = std::vsnprintf(nullptr, 0, fmt, args);
-		va_end(args);
-
-		this->resize(len);
-
-		va_start(args, fmt);
-		std::vsnprintf((char*)c_str(), len + 1, fmt, args);
-		va_end(args);
-
-		return 0;
-	}
-};
 
 void print_help(bool detail = false)
 {

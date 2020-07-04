@@ -46,7 +46,7 @@
     <ClInclude Include="..\libuuu\fastboot.h" />
     <ClInclude Include="..\libuuu\hidreport.h" />
     <ClInclude Include="..\libuuu\http.h" />
-    <ClInclude Include="..\libuuu\libcomm.h" />
+    <ClInclude Include="..\libuuu\include\libcomm.h" />
     <ClInclude Include="..\libuuu\liberror.h" />
     <ClInclude Include="..\libuuu\include\libuuu.h" />
     <ClInclude Include="..\libuuu\rominfo.h" />
