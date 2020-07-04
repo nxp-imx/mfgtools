@@ -9,6 +9,11 @@
 
 using namespace std;
 
+AutoReactivateCursor::~AutoReactivateCursor()
+{
+	printf("\x1b[?25h\n\n\n");
+}
+
 string build_progress_bar(size_t width, size_t pos, size_t total,
 	const char * vt_default, const char * vt_yellow)
 {

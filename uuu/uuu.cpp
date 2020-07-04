@@ -81,19 +81,10 @@ static vector<string> g_usb_path_filter;
 static int g_verbose = 0;
 static bool g_start_usb_transfer;
 
-class AutoCursor
-{
-public:
-	~AutoCursor()
-	{
-		printf("\x1b[?25h\n\n\n");
-	}
-};
-
 void ctrl_c_handle(int)
 {
 	do {
-		AutoCursor a;
+		AutoReactivateCursor a;
 	} while(0);
 
 	exit(1);
@@ -630,7 +621,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	AutoCursor a;
+	AutoReactivateCursor a;
 
 	print_version();
 
