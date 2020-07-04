@@ -18,7 +18,7 @@
     <ClInclude Include="..\libuuu\include\libuuu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libuuu\libcomm.h">
+    <ClInclude Include="..\libuuu\include\libcomm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\libuuu\cmd.h">
