@@ -59,15 +59,10 @@ static constexpr std::array<ROM_INFO, 15> g_RomInfo
 	ROM_INFO{ "SPL1",	 0x0,	     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP | ROM_INFO_HID_SDP_NO_MAX_PER_TRANS | ROM_INFO_AUTO_SCAN_UBOOT_POS},
 };
 
-const ROM_INFO * search_rom_info(const char *s)
+const ROM_INFO * search_rom_info(const std::string &s)
 {
-	if (s == nullptr) {
-		return nullptr;
-	}
-
-	const string s1{s};
 	for (const auto &rom_info : g_RomInfo) {
-		if (s1 == rom_info.m_name)
+		if (s == rom_info.m_name)
 		{
 			return &rom_info;
 		}
@@ -79,13 +74,17 @@ const ROM_INFO * search_rom_info(const char *s)
 const ROM_INFO * search_rom_info(const ConfigItem *item)
 {
 	if (item == nullptr)
+	{
 		return nullptr;
+	}
 
-	const ROM_INFO *p = search_rom_info(item->m_chip.c_str());
+	const ROM_INFO * const p = search_rom_info(item->m_chip);
 	if (p)
+	{
 		return p;
+	}
 
-	return search_rom_info(item->m_compatible.c_str());
+	return search_rom_info(item->m_compatible);
 }
 
 
