@@ -37,7 +37,6 @@
 #include <iomanip>
 #include <map>
 #include <mutex>
-#include <vector>
 #include <sstream>
 #include <fstream>
 #include <stdarg.h>
@@ -69,7 +68,6 @@ void clean_vt_color() noexcept
 using namespace std;
 
 int get_console_width();
-void print_oneline(string str);
 int auto_complete(int argc, char**argv);
 void print_autocomplete_help();
 
@@ -180,10 +178,6 @@ void print_help(bool detail = false)
 		pos += 1;
 		start = pos;
 	}
-}
-void print_version()
-{
-	printf("uuu (Universal Update Utility) for nxp imx chips -- %s\n\n", uuu_get_version_string());
 }
 
 int polling_usb(std::atomic<int>& bexit);
@@ -431,7 +425,7 @@ public:
 
 			str += g_wait[(g_wait_index++) & 0x3];
 
-			print_oneline(str);
+			print_oneline(str, get_console_width());
 			return ;
 		}
 		else
@@ -484,27 +478,6 @@ return;
 
 static map<string, ShowNotify> g_map_path_nt;
 mutex g_callback_mutex;
-
-void print_oneline(string str)
-{
-	size_t w = get_console_width();
-	if (w <= 3)
-		return;
-
-	if (str.size() >= w)
-	{
-		str.resize(w - 1);
-		str[str.size() - 1] = '.';
-		str[str.size() - 2] = '.';
-		str[str.size() - 3] = '.';
-	}
-	else
-	{
-		str.resize(w, ' ');
-	}
-	cout << str << endl;
-
-}
 
 ShowNotify Summary(map<uint64_t, ShowNotify> *np)
 {
@@ -566,13 +539,14 @@ int progress(uuu_notify nt, void *p)
 					str += g_usb_path_filter[i] + " ";
 			}
 
-			print_oneline(str);
-			print_oneline("");
+			const int console_width = get_console_width();
+			print_oneline(str, console_width);
+			print_oneline("", console_width);
 			if ((*np)[nt.id].m_dev == "Prep" && !g_start_usb_transfer)
 			{
 				Summary(np).print();
 			}else
-				print_oneline("");
+				print_oneline("", console_width);
 
 			for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
 				it->second.print();
@@ -641,15 +615,6 @@ int get_console_width()
 	return w.ws_col;
 }
 #endif
-void print_usb_filter()
-{
-	if (!g_usb_path_filter.empty())
-	{
-		cout << " at path ";
-		for (size_t i = 0; i < g_usb_path_filter.size(); i++)
-			cout << g_usb_path_filter[i] << " ";
-	}
-}
 
 int runshell(int shell)
 {
@@ -713,24 +678,6 @@ int runshell(int shell)
 	}
 
 	return -1;
-}
-
-void print_udev()
-{
-	uuu_for_each_cfg(print_udev_rule, NULL);
-	fprintf(stderr, "\n1: put above udev run into /etc/udev/rules.d/99-uuu.rules\n");
-	fprintf(stderr, "\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/99-uuu.rules\"\n");
-	fprintf(stderr, "2: update udev rule\n");
-	fprintf(stderr, "\tsudo udevadm control --reload-rules\n");
-}
-
-void print_lsusb()
-{
-	cout << "Connected Known USB Devices\n";
-	printf("\tPath\t Chip\t Pro\t Vid\t Pid\t BcdVersion\n");
-	printf("\t==================================================\n");
-
-	uuu_for_each_devices(print_usb_device, NULL);
 }
 
 int main(int argc, char **argv)
@@ -969,13 +916,13 @@ int main(int argc, char **argv)
 		if (!shell)
 			cout << "Wait for Known USB Device Appear...";
 
-		print_usb_filter();
+		print_usb_filter(g_usb_path_filter);
 
 		printf("\n");
 	}
 	else {
 		cout << "Wait for Known USB Device Appear...";
-		print_usb_filter();
+		print_usb_filter(g_usb_path_filter);
 		cout << "\r";
 		cout << "\x1b[?25l";
 		cout.flush();

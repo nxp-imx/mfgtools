@@ -1,4 +1,5 @@
 #include "print_helpers.h"
+#include "../libuuu/libuuu.h"
 
 #include <cstdio>
 #include <cstring>
@@ -41,6 +42,45 @@ int print_cfg(const char *pro, const char * chip, const char * /*compatible*/,
 	return 0;
 }
 
+void print_lsusb()
+{
+	cout << "Connected Known USB Devices\n";
+	printf("\tPath\t Chip\t Pro\t Vid\t Pid\t BcdVersion\n");
+	printf("\t==================================================\n");
+
+	uuu_for_each_devices(print_usb_device, nullptr);
+}
+
+void print_oneline(string str, int console_width)
+{
+	size_t w = static_cast<size_t>(console_width);
+	if (w <= 3)
+		return;
+
+	if (str.size() >= w)
+	{
+		str.resize(w - 1);
+		str[str.size() - 1] = '.';
+		str[str.size() - 2] = '.';
+		str[str.size() - 3] = '.';
+	}
+	else
+	{
+		str.resize(w, ' ');
+	}
+	cout << str << endl;
+
+}
+
+void print_udev()
+{
+	uuu_for_each_cfg(print_udev_rule, nullptr);
+	fprintf(stderr, "\n1: put above udev run into /etc/udev/rules.d/99-uuu.rules\n");
+	fprintf(stderr, "\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/99-uuu.rules\"\n");
+	fprintf(stderr, "2: update udev rule\n");
+	fprintf(stderr, "\tsudo udevadm control --reload-rules\n");
+}
+
 int print_udev_rule(const char * /*pro*/, const char * /*chip*/, const char * /*compatible*/,
 	uint16_t vid, uint16_t pid, uint16_t /*bcdmin*/, uint16_t /*bcdmax*/, void * /*p*/)
 {
@@ -54,4 +94,22 @@ int print_usb_device(const char *path, const char *chip, const char *pro,
 {
 	printf("\t%s\t %s\t %s\t 0x%04X\t0x%04X\t 0x%04X\n", path, chip, pro, vid, pid, bcd);
 	return 0;
+}
+
+void print_usb_filter(const vector<string> &usb_path_filters)
+{
+	if (!usb_path_filters.empty())
+	{
+		cout << " at path ";
+		for (const auto &usb_path_filter : usb_path_filters)
+		{
+			cout << usb_path_filter << " ";
+		}
+	}
+}
+
+void print_version()
+{
+	printf("uuu (Universal Update Utility) for nxp imx chips -- %s\n\n",
+		uuu_get_version_string());
 }
