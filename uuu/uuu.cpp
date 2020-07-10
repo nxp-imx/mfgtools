@@ -756,7 +756,7 @@ int main(int argc, char **argv)
 
 					tmpCmd.m_desc = "Script loaded from file";
 
-					BuildInScript tmpBuildInScript(&tmpCmd);
+					BuildInScript tmpBuildInScript(tmpCmd);
 					g_BuildScripts[tmpCmdFileName] = tmpBuildInScript;
 
 					cmd_script = g_BuildScripts[tmpCmdFileName].replace_script_args(args);

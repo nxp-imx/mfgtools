@@ -31,52 +31,55 @@
 
 #include "buildincmd.h"
 
-BuildCmd g_buildin_cmd[] =
+constexpr BuildCmd::BuildCmd(const char * const cmd, const char * const buildcmd,
+	const char * const desc) :
+	m_cmd{cmd},
+	m_buildcmd{buildcmd},
+	m_desc{desc}
 {
-	{
+}
+
+static constexpr std::array<const BuildCmd, 8> g_buildin_cmd
+{
+	BuildCmd{
 		"emmc",
 #include "emmc_burn_loader.clst"
 		,"burn boot loader to eMMC boot partition"
 	},
-	{
+	BuildCmd{
 		"emmc_all",
 #include "emmc_burn_all.clst"
 		,"burn whole image to eMMC"
 	},
-	{
+	BuildCmd{
 		"fat_write",
 #include "fat_write.clst"
 		,"update one file in fat partition, require uboot fastboot running in board"
 	},
-	{
+	BuildCmd{
 		"nand",
 #include "nand_burn_loader.clst"
 		,"burn boot loader to NAND flash"
 	},
-	{
+	BuildCmd{
 		"qspi",
 #include "qspi_burn_loader.clst"
 		,"burn boot loader to qspi nor flash"
 	},
-	{
+	BuildCmd{
 		"sd",
 #include "sd_burn_loader.clst"
 		,"burn boot loader to sd card"
 	},
-	{
+	BuildCmd{
 		"sd_all",
 #include "sd_burn_all.clst"
 		,"burn whole image to sd card"
 	},
-	{
+	BuildCmd{
 		"spl",
 #include "spl_boot.clst"
 		,"boot spl and uboot"
-	},
-	{
-		NULL,
-		NULL,
-		NULL,
 	}
 };
 

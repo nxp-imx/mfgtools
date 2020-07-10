@@ -45,6 +45,10 @@ extern const char * g_vt_boldwhite ;
 
 struct BuildCmd
 {
+	BuildCmd() = default;
+	constexpr BuildCmd(const char * const cmd, const char * const buildcmd,
+		const char * const desc);
+
 	const char *m_cmd;
 	const char *m_buildcmd;
 	const char *m_desc;
@@ -93,13 +97,13 @@ public:
 		return false;
 	}
 	BuildInScript() {};
-	BuildInScript(BuildCmd*p)
+	BuildInScript(const BuildCmd &p)
 	{
-		m_script = p->m_buildcmd;
-		if(p->m_desc)
-			m_desc = p->m_desc;
-		if(p->m_cmd)
-			m_cmd = p->m_cmd;
+		m_script = p.m_buildcmd;
+		if(p.m_desc)
+			m_desc = p.m_desc;
+		if(p.m_cmd)
+			m_cmd = p.m_cmd;
 
 		for (size_t i = 1; i < m_script.size(); i++)
 		{
@@ -236,13 +240,11 @@ public:
 class BuildInScriptVector : public std::map<std::string, BuildInScript>
 {
 public:
-	BuildInScriptVector(BuildCmd*p)
+	BuildInScriptVector(const std::array<const BuildCmd, 8> &build_cmds)
 	{
-		while (p->m_cmd)
-		{
-			BuildInScript one(p);
+		for (const auto &build_cmd : build_cmds) {
+			BuildInScript one{build_cmd};
 			(*this)[one.m_cmd] = one;
-			p++;
 		}
 	}
 
