@@ -28,14 +28,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
+
 #pragma once
 
+#include <locale>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include <locale>
-
-using namespace std;
 
 extern const char * g_vt_yellow ;
 extern const char * g_vt_default ;
@@ -54,10 +53,10 @@ struct BuildCmd
 class Arg
 {
 public:
-	string m_arg;
-	string m_desc;
+	std::string m_arg;
+	std::string m_desc;
 	uint32_t m_flags;
-	string m_options;
+	std::string m_options;
 	enum
 	{
 		ARG_MUST = 0x1,
@@ -65,11 +64,11 @@ public:
 		ARG_OPTION_KEY = 0x4,
 	};
 	Arg() {	m_flags = ARG_MUST;	}
-	int parser(string option)
+	int parser(std::string option)
 	{
 		size_t pos;
 		pos = option.find('[');
-		if (pos == string::npos)
+		if (pos == std::string::npos)
 			return 0;
 		m_options = option.substr(pos + 1, option.find(']') - pos - 1);
 		m_flags = ARG_OPTION | ARG_OPTION_KEY;
@@ -80,11 +79,11 @@ public:
 class BuildInScript
 {
 public:
-	string m_script;
-	string m_desc;
-	string m_cmd;
-	vector<Arg> m_args;
-	bool find_args(string arg)
+	std::string m_script;
+	std::string m_desc;
+	std::string m_cmd;
+	std::vector<Arg> m_args;
+	bool find_args(std::string arg)
 	{
 		for (size_t i = 0; i < m_args.size(); i++)
 		{
@@ -106,7 +105,7 @@ public:
 		{
 			size_t off;
 			size_t off_tab;
-			string param;
+			std::string param;
 			if (m_script[i] == '_' 
 				&& (m_script[i - 1] == '@' || m_script[i - 1] == ' '))
 			{
@@ -118,7 +117,7 @@ public:
 				if (ofn < off)
 					off = ofn;
 
-				if (off == string::npos)
+				if (off == std::string::npos)
 					off = m_script.size() + 1;
 
 				param = m_script.substr(i, off - i);
@@ -135,15 +134,15 @@ public:
 		for (size_t i = 0; i < m_args.size(); i++)
 		{
 			size_t pos = 0;
-			string str;
+			std::string str;
 			str += "@";
 			str += m_args[i].m_arg;
 			pos = m_script.find(str);
-			if (pos != string::npos) {
-				string def;
+			if (pos != std::string::npos) {
+				std::string def;
 				size_t start_descript;
 				start_descript = m_script.find('|', pos);
-				if (start_descript != string::npos)
+				if (start_descript != std::string::npos)
 				{
 					m_args[i].m_desc = m_script.substr(start_descript + 1,
 											m_script.find('\n', start_descript) - start_descript - 1);
@@ -164,7 +163,7 @@ public:
 		printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_cmd.c_str(), g_vt_default,  m_desc.c_str());
 		for (size_t i=0; i < m_args.size(); i++)
 		{
-			string desc;
+			std::string desc;
 			desc += m_args[i].m_arg;
 			if (m_args[i].m_flags & Arg::ARG_OPTION)
 			{
@@ -178,10 +177,10 @@ public:
 		}
 	}
 
-	inline string str_to_upper(string str)
+	inline std::string str_to_upper(std::string str)
 	{
 		std::locale loc;
-		string s;
+		std::string s;
 
 		for (size_t i = 0; i < str.size(); i++)
 			s.push_back(std::toupper(str[i], loc));
@@ -189,7 +188,7 @@ public:
 		return s;
 	}
 
-	string replace_str(string str, string key, string replace)
+	std::string replace_str(std::string str, std::string key, std::string replace)
 	{
 		if (replace.size() > 4)
 		{
@@ -199,7 +198,7 @@ public:
 			}
 		}
 
-		for (size_t j = 0; (j = str.find(key, j)) != string::npos;)
+		for (size_t j = 0; (j = str.find(key, j)) != std::string::npos;)
 		{
 			str.replace(j, key.size(), replace);
 			j += key.size();
@@ -207,9 +206,9 @@ public:
 		return str;
 	}
 
-	string replace_script_args(vector<string> args)
+	std::string replace_script_args(std::vector<std::string> args)
 	{
-		string script = m_script;
+		std::string script = m_script;
 		for (size_t i = 0; i < args.size() && i < m_args.size(); i++)
 		{
 			script = replace_str(script, m_args[i].m_arg, args[i]);
@@ -234,7 +233,7 @@ public:
 	}
 };
 
-class BuildInScriptVector : public map<string, BuildInScript>
+class BuildInScriptVector : public std::map<std::string, BuildInScript>
 {
 public:
 	BuildInScriptVector(BuildCmd*p)
@@ -270,7 +269,7 @@ public:
 		printf(">");
 	}
 
-	void PrintAutoComplete(string match, const char *space=" " )
+	void PrintAutoComplete(std::string match, const char *space=" " )
 	{
 		for (auto iCol = begin(); iCol != end(); ++iCol)
                 {
