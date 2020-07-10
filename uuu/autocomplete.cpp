@@ -54,6 +54,8 @@
 #include <Windows.h>
 #endif
 
+using namespace std;
+
 void linux_auto_arg(const char *space = " ", const char * filter = "")
 {
 	string str = filter;
