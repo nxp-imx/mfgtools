@@ -97,24 +97,26 @@ int Arg::parser(string option)
 	return 0;
 }
 
-BuildInScript::BuildInScript(const BuildCmd &p)
+BuildInScript::BuildInScript(const BuildCmd &p) :
+	m_script{p.m_buildcmd}
 {
-	m_script = p.m_buildcmd;
-	if(p.m_desc)
+	if (p.m_desc)
+	{
 		m_desc = p.m_desc;
-	if(p.m_cmd)
+	}
+	if (p.m_cmd)
+	{
 		m_cmd = p.m_cmd;
+	}
 
 	for (size_t i = 1; i < m_script.size(); i++)
 	{
-		size_t off;
-		size_t off_tab;
-		std::string param;
+		string param;
 		if (m_script[i] == '_'
 			&& (m_script[i - 1] == '@' || m_script[i - 1] == ' '))
 		{
-			off = m_script.find(' ', i);
-			off_tab = m_script.find('\t', i);
+			size_t off = m_script.find(' ', i);
+			size_t off_tab = m_script.find('\t', i);
 			size_t ofn = m_script.find('\n', i);
 			if (off_tab < off)
 				off = off_tab;
@@ -157,11 +159,11 @@ BuildInScript::BuildInScript(const BuildCmd &p)
 	}
 }
 
-bool BuildInScript::find_args(string arg)
+bool BuildInScript::find_args(const string &arg) const
 {
-	for (size_t i = 0; i < m_args.size(); i++)
+	for (const auto &arg_ref : m_args)
 	{
-		if (m_args[i].m_arg == arg)
+		if (arg_ref.m_arg == arg)
 		{
 			return true;
 		}
@@ -171,7 +173,7 @@ bool BuildInScript::find_args(string arg)
 
 string BuildInScript::replace_script_args(vector<string> args)
 {
-	std::string script = m_script;
+	string script{m_script};
 	for (size_t i = 0; i < args.size() && i < m_args.size(); i++)
 	{
 		script = replace_str(script, m_args[i].m_arg, args[i]);
@@ -195,7 +197,7 @@ string BuildInScript::replace_script_args(vector<string> args)
 	return script;
 }
 
-string BuildInScript::replace_str(string str, string key, string replace)
+string BuildInScript::replace_str(string str, const string &key, string replace)
 {
 	if (replace.size() > 4)
 	{
@@ -213,13 +215,12 @@ string BuildInScript::replace_str(string str, string key, string replace)
 	return str;
 }
 
-void BuildInScript::show_cmd()
+void BuildInScript::show_cmd() const
 {
 	printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_cmd.c_str(), g_vt_default,  m_desc.c_str());
-	for (size_t i=0; i < m_args.size(); i++)
+	for (size_t i = 0; i < m_args.size(); i++)
 	{
-		std::string desc;
-		desc += m_args[i].m_arg;
+		string desc{m_args[i].m_arg};
 		if (m_args[i].m_flags & Arg::ARG_OPTION)
 		{
 			desc += g_vt_boldwhite;
@@ -228,14 +229,15 @@ void BuildInScript::show_cmd()
 		}
 		desc += " ";
 		desc += m_args[i].m_desc;
-		printf("\t\targ%d: %s\n", (int)i, desc.c_str());
+		printf("\t\targ%d: %s\n", static_cast<int>(i), desc.c_str());
 	}
 }
 
-string BuildInScript::str_to_upper(string str)
+string BuildInScript::str_to_upper(const string &str)
 {
-	std::locale loc;
+	const std::locale loc;
 	std::string s;
+	s.reserve(str.size());
 
 	for (size_t i = 0; i < str.size(); i++)
 	{
@@ -253,35 +255,37 @@ BuildInScriptVector::BuildInScriptVector(const array<const BuildCmd, 8> &build_c
 	}
 }
 
-void BuildInScriptVector::PrintAutoComplete(string match, const char *space)
+void BuildInScriptVector::PrintAutoComplete(const string &match, const char *space)
 {
-	for (auto iCol = begin(); iCol != end(); ++iCol)
+	for (const auto &str_n_script : *this)
 	{
-		if(iCol->first.substr(0, match.size()) == match)
+		if(str_n_script.first.substr(0, match.size()) == match)
 		{
-			printf("%s%s\n", iCol->first.c_str(), space);
+			printf("%s%s\n", str_n_script.first.c_str(), space);
 		}
 	}
 }
 
-void BuildInScriptVector::ShowAll()
+void BuildInScriptVector::ShowAll() const
 {
-	for (auto iCol = begin(); iCol != end(); ++iCol)
+	for (const auto &str_n_script : *this)
 	{
-		iCol->second.show_cmd();
+		str_n_script.second.show_cmd();
 	}
 }
 
-void BuildInScriptVector::ShowCmds()
+void BuildInScriptVector::ShowCmds() const
 {
 	printf("<");
-	for (auto iCol = begin(); iCol != end(); ++iCol)
+	for (auto iCol = cbegin(); iCol != cend(); ++iCol)
 	{
+		// Print the current command's name
 		printf("%s%s%s", g_vt_boldwhite, iCol->first.c_str(), g_vt_default);
 
+		// Check if it's the last command and if not print a separating bar
 		auto i = iCol;
-		i++;
-		if(i != end())
+		++i;
+		if(i != cend())
 		{
 			printf("|");
 		}

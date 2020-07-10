@@ -75,20 +75,21 @@ public:
 class BuildInScript
 {
 public:
-	bool find_args(std::string arg);
 	BuildInScript() {};
 	BuildInScript(const BuildCmd &p);
 
 	inline const std::string &get_cmd() const noexcept { return m_cmd; }
 	inline const std::string &get_script() const noexcept { return m_script; }
 	std::string replace_script_args(std::vector<std::string> args);
-	std::string replace_str(std::string str, std::string key, std::string replace);
 	inline void show() { printf("%s\n", m_script.c_str()); }
-	void show_cmd();
-	std::string str_to_upper(std::string str);
-
+	void show_cmd() const;
 
 private:
+	bool find_args(const std::string &arg) const;
+	static std::string replace_str(std::string str, const std::string &key, std::string replace);
+	static std::string str_to_upper(const std::string &str);
+
+
 	std::string m_script;
 	std::string m_desc;
 	std::string m_cmd;
@@ -100,9 +101,9 @@ class BuildInScriptVector : public std::map<std::string, BuildInScript>
 public:
 	BuildInScriptVector(const std::array<const BuildCmd, 8> &build_cmds);
 
-	void PrintAutoComplete(std::string match, const char *space=" " );
-	void ShowAll();
-	void ShowCmds();
+	void PrintAutoComplete(const std::string &match, const char *space=" " );
+	void ShowAll() const;
+	void ShowCmds() const;
 };
 
 extern BuildInScriptVector g_BuildScripts;
