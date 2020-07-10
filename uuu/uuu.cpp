@@ -777,7 +777,7 @@ int main(int argc, char **argv)
 				}
 				else
 				{
-					printf("%s", g_BuildScripts[argv[i + 1]].m_script.c_str());
+					printf("%s", g_BuildScripts[argv[i + 1]].get_script().c_str());
 					return 0;
 				}
 			}

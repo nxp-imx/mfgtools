@@ -83,10 +83,6 @@ public:
 class BuildInScript
 {
 public:
-	std::string m_script;
-	std::string m_desc;
-	std::string m_cmd;
-	std::vector<Arg> m_args;
 	bool find_args(std::string arg)
 	{
 		for (size_t i = 0; i < m_args.size(); i++)
@@ -156,6 +152,9 @@ public:
 			}
 		}
 	}
+
+	inline const std::string &get_cmd() const noexcept { return m_cmd; }
+	inline const std::string &get_script() const noexcept { return m_script; }
 
 	void show()
 	{
@@ -235,51 +234,22 @@ public:
 		}
 		return script;
 	}
+
+private:
+	std::string m_script;
+	std::string m_desc;
+	std::string m_cmd;
+	std::vector<Arg> m_args;
 };
 
 class BuildInScriptVector : public std::map<std::string, BuildInScript>
 {
 public:
-	BuildInScriptVector(const std::array<const BuildCmd, 8> &build_cmds)
-	{
-		for (const auto &build_cmd : build_cmds) {
-			BuildInScript one{build_cmd};
-			(*this)[one.m_cmd] = one;
-		}
-	}
+	BuildInScriptVector(const std::array<const BuildCmd, 8> &build_cmds);
 
-	void ShowAll()
-	{
-		for (auto iCol = begin(); iCol != end(); ++iCol)
-		{
-			iCol->second.show_cmd();
-		}
-	}
-
-	void ShowCmds()
-	{
-		printf("<");
-		for (auto iCol = begin(); iCol != end(); ++iCol)
-		{
-			printf("%s%s%s", g_vt_boldwhite, iCol->first.c_str(), g_vt_default);
-
-			auto i = iCol;
-			i++;
-			if(i != end())
-				printf("|");
-		}
-		printf(">");
-	}
-
-	void PrintAutoComplete(std::string match, const char *space=" " )
-	{
-		for (auto iCol = begin(); iCol != end(); ++iCol)
-                {
-			if(iCol->first.substr(0, match.size()) == match)
-				printf("%s%s\n", iCol->first.c_str(), space);
-		}
-	}
-
+	void PrintAutoComplete(std::string match, const char *space=" " );
+	void ShowAll();
+	void ShowCmds();
 };
 
 extern BuildInScriptVector g_BuildScripts;

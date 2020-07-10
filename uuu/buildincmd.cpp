@@ -31,6 +31,7 @@
 
 #include "buildincmd.h"
 
+using namespace std;
 constexpr BuildCmd::BuildCmd(const char * const cmd, const char * const buildcmd,
 	const char * const desc) :
 	m_cmd{cmd},
@@ -84,3 +85,47 @@ static constexpr std::array<const BuildCmd, 8> g_buildin_cmd
 };
 
 BuildInScriptVector g_BuildScripts(g_buildin_cmd);
+
+BuildInScriptVector::BuildInScriptVector(const array<const BuildCmd, 8> &build_cmds)
+{
+	for (const auto &build_cmd : build_cmds) {
+		BuildInScript one{build_cmd};
+		(*this)[one.get_cmd()] = one;
+	}
+}
+
+void BuildInScriptVector::PrintAutoComplete(string match, const char *space)
+{
+	for (auto iCol = begin(); iCol != end(); ++iCol)
+	{
+		if(iCol->first.substr(0, match.size()) == match)
+		{
+			printf("%s%s\n", iCol->first.c_str(), space);
+		}
+	}
+}
+
+void BuildInScriptVector::ShowAll()
+{
+	for (auto iCol = begin(); iCol != end(); ++iCol)
+	{
+		iCol->second.show_cmd();
+	}
+}
+
+void BuildInScriptVector::ShowCmds()
+{
+	printf("<");
+	for (auto iCol = begin(); iCol != end(); ++iCol)
+	{
+		printf("%s%s%s", g_vt_boldwhite, iCol->first.c_str(), g_vt_default);
+
+		auto i = iCol;
+		i++;
+		if(i != end())
+		{
+			printf("|");
+		}
+	}
+	printf(">");
+}
