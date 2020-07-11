@@ -72,10 +72,6 @@ int get_console_width();
 int auto_complete(int argc, char**argv);
 void print_autocomplete_help();
 
-static char g_sample_cmd_list[] = {
-#include "uuu.clst"
-};
-
 static vector<string> g_usb_path_filter;
 
 static int g_verbose = 0;
@@ -92,7 +88,10 @@ void ctrl_c_handle(int)
 
 void print_help(bool detail = false)
 {
-	const char help[] =
+	static char g_sample_cmd_list[] = {
+	#include "uuu.clst"
+	};
+	static constexpr char help[] =
 		"uuu [-d -m -v -V] <" "bootloader|cmdlists|cmd" ">\n\n"
 		"    bootloader  download bootloader to board by usb\n"
 		"    cmdlist     run all commands in cmdlist file\n"
