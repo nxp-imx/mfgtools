@@ -56,19 +56,25 @@ struct BuildCmd
 class Arg
 {
 public:
-	std::string m_arg;
-	std::string m_desc;
-	uint32_t m_flags;
-	std::string m_options;
 	enum
 	{
 		ARG_MUST = 0x1,
 		ARG_OPTION = 0x2,
 		ARG_OPTION_KEY = 0x4,
 	};
-	Arg() {	m_flags = ARG_MUST;	}
 
-	int parser(std::string option);
+	Arg(const std::string &arg) : m_arg{arg} {}
+
+	const std::string &get_arg() const noexcept { return m_arg; }
+	const std::string &get_options() const noexcept { return m_options; }
+	int parser(const std::string &option);
+
+	std::string m_desc;
+	uint32_t m_flags = ARG_MUST;
+
+private:
+	std::string m_arg;
+	std::string m_options;
 };
 
 class BuildInScript
