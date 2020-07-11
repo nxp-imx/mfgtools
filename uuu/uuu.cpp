@@ -29,6 +29,7 @@
 *
 */
 
+#include "autocomplete.h"
 #include "print_helpers.h"
 #include <iostream>
 #include <stdio.h>
@@ -69,8 +70,6 @@ void clean_vt_color() noexcept
 using namespace std;
 
 int get_console_width();
-int auto_complete(int argc, char**argv);
-void print_autocomplete_help();
 
 static vector<string> g_usb_path_filter;
 
