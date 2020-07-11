@@ -31,6 +31,8 @@
 
 #include "buildincmd.h"
 
+#include <locale>
+
 using namespace std;
 constexpr BuildCmd::BuildCmd(const char * const cmd, const char * const buildcmd,
 	const char * const desc) :
