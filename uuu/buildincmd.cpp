@@ -88,7 +88,7 @@ static constexpr std::array<const BuildCmd, 8> g_buildin_cmd
 
 BuildInScriptVector g_BuildScripts(g_buildin_cmd);
 
-int Arg::parser(string option)
+int Arg::parser(const string &option)
 {
 	size_t pos;
 	pos = option.find('[');
@@ -131,8 +131,7 @@ BuildInScript::BuildInScript(const BuildCmd &p) :
 			param = m_script.substr(i, off - i);
 			if (!find_args(param))
 			{
-				Arg a;
-				a.m_arg = param;
+				Arg a{param};
 				a.m_flags = Arg::ARG_MUST;
 				m_args.push_back(a);
 			}
@@ -144,7 +143,7 @@ BuildInScript::BuildInScript(const BuildCmd &p) :
 		size_t pos = 0;
 		std::string str;
 		str += "@";
-		str += m_args[i].m_arg;
+		str += m_args[i].get_arg();
 		pos = m_script.find(str);
 		if (pos != std::string::npos) {
 			std::string def;
@@ -165,7 +164,7 @@ bool BuildInScript::find_args(const string &arg) const
 {
 	for (const auto &arg_ref : m_args)
 	{
-		if (arg_ref.m_arg == arg)
+		if (arg_ref.get_arg() == arg)
 		{
 			return true;
 		}
@@ -178,7 +177,7 @@ string BuildInScript::replace_script_args(vector<string> args)
 	string script{m_script};
 	for (size_t i = 0; i < args.size() && i < m_args.size(); i++)
 	{
-		script = replace_str(script, m_args[i].m_arg, args[i]);
+		script = replace_str(script, m_args[i].get_arg(), args[i]);
 	}
 
 	//handle option args;
@@ -188,9 +187,9 @@ string BuildInScript::replace_script_args(vector<string> args)
 		{
 			for (size_t j = 0; j < args.size(); j++)
 			{
-				if (m_args[j].m_arg == m_args[i].m_options)
+				if (m_args[j].get_arg() == m_args[i].get_options())
 				{
-					script = replace_str(script, m_args[i].m_arg, args[j]);
+					script = replace_str(script, m_args[i].get_arg(), args[j]);
 					break;
 				}
 			}
@@ -222,7 +221,7 @@ void BuildInScript::show_cmd() const
 	printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_cmd.c_str(), g_vt_default,  m_desc.c_str());
 	for (size_t i = 0; i < m_args.size(); i++)
 	{
-		string desc{m_args[i].m_arg};
+		string desc{m_args[i].get_arg()};
 		if (m_args[i].m_flags & Arg::ARG_OPTION)
 		{
 			desc += g_vt_boldwhite;
