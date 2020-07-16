@@ -29,6 +29,8 @@
 *
 */
 
+#include <regex>
+#include <iterator>
 #include <memory>
 #include <string.h>
 #include "cmd.h"
@@ -448,6 +450,7 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["_ALL:SH"] = new_cmd_obj<CmdShell>;
 	(*this)["_ALL:SHELL"] = new_cmd_obj<CmdShell>;
 	(*this)["_ALL:<"] = new_cmd_obj<CmdShell>;
+	(*this)["_ALL:@"] = new_cmd_obj<CmdEnv>;
 
 }
 
@@ -669,6 +672,69 @@ int CmdShell::run(CmdCtx*pCtx)
 	}
 
 	return 0;
+}
+
+int CmdEnv::parser(char *p)
+{
+	if (p)
+		m_cmd = p;
+
+	size_t pos = 0;
+
+	if (parser_protocal(p, pos))
+		return -1;
+	if (pos == string::npos || pos >= m_cmd.size())
+		return -1;
+
+	m_unfold_cmd = m_cmd.substr(0, pos);
+
+	// read the '@'
+	get_next_param(m_cmd, pos);
+
+	auto cmd = m_cmd.substr(pos);
+
+	regex expr { "@[0-9a-zA-Z_]+@" };
+	smatch result;
+	if (!regex_search(cmd, result, expr)) {
+		set_last_err_string("no variable found in: " + cmd);
+		return -1;
+	}
+
+	auto last_pos = static_cast<const string&>(cmd).begin();
+	for (auto &i : result) {
+		string key { i.first + 1, i.second - 1 };
+		auto value = [&key]() -> pair<bool, string> {
+#ifndef WIN32
+			auto ptr = getenv(key.c_str());
+			if (ptr)
+				return {true, ptr};
+			return {false, {}};
+#else
+			size_t len;
+			getenv_s(&len, nullptr, 0, key.c_str());
+			if (!len)
+				return {false, {}};
+			string value(len, '\0');
+			getenv_s(&len, &value[0], len, key.c_str());
+			return {true, value};
+#endif
+		}();
+		if (!value.first) {
+			set_last_err_string("variable '" + key + "' is not defined");
+			return -1;
+		}
+		m_unfold_cmd.append(&*last_pos, distance(last_pos, i.first));
+		m_unfold_cmd.append(value.second);
+		last_pos = i.second;
+	}
+	m_unfold_cmd.append(&*last_pos);
+
+	return 0;
+}
+
+int CmdEnv::run(CmdCtx *p)
+{
+	return run_cmd(p, m_unfold_cmd.c_str(), 0);
 }
 
 int run_cmds(const char *procotal, CmdCtx *p)
