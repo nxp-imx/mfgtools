@@ -203,6 +203,14 @@ public:
 	FBEraseCmd(char *p) : FBCmd(p, "erase") {}
 };
 
+
+class FBRebootCmd : public FBCmd
+{
+public:
+	FBRebootCmd(char *p) : FBCmd(p, "reboot") {}
+};
+
+
 class FBSetActiveCmd : public FBCmd
 {
 public:
