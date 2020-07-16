@@ -368,7 +368,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		}
 		if (pIvt == nullptr)
 		{
-			set_last_err_string("Can find validate IVT header");
+			set_last_err_string("Cannot find valid IVT header");
 			return -1;
 		}
 

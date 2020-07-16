@@ -666,7 +666,7 @@ int CmdShell::run(CmdCtx*pCtx)
 	}
 	else
 	{
-		set_last_err_string("Error: Failed to read the pipe to the end.\n");
+		set_last_err_string("Error: Failed to read the end of the pipe.\n");
 		return -1;
 	}
 
@@ -799,7 +799,7 @@ int check_version(string str)
 	if (ver > cur)
 	{
 		string str;
-		str = "Current uuu version is too low, please download latest one";
+		str = "This version of uuu is too old, please download the latest one";
 		set_last_err_string(str);
 		return -1;
 	}
