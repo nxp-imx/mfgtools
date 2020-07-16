@@ -152,6 +152,18 @@ private:
 	std::string m_shellcmd;
 };
 
+class CmdEnv : public CmdBase
+{
+public:
+	using CmdBase::CmdBase;
+
+	int parser(char *p = nullptr) override;
+	int run(CmdCtx *p) override;
+
+private:
+	std::string m_unfold_cmd;
+};
+
 class CmdList : public std::vector<std::shared_ptr<CmdBase>>
 {
 public:
