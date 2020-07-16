@@ -136,6 +136,7 @@ void print_help(bool detail = false)
 		"    -m          USBPATH Only monitor these paths.\n"
 		"                    -m 1:2 -m 1:3\n\n"
 		"    -t          Timeout second for wait known usb device appeared\n"
+		"    -e          set environment variable key=value\n"
 		"    -pp         usb polling period in milliseconds\n"
 		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
 		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
@@ -876,6 +877,18 @@ int main(int argc, char **argv)
 			{
 				print_lsusb();
 				return 0;
+			}
+			else if (s == "-e")
+			{
+#ifndef WIN32
+	#define _putenv putenv
+#endif
+				i++;
+				if (_putenv(argv[i]))
+				{
+					printf("error, failed to set '%s', environment parameter must have the from key=value\n", argv[i]);
+					return -1;
+				}
 			}
 			else if (s == "-b" || s == "-brun")
 			{
