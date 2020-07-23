@@ -70,6 +70,15 @@ Note that, since uuu is an OSI compliant Open Source project, you are entitled t
 - cmake .
 - make
 
+## macOS
+- git clone https://github.com/NXPmicro/mfgtools.git
+- cd mfgtools
+- brew install libusb libzip pkg-config cmake openssl
+- cmake .
+- make
+
+Note that we assume [brew](https://brew.sh) is installed and can be used to resolve dependencies as shown above. The remaining dependency `libbz2` can be resolved via the X-Code supplied libraries.
+
 # Run environment
  - Windows 10 64 bit
  - Linux (Ubuntu) 64 bit
