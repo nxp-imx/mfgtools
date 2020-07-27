@@ -13,13 +13,6 @@ if (STATIC)
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 endif()
 
-if (APPLE)
-    # This is a bug in CMake that causes it to prefer the system version over
-    # the one in the specified ROOT folder.
-    set(OPENSSL_ROOT_DIR ${OPENSSL_ROOT_DIR} /usr/local/Cellar/openssl@1.1/1.1.1g/)
-    set(OPENSSL_CRYPTO_LIBRARY ${OPENSSL_ROOT_DIR}/lib/libcrypto.dylib CACHE FILEPATH "" FORCE)
-    set(OPENSSL_SSL_LIBRARY ${OPENSSL_ROOT_DIR}/lib/libssl.dylib CACHE FILEPATH "" FORCE)
-endif()
 find_package(OpenSSL)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O2 -no-pie")
