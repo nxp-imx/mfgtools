@@ -82,7 +82,6 @@ Note that we assume [brew](https://brew.sh) is installed and can be used to reso
 # Run environment
  - Windows 10 64 bit
  - Linux (Ubuntu) 64 bit
- - macOS (Catalina)
  - 32 bit systems will have problems with big files.
 
 # License
