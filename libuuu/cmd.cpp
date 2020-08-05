@@ -689,6 +689,7 @@ int CmdEnv::parser(char *p)
 		return -1;
 
 	m_unfold_cmd = m_cmd.substr(0, pos);
+	m_unfold_cmd.append(" ");
 
 	// read the '@'
 	get_next_param(m_cmd, pos);
@@ -697,37 +698,38 @@ int CmdEnv::parser(char *p)
 
 	regex expr { "@[0-9a-zA-Z_]+@" };
 	smatch result;
-	if (!regex_search(cmd, result, expr)) {
-		set_last_err_string("no variable found in: " + cmd);
-		return -1;
-	}
-
 	auto last_pos = static_cast<const string&>(cmd).begin();
-	for (auto &i : result) {
-		string key { i.first + 1, i.second - 1 };
-		auto value = [&key]() -> pair<bool, string> {
+	auto cmd_end = static_cast<const string&>(cmd).end();
+	while (regex_search(last_pos, cmd_end, result, expr)) {
+		for (auto &i : result) {
+			string key { i.first + 1, i.second - 1 };
+			auto value = [&key]() -> pair<bool, string> {
 #ifndef WIN32
-			auto ptr = getenv(key.c_str());
-			if (ptr)
-				return {true, ptr};
-			return {false, {}};
-#else
-			size_t len;
-			getenv_s(&len, nullptr, 0, key.c_str());
-			if (!len)
+				auto ptr = getenv(key.c_str());
+				if (ptr)
+					return {true, ptr};
 				return {false, {}};
-			string value(len, '\0');
-			getenv_s(&len, &value[0], len, key.c_str());
-			return {true, value};
+#else
+				size_t len;
+				getenv_s(&len, nullptr, 0, key.c_str());
+				if (!len)
+					return {false, {}};
+				string value(len, '\0');
+				getenv_s(&len, &value[0], len, key.c_str());
+				return {true, value};
 #endif
-		}();
-		if (!value.first) {
-			set_last_err_string("variable '" + key + "' is not defined");
-			return -1;
+			}();
+			if (!value.first) {
+				set_last_err_string("variable '" + key + "' is not defined");
+				return -1;
+			}
+			auto begin = value.second.begin();
+			auto end = value.second.end();
+			auto pos = find_if(begin, end, [](char c){ return c == '\r' || c == '\n'; });
+			m_unfold_cmd.append(&*last_pos, distance(last_pos, i.first));
+			m_unfold_cmd.append(begin, pos);
+			last_pos = i.second;
 		}
-		m_unfold_cmd.append(&*last_pos, distance(last_pos, i.first));
-		m_unfold_cmd.append(value.second);
-		last_pos = i.second;
 	}
 	m_unfold_cmd.append(&*last_pos);
 
