@@ -714,7 +714,7 @@ int CmdEnv::parser(char *p)
 				getenv_s(&len, nullptr, 0, key.c_str());
 				if (!len)
 					return {false, {}};
-				string value(len, '\0');
+				string value(len-1, '\0');
 				getenv_s(&len, &value[0], len, key.c_str());
 				return {true, value};
 #endif
