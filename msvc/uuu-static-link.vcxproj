@@ -149,12 +149,6 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
-    <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -202,12 +196,6 @@ type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\n
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
-    <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
     <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
@@ -262,12 +250,6 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
-    <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -320,12 +302,6 @@ type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\n
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
-    <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
     <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
