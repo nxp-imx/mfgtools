@@ -81,27 +81,27 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>..\$(Platform)\$(Configuration)\lib</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
     <TargetName>uuu</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
-    <OutDir>..\$(Platform)\$(Configuration)\lib</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
     <TargetName>uuu</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>..\$(Platform)\$(Configuration)\lib</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
     <TargetName>uuu</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
-    <OutDir>..\$(Platform)\$(Configuration)\lib</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
     <TargetName>uuu</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
