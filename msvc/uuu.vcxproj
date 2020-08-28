@@ -81,24 +81,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>..\$(Platform)\$(Configuration)\dll</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
-    <OutDir>..\$(Platform)\$(Configuration)\dll</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>..\$(Platform)\$(Configuration)\dll</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
-    <OutDir>..\$(Platform)\$(Configuration)\dll</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -144,14 +144,11 @@ type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\n
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst</Command>
     </PreBuildEvent>
     <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
-    <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy /y "$(SolutionDir)..\libusb\$(Platform)\$(Configuration)\dll\*.dll" $(Platform)\$(Configuration)\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -197,14 +194,11 @@ type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\n
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst</Command>
     </PreBuildEvent>
     <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
-    <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy /y "$(SolutionDir)..\libusb\$(Platform)\$(Configuration)\dll\*.dll" $(Platform)\$(Configuration)\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -255,14 +249,11 @@ type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\n
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst</Command>
     </PreBuildEvent>
     <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
-    <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy /y "$(SolutionDir)..\libusb\$(Platform)\$(Configuration)\dll\*.dll" $(Platform)\$(Configuration)\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -313,14 +304,11 @@ type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\n
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst</Command>
     </PreBuildEvent>
     <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
-    <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>copy /y "$(SolutionDir)..\libusb\$(Platform)\$(Configuration)\dll\*.dll" $(Platform)\$(Configuration)\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

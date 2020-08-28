@@ -66,7 +66,7 @@ Note that, since uuu is an OSI compliant Open Source project, you are entitled t
 ## Linux
 - git clone https://github.com/NXPmicro/mfgtools.git
 - cd mfgtools
-- sudo apt-get install libusb-1.0-0-dev libzip-dev libbz2-dev pkg-config cmake libssl-dev
+- sudo apt-get install libusb-1.0-0-dev libzip-dev libbz2-dev pkg-config cmake libssl-dev g++
 - cmake .
 - make
 

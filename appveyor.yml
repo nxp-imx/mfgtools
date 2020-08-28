@@ -70,7 +70,7 @@ build_script:
 
 - cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu-static-link.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
-- cmd: if exist %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\x64\release\lib\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
+- cmd: if exist %APPVEYOR_BUILD_FOLDER%\msvc\x64\release\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\msvc\x64\release\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
    
 - sh: cmake -D 'STATIC=1' .
 - sh: make

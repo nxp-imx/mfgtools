@@ -81,27 +81,27 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>..\$(Platform)\$(Configuration)\lib</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
     <TargetName>uuu</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
-    <OutDir>..\$(Platform)\$(Configuration)\lib</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
     <TargetName>uuu</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>..\$(Platform)\$(Configuration)\lib</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
     <TargetName>uuu</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
-    <OutDir>..\$(Platform)\$(Configuration)\lib</OutDir>
+    <OutDir>$(Platform)\$(Configuration)</OutDir>
     <TargetName>uuu</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -148,12 +148,6 @@ type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\n
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
-    <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
     <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
@@ -202,12 +196,6 @@ type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\n
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
-    <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
     <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
@@ -262,12 +250,6 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
     <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
-    <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -320,12 +302,6 @@ type $(SolutionDir)\..\uuu\nand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\n
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst
 </Command>
     </PreBuildEvent>
-    <CustomBuildStep>
-      <Command>echo cde &gt;$(SolutionDir)\c.txt;</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Outputs>$(SolutionDir)\c.txt;</Outputs>
-    </CustomBuildStep>
     <CustomBuildStep>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
