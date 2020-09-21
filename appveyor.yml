@@ -14,7 +14,6 @@ platform:
  
 init:
  - sh: if [ "${CONFIGURATION}" = "Debug" ] ; then exit 0; fi
- - sh: if [ "${PLATFORM}" = "x86" ]; then exit 0; fi 
  
 skip_tags: true
 
@@ -71,6 +70,7 @@ build_script:
 - cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu-static-link.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 - cmd: if exist %APPVEYOR_BUILD_FOLDER%\msvc\x64\release\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\msvc\x64\release\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
+- cmd: if exist %APPVEYOR_BUILD_FOLDER%\msvc\x86\release\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\msvc\x86\release\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu32.exe
    
 - sh: cmake -D 'STATIC=1' .
 - sh: make
@@ -100,6 +100,7 @@ build_script:
     
 artifacts:
 - path: uuu.exe
+- path: uuu32.exe
 - path: uuu/uuu
 - path: mfgtools.wiki/UUU.pdf
 - path: uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz
