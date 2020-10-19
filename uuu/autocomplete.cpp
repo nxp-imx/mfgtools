@@ -205,13 +205,10 @@ void print_autocomplete_help()
 #ifndef _MSC_VER
 	{
 		cout << "Enjoy auto [tab] command complete by put below script into /etc/bash_completion.d/uuu" << endl;
-		char result[PATH_MAX];
-		memset(result, 0, PATH_MAX);
-		ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
 		cout << g_vt_kcyn;
 		cout << "  _uuu_autocomplete()" <<endl;
 		cout << "  {" << endl;
-		cout << "       COMPREPLY=($(" << result << " $1 $2 $3))" << endl;
+		cout << "       COMPREPLY=($(" << TARGET_PATH << " $1 $2 $3))" << endl;
 		cout << "  }" << endl;
 		cout << "  complete -o nospace -F _uuu_autocomplete  uuu" << g_vt_default << endl << endl;
 	}
