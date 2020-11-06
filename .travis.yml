@@ -38,4 +38,4 @@ addons:
             - pkg-config
 
 script:
-    - cmake -DOPENSSL_ROOT_DIR=$(brew --cellar)/openssl@1.1/1.1.1g . && make
+    - cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . && make

@@ -73,7 +73,7 @@ Note that, since uuu is an OSI compliant Open Source project, you are entitled t
 - `git clone https://github.com/NXPmicro/mfgtools.git`
 - `cd mfgtools`
 - `brew install cmake libusb libzip openssl pkg-config`
-- `cmake -DOPENSSL_ROOT_DIR=$(brew --cellar)/openssl@1.1/1.1.1g . && make`
+- `cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . && make`
 
 Note that we assume [brew](https://brew.sh) is installed and can be used to resolve dependencies as shown above. The remaining dependency `libbz2` can be resolved via the XCode supplied libraries.
 
