@@ -117,6 +117,7 @@ int Tar::get_file_buff(const string &filename, shared_ptr<FileBuffer> p )
 
 	p->resize(m_filemap[filename].size);
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
+	p->m_request_cv.notify_all();
 
 	shared_ptr<FileBuffer> file;
 	file = get_file_buffer(m_tarfilename);
@@ -125,6 +126,7 @@ int Tar::get_file_buff(const string &filename, shared_ptr<FileBuffer> p )
 
 	p->ref_other_buffer(file, offset, size);
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	p->m_request_cv.notify_all();
 
 	return 0;
 }

@@ -163,6 +163,7 @@ public:
 		p->m_avaible_size = st.st_size;
 		
 		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+		p->m_request_cv.notify_all();
 
 		return 0;
 	}
@@ -303,6 +304,7 @@ int http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string file
 	}
 
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	p->m_request_cv.notify_all();
 
 	ut.type = uuu_notify::NOTIFY_DOWNLOAD_END;
 	ut.str = (char*)filename.c_str();
@@ -322,6 +324,7 @@ int FSHttp::load(const string &backfile, const string &filename, shared_ptr<File
 	p->resize(sz);
 
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
+	p->m_request_cv.notify_all();
 
 	if (async)
 	{
@@ -337,6 +340,7 @@ int FSHttp::load(const string &backfile, const string &filename, shared_ptr<File
 
 		p->m_avaible_size = p->m_DataSize;
 		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+		p->m_request_cv.notify_all();
 	}
 
 	return 0;
@@ -551,6 +555,7 @@ int FSZip::load(const string &backfile, const string &filename, shared_ptr<FileB
 			return -1;
 
 		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+		p->m_request_cv.notify_all();
 	}
 	return 0;
 }
@@ -599,6 +604,7 @@ int FSTar::load(const string &backfile, const string &filename, shared_ptr<FileB
 		return -1;
 	p->m_avaible_size = p->m_DataSize;
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	p->m_request_cv.notify_all();
 	return 0;
 }
 
@@ -624,6 +630,7 @@ int FSFat::load(const string &backfile, const string &filename, shared_ptr<FileB
 		return -1;
 
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	p->m_request_cv.notify_all();
 
 	return 0;
 }
@@ -888,6 +895,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 	}
 
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
+	p->m_request_cv.notify_all();
 
 	{
 		lock_guard<mutex> lock(blks.blk_mutex);
@@ -922,6 +930,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 	if(p->resize(p->m_avaible_size))
 		return -1;
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	p->m_request_cv.notify_all();
 
 	return 0;
 }
@@ -1002,6 +1011,7 @@ int decompress_single_thread(string name,shared_ptr<FileBuffer>p)
 	p->resize(decompressed_size);
 	BZ2_bzDecompressEnd(&strm);
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	p->m_request_cv.notify_all();
 	return 0;
 }
 
@@ -1120,6 +1130,7 @@ int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBu
 
 		gzclose(fp);
 		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+		p->m_request_cv.notify_all();
 	}
 	return 0;
 }
@@ -1345,7 +1356,10 @@ int FileBuffer::reload(string filename, bool async)
 
 int FileBuffer::request_data(size_t sz)
 {
-	assert(this->m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT);
+	std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
+
+	while(!this->m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT)
+		m_request_cv.wait(lck);
 
 	if (IsLoaded())
 	{
@@ -1356,7 +1370,7 @@ int FileBuffer::request_data(size_t sz)
 		}
 	}
 
-	std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
+	
 	while ((sz > m_avaible_size) && !IsLoaded())
 	{
 		if (IsError())
