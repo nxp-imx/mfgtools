@@ -590,12 +590,12 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	if (m_raw2sparse)
 	{
+		size_t block_size = 4096;
+
 		if (getvar.parser((char*)"FB: getvar logical-block-size"))
 			return -1;
-		if (getvar.run(ctx))
-			return -1;
-
-		size_t block_size = str_to_uint32(getvar.m_val);
+		if (!getvar.run(ctx))
+			block_size = str_to_uint32(getvar.m_val);
 
 		if (block_size == 0)
 		{
