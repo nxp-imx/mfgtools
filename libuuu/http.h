@@ -52,7 +52,7 @@ class HttpStream
 	int parser_response(std::string rep);
 public:
 	HttpStream();
-	int HttpGetHeader(std::string host, std::string path, int port = 80);
+	int HttpGetHeader(std::string host, std::string path, int port = 80, bool ishttps=false);
 	size_t HttpGetFileSize();
 	int HttpDownload(char *buff, size_t sz);
 	~HttpStream();

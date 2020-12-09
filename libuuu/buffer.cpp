@@ -228,6 +228,9 @@ public:
 
 class FSNetwork : public FSBasic
 {
+protected:
+	int m_Port;
+
 public:
 	int split(const string &filename, string *outbackfile, string *outfilename, bool dir = false) override
 	{
@@ -244,6 +247,15 @@ public:
 			pos = filename.find('/', 1 + strlen(m_Prefix));
 
 			*outbackfile = filename.substr(1 + strlen(m_Prefix), pos - 1 - strlen(m_Prefix));
+
+			size_t cpos;
+			cpos = outbackfile->find(':');
+			if (cpos != string::npos)
+			{
+				m_Port = str_to_uint32(outbackfile->substr(cpos + 1));
+
+				*outbackfile = outbackfile->substr(0, cpos);
+			}
 			*outfilename = filename.substr(pos);
 
 			return 0;
@@ -255,8 +267,6 @@ public:
 
 static class FSHttp : public FSNetwork
 {
-protected:
-	int m_Port;
 public:
 	FSHttp() { m_Prefix = "HTTP://"; m_Port = 80; }
 	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override;
@@ -316,7 +326,7 @@ int FSHttp::load(const string &backfile, const string &filename, shared_ptr<File
 {
 	shared_ptr<HttpStream> http = make_shared<HttpStream>();
 
-	if (http->HttpGetHeader(backfile, filename, m_Port))
+	if (http->HttpGetHeader(backfile, filename, m_Port, typeid(*this) == typeid(FSHttps)))
 		return -1;
 
 	size_t sz = http->HttpGetFileSize();
