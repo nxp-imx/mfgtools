@@ -29,6 +29,8 @@
 *
 */
 
+#include "autocomplete.h"
+
 #include <iostream>
 #include <stdio.h>
 #include <thread>
@@ -45,7 +47,7 @@
 #include <signal.h>
 #include "buildincmd.h"
 
-#include "../libuuu/libuuu.h"
+#include "libuuu.h"
 
 #ifndef _MSC_VER
 #include <unistd.h>
@@ -53,6 +55,8 @@
 #else
 #include <Windows.h>
 #endif
+
+using namespace std;
 
 void linux_auto_arg(const char *space = " ", const char * filter = "")
 {

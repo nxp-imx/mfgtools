@@ -29,6 +29,8 @@
 *
 */
 
+#include "autocomplete.h"
+#include "print_helpers.h"
 #include <iostream>
 #include <stdio.h>
 #include <thread>
@@ -36,7 +38,6 @@
 #include <iomanip>
 #include <map>
 #include <mutex>
-#include <vector>
 #include <sstream>
 #include <fstream>
 #include <stdarg.h>
@@ -44,10 +45,10 @@
 #include <string.h>
 #include <signal.h>
 #include "buildincmd.h"
-#include <string>
 #include <streambuf>
 
-#include "../libuuu/libuuu.h"
+#include "libcomm.h"
+#include "libuuu.h"
 
 const char * g_vt_yellow = "\x1B[93m";
 const char * g_vt_default = "\x1B[0m";
@@ -69,60 +70,27 @@ void clean_vt_color() noexcept
 using namespace std;
 
 int get_console_width();
-void print_oneline(string str);
-int auto_complete(int argc, char**argv);
-void print_autocomplete_help();
 
-char g_sample_cmd_list[] = {
-#include "uuu.clst"
-};
+static vector<string> g_usb_path_filter;
 
-vector<string> g_usb_path_filter;
-
-int g_verbose = 0;
+static int g_verbose = 0;
 static bool g_start_usb_transfer;
-
-class AutoCursor
-{
-public:
-	~AutoCursor()
-	{
-		printf("\x1b[?25h\n\n\n");
-	}
-};
 
 void ctrl_c_handle(int)
 {
 	do {
-		AutoCursor a;
+		AutoReactivateCursor a;
 	} while(0);
 
 	exit(1);
 }
 
-class string_ex : public std::string
-{
-public:
-	int format(const char *fmt, ...)
-	{
-		va_list args;
-		va_start(args, fmt);
-		size_t len = std::vsnprintf(NULL, 0, fmt, args);
-		va_end(args);
-
-		this->resize(len);
-
-		va_start(args, fmt);
-		std::vsnprintf((char*)c_str(), len + 1, fmt, args);
-		va_end(args);
-
-		return 0;
-	}
-};
-
 void print_help(bool detail = false)
 {
-	const char help[] =
+	static char g_sample_cmd_list[] = {
+	#include "uuu.clst"
+	};
+	static constexpr char help[] =
 		"uuu [-d -m -v -V] <" "bootloader|cmdlists|cmd" ">\n\n"
 		"    bootloader  download bootloader to board by usb\n"
 		"    cmdlist     run all commands in cmdlist file\n"
@@ -181,106 +149,14 @@ void print_help(bool detail = false)
 		start = pos;
 	}
 }
-void print_version()
-{
-	printf("uuu (Universal Update Utility) for nxp imx chips -- %s\n\n", uuu_get_version_string());
-}
-
-int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, uint16_t pid, uint16_t vid, uint16_t bcdmin, uint16_t bcdmax, void * /*p*/)
-{
-	const char *ext;
-	if (strlen(chip) >= 7)
-		ext = "";
-	else
-		ext = "\t";
-
-	if (bcdmin == 0 && bcdmax == 0xFFFF)
-		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\n", pro, chip, ext, pid, vid);
-	else
-		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\t [0x%04x..0x%04x]\n", pro, chip, ext, pid, vid, bcdmin, bcdmax);
-	return 0;
-}
-
-int print_udev_rule(const char * /*pro*/, const char * /*chip*/, const char * /*compatible*/,
-	uint16_t vid, uint16_t pid, uint16_t /*bcdmin*/, uint16_t /*bcdmax*/, void * /*p*/)
-{
-	printf("SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"%04x\", ATTRS{idProduct}==\"%04x\", MODE=\"0666\"\n",
-			vid, pid);
-	return 0;
-}
 
 int polling_usb(std::atomic<int>& bexit);
 
-int g_overall_status;
-int g_overall_okay;
-int g_overall_failure;
-char g_wait[] = "|/-\\";
-int g_wait_index;
-
-
-string build_process_bar(size_t width, size_t pos, size_t total)
-{
-	string str;
-	str.resize(width, ' ');
-	str[0] = '[';
-	str[width - 1] = ']';
-
-	if (total == 0)
-	{
-		if (pos == 0)
-			return str;
-
-		string_ex loc;
-		size_t s = pos / (1024 * 1024);
-		loc.format("%dM", s);
-		str.replace(1, loc.size(), loc);
-		return str;
-	}
-
-	size_t i;
-
-	if (pos > total)
-		pos = total;
-
-	for (i = 1; i < (width-2) * pos / total; i++)
-	{
-		str[i] = '=';
-	}
-
-	if (i > 1)
-		str[i] = '>';
-
-	if (pos == total)
-		str[str.size() - 2] = '=';
-
-	string_ex per;
-	per.format("%d%%", pos * 100 / total);
-	
-	size_t start = (width - per.size()) / 2;
-	str.replace(start, per.size(), per);
-	str.insert(start, g_vt_yellow);
-	str.insert(start + per.size() + strlen(g_vt_yellow), g_vt_default);
-	return str;
-}
-
-void print_auto_scroll(string str, size_t len, size_t start)
-{
-	if (str.size() <= len)
-	{
-		str.resize(len, ' ');
-		cout << str;
-		return;
-	}
-
-	if(str.size())
-		start = start % str.size();
-	else
-		start = 0;
-
-	string s = str.substr(start, len);
-	s.resize(len, ' ');
-	cout << s;
-}
+static int g_overall_status;
+static int g_overall_okay;
+static int g_overall_failure;
+static char g_wait[] = "|/-\\";
+static int g_wait_index;
 class ShowNotify
 {
 public:
@@ -436,7 +312,7 @@ public:
 			cout << "Download file:" << nt->str << endl;
 
 	}
-	void print(int verbose = 0, uuu_notify*nt=NULL)
+	void print(int verbose = 0, uuu_notify*nt = nullptr)
 	{
 		verbose ? print_verbose(nt) : print_simple();
 	}
@@ -473,7 +349,7 @@ public:
 
 			str += g_wait[(g_wait_index++) & 0x3];
 
-			print_oneline(str);
+			print_oneline(str, get_console_width());
 			return ;
 		}
 		else
@@ -507,7 +383,7 @@ public:
 				}
 				cout << str;
 			} else {
-				cout << build_process_bar(bar, m_trans_pos, m_trans_size);
+				cout << build_progress_bar(bar, m_trans_pos, m_trans_size, g_vt_yellow, g_vt_default);
 			}
 			cout << " ";
 			print_auto_scroll(m_cmd, width - bar - info-1, m_start_pos);
@@ -525,28 +401,7 @@ return;
 };
 
 static map<string, ShowNotify> g_map_path_nt;
-mutex g_callback_mutex;
-
-void print_oneline(string str)
-{
-	size_t w = get_console_width();
-	if (w <= 3)
-		return;
-
-	if (str.size() >= w)
-	{
-		str.resize(w - 1);
-		str[str.size() - 1] = '.';
-		str[str.size() - 2] = '.';
-		str[str.size() - 3] = '.';
-	}
-	else
-	{
-		str.resize(w, ' ');
-	}
-	cout << str << endl;
-
-}
+static mutex g_callback_mutex;
 
 ShowNotify Summary(map<uint64_t, ShowNotify> *np)
 {
@@ -575,7 +430,7 @@ ShowNotify Summary(map<uint64_t, ShowNotify> *np)
 
 int progress(uuu_notify nt, void *p)
 {
-	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify>*)p;
+	map<uint64_t, ShowNotify> *np = reinterpret_cast<map<uint64_t, ShowNotify>*>(p);
 	map<string, ShowNotify>::iterator it;
 
 	std::lock_guard<std::mutex> lock(g_callback_mutex);
@@ -608,13 +463,14 @@ int progress(uuu_notify nt, void *p)
 					str += g_usb_path_filter[i] + " ";
 			}
 
-			print_oneline(str);
-			print_oneline("");
+			const int console_width = get_console_width();
+			print_oneline(str, console_width);
+			print_oneline("", console_width);
 			if ((*np)[nt.id].m_dev == "Prep" && !g_start_usb_transfer)
 			{
 				Summary(np).print();
 			}else
-				print_oneline("");
+				print_oneline("", console_width);
 
 			for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
 				it->second.print();
@@ -683,15 +539,6 @@ int get_console_width()
 	return w.ws_col;
 }
 #endif
-void print_usb_filter()
-{
-	if (!g_usb_path_filter.empty())
-	{
-		cout << " at path ";
-		for (size_t i = 0; i < g_usb_path_filter.size(); i++)
-			cout << g_usb_path_filter[i] << " ";
-	}
-}
 
 int runshell(int shell)
 {
@@ -757,30 +604,6 @@ int runshell(int shell)
 	return -1;
 }
 
-void print_udev()
-{
-	uuu_for_each_cfg(print_udev_rule, NULL);
-	fprintf(stderr, "\n1: put above udev run into /etc/udev/rules.d/99-uuu.rules\n");
-	fprintf(stderr, "\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/99-uuu.rules\"\n");
-	fprintf(stderr, "2: update udev rule\n");
-	fprintf(stderr, "\tsudo udevadm control --reload-rules\n");
-}
-
-int print_usb_device(const char *path, const char *chip, const char *pro, uint16_t vid, uint16_t pid, uint16_t bcd, void * /*p*/)
-{
-	printf("\t%s\t %s\t %s\t 0x%04X\t0x%04X\t 0x%04X\n", path, chip, pro, vid, pid, bcd);
-	return 0;
-}
-
-void print_lsusb()
-{
-	cout << "Connected Known USB Devices\n";
-	printf("\tPath\t Chip\t Pro\t Vid\t Pid\t BcdVersion\n");
-	printf("\t==================================================\n");
-
-	uuu_for_each_devices(print_usb_device, NULL);
-}
-
 int main(int argc, char **argv)
 {
 	if (auto_complete(argc, argv) == 0)
@@ -796,7 +619,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	AutoCursor a;
+	AutoReactivateCursor a;
 
 	print_version();
 
@@ -931,7 +754,7 @@ int main(int argc, char **argv)
 
 					tmpCmd.m_desc = "Script loaded from file";
 
-					BuildInScript tmpBuildInScript(&tmpCmd);
+					BuildInScript tmpBuildInScript(tmpCmd);
 					g_BuildScripts[tmpCmdFileName] = tmpBuildInScript;
 
 					cmd_script = g_BuildScripts[tmpCmdFileName].replace_script_args(args);
@@ -952,7 +775,7 @@ int main(int argc, char **argv)
 				}
 				else
 				{
-					printf("%s", g_BuildScripts[argv[i + 1]].m_script.c_str());
+					printf("%s", g_BuildScripts[argv[i + 1]].get_script().c_str());
 					return 0;
 				}
 			}
@@ -1009,7 +832,7 @@ int main(int argc, char **argv)
 		printf("%sBuild in config:%s\n", g_vt_boldwhite, g_vt_default);
 		printf("\tPctl\t Chip\t\t Vid\t Pid\t BcdVersion\n");
 		printf("\t==================================================\n");
-		uuu_for_each_cfg(print_cfg, NULL);
+		uuu_for_each_cfg(print_cfg, nullptr);
 
 		if (!cmd_script.empty())
 			printf("\n%sRun built-in script:%s\n %s\n\n", g_vt_boldwhite, g_vt_default, cmd_script.c_str());
@@ -1017,13 +840,13 @@ int main(int argc, char **argv)
 		if (!shell)
 			cout << "Wait for Known USB Device Appear...";
 
-		print_usb_filter();
+		print_usb_filter(g_usb_path_filter);
 
 		printf("\n");
 	}
 	else {
 		cout << "Wait for Known USB Device Appear...";
-		print_usb_filter();
+		print_usb_filter(g_usb_path_filter);
 		cout << "\r";
 		cout << "\x1b[?25l";
 		cout.flush();

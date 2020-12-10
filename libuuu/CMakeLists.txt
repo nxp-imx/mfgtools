@@ -63,3 +63,4 @@ include_directories(${generated_files_dir})
 
 #add_library( uuc SHARED ${SOURCES} ))
 add_library( uuc_s STATIC ${SOURCES} )
+target_include_directories(uuc_s PUBLIC include)

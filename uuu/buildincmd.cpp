@@ -31,53 +31,265 @@
 
 #include "buildincmd.h"
 
-BuildCmd g_buildin_cmd[] =
+#include <locale>
+
+using namespace std;
+constexpr BuildCmd::BuildCmd(const char * const cmd, const char * const buildcmd,
+	const char * const desc) :
+	m_cmd{cmd},
+	m_buildcmd{buildcmd},
+	m_desc{desc}
 {
-	{
+}
+
+static constexpr std::array<const BuildCmd, 8> g_buildin_cmd
+{
+	BuildCmd{
 		"emmc",
 #include "emmc_burn_loader.clst"
 		,"burn boot loader to eMMC boot partition"
 	},
-	{
+	BuildCmd{
 		"emmc_all",
 #include "emmc_burn_all.clst"
 		,"burn whole image to eMMC"
 	},
-	{
+	BuildCmd{
 		"fat_write",
 #include "fat_write.clst"
 		,"update one file in fat partition, require uboot fastboot running in board"
 	},
-	{
+	BuildCmd{
 		"nand",
 #include "nand_burn_loader.clst"
 		,"burn boot loader to NAND flash"
 	},
-	{
+	BuildCmd{
 		"qspi",
 #include "qspi_burn_loader.clst"
 		,"burn boot loader to qspi nor flash"
 	},
-	{
+	BuildCmd{
 		"sd",
 #include "sd_burn_loader.clst"
 		,"burn boot loader to sd card"
 	},
-	{
+	BuildCmd{
 		"sd_all",
 #include "sd_burn_all.clst"
 		,"burn whole image to sd card"
 	},
-	{
+	BuildCmd{
 		"spl",
 #include "spl_boot.clst"
 		,"boot spl and uboot"
-	},
-	{
-		NULL,
-		NULL,
-		NULL,
 	}
 };
 
 BuildInScriptVector g_BuildScripts(g_buildin_cmd);
+
+int Arg::parser(const string &option)
+{
+	size_t pos;
+	pos = option.find('[');
+	if (pos == std::string::npos)
+		return 0;
+	m_options = option.substr(pos + 1, option.find(']') - pos - 1);
+	m_flags = ARG_OPTION | ARG_OPTION_KEY;
+	return 0;
+}
+
+BuildInScript::BuildInScript(const BuildCmd &p) :
+	m_script{p.m_buildcmd}
+{
+	if (p.m_desc)
+	{
+		m_desc = p.m_desc;
+	}
+	if (p.m_cmd)
+	{
+		m_cmd = p.m_cmd;
+	}
+
+	for (size_t i = 1; i < m_script.size(); i++)
+	{
+		string param;
+		if (m_script[i] == '_'
+			&& (m_script[i - 1] == '@' || m_script[i - 1] == ' '))
+		{
+			size_t off = m_script.find(' ', i);
+			size_t off_tab = m_script.find('\t', i);
+			size_t ofn = m_script.find('\n', i);
+			if (off_tab < off)
+				off = off_tab;
+			if (ofn < off)
+				off = ofn;
+
+			if (off == std::string::npos)
+				off = m_script.size() + 1;
+
+			param = m_script.substr(i, off - i);
+			if (!find_args(param))
+			{
+				Arg a{param};
+				a.m_flags = Arg::ARG_MUST;
+				m_args.push_back(a);
+			}
+		}
+	}
+
+	for (size_t i = 0; i < m_args.size(); i++)
+	{
+		size_t pos = 0;
+		std::string str;
+		str += "@";
+		str += m_args[i].get_arg();
+		pos = m_script.find(str);
+		if (pos != std::string::npos) {
+			std::string def;
+			size_t start_descript;
+			start_descript = m_script.find('|', pos);
+			if (start_descript != std::string::npos)
+			{
+				m_args[i].m_desc = m_script.substr(start_descript + 1,
+										m_script.find('\n', start_descript) - start_descript - 1);
+				def = m_script.substr(pos, start_descript - pos);
+				m_args[i].parser(def);
+			}
+		}
+	}
+}
+
+bool BuildInScript::find_args(const string &arg) const
+{
+	for (const auto &arg_ref : m_args)
+	{
+		if (arg_ref.get_arg() == arg)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+string BuildInScript::replace_script_args(vector<string> args)
+{
+	string script{m_script};
+	for (size_t i = 0; i < args.size() && i < m_args.size(); i++)
+	{
+		script = replace_str(script, m_args[i].get_arg(), args[i]);
+	}
+
+	//handle option args;
+	for (size_t i = args.size(); i < m_args.size(); i++)
+	{
+		if (m_args[i].m_flags & Arg::ARG_OPTION_KEY)
+		{
+			for (size_t j = 0; j < args.size(); j++)
+			{
+				if (m_args[j].get_arg() == m_args[i].get_options())
+				{
+					script = replace_str(script, m_args[i].get_arg(), args[j]);
+					break;
+				}
+			}
+		}
+	}
+	return script;
+}
+
+string BuildInScript::replace_str(string str, const string &key, string replace)
+{
+	if (replace.size() > 4)
+	{
+		if (str_to_upper(replace.substr(replace.size() - 4)) == ".BZ2")
+		{
+			replace += "/*";
+		}
+	}
+
+	for (size_t j = 0; (j = str.find(key, j)) != std::string::npos;)
+	{
+		str.replace(j, key.size(), replace);
+		j += key.size();
+	}
+	return str;
+}
+
+void BuildInScript::show_cmd() const
+{
+	printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_cmd.c_str(), g_vt_default,  m_desc.c_str());
+	for (size_t i = 0; i < m_args.size(); i++)
+	{
+		string desc{m_args[i].get_arg()};
+		if (m_args[i].m_flags & Arg::ARG_OPTION)
+		{
+			desc += g_vt_boldwhite;
+			desc += "[Optional]";
+			desc += g_vt_default;
+		}
+		desc += " ";
+		desc += m_args[i].m_desc;
+		printf("\t\targ%d: %s\n", static_cast<int>(i), desc.c_str());
+	}
+}
+
+string BuildInScript::str_to_upper(const string &str)
+{
+	const std::locale loc;
+	std::string s;
+	s.reserve(str.size());
+
+	for (size_t i = 0; i < str.size(); i++)
+	{
+		s.push_back(std::toupper(str[i], loc));
+	}
+
+	return s;
+}
+
+BuildInScriptVector::BuildInScriptVector(const array<const BuildCmd, 8> &build_cmds)
+{
+	for (const auto &build_cmd : build_cmds) {
+		BuildInScript one{build_cmd};
+		(*this)[one.get_cmd()] = one;
+	}
+}
+
+void BuildInScriptVector::PrintAutoComplete(const string &match, const char *space)
+{
+	for (const auto &str_n_script : *this)
+	{
+		if(str_n_script.first.substr(0, match.size()) == match)
+		{
+			printf("%s%s\n", str_n_script.first.c_str(), space);
+		}
+	}
+}
+
+void BuildInScriptVector::ShowAll() const
+{
+	for (const auto &str_n_script : *this)
+	{
+		str_n_script.second.show_cmd();
+	}
+}
+
+void BuildInScriptVector::ShowCmds() const
+{
+	printf("<");
+	for (auto iCol = cbegin(); iCol != cend(); ++iCol)
+	{
+		// Print the current command's name
+		printf("%s%s%s", g_vt_boldwhite, iCol->first.c_str(), g_vt_default);
+
+		// Check if it's the last command and if not print a separating bar
+		auto i = iCol;
+		++i;
+		if(i != cend())
+		{
+			printf("|");
+		}
+	}
+	printf(">");
+}

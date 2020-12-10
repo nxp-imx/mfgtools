@@ -57,7 +57,7 @@ public:
 		this->resize(len);
 
 		va_start(args, fmt);
-		std::vsnprintf((char*)c_str(), len+1, fmt, args);
+		std::vsnprintf((char*)c_str(), len + 1, fmt, args);
 		va_end(args);
 
 		return 0;
