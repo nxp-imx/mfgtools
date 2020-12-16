@@ -35,19 +35,20 @@
 #include <cstddef>
 #include <cstring>
 
-chunk_header_t * SparseFile::get_next_chunk(uint8_t *p, size_t &pos)
+chunk_header_t *SparseFile::get_next_chunk(uint8_t *p, size_t &pos)
 {
 	if (pos == 0)
 	{
-		sparse_header *pheader = (sparse_header*)p;
-		if (pheader->magic != SPARSE_HEADER_MAGIC) {
+		sparse_header *pheader = (sparse_header *)p;
+		if (pheader->magic != SPARSE_HEADER_MAGIC)
+		{
 			set_last_err_string("Sparse heade Magic missed");
 			return nullptr;
 		}
 		pos += pheader->file_hdr_sz;
 	}
 
-	chunk_header_t *pchunk = (chunk_header_t*)(p + pos);
+	chunk_header_t *pchunk = (chunk_header_t *)(p + pos);
 	pos += pchunk->total_sz;
 	return pchunk;
 }
@@ -66,12 +67,12 @@ int SparseFile::init_header(size_t blsz, int blcount)
 	m_cur_chunk_header_pos = 0;
 	if (blcount)
 	{
-		m_data.reserve(blsz*blcount + 0x1000);
+		m_data.reserve(blsz * blcount + 0x1000);
 		m_max_size = blsz * blcount;
 	}
 	m_data.clear();
 	push(&header, sizeof(header));
-	m_pcrc = (uint32_t*)(m_data.data() + offsetof(sparse_header, image_checksum));
+	m_pcrc = (uint32_t *)(m_data.data() + offsetof(sparse_header, image_checksum));
 	return 0;
 }
 
@@ -88,8 +89,8 @@ bool SparseFile::is_append_old_chuck(int type, void *p)
 
 	if (type == CHUNK_TYPE_FILL)
 	{
-		uint32_t a = *(uint32_t*)(pchunk + 1);
-		uint32_t b = *(uint32_t*)p;
+		uint32_t a = *(uint32_t *)(pchunk + 1);
+		uint32_t b = *(uint32_t *)p;
 		if (a != b)
 			return false;
 	}
@@ -108,7 +109,7 @@ bool SparseFile::is_same_value(void *data, size_t sz)
 
 bool SparseFile::is_validate_sparse_file(void *p, size_t)
 {
-	sparse_header *pheader = (sparse_header*)p;
+	sparse_header *pheader = (sparse_header *)p;
 	if (pheader->magic == SPARSE_HEADER_MAGIC)
 		return true;
 	return false;
@@ -165,7 +166,7 @@ int SparseFile::push_one_block(void *data)
 		}
 	}
 
-	if (m_data.size() + 2 * pheader->blk_sz > m_max_size )
+	if (m_data.size() + 2 * pheader->blk_sz > m_max_size)
 		return -1;
 
 	return 0;
@@ -181,7 +182,7 @@ size_t SparseFile::push_one_chuck(chunk_header_t *p, void *data)
 
 	if (p->total_sz + m_data.size() > m_max_size)
 	{
-		size_t blk = (m_max_size - m_data.size())/pheader->blk_sz;
+		size_t blk = (m_max_size - m_data.size()) / pheader->blk_sz;
 		if (blk < 2)
 			return 0;
 
@@ -193,10 +194,11 @@ size_t SparseFile::push_one_chuck(chunk_header_t *p, void *data)
 	}
 
 	push(&cheader, sizeof(chunk_header));
-	pheader->total_chunks ++;
+	pheader->total_chunks++;
 	pheader->total_blks += cheader.chunk_sz;
 
-	if (data) {
+	if (data)
+	{
 		push(data, sz);
 	}
 
@@ -212,7 +214,7 @@ size_t SparseFile::push_raw_data(void *data, size_t sz)
 	pheader = (sparse_header *)m_data.data();
 
 	cheader.chunk_sz = sz / pheader->blk_sz;
-	cheader.total_sz = cheader.chunk_sz*pheader->blk_sz + sizeof(chunk_header_t);
+	cheader.total_sz = cheader.chunk_sz * pheader->blk_sz + sizeof(chunk_header_t);
 	pheader = (sparse_header *)m_data.data();
 
 	return push_one_chuck(&cheader, data);

@@ -39,7 +39,7 @@
 
 using namespace std;
 
-static map<uuu_notify_fun, void*> g_notification_map;
+static map<uuu_notify_fun, void *> g_notification_map;
 static mutex g_mutex_notify;
 
 using namespace std::chrono;
@@ -70,9 +70,12 @@ void call_notify(struct uuu_notify nf)
 
 	for (const auto &item : g_notification_map)
 	{
-		try {
+		try
+		{
 			item.first(nf, item.second);
-		} catch (const std::exception& e) {
+		}
+		catch (const std::exception &e)
+		{
 			std::cerr << "notify exception: " << e.what() << std::endl;
 		}
 	}

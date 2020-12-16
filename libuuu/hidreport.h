@@ -65,7 +65,7 @@ public:
 private:
 	size_t m_notify_total = 0;
 	std::vector<uint8_t> m_out_buff;
-	TransBase * const m_pdev = nullptr;
+	TransBase *const m_pdev = nullptr;
 	size_t m_postion_base = 0;
 	size_t m_size_in = 64;
 	size_t m_size_out = 1024;

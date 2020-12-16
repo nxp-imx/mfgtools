@@ -61,7 +61,7 @@ private:
 class FBGetVar : public CmdBase
 {
 public:
-	FBGetVar(char *p) :CmdBase(p) {}
+	FBGetVar(char *p) : CmdBase(p) {}
 
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
@@ -73,11 +73,10 @@ private:
 	friend FBFlashCmd;
 };
 
-class FBCmd: public CmdBase
+class FBCmd : public CmdBase
 {
 public:
-	FBCmd(char *p, std::string &&fb_cmd, char separator =':') :
-		CmdBase(p), m_fb_cmd{std::move(fb_cmd)}, m_separator(separator) {}
+	FBCmd(char *p, std::string &&fb_cmd, char separator = ':') : CmdBase(p), m_fb_cmd{std::move(fb_cmd)}, m_separator(separator) {}
 
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
@@ -93,16 +92,16 @@ private:
 class FBUCmd : public FBCmd
 {
 public:
-	FBUCmd(char *p) :FBCmd(p, "UCmd") {}
+	FBUCmd(char *p) : FBCmd(p, "UCmd") {}
 };
 
 class FBACmd : public FBCmd
 {
 public:
-	FBACmd(char *p) :FBCmd(p, "ACmd") {}
+	FBACmd(char *p) : FBCmd(p, "ACmd") {}
 };
 
-class FBSyncCmd: public FBCmd
+class FBSyncCmd : public FBCmd
 {
 public:
 	FBSyncCmd(char *p) : FBCmd(p, "Sync") {}
@@ -143,13 +142,13 @@ private:
 class FBDelPartition : public FBCmd
 {
 public:
-	FBDelPartition(char*p) : FBCmd(p, "delete-logical-partition") {}
+	FBDelPartition(char *p) : FBCmd(p, "delete-logical-partition") {}
 };
 
 class FBPartNumber : public CmdBase
 {
 public:
-	FBPartNumber(char *p, std::string &&fb_cmd) :CmdBase(p), m_fb_cmd{std::move(fb_cmd)}
+	FBPartNumber(char *p, std::string &&fb_cmd) : CmdBase(p), m_fb_cmd{std::move(fb_cmd)}
 	{
 		m_Size = 0;
 		m_bCheckTotalParam = true;
@@ -169,19 +168,19 @@ private:
 class FBCreatePartition : public FBPartNumber
 {
 public:
-	FBCreatePartition(char*p) :FBPartNumber(p, "create-logical-partition") {}
+	FBCreatePartition(char *p) : FBPartNumber(p, "create-logical-partition") {}
 };
 
 class FBResizePartition : public FBPartNumber
 {
 public:
-	FBResizePartition(char*p) :FBPartNumber(p, "resize-logical-partition") {}
+	FBResizePartition(char *p) : FBPartNumber(p, "resize-logical-partition") {}
 };
 
 class FBUpdateSuper : public CmdBase
 {
 public:
-	FBUpdateSuper(char *p) :CmdBase(p)
+	FBUpdateSuper(char *p) : CmdBase(p)
 	{
 		m_bCheckTotalParam = true;
 		m_NoKeyParam = true;
@@ -203,13 +202,11 @@ public:
 	FBEraseCmd(char *p) : FBCmd(p, "erase") {}
 };
 
-
 class FBRebootCmd : public FBCmd
 {
 public:
 	FBRebootCmd(char *p) : FBCmd(p, "reboot") {}
 };
-
 
 class FBSetActiveCmd : public FBCmd
 {
@@ -220,7 +217,7 @@ public:
 class FBDownload : public CmdBase
 {
 public:
-	FBDownload(char *p) :CmdBase(p)
+	FBDownload(char *p) : CmdBase(p)
 	{
 		insert_param_info("download", nullptr, Param::Type::e_null);
 		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
@@ -235,7 +232,7 @@ private:
 class FBCopy : public CmdBase
 {
 public:
-	FBCopy(char *p) :CmdBase(p) {}
+	FBCopy(char *p) : CmdBase(p) {}
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
 

@@ -86,7 +86,7 @@ class Fat : public Backfile
 {
 public:
 	void *get_data_buff(shared_ptr<FileBuffer> p, int cluster);
-	int get_file_buff(string filename, shared_ptr<FileBuffer>p);
+	int get_file_buff(string filename, shared_ptr<FileBuffer> p);
 	int get_next_cluster(shared_ptr<FileBuffer> p, int cluster);
 	string lfn2string(FatLFN *p);
 	int Open(string filename);

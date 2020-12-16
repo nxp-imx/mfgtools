@@ -36,7 +36,7 @@
 class Backfile
 {
 public:
-	const std::string& get_filename() const noexcept { return m_filename; }
+	const std::string &get_filename() const noexcept { return m_filename; }
 
 protected:
 	std::string m_filename;

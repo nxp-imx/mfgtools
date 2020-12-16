@@ -58,11 +58,11 @@ int TransBase::read(vector<uint8_t> &buff)
 int USBTrans::open(void *p)
 {
 	m_devhandle = p;
-	libusb_device_handle * handle = (libusb_device_handle *)m_devhandle;
+	libusb_device_handle *handle = (libusb_device_handle *)m_devhandle;
 	if (libusb_kernel_driver_active(handle, 0))
 	{
 		int ret = libusb_detach_kernel_driver((libusb_device_handle *)m_devhandle, 0);
-		if(ret <0 && ret != LIBUSB_ERROR_NOT_SUPPORTED)
+		if (ret < 0 && ret != LIBUSB_ERROR_NOT_SUPPORTED)
 		{
 			set_last_err_string("detach kernel driver failure");
 			return -1;
@@ -129,8 +129,7 @@ int HIDTrans::write(void *buff, size_t size)
 			p,
 			size,
 			&actual_size,
-			1000
-		);
+			1000);
 	}
 	else
 	{
@@ -142,8 +141,7 @@ int HIDTrans::write(void *buff, size_t size)
 			0,
 			p,
 			size,
-			1000
-		);
+			1000);
 	}
 
 	if (ret < 0)
@@ -165,11 +163,10 @@ int HIDTrans::read(void *buff, size_t size, size_t *rsize)
 	ret = libusb_interrupt_transfer(
 		(libusb_device_handle *)m_devhandle,
 		0x81,
-		(uint8_t*)buff,
+		(uint8_t *)buff,
 		size,
 		&actual,
-		m_read_timeout
-	);
+		m_read_timeout);
 
 	*rsize = actual;
 
@@ -205,8 +202,7 @@ int BulkTrans::write(void *buff, size_t size)
 			p,
 			sz,
 			&actual_lenght,
-			m_timeout
-		);
+			m_timeout);
 
 		if (ret < 0)
 		{
@@ -220,7 +216,7 @@ int BulkTrans::write(void *buff, size_t size)
 	}
 
 	//Send zero package
-	if (m_b_send_zero && ( (size%m_ep_out.package_size) == 0))
+	if (m_b_send_zero && ((size % m_ep_out.package_size) == 0))
 	{
 		ret = libusb_bulk_transfer(
 			(libusb_device_handle *)m_devhandle,
@@ -228,8 +224,7 @@ int BulkTrans::write(void *buff, size_t size)
 			nullptr,
 			0,
 			&actual_lenght,
-			2000
-		);
+			2000);
 
 		if (ret < 0)
 		{
@@ -280,8 +275,7 @@ int BulkTrans::read(void *buff, size_t size, size_t *rsize)
 		p,
 		size,
 		&actual_lenght,
-		m_timeout
-	);
+		m_timeout);
 
 	*rsize = actual_lenght;
 

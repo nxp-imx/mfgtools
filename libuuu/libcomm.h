@@ -46,7 +46,6 @@ int get_libusb_debug_level() noexcept;
 class string_ex : public std::string
 {
 public:
-
 	int format(const char *fmt, ...)
 	{
 		va_list args;
@@ -57,7 +56,7 @@ public:
 		this->resize(len);
 
 		va_start(args, fmt);
-		std::vsnprintf((char*)c_str(), len+1, fmt, args);
+		std::vsnprintf((char *)c_str(), len + 1, fmt, args);
 		va_end(args);
 
 		return 0;
@@ -84,28 +83,29 @@ public:
 	}
 };
 
-inline uint64_t EndianSwap(uint64_t x) {
-	return  (((x & 0x00000000000000ffLL) << 56) |
-		((x & 0x000000000000ff00LL) << 40) |
-		((x & 0x0000000000ff0000LL) << 24) |
-		((x & 0x00000000ff000000LL) << 8) |
-		((x & 0x000000ff00000000LL) >> 8) |
-		((x & 0x0000ff0000000000LL) >> 24) |
-		((x & 0x00ff000000000000LL) >> 40) |
-		((x & 0xff00000000000000LL) >> 56));
+inline uint64_t EndianSwap(uint64_t x)
+{
+	return (((x & 0x00000000000000ffLL) << 56) |
+			((x & 0x000000000000ff00LL) << 40) |
+			((x & 0x0000000000ff0000LL) << 24) |
+			((x & 0x00000000ff000000LL) << 8) |
+			((x & 0x000000ff00000000LL) >> 8) |
+			((x & 0x0000ff0000000000LL) >> 24) |
+			((x & 0x00ff000000000000LL) >> 40) |
+			((x & 0xff00000000000000LL) >> 56));
 }
 
 inline uint32_t EndianSwap(uint32_t x)
 {
 	return (x >> 24) |
-		((x << 8) & 0x00FF0000) |
-		((x >> 8) & 0x0000FF00) |
-		(x << 24);
+		   ((x << 8) & 0x00FF0000) |
+		   ((x >> 8) & 0x0000FF00) |
+		   (x << 24);
 }
 inline uint16_t EndianSwap(uint16_t x)
 {
 	return (x >> 8) |
-		((x << 8) & 0xFF00);
+		   ((x << 8) & 0xFF00);
 }
 
 inline string str_to_upper(const string &str)
@@ -141,9 +141,9 @@ inline bool compare_str(const string &str1, const string &str2, bool ignore_case
 		return str1 == str2;
 }
 
-uint16_t str_to_uint16(const string &str, bool * conversion_suceeded = nullptr);
-uint32_t str_to_uint32(const string &str, bool * conversion_suceeded = nullptr);
-uint64_t str_to_uint64(const string &str, bool * conversion_suceeded = nullptr);
+uint16_t str_to_uint16(const string &str, bool *conversion_suceeded = nullptr);
+uint32_t str_to_uint32(const string &str, bool *conversion_suceeded = nullptr);
+uint64_t str_to_uint64(const string &str, bool *conversion_suceeded = nullptr);
 
 template <class T>
 inline T round_up(T x, T align)

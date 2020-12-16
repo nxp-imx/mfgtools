@@ -49,12 +49,12 @@
 
 #include "../libuuu/libuuu.h"
 
-const char * g_vt_yellow = "\x1B[93m";
-const char * g_vt_default = "\x1B[0m";
-const char * g_vt_green = "\x1B[92m";
-const char * g_vt_red = "\x1B[91m";
-const char * g_vt_kcyn = "\x1B[36m";
-const char * g_vt_boldwhite = "\x1B[97m";
+const char *g_vt_yellow = "\x1B[93m";
+const char *g_vt_default = "\x1B[0m";
+const char *g_vt_green = "\x1B[92m";
+const char *g_vt_red = "\x1B[91m";
+const char *g_vt_kcyn = "\x1B[36m";
+const char *g_vt_boldwhite = "\x1B[97m";
 
 void clean_vt_color() noexcept
 {
@@ -70,7 +70,7 @@ using namespace std;
 
 int get_console_width();
 void print_oneline(string str);
-int auto_complete(int argc, char**argv);
+int auto_complete(int argc, char **argv);
 void print_autocomplete_help();
 
 char g_sample_cmd_list[] = {
@@ -93,9 +93,10 @@ public:
 
 void ctrl_c_handle(int)
 {
-	do {
+	do
+	{
 		AutoCursor a;
-	} while(0);
+	} while (0);
 
 	exit(1);
 }
@@ -113,7 +114,7 @@ public:
 		this->resize(len);
 
 		va_start(args, fmt);
-		std::vsnprintf((char*)c_str(), len + 1, fmt, args);
+		std::vsnprintf((char *)c_str(), len + 1, fmt, args);
 		va_end(args);
 
 		return 0;
@@ -123,7 +124,9 @@ public:
 void print_help(bool detail = false)
 {
 	const char help[] =
-		"uuu [-d -m -v -V] <" "bootloader|cmdlists|cmd" ">\n\n"
+		"uuu [-d -m -v -V] <"
+		"bootloader|cmdlists|cmd"
+		">\n\n"
 		"    bootloader  download bootloader to board by usb\n"
 		"    cmdlist     run all commands in cmdlist file\n"
 		"                If it is path, search uuu.auto in dir\n"
@@ -161,10 +164,10 @@ void print_help(bool detail = false)
 		return;
 
 	size_t start = 0, pos = 0;
-	string str= g_sample_cmd_list;
+	string str = g_sample_cmd_list;
 
 	bool bprint = false;
-	while ((pos = str.find('\n',pos)) != str.npos)
+	while ((pos = str.find('\n', pos)) != str.npos)
 	{
 		string s = str.substr(start, pos - start);
 		if (s.substr(0, 6) == "# ----")
@@ -186,7 +189,7 @@ void print_version()
 	printf("uuu (Universal Update Utility) for nxp imx chips -- %s\n\n", uuu_get_version_string());
 }
 
-int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, uint16_t pid, uint16_t vid, uint16_t bcdmin, uint16_t bcdmax, void * /*p*/)
+int print_cfg(const char *pro, const char *chip, const char * /*compatible*/, uint16_t pid, uint16_t vid, uint16_t bcdmin, uint16_t bcdmax, void * /*p*/)
 {
 	const char *ext;
 	if (strlen(chip) >= 7)
@@ -202,21 +205,20 @@ int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, u
 }
 
 int print_udev_rule(const char * /*pro*/, const char * /*chip*/, const char * /*compatible*/,
-	uint16_t vid, uint16_t pid, uint16_t /*bcdmin*/, uint16_t /*bcdmax*/, void * /*p*/)
+					uint16_t vid, uint16_t pid, uint16_t /*bcdmin*/, uint16_t /*bcdmax*/, void * /*p*/)
 {
 	printf("SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"%04x\", ATTRS{idProduct}==\"%04x\", MODE=\"0666\"\n",
-			vid, pid);
+		   vid, pid);
 	return 0;
 }
 
-int polling_usb(std::atomic<int>& bexit);
+int polling_usb(std::atomic<int> &bexit);
 
 int g_overall_status;
 int g_overall_okay;
 int g_overall_failure;
 char g_wait[] = "|/-\\";
 int g_wait_index;
-
 
 string build_process_bar(size_t width, size_t pos, size_t total)
 {
@@ -242,7 +244,7 @@ string build_process_bar(size_t width, size_t pos, size_t total)
 	if (pos > total)
 		pos = total;
 
-	for (i = 1; i < (width-2) * pos / total; i++)
+	for (i = 1; i < (width - 2) * pos / total; i++)
 	{
 		str[i] = '=';
 	}
@@ -255,7 +257,7 @@ string build_process_bar(size_t width, size_t pos, size_t total)
 
 	string_ex per;
 	per.format("%d%%", pos * 100 / total);
-	
+
 	size_t start = (width - per.size()) / 2;
 	str.replace(start, per.size(), per);
 	str.insert(start, g_vt_yellow);
@@ -272,7 +274,7 @@ void print_auto_scroll(string str, size_t len, size_t start)
 		return;
 	}
 
-	if(str.size())
+	if (str.size())
 		start = start % str.size();
 	else
 		start = 0;
@@ -293,7 +295,7 @@ public:
 	string m_last_err;
 	int m_done = 0;
 	size_t m_start_pos = 0;
-	size_t	m_trans_size = 0;
+	size_t m_trans_size = 0;
 	clock_t m_start_time;
 	uint64_t m_cmd_start_time;
 	uint64_t m_cmd_end_time;
@@ -360,7 +362,7 @@ public:
 		if (nt.type == uuu_notify::NOTIFY_CMD_END)
 		{
 			m_cmd_end_time = nt.timestamp;
-			if(nt.status)
+			if (nt.status)
 			{
 				g_overall_status = nt.status;
 				m_last_err = uuu_get_last_err_string();
@@ -371,14 +373,14 @@ public:
 		}
 		if (nt.type == uuu_notify::NOTIFY_TRANS_POS || nt.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
 		{
-			if (m_trans_size == 0) {
+			if (m_trans_size == 0)
+			{
 
 				m_trans_pos = nt.index;
 				return true;
 			}
-	
-			if ((nt.index - m_trans_pos) < (m_trans_size / 100)
-				&& nt.index != m_trans_size)
+
+			if ((nt.index - m_trans_pos) < (m_trans_size / 100) && nt.index != m_trans_size)
 				return false;
 
 			m_trans_pos = nt.index;
@@ -386,7 +388,7 @@ public:
 
 		return true;
 	}
-	void print_verbose(uuu_notify*nt)
+	void print_verbose(uuu_notify *nt)
 	{
 		if (this->m_dev == "Prep" && g_start_usb_transfer)
 			return;
@@ -397,7 +399,8 @@ public:
 		}
 		if (nt->type == uuu_notify::NOTIFY_CMD_START)
 		{
-			cout << m_dev << ">" << "Start Cmd:" << nt->str << endl;
+			cout << m_dev << ">"
+				 << "Start Cmd:" << nt->str << endl;
 		}
 		if (nt->type == uuu_notify::NOTIFY_CMD_END)
 		{
@@ -405,18 +408,18 @@ public:
 			diff /= 1000;
 			if (nt->status)
 			{
-				cout << m_dev << ">" << g_vt_red <<"Fail " << uuu_get_last_err_string() << "("<< std::setprecision(4) << diff << "s)" <<  g_vt_default << endl;
+				cout << m_dev << ">" << g_vt_red << "Fail " << uuu_get_last_err_string() << "(" << std::setprecision(4) << diff << "s)" << g_vt_default << endl;
 			}
 			else
 			{
-				cout << m_dev << ">" << g_vt_green << "Okay ("<< std::setprecision(4) << diff << "s)" << g_vt_default << endl;
+				cout << m_dev << ">" << g_vt_green << "Okay (" << std::setprecision(4) << diff << "s)" << g_vt_default << endl;
 			}
 		}
 
 		if (nt->type == uuu_notify::NOTIFY_TRANS_POS || nt->type == uuu_notify::NOTIFY_DECOMPRESS_POS)
 		{
 			if (m_trans_size)
-				cout << g_vt_yellow << "\r" << m_trans_pos * 100 / m_trans_size <<"%" << g_vt_default;
+				cout << g_vt_yellow << "\r" << m_trans_pos * 100 / m_trans_size << "%" << g_vt_default;
 			else
 				cout << "\r" << m_trans_pos;
 
@@ -427,16 +430,15 @@ public:
 			cout << nt->str;
 
 		if (nt->type == uuu_notify::NOTIFY_WAIT_FOR)
-			cout << "\r" << nt->str << " "<< g_wait[((g_wait_index++) & 0x3)];
+			cout << "\r" << nt->str << " " << g_wait[((g_wait_index++) & 0x3)];
 
 		if (nt->type == uuu_notify::NOTIFY_DECOMPRESS_START)
 			cout << "Decompress file:" << nt->str << endl;
 
 		if (nt->type == uuu_notify::NOTIFY_DOWNLOAD_START)
 			cout << "Download file:" << nt->str << endl;
-
 	}
-	void print(int verbose = 0, uuu_notify*nt=NULL)
+	void print(int verbose = 0, uuu_notify *nt = NULL)
 	{
 		verbose ? print_verbose(nt) : print_simple();
 	}
@@ -447,7 +449,7 @@ public:
 		str.resize(8, ' ');
 
 		string_ex s;
-		s.format("%2d/%2d", m_cmd_index+1, m_cmd_total);
+		s.format("%2d/%2d", m_cmd_index + 1, m_cmd_total);
 
 		str += s;
 		return str;
@@ -474,7 +476,7 @@ public:
 			str += g_wait[(g_wait_index++) & 0x3];
 
 			print_oneline(str);
-			return ;
+			return;
 		}
 		else
 		{
@@ -506,20 +508,22 @@ public:
 					str.insert(1 + strlen(g_vt_green) + strlen("Done"), g_vt_default);
 				}
 				cout << str;
-			} else {
+			}
+			else
+			{
 				cout << build_process_bar(bar, m_trans_pos, m_trans_size);
 			}
 			cout << " ";
-			print_auto_scroll(m_cmd, width - bar - info-1, m_start_pos);
+			print_auto_scroll(m_cmd, width - bar - info - 1, m_start_pos);
 
-if (clock() - m_start_time > CLOCKS_PER_SEC / 4)
-{
-	m_start_pos++;
-	m_start_time = clock();
-}
-cout << endl;
+			if (clock() - m_start_time > CLOCKS_PER_SEC / 4)
+			{
+				m_start_pos++;
+				m_start_time = clock();
+			}
+			cout << endl;
 
-return;
+			return;
 		}
 	}
 };
@@ -545,7 +549,6 @@ void print_oneline(string str)
 		str.resize(w, ' ');
 	}
 	cout << str << endl;
-
 }
 
 ShowNotify Summary(map<uint64_t, ShowNotify> *np)
@@ -565,7 +568,7 @@ ShowNotify Summary(map<uint64_t, ShowNotify> *np)
 		}
 	}
 
-	if(g_start_usb_transfer)
+	if (g_start_usb_transfer)
 		sn.m_IsEmptyLine = true; // Hidden HTTP download when USB start transfer
 
 	sn.m_dev = "Prep";
@@ -575,7 +578,7 @@ ShowNotify Summary(map<uint64_t, ShowNotify> *np)
 
 int progress(uuu_notify nt, void *p)
 {
-	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify>*)p;
+	map<uint64_t, ShowNotify> *np = (map<uint64_t, ShowNotify> *)p;
 	map<string, ShowNotify>::iterator it;
 
 	std::lock_guard<std::mutex> lock(g_callback_mutex);
@@ -588,7 +591,7 @@ int progress(uuu_notify nt, void *p)
 
 		if (g_verbose)
 		{
-			if((*np)[nt.id].m_dev == "Prep")
+			if ((*np)[nt.id].m_dev == "Prep")
 				Summary(np).print(g_verbose, &nt);
 			else
 				(*np)[nt.id].print(g_verbose, &nt);
@@ -613,7 +616,8 @@ int progress(uuu_notify nt, void *p)
 			if ((*np)[nt.id].m_dev == "Prep" && !g_start_usb_transfer)
 			{
 				Summary(np).print();
-			}else
+			}
+			else
 				print_oneline("");
 
 			for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
@@ -621,7 +625,6 @@ int progress(uuu_notify nt, void *p)
 
 			for (size_t i = 0; i < g_map_path_nt.size() + 3; i++)
 				cout << "\x1B[1F";
-
 		}
 
 		//(*np)[nt.id] = g_map_path_nt[(*np)[nt.id].m_dev];
@@ -629,7 +632,7 @@ int progress(uuu_notify nt, void *p)
 
 	if (nt.type == uuu_notify::NOTIFY_THREAD_EXIT)
 	{
-		if(np->find(nt.id) != np->end())
+		if (np->find(nt.id) != np->end())
 			np->erase(nt.id);
 	}
 	return 0;
@@ -675,7 +678,10 @@ int get_console_width()
 }
 #else
 #include <sys/ioctl.h>
-bool enable_vt_mode() { return true; }
+bool enable_vt_mode()
+{
+	return true;
+}
 int get_console_width()
 {
 	struct winsize w;
@@ -728,7 +734,8 @@ int runshell(int shell)
 				prompt = "U>";
 				cout << "Exit u-boot cmd mode" << endl;
 				cout << "Okay" << endl;
-			}else if (cmd == "help" || cmd == "?")
+			}
+			else if (cmd == "help" || cmd == "?")
 			{
 				print_help();
 			}
@@ -789,7 +796,7 @@ int main(int argc, char **argv)
 	if (argc >= 2)
 	{
 		string s = argv[1];
-		if(s == "-udev")
+		if (s == "-udev")
 		{
 			print_udev();
 			return 0;
@@ -817,7 +824,7 @@ int main(int argc, char **argv)
 	string filename;
 	string cmd;
 	int ret;
-	int dryrun  = 0;
+	int dryrun = 0;
 
 	string cmd_script;
 
@@ -829,7 +836,8 @@ int main(int argc, char **argv)
 			if (s == "-d")
 			{
 				deamon = 1;
-			}else if (s == "-s")
+			}
+			else if (s == "-s")
 			{
 				shell = 1;
 				g_verbose = 1;
@@ -842,7 +850,8 @@ int main(int argc, char **argv)
 			{
 				g_verbose = 1;
 				uuu_set_debug_level(2);
-			}else if (s == "-dry")
+			}
+			else if (s == "-dry")
 			{
 				dryrun = 1;
 				g_verbose = 1;
@@ -881,7 +890,7 @@ int main(int argc, char **argv)
 			else if (s == "-e")
 			{
 #ifndef WIN32
-	#define _putenv putenv
+#define _putenv putenv
 #endif
 				i++;
 				if (_putenv(argv[i]))
@@ -913,16 +922,18 @@ int main(int argc, char **argv)
 				}
 
 				// if script name is not build-in, try to look for a file
-				if (g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end()) {
+				if (g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end())
+				{
 					BuildCmd tmpCmd;
 					string tmpCmdFileName = argv[i + 1];
 					tmpCmd.m_cmd = tmpCmdFileName.c_str();
 
 					std::ifstream t(tmpCmdFileName);
 					std::string fileContents((std::istreambuf_iterator<char>(t)),
-						std::istreambuf_iterator<char>());
+											 std::istreambuf_iterator<char>());
 
-					if (fileContents.empty()) {
+					if (fileContents.empty())
+					{
 						printf("%s is not built-in script or fail load external script file", tmpCmdFileName.c_str());
 						return -1;
 					}
@@ -936,14 +947,15 @@ int main(int argc, char **argv)
 
 					cmd_script = g_BuildScripts[tmpCmdFileName].replace_script_args(args);
 				}
-				else {
+				else
+				{
 					cmd_script = g_BuildScripts[argv[i + 1]].replace_script_args(args);
 				}
 				break;
 			}
 			else if (s == "-bshow")
 			{
-				if (i + 1 == argc || g_BuildScripts.find(argv[i+1]) == g_BuildScripts.end())
+				if (i + 1 == argc || g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end())
 				{
 					printf("error, must be have script name: ");
 					g_BuildScripts.ShowCmds();
@@ -961,7 +973,8 @@ int main(int argc, char **argv)
 				cout << "Unknown option: " << s.c_str();
 				return -1;
 			}
-		}else if (!s.empty() && s[s.size() - 1] == ':')
+		}
+		else if (!s.empty() && s[s.size() - 1] == ':')
 		{
 			for (int j = i; j < argc; j++)
 			{
@@ -972,7 +985,7 @@ int main(int argc, char **argv)
 					s.insert(s.end(), '"');
 				}
 				cmd.append(s);
-				if(j != (argc -1)) /* Don't add space at last arg */
+				if (j != (argc - 1)) /* Don't add space at last arg */
 					cmd.append(" ");
 			}
 			break;
@@ -1021,7 +1034,8 @@ int main(int argc, char **argv)
 
 		printf("\n");
 	}
-	else {
+	else
+	{
 		cout << "Wait for Known USB Device Appear...";
 		print_usb_filter();
 		cout << "\r";
@@ -1033,14 +1047,13 @@ int main(int argc, char **argv)
 
 	uuu_register_notify_callback(progress, &nt_session);
 
-
 	if (!cmd.empty())
 	{
 		ret = uuu_run_cmd(cmd.c_str(), dryrun);
 
-		for (size_t i = 0; i < g_map_path_nt.size()+3; i++)
+		for (size_t i = 0; i < g_map_path_nt.size() + 3; i++)
 			printf("\n");
-		if(ret)
+		if (ret)
 			printf("\nError: %s\n", uuu_get_last_err_string());
 		else
 			printf("Okay\n");
@@ -1058,7 +1071,7 @@ int main(int argc, char **argv)
 	{
 		runshell(shell);
 
-		cout << g_vt_red << "\nError: " << g_vt_default <<  uuu_get_last_err_string();
+		cout << g_vt_red << "\nError: " << g_vt_default << uuu_get_last_err_string();
 		return ret;
 	}
 
@@ -1072,7 +1085,7 @@ int main(int argc, char **argv)
 
 	/*Wait for the other thread exit, after send out CMD_DONE*/
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	if(!g_verbose)
+	if (!g_verbose)
 		printf("\n\n\n");
 	return g_overall_status;
 }

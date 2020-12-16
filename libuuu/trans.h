@@ -38,19 +38,19 @@ class TransBase
 {
 public:
 	TransBase() = default;
-	TransBase(const TransBase&) = delete;
-	TransBase& operator=(const TransBase&) = delete;
+	TransBase(const TransBase &) = delete;
+	TransBase &operator=(const TransBase &) = delete;
 	virtual ~TransBase();
 
 	virtual int open(void *) { return 0; }
 	virtual int close() { return 0; }
 	virtual int write(void *buff, size_t size) = 0;
 	virtual int read(void *buff, size_t size, size_t *return_size) = 0;
-	int write(std::vector<uint8_t> & buff) { return write(buff.data(), buff.size()); }
+	int write(std::vector<uint8_t> &buff) { return write(buff.data(), buff.size()); }
 	int read(std::vector<uint8_t> &buff);
 
 protected:
-	void * m_devhandle = nullptr;
+	void *m_devhandle = nullptr;
 };
 
 class EPInfo
@@ -75,7 +75,12 @@ class HIDTrans : public USBTrans
 {
 public:
 	HIDTrans(int read_timeout = 1000) : m_read_timeout{read_timeout} {}
-	~HIDTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
+	~HIDTrans() override
+	{
+		if (m_devhandle)
+			close();
+		m_devhandle = nullptr;
+	}
 
 	int open(void *p) override;
 	void set_hid_out_ep(int ep) noexcept { m_outEP = ep; }
@@ -92,7 +97,12 @@ class BulkTrans : public USBTrans
 {
 public:
 	BulkTrans(uint64_t timeout = 2000) : m_timeout{timeout} {}
-	~BulkTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
+	~BulkTrans() override
+	{
+		if (m_devhandle)
+			close();
+		m_devhandle = nullptr;
+	}
 
 	int open(void *p) override;
 	int write(void *buff, size_t size) override;
@@ -106,4 +116,4 @@ private:
 	uint64_t m_timeout = 2000;
 };
 
-int polling_usb(std::atomic<int>& bexit);
+int polling_usb(std::atomic<int> &bexit);

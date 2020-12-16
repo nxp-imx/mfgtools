@@ -72,27 +72,30 @@ public:
 	virtual int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) = 0;
 	virtual bool exist(const string &backfile, const string &filename) = 0;
 	virtual int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) = 0;
-	virtual int split(const string &filename, string *outbackfile, string *outfilename, bool dir=false)
+	virtual int split(const string &filename, string *outbackfile, string *outfilename, bool dir = false)
 	{
 		string path = str_to_upper(filename);
 		if (m_ext == nullptr || strlen(m_ext) == 0)
 		{
-			if(dir)
+			if (dir)
 			{
 				size_t pos = path.rfind("/");
-				if(pos == string::npos)
+				if (pos == string::npos)
 				{
 					*outbackfile = MAGIC_PATH;
 					*outbackfile += "./";
 					*outfilename = filename;
-				} else {
+				}
+				else
+				{
 					*outbackfile = filename.substr(0, pos);
-					if(filename.size() >= pos + 1)
+					if (filename.size() >= pos + 1)
 						*outfilename = filename.substr(pos + 1);
 					else
 						outfilename->clear();
 				}
-			}else
+			}
+			else
 			{
 				*outbackfile = filename;
 			}
@@ -100,7 +103,7 @@ public:
 		}
 
 		string ext = m_ext;
-		if(!dir)
+		if (!dir)
 			ext += "/";
 		size_t pos = path.rfind(ext);
 		if (pos == string::npos)
@@ -111,7 +114,7 @@ public:
 
 		*outbackfile = filename.substr(0, pos + strlen(m_ext));
 
-		if(filename.size() >= pos + strlen(m_ext) + 1)
+		if (filename.size() >= pos + strlen(m_ext) + 1)
 			*outfilename = filename.substr(pos + strlen(m_ext) + 1);
 		else
 			outfilename->clear();
@@ -119,11 +122,11 @@ public:
 	}
 
 protected:
-	const char * m_ext = nullptr;
-	const char * m_Prefix = nullptr;
+	const char *m_ext = nullptr;
+	const char *m_Prefix = nullptr;
 };
 
-static class FSFlat: public FSBasic
+static class FSFlat : public FSBasic
 {
 public:
 	FSFlat() { m_ext = ""; }
@@ -161,7 +164,7 @@ public:
 			return -1;
 
 		p->m_avaible_size = st.st_size;
-		
+
 		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 		p->m_request_cv.notify_all();
 
@@ -172,12 +175,12 @@ public:
 	{
 		struct stat64 st;
 
-		if(stat64(backfile.c_str() + 1, &st))
+		if (stat64(backfile.c_str() + 1, &st))
 		{
 			return -1;
 		}
 
-		if(st.st_mode & S_IFDIR)
+		if (st.st_mode & S_IFDIR)
 		{
 #ifdef WIN32
 			string str = backfile.substr(1);
@@ -194,7 +197,7 @@ public:
 				if (handle == INVALID_HANDLE_VALUE)
 					break;
 				string path = backfile + "/" + fd.cFileName;
-				if(fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+				if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 					path += "/";
 				fn(path.c_str() + 1, p);
 			} while (FindNextFile(handle, &fd));
@@ -204,13 +207,13 @@ public:
 			DIR *dir;
 			dir = opendir(backfile.c_str() + 1);
 			struct dirent *dp;
-			while ((dp=readdir(dir)) != nullptr)
+			while ((dp = readdir(dir)) != nullptr)
 			{
 				string name = dp->d_name;
-				if(name.substr(0, filename.size()) == filename || filename.empty())
+				if (name.substr(0, filename.size()) == filename || filename.empty())
 				{
 					string path = backfile + "/" + name;
-					if(dp->d_type == DT_DIR)
+					if (dp->d_type == DT_DIR)
 						path += "/";
 					fn(path.c_str() + 1, p);
 				}
@@ -218,7 +221,8 @@ public:
 			closedir(dir);
 			return 0;
 #endif
-		}else
+		}
+		else
 		{
 			return fn(backfile.c_str() + 1, p);
 		}
@@ -268,18 +272,26 @@ public:
 static class FSHttp : public FSNetwork
 {
 public:
-	FSHttp() { m_Prefix = "HTTP://"; m_Port = 80; }
+	FSHttp()
+	{
+		m_Prefix = "HTTP://";
+		m_Port = 80;
+	}
 	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override;
 	virtual bool exist(const string &backfile, const string &filename) override { return true; };
 	int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) override { return 0; };
 	int get_file_timesample(const string &filename, uint64_t *ptime) override { return 0; };
-}g_fshttp;
+} g_fshttp;
 
 static class FSHttps : public FSHttp
 {
 public:
-	FSHttps() { m_Prefix = "HTTPS://"; m_Port = 443; }
-}g_fshttps;
+	FSHttps()
+	{
+		m_Prefix = "HTTPS://";
+		m_Port = 443;
+	}
+} g_fshttps;
 
 int http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string filename)
 {
@@ -287,7 +299,7 @@ int http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string file
 
 	uuu_notify ut;
 	ut.type = uuu_notify::NOTIFY_DOWNLOAD_START;
-	ut.str = (char*)filename.c_str();
+	ut.str = (char *)filename.c_str();
 	call_notify(ut);
 
 	ut.type = uuu_notify::NOTIFY_TRANS_SIZE;
@@ -299,7 +311,7 @@ int http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string file
 		size_t sz = p->size() - i;
 		if (sz > max)
 			sz = max;
-		if (http->HttpDownload((char*)(p->data() + i), sz) < 0)
+		if (http->HttpDownload((char *)(p->data() + i), sz) < 0)
 		{
 			atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_ERROR_BIT);
 			p->m_request_cv.notify_all();
@@ -317,7 +329,7 @@ int http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string file
 	p->m_request_cv.notify_all();
 
 	ut.type = uuu_notify::NOTIFY_DOWNLOAD_END;
-	ut.str = (char*)filename.c_str();
+	ut.str = (char *)filename.c_str();
 	call_notify(ut);
 	return 0;
 }
@@ -360,7 +372,6 @@ class FSBackFile : public FSBasic
 {
 public:
 	int get_file_timesample(const string &filename, uint64_t *ptime) override;
-
 };
 
 static class FSZip : public FSBackFile
@@ -370,17 +381,16 @@ public:
 	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override;
 	bool exist(const string &backfile, const string &filename) override;
 	int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) override;
-}g_fszip;
+} g_fszip;
 
-static class FSTar: public FSBackFile
+static class FSTar : public FSBackFile
 {
 public:
-	FSTar() {m_ext = ".TAR"; };
+	FSTar() { m_ext = ".TAR"; };
 	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override;
 	bool exist(const string &backfile, const string &filename) override;
 	int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) override;
-}g_fstar;
-
+} g_fstar;
 
 static class FSFat : public FSBackFile
 {
@@ -389,7 +399,7 @@ public:
 	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override;
 	bool exist(const string &backfile, const string &filename) override;
 	int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) override;
-}g_fsfat;
+} g_fsfat;
 
 class FSCompressStream : public FSBackFile
 {
@@ -403,14 +413,14 @@ static class FSBz2 : public FSCompressStream
 public:
 	FSBz2() { m_ext = ".BZ2"; };
 	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override;
-}g_fsbz2;
+} g_fsbz2;
 
 static class FSGz : public FSCompressStream
 {
 public:
 	FSGz() { m_ext = ".GZ"; };
 	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override;
-}g_fsgz;
+} g_fsgz;
 
 static class FS_DATA
 {
@@ -447,15 +457,15 @@ public:
 
 	int for_each_ls(uuu_ls_file fn, string path, void *p)
 	{
-		for (int i = m_pFs.size() -1; i >= 0; i--)
-                {
-                        string back, filename;
-                        if (m_pFs[i]->split(path, &back, &filename, true) == 0)
-                                if(m_pFs[i]->for_each_ls(fn, back, filename, p)==0)
+		for (int i = m_pFs.size() - 1; i >= 0; i--)
+		{
+			string back, filename;
+			if (m_pFs[i]->split(path, &back, &filename, true) == 0)
+				if (m_pFs[i]->for_each_ls(fn, back, filename, p) == 0)
 				{
 					return 0;
 				}
-        }
+		}
 		return 0;
 	}
 
@@ -476,7 +486,7 @@ public:
 		{
 			string back, fn;
 			if (m_pFs[i]->split(filename, &back, &fn) == 0)
-				if(m_pFs[i]->load(back, fn, p, async) == 0)
+				if (m_pFs[i]->load(back, fn, p, async) == 0)
 					return 0;
 		}
 
@@ -486,14 +496,14 @@ public:
 		set_last_err_string(err);
 		return -1;
 	}
-}g_fs_data;
+} g_fs_data;
 
 int FSBackFile::get_file_timesample(const string &filename, uint64_t *ptime)
 {
 	string back, file;
 	if (split(filename, &back, &file))
 		return -1;
-	
+
 	return g_fs_data.get_file_timesample(back, ptime);
 }
 
@@ -510,17 +520,17 @@ int FSZip::for_each_ls(uuu_ls_file fn, const string &backfile, const string &fil
 {
 	Zip zip;
 
-        if (zip.Open(backfile))
-                return -1;
+	if (zip.Open(backfile))
+		return -1;
 
-	for(auto it = zip.m_filemap.begin(); it!=zip.m_filemap.end(); ++it)
+	for (auto it = zip.m_filemap.begin(); it != zip.m_filemap.end(); ++it)
 	{
-		if(it->first.substr(0, filename.size()) == filename || filename.empty())
+		if (it->first.substr(0, filename.size()) == filename || filename.empty())
 		{
 			string name = backfile;
 			name += "/";
 			name += it->first;
-			fn(name.c_str()+1, p);
+			fn(name.c_str() + 1, p);
 		}
 	}
 
@@ -535,7 +545,7 @@ int zip_async_load(string zipfile, string fn, shared_ptr<FileBuffer> buff)
 	if (zip.Open(zipfile))
 		return -1;
 
-	if(zip.get_file_buff(fn, buff))
+	if (zip.get_file_buff(fn, buff))
 		return -1;
 
 	buff->m_avaible_size = buff->m_DataSize;
@@ -561,7 +571,7 @@ int FSZip::load(const string &backfile, const string &filename, shared_ptr<FileB
 	}
 	else
 	{
-		if(zip.get_file_buff(filename, p))
+		if (zip.get_file_buff(filename, p))
 			return -1;
 
 		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
@@ -579,22 +589,21 @@ bool FSTar::exist(const string &backfile, const string &filename)
 	return tar.check_file_exist(filename);
 }
 
-
 int FSTar::for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p)
 {
 	Tar tar;
 
-        if (tar.Open(backfile))
-                return -1;
+	if (tar.Open(backfile))
+		return -1;
 
-	for(auto it = tar.m_filemap.begin(); it!=tar.m_filemap.end(); ++it)
+	for (auto it = tar.m_filemap.begin(); it != tar.m_filemap.end(); ++it)
 	{
-		if(it->first.substr(0, filename.size()) == filename || filename.empty())
+		if (it->first.substr(0, filename.size()) == filename || filename.empty())
 		{
 			string name = backfile;
 			name += "/";
 			name += it->first;
-			fn(name.c_str()+1, p);
+			fn(name.c_str() + 1, p);
 		}
 	}
 
@@ -610,7 +619,7 @@ int FSTar::load(const string &backfile, const string &filename, shared_ptr<FileB
 	if (!tar.check_file_exist(filename))
 		return -1;
 
-	if(tar.get_file_buff(filename, p))
+	if (tar.get_file_buff(filename, p))
 		return -1;
 	p->m_avaible_size = p->m_DataSize;
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
@@ -635,8 +644,8 @@ int FSFat::load(const string &backfile, const string &filename, shared_ptr<FileB
 	{
 		return -1;
 	}
-	
-	if(fat.get_file_buff(filename, p))
+
+	if (fat.get_file_buff(filename, p))
 		return -1;
 
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
@@ -648,19 +657,19 @@ int FSFat::load(const string &backfile, const string &filename, shared_ptr<FileB
 int FSFat::for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p)
 {
 	Fat fat;
-        if (fat.Open(backfile))
-        {
-                return -1;
-        }
-
-	for(auto it = fat.m_filemap.begin(); it != fat.m_filemap.end(); ++it)
+	if (fat.Open(backfile))
 	{
-		if(it->first.substr(0, filename.size()) == filename || filename.empty())
+		return -1;
+	}
+
+	for (auto it = fat.m_filemap.begin(); it != fat.m_filemap.end(); ++it)
+	{
+		if (it->first.substr(0, filename.size()) == filename || filename.empty())
 		{
 			string name = backfile;
 			name += "/";
 			name += it->first;
-			fn(name.c_str()+1, p);
+			fn(name.c_str() + 1, p);
 		}
 	}
 	return 0;
@@ -677,7 +686,7 @@ bool FSCompressStream::exist(const string &backfile, const string &filename)
 int FSCompressStream::for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p)
 {
 
-	if(!g_fs_data.exist(backfile))
+	if (!g_fs_data.exist(backfile))
 		return -1;
 
 	string str;
@@ -694,7 +703,7 @@ struct bz2_blk
 	size_t decompress_offset;
 	size_t decompress_size;
 	size_t actual_size;
-	int	error;
+	int error;
 };
 
 class bz2_blks
@@ -708,10 +717,14 @@ public:
 
 	atomic<size_t> top;
 	atomic<size_t> bottom;
-	bz2_blks() { top = 0; bottom = ULLONG_MAX; }
+	bz2_blks()
+	{
+		top = 0;
+		bottom = ULLONG_MAX;
+	}
 };
 
-int bz2_update_available(shared_ptr<FileBuffer> p, bz2_blks * pblk)
+int bz2_update_available(shared_ptr<FileBuffer> p, bz2_blks *pblk)
 {
 	lock_guard<mutex> lock(pblk->blk_mutex);
 	size_t sz = 0;
@@ -731,7 +744,7 @@ int bz2_update_available(shared_ptr<FileBuffer> p, bz2_blks * pblk)
 	return 0;
 }
 
-int bz2_decompress(shared_ptr<FileBuffer> pbz, shared_ptr<FileBuffer> p, bz2_blks * pblk)
+int bz2_decompress(shared_ptr<FileBuffer> pbz, shared_ptr<FileBuffer> p, bz2_blks *pblk)
 {
 	bz2_blk one;
 	size_t cur;
@@ -744,7 +757,8 @@ int bz2_decompress(shared_ptr<FileBuffer> pbz, shared_ptr<FileBuffer> p, bz2_blk
 
 		{
 			std::unique_lock<std::mutex> lck(pblk->con_mutex);
-			while (pblk->top + 1 >= pblk->blk.size()) {
+			while (pblk->top + 1 >= pblk->blk.size())
+			{
 				pblk->cv.wait(lck);
 				if (p->IsError())
 					return -1;
@@ -768,12 +782,12 @@ int bz2_decompress(shared_ptr<FileBuffer> pbz, shared_ptr<FileBuffer> p, bz2_blk
 		unsigned int len = one.decompress_size;
 		buff.resize(len);
 
-		one.error = BZ2_bzBuffToBuffDecompress((char*)buff.data(),
-			&len,
-			(char*)pbz->data() + one.start,
-			one.size,
-			0,
-			0);
+		one.error = BZ2_bzBuffToBuffDecompress((char *)buff.data(),
+											   &len,
+											   (char *)pbz->data() + one.start,
+											   one.size,
+											   0,
+											   0);
 		one.actual_size = len;
 
 		{
@@ -781,18 +795,16 @@ int bz2_decompress(shared_ptr<FileBuffer> pbz, shared_ptr<FileBuffer> p, bz2_blk
 			(*pblk).blk[cur] = one;
 		}
 
-
 		{
 			lock_guard<mutex> lock(p->m_data_mutex);
 			if (p->size() < one.decompress_offset + one.actual_size)
-				if(p->resize(one.decompress_offset + one.actual_size))
+				if (p->resize(one.decompress_offset + one.actual_size))
 					return -1;
 
 			memcpy(p->data() + one.decompress_offset, buff.data(), one.actual_size);
 		}
 
 		bz2_update_available(p, pblk);
-
 	}
 
 	return 0;
@@ -803,7 +815,8 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 	shared_ptr<FileBuffer> pbz;
 
 	pbz = get_file_buffer(filename, true);
-	if (pbz == nullptr) {
+	if (pbz == nullptr)
+	{
 		string err;
 		err = "Failure get file buffer: ";
 		err += filename;
@@ -835,7 +848,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 	{
 		threads.push_back(thread(bz2_decompress, pbz, p, &blks));
 #ifdef WIN32
-		if( i!=0 )
+		if (i != 0)
 			SetThreadPriority(threads[i].native_handle(), THREAD_PRIORITY_BELOW_NORMAL);
 #endif
 	}
@@ -843,7 +856,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 	size_t requested = 0;
 	for (size_t i = 0; i < pbz->size() - 10; i++)
 	{
-		if(i >= requested)
+		if (i >= requested)
 		{
 			requested = i + 0x10000;
 			if (requested > pbz->size())
@@ -863,12 +876,12 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 		uint16_t *header = (uint16_t *)p1++;
 		if (*header == 0x5a42) //"BZ"
 		{
-			uint32_t *magic1 = (uint32_t *)&pbz->at(i+4);
+			uint32_t *magic1 = (uint32_t *)&pbz->at(i + 4);
 			if (*magic1 == 0x26594131) //PI 3.1415926
 			{
 				uint16_t *magic2 = (uint16_t *)&pbz->at(i + 8);
 				if (*magic2 == 0x5953)
-				{     
+				{
 					/*which is valude bz2 header*/
 					struct bz2_blk one;
 					memset(&one, 0, sizeof(one));
@@ -891,7 +904,8 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 		}
 	}
 
-	if (blks.blk.size() == 1) {
+	if (blks.blk.size() == 1)
+	{
 		set_last_err_string("Can't find validate bz2 magic number");
 		return -1;
 	}
@@ -900,7 +914,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 
 	{
 		lock_guard<mutex> lock(p->m_data_mutex);
-		if(p->resize(total))
+		if (p->resize(total))
 			return -1;
 	}
 
@@ -928,7 +942,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 			set_last_err_string("decompress err");
 			return -1;
 		}
-		if ((blks.blk[i].decompress_size != blks.blk[i].actual_size) && (i != blks.blk.size() - 2))  /*two dummy blks (one header and other end)*/
+		if ((blks.blk[i].decompress_size != blks.blk[i].actual_size) && (i != blks.blk.size() - 2)) /*two dummy blks (one header and other end)*/
 		{
 			set_last_err_string("bz2: only support last block less then other block");
 			return -1;
@@ -937,7 +951,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 
 	bz2_update_available(p, &blks);
 
-	if(p->resize(p->m_avaible_size))
+	if (p->resize(p->m_avaible_size))
 		return -1;
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 	p->m_request_cv.notify_all();
@@ -947,76 +961,75 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 
 bool is_pbzip2_file(string filename)
 {
-	shared_ptr<FileBuffer> file=get_file_buffer(filename, true);
-	uint64_t filesize= file->size();
-	uint64_t readsize= (filesize< (1024*1024) )? filesize:(1024*1024); //read at most 1MB, because maximum block size is 900kb
+	shared_ptr<FileBuffer> file = get_file_buffer(filename, true);
+	uint64_t filesize = file->size();
+	uint64_t readsize = (filesize < (1024 * 1024)) ? filesize : (1024 * 1024); //read at most 1MB, because maximum block size is 900kb
 
 	file->request_data(readsize);
 
-	int header_num=0;
-	uint8_t* ptr= file->data();
-	for(size_t i =0 ; i < readsize ; i++)
+	int header_num = 0;
+	uint8_t *ptr = file->data();
+	for (size_t i = 0; i < readsize; i++)
 	{
-		if(ptr[0]=='B'&& ptr[1]=='Z'&& ptr[2]=='h' && ptr[4]=='1'&& ptr[5]=='A' && ptr[6]=='Y' && ptr[7]=='&' && ptr[8]=='S'&& ptr[9]=='Y')
+		if (ptr[0] == 'B' && ptr[1] == 'Z' && ptr[2] == 'h' && ptr[4] == '1' && ptr[5] == 'A' && ptr[6] == 'Y' && ptr[7] == '&' && ptr[8] == 'S' && ptr[9] == 'Y')
 		{
 			header_num++;
 		}
 		ptr++;
 	}
-	if(header_num>1)
+	if (header_num > 1)
 		return true;
 	else
 		return false;
 }
 
-int decompress_single_thread(string name,shared_ptr<FileBuffer>p)
+int decompress_single_thread(string name, shared_ptr<FileBuffer> p)
 {
-	uint8_t* decompressed_file;
+	uint8_t *decompressed_file;
 	uint64_t decompressed_size;
 
-	uint8_t* compressed_file;
+	uint8_t *compressed_file;
 	uint64_t compressed_size;
 
-	shared_ptr<FileBuffer> filebuffer=get_file_buffer(name);
+	shared_ptr<FileBuffer> filebuffer = get_file_buffer(name);
 
-	compressed_file=filebuffer->data();
-	compressed_size=filebuffer->size();
+	compressed_file = filebuffer->data();
+	compressed_size = filebuffer->size();
 
-	decompressed_file=p->data();
-	decompressed_size=0;
+	decompressed_file = p->data();
+	decompressed_size = 0;
 
-	p->reserve(7*compressed_size);//the usual compressed ratio is about 18%, so 7*18% > 100%
+	p->reserve(7 * compressed_size); //the usual compressed ratio is about 18%, so 7*18% > 100%
 
 	bz_stream strm;
-	strm.bzalloc  = nullptr;
-	strm.bzfree   = nullptr;
-	strm.opaque   = nullptr;
+	strm.bzalloc = nullptr;
+	strm.bzfree = nullptr;
+	strm.opaque = nullptr;
 
 	int ret;
-	ret = BZ2_bzDecompressInit (&strm,0, 0 );
+	ret = BZ2_bzDecompressInit(&strm, 0, 0);
 	if (ret != BZ_OK)
 		return -1;
-	strm.next_in  = (char*)compressed_file;
+	strm.next_in = (char *)compressed_file;
 	strm.avail_in = compressed_size;
 
-	uint64_t decompress_amount=5000; //decompress 5000 byte every iteration, choose 5000 only because the pbzip2 also used 5000 in their implementation.
-	while(1)
+	uint64_t decompress_amount = 5000; //decompress 5000 byte every iteration, choose 5000 only because the pbzip2 also used 5000 in their implementation.
+	while (1)
 	{
-		p->reserve(decompressed_size+1000*decompress_amount);//make sure the space is enough,multiple by 1000 to avoid repeated realloc
-		strm.next_out=(char*)p->data()+decompressed_size;
-		strm.avail_out=decompress_amount;
+		p->reserve(decompressed_size + 1000 * decompress_amount); //make sure the space is enough,multiple by 1000 to avoid repeated realloc
+		strm.next_out = (char *)p->data() + decompressed_size;
+		strm.avail_out = decompress_amount;
 
-		ret=BZ2_bzDecompress(&strm);
-		decompressed_size+=decompress_amount;
+		ret = BZ2_bzDecompress(&strm);
+		decompressed_size += decompress_amount;
 
-		if(ret==BZ_STREAM_END)
+		if (ret == BZ_STREAM_END)
 		{
-			decompressed_size-= strm.avail_out;
+			decompressed_size -= strm.avail_out;
 			break;
 		}
-		else if (ret != BZ_OK)//if it is not bz_ok nor bz_stream_end, decompression failed.
+		else if (ret != BZ_OK) //if it is not bz_ok nor bz_stream_end, decompression failed.
 			return -1;
-
 	}
 	p->resize(decompressed_size);
 	BZ2_bzDecompressEnd(&strm);
@@ -1025,8 +1038,7 @@ int decompress_single_thread(string name,shared_ptr<FileBuffer>p)
 	return 0;
 }
 
-
-int FSBz2::load(const string &backfile, const string &filename, shared_ptr<FileBuffer>p, bool async)
+int FSBz2::load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async)
 {
 	if (!g_fs_data.exist(backfile))
 	{
@@ -1038,9 +1050,9 @@ int FSBz2::load(const string &backfile, const string &filename, shared_ptr<FileB
 	}
 	if (filename != "*")
 	{
-		string star ("/*");
-		string decompressed_name= backfile+ star;
-		shared_ptr<FileBuffer> decompressed_file=get_file_buffer(decompressed_name);
+		string star("/*");
+		string decompressed_name = backfile + star;
+		shared_ptr<FileBuffer> decompressed_file = get_file_buffer(decompressed_name);
 		Tar tar;
 		tar.Open(decompressed_name);
 		if (tar.get_file_buff(filename, p))
@@ -1049,16 +1061,18 @@ int FSBz2::load(const string &backfile, const string &filename, shared_ptr<FileB
 	}
 	else
 	{
-		if(!check_file_exist(backfile.substr(1)))
+		if (!check_file_exist(backfile.substr(1)))
 			return -1;
-		if(is_pbzip2_file(backfile.substr(1))==true)//the bz2 file can be decompressed with multithreading
+		if (is_pbzip2_file(backfile.substr(1)) == true) //the bz2 file can be decompressed with multithreading
 			p->m_aync_thread = thread(bz_async_load, backfile, p);
-		else//the bz2 file can only be decompressed using single thread
+		else //the bz2 file can only be decompressed using single thread
 			p->m_aync_thread = thread(decompress_single_thread, backfile, p);
 
-		if (!async) {
+		if (!async)
+		{
 			p->m_aync_thread.join();
-			if (! p->IsLoaded()) {
+			if (!p->IsLoaded())
+			{
 				set_last_err_string("async data load failure\n");
 				return -1;
 			}
@@ -1067,7 +1081,7 @@ int FSBz2::load(const string &backfile, const string &filename, shared_ptr<FileB
 	return 0;
 }
 
-int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBuffer>p, bool async)
+int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async)
 {
 	if (!g_fs_data.exist(backfile))
 	{
@@ -1107,7 +1121,7 @@ int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBu
 
 		uuu_notify ut;
 		ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
-		ut.str = (char*)backfile.c_str();
+		ut.str = (char *)backfile.c_str();
 		call_notify(ut);
 
 		ut.type = uuu_notify::NOTIFY_DECOMPRESS_SIZE;
@@ -1147,7 +1161,7 @@ int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBu
 
 uint64_t get_file_timesample(string filename)
 {
-	uint64_t time=0;
+	uint64_t time = 0;
 	g_fs_data.get_file_timesample(filename, &time);
 	return time;
 }
@@ -1195,7 +1209,7 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 		shared_ptr<FileBuffer> p;
 		{
 			std::lock_guard<mutex> lock(g_mutex_map);
-			p= g_filebuffer_map[filename];
+			p = g_filebuffer_map[filename];
 		}
 		if (p->m_timesample != get_file_timesample(filename))
 			if (p->reload(filename, async))
@@ -1207,10 +1221,10 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 		{
 			std::lock_guard<mutex> lock(p->m_async_mutex);
 
-			if(p->m_aync_thread.joinable())
+			if (p->m_aync_thread.joinable())
 				p->m_aync_thread.join();
 
-			if(!p->IsLoaded())
+			if (!p->IsLoaded())
 			{
 				return nullptr;
 			}
@@ -1235,7 +1249,7 @@ FileBuffer::FileBuffer(void *p, size_t sz)
 	m_DataSize = 0;
 	m_MemSize = 0;
 
-	m_pDatabuffer = (uint8_t*)malloc(sz);
+	m_pDatabuffer = (uint8_t *)malloc(sz);
 	m_MemSize = m_DataSize = sz;
 
 	memcpy(m_pDatabuffer, p, sz);
@@ -1244,14 +1258,14 @@ FileBuffer::FileBuffer(void *p, size_t sz)
 
 FileBuffer::~FileBuffer()
 {
-	if(m_aync_thread.joinable())
+	if (m_aync_thread.joinable())
 		m_aync_thread.join();
 
 	if (m_pDatabuffer)
 	{
-		if(m_allocate_way == ALLOCATION_WAYS::MMAP)
+		if (m_allocate_way == ALLOCATION_WAYS::MMAP)
 			unmapfile();
-		if(m_allocate_way == ALLOCATION_WAYS::MALLOC)
+		if (m_allocate_way == ALLOCATION_WAYS::MALLOC)
 			free(m_pDatabuffer);
 	}
 }
@@ -1260,87 +1274,88 @@ int FileBuffer::mapfile(string filename, size_t sz)
 {
 #ifdef _MSC_VER
 
-		m_Request.StructureVersion = REQUEST_OPLOCK_CURRENT_VERSION;
-		m_Request.StructureLength = sizeof(REQUEST_OPLOCK_INPUT_BUFFER);
-		m_Request.RequestedOplockLevel = (OPLOCK_LEVEL_CACHE_READ | OPLOCK_LEVEL_CACHE_HANDLE);
-		m_Request.Flags = REQUEST_OPLOCK_INPUT_FLAG_REQUEST;
+	m_Request.StructureVersion = REQUEST_OPLOCK_CURRENT_VERSION;
+	m_Request.StructureLength = sizeof(REQUEST_OPLOCK_INPUT_BUFFER);
+	m_Request.RequestedOplockLevel = (OPLOCK_LEVEL_CACHE_READ | OPLOCK_LEVEL_CACHE_HANDLE);
+	m_Request.Flags = REQUEST_OPLOCK_INPUT_FLAG_REQUEST;
 
-		REQUEST_OPLOCK_OUTPUT_BUFFER Response;
+	REQUEST_OPLOCK_OUTPUT_BUFFER Response;
 
-		m_OverLapped.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-		ResetEvent(m_OverLapped.hEvent);
+	m_OverLapped.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+	ResetEvent(m_OverLapped.hEvent);
 
-		m_file_handle = CreateFile(filename.c_str(),
-			GENERIC_READ,
-			FILE_SHARE_READ | FILE_SHARE_WRITE,
-			nullptr,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED,
-			nullptr);
+	m_file_handle = CreateFile(filename.c_str(),
+							   GENERIC_READ,
+							   FILE_SHARE_READ | FILE_SHARE_WRITE,
+							   nullptr,
+							   OPEN_EXISTING,
+							   FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED,
+							   nullptr);
 
-		if (m_file_handle == INVALID_HANDLE_VALUE)
-		{
-			string err = "Create File Failure ";
-			err += filename;
-			set_last_err_string(err);
-			return -1;
-		}
+	if (m_file_handle == INVALID_HANDLE_VALUE)
+	{
+		string err = "Create File Failure ";
+		err += filename;
+		set_last_err_string(err);
+		return -1;
+	}
 
-		BOOL bSuccess = DeviceIoControl(m_file_handle,
-			FSCTL_REQUEST_OPLOCK,
-			&m_Request,
-			sizeof(m_Request),
-			&Response,
-			sizeof(Response),
-			nullptr,
-			&m_OverLapped);
+	BOOL bSuccess = DeviceIoControl(m_file_handle,
+									FSCTL_REQUEST_OPLOCK,
+									&m_Request,
+									sizeof(m_Request),
+									&Response,
+									sizeof(Response),
+									nullptr,
+									&m_OverLapped);
 
-		if (bSuccess || GetLastError() == ERROR_IO_PENDING)
-		{
-			m_file_monitor = thread(file_overwrite_monitor, filename, this);
-		}
+	if (bSuccess || GetLastError() == ERROR_IO_PENDING)
+	{
+		m_file_monitor = thread(file_overwrite_monitor, filename, this);
+	}
 
-		m_file_map = CreateFileMapping(m_file_handle,
-			nullptr, PAGE_READONLY, 0, 0, nullptr);
+	m_file_map = CreateFileMapping(m_file_handle,
+								   nullptr, PAGE_READONLY, 0, 0, nullptr);
 
-		if (m_file_map == INVALID_HANDLE_VALUE)
-		{
-			set_last_err_string("Fail create Map");
-			return -1;
-		}
+	if (m_file_map == INVALID_HANDLE_VALUE)
+	{
+		set_last_err_string("Fail create Map");
+		return -1;
+	}
 
-		m_pDatabuffer = (uint8_t *)MapViewOfFile(m_file_map, FILE_MAP_READ, 0, 0, sz);
-		m_DataSize = sz;
-		m_MemSize = sz;
-		m_allocate_way = ALLOCATION_WAYS::MMAP;
+	m_pDatabuffer = (uint8_t *)MapViewOfFile(m_file_map, FILE_MAP_READ, 0, 0, sz);
+	m_DataSize = sz;
+	m_MemSize = sz;
+	m_allocate_way = ALLOCATION_WAYS::MMAP;
 
 #else
-		int fd = open(filename.c_str(), O_RDONLY);
-		if (fd == -1)
-		{
-			string err;
-			err += "xx Failure open file: ";
-			err + filename;
-			set_last_err_string(err);
-			return -1;
-		}
-
-		m_pDatabuffer = (uint8_t *)mmap64(0, sz, PROT_READ, MAP_SHARED, fd, 0);
-		if (m_pDatabuffer == MAP_FAILED) {
-			m_pDatabuffer = nullptr;
-			set_last_err_string("mmap failure\n");
-			return -1;
-		}
-		m_DataSize = sz;
-		m_MemSize = sz;
-		m_allocate_way = ALLOCATION_WAYS::MMAP;
-		close(fd);
-#endif
-		if (m_pDatabuffer)
-			return 0;
-
-		set_last_err_string("mmap file failure");
+	int fd = open(filename.c_str(), O_RDONLY);
+	if (fd == -1)
+	{
+		string err;
+		err += "xx Failure open file: ";
+		err + filename;
+		set_last_err_string(err);
 		return -1;
+	}
+
+	m_pDatabuffer = (uint8_t *)mmap64(0, sz, PROT_READ, MAP_SHARED, fd, 0);
+	if (m_pDatabuffer == MAP_FAILED)
+	{
+		m_pDatabuffer = nullptr;
+		set_last_err_string("mmap failure\n");
+		return -1;
+	}
+	m_DataSize = sz;
+	m_MemSize = sz;
+	m_allocate_way = ALLOCATION_WAYS::MMAP;
+	close(fd);
+#endif
+	if (m_pDatabuffer)
+		return 0;
+
+	set_last_err_string("mmap file failure");
+	return -1;
 }
 
 int FileBuffer::ref_other_buffer(shared_ptr<FileBuffer> p, size_t offset, size_t size)
@@ -1368,7 +1383,7 @@ int FileBuffer::request_data(size_t sz)
 {
 	std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
 
-	while(!this->m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT)
+	while (!this->m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT)
 		m_request_cv.wait(lck);
 
 	if (IsLoaded())
@@ -1380,7 +1395,6 @@ int FileBuffer::request_data(size_t sz)
 		}
 	}
 
-	
 	while ((sz > m_avaible_size) && !IsLoaded())
 	{
 		if (IsError())
@@ -1447,11 +1461,13 @@ int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 
 	data.resize(size);
 
-	if (needlock) m_data_mutex.lock();
+	if (needlock)
+		m_data_mutex.lock();
 
 	memcpy(data.data(), this->data() + offset, size);
 
-	if (needlock) m_data_mutex.unlock();
+	if (needlock)
+		m_data_mutex.unlock();
 
 	return 0;
 }
@@ -1462,7 +1478,7 @@ int FileBuffer::reserve(size_t sz)
 
 	if (sz > m_MemSize)
 	{
-		m_pDatabuffer = (uint8_t*)realloc(m_pDatabuffer, sz);
+		m_pDatabuffer = (uint8_t *)realloc(m_pDatabuffer, sz);
 		m_MemSize = sz;
 
 		if (m_pDatabuffer == nullptr)
@@ -1532,11 +1548,11 @@ int file_overwrite_monitor(string filename, FileBuffer *p)
 	str = ">";
 	str += filename;
 
-	if(p->m_pDatabuffer && p->get_m_allocate_way() == FileBuffer::ALLOCATION_WAYS::MMAP)
+	if (p->m_pDatabuffer && p->get_m_allocate_way() == FileBuffer::ALLOCATION_WAYS::MMAP)
 	{
 		std::lock_guard<mutex> lock(g_mutex_map);
 		p->m_file_monitor.detach(); /*Detach itself, erase will delete p*/
-		if(g_filebuffer_map.find(str) != g_filebuffer_map.end())
+		if (g_filebuffer_map.find(str) != g_filebuffer_map.end())
 			g_filebuffer_map.erase(str);
 	}
 
@@ -1547,22 +1563,24 @@ int file_overwrite_monitor(string filename, FileBuffer *p)
 int uuu_for_each_ls_file(uuu_ls_file fn, const char *file_path, void *p)
 {
 	string_ex path;
-	path +=">";
+	path += ">";
 
 	string f = file_path;
 
-	if(f.size() == 0)
+	if (f.size() == 0)
 	{
 		path += "./";
-	}else if( f[0] == '/')
+	}
+	else if (f[0] == '/')
 	{
 		path += "//";
-	}else
+	}
+	else
 	{
 		path += "./";
 	}
 
-	path+=file_path;
+	path += file_path;
 	path.replace('\\', '/');
 
 	f = path;

@@ -35,4 +35,3 @@
 
 void set_last_err_string(const std::string &str);
 void set_last_err_id(int id);
-

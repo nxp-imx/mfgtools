@@ -54,18 +54,18 @@
 #ifdef WIN32
 class FileBuffer;
 int file_overwrite_monitor(std::string filename, FileBuffer *p);
-#endif 
+#endif
 
 //bit 0, data loaded
 //bit 1, data total size known
-#define FILEBUFFER_FLAG_LOADED_BIT		0x1
-#define FILEBUFFER_FLAG_KNOWN_SIZE_BIT  0x2
-#define FILEBUFFER_FLAG_ERROR_BIT		0x4
+#define FILEBUFFER_FLAG_LOADED_BIT 0x1
+#define FILEBUFFER_FLAG_KNOWN_SIZE_BIT 0x2
+#define FILEBUFFER_FLAG_ERROR_BIT 0x4
 
-#define FILEBUFFER_FLAG_LOADED		(FILEBUFFER_FLAG_LOADED_BIT|FILEBUFFER_FLAG_KNOWN_SIZE_BIT) // LOADED must be knownsize
-#define FILEBUFFER_FLAG_KNOWN_SIZE	FILEBUFFER_FLAG_KNOWN_SIZE_BIT
+#define FILEBUFFER_FLAG_LOADED (FILEBUFFER_FLAG_LOADED_BIT | FILEBUFFER_FLAG_KNOWN_SIZE_BIT) // LOADED must be knownsize
+#define FILEBUFFER_FLAG_KNOWN_SIZE FILEBUFFER_FLAG_KNOWN_SIZE_BIT
 
-class FileBuffer: public std::enable_shared_from_this<FileBuffer>
+class FileBuffer : public std::enable_shared_from_this<FileBuffer>
 {
 public:
 	enum class ALLOCATION_WAYS
@@ -87,7 +87,7 @@ public:
 	int ref_other_buffer(std::shared_ptr<FileBuffer> p, size_t offset, size_t size);
 
 	std::mutex m_async_mutex;
-	
+
 	std::atomic_int m_dataflags;
 
 	std::thread m_aync_thread;
@@ -105,7 +105,7 @@ public:
 #endif
 
 	FileBuffer();
-	FileBuffer(void*p, size_t sz);
+	FileBuffer(void *p, size_t sz);
 	~FileBuffer();
 
 	ALLOCATION_WAYS get_m_allocate_way() const noexcept { return m_allocate_way; }
@@ -126,9 +126,9 @@ public:
 	{
 		return m_dataflags & FILEBUFFER_FLAG_ERROR_BIT;
 	}
-	uint8_t * data() noexcept
+	uint8_t *data() noexcept
 	{
-		return m_pDatabuffer ;
+		return m_pDatabuffer;
 	}
 
 	size_t size() const noexcept
@@ -136,7 +136,7 @@ public:
 		return m_DataSize;
 	}
 
-	uint8_t & operator[] (size_t index)
+	uint8_t &operator[](size_t index)
 	{
 		assert(m_pDatabuffer);
 		assert(index < m_DataSize);
@@ -144,7 +144,7 @@ public:
 		return *(m_pDatabuffer + index);
 	}
 
-	uint8_t & at(size_t index)
+	uint8_t &at(size_t index)
 	{
 		return (*this)[index];
 	}
@@ -152,20 +152,20 @@ public:
 
 	int reserve(size_t sz);
 
-	int swap(FileBuffer & a);
+	int swap(FileBuffer &a);
 
 	int mapfile(std::string filename, size_t sz);
 
 	int unmapfile();
 	//Read write lock;
 	uint64_t m_timesample;
-	int reload(std::string filename, bool async=false);
+	int reload(std::string filename, bool async = false);
 
 private:
 	ALLOCATION_WAYS m_allocate_way = ALLOCATION_WAYS::MALLOC;
 };
 
-std::shared_ptr<FileBuffer> get_file_buffer(std::string filename, bool aysnc=false);
-bool check_file_exist(std::string filename, bool start_async_load=true);
+std::shared_ptr<FileBuffer> get_file_buffer(std::string filename, bool aysnc = false);
+bool check_file_exist(std::string filename, bool start_async_load = true);
 
 void set_current_dir(const std::string &dir);

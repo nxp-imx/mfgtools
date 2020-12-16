@@ -39,8 +39,7 @@ class ConfigItem
 {
 public:
 	ConfigItem() = default;
-	ConfigItem(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t verLow = 0, uint16_t verUp = UINT16_MAX) :
-		m_pid{pid}, m_vid{vid}, m_bcdVerMin{verLow}, m_bcdVerMax{verUp}
+	ConfigItem(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t verLow = 0, uint16_t verUp = UINT16_MAX) : m_pid{pid}, m_vid{vid}, m_bcdVerMin{verLow}, m_bcdVerMax{verUp}
 	{
 		if (pro)
 			m_protocol = pro;
@@ -58,7 +57,7 @@ public:
 	uint16_t m_bcdVerMax = UINT16_MAX;
 };
 
-class Config :public std::vector<ConfigItem>
+class Config : public std::vector<ConfigItem>
 {
 public:
 	Config();
@@ -66,4 +65,4 @@ public:
 	Config find(const std::string &protocal);
 };
 
-Config * get_config() noexcept;
+Config *get_config() noexcept;

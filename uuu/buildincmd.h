@@ -37,12 +37,12 @@
 
 using namespace std;
 
-extern const char * g_vt_yellow ;
-extern const char * g_vt_default ;
-extern const char * g_vt_green ;
-extern const char * g_vt_red  ;
-extern const char * g_vt_kcyn ;
-extern const char * g_vt_boldwhite ;
+extern const char *g_vt_yellow;
+extern const char *g_vt_default;
+extern const char *g_vt_green;
+extern const char *g_vt_red;
+extern const char *g_vt_kcyn;
+extern const char *g_vt_boldwhite;
 
 struct BuildCmd
 {
@@ -64,7 +64,7 @@ public:
 		ARG_OPTION = 0x2,
 		ARG_OPTION_KEY = 0x4,
 	};
-	Arg() {	m_flags = ARG_MUST;	}
+	Arg() { m_flags = ARG_MUST; }
 	int parser(string option)
 	{
 		size_t pos;
@@ -93,13 +93,13 @@ public:
 		}
 		return false;
 	}
-	BuildInScript() {};
-	BuildInScript(BuildCmd*p)
+	BuildInScript(){};
+	BuildInScript(BuildCmd *p)
 	{
 		m_script = p->m_buildcmd;
-		if(p->m_desc)
+		if (p->m_desc)
 			m_desc = p->m_desc;
-		if(p->m_cmd)
+		if (p->m_cmd)
 			m_cmd = p->m_cmd;
 
 		for (size_t i = 1; i < m_script.size(); i++)
@@ -107,8 +107,7 @@ public:
 			size_t off;
 			size_t off_tab;
 			string param;
-			if (m_script[i] == '_' 
-				&& (m_script[i - 1] == '@' || m_script[i - 1] == ' '))
+			if (m_script[i] == '_' && (m_script[i - 1] == '@' || m_script[i - 1] == ' '))
 			{
 				off = m_script.find(' ', i);
 				off_tab = m_script.find('\t', i);
@@ -139,14 +138,15 @@ public:
 			str += "@";
 			str += m_args[i].m_arg;
 			pos = m_script.find(str);
-			if (pos != string::npos) {
+			if (pos != string::npos)
+			{
 				string def;
 				size_t start_descript;
 				start_descript = m_script.find('|', pos);
 				if (start_descript != string::npos)
 				{
 					m_args[i].m_desc = m_script.substr(start_descript + 1,
-											m_script.find('\n', start_descript) - start_descript - 1);
+													   m_script.find('\n', start_descript) - start_descript - 1);
 					def = m_script.substr(pos, start_descript - pos);
 					m_args[i].parser(def);
 				}
@@ -161,8 +161,8 @@ public:
 
 	void show_cmd()
 	{
-		printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_cmd.c_str(), g_vt_default,  m_desc.c_str());
-		for (size_t i=0; i < m_args.size(); i++)
+		printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_cmd.c_str(), g_vt_default, m_desc.c_str());
+		for (size_t i = 0; i < m_args.size(); i++)
 		{
 			string desc;
 			desc += m_args[i].m_arg;
@@ -237,7 +237,7 @@ public:
 class BuildInScriptVector : public map<string, BuildInScript>
 {
 public:
-	BuildInScriptVector(BuildCmd*p)
+	BuildInScriptVector(BuildCmd *p)
 	{
 		while (p->m_cmd)
 		{
@@ -264,21 +264,20 @@ public:
 
 			auto i = iCol;
 			i++;
-			if(i != end())
+			if (i != end())
 				printf("|");
 		}
 		printf(">");
 	}
 
-	void PrintAutoComplete(string match, const char *space=" " )
+	void PrintAutoComplete(string match, const char *space = " ")
 	{
 		for (auto iCol = begin(); iCol != end(); ++iCol)
-                {
-			if(iCol->first.substr(0, match.size()) == match)
+		{
+			if (iCol->first.substr(0, match.size()) == match)
 				printf("%s%s\n", iCol->first.c_str(), space);
 		}
 	}
-
 };
 
 extern BuildInScriptVector g_BuildScripts;

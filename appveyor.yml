@@ -1,119 +1,117 @@
 version: 1.4.{build}
 image:
-- Visual Studio 2019
-- Visual Studio 2017
-- Ubuntu1604
+  - Visual Studio 2019
+  - Visual Studio 2017
+  - Ubuntu1604
 
-configuration: 
-- Debug
-- Release
+configuration:
+  - Debug
+  - Release
 
 platform:
- - x86
- - x64
- 
+  - x86
+  - x64
+
 init:
- - sh: if [ "${CONFIGURATION}" = "Debug" ] ; then exit 0; fi
- - sh: if [ "${PLATFORM}" = "x86" ]; then exit 0; fi 
- 
+  - sh: if [ "${CONFIGURATION}" = "Debug" ] ; then exit 0; fi
+  - sh: if [ "${PLATFORM}" = "x86" ]; then exit 0; fi
+
 skip_tags: true
 
 install:
-- cmd: echo %APPVEYOR_BUILD_FOLDER%
+  - cmd: echo %APPVEYOR_BUILD_FOLDER%
 
-- cmd: git submodule update --init
-    
-- cmd: cd %APPVEYOR_BUILD_FOLDER%\libusb
-    
-- cmd:    cd ..
- 
-- sh: sudo apt-get update
+  - cmd: git submodule update --init
 
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%\libusb
 
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install libzip-dev
+  - cmd: cd ..
 
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install libbz2-dev
-    
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install asciidoc
-    
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install rename
+  - sh: sudo apt-get update
+
+  - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev
+
+  - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install libzip-dev
+
+  - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install libbz2-dev
+
+  - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install asciidoc
+
+  - sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install rename
 
 build_script:
+  # below powershell actions equals to retarget projects to newest SDK and tool v142 in visual studio 2019
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\uuu.vcxproj) -replace '141', '142' | Out-File -encoding ASCII msvc\uuu.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\uuu.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\uuu.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\bzip2.vcxproj) -replace '141', '142' | Out-File -encoding ASCII msvc\bzip2.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\bzip2.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\bzip2.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\libuuu.vcxproj) -replace '141', '142' | Out-File -encoding ASCII msvc\libuuu.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\libuuu.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\libuuu.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\zlib.vcxproj) -replace '141', '142' | Out-File -encoding ASCII msvc\zlib.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\zlib.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\zlib.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_dll_2017.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII libusb\msvc\libusb_dll_2017.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_dll_2017.vcxproj) -replace '141', '142' | Out-File -encoding ASCII libusb\msvc\libusb_dll_2017.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\uuu-static-link.vcxproj) -replace '141', '142' | Out-File -encoding ASCII msvc\uuu-static-link.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\uuu-static-link.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\uuu-static-link.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_static_2017.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII libusb\msvc\libusb_static_2017.vcxproj}
+  - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_static_2017.vcxproj) -replace '141', '142' | Out-File -encoding ASCII libusb\msvc\libusb_static_2017.vcxproj}
 
-# below powershell actions equals to retarget projects to newest SDK and tool v142 in visual studio 2019
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\uuu.vcxproj) -replace '141', '142' | Out-File -encoding ASCII msvc\uuu.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\uuu.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\uuu.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\bzip2.vcxproj) -replace '141', '142' | Out-File -encoding ASCII msvc\bzip2.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\bzip2.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\bzip2.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\libuuu.vcxproj) -replace '141', '142' | Out-File -encoding ASCII msvc\libuuu.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\libuuu.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\libuuu.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\zlib.vcxproj) -replace '141', '142' | Out-File -encoding ASCII msvc\zlib.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\zlib.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\zlib.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_dll_2017.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII libusb\msvc\libusb_dll_2017.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_dll_2017.vcxproj) -replace '141', '142' | Out-File -encoding ASCII libusb\msvc\libusb_dll_2017.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\uuu-static-link.vcxproj) -replace '141', '142' | Out-File -encoding ASCII msvc\uuu-static-link.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\uuu-static-link.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\uuu-static-link.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_static_2017.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII libusb\msvc\libusb_static_2017.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_static_2017.vcxproj) -replace '141', '142' | Out-File -encoding ASCII libusb\msvc\libusb_static_2017.vcxproj}
+  - cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2019" (msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll")
+  #coverity tool is only available to visual studio 2017 imagine in appveyor
+  - cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll")
 
+  - cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (7z a -tzip mfg.zip cov-int)
 
-- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2019" (msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll")
-#coverity tool is only available to visual studio 2017 imagine in appveyor
-- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll")
+  - cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (curl --form token=%coverity_token% --form email=frank.li@nxp.com --form file=@mfg.zip --form version="automation test"  --form description="testing coverity automation" https://scan.coverity.com/builds?project=NXPmicro%2Fmfgtools)
 
-- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (7z a -tzip mfg.zip cov-int)
+  - cmd: git clean -dxf .
 
-- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (curl --form token=%coverity_token% --form email=frank.li@nxp.com --form file=@mfg.zip --form version="automation test"  --form description="testing coverity automation" https://scan.coverity.com/builds?project=NXPmicro%2Fmfgtools)
+  - cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu-static-link.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
-- cmd: git clean -dxf .
+  - cmd: if exist %APPVEYOR_BUILD_FOLDER%\msvc\x64\release\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\msvc\x64\release\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
 
-- cmd: msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu-static-link.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - sh: cmake -D 'STATIC=1' .
+  - sh: make
 
-- cmd: if exist %APPVEYOR_BUILD_FOLDER%\msvc\x64\release\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\msvc\x64\release\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
-   
-- sh: cmake -D 'STATIC=1' .
-- sh: make
+  - sh: git submodule init
+  - sh: git submodule update
+  - sh: git archive --prefix "uuu-${APPVEYOR_BUILD_VERSION}/" -o "uuu_source-${APPVEYOR_BUILD_VERSION}.tar" HEAD
+  - sh: git submodule foreach --recursive "git archive --prefix=uuu-${APPVEYOR_BUILD_VERSION}/\$path/ --output=\$sha1.tar HEAD && tar --concatenate --file=$(pwd)/uuu_source-${APPVEYOR_BUILD_VERSION}.tar \$sha1.tar && rm \$sha1.tar"
+  - sh: mkdir uuu-${APPVEYOR_BUILD_VERSION}; git describe --tags --long >uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version
+  - sh: tar -r uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version -f uuu_source-${APPVEYOR_BUILD_VERSION}.tar
+  - sh: gzip uuu_source-${APPVEYOR_BUILD_VERSION}.tar
+  - sh: tar xzf uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz && zip uuu_source-${APPVEYOR_BUILD_VERSION}.zip $(tar tf uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz)
 
-- sh: git submodule init
-- sh: git submodule update
-- sh: git archive --prefix "uuu-${APPVEYOR_BUILD_VERSION}/" -o "uuu_source-${APPVEYOR_BUILD_VERSION}.tar" HEAD
-- sh: git submodule foreach --recursive "git archive --prefix=uuu-${APPVEYOR_BUILD_VERSION}/\$path/ --output=\$sha1.tar HEAD && tar --concatenate --file=$(pwd)/uuu_source-${APPVEYOR_BUILD_VERSION}.tar \$sha1.tar && rm \$sha1.tar"
-- sh: mkdir uuu-${APPVEYOR_BUILD_VERSION}; git describe --tags --long >uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version
-- sh: tar -r uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version -f uuu_source-${APPVEYOR_BUILD_VERSION}.tar
-- sh: gzip uuu_source-${APPVEYOR_BUILD_VERSION}.tar
-- sh: tar xzf uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz && zip uuu_source-${APPVEYOR_BUILD_VERSION}.zip $(tar tf uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz)
+  - sh: git clone https://github.com/NXPmicro/mfgtools.wiki.git
 
-- sh: git clone https://github.com/NXPmicro/mfgtools.wiki.git
-    
-- sh: cd mfgtools.wiki
-    
-- sh: rename -f 's/\.asciidoc$//' *
-    
-- sh: echo "<revhistory>" > UUU-docinfo.xml
-    
-- sh: git log -n25 --reverse --format="format:<revision><revnumber>%h</revnumber><date>%cd</date><authorinitials>%an</authorinitials><revremark>%s</revremark></revision>" >> UUU-docinfo.xml
-    
-- sh: echo "</revhistory>" >> UUU-docinfo.xml
-    
-- sh: a2x -L -a docinfo UUU
-    
+  - sh: cd mfgtools.wiki
+
+  - sh: rename -f 's/\.asciidoc$//' *
+
+  - sh: echo "<revhistory>" > UUU-docinfo.xml
+
+  - sh: git log -n25 --reverse --format="format:<revision><revnumber>%h</revnumber><date>%cd</date><authorinitials>%an</authorinitials><revremark>%s</revremark></revision>" >> UUU-docinfo.xml
+
+  - sh: echo "</revhistory>" >> UUU-docinfo.xml
+
+  - sh: a2x -L -a docinfo UUU
+
 artifacts:
-- path: uuu.exe
-- path: uuu/uuu
-- path: mfgtools.wiki/UUU.pdf
-- path: uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz
-- path: uuu_source-${APPVEYOR_BUILD_VERSION}.zip
+  - path: uuu.exe
+  - path: uuu/uuu
+  - path: mfgtools.wiki/UUU.pdf
+  - path: uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz
+  - path: uuu_source-${APPVEYOR_BUILD_VERSION}.zip
 
 before_deploy:
-- cmd: ''
+  - cmd: ""
 deploy:
-- provider: GitHub
-  description: prebuild for $(APPVEYOR_REPO_COMMIT) \n\n $(APPVEYOR_REPO_COMMIT_MESSAGE)
-  auth_token:
-    secure: SWWVkwSfPyVIaPChBBl+uAA3Fau9Rl5iNPQ9VRL8yyggXvc6wPcr/O9iXBMVM7Ju
-  artifact: uuu.exe;  libusb-1.0.dll; uuu/uuu; mfgtools.wiki/UUU.pdf; uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz; uuu_source-${APPVEYOR_BUILD_VERSION}.zip
-  draft: true
+  - provider: GitHub
+    description: prebuild for $(APPVEYOR_REPO_COMMIT) \n\n $(APPVEYOR_REPO_COMMIT_MESSAGE)
+    auth_token:
+      secure: SWWVkwSfPyVIaPChBBl+uAA3Fau9Rl5iNPQ9VRL8yyggXvc6wPcr/O9iXBMVM7Ju
+    artifact: uuu.exe;  libusb-1.0.dll; uuu/uuu; mfgtools.wiki/UUU.pdf; uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz; uuu_source-${APPVEYOR_BUILD_VERSION}.zip
+    draft: true
 
 environment:
   coverity_token:

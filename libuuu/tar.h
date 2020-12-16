@@ -70,7 +70,6 @@ public:
 	uint64_t size;
 };
 
-
 class Tar
 {
 	std::string m_tarfilename;

@@ -54,17 +54,17 @@ int Zip::BuildDirInfo()
 
 	for (i = zipfile->size() - sizeof(Zip_eocd); i > 0; i--)
 	{
-		peocd = (Zip_eocd*)(zipfile->data() + i);
+		peocd = (Zip_eocd *)(zipfile->data() + i);
 		if (peocd->sign == EOCD_SIGNATURE)
 		{
 			if (peocd->offset_of_central_dir == 0xFFFFFFFF)
-			{//zip64
+			{ //zip64
 				for (size_t j = i - sizeof(Zip64_eocd_locator); j > 0; j--)
 				{
-					peocd64_loc = (Zip64_eocd_locator*)(zipfile->data() + j);
+					peocd64_loc = (Zip64_eocd_locator *)(zipfile->data() + j);
 					if (peocd64_loc->sign == EOCD64_LOCATOR_SIGNATURE)
 					{
-						peocd64 = (Zip64_eocd*)(zipfile->data() + peocd64_loc->offset_of_eocd);
+						peocd64 = (Zip64_eocd *)(zipfile->data() + peocd64_loc->offset_of_eocd);
 						if (peocd64->sign != EOCD64_SIGNATURE)
 						{
 							set_last_err_string("Can't find EOCD64_SIGNATURE, not a zip64 file");
@@ -96,9 +96,9 @@ int Zip::BuildDirInfo()
 		return -1;
 	}
 
-	i = peocd64? peocd64->offset:peocd->offset_of_central_dir;
+	i = peocd64 ? peocd64->offset : peocd->offset_of_central_dir;
 	size_t total = i;
-	total += peocd64 ? peocd64->size: peocd->size_of_central_dir;
+	total += peocd64 ? peocd64->size : peocd->size_of_central_dir;
 
 	while (i < total)
 	{
@@ -109,7 +109,7 @@ int Zip::BuildDirInfo()
 			return -1;
 		}
 		Zip_file_Info info;
-		info.m_filename.append((char*)pdir->filename, pdir->file_name_length);
+		info.m_filename.append((char *)pdir->filename, pdir->file_name_length);
 		info.m_offset = pdir->offset;
 		info.m_filesize = pdir->uncompressed_size;
 		info.m_timestamp = (pdir->last_modidfy_date << 16) + pdir->last_modidfy_time;
@@ -120,14 +120,14 @@ int Zip::BuildDirInfo()
 			size_t e;
 			for (e = 0; e < pdir->extrafield_length; /*dummy*/)
 			{
-				Zip_ext *ext = (Zip_ext*)(zipfile->data() + e + i + sizeof(Zip_central_dir) + pdir->file_name_length);
+				Zip_ext *ext = (Zip_ext *)(zipfile->data() + e + i + sizeof(Zip_central_dir) + pdir->file_name_length);
 
 				if (ext->tag == 0x1)
 				{
 					size_t cur64 = 0;
 					if (info.m_filesize == 0xFFFFFFFF)
 					{
-						info.m_filesize = *((uint64_t*)(((uint8_t*)ext) + sizeof(Zip_ext) + cur64));
+						info.m_filesize = *((uint64_t *)(((uint8_t *)ext) + sizeof(Zip_ext) + cur64));
 						cur64 += 8;
 					}
 
@@ -139,7 +139,7 @@ int Zip::BuildDirInfo()
 
 					if (info.m_compressedsize == 0xFFFFFFFF)
 					{
-						info.m_compressedsize = *((uint64_t*)(((uint8_t*)ext) + sizeof(Zip_ext) + cur64));
+						info.m_compressedsize = *((uint64_t *)(((uint8_t *)ext) + sizeof(Zip_ext) + cur64));
 						cur64 += 8;
 					}
 
@@ -151,7 +151,7 @@ int Zip::BuildDirInfo()
 
 					if (info.m_offset == 0xFFFFFFFF)
 					{
-						info.m_offset = *((uint64_t*)(((uint8_t*)ext) + sizeof(Zip_ext) + cur64));
+						info.m_offset = *((uint64_t *)(((uint8_t *)ext) + sizeof(Zip_ext) + cur64));
 						cur64 += 8;
 					}
 
@@ -200,7 +200,7 @@ int Zip::get_file_buff(string filename, shared_ptr<FileBuffer> p)
 
 	uuu_notify ut;
 	ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
-	ut.str = (char*)filename.c_str();
+	ut.str = (char *)filename.c_str();
 	call_notify(ut);
 
 	return m_filemap[filename].decompress(this, p);
@@ -214,7 +214,6 @@ int Zip::Open(string filename)
 
 Zip_file_Info::Zip_file_Info()
 {
-
 }
 
 Zip_file_Info::~Zip_file_Info()
@@ -222,12 +221,12 @@ Zip_file_Info::~Zip_file_Info()
 	memset(&m_strm, 0, sizeof(m_strm));
 }
 
-int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
+int Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer> p)
 {
 	p->resize(m_filesize);
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
 	p->m_request_cv.notify_all();
-	
+
 	uuu_notify ut;
 	ut.type = uuu_notify::NOTIFY_DECOMPRESS_SIZE;
 	ut.total = m_filesize;
@@ -238,7 +237,7 @@ int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 	if (zipfile == nullptr)
 		return -1;
 
-	Zip_file_desc *file_desc=(Zip_file_desc *)(zipfile->data() + m_offset);
+	Zip_file_desc *file_desc = (Zip_file_desc *)(zipfile->data() + m_offset);
 	if (file_desc->sign != FILE_SIGNATURE)
 	{
 		set_last_err_string("file signature miss matched");
@@ -274,7 +273,8 @@ int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 
 	/* run inflate() on input until output buffer not full */
 	size_t each_out_size = CHUNK;
-	do {
+	do
+	{
 
 		if (p->size() - pos < each_out_size)
 			each_out_size = p->size() - pos;
@@ -283,9 +283,10 @@ int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 		m_strm.next_out = p->data() + pos;
 		ret = inflate(&m_strm, Z_NO_FLUSH);
 		//assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
-		switch (ret) {
+		switch (ret)
+		{
 		case Z_NEED_DICT:
-			ret = Z_DATA_ERROR;     /* and fall through */
+			ret = Z_DATA_ERROR; /* and fall through */
 		case Z_DATA_ERROR:
 		case Z_MEM_ERROR:
 			(void)inflateEnd(&m_strm);

@@ -40,7 +40,7 @@ class SparseFile
 public:
 	std::vector<uint8_t> m_data;
 
-	static chunk_header_t * get_next_chunk(uint8_t *p, size_t &pos);
+	static chunk_header_t *get_next_chunk(uint8_t *p, size_t &pos);
 
 	int init_header(size_t blsz, int blcount);
 

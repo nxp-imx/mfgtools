@@ -44,7 +44,7 @@
  * Get Last error string
  * @return last error string
 */
-EXT const char * uuu_get_last_err_string();
+EXT const char *uuu_get_last_err_string();
 
 /**
 * Get Last error code
@@ -52,7 +52,7 @@ EXT const char * uuu_get_last_err_string();
 */
 EXT int uuu_get_last_err();
 
-EXT const char * uuu_get_version_string();
+EXT const char *uuu_get_version_string();
 
 /**
  * 1.0.1
@@ -61,31 +61,29 @@ EXT const char * uuu_get_version_string();
 
 EXT int uuu_get_version();
 
-
-
 struct uuu_notify
 {
 	enum NOTIFY_TYPE
 	{
 		NOTIFY_CMD_TOTAL,
-		NOTIFY_CMD_START,	/* str is command name*/
-		NOTIFY_CMD_END,	    /* status show command finish status. 0 is success. Other failure.*/
-		NOTIFY_CMD_INDEX,   /*Current running command index*/
+		NOTIFY_CMD_START, /* str is command name*/
+		NOTIFY_CMD_END,	  /* status show command finish status. 0 is success. Other failure.*/
+		NOTIFY_CMD_INDEX, /*Current running command index*/
 
-		NOTIFY_CMD_INFO,	/* Status info string */
+		NOTIFY_CMD_INFO, /* Status info string */
 
 		NOTIFY_PHASE_TOTAL,
 		NOTIFY_PHASE_INDEX, /*Current running phase*/
 
-		NOTIFY_TRANS_SIZE,  /*Total size*/
-		NOTIFY_TRANS_POS,   /*Current finished transfer pos*/
+		NOTIFY_TRANS_SIZE, /*Total size*/
+		NOTIFY_TRANS_POS,  /*Current finished transfer pos*/
 
 		NOTIFY_WAIT_FOR,
 		NOFITY_DEV_ATTACH,
 
 		NOTIFY_DECOMPRESS_START,
 		NOTIFY_DECOMPRESS_SIZE,
-		NOTIFY_DECOMPRESS_POS, 
+		NOTIFY_DECOMPRESS_POS,
 
 		NOTIFY_DOWNLOAD_START,
 		NOTIFY_DOWNLOAD_END,
@@ -111,19 +109,19 @@ typedef int (*uuu_notify_fun)(struct uuu_notify, void *data);
 int uuu_register_notify_callback(uuu_notify_fun f, void *data);
 int uuu_unregister_notify_callback(uuu_notify_fun f);
 
-typedef int(*uuu_show_cfg)(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t bcdlow, uint16_t bcdhigh, void *p);
+typedef int (*uuu_show_cfg)(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t bcdlow, uint16_t bcdhigh, void *p);
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p);
 
-typedef int(*uuu_ls_file)(const char *path, void *p);
+typedef int (*uuu_ls_file)(const char *path, void *p);
 int uuu_for_each_ls_file(uuu_ls_file fn, const char *path, void *p);
 
-typedef int(*uuu_ls_usb_devices)(const char *path, const char *chip, const char *pro,  uint16_t vid, uint16_t pid, uint16_t bcd, void *p);
+typedef int (*uuu_ls_usb_devices)(const char *path, const char *chip, const char *pro, uint16_t vid, uint16_t pid, uint16_t bcd, void *p);
 int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p);
 
-int uuu_run_cmd(const char * cmd, int dry);
+int uuu_run_cmd(const char *cmd, int dry);
 int uuu_run_cmd_script(const char *script, int dry);
 
-int uuu_auto_detect_file(const char * filename);
+int uuu_auto_detect_file(const char *filename);
 int uuu_wait_uuu_finish(int deamon, int dry);
 int uuu_add_usbpath_filter(const char *path);
 

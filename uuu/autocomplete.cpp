@@ -54,11 +54,11 @@
 #include <Windows.h>
 #endif
 
-void linux_auto_arg(const char *space = " ", const char * filter = "")
+void linux_auto_arg(const char *space = " ", const char *filter = "")
 {
 	string str = filter;
 
-	const char *param[] = { "-b", "-d", "-v", "-V", "-s", NULL };
+	const char *param[] = {"-b", "-d", "-v", "-V", "-s", NULL};
 	int i = 0;
 
 	for (int i = 0; param[i]; i++)
@@ -82,7 +82,8 @@ void linux_autocomplete(int argc, char **argv)
 	if (argc == 3)
 	{
 		last = argv[2];
-	}else
+	}
+	else
 	{
 		cur = argv[2];
 		last = argv[3];
@@ -98,23 +99,23 @@ void linux_autocomplete(int argc, char **argv)
 		return;
 	}
 
-	if (last.size()>=3)
+	if (last.size() >= 3)
 	{
-		if (last.substr(last.size() - 3) == "uuu" &&(cur.empty() || cur[0] == '-'))
+		if (last.substr(last.size() - 3) == "uuu" && (cur.empty() || cur[0] == '-'))
 		{
 			linux_auto_arg();
 			cout << cur << endl;
 		}
-
-	}else if(last.empty())
+	}
+	else if (last.empty())
 	{
 		linux_auto_arg();
 	}
 	else if (last == "-b")
 	{
 		return g_BuildScripts.PrintAutoComplete(cur);
-
-	}else if(last[0] == '-')
+	}
+	else if (last[0] == '-')
 	{
 		linux_auto_arg();
 	}
@@ -138,7 +139,8 @@ void power_shell_autocomplete(const char *p)
 
 	string file;
 
-	vector<string> argv; string params;
+	vector<string> argv;
+	string params;
 	while (pos != string::npos && pos < pstr.size())
 	{
 		file = get_next_word(pstr, pos);
@@ -173,7 +175,7 @@ void power_shell_autocomplete(const char *p)
 	uuu_for_each_ls_file(linux_autocomplete_ls, last.c_str(), NULL);
 }
 
-int auto_complete(int argc, char**argv)
+int auto_complete(int argc, char **argv)
 {
 	if (argc == 4 || argc == 3)
 	{
@@ -206,23 +208,23 @@ void print_autocomplete_help()
 	{
 		cout << "Enjoy auto [tab] command complete by put below script into /etc/bash_completion.d/uuu" << endl;
 		cout << g_vt_kcyn;
-		cout << "  _uuu_autocomplete()" <<endl;
+		cout << "  _uuu_autocomplete()" << endl;
 		cout << "  {" << endl;
 		cout << "       COMPREPLY=($(" << TARGET_PATH << " $1 $2 $3))" << endl;
 		cout << "  }" << endl;
-		cout << "  complete -o nospace -F _uuu_autocomplete  uuu" << g_vt_default << endl << endl;
+		cout << "  complete -o nospace -F _uuu_autocomplete  uuu" << g_vt_default << endl
+			 << endl;
 	}
 #else
 	{
 		printf("Powershell: Enjoy auto [tab] command complete by run below command or put into Documents\\WindowsPowerShell\\Microsoft.PowerShell_profile.ps1\n");
-		
+
 		HMODULE hModule = GetModuleHandleA(NULL);
 		char path[MAX_PATH];
 		GetModuleFileNameA(hModule, path, MAX_PATH);
 
 		printf("   Register-ArgumentCompleter -CommandName uuu -ScriptBlock {param($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameter); %s -autocomplete $parameterName }\n\n",
-			path);
+			   path);
 	}
 #endif
-
 }

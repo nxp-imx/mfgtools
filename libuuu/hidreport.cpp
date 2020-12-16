@@ -44,7 +44,7 @@ void HIDReport::notify(size_t index, uuu_notify::NOTIFY_TYPE type)
 {
 	uuu_notify nf;
 	nf.type = type;
-	if(type == uuu_notify::NOTIFY_TRANS_POS)
+	if (type == uuu_notify::NOTIFY_TRANS_POS)
 		nf.index = index + m_postion_base;
 	if (type == uuu_notify::NOTIFY_TRANS_SIZE)
 	{
@@ -70,7 +70,7 @@ int HIDReport::write(const void *p, size_t sz, uint8_t report_id)
 {
 	notify(sz, uuu_notify::NOTIFY_TRANS_SIZE);
 
-	const uint8_t * const buff = reinterpret_cast<const uint8_t *>(p);
+	const uint8_t *const buff = reinterpret_cast<const uint8_t *>(p);
 	size_t off = 0;
 	for (; off < sz; off += m_size_out)
 	{
@@ -82,7 +82,7 @@ int HIDReport::write(const void *p, size_t sz, uint8_t report_id)
 
 		memcpy(m_out_buff.data() + m_size_payload, buff + off, s);
 
-		int ret = m_pdev->write(m_out_buff.data(), report_id == 1? s + m_size_payload: m_size_out + m_size_payload);
+		int ret = m_pdev->write(m_out_buff.data(), report_id == 1 ? s + m_size_payload : m_size_out + m_size_payload);
 
 		if (ret < 0)
 			return -1;

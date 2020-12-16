@@ -50,7 +50,7 @@ int Fat::Open(string filename)
 		set_last_err_string("File too small");
 		return -1;
 	}
-	if (pbuff->at(510) != 0x55|| pbuff->at(511) != 0xAA)
+	if (pbuff->at(510) != 0x55 || pbuff->at(511) != 0xAA)
 	{
 		set_last_err_string("Partition signature miss matched");
 		return -1;
@@ -93,7 +93,7 @@ int Fat::Open(string filename)
 	m_num_of_rootdir = boot[0x12] << 8;
 
 	FatDirEntry *entry;
-	entry = (FatDirEntry*)(boot + m_root_dir_offset);
+	entry = (FatDirEntry *)(boot + m_root_dir_offset);
 	m_filemap.clear();
 
 	for (int i = 0; i < m_num_of_rootdir; i++)
@@ -115,11 +115,11 @@ int Fat::Open(string filename)
 
 		if (filename.empty())
 		{
-			filename.append((char*)entry->filename, 8);
+			filename.append((char *)entry->filename, 8);
 			if (entry->ext[0])
 			{
 				filename.append(".");
-				filename.append((char*)entry->ext, 3);
+				filename.append((char *)entry->ext, 3);
 			}
 		}
 		m_filemap[filename] = *entry;
@@ -133,17 +133,17 @@ int Fat::Open(string filename)
 
 int Fat::get_next_cluster(shared_ptr<FileBuffer> p, int cluster)
 {
-	uint16_t *pfat = (uint16_t*)(p->data() +  m_fat_part_start + m_fat_table_offset);
+	uint16_t *pfat = (uint16_t *)(p->data() + m_fat_part_start + m_fat_table_offset);
 	return pfat[cluster];
 }
 
 void *Fat::get_data_buff(shared_ptr<FileBuffer> p, int cluster)
 {
-	void *p1 = p->data() + m_fat_part_start + m_root_dir_offset + (cluster-2) * m_cluster + m_num_of_rootdir * 32;
+	void *p1 = p->data() + m_fat_part_start + m_root_dir_offset + (cluster - 2) * m_cluster + m_num_of_rootdir * 32;
 	return p1;
 }
 
-int Fat::get_file_buff(string filename, shared_ptr<FileBuffer>p)
+int Fat::get_file_buff(string filename, shared_ptr<FileBuffer> p)
 {
 	if (m_filemap.find(filename) == m_filemap.end())
 	{

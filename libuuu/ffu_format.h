@@ -42,46 +42,46 @@
 
 typedef struct _FFU_SECURITY_HEADER
 {
-	uint32_t cbSize;            // size of struct, overall
-	uint8_t  signature[12];     // "SignedImage "
-	uint32_t dwChunkSizeInKb;   // size of a hashed chunk within the image
-	uint32_t dwAlgId;           // algorithm used to hash
-	uint32_t dwCatalogSize;     // size of catalog to validate
-	uint32_t dwHashTableSize;   // size of hash table
+	uint32_t cbSize;		  // size of struct, overall
+	uint8_t signature[12];	  // "SignedImage "
+	uint32_t dwChunkSizeInKb; // size of a hashed chunk within the image
+	uint32_t dwAlgId;		  // algorithm used to hash
+	uint32_t dwCatalogSize;	  // size of catalog to validate
+	uint32_t dwHashTableSize; // size of hash table
 } FFU_SECURITY_HEADER;
 
 #define FFU_SIGNATURE "ImageFlash  "
 
 typedef struct _IMAGE_HEADER
 {
-	uint32_t  cbSize;           // sizeof(ImageHeader)
-	uint8_t   Signature[12];    // "ImageFlash  "
-	uint32_t  ManifestLength;   // in bytes
-	uint32_t  dwChunkSize;      // Used only during image generation.
+	uint32_t cbSize;		 // sizeof(ImageHeader)
+	uint8_t Signature[12];	 // "ImageFlash  "
+	uint32_t ManifestLength; // in bytes
+	uint32_t dwChunkSize;	 // Used only during image generation.
 } FFU_IMAGE_HEADER;
 
 typedef struct _STORE_HEADER
 {
-	uint32_t dwUpdateType; // indicates partial or full flash
-	uint16_t MajorVersion, MinorVersion; // used to validate struct
+	uint32_t dwUpdateType;								   // indicates partial or full flash
+	uint16_t MajorVersion, MinorVersion;				   // used to validate struct
 	uint16_t FullFlashMajorVersion, FullFlashMinorVersion; // FFU version, i.e. the image format
-	uint8_t szPlatformId[192]; // string which indicates what device this FFU is intended to be written to
-	uint32_t dwBlockSizeInBytes; // size of an image block in bytes - the device's actual sector size may differ
-	uint32_t dwWriteDescriptorCount; // number of write descriptors to iterate through
-	uint32_t dwWriteDescriptorLength; // total size of all the write descriptors, in bytes (included so they can be read out up front and interpreted later)
-	uint32_t dwValidateDescriptorCount; // number of validation descriptors to check
-	uint32_t dwValidateDescriptorLength; // total size of all the validation descriptors, in bytes
-	uint32_t dwInitialTableIndex; // block index in the payload of the initial (invalid) GPT
-	uint32_t dwInitialTableCount; // count of blocks for the initial GPT, i.e. the GPT spans blockArray[idx..(idx + count -1)]
-	uint32_t dwFlashOnlyTableIndex; // first block index in the payload of the flash-only GPT (included so safe flashing can be accomplished)
-	uint32_t dwFlashOnlyTableCount; // count of blocks in the flash-only GPT
-	uint32_t dwFinalTableIndex; // index in the table of the real GPT
-	uint32_t dwFinalTableCount; // number of blocks in the real GPT
-	uint16_t NumOfStores; // Total number of stores (V2 only)
-	uint16_t StoreIndex; // Current store index, 1-based (V2 only)
-	uint64_t StorePayloadSize; // Payload data only, excludes padding (V2 only)
-	uint16_t DevicePathLength; // Length of the device path (V2 only)
-	uint16_t DevicePath[1]; // Device path has no NUL at then end (V2 only)
+	uint8_t szPlatformId[192];							   // string which indicates what device this FFU is intended to be written to
+	uint32_t dwBlockSizeInBytes;						   // size of an image block in bytes - the device's actual sector size may differ
+	uint32_t dwWriteDescriptorCount;					   // number of write descriptors to iterate through
+	uint32_t dwWriteDescriptorLength;					   // total size of all the write descriptors, in bytes (included so they can be read out up front and interpreted later)
+	uint32_t dwValidateDescriptorCount;					   // number of validation descriptors to check
+	uint32_t dwValidateDescriptorLength;				   // total size of all the validation descriptors, in bytes
+	uint32_t dwInitialTableIndex;						   // block index in the payload of the initial (invalid) GPT
+	uint32_t dwInitialTableCount;						   // count of blocks for the initial GPT, i.e. the GPT spans blockArray[idx..(idx + count -1)]
+	uint32_t dwFlashOnlyTableIndex;						   // first block index in the payload of the flash-only GPT (included so safe flashing can be accomplished)
+	uint32_t dwFlashOnlyTableCount;						   // count of blocks in the flash-only GPT
+	uint32_t dwFinalTableIndex;							   // index in the table of the real GPT
+	uint32_t dwFinalTableCount;							   // number of blocks in the real GPT
+	uint16_t NumOfStores;								   // Total number of stores (V2 only)
+	uint16_t StoreIndex;								   // Current store index, 1-based (V2 only)
+	uint64_t StorePayloadSize;							   // Payload data only, excludes padding (V2 only)
+	uint16_t DevicePathLength;							   // Length of the device path (V2 only)
+	uint16_t DevicePath[1];								   // Device path has no NUL at then end (V2 only)
 } FFU_STORE_HEADER;
 
 typedef struct _VALIDATION_ENTRY

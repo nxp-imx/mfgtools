@@ -38,14 +38,15 @@
 class FileBuffer;
 class HIDReport;
 
-#pragma pack (1)
-struct SDPCmd {
+#pragma pack(1)
+struct SDPCmd
+{
 	uint16_t m_cmd;
 	uint32_t m_addr;
-	uint8_t  m_format;
+	uint8_t m_format;
 	uint32_t m_count;
 	uint32_t m_data;
-	uint8_t  m_rsvd;
+	uint8_t m_rsvd;
 };
 
 struct IvtHeader
@@ -66,32 +67,31 @@ struct BootData
 	uint32_t PluginFlag;
 };
 
-#pragma pack ()
+#pragma pack()
 
-#define ROM_KERNEL_CMD_RD_MEM							0x0101
-#define ROM_KERNEL_CMD_WR_MEM							0x0202
-#define ROM_KERNEL_CMD_WR_FILE							0x0404
-#define ROM_KERNEL_CMD_ERROR_STATUS				0x0505
-#define RAM_KERNEL_CMD_HEADER							0x0606
+#define ROM_KERNEL_CMD_RD_MEM 0x0101
+#define ROM_KERNEL_CMD_WR_MEM 0x0202
+#define ROM_KERNEL_CMD_WR_FILE 0x0404
+#define ROM_KERNEL_CMD_ERROR_STATUS 0x0505
+#define RAM_KERNEL_CMD_HEADER 0x0606
 //#define ROM_KERNEL_CMD_RE_ENUM 0x0909
-#define ROM_KERNEL_CMD_DCD_WRITE					0x0A0A
-#define ROM_KERNEL_CMD_JUMP_ADDR					0x0B0B
-#define ROM_KERNEL_CMD_SKIP_DCD_HEADER				0x0C0C
+#define ROM_KERNEL_CMD_DCD_WRITE 0x0A0A
+#define ROM_KERNEL_CMD_JUMP_ADDR 0x0B0B
+#define ROM_KERNEL_CMD_SKIP_DCD_HEADER 0x0C0C
 
-#define MAX_DCD_WRITE_REG_CNT		85
-#define ROM_WRITE_ACK						0x128A8A12
-#define ROM_STATUS_ACK					0x88888888
-#define ROM_OK_ACK						0x900DD009
+#define MAX_DCD_WRITE_REG_CNT 85
+#define ROM_WRITE_ACK 0x128A8A12
+#define ROM_STATUS_ACK 0x88888888
+#define ROM_OK_ACK 0x900DD009
 
-#define IVT_BARKER_HEADER				0x402000D1
-#define IVT_BARKER2_HEADER				0x412000D1
+#define IVT_BARKER_HEADER 0x402000D1
+#define IVT_BARKER2_HEADER 0x412000D1
 
-#define HAB_TAG_DCD							0xd2       /**< Device Configuration Data */
+#define HAB_TAG_DCD 0xd2 /**< Device Configuration Data */
 
-class SDPCmdBase:public CmdBase
+class SDPCmdBase : public CmdBase
 {
 public:
-
 	enum HAB_t
 	{
 		HabUnknown = -1,
@@ -99,14 +99,14 @@ public:
 		HabDisabled = 0x56787856
 	};
 
-	SDPCmdBase(char *p) :CmdBase(p) { init_cmd(); }
+	SDPCmdBase(char *p) : CmdBase(p) { init_cmd(); }
 
 protected:
 	int check_ack(HIDReport *report, uint32_t ack);
 	HAB_t get_hab_type(HIDReport *report);
 	int get_status(HIDReport *p, uint32_t &status, uint8_t report_id);
 	int init_cmd();
-	IvtHeader * search_ivt_header(std::shared_ptr<FileBuffer> data, size_t &off, size_t limit=ULLONG_MAX);
+	IvtHeader *search_ivt_header(std::shared_ptr<FileBuffer> data, size_t &off, size_t limit = ULLONG_MAX);
 
 	std::string m_filename;
 	SDPCmd m_spdcmd;
@@ -137,7 +137,7 @@ private:
 class SDPReadMemCmd : public SDPCmdBase
 {
 public:
-	SDPReadMemCmd(char*p);
+	SDPReadMemCmd(char *p);
 	int run(CmdCtx *) override;
 
 private:
@@ -148,7 +148,7 @@ private:
 class SDPWriteMemCmd : public SDPCmdBase
 {
 public:
-	SDPWriteMemCmd(char*p);
+	SDPWriteMemCmd(char *p);
 	int run(CmdCtx *p) override;
 
 private:
@@ -160,7 +160,7 @@ private:
 class SDPWriteCmd : public SDPCmdBase
 {
 public:
-	SDPWriteCmd(char*p);
+	SDPWriteCmd(char *p);
 
 	int run(CmdCtx *p) override;
 	int run(CmdCtx *p, void *buff, size_t size, uint32_t addr);
@@ -179,7 +179,7 @@ private:
 class SDPJumpCmd : public SDPCmdBase
 {
 public:
-	SDPJumpCmd(char*p);
+	SDPJumpCmd(char *p);
 	int run(CmdCtx *p) override;
 
 private:
@@ -189,14 +189,14 @@ private:
 	bool m_PlugIn;
 };
 
-class SDPSkipDCDCmd :public SDPCmdBase
+class SDPSkipDCDCmd : public SDPCmdBase
 {
 public:
 	SDPSkipDCDCmd(char *p);
 	int run(CmdCtx *p) override;
 };
 
-class SDPStatusCmd :public SDPCmdBase
+class SDPStatusCmd : public SDPCmdBase
 {
 public:
 	SDPStatusCmd(char *p);

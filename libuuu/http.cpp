@@ -29,7 +29,6 @@
  *
  */
 
-
 #ifdef _WIN32
 //	request += "Connection: Keep-Alive\n";
 #include <ws2tcpip.h>
@@ -78,7 +77,6 @@ static CUUUSSL g_uuussl;
 
 #endif
 
-
 using namespace std;
 
 #ifdef _WIN32
@@ -96,9 +94,9 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 {
 
 	m_hSession = WinHttpOpen(L"WinHTTP UUU/1.0",
-		WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
-		WINHTTP_NO_PROXY_NAME,
-		WINHTTP_NO_PROXY_BYPASS, 0);
+							 WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+							 WINHTTP_NO_PROXY_NAME,
+							 WINHTTP_NO_PROXY_BYPASS, 0);
 
 	if (!m_hSession)
 	{
@@ -111,7 +109,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 
 	if (m_hSession)
 		m_hConnect = WinHttpConnect(m_hSession, whost.c_str(),
-			port, 0);
+									port, 0);
 
 	if (!m_hConnect)
 	{
@@ -122,11 +120,11 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 	wstring wpath = converter.from_bytes(path);
 
 	m_hRequest = WinHttpOpenRequest(m_hConnect, L"GET", wpath.c_str(),
-			nullptr, WINHTTP_NO_REFERER,
-			WINHTTP_DEFAULT_ACCEPT_TYPES,
-			ishttps ?WINHTTP_FLAG_SECURE:0);
+									nullptr, WINHTTP_NO_REFERER,
+									WINHTTP_DEFAULT_ACCEPT_TYPES,
+									ishttps ? WINHTTP_FLAG_SECURE : 0);
 
-	BOOL  bResults = FALSE;
+	BOOL bResults = FALSE;
 	if (!m_hRequest)
 	{
 		set_last_err_string("Fail WinHttpOpenRequest");
@@ -134,9 +132,9 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 	}
 
 	bResults = WinHttpSendRequest(m_hRequest,
-			WINHTTP_NO_ADDITIONAL_HEADERS, 0,
-			WINHTTP_NO_REQUEST_DATA, 0,
-			0, 0);
+								  WINHTTP_NO_ADDITIONAL_HEADERS, 0,
+								  WINHTTP_NO_REQUEST_DATA, 0,
+								  0, 0);
 
 	if (!bResults)
 	{
@@ -155,8 +153,8 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 	DWORD status = 0;
 	DWORD dwSize = sizeof(status);
 	WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER,
-		WINHTTP_HEADER_NAME_BY_INDEX, &status,
-		&dwSize, WINHTTP_NO_HEADER_INDEX);
+						WINHTTP_HEADER_NAME_BY_INDEX, &status,
+						&dwSize, WINHTTP_NO_HEADER_INDEX);
 
 	if (status != HTTP_STATUS_OK)
 	{
@@ -169,12 +167,12 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 size_t HttpStream::HttpGetFileSize()
 {
 	DWORD dwSize = 0;
-	BOOL  bResults = FALSE;
+	BOOL bResults = FALSE;
 	wstring out;
 
 	WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_CONTENT_LENGTH,
-		WINHTTP_HEADER_NAME_BY_INDEX, nullptr,
-		&dwSize, WINHTTP_NO_HEADER_INDEX);
+						WINHTTP_HEADER_NAME_BY_INDEX, nullptr,
+						&dwSize, WINHTTP_NO_HEADER_INDEX);
 
 	// Allocate memory for the buffer.
 	if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
@@ -183,10 +181,10 @@ size_t HttpStream::HttpGetFileSize()
 
 		// Now, use WinHttpQueryHeaders to retrieve the header.
 		bResults = WinHttpQueryHeaders(m_hRequest,
-			WINHTTP_QUERY_CONTENT_LENGTH,
-			WINHTTP_HEADER_NAME_BY_INDEX,
-			(LPVOID)out.c_str(), &dwSize,
-			WINHTTP_NO_HEADER_INDEX);
+									   WINHTTP_QUERY_CONTENT_LENGTH,
+									   WINHTTP_HEADER_NAME_BY_INDEX,
+									   (LPVOID)out.c_str(), &dwSize,
+									   WINHTTP_NO_HEADER_INDEX);
 	}
 	return _wtoll(out.c_str());
 }
@@ -207,7 +205,7 @@ int HttpStream::HttpDownload(char *buff, size_t sz)
 			dwSize = sz;
 
 		if (!WinHttpReadData(m_hRequest, (LPVOID)buff,
-			dwSize, &dwDownloaded))
+							 dwSize, &dwDownloaded))
 		{
 			set_last_err_string("Fail at WinHttpReadData");
 			return -1;
@@ -238,18 +236,17 @@ HttpStream::HttpStream()
 int HttpStream::SendPacket(char *buff, size_t sz)
 {
 #ifdef UUUSSL
-	if(m_ssl)
-		return SSL_write((SSL*)m_ssl, buff, sz);
+	if (m_ssl)
+		return SSL_write((SSL *)m_ssl, buff, sz);
 #endif
 	return send(m_socket, buff, sz, 0);
 }
 
-
 int HttpStream::RecvPacket(char *buff, size_t sz)
 {
 #ifdef UUUSSL
-	if(m_ssl)
-		return SSL_read((SSL*)m_ssl, buff, sz);
+	if (m_ssl)
+		return SSL_read((SSL *)m_ssl, buff, sz);
 #endif
 	return recv(m_socket, buff, sz, 0);
 }
@@ -273,7 +270,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 	tv.tv_sec = 10;
 	tv.tv_usec = 0;
 
-	setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv));
+	setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(tv));
 
 	if (m_socket == INVALID_SOCKET)
 	{
@@ -287,30 +284,30 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 		return -1;
 	}
 
-	if(ishttps)
+	if (ishttps)
 	{
 #ifdef UUUSSL
 
 		const SSL_METHOD *meth = TLSv1_2_client_method();
-		if(!meth)
+		if (!meth)
 		{
 			set_last_err_string("Failure at TLSv1_2_client_method\n");
 			return -1;
 		}
-		SSL_CTX *ctx = SSL_CTX_new (meth);
-		if(!ctx)
+		SSL_CTX *ctx = SSL_CTX_new(meth);
+		if (!ctx)
 		{
 			set_last_err_string("Error create ssl ctx\n");
 			return -1;
 		}
-		m_ssl = SSL_new (ctx);
-		if(!m_ssl)
+		m_ssl = SSL_new(ctx);
+		if (!m_ssl)
 		{
 			set_last_err_string("Error create SSL\n");
 			return -1;
 		}
-		SSL_set_fd((SSL*)m_ssl, m_socket);
-		if( SSL_connect((SSL*)m_ssl) <= 0)
+		SSL_set_fd((SSL *)m_ssl, m_socket);
+		if (SSL_connect((SSL *)m_ssl) <= 0)
 		{
 			set_last_err_string("error build ssl connection");
 			return -1;
@@ -319,15 +316,15 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 		set_last_err_string("Can't support https");
 		return -1;
 #endif
-        }
+	}
 
-	if(ishttps)
+	if (ishttps)
 		path = "https://" + host + path;
 
 	string request = "GET " + path + " HTTP/1.1\r\n";
 	request += "Host: " + host + "\r\n\r\n";
 
-	ret = SendPacket((char*)request.c_str(), request.size());
+	ret = SendPacket((char *)request.c_str(), request.size());
 	if (ret != request.size())
 	{
 		set_last_err_string("http send error");
@@ -335,7 +332,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 	}
 
 	m_buff.resize(1024);
-	ret = RecvPacket((char*)m_buff.data(), m_buff.size());
+	ret = RecvPacket((char *)m_buff.data(), m_buff.size());
 	if (ret < 0)
 	{
 		set_last_err_string("http recv Error");
@@ -364,7 +361,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 
 	string str;
 	str.resize(i + 2);
-	memcpy((void*)str.c_str(), m_buff.data(), i + 2);
+	memcpy((void *)str.c_str(), m_buff.data(), i + 2);
 
 	if (parser_response(str))
 		return -1;
@@ -415,12 +412,12 @@ int HttpStream::HttpDownload(char *buff, size_t sz)
 	size_t left = 0;
 	if (m_data_start < m_buff.size())
 		left = m_buff.size() - m_data_start;
-	
+
 	size_t trim_transfered = 0;
 
 	if (left)
 	{
-		
+
 		trim_transfered = sz;
 		if (trim_transfered > left)
 			trim_transfered = left;
@@ -454,10 +451,10 @@ HttpStream::~HttpStream()
 {
 	close(m_socket);
 #ifdef UUUSSL
-	if(m_ssl)
+	if (m_ssl)
 	{
-		SSL_CTX_free(SSL_get_SSL_CTX((SSL*)m_ssl));
-		SSL_free((SSL*)m_ssl);
+		SSL_CTX_free(SSL_get_SSL_CTX((SSL *)m_ssl));
+		SSL_free((SSL *)m_ssl);
 	}
 #endif
 }

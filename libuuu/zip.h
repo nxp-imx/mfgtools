@@ -117,7 +117,7 @@ struct Zip_eocd
 	uint32_t size_of_central_dir;
 	uint32_t offset_of_central_dir;
 	uint16_t length_of_comment;
-	uint8_t  comment[0];
+	uint8_t comment[0];
 };
 
 struct Zip64_eocd_locator
@@ -182,11 +182,10 @@ class Zip : public Backfile
 public:
 	int BuildDirInfo();
 	bool check_file_exist(std::string filename);
-	int get_file_buff(std::string filename, std::shared_ptr<FileBuffer>p);
+	int get_file_buff(std::string filename, std::shared_ptr<FileBuffer> p);
 	int Open(std::string filename);
 
 	std::map<std::string, Zip_file_Info> m_filemap;
 };
-
 
 #pragma pack()

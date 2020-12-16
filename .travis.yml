@@ -1,41 +1,40 @@
 language: c++
 
 matrix:
-    include:
+  include:
+    - os: osx
+      osx_image: xcode9.4
+      compiler: clang
 
-        - os: osx
-          osx_image: xcode9.4
-          compiler: clang
+    - os: osx
+      osx_image: xcode9.4
+      compiler: gcc
 
-        - os: osx
-          osx_image: xcode9.4
-          compiler: gcc
+    - os: osx
+      osx_image: xcode10.1
+      compiler: clang
 
-        - os: osx
-          osx_image: xcode10.1
-          compiler: clang
+    - os: osx
+      osx_image: xcode10.1
+      compiler: gcc
 
-        - os: osx
-          osx_image: xcode10.1
-          compiler: gcc
+    - os: osx
+      osx_image: xcode11.6
+      compiler: clang
 
-        - os: osx
-          osx_image: xcode11.6
-          compiler: clang
-
-        - os: osx
-          osx_image: xcode11.6
-          compiler: gcc
+    - os: osx
+      osx_image: xcode11.6
+      compiler: gcc
 
 addons:
-    homebrew:
-        update: true
-        packages:
-            - cmake
-            - libusb
-            - libzip
-            - openssl
-            - pkg-config
+  homebrew:
+    update: true
+    packages:
+      - cmake
+      - libusb
+      - libzip
+      - openssl
+      - pkg-config
 
 script:
-    - cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . && make
+  - cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . && make

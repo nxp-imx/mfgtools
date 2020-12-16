@@ -107,7 +107,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 
 	string str;
 	str = get_device_path(dev);
-	nt.str = (char*)str.c_str();
+	nt.str = (char *)str.c_str();
 	call_notify(nt);
 
 	CmdUsbCtx ctx;
@@ -140,12 +140,12 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 	return ret;
 }
 
-
 static int usb_add(libusb_device *dev)
 {
 	struct libusb_device_descriptor desc;
 	int r = libusb_get_device_descriptor(dev, &desc);
-	if (r < 0) {
+	if (r < 0)
+	{
 		set_last_err_string("failure get device descrior");
 		return r;
 	}
@@ -173,9 +173,9 @@ static int usb_remove(libusb_device * /*dev*/)
 	return 0;
 }
 
-void compare_list(libusb_device ** old, libusb_device **nw)
+void compare_list(libusb_device **old, libusb_device **nw)
 {
-	libusb_device * dev;
+	libusb_device *dev;
 	int i = 0;
 
 	if (old == nullptr)
@@ -189,12 +189,12 @@ void compare_list(libusb_device ** old, libusb_device **nw)
 
 	while ((dev = nw[i++]) != nullptr)
 	{
-		libusb_device * p;
+		libusb_device *p;
 		int j = 0;
 		while ((p = old[j++]) != nullptr)
 		{
 			if (p == dev)
-				break;//find it.
+				break; //find it.
 		};
 		if (p != dev)
 			usb_add(dev);
@@ -203,19 +203,19 @@ void compare_list(libusb_device ** old, libusb_device **nw)
 	i = 0;
 	while ((dev = old[i++]) != nullptr)
 	{
-		libusb_device * p;
+		libusb_device *p;
 		int j = 0;
 		while ((p = nw[j++]) != nullptr)
 		{
 			if (p == dev)
-				break;//find it.
+				break; //find it.
 		};
 		if (p != dev)
 			usb_remove(dev);
 	}
 }
 
-int polling_usb(std::atomic<int>& bexit)
+int polling_usb(std::atomic<int> &bexit)
 {
 	libusb_device **oldlist = nullptr;
 	libusb_device **newlist = nullptr;
@@ -236,7 +236,7 @@ int polling_usb(std::atomic<int>& bexit)
 
 	time_t start = time(0);
 
-	while(!bexit)
+	while (!bexit)
 	{
 		ssize_t sz = libusb_get_device_list(nullptr, &newlist);
 		if (sz < 0)
@@ -265,7 +265,7 @@ int polling_usb(std::atomic<int>& bexit)
 		}
 	}
 
-	if(newlist)
+	if (newlist)
 		libusb_free_device_list(newlist, 1);
 
 	return 0;
@@ -275,7 +275,7 @@ CmdUsbCtx::~CmdUsbCtx()
 {
 	if (m_dev)
 	{
-		libusb_close((libusb_device_handle*)m_dev);
+		libusb_close((libusb_device_handle *)m_dev);
 		m_dev = 0;
 	}
 }
@@ -311,7 +311,8 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 		{
 			struct libusb_device_descriptor desc;
 			int r = libusb_get_device_descriptor(dev, &desc);
-			if (r < 0) {
+			if (r < 0)
+			{
 				set_last_err_string("failure get device descrior");
 				return -1;
 			}
@@ -322,32 +323,32 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 
 			ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
 			if (item && item->m_protocol == str_to_upper(pro))
-				{
-					uuu_notify nt;
-					nt.type = uuu_notify::NOFITY_DEV_ATTACH;
-					m_config_item = item;
+			{
+				uuu_notify nt;
+				nt.type = uuu_notify::NOFITY_DEV_ATTACH;
+				m_config_item = item;
 
-					/* work around windows open device failure 1/10
+				/* work around windows open device failure 1/10
 					 * sometime HID device detect need some time, refresh list
 					 * to make sure HID driver installed.
 					 */
-					std::this_thread::sleep_for(std::chrono::milliseconds(200));
-					libusb_device **list = nullptr;
-					libusb_get_device_list(nullptr, &list);
+				std::this_thread::sleep_for(std::chrono::milliseconds(200));
+				libusb_device **list = nullptr;
+				libusb_get_device_list(nullptr, &list);
 
-					if (libusb_open(dev, (libusb_device_handle **)&(m_dev)) < 0)
-					{
-						set_last_err_string("Failure open usb device" TRY_SUDO);
-						libusb_free_device_list(list, 1);
-						return -1;
-					}
-
+				if (libusb_open(dev, (libusb_device_handle **)&(m_dev)) < 0)
+				{
+					set_last_err_string("Failure open usb device" TRY_SUDO);
 					libusb_free_device_list(list, 1);
-					nt.str = (char*)str.c_str();
-					call_notify(nt);
-
-					return 0;
+					return -1;
 				}
+
+				libusb_free_device_list(list, 1);
+				nt.str = (char *)str.c_str();
+				call_notify(nt);
+
+				return 0;
+			}
 		}
 
 		libusb_free_device_list(newlist, 1);
@@ -355,7 +356,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 
 		uuu_notify nt;
 		nt.type = nt.NOTIFY_WAIT_FOR;
-		nt.str = (char*)"Wait for Known USB";
+		nt.str = (char *)"Wait for Known USB";
 		call_notify(nt);
 
 		if (g_wait_usb_timeout >= 0)
@@ -397,7 +398,8 @@ int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 	{
 		struct libusb_device_descriptor desc;
 		int r = libusb_get_device_descriptor(dev, &desc);
-		if (r < 0) {
+		if (r < 0)
+		{
 			set_last_err_string("failure get device descrior");
 			return -1;
 		}

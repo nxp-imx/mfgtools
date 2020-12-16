@@ -32,52 +32,35 @@
 #include "buildincmd.h"
 
 BuildCmd g_buildin_cmd[] =
-{
 	{
-		"emmc",
+		{"emmc",
 #include "emmc_burn_loader.clst"
-		,"burn boot loader to eMMC boot partition"
-	},
-	{
-		"emmc_all",
+		 , "burn boot loader to eMMC boot partition"},
+		{"emmc_all",
 #include "emmc_burn_all.clst"
-		,"burn whole image to eMMC"
-	},
-	{
-		"fat_write",
+		 , "burn whole image to eMMC"},
+		{"fat_write",
 #include "fat_write.clst"
-		,"update one file in fat partition, require uboot fastboot running in board"
-	},
-	{
-		"nand",
+		 , "update one file in fat partition, require uboot fastboot running in board"},
+		{"nand",
 #include "nand_burn_loader.clst"
-		,"burn boot loader to NAND flash"
-	},
-	{
-		"qspi",
+		 , "burn boot loader to NAND flash"},
+		{"qspi",
 #include "qspi_burn_loader.clst"
-		,"burn boot loader to qspi nor flash"
-	},
-	{
-		"sd",
+		 , "burn boot loader to qspi nor flash"},
+		{"sd",
 #include "sd_burn_loader.clst"
-		,"burn boot loader to sd card"
-	},
-	{
-		"sd_all",
+		 , "burn boot loader to sd card"},
+		{"sd_all",
 #include "sd_burn_all.clst"
-		,"burn whole image to sd card"
-	},
-	{
-		"spl",
+		 , "burn whole image to sd card"},
+		{"spl",
 #include "spl_boot.clst"
-		,"boot spl and uboot"
-	},
-	{
-		NULL,
-		NULL,
-		NULL,
-	}
-};
+		 , "boot spl and uboot"},
+		{
+			NULL,
+			NULL,
+			NULL,
+		}};
 
 BuildInScriptVector g_BuildScripts(g_buildin_cmd);

@@ -49,7 +49,7 @@ int get_libusb_debug_level() noexcept
 	return g_debug_level & 0xFFFF;
 }
 
-const char * uuu_get_last_err_string()
+const char *uuu_get_last_err_string()
 {
 	return g_last_error_str.c_str();
 }

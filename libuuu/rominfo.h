@@ -57,13 +57,13 @@ constexpr uint32_t ROM_INFO_AUTO_SCAN_UBOOT_POS = 0x8000;
 
 struct ROM_INFO
 {
-	const char * m_name;
-	uint32_t    free_addr;
-	uint32_t	flags;
+	const char *m_name;
+	uint32_t free_addr;
+	uint32_t flags;
 };
 
-const ROM_INFO * search_rom_info(const std::string &s);
-const ROM_INFO * search_rom_info(const ConfigItem *item);
+const ROM_INFO *search_rom_info(const std::string &s);
+const ROM_INFO *search_rom_info(const ConfigItem *item);
 
 size_t GetContainerActualSize(std::shared_ptr<FileBuffer> p, size_t offset);
 size_t GetFlashHeaderSize(std::shared_ptr<FileBuffer> p, size_t offset = 0);
