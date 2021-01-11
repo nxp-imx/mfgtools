@@ -181,15 +181,20 @@ size_t SparseFile::push_one_chuck(chunk_header_t *p, void *data)
 
 	if (p->total_sz + m_data.size() > m_max_size)
 	{
-		size_t blk = (m_max_size - m_data.size())/pheader->blk_sz;
-		if (blk < 2)
+		if (p->chunk_type == CHUNK_TYPE_RAW)
+		{
+			size_t blk = (m_max_size - m_data.size()) / pheader->blk_sz;
+			if (blk < 2)
+				return 0;
+
+			blk -= 2;
+
+			cheader.chunk_sz = blk;
+			sz = blk * pheader->blk_sz;
+			cheader.total_sz = sizeof(chunk_header_t) + sz;
+		}
+		else
 			return 0;
-
-		blk -= 2;
-
-		cheader.chunk_sz = blk;
-		sz = blk * pheader->blk_sz;
-		cheader.total_sz = sizeof(chunk_header_t) + sz;
 	}
 
 	push(&cheader, sizeof(chunk_header));

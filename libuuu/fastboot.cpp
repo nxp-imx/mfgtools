@@ -678,6 +678,27 @@ int FBFlashCmd::run(CmdCtx *ctx)
 			{
 				startblock += pheader->chunk_sz;
 			}
+			else if (sz == 0)
+			{
+				//whole chuck have not push into data.
+				if (flash(&fb, sf.m_data.data(), sf.m_data.size()))
+					return -1;
+
+				sf.init_header(pfile->blk_sz, max / pfile->blk_sz);
+
+				chunk_header_t ct;
+				ct.chunk_type = CHUNK_TYPE_DONT_CARE;
+				ct.chunk_sz = startblock;
+				ct.reserved1 = 0;
+				ct.total_sz = sizeof(ct);
+
+				sz = sf.push_one_chuck(&ct, nullptr);
+
+				uuu_notify nt;
+				nt.type = uuu_notify::NOTIFY_TRANS_POS;
+				nt.total = startblock;
+				call_notify(nt);
+			}
 			else
 			{
 				size_t off = ((uint8_t*)pheader) - pdata->data() + sz + sizeof(chunk_header_t);
