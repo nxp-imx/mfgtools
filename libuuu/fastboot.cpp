@@ -670,6 +670,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		for(size_t nblk=0; nblk < pfile->total_chunks && pos <= pdata->size(); nblk++)
 		{
 			pdata->request_data(pos+sizeof(chunk_header_t)+sizeof(sparse_header));
+			size_t oldpos = pos;
 			pheader = SparseFile::get_next_chunk(pdata->data(), pos);
 			pdata->request_data(pos);
 
@@ -694,6 +695,11 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 				sz = sf.push_one_chuck(&ct, nullptr);
 
+				/*
+					roll back pos to previous failure chunck and let it push again into new sparse file.
+					can't push it here because next chuck may big size chuck and need split as below else logic.
+				*/
+				pos = oldpos;
 				uuu_notify nt;
 				nt.type = uuu_notify::NOTIFY_TRANS_POS;
 				nt.total = startblock;
