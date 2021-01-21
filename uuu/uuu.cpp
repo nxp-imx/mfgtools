@@ -204,7 +204,7 @@ int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, u
 int print_udev_rule(const char * /*pro*/, const char * /*chip*/, const char * /*compatible*/,
 	uint16_t vid, uint16_t pid, uint16_t /*bcdmin*/, uint16_t /*bcdmax*/, void * /*p*/)
 {
-	printf("SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"%04x\", ATTRS{idProduct}==\"%04x\", MODE=\"0666\"\n",
+	printf("SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"%04x\", ATTRS{idProduct}==\"%04x\", TAG+=\"uaccess\"\n",
 			vid, pid);
 	return 0;
 }
