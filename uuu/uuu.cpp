@@ -760,10 +760,10 @@ int runshell(int shell)
 void print_udev()
 {
 	uuu_for_each_cfg(print_udev_rule, NULL);
-	fprintf(stderr, "\n1: put above udev run into /etc/udev/rules.d/99-uuu.rules\n");
-	fprintf(stderr, "\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/99-uuu.rules\"\n");
+	fprintf(stderr, "\n1: put above udev run into /etc/udev/rules.d/70-uuu.rules\n");
+	fprintf(stderr, "\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"\n");
 	fprintf(stderr, "2: update udev rule\n");
-	fprintf(stderr, "\tsudo udevadm control --reload-rules\n");
+	fprintf(stderr, "\tsudo udevadm control --reload\n");
 }
 
 int print_usb_device(const char *path, const char *chip, const char *pro, uint16_t vid, uint16_t pid, uint16_t bcd, void * /*p*/)
