@@ -1,16 +1,16 @@
 version: 1.4.{build}
 image:
-#- Visual Studio 2019
-#- Visual Studio 2017
-#- Ubuntu1604
-- macOS
+ - Visual Studio 2019
+ - Visual Studio 2017
+ - Ubuntu1604
+ - macOS
 
 configuration: 
-#- Debug
-- Release
+ - Debug
+ - Release
 
 platform:
-# - x86
+ - x86
  - x64
  
 init:
