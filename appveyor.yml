@@ -3,6 +3,7 @@ image:
 - Visual Studio 2019
 - Visual Studio 2017
 - Ubuntu1604
+- macOS
 
 configuration: 
 - Debug
@@ -27,17 +28,11 @@ install:
     
 - cmd:    cd ..
  
-- sh: sudo apt-get update
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then brew install cmake libusb libzip openssl pkg-config; fi
 
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then sudo apt-get update; fi
 
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install libzip-dev
-
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install libbz2-dev
-    
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install asciidoc
-    
-- sh: sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes install rename
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev libzip-dev libbz2-dev asciidoc rename; fi
 
 build_script:
 
@@ -72,35 +67,37 @@ build_script:
 
 - cmd: if exist %APPVEYOR_BUILD_FOLDER%\msvc\x64\release\uuu.exe  cp %APPVEYOR_BUILD_FOLDER%\msvc\x64\release\uuu.exe  %APPVEYOR_BUILD_FOLDER%\uuu.exe
    
-- sh: cmake -D 'STATIC=1' .
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl -D 'STATIC=1'; else cmake -D 'STATIC=1' .; fi
 - sh: make
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then mv  %APPVEYOR_BUILD_FOLDER%\uuu\uuu %APPVEYOR_BUILD_FOLDER%\uuu\uuu_mac; fi
 
-- sh: git submodule init
-- sh: git submodule update
-- sh: git archive --prefix "uuu-${APPVEYOR_BUILD_VERSION}/" -o "uuu_source-${APPVEYOR_BUILD_VERSION}.tar" HEAD
-- sh: git submodule foreach --recursive "git archive --prefix=uuu-${APPVEYOR_BUILD_VERSION}/\$path/ --output=\$sha1.tar HEAD && tar --concatenate --file=$(pwd)/uuu_source-${APPVEYOR_BUILD_VERSION}.tar \$sha1.tar && rm \$sha1.tar"
-- sh: mkdir uuu-${APPVEYOR_BUILD_VERSION}; git describe --tags --long >uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version
-- sh: tar -r uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version -f uuu_source-${APPVEYOR_BUILD_VERSION}.tar
-- sh: gzip uuu_source-${APPVEYOR_BUILD_VERSION}.tar
-- sh: tar xzf uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz && zip uuu_source-${APPVEYOR_BUILD_VERSION}.zip $(tar tf uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz)
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then git submodule init; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then git submodule update; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then git archive --prefix "uuu-${APPVEYOR_BUILD_VERSION}/" -o "uuu_source-${APPVEYOR_BUILD_VERSION}.tar" HEAD ; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then git submodule foreach --recursive "git archive --prefix=uuu-${APPVEYOR_BUILD_VERSION}/\$path/ --output=\$sha1.tar HEAD && tar --concatenate --file=$(pwd)/uuu_source-${APPVEYOR_BUILD_VERSION}.tar \$sha1.tar && rm \$sha1.tar" ; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then mkdir uuu-${APPVEYOR_BUILD_VERSION}; git describe --tags --long >uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version ; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then tar -r uuu-${APPVEYOR_BUILD_VERSION}/.tarball-version -f uuu_source-${APPVEYOR_BUILD_VERSION}.tar ; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then gzip uuu_source-${APPVEYOR_BUILD_VERSION}.tar; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then tar xzf uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz && zip uuu_source-${APPVEYOR_BUILD_VERSION}.zip $(tar tf uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz); fi
 
-- sh: git clone https://github.com/NXPmicro/mfgtools.wiki.git
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then git clone https://github.com/NXPmicro/mfgtools.wiki.git; fi
     
-- sh: cd mfgtools.wiki
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then cd mfgtools.wiki; fi
     
-- sh: rename -f 's/\.asciidoc$//' *
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then rename -f 's/\.asciidoc$//' *; fi
     
-- sh: echo "<revhistory>" > UUU-docinfo.xml
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then echo "<revhistory>" > UUU-docinfo.xml; fi
     
-- sh: git log -n25 --reverse --format="format:<revision><revnumber>%h</revnumber><date>%cd</date><authorinitials>%an</authorinitials><revremark>%s</revremark></revision>" >> UUU-docinfo.xml
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then git log -n25 --reverse --format="format:<revision><revnumber>%h</revnumber><date>%cd</date><authorinitials>%an</authorinitials><revremark>%s</revremark></revision>" >> UUU-docinfo.xml; fi
     
-- sh: echo "</revhistory>" >> UUU-docinfo.xml
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then echo "</revhistory>" >> UUU-docinfo.xml; fi
     
-- sh: a2x -L -a docinfo UUU
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then a2x -L -a docinfo UUU; fi
     
 artifacts:
 - path: uuu.exe
 - path: uuu/uuu
+- path: uuu/uuu_mac
 - path: mfgtools.wiki/UUU.pdf
 - path: uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz
 - path: uuu_source-${APPVEYOR_BUILD_VERSION}.zip
