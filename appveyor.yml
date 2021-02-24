@@ -1,12 +1,12 @@
 version: 1.4.{build}
 image:
-- Visual Studio 2019
-- Visual Studio 2017
-- Ubuntu1604
+#- Visual Studio 2019
+#- Visual Studio 2017
+#- Ubuntu1604
 - macOS
 
 configuration: 
-- Debug
+#- Debug
 - Release
 
 platform:
@@ -28,7 +28,7 @@ install:
     
 - cmd:    cd ..
  
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then brew install cmake libusb libzip openssl pkg-config; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then brew reinstall cmake libusb libzip openssl pkg-config; fi
 
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then sudo apt-get update; fi
 
