@@ -72,16 +72,12 @@ parts:
     after:
       - selective-checkout
 
-    source: https://github.com/NXPmicro/mfgtools.git
+    source: .
     source-depth: 50
     override-pull: |
       set -o nounset
 
-      #snapcraftctl pull
-      git clone \
-        --depth=50 \
-        https://github.com/NXPmicro/mfgtools.git \
-        "${SNAPCRAFT_PART_SRC}"
+      snapcraftctl pull
 
       "${SNAPCRAFT_STAGE}"/scriptlets/selective-checkout \
         --append-packaging-revision \
