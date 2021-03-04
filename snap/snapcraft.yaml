@@ -13,6 +13,9 @@
 #   https://forum.snapcraft.io/c/doc
 # For support refer to the snapcraft section in the Snapcraft Forum:
 # https://forum.snapcraft.io/c/snapcraft
+#
+# Copyright (c) 2017 Snapcrafters
+#
 
 name: universal-update-utility
 title: Universal Update Utility (UNOFFICIAL)
