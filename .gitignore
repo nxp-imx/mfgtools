@@ -12,3 +12,4 @@ uuu/uuu
 Makefile
 CMakeCache.txt
 *.clst
+*.snap
