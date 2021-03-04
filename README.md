@@ -5,6 +5,8 @@
 
 ![GitHub](https://img.shields.io/github/license/NXPmicro/mfgtools.svg)
 
+[![get](https://github.com/snapcore/snap-store-badges/blob/master/EN/%5BEN%5D-snap-store-black.png)](https://snapcraft.io/universal-update-utility)
+
 Freescale/NXP I.MX Chip image deploy tools.
 **original linux version uses "linux" branch, windows version uses "windows" branch**
 
