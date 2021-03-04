@@ -80,7 +80,6 @@ parts:
       snapcraftctl pull
 
       "${SNAPCRAFT_STAGE}"/scriptlets/selective-checkout \
-        --append-packaging-revision \
         --release-tag-prefix=uuu_
     build-snaps:
       - cmake
