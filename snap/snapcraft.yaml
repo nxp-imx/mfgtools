@@ -61,8 +61,8 @@ parts:
   # Check out the tagged release revision if it isn't promoted to the stable channel
   # https://forum.snapcraft.io/t/selective-checkout-check-out-the-tagged-release-revision-if-it-isnt-promoted-to-the-stable-channel/10617
   selective-checkout:
-    source: .
-    source-tag: uuu_1.4.95
+    source: https://github.com/Lin-Buo-Ren/selective-checkout.git
+    source-tag: v1.0.0
     plugin: dump
     build-packages:
       - git
