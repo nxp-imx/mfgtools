@@ -87,6 +87,7 @@ parts:
       snapcraftctl pull
 
       "${SNAPCRAFT_STAGE}"/scriptlets/selective-checkout \
+        --release-tag-pattern='uuu_[[:digit:]]+(\.[[:digit:]]+){2}' \
         --release-tag-prefix=uuu_
     build-snaps:
       - cmake
