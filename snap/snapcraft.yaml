@@ -132,6 +132,9 @@ apps:
 plugs:
   # Regular files access
   home:
+    # Allow reading the SUDO_USER's uuu script when run as root
+    # (by default only scripts under root's home dir is readable)
+    read: all
   removable-media: # Non-A/C
 
   # NOTE: This only lifts the snapd side of confinement, the user still
