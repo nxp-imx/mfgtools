@@ -40,6 +40,8 @@ license: BSD-3-Clause
 adopt-info: main
 assumes:
   - command-chain
+  # required by the `snapctl is-connected` command
+  - snapd2.43
 base: core
 confinement: strict
 grade: stable

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Configure hook to set up configuration when `snap set` is called
+#
+# Copyright (c) 2021 Snapcrafters
+
+# lint: The use of backticks in the printf messages is intended
+# shellcheck disable=SC2016
+
+set \
+    -o errexit \
+    -o errtrace \
+    -o nounset \
+    -o pipefail
+
+disable_snap_confinement_warnings="$(snapctl get disable-snap-confinement-warnings)"
+
+if test -n "${disable_snap_confinement_warnings}"; then
+    if [[ ! "${disable_snap_confinement_warnings}" =~ (false|true) ]]; then
+        printf -- \
+            'Error: disable-snap-confinement-warnings must be either `true` or `false`.\n' \
+            1>&2
+        exit 1
+    fi
+else
+    snapctl set disable-snap-confinement-warnings=false
+fi
