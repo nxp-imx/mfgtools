@@ -18,7 +18,7 @@
 #
 
 name: universal-update-utility
-title: Universal Update Utility (UNOFFICIAL)
+title: Universal Update Utility - UUU
 summary: Freescale/NXP I.MX Chip image deploy tools
 description: |
   **Key features**
@@ -32,6 +32,9 @@ description: |
     from [https://zadig.akeo.ie/](https://zadig.akeo.ie/) Windows10 will
     install the driver automatically.
 
+  **Search keywords**
+
+  mfgtools, uuu, nxp, nxpmicro
 icon: snap/gui/universal-update-utility.png
 license: BSD-3-Clause
 adopt-info: main
