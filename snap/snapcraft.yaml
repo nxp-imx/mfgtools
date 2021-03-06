@@ -42,7 +42,7 @@ assumes:
   - command-chain
   # required by the `snapctl is-connected` command
   - snapd2.43
-base: core
+base: core18
 confinement: strict
 grade: stable
 
@@ -97,7 +97,7 @@ parts:
     build-snaps:
       - cmake
     build-packages:
-      # CMake shipped in Ubuntu 16.04(3.5.1) is too old
+      # CMake shipped in Ubuntu 18.04(3.10.2) is too old
       #- cmake
       - g++
       - libbz2-dev
