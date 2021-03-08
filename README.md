@@ -92,4 +92,3 @@ The BSD licensed prebuilt Windows binary version of uuu is statically linked wit
  - bzip2 (BSD license) is from https://github.com/enthought/bzip2-1.0.6
  - zlib  (zlib license) is from https://github.com/madler/zlib.git
  - libusb (LGPL-2.1) is from  https://github.com/libusb/libusb.git
-
