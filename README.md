@@ -5,7 +5,7 @@
 
 ![GitHub](https://img.shields.io/github/license/NXPmicro/mfgtools.svg) 
 
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/universal-update-utility) sudo snap install universal-update-utility;snap alias universal-update-utility uuu
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/universal-update-utility) sudo snap install universal-update-utility;
 
 Freescale/NXP I.MX Chip image deploy tools.
 **original linux version uses "linux" branch, windows version uses "windows" branch**
