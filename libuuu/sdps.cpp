@@ -116,7 +116,7 @@ int SDPSCmd::run(CmdCtx *pro)
 		return -1;
 	}
 
-	size_t sz = GetContainerActualSize(p, offset);
+	size_t sz = GetContainerActualSize(p, offset, rom->flags & ROM_INFO_HID_ROMAPI);
 
 	if (!(rom->flags & ROM_INFO_HID_NO_CMD))
 	{

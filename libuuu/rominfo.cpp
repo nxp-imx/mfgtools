@@ -52,7 +52,7 @@ static constexpr std::array<ROM_INFO, 15> g_RomInfo
 	ROM_INFO{ "MXRT106X",	 0x1000,     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_HID_SKIP_DCD },
 	ROM_INFO{ "MX8QXP",      0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING },
 	ROM_INFO{ "MX28",	 0x0,        ROM_INFO_HID},
-	ROM_INFO{ "MX815",       0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING | ROM_INFO_HID_EP1 | ROM_INFO_HID_PACK_SIZE_1020 },
+	ROM_INFO{ "MX815",       0x0,        ROM_INFO_HID | ROM_INFO_HID_NO_CMD | ROM_INFO_HID_UID_STRING | ROM_INFO_HID_EP1 | ROM_INFO_HID_PACK_SIZE_1020 | ROM_INFO_HID_ROMAPI},
 	ROM_INFO{ "SPL",	 0x0,	     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP | ROM_INFO_HID_SDP_NO_MAX_PER_TRANS},
 	ROM_INFO{ "SPL1",	 0x0,	     ROM_INFO_HID | ROM_INFO_HID_MX6 | ROM_INFO_SPL_JUMP | ROM_INFO_HID_SDP_NO_MAX_PER_TRANS | ROM_INFO_AUTO_SCAN_UBOOT_POS},
 };
@@ -123,8 +123,11 @@ static constexpr uint32_t IMG_V2X = 0x0B;
 #pragma pack ()
 
 
-size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset)
+size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset, bool bROMAPI)
 {
+	if(bROMAPI)
+		return p->size() - offset;
+
 	auto hdr = reinterpret_cast<struct rom_container *>(p->data() + offset + CONTAINER_HDR_ALIGNMENT);
 	if (hdr->tag != CONTAINER_TAG)
 	{
