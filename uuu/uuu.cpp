@@ -794,6 +794,25 @@ int main(int argc, char **argv)
 			print_udev();
 			return 0;
 		}
+		if (s == "-bshow")
+		{
+			if (2 == argc || g_BuildScripts.find(argv[2]) == g_BuildScripts.end())
+			{
+				printf("error, must be have script name: ");
+				g_BuildScripts.ShowCmds();
+				printf("\n");
+				return -1;
+			}
+			else
+			{
+				string str = g_BuildScripts[argv[2]].m_script;
+				while (str.size() > 0 && (str[0] == '\n' || str[0] == ' '))
+					str = str.erase(0,1);
+
+				printf("%s", str.c_str());
+				return 0;
+			}
+		}
 	}
 
 	AutoCursor a;
@@ -940,21 +959,6 @@ int main(int argc, char **argv)
 					cmd_script = g_BuildScripts[argv[i + 1]].replace_script_args(args);
 				}
 				break;
-			}
-			else if (s == "-bshow")
-			{
-				if (i + 1 == argc || g_BuildScripts.find(argv[i+1]) == g_BuildScripts.end())
-				{
-					printf("error, must be have script name: ");
-					g_BuildScripts.ShowCmds();
-					printf("\n");
-					return -1;
-				}
-				else
-				{
-					printf("%s", g_BuildScripts[argv[i + 1]].m_script.c_str());
-					return 0;
-				}
 			}
 			else
 			{
