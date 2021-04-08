@@ -800,7 +800,7 @@ int main(int argc, char **argv)
 			{
 				fprintf(stderr, "Error, must be have script name: ");
 				g_BuildScripts.ShowCmds(stderr);
-				printf("\n");
+				fprintf(stderr,"\n");
 				return -1;
 			}
 			else
