@@ -798,8 +798,8 @@ int main(int argc, char **argv)
 		{
 			if (2 == argc || g_BuildScripts.find(argv[2]) == g_BuildScripts.end())
 			{
-				printf("error, must be have script name: ");
-				g_BuildScripts.ShowCmds();
+				fprintf(stderr, "Error, must be have script name: ");
+				g_BuildScripts.ShowCmds(stderr);
 				printf("\n");
 				return -1;
 			}

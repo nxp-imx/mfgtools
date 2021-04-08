@@ -255,19 +255,19 @@ public:
 		}
 	}
 
-	void ShowCmds()
+	void ShowCmds(FILE * file=stdout)
 	{
-		printf("<");
+		fprintf(file, "<");
 		for (auto iCol = begin(); iCol != end(); ++iCol)
 		{
-			printf("%s%s%s", g_vt_boldwhite, iCol->first.c_str(), g_vt_default);
+			fprintf(file, "%s", iCol->first.c_str());
 
 			auto i = iCol;
 			i++;
 			if(i != end())
-				printf("|");
+				fprintf(file, "|");
 		}
-		printf(">");
+		fprintf(file, ">");
 	}
 
 	void PrintAutoComplete(string match, const char *space=" " )
