@@ -136,6 +136,7 @@ void print_help(bool detail = false)
 		"    -m          USBPATH Only monitor these paths.\n"
 		"                    -m 1:2 -m 1:3\n\n"
 		"    -t          Timeout second for wait known usb device appeared\n"
+		"    -T          Timeout second for wait next known usb device appeared at stage switch\n"
 		"    -e          set environment variable key=value\n"
 		"    -pp         usb polling period in milliseconds\n"
 		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
@@ -886,6 +887,11 @@ int main(int argc, char **argv)
 			{
 				i++;
 				uuu_set_wait_timeout(atoll(argv[i]));
+			}
+			else if (s == "-T")
+			{
+				i++;
+				uuu_set_wait_next_timeout(atoll(argv[i]));
 			}
 			else if (s == "-pp")
 			{

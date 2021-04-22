@@ -56,8 +56,15 @@ using chrono::operator ""s;
 
 static atomic<seconds> g_wait_usb_timeout{-1s};
 static atomic<milliseconds> g_usb_poll_period{200ms};
+static atomic<seconds> g_wait_next_usb_timeout{-1s};
 
-static atomic_int g_known_device_appeared{0};
+enum KnownDeviceState {
+	NoKnownDevice,
+	KnownDeviceToDo,
+	KnownDeviceDone,
+	WaitNextKnownDevice,
+};
+static atomic<KnownDeviceState> g_known_device_state{NoKnownDevice};
 
 static struct {
 	vector<string> list;
@@ -169,6 +176,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 	}
 
 	ret = run_cmds(item->m_protocol.c_str(), &ctx);
+	g_known_device_state = KnownDeviceDone;
 
 	libusb_free_device_list(list, 1);
 
@@ -197,7 +205,7 @@ static int usb_add(libusb_device *dev)
 
 	if (item)
 	{
-		g_known_device_appeared = 1;
+		g_known_device_state = KnownDeviceToDo;
 		std::thread(run_usb_cmds, item, dev).detach();
 	}
 	return 0;
@@ -253,12 +261,29 @@ void compare_list(libusb_device ** old, libusb_device **nw)
 
 static int check_usb_timeout(Timer& usb_timer)
 {
+	auto known_device_state = g_known_device_state.load();
+	if (known_device_state == KnownDeviceDone)
+	{
+		g_known_device_state = known_device_state = WaitNextKnownDevice;
+		usb_timer.reset();
+	}
+
 	auto usb_timeout = g_wait_usb_timeout.load();
-	if (usb_timeout >= 0s && !g_known_device_appeared)
+	if (usb_timeout >= 0s && known_device_state == NoKnownDevice)
 	{
 		if (usb_timer.is_elapsed(usb_timeout))
 		{
 			set_last_err_string("Timeout: Wait for Known USB Device");
+			return -1;
+		}
+	}
+
+	usb_timeout = g_wait_next_usb_timeout.load();
+	if (usb_timeout >= 0s && g_known_device_state == WaitNextKnownDevice)
+	{
+		if (usb_timer.is_elapsed(usb_timeout))
+		{
+			set_last_err_string("Timeout: Wait for next USB Device");
 			return -1;
 		}
 	}
@@ -458,4 +483,10 @@ int uuu_set_wait_timeout(int timeout_in_seconds)
 void uuu_set_poll_period(int period_in_milliseconds)
 {
 	g_usb_poll_period = milliseconds{period_in_milliseconds};
+}
+
+int uuu_set_wait_next_timeout(int timeout_in_seconds)
+{
+	g_wait_next_usb_timeout = seconds{timeout_in_seconds};
+	return 0;
 }
