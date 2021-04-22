@@ -1,0 +1,7 @@
+#!/bin/sh -e
+
+echo "test" > /etc/udev/rules.d/test
+uuu -udev >> /etc/udev/rules.d/70-uuu.rules
+udevadm control --reload
+
+
