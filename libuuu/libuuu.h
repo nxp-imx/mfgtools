@@ -129,6 +129,8 @@ int uuu_add_usbpath_filter(const char *path);
 
 /*Set timeout wait for known devices appeared*/
 int uuu_set_wait_timeout(int timeout_in_seconds);
+/*Set timeout wait for next devices appeared, e.g. FB -> FBK*/
+int uuu_set_wait_next_timeout(int timeout_in_seconds);
 /*Set usb device polling period */
 void uuu_set_poll_period(int period_in_milliseconds);
 /*
