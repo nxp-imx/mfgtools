@@ -36,6 +36,10 @@
 
 #include <thread>
 #include <atomic>
+#include <mutex>
+#include <utility>
+#include <algorithm>
+#include <stdexcept>
 #include "libusb.h"
 #include "liberror.h"
 #include "config.h"
@@ -45,31 +49,67 @@
 #include "vector"
 #include <time.h>
 
-static vector<string> g_filter_usbpath;
+using chrono::milliseconds;
+using chrono::operator ""ms;
+using chrono::seconds;
+using chrono::operator ""s;
 
-static int g_wait_usb_timeout = -1;
-static int g_usb_poll_period = 0;
+static atomic<seconds> g_wait_usb_timeout{-1s};
+static atomic<milliseconds> g_usb_poll_period{200ms};
 
-static int g_known_device_appeared;
+static atomic_int g_known_device_appeared{0};
 
-static int g_libusb_init;
+static struct {
+	vector<string> list;
+	mutex lock;
+
+	void push_back(string filter)
+	{
+		lock_guard<mutex> guard{lock};
+		list.emplace_back(move(filter));
+	}
+
+	bool is_valid(const string& path)
+	{
+		lock_guard<mutex> guard{lock};
+		if (list.empty())
+			return true;
+
+		auto end = list.end();
+		auto pos = find(list.begin(), end, path);
+		return pos != end;
+	}
+} g_filter_usbpath;
+
+struct Timer
+{
+	using Clock = chrono::steady_clock;
+	Clock::time_point start;
+
+	explicit Timer(Clock::time_point start) : start{start} {}
+	Timer() : Timer{Clock::now()} {}
+
+	bool is_elapsed(Clock::duration interval) const
+	{
+		return (Clock::now() - start) >= interval;
+	}
+
+	void reset(Clock::time_point start)
+	{
+		this->start = start;
+	}
+
+	void reset()
+	{
+		reset(Clock::now());
+	}
+};
 
 #ifdef _MSC_VER
 #define TRY_SUDO
 #else
 #define TRY_SUDO ",Try sudo uuu"
 #endif
-
-static bool is_match_filter(string path)
-{
-	if (g_filter_usbpath.empty())
-		return true;
-	for (size_t i = 0; i < g_filter_usbpath.size(); i++)
-		if (g_filter_usbpath[i] == path)
-			return true;
-
-	return false;
-}
 
 static string get_device_path(libusb_device *dev)
 {
@@ -138,7 +178,6 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 	return ret;
 }
 
-
 static int usb_add(libusb_device *dev)
 {
 	struct libusb_device_descriptor desc;
@@ -150,12 +189,11 @@ static int usb_add(libusb_device *dev)
 
 	string str;
 	str = get_device_path(dev);
-	if (!is_match_filter(str))
+	if (!g_filter_usbpath.is_valid(str))
 		return -1;
 
 	ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
-	int poll = g_usb_poll_period ? g_usb_poll_period : 200;
-	std::this_thread::sleep_for(std::chrono::milliseconds(poll));
+	this_thread::sleep_for(g_usb_poll_period.load());
 
 	if (item)
 	{
@@ -213,26 +251,49 @@ void compare_list(libusb_device ** old, libusb_device **nw)
 	}
 }
 
+static int check_usb_timeout(Timer& usb_timer)
+{
+	auto usb_timeout = g_wait_usb_timeout.load();
+	if (usb_timeout >= 0s && !g_known_device_appeared)
+	{
+		if (usb_timer.is_elapsed(usb_timeout))
+		{
+			set_last_err_string("Timeout: Wait for Known USB Device");
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+static int ensure_libusb_initialized()
+{
+	static once_flag is_libusb_init;
+	try {
+		call_once(is_libusb_init, []{
+			if (libusb_init(nullptr) < 0)
+				throw runtime_error{"Call libusb_init failure"};
+			libusb_set_debug(nullptr, get_libusb_debug_level());
+		});
+	} catch(const exception& ex) {
+		set_last_err_string(ex.what());
+		return -1;
+	}
+	return 0;
+}
+
 int polling_usb(std::atomic<int>& bexit)
 {
 	libusb_device **oldlist = nullptr;
 	libusb_device **newlist = nullptr;
 
-	if (!g_libusb_init)
-	{
-		if (libusb_init(nullptr) < 0)
-		{
-			set_last_err_string("Call libusb_init failure");
-			return -1;
-		}
-		g_libusb_init = true;
-		libusb_set_debug(nullptr, get_libusb_debug_level());
-	}
+	if (ensure_libusb_initialized())
+		return -1;
 
 	if (run_cmds("CFG:", nullptr))
 		return -1;
 
-	time_t start = time(0);
+	Timer usb_timer;
 
 	while(!bexit)
 	{
@@ -250,17 +311,10 @@ int polling_usb(std::atomic<int>& bexit)
 
 		oldlist = newlist;
 
-		int poll = g_usb_poll_period ? g_usb_poll_period : 200;
-		std::this_thread::sleep_for(std::chrono::milliseconds(poll));
+		this_thread::sleep_for(g_usb_poll_period.load());
 
-		if (g_wait_usb_timeout >= 0 && !g_known_device_appeared)
-		{
-			if (difftime(time(0), start) >= g_wait_usb_timeout)
-			{
-				set_last_err_string("Timeout: Wait for Known USB Device");
-				return -1;
-			}
-		}
+		if (check_usb_timeout(usb_timer))
+			return -1;
 	}
 
 	if(newlist)
@@ -280,23 +334,13 @@ CmdUsbCtx::~CmdUsbCtx()
 
 int CmdUsbCtx::look_for_match_device(const char *pro)
 {
-	if (!g_libusb_init)
-	{
-		if (libusb_init(nullptr) < 0)
-		{
-			set_last_err_string("Call libusb_init failure");
-			return -1;
-		}
-
-		libusb_set_debug(nullptr, get_libusb_debug_level());
-
-		g_libusb_init = true;
-	}
+	if (ensure_libusb_initialized())
+		return -1;
 
 	if (run_cmds("CFG:", nullptr))
 		return -1;
 
-	time_t start = time(0);
+	Timer usb_timer;
 
 	while (1)
 	{
@@ -315,7 +359,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 			}
 			string str = get_device_path(dev);
 
-			if (!is_match_filter(str))
+			if (!g_filter_usbpath.is_valid(str))
 				continue;
 
 			ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
@@ -329,7 +373,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 					 * sometime HID device detect need some time, refresh list
 					 * to make sure HID driver installed.
 					 */
-					std::this_thread::sleep_for(std::chrono::milliseconds(200));
+					this_thread::sleep_for(200ms);
 					libusb_device **list = nullptr;
 					libusb_get_device_list(nullptr, &list);
 
@@ -349,21 +393,14 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 		}
 
 		libusb_free_device_list(newlist, 1);
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		this_thread::sleep_for(200ms);
 
 		uuu_notify nt;
 		nt.type = nt.NOTIFY_WAIT_FOR;
 		nt.str = (char*)"Wait for Known USB";
 		call_notify(nt);
 
-		if (g_wait_usb_timeout >= 0)
-		{
-			if (difftime(time(0), start) >= g_wait_usb_timeout)
-			{
-				set_last_err_string("Timeout: Wait for USB Device Appear");
-				return -1;
-			}
-		}
+		check_usb_timeout(usb_timer);
 	}
 
 	return -1;
@@ -377,15 +414,9 @@ int uuu_add_usbpath_filter(const char *path)
 
 int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 {
-	if (!g_libusb_init)
-	{
-		if (libusb_init(nullptr) < 0)
-		{
-			set_last_err_string("Call libusb_init failure");
-			return -1;
-		}
-		g_libusb_init = true;
-	}
+	if (ensure_libusb_initialized())
+		return -1;
+
 	libusb_device **newlist = nullptr;
 	libusb_get_device_list(nullptr, &newlist);
 	size_t i = 0;
@@ -418,13 +449,13 @@ int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 	return 0;
 }
 
-int uuu_set_wait_timeout(int second)
+int uuu_set_wait_timeout(int timeout_in_seconds)
 {
-	g_wait_usb_timeout = second;
+	g_wait_usb_timeout = seconds{timeout_in_seconds};
 	return 0;
 }
 
-void uuu_set_poll_period(int msecond)
+void uuu_set_poll_period(int period_in_milliseconds)
 {
-	g_usb_poll_period = msecond;
+	g_usb_poll_period = milliseconds{period_in_milliseconds};
 }
