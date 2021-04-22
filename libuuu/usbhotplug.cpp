@@ -45,8 +45,6 @@
 #include "vector"
 #include <time.h>
 
-static vector<thread> g_running_thread;
-
 static vector<string> g_filter_usbpath;
 
 static int g_wait_usb_timeout = -1;
