@@ -523,7 +523,8 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, siz
 	
 
 	size_t i = 0;
-	while (!pdata->request_data(data, i*block_size, block_size))
+	int r;
+	while (!(r=pdata->request_data(data, i*block_size, block_size)))
 	{
 		int ret = sf.push_one_block(data.data());
 		if (ret)
@@ -557,6 +558,9 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, siz
 			bload = pdata->IsKnownSize();
 		}
 	}
+
+	if (r == ERR_OUT_MEMORY)
+		return r;
 
 	if (flash(fb, sf.m_data.data(), sf.m_data.size()))
 		return -1;

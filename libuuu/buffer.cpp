@@ -1406,6 +1406,7 @@ int FileBuffer::request_data(size_t sz)
 int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 {
 	bool needlock = false;
+	int ret = 0;
 
 	if (IsLoaded())
 	{
@@ -1449,11 +1450,18 @@ int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 
 	if (needlock) m_data_mutex.lock();
 
-	memcpy(data.data(), this->data() + offset, size);
-
+	if (this->data())
+	{
+		memcpy(data.data(), this->data() + offset, size);
+	}
+	else
+	{
+		set_last_err_string("Out of memory");
+		ret = ERR_OUT_MEMORY;
+	}
 	if (needlock) m_data_mutex.unlock();
 
-	return 0;
+	return ret;
 }
 
 int FileBuffer::reserve(size_t sz)
