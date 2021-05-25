@@ -783,6 +783,7 @@ void print_lsusb()
 	uuu_for_each_devices(print_usb_device, NULL);
 }
 
+#ifdef WIN32
 int ignore_serial_number(const char *pro, const char *chip, const char */*comp*/, uint16_t vid, uint16_t pid, uint16_t /*bcdlow*/, uint16_t /*bcdhigh*/, void */*p*/)
 {
 	printf("\t %s\t %s\t 0x%04X\t0x%04X\n", chip, pro, vid, pid);
@@ -800,6 +801,7 @@ int ignore_serial_number(const char *pro, const char *chip, const char */*comp*/
 	printf("Set key failure, try run as administrator permission\n");
 	return -1;
 }
+#endif
 
 int set_ignore_serial_number()
 {
