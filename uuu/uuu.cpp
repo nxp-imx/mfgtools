@@ -143,6 +143,7 @@ void print_help(bool detail = false)
 		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
 		"uuu -udev       linux: show udev rule to avoid sudo each time \n"
 		"uuu -lsusb      List connected know devices\n"
+		"uuu -IgSerNum   Set windows registry to ignore USB serial number for known uuu devices"
 		"uuu -h -H       show help, -H means detail helps\n\n";
 	printf("%s", help);
 	printf("uuu [-d -m -v] -b[run] ");
@@ -782,6 +783,35 @@ void print_lsusb()
 	uuu_for_each_devices(print_usb_device, NULL);
 }
 
+int ignore_serial_number(const char *pro, const char *chip, const char */*comp*/, uint16_t vid, uint16_t pid, uint16_t /*bcdlow*/, uint16_t /*bcdhigh*/, void */*p*/)
+{
+	printf("\t %s\t %s\t 0x%04X\t0x%04X\n", chip, pro, vid, pid);
+
+	char sub[128];
+	snprintf(sub, 128, "IgnoreHWSerNum%04x%04x", vid, pid);
+	const BYTE value = 1;
+
+	LSTATUS ret = RegSetKeyValueA(HKEY_LOCAL_MACHINE,
+								  "SYSTEM\\CurrentControlSet\\Control\\UsbFlags",
+									sub, REG_BINARY, &value, 1);
+	if(ret == ERROR_SUCCESS)
+		return 0;
+
+	printf("Set key failure, try run as administrator permission\n");
+	return -1;
+}
+
+int set_ignore_serial_number()
+{
+#ifndef WIN32
+	printf("Only windows system need set ignore serial number registry");
+	return -1;
+#else
+	printf("Set window registry to ignore usb hardware serial number for known uuu device:\n");
+	return uuu_for_each_cfg(ignore_serial_number, NULL);
+#endif
+}
+
 int main(int argc, char **argv)
 {
 	if (auto_complete(argc, argv) == 0)
@@ -902,6 +932,10 @@ int main(int argc, char **argv)
 			{
 				print_lsusb();
 				return 0;
+			}
+			else if (s == "-IgSerNum")
+			{
+				return set_ignore_serial_number();
 			}
 			else if (s == "-e")
 			{
