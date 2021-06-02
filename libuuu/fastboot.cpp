@@ -704,6 +704,8 @@ int FBFlashCmd::run(CmdCtx *ctx)
 					can't push it here because next chuck may big size chuck and need split as below else logic.
 				*/
 				pos = oldpos;
+				nblk--;
+
 				uuu_notify nt;
 				nt.type = uuu_notify::NOTIFY_TRANS_POS;
 				nt.total = startblock;
