@@ -358,7 +358,14 @@ int FBCopy::run(CmdCtx *ctx)
 			if (fb.Transport(cmd, buff->data() + i, sz))
 			{
 				if (fb.m_info == "EPIPE")
-					break;
+					set_last_err_string("pipe closed by target");
+				else
+					set_last_err_string("target return unknown error");
+
+				cmd.format("Close");
+				if (fb.Transport(cmd, nullptr, 0))
+					return -1;
+
 				return -1;
 			}
 
@@ -368,7 +375,7 @@ int FBCopy::run(CmdCtx *ctx)
 		}
 
 		nt.type = uuu_notify::NOTIFY_TRANS_POS;
-		nt.index = i;
+		nt.index = buff->size();
 		call_notify(nt);
 	}
 	else
