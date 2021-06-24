@@ -1,5 +1,5 @@
 /*
-* Copyright 2018 NXP.
+* Copyright 2018-2021 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -28,19 +28,40 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
+
 #pragma once
 
+#include <locale>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include <locale>
 
-extern const char * g_vt_yellow ;
-extern const char * g_vt_default ;
-extern const char * g_vt_green ;
-extern const char * g_vt_red  ;
-extern const char * g_vt_kcyn ;
-extern const char * g_vt_boldwhite ;
+extern const char * g_vt_boldwhite;
+extern const char * g_vt_default;
+extern const char * g_vt_kcyn;
+extern const char * g_vt_green;
+extern const char * g_vt_red ;
+extern const char * g_vt_yellow;
+
+class Arg
+{
+public:
+	enum
+	{
+		ARG_MUST = 0x1,
+		ARG_OPTION = 0x2,
+		ARG_OPTION_KEY = 0x4,
+	};
+
+	Arg() {	m_flags = ARG_MUST;	}
+
+	int parser(std::string option);
+
+	std::string m_arg;
+	std::string m_desc;
+	uint32_t m_flags;
+	std::string m_options;
+};
 
 struct BuildCmd
 {
@@ -49,39 +70,23 @@ struct BuildCmd
 	const char *m_desc;
 };
 
-class Arg
-{
-public:
-	std::string m_arg;
-	std::string m_desc;
-	uint32_t m_flags;
-	std::string m_options;
-	enum
-	{
-		ARG_MUST = 0x1,
-		ARG_OPTION = 0x2,
-		ARG_OPTION_KEY = 0x4,
-	};
-	Arg() {	m_flags = ARG_MUST;	}
-	int parser(std::string option);
-};
-
 class BuildInScript
 {
 public:
+	BuildInScript() {};
+	BuildInScript(BuildCmd*p);
+
+	bool find_args(std::string arg);
+	std::string replace_script_args(std::vector<std::string> args);
+	std::string replace_str(std::string str, std::string key, std::string replace);
+	void show();
+	void show_cmd();
+	std::string str_to_upper(std::string str);
+
 	std::string m_script;
 	std::string m_desc;
 	std::string m_cmd;
 	std::vector<Arg> m_args;
-	bool find_args(std::string arg);
-	BuildInScript() {};
-	BuildInScript(BuildCmd*p);
-
-	void show();
-	void show_cmd();
-	std::string str_to_upper(std::string str);
-	std::string replace_str(std::string str, std::string key, std::string replace);
-	std::string replace_script_args(std::vector<std::string> args);
 };
 
 class BuildInScriptVector : public std::map<std::string, BuildInScript>
@@ -89,9 +94,9 @@ class BuildInScriptVector : public std::map<std::string, BuildInScript>
 public:
 	BuildInScriptVector(BuildCmd*p);
 
+	void PrintAutoComplete(std::string match, const char *space=" " );
 	void ShowAll();
 	void ShowCmds(FILE * file=stdout);
-	void PrintAutoComplete(std::string match, const char *space=" " );
 };
 
 extern BuildInScriptVector g_BuildScripts;
