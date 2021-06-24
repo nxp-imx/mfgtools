@@ -31,6 +31,208 @@
 
 #include "buildincmd.h"
 
+int Arg::parser(std::string option)
+{
+	size_t pos;
+	pos = option.find('[');
+	if (pos == std::string::npos)
+		return 0;
+	m_options = option.substr(pos + 1, option.find(']') - pos - 1);
+	m_flags = ARG_OPTION | ARG_OPTION_KEY;
+	return 0;
+}
+
+BuildInScript::BuildInScript(BuildCmd*p)
+{
+	m_script = p->m_buildcmd;
+	if(p->m_desc)
+		m_desc = p->m_desc;
+	if(p->m_cmd)
+		m_cmd = p->m_cmd;
+
+	for (size_t i = 1; i < m_script.size(); i++)
+	{
+		size_t off;
+		size_t off_tab;
+		std::string param;
+		if (m_script[i] == '_'
+			&& (m_script[i - 1] == '@' || m_script[i - 1] == ' '))
+		{
+			off = m_script.find(' ', i);
+			off_tab = m_script.find('\t', i);
+			size_t ofn = m_script.find('\n', i);
+			if (off_tab < off)
+				off = off_tab;
+			if (ofn < off)
+				off = ofn;
+
+			if (off == std::string::npos)
+				off = m_script.size() + 1;
+
+			param = m_script.substr(i, off - i);
+			if (!find_args(param))
+			{
+				Arg a;
+				a.m_arg = param;
+				a.m_flags = Arg::ARG_MUST;
+				m_args.push_back(a);
+			}
+		}
+	}
+
+	for (size_t i = 0; i < m_args.size(); i++)
+	{
+		size_t pos = 0;
+		std::string str;
+		str += "@";
+		str += m_args[i].m_arg;
+		pos = m_script.find(str);
+		if (pos != std::string::npos) {
+			std::string def;
+			size_t start_descript;
+			start_descript = m_script.find('|', pos);
+			if (start_descript != std::string::npos)
+			{
+				m_args[i].m_desc = m_script.substr(start_descript + 1,
+										m_script.find('\n', start_descript) - start_descript - 1);
+				def = m_script.substr(pos, start_descript - pos);
+				m_args[i].parser(def);
+			}
+		}
+	}
+}
+
+bool BuildInScript::find_args(std::string arg)
+{
+	for (size_t i = 0; i < m_args.size(); i++)
+	{
+		if (m_args[i].m_arg == arg)
+			return true;
+	}
+	return false;
+}
+
+std::string BuildInScript::replace_script_args(std::vector<std::string> args)
+{
+	std::string script = m_script;
+	for (size_t i = 0; i < args.size() && i < m_args.size(); i++)
+	{
+		script = replace_str(script, m_args[i].m_arg, args[i]);
+	}
+
+	//handle option args;
+	for (size_t i = args.size(); i < m_args.size(); i++)
+	{
+		if (m_args[i].m_flags & Arg::ARG_OPTION_KEY)
+		{
+			for (size_t j = 0; j < args.size(); j++)
+			{
+				if (m_args[j].m_arg == m_args[i].m_options)
+				{
+					script = replace_str(script, m_args[i].m_arg, args[j]);
+					break;
+				}
+			}
+		}
+	}
+	return script;
+}
+
+std::string BuildInScript::replace_str(std::string str, std::string key, std::string replace)
+{
+	if (replace.size() > 4)
+	{
+		if (str_to_upper(replace.substr(replace.size() - 4)) == ".BZ2")
+		{
+			replace += "/*";
+		}
+	}
+
+	for (size_t j = 0; (j = str.find(key, j)) != std::string::npos;)
+	{
+		str.replace(j, key.size(), replace);
+		j += key.size();
+	}
+	return str;
+}
+
+void BuildInScript::show()
+{
+	printf("%s\n", m_script.c_str());
+}
+
+void BuildInScript::show_cmd()
+{
+	printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_cmd.c_str(), g_vt_default,  m_desc.c_str());
+	for (size_t i=0; i < m_args.size(); i++)
+	{
+		std::string desc;
+		desc += m_args[i].m_arg;
+		if (m_args[i].m_flags & Arg::ARG_OPTION)
+		{
+			desc += g_vt_boldwhite;
+			desc += "[Optional]";
+			desc += g_vt_default;
+		}
+		desc += " ";
+		desc += m_args[i].m_desc;
+		printf("\t\targ%d: %s\n", (int)i, desc.c_str());
+	}
+}
+
+std::string BuildInScript::str_to_upper(std::string str)
+{
+	std::locale loc;
+	std::string s;
+
+	for (size_t i = 0; i < str.size(); i++)
+		s.push_back(std::toupper(str[i], loc));
+
+	return s;
+}
+
+BuildInScriptVector::BuildInScriptVector(BuildCmd*p)
+{
+	while (p->m_cmd)
+	{
+		BuildInScript one(p);
+		(*this)[one.m_cmd] = one;
+		p++;
+	}
+}
+
+void BuildInScriptVector::PrintAutoComplete(std::string match, const char *space)
+{
+	for (auto iCol = begin(); iCol != end(); ++iCol)
+			{
+		if(iCol->first.substr(0, match.size()) == match)
+			printf("%s%s\n", iCol->first.c_str(), space);
+	}
+}
+
+void BuildInScriptVector::ShowAll()
+{
+	for (auto iCol = begin(); iCol != end(); ++iCol)
+	{
+		iCol->second.show_cmd();
+	}
+}
+
+void BuildInScriptVector::ShowCmds(FILE * file)
+{
+	fprintf(file, "<");
+	for (auto iCol = begin(); iCol != end(); ++iCol)
+	{
+		fprintf(file, "%s", iCol->first.c_str());
+
+		auto i = iCol;
+		i++;
+		if(i != end())
+			fprintf(file, "|");
+	}
+	fprintf(file, ">");
+}
+
 BuildCmd g_buildin_cmd[] =
 {
 	{
