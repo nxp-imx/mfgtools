@@ -44,7 +44,7 @@ int BuiltInScript::Arg::parser(std::string option)
 	pos = option.find('[');
 	if (pos == std::string::npos)
 		return 0;
-	m_options = option.substr(pos + 1, option.find(']') - pos - 1);
+	m_fallback_option = option.substr(pos + 1, option.find(']') - pos - 1);
 	m_flags = ARG_OPTION | ARG_OPTION_KEY;
 	return 0;
 }
@@ -57,36 +57,36 @@ int BuiltInScript::Arg::parser(std::string option)
  */
 BuiltInScript::BuiltInScript(BuiltInScriptRawData*p)
 {
-	m_script = p->m_buildcmd;
+	m_text = p->m_text;
 	if(p->m_desc)
 		m_desc = p->m_desc;
-	if(p->m_cmd)
-		m_cmd = p->m_cmd;
+	if(p->m_name)
+		m_name = p->m_name;
 
-	for (size_t i = 1; i < m_script.size(); i++)
+	for (size_t i = 1; i < m_text.size(); i++)
 	{
 		size_t off;
 		size_t off_tab;
 		std::string param;
-		if (m_script[i] == '_'
-			&& (m_script[i - 1] == '@' || m_script[i - 1] == ' '))
+		if (m_text[i] == '_'
+			&& (m_text[i - 1] == '@' || m_text[i - 1] == ' '))
 		{
-			off = m_script.find(' ', i);
-			off_tab = m_script.find('\t', i);
-			size_t ofn = m_script.find('\n', i);
+			off = m_text.find(' ', i);
+			off_tab = m_text.find('\t', i);
+			size_t ofn = m_text.find('\n', i);
 			if (off_tab < off)
 				off = off_tab;
 			if (ofn < off)
 				off = ofn;
 
 			if (off == std::string::npos)
-				off = m_script.size() + 1;
+				off = m_text.size() + 1;
 
-			param = m_script.substr(i, off - i);
+			param = m_text.substr(i, off - i);
 			if (!find_args(param))
 			{
 				Arg a;
-				a.m_arg = param;
+				a.m_name = param;
 				a.m_flags = Arg::ARG_MUST;
 				m_args.push_back(a);
 			}
@@ -98,17 +98,17 @@ BuiltInScript::BuiltInScript(BuiltInScriptRawData*p)
 		size_t pos = 0;
 		std::string str;
 		str += "@";
-		str += m_args[i].m_arg;
-		pos = m_script.find(str);
+		str += m_args[i].m_name;
+		pos = m_text.find(str);
 		if (pos != std::string::npos) {
 			std::string def;
 			size_t start_descript;
-			start_descript = m_script.find('|', pos);
+			start_descript = m_text.find('|', pos);
 			if (start_descript != std::string::npos)
 			{
-				m_args[i].m_desc = m_script.substr(start_descript + 1,
-										m_script.find('\n', start_descript) - start_descript - 1);
-				def = m_script.substr(pos, start_descript - pos);
+				m_args[i].m_desc = m_text.substr(start_descript + 1,
+										m_text.find('\n', start_descript) - start_descript - 1);
+				def = m_text.substr(pos, start_descript - pos);
 				m_args[i].parser(def);
 			}
 		}
@@ -126,7 +126,7 @@ bool BuiltInScript::find_args(std::string arg)
 {
 	for (size_t i = 0; i < m_args.size(); i++)
 	{
-		if (m_args[i].m_arg == arg)
+		if (m_args[i].m_name == arg)
 			return true;
 	}
 	return false;
@@ -141,10 +141,10 @@ bool BuiltInScript::find_args(std::string arg)
  */
 std::string BuiltInScript::replace_script_args(std::vector<std::string> args)
 {
-	std::string script = m_script;
+	std::string script = m_text;
 	for (size_t i = 0; i < args.size() && i < m_args.size(); i++)
 	{
-		script = replace_str(script, m_args[i].m_arg, args[i]);
+		script = replace_str(script, m_args[i].m_name, args[i]);
 	}
 
 	//handle option args;
@@ -154,9 +154,9 @@ std::string BuiltInScript::replace_script_args(std::vector<std::string> args)
 		{
 			for (size_t j = 0; j < args.size(); j++)
 			{
-				if (m_args[j].m_arg == m_args[i].m_options)
+				if (m_args[j].m_name == m_args[i].m_fallback_option)
 				{
-					script = replace_str(script, m_args[i].m_arg, args[j]);
+					script = replace_str(script, m_args[i].m_name, args[j]);
 					break;
 				}
 			}
@@ -196,7 +196,7 @@ std::string BuiltInScript::replace_str(std::string str, std::string key, std::st
  */
 void BuiltInScript::show()
 {
-	printf("%s\n", m_script.c_str());
+	printf("%s\n", m_text.c_str());
 }
 
 /**
@@ -204,11 +204,11 @@ void BuiltInScript::show()
  */
 void BuiltInScript::show_cmd()
 {
-	printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_cmd.c_str(), g_vt_default,  m_desc.c_str());
+	printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_name.c_str(), g_vt_default,  m_desc.c_str());
 	for (size_t i=0; i < m_args.size(); i++)
 	{
 		std::string desc;
-		desc += m_args[i].m_arg;
+		desc += m_args[i].m_name;
 		if (m_args[i].m_flags & Arg::ARG_OPTION)
 		{
 			desc += g_vt_boldwhite;
@@ -244,10 +244,10 @@ std::string BuiltInScript::str_to_upper(std::string str)
  */
 BuiltInScriptMap::BuiltInScriptMap(BuiltInScriptRawData*p)
 {
-	while (p->m_cmd)
+	while (p->m_name)
 	{
 		BuiltInScript one(p);
-		(*this)[one.m_cmd] = one;
+		(*this)[one.m_name] = one;
 		p++;
 	}
 }

@@ -838,7 +838,7 @@ int main(int argc, char **argv)
 			}
 			else
 			{
-				string str = g_BuildScripts[argv[2]].m_script;
+				string str = g_BuildScripts[argv[2]].m_text;
 				while (str.size() > 0 && (str[0] == '\n' || str[0] == ' '))
 					str = str.erase(0,1);
 
@@ -977,7 +977,7 @@ int main(int argc, char **argv)
 				if (g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end()) {
 					BuiltInScriptRawData tmpCmd;
 					string tmpCmdFileName = argv[i + 1];
-					tmpCmd.m_cmd = tmpCmdFileName.c_str();
+					tmpCmd.m_name = tmpCmdFileName.c_str();
 
 					std::ifstream t(tmpCmdFileName);
 					std::string fileContents((std::istreambuf_iterator<char>(t)),
@@ -988,7 +988,7 @@ int main(int argc, char **argv)
 						return -1;
 					}
 
-					tmpCmd.m_buildcmd = fileContents.c_str();
+					tmpCmd.m_text = fileContents.c_str();
 
 					tmpCmd.m_desc = "Script loaded from file";
 

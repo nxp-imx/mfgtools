@@ -49,11 +49,11 @@ extern const char * g_vt_yellow;
 struct BuiltInScriptRawData
 {
 	//! The name of the built-in script
-	const char *m_cmd;
+	const char *m_name = nullptr;
 	//! The actual built-in script itself
-	const char *m_buildcmd;
+	const char *m_text = nullptr;
 	//! A description of the built-in script's purpose
-	const char *m_desc;
+	const char *m_desc = nullptr;
 };
 
 class BuiltInScript
@@ -78,14 +78,14 @@ public:
 		int parser(std::string option);
 
 		//! The name of the argument
-		std::string m_arg;
+		std::string m_name;
 		//! A description of the argument
 		std::string m_desc;
 		//! Flags of the argument (basically if it's optional or not)
 		uint32_t m_flags;
 		//! The argument whose value this one will fall back to if it's optional
 		//! and not given explicitly
-		std::string m_options;
+		std::string m_fallback_option;
 	};
 
 	BuiltInScript() {};
@@ -99,11 +99,11 @@ public:
 	std::string str_to_upper(std::string str);
 
 	//! The actual script which is being represented
-	std::string m_script;
+	std::string m_text;
 	//! A description of the script's purpose
 	std::string m_desc;
 	//! A short name of the built-in script
-	std::string m_cmd;
+	std::string m_name;
 	//! The arguments of the built-in script
 	std::vector<Arg> m_args;
 };
