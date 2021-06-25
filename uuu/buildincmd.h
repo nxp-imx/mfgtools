@@ -43,6 +43,10 @@ extern const char * g_vt_green;
 extern const char * g_vt_red ;
 extern const char * g_vt_yellow;
 
+/**
+ * @brief A class for representing arguments of built-in scripts represented by
+ * BuildCmd
+ */
 class Arg
 {
 public:
@@ -57,16 +61,27 @@ public:
 
 	int parser(std::string option);
 
+	//! The name of the argument
 	std::string m_arg;
+	//! A description of the argument
 	std::string m_desc;
+	//! Flags of the argument (basically if it's optional or not)
 	uint32_t m_flags;
+	//! The argument whose value this one will fall back to if it's optional and
+	//! not given explicitly
 	std::string m_options;
 };
 
+/**
+ * @brief Structure to hold the raw data of a built-in script
+ */
 struct BuildCmd
 {
+	//! The name of the built-in script
 	const char *m_cmd;
+	//! The actual built-in script itself
 	const char *m_buildcmd;
+	//! A description of the built-in script's purpose
 	const char *m_desc;
 };
 
@@ -83,12 +98,21 @@ public:
 	void show_cmd();
 	std::string str_to_upper(std::string str);
 
+	//! The actual script which is being represented
 	std::string m_script;
+	//! A description of the script's purpose
 	std::string m_desc;
+	//! A short name of the built-in script
 	std::string m_cmd;
+	//! The arguments of the built-in script
 	std::vector<Arg> m_args;
 };
 
+/**
+ * @brief A map of all built-in scripts indexed by their names
+ *
+ * Each built-in script is represented by a BuildInScript instance.
+ */
 class BuildInScriptVector : public std::map<std::string, BuildInScript>
 {
 public:
@@ -99,4 +123,5 @@ public:
 	void ShowCmds(FILE * file=stdout);
 };
 
+//! A map of the built-in scripts' names to their BuildInScript representations
 extern BuildInScriptVector g_BuildScripts;

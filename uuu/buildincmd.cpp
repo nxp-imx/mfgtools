@@ -31,6 +31,13 @@
 
 #include "buildincmd.h"
 
+/**
+ * @brief Parse characters between argument name and its description and check
+ * if its an optional one
+ * @param[in] option The characters between argument name and its description to
+ * be parsed
+ * @return `0` in any case
+ */
 int Arg::parser(std::string option)
 {
 	size_t pos;
@@ -42,6 +49,12 @@ int Arg::parser(std::string option)
 	return 0;
 }
 
+/**
+ * @brief Create a new BuildInScript instance by extracting information from a
+ * BuildCmd instance
+ * @param[in] p The BuildCmd containing all data of the script this
+ * BuildInScript instance shall represent
+ */
 BuildInScript::BuildInScript(BuildCmd*p)
 {
 	m_script = p->m_buildcmd;
@@ -102,6 +115,13 @@ BuildInScript::BuildInScript(BuildCmd*p)
 	}
 }
 
+/**
+ * @brief Check if the BuildInScript instance has an argument called `arg`
+ * @param[in] arg The argument for which its existence in the BuildInScript
+ * shall be checked
+ * @return `true` if BuildInScript has an argument named `arg`, `false`
+ * otherwise
+ */
 bool BuildInScript::find_args(std::string arg)
 {
 	for (size_t i = 0; i < m_args.size(); i++)
@@ -112,6 +132,13 @@ bool BuildInScript::find_args(std::string arg)
 	return false;
 }
 
+/**
+ * @brief Replace built-in script's arguments by actual values given in `args`
+ * @param[in] args The actual values that shall replace the arguments (the order
+ * must fit the order of the arguments in the script)
+ * @return A copy of the built-in script with the arguments replaced by their
+ * actual values
+ */
 std::string BuildInScript::replace_script_args(std::vector<std::string> args)
 {
 	std::string script = m_script;
@@ -138,6 +165,14 @@ std::string BuildInScript::replace_script_args(std::vector<std::string> args)
 	return script;
 }
 
+/**
+ * @brief Replace a `key` substring of a string `str` by a replacement `replace`
+ * @param[in] str The string of which a copy with the replacements shall be
+ * created
+ * @param[in] key The string which shall be replaced
+ * @param[in] replace The string that shall replace ocurrences of `key`
+ * @return
+ */
 std::string BuildInScript::replace_str(std::string str, std::string key, std::string replace)
 {
 	if (replace.size() > 4)
@@ -156,11 +191,17 @@ std::string BuildInScript::replace_str(std::string str, std::string key, std::st
 	return str;
 }
 
+/**
+ * @brief Print the built-in script to `stdout` followed by a newline
+ */
 void BuildInScript::show()
 {
 	printf("%s\n", m_script.c_str());
 }
 
+/**
+ * @brief Print the script's name, its description and its arguments to stdout
+ */
 void BuildInScript::show_cmd()
 {
 	printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_cmd.c_str(), g_vt_default,  m_desc.c_str());
@@ -180,6 +221,12 @@ void BuildInScript::show_cmd()
 	}
 }
 
+/**
+ * @brief Returns a copy of `str` with all applicable characters converted to
+ * uppercase
+ * @param[in] str The string for which an uppercase copy shall be created
+ * @return The copy of `str` converted to uppercase
+ */
 std::string BuildInScript::str_to_upper(std::string str)
 {
 	std::locale loc;
@@ -191,6 +238,10 @@ std::string BuildInScript::str_to_upper(std::string str)
 	return s;
 }
 
+/**
+ * @brief Create a new map by parsing an array of BuildCmd instances
+ * @param[in] p Pointer to the first element of a BuildCmd array
+ */
 BuildInScriptVector::BuildInScriptVector(BuildCmd*p)
 {
 	while (p->m_cmd)
@@ -201,6 +252,12 @@ BuildInScriptVector::BuildInScriptVector(BuildCmd*p)
 	}
 }
 
+/**
+ * @brief Auto-complete names of built-in scripts if they match `match`
+ * @param[in] match The string against which the scripts' names will be machted
+ * @param[in] space A separator character which shall be printed after the
+ * completed script name
+ */
 void BuildInScriptVector::PrintAutoComplete(std::string match, const char *space)
 {
 	for (auto iCol = begin(); iCol != end(); ++iCol)
@@ -210,6 +267,9 @@ void BuildInScriptVector::PrintAutoComplete(std::string match, const char *space
 	}
 }
 
+/**
+ * @brief Print information about all contained scripts to stdout
+ */
 void BuildInScriptVector::ShowAll()
 {
 	for (auto iCol = begin(); iCol != end(); ++iCol)
@@ -218,6 +278,10 @@ void BuildInScriptVector::ShowAll()
 	}
 }
 
+/**
+ * @brief Print the names of all contained scripts to the given stream
+ * @param[in] file The stream to which the names shall be printed
+ */
 void BuildInScriptVector::ShowCmds(FILE * file)
 {
 	fprintf(file, "<");
@@ -233,6 +297,7 @@ void BuildInScriptVector::ShowCmds(FILE * file)
 	fprintf(file, ">");
 }
 
+//! Array containing raw information about all the built-in scripts of uuu
 BuildCmd g_buildin_cmd[] =
 {
 	{
@@ -282,4 +347,5 @@ BuildCmd g_buildin_cmd[] =
 	}
 };
 
+//! A map of the built-in scripts' names to their BuildInScript representations
 BuildInScriptVector g_BuildScripts(g_buildin_cmd);
