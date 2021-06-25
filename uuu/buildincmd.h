@@ -44,38 +44,9 @@ extern const char * g_vt_red ;
 extern const char * g_vt_yellow;
 
 /**
- * @brief A class for representing arguments of built-in scripts represented by
- * BuildCmd
- */
-class Arg
-{
-public:
-	enum
-	{
-		ARG_MUST = 0x1,
-		ARG_OPTION = 0x2,
-		ARG_OPTION_KEY = 0x4,
-	};
-
-	Arg() {	m_flags = ARG_MUST;	}
-
-	int parser(std::string option);
-
-	//! The name of the argument
-	std::string m_arg;
-	//! A description of the argument
-	std::string m_desc;
-	//! Flags of the argument (basically if it's optional or not)
-	uint32_t m_flags;
-	//! The argument whose value this one will fall back to if it's optional and
-	//! not given explicitly
-	std::string m_options;
-};
-
-/**
  * @brief Structure to hold the raw data of a built-in script
  */
-struct BuildCmd
+struct BuiltInScriptRawData
 {
 	//! The name of the built-in script
 	const char *m_cmd;
@@ -85,11 +56,40 @@ struct BuildCmd
 	const char *m_desc;
 };
 
-class BuildInScript
+class BuiltInScript
 {
 public:
-	BuildInScript() {};
-	BuildInScript(BuildCmd*p);
+	/**
+	 * @brief A class for representing arguments of built-in scripts represented
+	 * by BuiltInScript
+	 */
+	class Arg
+	{
+	public:
+		enum
+		{
+			ARG_MUST = 0x1,
+			ARG_OPTION = 0x2,
+			ARG_OPTION_KEY = 0x4,
+		};
+
+		Arg() {	m_flags = ARG_MUST;	}
+
+		int parser(std::string option);
+
+		//! The name of the argument
+		std::string m_arg;
+		//! A description of the argument
+		std::string m_desc;
+		//! Flags of the argument (basically if it's optional or not)
+		uint32_t m_flags;
+		//! The argument whose value this one will fall back to if it's optional
+		//! and not given explicitly
+		std::string m_options;
+	};
+
+	BuiltInScript() {};
+	BuiltInScript(BuiltInScriptRawData*p);
 
 	bool find_args(std::string arg);
 	std::string replace_script_args(std::vector<std::string> args);
@@ -111,17 +111,17 @@ public:
 /**
  * @brief A map of all built-in scripts indexed by their names
  *
- * Each built-in script is represented by a BuildInScript instance.
+ * Each built-in script is represented by a BuiltInScript instance.
  */
-class BuildInScriptVector : public std::map<std::string, BuildInScript>
+class BuiltInScriptMap : public std::map<std::string, BuiltInScript>
 {
 public:
-	BuildInScriptVector(BuildCmd*p);
+	BuiltInScriptMap(BuiltInScriptRawData*p);
 
 	void PrintAutoComplete(std::string match, const char *space=" " );
 	void ShowAll();
 	void ShowCmds(FILE * file=stdout);
 };
 
-//! A map of the built-in scripts' names to their BuildInScript representations
-extern BuildInScriptVector g_BuildScripts;
+//! A map of the built-in scripts' names to their BuiltInScript representations
+extern BuiltInScriptMap g_BuildScripts;
