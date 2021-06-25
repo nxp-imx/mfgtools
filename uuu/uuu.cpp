@@ -975,7 +975,7 @@ int main(int argc, char **argv)
 
 				// if script name is not build-in, try to look for a file
 				if (g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end()) {
-					BuildCmd tmpCmd;
+					BuiltInScriptRawData tmpCmd;
 					string tmpCmdFileName = argv[i + 1];
 					tmpCmd.m_cmd = tmpCmdFileName.c_str();
 
@@ -992,8 +992,8 @@ int main(int argc, char **argv)
 
 					tmpCmd.m_desc = "Script loaded from file";
 
-					BuildInScript tmpBuildInScript(&tmpCmd);
-					g_BuildScripts[tmpCmdFileName] = tmpBuildInScript;
+					BuiltInScript tmpBuiltInScript(&tmpCmd);
+					g_BuildScripts[tmpCmdFileName] = tmpBuiltInScript;
 
 					cmd_script = g_BuildScripts[tmpCmdFileName].replace_script_args(args);
 				}
