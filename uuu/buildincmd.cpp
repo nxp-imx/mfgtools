@@ -38,10 +38,9 @@
  * be parsed
  * @return `0` in any case
  */
-int BuiltInScript::Arg::parser(std::string option)
+int BuiltInScript::Arg::parser(const std::string &option)
 {
-	size_t pos;
-	pos = option.find('[');
+	const auto pos = option.find('[');
 	if (pos == std::string::npos)
 		return 0;
 	m_fallback_option = option.substr(pos + 1, option.find(']') - pos - 1);
@@ -55,7 +54,7 @@ int BuiltInScript::Arg::parser(std::string option)
  * @param[in] p The BuiltInScriptRawData containing all data of the script this
  * BuiltInScript instance shall represent
  */
-BuiltInScript::BuiltInScript(BuiltInScriptRawData*p)
+BuiltInScript::BuiltInScript(const BuiltInScriptRawData * const p)
 {
 	m_text = p->m_text;
 	if(p->m_desc)
@@ -66,13 +65,11 @@ BuiltInScript::BuiltInScript(BuiltInScriptRawData*p)
 	for (size_t i = 1; i < m_text.size(); i++)
 	{
 		size_t off;
-		size_t off_tab;
-		std::string param;
 		if (m_text[i] == '_'
 			&& (m_text[i - 1] == '@' || m_text[i - 1] == ' '))
 		{
 			off = m_text.find(' ', i);
-			off_tab = m_text.find('\t', i);
+			const auto off_tab = m_text.find('\t', i);
 			size_t ofn = m_text.find('\n', i);
 			if (off_tab < off)
 				off = off_tab;
@@ -82,7 +79,7 @@ BuiltInScript::BuiltInScript(BuiltInScriptRawData*p)
 			if (off == std::string::npos)
 				off = m_text.size() + 1;
 
-			param = m_text.substr(i, off - i);
+			const std::string param{m_text.substr(i, off - i)};
 			if (!find_args(param))
 			{
 				Arg a;
@@ -95,20 +92,17 @@ BuiltInScript::BuiltInScript(BuiltInScriptRawData*p)
 
 	for (size_t i = 0; i < m_args.size(); i++)
 	{
-		size_t pos = 0;
 		std::string str;
 		str += "@";
 		str += m_args[i].m_name;
-		pos = m_text.find(str);
+		const auto pos = m_text.find(str);
 		if (pos != std::string::npos) {
-			std::string def;
-			size_t start_descript;
-			start_descript = m_text.find('|', pos);
+			const auto start_descript = m_text.find('|', pos);
 			if (start_descript != std::string::npos)
 			{
 				m_args[i].m_desc = m_text.substr(start_descript + 1,
 										m_text.find('\n', start_descript) - start_descript - 1);
-				def = m_text.substr(pos, start_descript - pos);
+				const std::string def{m_text.substr(pos, start_descript - pos)};
 				m_args[i].parser(def);
 			}
 		}
@@ -122,7 +116,7 @@ BuiltInScript::BuiltInScript(BuiltInScriptRawData*p)
  * @return `true` if BuiltInScript has an argument named `arg`, `false`
  * otherwise
  */
-bool BuiltInScript::find_args(std::string arg)
+bool BuiltInScript::find_args(const std::string &arg) const
 {
 	for (size_t i = 0; i < m_args.size(); i++)
 	{
@@ -139,7 +133,7 @@ bool BuiltInScript::find_args(std::string arg)
  * @return A copy of the built-in script with the arguments replaced by their
  * actual values
  */
-std::string BuiltInScript::replace_script_args(std::vector<std::string> args)
+std::string BuiltInScript::replace_script_args(const std::vector<std::string> &args) const
 {
 	std::string script = m_text;
 	for (size_t i = 0; i < args.size() && i < m_args.size(); i++)
@@ -173,7 +167,7 @@ std::string BuiltInScript::replace_script_args(std::vector<std::string> args)
  * @param[in] replace The string that shall replace ocurrences of `key`
  * @return
  */
-std::string BuiltInScript::replace_str(std::string str, std::string key, std::string replace)
+std::string BuiltInScript::replace_str(std::string str, std::string key, std::string replace) const
 {
 	if (replace.size() > 4)
 	{
@@ -194,7 +188,7 @@ std::string BuiltInScript::replace_str(std::string str, std::string key, std::st
 /**
  * @brief Print the built-in script to `stdout` followed by a newline
  */
-void BuiltInScript::show()
+void BuiltInScript::show() const
 {
 	printf("%s\n", m_text.c_str());
 }
@@ -202,7 +196,7 @@ void BuiltInScript::show()
 /**
  * @brief Print the script's name, its description and its arguments to stdout
  */
-void BuiltInScript::show_cmd()
+void BuiltInScript::show_cmd() const
 {
 	printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_name.c_str(), g_vt_default,  m_desc.c_str());
 	for (size_t i=0; i < m_args.size(); i++)
@@ -227,7 +221,7 @@ void BuiltInScript::show_cmd()
  * @param[in] str The string for which an uppercase copy shall be created
  * @return The copy of `str` converted to uppercase
  */
-std::string BuiltInScript::str_to_upper(std::string str)
+std::string BuiltInScript::str_to_upper(const std::string &str) const
 {
 	std::locale loc;
 	std::string s;
@@ -242,7 +236,7 @@ std::string BuiltInScript::str_to_upper(std::string str)
  * @brief Create a new map by parsing an array of BuiltInScriptRawData instances
  * @param[in] p Pointer to the first element of a BuiltInScriptRawData array
  */
-BuiltInScriptMap::BuiltInScriptMap(BuiltInScriptRawData*p)
+BuiltInScriptMap::BuiltInScriptMap(const BuiltInScriptRawData*p)
 {
 	while (p->m_name)
 	{
@@ -258,7 +252,7 @@ BuiltInScriptMap::BuiltInScriptMap(BuiltInScriptRawData*p)
  * @param[in] space A separator character which shall be printed after the
  * completed script name
  */
-void BuiltInScriptMap::PrintAutoComplete(std::string match, const char *space)
+void BuiltInScriptMap::PrintAutoComplete(std::string match, const char *space) const
 {
 	for (auto iCol = begin(); iCol != end(); ++iCol)
 			{
@@ -270,7 +264,7 @@ void BuiltInScriptMap::PrintAutoComplete(std::string match, const char *space)
 /**
  * @brief Print information about all contained scripts to stdout
  */
-void BuiltInScriptMap::ShowAll()
+void BuiltInScriptMap::ShowAll() const
 {
 	for (auto iCol = begin(); iCol != end(); ++iCol)
 	{
@@ -282,7 +276,7 @@ void BuiltInScriptMap::ShowAll()
  * @brief Print the names of all contained scripts to the given stream
  * @param[in] file The stream to which the names shall be printed
  */
-void BuiltInScriptMap::ShowCmds(FILE * file)
+void BuiltInScriptMap::ShowCmds(FILE * file) const
 {
 	fprintf(file, "<");
 	for (auto iCol = begin(); iCol != end(); ++iCol)
@@ -298,7 +292,7 @@ void BuiltInScriptMap::ShowCmds(FILE * file)
 }
 
 //! Array containing raw information about all the built-in scripts of uuu
-BuiltInScriptRawData g_builtin_cmd[] =
+static constexpr BuiltInScriptRawData g_builtin_cmd[] =
 {
 	{
 		"emmc",
