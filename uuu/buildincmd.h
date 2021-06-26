@@ -91,12 +91,9 @@ public:
 	BuiltInScript() {};
 	BuiltInScript(const BuiltInScriptRawData*p);
 
-	bool find_args(const std::string &arg) const;
 	std::string replace_script_args(const std::vector<std::string> &args) const;
-	std::string replace_str(std::string str, std::string key, std::string replace) const;
 	void show() const;
 	void show_cmd() const;
-	std::string str_to_upper(const std::string &str) const;
 
 	//! The actual script which is being represented
 	std::string m_text;
@@ -106,6 +103,9 @@ public:
 	std::string m_name;
 	//! The arguments of the built-in script
 	std::vector<Arg> m_args;
+
+private:
+	bool find_args(const std::string &arg) const;
 };
 
 /**
