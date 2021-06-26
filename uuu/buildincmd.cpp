@@ -31,6 +31,9 @@
 
 #include "buildincmd.h"
 
+#include <algorithm>
+#include <locale>
+
 static std::string replace_str(std::string str, std::string key, std::string replace);
 static std::string str_to_upper(const std::string &str);
 
@@ -41,14 +44,15 @@ static std::string str_to_upper(const std::string &str);
  * be parsed
  * @return `0` in any case
  */
-int BuiltInScript::Arg::parser(const std::string &option)
+void BuiltInScript::Arg::parser(const std::string &option)
 {
 	const auto pos = option.find('[');
 	if (pos == std::string::npos)
-		return 0;
+	{
+		return;
+	}
 	m_fallback_option = option.substr(pos + 1, option.find(']') - pos - 1);
 	m_flags = ARG_OPTION | ARG_OPTION_KEY;
-	return 0;
 }
 
 /**
@@ -57,14 +61,11 @@ int BuiltInScript::Arg::parser(const std::string &option)
  * @param[in] p The BuiltInScriptRawData containing all data of the script this
  * BuiltInScript instance shall represent
  */
-BuiltInScript::BuiltInScript(const BuiltInScriptRawData * const p)
+BuiltInScript::BuiltInScript(const BuiltInScriptRawData * const p) :
+	m_text{p->m_text},
+	m_desc{p->m_desc ? p->m_desc : ""},
+	m_name{p->m_name ? p->m_name : ""}
 {
-	m_text = p->m_text;
-	if(p->m_desc)
-		m_desc = p->m_desc;
-	if(p->m_name)
-		m_name = p->m_name;
-
 	for (size_t i = 1; i < m_text.size(); i++)
 	{
 		size_t off;
@@ -121,12 +122,8 @@ BuiltInScript::BuiltInScript(const BuiltInScriptRawData * const p)
  */
 bool BuiltInScript::find_args(const std::string &arg) const
 {
-	for (size_t i = 0; i < m_args.size(); i++)
-	{
-		if (m_args[i].m_name == arg)
-			return true;
-	}
-	return false;
+	return std::any_of(m_args.cbegin(), m_args.cend(),
+					   [&arg](const Arg &brg){ return brg.m_name == arg; });
 }
 
 /**
@@ -176,10 +173,9 @@ void BuiltInScript::show() const
 void BuiltInScript::show_cmd() const
 {
 	printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_name.c_str(), g_vt_default,  m_desc.c_str());
-	for (size_t i=0; i < m_args.size(); i++)
+	for (auto i = 0u; i < m_args.size(); ++i)
 	{
-		std::string desc;
-		desc += m_args[i].m_name;
+		std::string desc{m_args[i].m_name};
 		if (m_args[i].m_flags & Arg::ARG_OPTION)
 		{
 			desc += g_vt_boldwhite;
@@ -188,7 +184,7 @@ void BuiltInScript::show_cmd() const
 		}
 		desc += " ";
 		desc += m_args[i].m_desc;
-		printf("\t\targ%d: %s\n", (int)i, desc.c_str());
+		printf("\t\targ%u: %s\n", i, desc.c_str());
 	}
 }
 
@@ -202,7 +198,7 @@ BuiltInScriptMap::BuiltInScriptMap(const BuiltInScriptRawData*p)
 	{
 		BuiltInScript one(p);
 		(*this)[one.m_name] = one;
-		p++;
+		++p;
 	}
 }
 
@@ -212,12 +208,14 @@ BuiltInScriptMap::BuiltInScriptMap(const BuiltInScriptRawData*p)
  * @param[in] space A separator character which shall be printed after the
  * completed script name
  */
-void BuiltInScriptMap::PrintAutoComplete(std::string match, const char *space) const
+void BuiltInScriptMap::PrintAutoComplete(const std::string &match, const char *space) const
 {
-	for (auto iCol = begin(); iCol != end(); ++iCol)
-			{
-		if(iCol->first.substr(0, match.size()) == match)
-			printf("%s%s\n", iCol->first.c_str(), space);
+	for (const auto &script_pair : *this)
+	{
+		if(script_pair.first.substr(0, match.size()) == match)
+		{
+			printf("%s%s\n", script_pair.first.c_str(), space);
+		}
 	}
 }
 
@@ -226,9 +224,9 @@ void BuiltInScriptMap::PrintAutoComplete(std::string match, const char *space) c
  */
 void BuiltInScriptMap::ShowAll() const
 {
-	for (auto iCol = begin(); iCol != end(); ++iCol)
+	for (const auto &script_pair : *this)
 	{
-		iCol->second.show_cmd();
+		script_pair.second.show_cmd();
 	}
 }
 
@@ -236,7 +234,7 @@ void BuiltInScriptMap::ShowAll() const
  * @brief Print the names of all contained scripts to the given stream
  * @param[in] file The stream to which the names shall be printed
  */
-void BuiltInScriptMap::ShowCmds(FILE * file) const
+void BuiltInScriptMap::ShowCmds(FILE * const file) const
 {
 	fprintf(file, "<");
 	for (auto iCol = begin(); iCol != end(); ++iCol)
@@ -246,7 +244,9 @@ void BuiltInScriptMap::ShowCmds(FILE * file) const
 		auto i = iCol;
 		i++;
 		if(i != end())
+		{
 			fprintf(file, "|");
+		}
 	}
 	fprintf(file, ">");
 }
@@ -285,11 +285,11 @@ static std::string replace_str(std::string str, std::string key, std::string rep
  */
 static std::string str_to_upper(const std::string &str)
 {
-	std::locale loc;
+	const std::locale loc;
 	std::string s;
 	s.reserve(str.size());
 
-	for (size_t i = 0; i < str.size(); i++)
+	for (size_t i = 0; i < str.size(); ++i)
 	{
 		s.push_back(std::toupper(str[i], loc));
 	}
@@ -341,9 +341,9 @@ static constexpr BuiltInScriptRawData g_builtin_cmd[] =
 		,"boot spl and uboot"
 	},
 	{
-		NULL,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
+		nullptr,
 	}
 };
 
