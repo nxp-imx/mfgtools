@@ -75,7 +75,7 @@ public:
 
 		Arg() {	m_flags = ARG_MUST;	}
 
-		int parser(std::string option);
+		int parser(const std::string &option);
 
 		//! The name of the argument
 		std::string m_name;
@@ -89,14 +89,14 @@ public:
 	};
 
 	BuiltInScript() {};
-	BuiltInScript(BuiltInScriptRawData*p);
+	BuiltInScript(const BuiltInScriptRawData*p);
 
-	bool find_args(std::string arg);
-	std::string replace_script_args(std::vector<std::string> args);
-	std::string replace_str(std::string str, std::string key, std::string replace);
-	void show();
-	void show_cmd();
-	std::string str_to_upper(std::string str);
+	bool find_args(const std::string &arg) const;
+	std::string replace_script_args(const std::vector<std::string> &args) const;
+	std::string replace_str(std::string str, std::string key, std::string replace) const;
+	void show() const;
+	void show_cmd() const;
+	std::string str_to_upper(const std::string &str) const;
 
 	//! The actual script which is being represented
 	std::string m_text;
@@ -116,11 +116,11 @@ public:
 class BuiltInScriptMap : public std::map<std::string, BuiltInScript>
 {
 public:
-	BuiltInScriptMap(BuiltInScriptRawData*p);
+	BuiltInScriptMap(const BuiltInScriptRawData*p);
 
-	void PrintAutoComplete(std::string match, const char *space=" " );
-	void ShowAll();
-	void ShowCmds(FILE * file=stdout);
+	void PrintAutoComplete(std::string match, const char *space=" " ) const;
+	void ShowAll() const;
+	void ShowCmds(FILE * file=stdout) const;
 };
 
 //! A map of the built-in scripts' names to their BuiltInScript representations
