@@ -31,7 +31,6 @@
 
 #pragma once
 
-#include <locale>
 #include <map>
 #include <string>
 #include <vector>
@@ -73,16 +72,14 @@ public:
 			ARG_OPTION_KEY = 0x4,
 		};
 
-		Arg() {	m_flags = ARG_MUST;	}
-
-		int parser(const std::string &option);
+		void parser(const std::string &option);
 
 		//! The name of the argument
 		std::string m_name;
 		//! A description of the argument
 		std::string m_desc;
 		//! Flags of the argument (basically if it's optional or not)
-		uint32_t m_flags;
+		uint32_t m_flags = ARG_MUST;
 		//! The argument whose value this one will fall back to if it's optional
 		//! and not given explicitly
 		std::string m_fallback_option;
@@ -118,7 +115,7 @@ class BuiltInScriptMap : public std::map<std::string, BuiltInScript>
 public:
 	BuiltInScriptMap(const BuiltInScriptRawData*p);
 
-	void PrintAutoComplete(std::string match, const char *space=" " ) const;
+	void PrintAutoComplete(const std::string &match, const char *space = " ") const;
 	void ShowAll() const;
 	void ShowCmds(FILE * file=stdout) const;
 };
