@@ -31,6 +31,9 @@
 
 #include "buildincmd.h"
 
+static std::string replace_str(std::string str, std::string key, std::string replace);
+static std::string str_to_upper(const std::string &str);
+
 /**
  * @brief Parse characters between argument name and its description and check
  * if its an optional one
@@ -160,32 +163,6 @@ std::string BuiltInScript::replace_script_args(const std::vector<std::string> &a
 }
 
 /**
- * @brief Replace a `key` substring of a string `str` by a replacement `replace`
- * @param[in] str The string of which a copy with the replacements shall be
- * created
- * @param[in] key The string which shall be replaced
- * @param[in] replace The string that shall replace ocurrences of `key`
- * @return
- */
-std::string BuiltInScript::replace_str(std::string str, std::string key, std::string replace) const
-{
-	if (replace.size() > 4)
-	{
-		if (str_to_upper(replace.substr(replace.size() - 4)) == ".BZ2")
-		{
-			replace += "/*";
-		}
-	}
-
-	for (size_t j = 0; (j = str.find(key, j)) != std::string::npos;)
-	{
-		str.replace(j, key.size(), replace);
-		j += key.size();
-	}
-	return str;
-}
-
-/**
  * @brief Print the built-in script to `stdout` followed by a newline
  */
 void BuiltInScript::show() const
@@ -213,23 +190,6 @@ void BuiltInScript::show_cmd() const
 		desc += m_args[i].m_desc;
 		printf("\t\targ%d: %s\n", (int)i, desc.c_str());
 	}
-}
-
-/**
- * @brief Returns a copy of `str` with all applicable characters converted to
- * uppercase
- * @param[in] str The string for which an uppercase copy shall be created
- * @return The copy of `str` converted to uppercase
- */
-std::string BuiltInScript::str_to_upper(const std::string &str) const
-{
-	std::locale loc;
-	std::string s;
-
-	for (size_t i = 0; i < str.size(); i++)
-		s.push_back(std::toupper(str[i], loc));
-
-	return s;
 }
 
 /**
@@ -289,6 +249,52 @@ void BuiltInScriptMap::ShowCmds(FILE * file) const
 			fprintf(file, "|");
 	}
 	fprintf(file, ">");
+}
+
+/**
+ * @brief Replace a `key` substring of a string `str` by a replacement `replace`
+ * @param[in] str The string of which a copy with the replacements shall be
+ * created
+ * @param[in] key The string which shall be replaced
+ * @param[in] replace The string that shall replace ocurrences of `key`
+ * @return A new string instance with the replacements conducted on it
+ */
+static std::string replace_str(std::string str, std::string key, std::string replace)
+{
+	if (replace.size() > 4)
+	{
+		if (str_to_upper(replace.substr(replace.size() - 4)) == ".BZ2")
+		{
+			replace += "/*";
+		}
+	}
+
+	for (size_t j = 0; (j = str.find(key, j)) != std::string::npos;)
+	{
+		str.replace(j, key.size(), replace);
+		j += key.size();
+	}
+	return str;
+}
+
+/**
+ * @brief Returns a copy of `str` with all applicable characters converted to
+ * uppercase
+ * @param[in] str The string for which an uppercase copy shall be created
+ * @return The copy of `str` converted to uppercase
+ */
+static std::string str_to_upper(const std::string &str)
+{
+	std::locale loc;
+	std::string s;
+	s.reserve(str.size());
+
+	for (size_t i = 0; i < str.size(); i++)
+	{
+		s.push_back(std::toupper(str[i], loc));
+	}
+
+	return s;
 }
 
 //! Array containing raw information about all the built-in scripts of uuu
