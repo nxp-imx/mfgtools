@@ -1368,7 +1368,7 @@ int FileBuffer::request_data(size_t sz)
 {
 	std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
 
-	while(!this->m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT)
+	while(!(this->m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT))
 		m_request_cv.wait(lck);
 
 	if (IsLoaded())
