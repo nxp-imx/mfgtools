@@ -813,7 +813,11 @@ void CmdIf::build_map(CmdCtx*p)
 	s.format("0x%04X", p->m_config_item->m_pid);
 	m_key_map["@PID@"] = s;
 
+	s.format("0x%04X", p->m_current_bcd);
+	m_key_map["@BCD@"] = s;
+
 	m_key_map["@CHIP@"] = p->m_config_item->m_chip;
+
 }
 
 int CmdIf::run(CmdCtx *p)

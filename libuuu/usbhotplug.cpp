@@ -144,7 +144,7 @@ static string get_device_path(libusb_device *dev)
 	return str;
 }
 
-static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
+static int run_usb_cmds(ConfigItem *item, libusb_device *dev, short bcddevice)
 {
 	int ret;
 	uuu_notify nt;
@@ -157,6 +157,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev)
 
 	CmdUsbCtx ctx;
 	ctx.m_config_item = item;
+	ctx.m_current_bcd = bcddevice;
 
 	/* work around windows open device failure 1/10
 	 * sometime HID device detect need some time, refresh list
@@ -206,7 +207,7 @@ static int usb_add(libusb_device *dev)
 	if (item)
 	{
 		g_known_device_state = KnownDeviceToDo;
-		std::thread(run_usb_cmds, item, dev).detach();
+		std::thread(run_usb_cmds, item, dev, desc.bcdDevice).detach();
 	}
 	return 0;
 }
@@ -393,7 +394,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 					uuu_notify nt;
 					nt.type = uuu_notify::NOFITY_DEV_ATTACH;
 					m_config_item = item;
-
+					m_current_bcd = desc.bcdDevice;
 					/* work around windows open device failure 1/10
 					 * sometime HID device detect need some time, refresh list
 					 * to make sure HID driver installed.
