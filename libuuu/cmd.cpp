@@ -453,6 +453,8 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["_ALL:SHELL"] = new_cmd_obj<CmdShell>;
 	(*this)["_ALL:<"] = new_cmd_obj<CmdShell>;
 	(*this)["_ALL:@"] = new_cmd_obj<CmdEnv>;
+	(*this)["_ALL:ERROR"] = new_cmd_obj<CmdError>;
+	(*this)["_ALL:IF"] = new_cmd_obj<CmdIf>;
 
 }
 
@@ -590,6 +592,30 @@ int CmdDelay::run(CmdCtx *)
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(m_ms));
 	return 0;
+}
+
+int CmdError::parser(char *p)
+{
+	if (p)
+		m_cmd = p;
+
+	size_t pos = 0;
+	string s;
+
+	if (parser_protocal(p, pos))
+		return -1;
+
+	s = get_next_param(m_cmd, pos);
+
+	m_error = m_cmd.substr(pos);
+
+	return 0;
+}
+
+int CmdError::run(CmdCtx *pCtx)
+{
+	set_last_err_string(m_error);
+	return -1;
 }
 
 int CmdShell::parser(char * p)
@@ -734,6 +760,108 @@ int CmdEnv::parser(char *p)
 	m_unfold_cmd.append(&*last_pos);
 
 	return 0;
+}
+
+int CmdIf::parser(char *p)
+{
+	if (p)
+		m_cmd = p;
+
+	string s;
+
+	size_t pos = 0;
+
+	if (parser_protocal(p, pos))
+		return -1;
+
+	m_protocal = m_cmd.substr(0, pos);
+
+	if (pos == string::npos || pos >= m_cmd.size())
+		return -1;
+
+	s = get_next_param(m_cmd, pos);
+	if (str_to_upper(s) != "IF")
+	{
+		string err = "Unknown command: ";
+		err += s;
+		set_last_err_string(s);
+		return -1;
+	}
+	size_t lc = pos;
+	get_next_param(m_cmd, pos);
+
+	int end = m_cmd.find("then", pos);
+
+	if (end == string::npos)
+	{
+		set_last_err_string("missed key word: then");
+		return -1;
+	}
+
+	m_condtion = m_cmd.substr(lc, end - lc);
+	m_true_cmd = m_cmd.substr(end + 4);
+	return 0;
+}
+
+void CmdIf::build_map(CmdCtx*p)
+{
+	string_ex s;
+
+	s.format("0x%04X", p->m_config_item->m_vid);
+	m_key_map["@VID@"] = s;
+
+	s.format("0x%04X", p->m_config_item->m_pid);
+	m_key_map["@PID@"] = s;
+
+	m_key_map["@CHIP@"] = p->m_config_item->m_chip;
+}
+
+int CmdIf::run(CmdCtx *p)
+{
+	string l, r;
+	string cmp[] = { "==", "!=", "" };
+	int i = 0;
+	for (i = 0; !cmp[i].empty(); i++)
+	{
+		size_t pos = m_condtion.find(cmp[i], 0);
+		if (pos != string::npos)
+		{
+			l = m_condtion.substr(0, pos);
+			r = m_condtion.substr(pos + cmp[i].size() + 1);
+			break;
+		}
+	}
+	l = str_to_upper(trim(l));
+	r = str_to_upper(trim(r));
+
+	build_map(p);
+
+	if (m_key_map.find(l) != m_key_map.end())
+		l = m_key_map[l];
+
+	if (m_key_map.find(r) != m_key_map.end())
+		r = m_key_map[r];
+
+	switch (i)
+	{
+	case 0: // ==
+		if (l != r)
+			return 0;
+		break;
+	case 1: // !=
+		if (l == r)
+			return 0;
+		break;
+	default:
+		set_last_err_string("unknown if condition");
+		return -1;
+	}
+
+	//Pass condition check;
+	string cmd = m_protocal;
+	cmd += ' ';
+	cmd += this->m_true_cmd;
+	return run_cmd(p, cmd.c_str(), 0);
 }
 
 int CmdEnv::run(CmdCtx *p)

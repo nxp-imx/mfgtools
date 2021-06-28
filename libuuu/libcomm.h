@@ -31,7 +31,8 @@
 #include <string>
 #include <stdarg.h>
 #include <locale>
-
+#include <cctype>
+#include <algorithm>
 #pragma once
 
 using namespace std;
@@ -149,4 +150,10 @@ template <class T>
 inline T round_up(T x, T align)
 {
 	return (x + align - 1) / align * align;
+}
+
+inline std::string trim(const std::string &s)
+{
+	auto  wsfront = std::find_if_not(s.begin(), s.end(), [](int c) {return std::isspace(c); });
+	return std::string(wsfront, std::find_if_not(s.rbegin(), std::string::const_reverse_iterator(wsfront), [](int c) {return std::isspace(c); }).base());
 }

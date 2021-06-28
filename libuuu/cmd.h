@@ -138,6 +138,17 @@ private:
 	int m_ms = 0;
 };
 
+class CmdError : public CmdBase
+{
+public:
+	CmdError(char *p) :CmdBase(p) {}
+	int parser(char *p = nullptr) override;
+	int run(CmdCtx *p) override;
+
+private:
+	std::string m_error;
+};
+
 class CmdShell : public CmdBase
 {
 public:
@@ -150,6 +161,22 @@ private:
 	bool m_dyn = false;
 	std::string m_protocal;
 	std::string m_shellcmd;
+};
+
+class CmdIf : public CmdBase
+{
+public:
+	CmdIf(char *p) : CmdBase(p) {}
+
+	int parser(char *p = nullptr) override;
+	int run(CmdCtx *p) override;
+
+private:
+	std::string m_condtion;
+	std::string m_protocal;
+	std::string m_true_cmd;
+	std::map <std::string, std::string> m_key_map;
+	void build_map(CmdCtx *p);
 };
 
 class CmdEnv : public CmdBase
