@@ -46,9 +46,13 @@
 #include <limits>
 #include "http.h"
 
-#ifdef _MSC_VER
-#define stat64 _stat64
+#ifdef WIN32
+#define stat_os _stat64
+#elif defined(__APPLE__)
+#define stat_os stat
+#include "dirent.h"
 #else
+#define stat_os stat64
 #include "dirent.h"
 #endif
 
@@ -129,10 +133,10 @@ public:
 	FSFlat() { m_ext = ""; }
 	int get_file_timesample(const string &filename, uint64_t *ptime) override
 	{
-		struct stat64 st;
-		if (stat64(filename.c_str() + 1, &st))
+		struct stat_os st;
+		if (stat_os(filename.c_str() + 1, &st))
 		{
-			set_last_err_string("stat64 failure");
+			set_last_err_string("stat_os failure");
 			return -1;
 		}
 
@@ -143,16 +147,16 @@ public:
 
 	bool exist(const string &backfile, const string &filename) override
 	{
-		struct stat64 st;
-		return stat64(backfile.c_str() + 1, &st) == 0 && ((st.st_mode & S_IFDIR) == 0);
+		struct stat_os st;
+		return stat_os(backfile.c_str() + 1, &st) == 0 && ((st.st_mode & S_IFDIR) == 0);
 	}
 
 	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override
 	{
-		struct stat64 st;
-		if (stat64(backfile.c_str() + 1, &st))
+		struct stat_os st;
+		if (stat_os(backfile.c_str() + 1, &st))
 		{
-			set_last_err_string("stat64 failure");
+			set_last_err_string("stat_os failure");
 			return -1;
 		}
 		p->unmapfile();
@@ -170,9 +174,9 @@ public:
 
 	int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) override
 	{
-		struct stat64 st;
+		struct stat_os st;
 
-		if(stat64(backfile.c_str() + 1, &st))
+		if(stat_os(backfile.c_str() + 1, &st))
 		{
 			return -1;
 		}
