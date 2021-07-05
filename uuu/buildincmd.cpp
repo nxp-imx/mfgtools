@@ -33,6 +33,7 @@
 
 #include <algorithm>
 #include <locale>
+#include <regex>
 
 static std::string replace_str(std::string str, std::string key, std::string replace);
 static std::string str_to_upper(const std::string &str);
@@ -66,31 +67,20 @@ BuiltInScript::BuiltInScript(const BuiltInScriptRawData * const p) :
 	m_desc{p->m_desc ? p->m_desc : ""},
 	m_name{p->m_name ? p->m_name : ""}
 {
-	for (size_t i = 1; i < m_text.size(); i++)
+	// Regular expression to detect script argument name occurrences
+	static const std::regex arg_name_regexp{R"####((@| )(_\S+))####"};
+
+	for (std::sregex_iterator it
+		 = std::sregex_iterator{m_text.cbegin(), m_text.cend(), arg_name_regexp};
+					   it != std::sregex_iterator{}; ++it)
 	{
-		size_t off;
-		if (m_text[i] == '_'
-			&& (m_text[i - 1] == '@' || m_text[i - 1] == ' '))
+		const std::string param{it->str(2)};
+		if (!find_args(param))
 		{
-			off = m_text.find(' ', i);
-			const auto off_tab = m_text.find('\t', i);
-			size_t ofn = m_text.find('\n', i);
-			if (off_tab < off)
-				off = off_tab;
-			if (ofn < off)
-				off = ofn;
-
-			if (off == std::string::npos)
-				off = m_text.size() + 1;
-
-			const std::string param{m_text.substr(i, off - i)};
-			if (!find_args(param))
-			{
-				Arg a;
-				a.m_name = param;
-				a.m_flags = Arg::ARG_MUST;
-				m_args.push_back(a);
-			}
+			Arg a;
+			a.m_name = param;
+			a.m_flags = Arg::ARG_MUST;
+			m_args.emplace_back(std::move(a));
 		}
 	}
 
