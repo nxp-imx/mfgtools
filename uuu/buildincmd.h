@@ -48,11 +48,11 @@ extern const char * g_vt_yellow;
 struct BuiltInScriptRawData
 {
 	//! The name of the built-in script
-	const char *m_name = nullptr;
+	const char * const m_name = nullptr;
 	//! The actual built-in script itself
-	const char *m_text = nullptr;
+	const char * const m_text = nullptr;
 	//! A description of the built-in script's purpose
-	const char *m_desc = nullptr;
+	const char * const m_desc = nullptr;
 };
 
 class BuiltInScript
@@ -93,11 +93,11 @@ public:
 	void show_cmd() const;
 
 	//! The actual script which is being represented
-	std::string m_text;
+	const std::string m_text;
 	//! A description of the script's purpose
-	std::string m_desc;
+	const std::string m_desc;
 	//! A short name of the built-in script
-	std::string m_name;
+	const std::string m_name;
 	//! The arguments of the built-in script
 	std::vector<Arg> m_args;
 
