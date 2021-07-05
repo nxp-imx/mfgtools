@@ -975,9 +975,7 @@ int main(int argc, char **argv)
 
 				// if script name is not build-in, try to look for a file
 				if (g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end()) {
-					BuiltInScriptRawData tmpCmd;
-					string tmpCmdFileName = argv[i + 1];
-					tmpCmd.m_name = tmpCmdFileName.c_str();
+					const string tmpCmdFileName{argv[i + 1]};
 
 					std::ifstream t(tmpCmdFileName);
 					std::string fileContents((std::istreambuf_iterator<char>(t)),
@@ -988,12 +986,13 @@ int main(int argc, char **argv)
 						return -1;
 					}
 
-					tmpCmd.m_text = fileContents.c_str();
+					BuiltInScriptRawData tmpCmd{
+						tmpCmdFileName.c_str(),
+						fileContents.c_str(),
+						"Script loaded from file"
+					};
 
-					tmpCmd.m_desc = "Script loaded from file";
-
-					BuiltInScript tmpBuiltInScript(&tmpCmd);
-					g_BuildScripts[tmpCmdFileName] = tmpBuiltInScript;
+					g_BuildScripts.emplace(tmpCmdFileName, &tmpCmd);
 
 					cmd_script = g_BuildScripts[tmpCmdFileName].replace_script_args(args);
 				}

@@ -186,8 +186,7 @@ BuiltInScriptMap::BuiltInScriptMap(const BuiltInScriptRawData*p)
 {
 	while (p->m_name)
 	{
-		BuiltInScript one(p);
-		(*this)[one.m_name] = one;
+		emplace(p->m_name, p);
 		++p;
 	}
 }
