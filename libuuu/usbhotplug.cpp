@@ -194,6 +194,16 @@ static int open_libusb(libusb_device *dev, void **usb_device_handle)
 	return -1;
 }
 
+/**
+ Thread function. Didn't call this function directly.
+ Unbalance libusb_unref_device.
+ Before start thread, need call libusb_ref_device to dev is free
+
+ libusb_get_list()
+ libusb_ref_devive        // avoid free at libusb_free_list if run_usb_cmd have not open device in time.
+ thread start run_usb_cmds;
+ libusb_free_list()
+*/
 static int run_usb_cmds(ConfigItem *item, libusb_device *dev, short bcddevice)
 {
 	int ret;
@@ -223,6 +233,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev, short bcddevice)
 	nt.type = uuu_notify::NOTIFY_THREAD_EXIT;
 	call_notify(nt);
 
+	libusb_unref_device(dev); //ref_device when start thread
 	return ret;
 }
 
@@ -246,6 +257,13 @@ static int usb_add(libusb_device *dev)
 	if (item)
 	{
 		g_known_device_state = KnownDeviceToDo;
+
+		/*
+		 * start new thread, need increase dev ref number.
+		 * otherwise polling thread, free_device_list free device if open device call after free_device_list. 
+		 */
+		libusb_ref_device(dev);
+
 		std::thread(run_usb_cmds, item, dev, desc.bcdDevice).detach();
 	}
 	return 0;
