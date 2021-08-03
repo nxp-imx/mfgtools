@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.4)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -73,4 +73,6 @@ add_executable(uuu ${SOURCES})
 target_link_libraries(uuu uuc_s ${OPENSSL_LIBRARIES} ${LIBUSB_LIBRARIES} ${LIBZIP_LIBRARIES} ${LIBZ_LIBRARIES} dl bz2)
 
 install(TARGETS uuu DESTINATION bin)
-add_compile_definitions(TARGET_PATH="${CMAKE_INSTALL_PREFIX}/bin/uuu")
+target_compile_definitions(uuu
+    PRIVATE "TARGET_PATH=\"${CMAKE_INSTALL_PREFIX}/bin/uuu\""
+)
