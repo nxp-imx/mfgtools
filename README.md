@@ -71,6 +71,15 @@ Note that, since uuu is an OSI compliant Open Source project, you are entitled t
 - `sudo apt-get install libusb-1.0-0-dev libzip-dev libbz2-dev pkg-config cmake libssl-dev g++`
 - `cmake . && make`
 
+The above commands build mfgtools in source. To build it out of source
+(requires cmake 3.13 or newer):
+- `cmake -S . -B build`
+- `cmake --build build --target all`
+
+For cmake prior 3.13:
+- `mkdir build && cd build`
+- `cmake .. && make`
+
 ## macOS
 - `git clone https://github.com/NXPmicro/mfgtools.git`
 - `cd mfgtools`
