@@ -267,7 +267,7 @@ int CmdMap::run_all(const std::string &protocol, CmdCtx *p, bool dry_run)
 	{
 		set_last_err_id(-1);
 		std::string err;
-		err.append("Unknown Protocal:");
+		err.append("Unknown Protocol:");
 		err.append(protocol);
 		set_last_err_string(err);
 		return -1;
@@ -577,7 +577,7 @@ int CmdDelay::parser(char * /*p*/)
 
 	if (str_to_upper(param) != "DELAY")
 	{
-		string err = "Unknown Commnd:";
+		string err = "Unknown Command:";
 		err += param;
 		set_last_err_string(err);
 		return -1;
