@@ -184,7 +184,7 @@ public:
 
 private:
 	bool m_clear_dcd = false;
-	bool m_Ivt;
+	int32_t m_Ivt;
 	uint32_t m_jump_addr = 0;
 	bool m_PlugIn;
 };

@@ -103,7 +103,7 @@ IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &of
 	if (limit >= data->size())
 		limit = data->size();
 
-	for (; off < limit; off += 0x100)
+	for (; off < limit; off += 0x4)
 	{
 		IvtHeader *p = (IvtHeader*)(data->data() + off);
 		if (p->IvtBarker == IVT_BARKER_HEADER)
@@ -291,7 +291,7 @@ SDPWriteCmd::SDPWriteCmd(char *p) : SDPCmdBase(p)
 {
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_FILE;
 	m_PlugIn = -1;
-	m_Ivt = -1;
+	m_Ivt = 0;
 	m_max_download_pre_cmd = 0x200000;
 	m_offset = 0;
 	m_bIvtReserve = false;
@@ -363,7 +363,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		IvtHeader *pIvt = search_ivt_header(fbuff, off);
 		for (int i = 0; i < m_Ivt; i++)
 		{
-			off += 0x100;
+			off += sizeof(IvtHeader);
 			pIvt = search_ivt_header(fbuff, off);
 		}
 		if (pIvt == nullptr)
@@ -561,8 +561,8 @@ SDPJumpCmd::SDPJumpCmd(char *p) : SDPCmdBase(p)
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_JUMP_ADDR;
 	insert_param_info("jump", nullptr, Param::Type::e_null);
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
-	insert_param_info("-ivt", &m_Ivt, Param::Type::e_bool);
-	insert_param_info("-plugin", &m_Ivt, Param::Type::e_bool);
+	insert_param_info("-ivt", &m_Ivt, Param::Type::e_uint32);
+	insert_param_info("-plugin", &m_PlugIn, Param::Type::e_bool);
 	insert_param_info("-addr", &m_jump_addr, Param::Type::e_uint32);
 	insert_param_info("-cleardcd", &m_clear_dcd, Param::Type::e_bool);
 }
@@ -600,6 +600,18 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 
 	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off);
+
+	for (int i = 0; i < m_Ivt; i++)
+	{
+		off += sizeof(IvtHeader);
+		pIVT = search_ivt_header(buff, off);
+	}
+
+	if (pIVT == nullptr)
+	{
+		set_last_err_string("Cannot find valid IVT header");
+		return -1;
+	}
 
 	m_spdcmd.m_addr = EndianSwap(pIVT->SelfAddr);
 
