@@ -291,7 +291,7 @@ SDPWriteCmd::SDPWriteCmd(char *p) : SDPCmdBase(p)
 {
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_FILE;
 	m_PlugIn = -1;
-	m_Ivt = 0;
+	m_Ivt = -1;
 	m_max_download_pre_cmd = 0x200000;
 	m_offset = 0;
 	m_bIvtReserve = false;
