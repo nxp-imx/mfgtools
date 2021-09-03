@@ -244,7 +244,7 @@ int SDPBootCmd::run(CmdCtx *ctx)
 
 	str = "SDP: jump -f ";
 	str += m_filename;
-	str += " -ivt";
+	str += " -ivt 0";
 	if (m_clear_dcd)
 		str += " -cleardcd";
 

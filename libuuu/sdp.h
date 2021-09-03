@@ -184,9 +184,9 @@ public:
 
 private:
 	bool m_clear_dcd = false;
-	int32_t m_Ivt;
+	int32_t m_Ivt = -1;
 	uint32_t m_jump_addr = 0;
-	bool m_PlugIn;
+	bool m_PlugIn = false;
 };
 
 class SDPSkipDCDCmd :public SDPCmdBase
