@@ -260,7 +260,8 @@ static std::string replace_str(std::string str, std::string key, std::string rep
 
 	for (size_t j = 0; (j = str.find(key, j)) != std::string::npos;)
 	{
-		str.replace(j, key.size(), replace);
+		if (j == 0 || (j!=0 && str[j - 1] == ' '))
+			str.replace(j, key.size(), replace);
 		j += key.size();
 	}
 	return str;
