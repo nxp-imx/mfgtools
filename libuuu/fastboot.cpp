@@ -354,7 +354,7 @@ int FBCopy::run(CmdCtx *ctx)
 			if (sz > m_Maxsize_pre_cmd)
 				sz = m_Maxsize_pre_cmd;
 
-			cmd.format("donwload:%08X", sz);
+			cmd.format("download:%08X", sz);
 			if (fb.Transport(cmd, buff->data() + i, sz))
 			{
 				if (fb.m_info == "EPIPE")
