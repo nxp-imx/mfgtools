@@ -418,6 +418,8 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:ACMD"] = new_cmd_obj<FBACmd>;
 	(*this)["FB:DOWNLOAD"] = new_cmd_obj<FBDownload>;
 	(*this)["FASTBOOT:DOWNLOAD"] = new_cmd_obj<FBDownload>;
+	(*this)["FB:UPLOAD"] = new_cmd_obj<FBUpload>;
+	(*this)["FASTBOOT:UPLOAD"] = new_cmd_obj<FBUpload>;
 	(*this)["FB:FLASH"] = new_cmd_obj<FBFlashCmd>;
 	(*this)["FASTBOOT:FLASH"] = new_cmd_obj<FBFlashCmd>;
 	(*this)["FB:ERASE"] = new_cmd_obj<FBEraseCmd>;
