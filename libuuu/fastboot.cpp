@@ -47,6 +47,7 @@
 #include "ffu_format.h"
 #include "libcomm.h"
 #include "trans.h"
+#include <iterator>
 
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
