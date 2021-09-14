@@ -242,6 +242,29 @@ int FBDownload::run(CmdCtx *ctx)
 	return 0;
 }
 
+int FBUpload::run(CmdCtx* ctx)
+{
+	BulkTrans dev;
+	if (dev.open( ctx->m_dev ))
+		return -1;
+
+	FastBoot fb(&dev);
+	
+	string_ex cmd;
+	cmd.format("upload");
+
+	std::vector<uint8_t> buff;
+	if (fb.Transport(cmd, nullptr, buff.size(), &buff))
+		return -1;
+
+	std::ofstream fout(m_filename, ios::out | ios::trunc);
+	std::copy(buff.begin(), buff.end(), std::ostream_iterator<uint8_t>( fout ));
+	fout.flush();
+	fout.close();
+
+	return 0;
+}
+
 int FBCopy::parser(char *p)
 {
 	if (p)

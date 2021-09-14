@@ -251,3 +251,18 @@ class FBContinueCmd : public FBCmd
 public:
 	FBContinueCmd(char *p) : FBCmd(p, "continue") {}
 };
+
+class FBUpload : public CmdBase
+{
+public:
+	FBUpload(char* p) : CmdBase(p)
+	{
+		insert_param_info("upload", nullptr, Param::Type::e_null);
+		insert_param_info("-f", &m_filename, Param::Type::e_string);
+	}
+
+	int run(CmdCtx* ctx) override;
+
+private:
+	std::string m_filename;
+};
