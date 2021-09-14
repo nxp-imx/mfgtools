@@ -245,7 +245,7 @@ int FBDownload::run(CmdCtx *ctx)
 int FBUpload::run(CmdCtx* ctx)
 {
 	BulkTrans dev;
-	if (dev.open( ctx->m_dev ))
+	if (dev.open(ctx->m_dev))
 		return -1;
 
 	FastBoot fb(&dev);
@@ -258,7 +258,7 @@ int FBUpload::run(CmdCtx* ctx)
 		return -1;
 
 	std::ofstream fout(m_filename, ios::out | ios::trunc);
-	std::copy(buff.begin(), buff.end(), std::ostream_iterator<uint8_t>( fout ));
+	std::copy(buff.begin(), buff.end(), std::ostream_iterator<uint8_t>(fout));
 	fout.flush();
 	fout.close();
 
