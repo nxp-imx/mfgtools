@@ -195,12 +195,52 @@ size_t GetFlashHeaderSize(shared_ptr<FileBuffer> p, size_t offset)
 	};
 
 	for (const auto test_offset : offsets) {
-		if (p->size() < (offset + test_offset)) {
+		if (p->m_avaible_size < (offset + test_offset)) {
 			return 0;
 		}
 
 		if (CheckHeader(reinterpret_cast<uint32_t*>(p->data() + offset + test_offset))) {
 			return 0x1000;
+		}
+	}
+
+	return 0;
+}
+
+bool IsMBR(shared_ptr<FileBuffer> p)
+{
+	uint16_t * m = (uint16_t *)(p->data() + 510);
+	if (*m == 0xaa55)
+		return true;
+	return false;
+}
+
+size_t ScanTerm(std::shared_ptr<FileBuffer> p, size_t &pos, size_t offset, size_t limited)
+{
+	const char *tag = "UUUBURNXXOEUZX7+A-XY5601QQWWZ";
+
+	if (limited >= p->m_avaible_size)
+		limited = p->m_avaible_size;
+
+	limited = limited - strlen(tag) - 64;
+
+	if (offset > limited)
+		return 0;
+
+	for (size_t i = offset; i < limited; i++)
+	{
+		char *c = (char*)p->data() + i;
+		size_t length = strlen(tag);
+		size_t j;
+		for (j = 0; j < length; j++)
+		{
+			if (tag[j] != c[j])
+				break;
+		}
+		if (j == length)
+		{
+			pos = i;
+			return atoll(c + length);
 		}
 	}
 

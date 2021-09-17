@@ -1,11 +1,15 @@
-uuu_version 1.2.39
+uuu_version 1.4.149
+
+# @_flash.bin            | bootloader, which can extract from wic image
+# @_image   [_flash.bin] | wic image burn to emmc.
+
 
 # This command will be run when i.MX6/7 i.MX8MM, i.MX8MQ
 SDP: boot -f _flash.bin
 
 # This command will be run when ROM support stream mode
 # i.MX8QXP, i.MX8QM
-SDPS: boot -f _flash.bin
+SDPS: boot -scanterm -f _flash.bin
 
 # These commands will be run when use SPL and will be skipped if no spl
 # SDPU will be deprecated. please use SDPV instead of SDPU
@@ -19,7 +23,7 @@ SDPU: jump
 # if (SPL support SDPV)
 # {
 SDPV: delay 1000
-SDPV: write -f _flash.bin -skipspl
+SDPV: write -f _flash.bin -skipspl -scanterm
 SDPV: jump
 # }
 
@@ -27,8 +31,8 @@ SDPV: jump
 FB: ucmd setenv fastboot_dev mmc
 FB: ucmd setenv mmcdev ${emmc_dev}
 FB: ucmd mmc dev ${emmc_dev}
-FB: flash -raw2sparse all _rootfs.sdcard
-FB: flash bootloader _flash.bin
+FB: flash -raw2sparse all _image
+FB: flash -scanterm bootloader _flash.bin
 FB: ucmd if env exists emmc_ack; then ; else setenv emmc_ack 0; fi;
 FB: ucmd mmc partconf ${emmc_dev} ${emmc_ack} 1 0
 FB: done

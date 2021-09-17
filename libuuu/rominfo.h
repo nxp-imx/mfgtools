@@ -56,6 +56,8 @@ constexpr uint32_t ROM_INFO_HID_SDP_NO_MAX_PER_TRANS = 0x4000;
 constexpr uint32_t ROM_INFO_AUTO_SCAN_UBOOT_POS = 0x8000;
 constexpr uint32_t ROM_INFO_HID_ROMAPI = 0x10000;
 
+constexpr uint32_t WIC_BOOTPART_SIZE = 0x800000;
+
 struct ROM_INFO
 {
 	const char * m_name;
@@ -68,3 +70,5 @@ const ROM_INFO * search_rom_info(const ConfigItem *item);
 
 size_t GetContainerActualSize(std::shared_ptr<FileBuffer> p, size_t offset, bool bROMAPI=false);
 size_t GetFlashHeaderSize(std::shared_ptr<FileBuffer> p, size_t offset = 0);
+bool IsMBR(std::shared_ptr<FileBuffer> p);
+size_t ScanTerm(std::shared_ptr<FileBuffer> p, size_t &pos,  size_t offset=512, size_t limited=0x800000);

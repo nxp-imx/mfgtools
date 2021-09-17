@@ -100,8 +100,8 @@ int SDPCmdBase::init_cmd()
 
 IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit)
 {
-	if (limit >= data->size())
-		limit = data->size();
+	if (limit >= data->m_avaible_size)
+		limit = data->m_avaible_size;
 
 	for (; off < limit; off += 0x4)
 	{
@@ -147,7 +147,9 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 	}
 	init_cmd();
 
-	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
+	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename, false);
+
+	buff->request_data(WIC_BOOTPART_SIZE);
 
 	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off);
@@ -170,6 +172,8 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 	}
 
 	uint32_t size = (pdcd[1] << 8) | pdcd[2];
+
+	buff->request_data(off + size);
 
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_DCD_WRITE;
 	m_spdcmd.m_addr = EndianSwap(m_dcd_addr ? m_dcd_addr : rom->free_addr);
@@ -297,6 +301,7 @@ SDPWriteCmd::SDPWriteCmd(char *p) : SDPCmdBase(p)
 	m_bIvtReserve = false;
 	m_download_addr = 0;
 	m_bskipspl = false;
+	m_bscanterm = false;
 
 	insert_param_info("write", nullptr, Param::Type::e_null);
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
@@ -305,6 +310,7 @@ SDPWriteCmd::SDPWriteCmd(char *p) : SDPCmdBase(p)
 	insert_param_info("-offset", &m_offset, Param::Type::e_uint32);
 	insert_param_info("-skipspl", &m_bskipspl, Param::Type::e_bool);
 	insert_param_info("-skipfhdr", &m_bskipfhdr, Param::Type::e_bool);
+	insert_param_info("-scanterm", &m_bscanterm, Param::Type::e_bool);
 }
 
 int SDPWriteCmd::run(CmdCtx*ctx)
@@ -313,10 +319,12 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 	uint8_t *pbuff;
 	int offset = 0;
 
-	shared_ptr<FileBuffer> fbuff = get_file_buffer(m_filename);
+	shared_ptr<FileBuffer> fbuff = get_file_buffer(m_filename, false);
 
 	if (fbuff == nullptr)
 		return -1;
+
+	fbuff->request_data(WIC_BOOTPART_SIZE);
 
 	if (m_Ivt < 0)
 	{
@@ -327,6 +335,28 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 
 		if (m_bskipfhdr)
 			offset += GetFlashHeaderSize(fbuff, offset);
+
+		size_t pos = 0, length;
+		if (m_bscanterm)
+		{
+			if (IsMBR(fbuff))
+			{
+				length = ScanTerm(fbuff, pos);
+				if (length == 0)
+				{
+					set_last_err_string("This wic have NOT terminate tag after bootloader, please use new yocto");
+					return -1;
+				}
+
+				offset = pos - length;
+				if (offset < 0)
+				{
+					set_last_err_string("This wic boot length is wrong");
+					return -1;
+				}
+				size = pos;
+			}
+		}
 
 		if (m_bskipspl) {
 			const ROM_INFO * rom = search_rom_info(ctx->m_config_item);
@@ -348,7 +378,9 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 				offset += GetContainerActualSize(fbuff, offset);
 			}
 
-			if (offset >= fbuff->size())
+			fbuff->request_data(offset);
+
+			if (offset >= fbuff->m_avaible_size)
 			{
 				set_last_err_string("Unknown Image type, can't use skipspl format");
 				return -1;
@@ -377,6 +409,8 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		m_download_addr = pIvt->SelfAddr;
 		//size = fbuff->size() - off;
 		size = pDB->ImageSize - (pIvt->SelfAddr - pDB->ImageStartAddr);
+
+		fbuff->request_data(size);
 
 		//ImageSize may be bigger than Imagesize because ImageSize include IVT offset
 		//Difference boot storage have difference IVT offset. 
@@ -596,10 +630,12 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 		return 0;
 	}
 
-	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename);
+	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename, false);
+
+	buff->request_data(WIC_BOOTPART_SIZE);
 
 	size_t off = 0;
-	IvtHeader *pIVT = search_ivt_header(buff, off);
+	IvtHeader *pIVT = search_ivt_header(buff, off, WIC_BOOTPART_SIZE);
 
 	for (int i = 0; i < m_Ivt; i++)
 	{

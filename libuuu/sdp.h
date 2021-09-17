@@ -172,8 +172,9 @@ private:
 	uint32_t m_max_download_pre_cmd;
 	uint32_t m_offset;
 	bool m_bIvtReserve;
-	bool m_bskipspl;
-	bool m_bskipfhdr;
+	bool m_bskipspl = false;
+	bool m_bskipfhdr = false;
+	bool m_bscanterm = false;
 };
 
 class SDPJumpCmd : public SDPCmdBase

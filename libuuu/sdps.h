@@ -40,11 +40,13 @@ public:
 		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
 		insert_param_info("-offset", &m_offset, Param::Type::e_uint32);
 		insert_param_info("-skipfhdr", &m_bskipflashheader, Param::Type::e_bool);
+		insert_param_info("-scanterm", &m_bscanterm, Param::Type::e_bool);
 	}
 	int run(CmdCtx *p) override;
 
 private:
-	bool m_bskipflashheader;
+	bool m_bskipflashheader=0;
+	bool m_bscanterm=0;
 	std::string m_filename;
 	uint32_t m_offset = 0;
 };

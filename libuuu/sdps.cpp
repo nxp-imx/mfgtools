@@ -98,7 +98,7 @@ int SDPSCmd::run(CmdCtx *pro)
 	if(dev.open(pro->m_dev))
 		return -1;
 
-	shared_ptr<FileBuffer> p = get_file_buffer(m_filename);
+	shared_ptr<FileBuffer> p = get_file_buffer(m_filename, true);
 	if (!p)
 		return -1;
 
@@ -106,6 +106,34 @@ int SDPSCmd::run(CmdCtx *pro)
 	report.set_skip_notify(false);
 
 	size_t offset = m_offset;
+
+	p->request_data(0x8000); //request 32k data for header.
+
+	if (m_bscanterm)
+	{
+		if (IsMBR(p))
+		{
+			size_t pos = 0, length;
+			p->request_data(WIC_BOOTPART_SIZE); //request 8M data for boot loader
+			length = ScanTerm(p, pos, 512, WIC_BOOTPART_SIZE);
+			if (length == 0)
+			{
+				set_last_err_string("This wic have NOT terminate tag after bootloader, please use new yocto");
+				return -1;
+			}
+
+			offset = pos - length;
+			if (offset < 0)
+			{
+				set_last_err_string("This wic boot length is wrong");
+				return -1;
+			}
+		}
+	}
+	else
+	{
+		p = get_file_buffer(m_filename); //request all data
+	}
 
 	if (m_bskipflashheader)
 		offset += GetFlashHeaderSize(p, offset);

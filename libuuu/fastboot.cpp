@@ -48,6 +48,7 @@
 #include "libcomm.h"
 #include "trans.h"
 #include <iterator>
+#include "rominfo.h"
 
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
@@ -477,12 +478,20 @@ int FBFlashCmd::parser(char *p)
 	string subcmd = m_uboot_cmd;
 	size_t pos = 0;
 	m_partition = get_next_param(subcmd, pos);
+
 	if (m_partition == "-raw2sparse")
 	{
 		m_raw2sparse = true;
 		m_partition = get_next_param(subcmd, pos);
 	}
-	else if (m_partition == "-S")
+
+	if (m_partition == "-scanterm")
+	{
+		m_scanterm = true;
+		m_partition = get_next_param(subcmd, pos);
+	}
+
+	if (m_partition == "-S")
 	{
 		m_partition = get_next_param(subcmd, pos);
 		bool conversion_success = false;
@@ -669,6 +678,28 @@ int FBFlashCmd::run(CmdCtx *ctx)
 	{	/* Limited max size to 16M for sparse file to avoid long timeout at read status*/
 		if (max > m_sparse_limit)
 			max = m_sparse_limit;
+	}
+
+	if (m_scanterm)
+	{
+		pdata->request_data(WIC_BOOTPART_SIZE);
+		size_t length,pos=0;
+		if (IsMBR(pdata))
+		{
+			length = ScanTerm(pdata, pos);
+			if (length == 0)
+			{
+				set_last_err_string("This wic have NOT terminate tag after bootloader, please use new yocto");
+				return -1;
+			}
+			size_t offset = pos - length;
+			if (offset < 0)
+			{
+				set_last_err_string("This wic boot length is wrong");
+				return -1;
+			}
+			return flash(&fb, pdata->data() + offset, length);
+		}
 	}
 
 	if (pdata->size() <= max)
