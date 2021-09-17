@@ -252,7 +252,15 @@ static std::string replace_str(std::string str, std::string key, std::string rep
 {
 	if (replace.size() > 4)
 	{
-		if (str_to_upper(replace.substr(replace.size() - 4)) == ".BZ2")
+		if (replace[replace.size() - 1] == '\"')
+		{
+			if (str_to_upper(replace.substr(replace.size() - 5)) == ".BZ2\"")
+			{
+				replace = replace.substr(0, replace.size() - 1);
+				replace += "/*\"";
+			}
+
+		}else if (str_to_upper(replace.substr(replace.size() - 4)) == ".BZ2")
 		{
 			replace += "/*";
 		}
