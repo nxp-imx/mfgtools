@@ -109,8 +109,11 @@ public:
 	~FileBuffer();
 
 	ALLOCATION_WAYS get_m_allocate_way() const noexcept { return m_allocate_way; }
+	int64_t request_data(void * data, size_t offset, size_t sz);
 	int request_data(std::vector<uint8_t> &data, size_t offset, size_t sz);
 	int request_data(size_t total);
+
+	std::shared_ptr<FileBuffer> request_data(size_t offset, size_t sz);
 
 	bool IsLoaded() const noexcept
 	{

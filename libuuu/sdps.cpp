@@ -98,8 +98,8 @@ int SDPSCmd::run(CmdCtx *pro)
 	if(dev.open(pro->m_dev))
 		return -1;
 
-	shared_ptr<FileBuffer> p = get_file_buffer(m_filename, true);
-	if (!p)
+	shared_ptr<FileBuffer> p, p1 = get_file_buffer(m_filename, true);
+	if (!p1)
 		return -1;
 
 	HIDReport report(&dev);
@@ -107,14 +107,14 @@ int SDPSCmd::run(CmdCtx *pro)
 
 	size_t offset = m_offset;
 
-	p->request_data(0x8000); //request 32k data for header.
+	vector<uint8_t> buff;
 
 	if (m_bscanterm)
 	{
+		p = p1->request_data(0, WIC_BOOTPART_SIZE);
 		if (IsMBR(p))
 		{
 			size_t pos = 0, length;
-			p->request_data(WIC_BOOTPART_SIZE); //request 8M data for boot loader
 			length = ScanTerm(p, pos, 512, WIC_BOOTPART_SIZE);
 			if (length == 0)
 			{

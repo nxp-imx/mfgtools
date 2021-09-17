@@ -1351,6 +1351,7 @@ int FileBuffer::ref_other_buffer(shared_ptr<FileBuffer> p, size_t offset, size_t
 {
 	m_pDatabuffer = p->data() + offset;
 	m_DataSize = m_MemSize = size;
+	m_avaible_size = m_DataSize;
 	m_allocate_way = ALLOCATION_WAYS::REF;
 	m_ref = p;
 	return 0;
@@ -1407,7 +1408,21 @@ int FileBuffer::request_data(size_t sz)
 	return 0;
 }
 
-int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
+int FileBuffer::request_data(std::vector<uint8_t> &data, size_t offset, size_t sz)
+{
+	int64_t ret;
+	ret = request_data(data.data(), offset, sz);
+	if (ret < 0)
+	{
+		data.clear();
+		return -1;
+	}
+
+	data.resize(ret);
+	return 0;
+}
+
+int64_t FileBuffer::request_data(void *data, size_t offset, size_t sz)
 {
 	bool needlock = false;
 	int ret = 0;
@@ -1416,7 +1431,6 @@ int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 	{
 		if (offset >= this->size())
 		{
-			data.clear();
 			set_last_err_string("request offset execeed memory size");
 			return -1;
 		}
@@ -1438,7 +1452,6 @@ int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 		{
 			if (offset > m_avaible_size)
 			{
-				data.clear();
 				set_last_err_string("request offset execeed memory size");
 				return -1;
 			}
@@ -1450,13 +1463,12 @@ int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 	if (offset + size >= m_avaible_size)
 		size = m_avaible_size - offset;
 
-	data.resize(size);
-
 	if (needlock) m_data_mutex.lock();
 
 	if (this->data())
 	{
-		memcpy(data.data(), this->data() + offset, size);
+		memcpy(data, this->data() + offset, size);
+		ret = size;
 	}
 	else
 	{
@@ -1466,6 +1478,36 @@ int FileBuffer::request_data(vector<uint8_t> &data, size_t offset, size_t sz)
 	if (needlock) m_data_mutex.unlock();
 
 	return ret;
+}
+
+std::shared_ptr<FileBuffer> FileBuffer::request_data(size_t offset, size_t sz)
+{
+	shared_ptr<FileBuffer> p(new FileBuffer);
+
+	if (IsLoaded())
+	{
+		if (offset >= this->size())
+		{
+			set_last_err_string("request offset bigger than file size");
+			return nullptr;
+		}
+
+		size_t size = sz;
+		if (offset + sz > this->size())
+			size = this->size() - offset;
+		p->ref_other_buffer(shared_from_this(), offset, size);
+		return p;
+	}
+
+	p->reserve(sz);
+	int64_t ret = request_data(p->m_pDatabuffer, offset, sz);
+	if (ret < 0)
+		return nullptr;
+
+	p->resize(ret);
+	p->m_avaible_size = ret;
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	return p;
 }
 
 int FileBuffer::reserve(size_t sz)
