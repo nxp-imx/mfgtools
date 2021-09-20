@@ -147,9 +147,12 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 	}
 	init_cmd();
 
-	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename, false);
+	shared_ptr<FileBuffer> buff, p = get_file_buffer(m_filename, true);
 
-	buff->request_data(WIC_BOOTPART_SIZE);
+	if (!p)
+		return -1;
+
+	buff= p->request_data(0, WIC_BOOTPART_SIZE);
 
 	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off);
@@ -173,7 +176,14 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 
 	uint32_t size = (pdcd[1] << 8) | pdcd[2];
 
-	buff->request_data(off + size);
+	if (size >= WIC_BOOTPART_SIZE)
+	{
+		set_last_err_string("dcd bigger than 8M");
+		return -1;
+	}
+
+	// point maybe change after new requestion buffer.
+	pdcd = &(buff->at(off + pIVT->DCDAddress - pIVT->SelfAddr));
 
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_DCD_WRITE;
 	m_spdcmd.m_addr = EndianSwap(m_dcd_addr ? m_dcd_addr : rom->free_addr);
@@ -319,12 +329,12 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 	uint8_t *pbuff;
 	int offset = 0;
 
-	shared_ptr<FileBuffer> fbuff = get_file_buffer(m_filename, false);
+	shared_ptr<FileBuffer> fbuff, p1= get_file_buffer(m_filename, true);
 
-	if (fbuff == nullptr)
+	if (p1 == nullptr)
 		return -1;
 
-	fbuff->request_data(WIC_BOOTPART_SIZE);
+	fbuff = p1->request_data(0, WIC_BOOTPART_SIZE);
 
 	if (m_Ivt < 0)
 	{
@@ -396,7 +406,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		for (int i = 0; i < m_Ivt; i++)
 		{
 			off += sizeof(IvtHeader);
-			pIvt = search_ivt_header(fbuff, off);
+			pIvt = search_ivt_header(fbuff, off, WIC_BOOTPART_SIZE);
 		}
 		if (pIvt == nullptr)
 		{
@@ -410,7 +420,11 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		//size = fbuff->size() - off;
 		size = pDB->ImageSize - (pIvt->SelfAddr - pDB->ImageStartAddr);
 
-		fbuff->request_data(size);
+		if (size >= WIC_BOOTPART_SIZE)
+		{
+			set_last_err_string("TODO: image is too big");
+			return -1;
+		}
 
 		//ImageSize may be bigger than Imagesize because ImageSize include IVT offset
 		//Difference boot storage have difference IVT offset. 
@@ -630,9 +644,11 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 		return 0;
 	}
 
-	shared_ptr<FileBuffer> buff = get_file_buffer(m_filename, false);
+	shared_ptr<FileBuffer> buff, p1 = get_file_buffer(m_filename, true);
+	if (!p1)
+		return -1;
 
-	buff->request_data(WIC_BOOTPART_SIZE);
+	buff = p1->request_data(0, WIC_BOOTPART_SIZE);
 
 	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off, WIC_BOOTPART_SIZE);
