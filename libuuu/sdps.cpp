@@ -128,6 +128,7 @@ int SDPSCmd::run(CmdCtx *pro)
 				set_last_err_string("This wic boot length is wrong");
 				return -1;
 			}
+			p->resize(pos);
 		}
 	}
 	else
