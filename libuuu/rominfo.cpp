@@ -33,6 +33,7 @@
 #include "buffer.h"
 #include "config.h"
 #include "libcomm.h"
+#include <cstring>
 
 #include <array>
 
