@@ -1531,6 +1531,16 @@ int FileBuffer::reserve(size_t sz)
 
 int FileBuffer::resize(size_t sz)
 {
+	if (this->m_allocate_way == ALLOCATION_WAYS::REF)
+	{
+		if (sz > m_DataSize)
+		{
+			assert(true);
+			return 0;
+		}
+		m_DataSize = sz;
+		return m_DataSize;
+	}
 	int ret = reserve(sz);
 
 	m_DataSize = sz;
