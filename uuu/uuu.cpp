@@ -132,7 +132,7 @@ void print_help(bool detail = false)
 		"                example: SDPS: boot -f flash.bin\n"
 		"    -d          Daemon mode, wait for forever.\n"
 		"    -v -V       verbose mode, -V enable libusb error\\warning info\n"
-		"    -dry	 Dry run mode, check if script or cmd correct \n"
+		"    -dry        Dry run mode, check if script or cmd correct \n"
 		"    -m          USBPATH Only monitor these paths.\n"
 		"                    -m 1:2 -m 1:3\n\n"
 		"    -t          Timeout second for wait known usb device appeared\n"
@@ -143,8 +143,9 @@ void print_help(bool detail = false)
 		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
 		"uuu -udev       linux: show udev rule to avoid sudo each time \n"
 		"uuu -lsusb      List connected know devices\n"
-		"uuu -IgSerNum   Set windows registry to ignore USB serial number for known uuu devices"
-		"uuu -h -H       show help, -H means detail helps\n\n";
+		"uuu -IgSerNum   Set windows registry to ignore USB serial number for known uuu devices\n"
+		"uuu -h          show general help\n"
+		"uuu -H          show general help and detailed help for commands\n\n";
 	printf("%s", help);
 	printf("uuu [-d -m -v] -b[run] ");
 	g_BuildScripts.ShowCmds();
@@ -947,7 +948,7 @@ int main(int argc, char **argv)
 				i++;
 				if (_putenv(argv[i]))
 				{
-					printf("error, failed to set '%s', environment parameter must have the from key=value\n", argv[i]);
+					printf("error, failed to set '%s', environment parameter must have the form key=value\n", argv[i]);
 					return -1;
 				}
 			}
