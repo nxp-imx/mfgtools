@@ -142,6 +142,11 @@ int FBGetVar::run(CmdCtx *ctx)
 		return -1;
 
 	m_val = fb.m_info;
+
+	string key = "@";
+	key += str_to_upper(m_var);
+	key += "@";
+	insert_env_variable(key, str_to_upper(fb.m_info));
 	return 0;
 }
 

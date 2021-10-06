@@ -176,7 +176,6 @@ private:
 	std::string m_condtion;
 	std::string m_protocal;
 	std::string m_true_cmd;
-	std::map <std::string, std::string> m_key_map;
 	void build_map(CmdCtx *p);
 };
 
@@ -215,3 +214,8 @@ public:
 
 int run_cmds(const char *procotal, CmdCtx *p);
 int run_cmd(CmdCtx *pCtx, const char * cmd, int dry);
+
+int insert_env_variable(std::string key, std::string value);
+std::string get_env_variable(std::string key);
+int clear_env();
+bool is_evn_exist(std::string key);

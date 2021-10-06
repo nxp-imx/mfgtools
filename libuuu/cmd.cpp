@@ -54,6 +54,29 @@ static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
 static string g_cmd_list_file;
 
+static map<thread::id, map<string, string>> g_environment;
+
+int insert_env_variable(string key, string value)
+{
+	g_environment[std::this_thread::get_id()][key] = value;
+	return 0;
+}
+
+string get_env_variable(string key)
+{
+	return g_environment[std::this_thread::get_id()][key];
+}
+
+int clear_env()
+{
+	return g_environment.erase(std::this_thread::get_id());
+}
+
+bool is_env_exist(string key)
+{
+	return g_environment[std::this_thread::get_id()].find(key) != g_environment[std::this_thread::get_id()].end();
+}
+
 int get_string_in_square_brackets(const std::string &cmd, std::string &context);
 int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap = nullptr);
 std::string remove_square_brackets(const std::string &cmd);
@@ -810,15 +833,15 @@ void CmdIf::build_map(CmdCtx*p)
 	string_ex s;
 
 	s.format("0x%04X", p->m_config_item->m_vid);
-	m_key_map["@VID@"] = s;
+	insert_env_variable("@VID@", s);
 
 	s.format("0x%04X", p->m_config_item->m_pid);
-	m_key_map["@PID@"] = s;
+	insert_env_variable("@PID@", s);
 
 	s.format("0x%04X", p->m_current_bcd);
-	m_key_map["@BCD@"] = s;
+	insert_env_variable("@BCD@", s);
 
-	m_key_map["@CHIP@"] = p->m_config_item->m_chip;
+	insert_env_variable("@CHIP@", p->m_config_item->m_chip);
 
 }
 
@@ -842,11 +865,11 @@ int CmdIf::run(CmdCtx *p)
 
 	build_map(p);
 
-	if (m_key_map.find(l) != m_key_map.end())
-		l = m_key_map[l];
+	if (is_env_exist(l))
+		l = get_env_variable(l);
 
-	if (m_key_map.find(r) != m_key_map.end())
-		r = m_key_map[r];
+	if (is_env_exist(r))
+		r = get_env_variable(r);
 
 	switch (i)
 	{

@@ -234,6 +234,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev, short bcddevice)
 	call_notify(nt);
 
 	libusb_unref_device(dev); //ref_device when start thread
+	clear_env();
 	return ret;
 }
 
