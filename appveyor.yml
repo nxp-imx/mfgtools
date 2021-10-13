@@ -28,11 +28,11 @@ install:
     
 - cmd:    cd ..
  
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then brew install libusb libzip pkg-config; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then brew install libusb pkg-config; fi
 
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then sudo apt-get update; fi
 
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev libzip-dev libbz2-dev asciidoc rename; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev libbz2-dev asciidoc rename; fi
 
 build_script:
 
