@@ -33,7 +33,6 @@ addons:
         packages:
             - cmake
             - libusb
-            - libzip
             - openssl
             - pkg-config
 

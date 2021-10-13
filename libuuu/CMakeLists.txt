@@ -7,7 +7,6 @@ set(CMAKE_SKIP_RPATH ON)
 find_package(BZip2 REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0>=1.0.16)
-pkg_check_modules(LIBZIP REQUIRED libzip)
 find_package(Threads)
 
 if (STATIC)
