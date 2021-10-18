@@ -1102,9 +1102,9 @@ int main(int argc, char **argv)
 
 	if (ret)
 	{
-		runshell(shell);
-
-		cout << g_vt_red << "\nError: " << g_vt_default <<  uuu_get_last_err_string();
+		ret = runshell(shell);
+		if(ret)
+			cout << g_vt_red << "\nError: " << g_vt_default <<  uuu_get_last_err_string();
 		return ret;
 	}
 
