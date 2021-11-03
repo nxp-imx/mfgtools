@@ -291,7 +291,12 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 	{
 #ifdef UUUSSL
 
-		const SSL_METHOD *meth = TLSv1_2_client_method();
+		const SSL_METHOD* meth =
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L)
+		TLSv1_2_client_method();
+#else
+		TLS_client_method();
+#endif
 		if(!meth)
 		{
 			set_last_err_string("Failure at TLSv1_2_client_method\n");
