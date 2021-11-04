@@ -357,7 +357,11 @@ static int ensure_libusb_initialized()
 		call_once(is_libusb_init, []{
 			if (libusb_init(nullptr) < 0)
 				throw runtime_error{"Call libusb_init failure"};
+#if LIBUSB_API_VERSION > 0x01000106
 			libusb_set_option(nullptr, LIBUSB_OPTION_LOG_LEVEL, get_libusb_debug_level());
+#else
+			libusb_set_debug(nullptr, get_libusb_debug_level());
+#endif
 		});
 	} catch(const exception& ex) {
 		set_last_err_string(ex.what());
