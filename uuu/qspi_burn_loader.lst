@@ -29,7 +29,7 @@ SDPV: jump
 FB: ucmd setenv fastboot_buffer ${loadaddr}
 FB: download -f _image
 
-FB: ucmd if test ! -n "$fastboot_bytes"; then setenv fastboot_bytes $filesize; fi
+FB: ucmd if test ! -n "$fastboot_bytes"; then setenv fastboot_bytes $filesize; else true; fi
 
 # Check Image if include flexspi header
 FB: ucmd if qspihdr dump ${fastboot_buffer}; then setenv qspihdr_exist yes; else setenv qspihdr_exist no; fi;
