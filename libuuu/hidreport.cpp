@@ -92,6 +92,7 @@ int HIDReport::write(const void *p, size_t sz, uint8_t report_id)
 			notify(off, uuu_notify::NOTIFY_TRANS_POS);
 		}
 	}
-	notify(off, uuu_notify::NOTIFY_TRANS_POS);
+
+	notify(sz, uuu_notify::NOTIFY_TRANS_POS);
 	return 0;
 }
