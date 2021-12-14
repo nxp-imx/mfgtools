@@ -68,8 +68,9 @@ static atomic<KnownDeviceState> g_known_device_state{NoKnownDevice};
 
 class CAutoList
 {
-	libusb_device **list = nullptr;
 public:
+	libusb_device **list = nullptr;
+
 	CAutoList()
 	{
 		libusb_get_device_list(nullptr, &list);
@@ -432,12 +433,12 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 
 	while (1)
 	{
-		libusb_device **newlist = nullptr;
-		libusb_get_device_list(nullptr, &newlist);
+		CAutoList l;
+
 		size_t i = 0;
 		libusb_device *dev;
 
-		while ((dev = newlist[i++]) != nullptr)
+		while ((dev = l.list[i++]) != nullptr)
 		{
 			struct libusb_device_descriptor desc;
 			int r = libusb_get_device_descriptor(dev, &desc);
@@ -469,7 +470,6 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 				}
 		}
 
-		libusb_free_device_list(newlist, 1);
 		this_thread::sleep_for(200ms);
 
 		uuu_notify nt;
