@@ -66,6 +66,15 @@ enum KnownDeviceState {
 };
 static atomic<KnownDeviceState> g_known_device_state{NoKnownDevice};
 
+class CAutoDeInit
+{
+public:
+	~CAutoDeInit()
+	{
+		libusb_exit(nullptr);
+	}
+} g_autoDeInit;
+
 class CAutoList
 {
 public:
