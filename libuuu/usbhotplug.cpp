@@ -71,14 +71,53 @@ class CAutoList
 public:
 	libusb_device **list = nullptr;
 
+	CAutoList(libusb_device **list)
+	{
+		this->list = list;
+		m_rc = -1;
+	}
+
+	CAutoList(CAutoList &&other)
+	{
+		this->list = other.list;
+		this->m_rc = other.m_rc;
+		other.list = nullptr;
+	}
+
 	CAutoList()
 	{
-		libusb_get_device_list(nullptr, &list);
+		m_rc = libusb_get_device_list(nullptr, &list);
+		if (m_rc < 0) {
+			set_last_err_string(std::string("libusb_get_device_list failed: ") +
+							    	libusb_strerror(static_cast<libusb_error>(m_rc)));
+		}
 	}
+
 	~CAutoList()
 	{
-		libusb_free_device_list(list, 1);
+		if (list != nullptr) {
+			libusb_free_device_list(list, 1);
+		}
 	}
+
+	CAutoList& operator=(CAutoList &&other)
+	{
+		this->list = other.list;
+		this->m_rc = other.m_rc;
+		other.list = nullptr;
+		return *this;
+	}
+
+	CAutoList& operator=(const CAutoList&) = delete;	// Prevent copy, allow move only
+	CAutoList(const CAutoList&) = delete;	// Prevent copy, allow move only
+
+	bool good() const
+	{
+		return m_rc >= 0;
+	}
+
+private:
+	int m_rc = 0;
 };
 
 static struct {
@@ -373,9 +412,6 @@ static int ensure_libusb_initialized()
 
 int polling_usb(std::atomic<int>& bexit)
 {
-	libusb_device **oldlist = nullptr;
-	libusb_device **newlist = nullptr;
-
 	if (ensure_libusb_initialized())
 		return -1;
 
@@ -384,30 +420,25 @@ int polling_usb(std::atomic<int>& bexit)
 
 	Timer usb_timer;
 
+	CAutoList oldlist(nullptr);
+
 	while(!bexit)
 	{
-		ssize_t sz = libusb_get_device_list(nullptr, &newlist);
-		if (sz < 0)
+		CAutoList newlist;
+		if (!newlist.good())
 		{
-			set_last_err_string("Call libusb_get_device_list failure");
 			return -1;
 		}
 
-		compare_list(oldlist, newlist);
+		compare_list(oldlist.list, newlist.list);
 
-		if (oldlist)
-			libusb_free_device_list(oldlist, 1);
-
-		oldlist = newlist;
+		std::swap(oldlist, newlist);
 
 		this_thread::sleep_for(g_usb_poll_period.load());
 
 		if (check_usb_timeout(usb_timer))
 			return -1;
 	}
-
-	if(newlist)
-		libusb_free_device_list(newlist, 1);
 
 	return 0;
 }
@@ -434,6 +465,10 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 	while (1)
 	{
 		CAutoList l;
+
+		if (!l.good()) {
+			break;
+		}
 
 		size_t i = 0;
 		libusb_device *dev;
@@ -494,12 +529,15 @@ int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 	if (ensure_libusb_initialized())
 		return -1;
 
-	libusb_device **newlist = nullptr;
-	libusb_get_device_list(nullptr, &newlist);
+	CAutoList l;
 	size_t i = 0;
 	libusb_device *dev;
 
-	while ((dev = newlist[i++]) != nullptr)
+	if (!l.good()) {
+		return -1;
+	}
+
+	while ((dev = l.list[i++]) != nullptr)
 	{
 		struct libusb_device_descriptor desc;
 		int r = libusb_get_device_descriptor(dev, &desc);
@@ -519,8 +557,6 @@ int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 			}
 		}
 	}
-
-	libusb_free_device_list(newlist, 1);
 
 	return 0;
 }
