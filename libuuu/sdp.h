@@ -110,6 +110,7 @@ protected:
 
 	std::string m_filename;
 	SDPCmd m_spdcmd;
+	uint64_t m_scan_limited = UINT64_MAX;
 
 private:
 	int send_cmd(HIDReport *p);

@@ -509,6 +509,18 @@ int FBFlashCmd::parser(char *p)
 		m_partition = get_next_param(subcmd, pos);
 	}
 
+	if (m_partition == "-scanlimited")
+	{
+		m_partition = get_next_param(subcmd, pos);
+		bool conversion_success = false;
+		m_scan_limited = str_to_uint64(m_partition, &conversion_success);
+		if (!conversion_success)
+		{
+			set_last_err_string("FB: flash failed to parse size argument given to -scanlimited: "s + m_partition);
+			return -1;
+		}
+		m_partition = get_next_param(subcmd, pos);
+	}
 	if (pos == string::npos || m_partition.empty())
 	{
 		set_last_err_string("Missed partition name");
@@ -687,7 +699,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	if (m_scanterm)
 	{
-		pdata->request_data(WIC_BOOTPART_SIZE);
+		pdata->request_data(m_scan_limited);
 		size_t length,pos=0;
 		if (IsMBR(pdata))
 		{

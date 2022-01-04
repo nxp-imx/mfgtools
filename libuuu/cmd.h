@@ -65,6 +65,7 @@ struct Param
 	enum class Type
 	{
 		e_uint32,
+		e_uint64,
 		e_bool,
 		e_string,
 		e_null,

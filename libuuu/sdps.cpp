@@ -111,11 +111,11 @@ int SDPSCmd::run(CmdCtx *pro)
 
 	if (m_bscanterm)
 	{
-		p = p1->request_data(0, WIC_BOOTPART_SIZE);
+		p = p1->request_data(0, m_scan_limited);
 		if (IsMBR(p))
 		{
 			size_t pos = 0, length;
-			length = ScanTerm(p, pos, 512, WIC_BOOTPART_SIZE);
+			length = ScanTerm(p, pos, 512, m_scan_limited);
 			if (length == 0)
 			{
 				set_last_err_string("This wic have NOT terminate tag after bootloader, please use new yocto");

@@ -154,6 +154,13 @@ int CmdBase::parser(char *p)
 			*(uint32_t*)pp->pData = str_to_uint32(param);
 		}
 
+		if (pp->type == Param::Type::e_uint64)
+		{
+			if (!m_NoKeyParam)
+				param = get_next_param(m_cmd, pos);
+			*(uint64_t*)pp->pData = str_to_uint64(param);
+		}
+
 		if (pp->type == Param::Type::e_string_filename)
 		{
 			if (!m_NoKeyParam)
