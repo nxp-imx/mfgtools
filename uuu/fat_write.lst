@@ -7,6 +7,6 @@ uuu_version 1.1.4
 
 FB: ucmd setenv fastboot_buffer ${loadaddr}
 FB: download -f _image
-FB: ucmd if test ! -n "$fastboot_bytes"; then setenv fastboot_bytes $filesize; fi
+FB: ucmd if test ! -n "$fastboot_bytes"; then setenv fastboot_bytes $filesize; else true; fi
 FB[-t 20000]: ucmd fatwrite _device _partition ${fastboot_buffer} _filename  ${fastboot_bytes}
 FB: done
