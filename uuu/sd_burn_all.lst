@@ -5,31 +5,31 @@ uuu_version 1.4.149
 
 
 # This command will be run when i.MX6/7 i.MX8MM, i.MX8MQ
-SDP: boot -f _flash.bin
+SDP: boot -f _flash.bin -scanlimited 0x800000
 
 # This command will be run when ROM support stream mode
 # i.MX8QXP, i.MX8QM
-SDPS: boot -scanterm -f _flash.bin
+SDPS: boot -scanterm -f _flash.bin -scanlimited 0x800000
 
 # These commands will be run when use SPL and will be skipped if no spl
 # SDPU will be deprecated. please use SDPV instead of SDPU
 # {
 SDPU: delay 1000
-SDPU: write -f _flash.bin -offset 0x57c00
-SDPU: jump
+SDPU: write -f _flash.bin -offset 0x57c00 -scanlimited 0x800000
+SDPU: jump -scanlimited 0x800000
 # }
 
 # These commands will be run when use SPL and will be skipped if no spl
 # if (SPL support SDPV)
 # {
 SDPV: delay 1000
-SDPV: write -f _flash.bin -skipspl -scanterm
-SDPV: jump
+SDPV: write -f _flash.bin -skipspl -scanterm -scanlimited 0x800000
+SDPV: jump -scanlimited 0x800000
 # }
 
 FB: ucmd setenv fastboot_dev mmc
 FB: ucmd setenv mmcdev ${sd_dev}
 FB: ucmd mmc dev ${sd_dev}
 FB: flash -raw2sparse all _image
-FB: flash -scanterm bootloader _flash.bin
+FB: flash -scanterm -scanlimited 0x800000 bootloader _flash.bin
 FB: done

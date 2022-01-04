@@ -139,6 +139,7 @@ private:
 	size_t m_sparse_limit = 0x1000000;
 	uint64_t m_totalsize;
 	bool m_scanterm = false;
+	uint64_t m_scan_limited = UINT64_MAX;
 };
 
 class FBDelPartition : public FBCmd

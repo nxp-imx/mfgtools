@@ -41,6 +41,7 @@ public:
 		insert_param_info("-offset", &m_offset, Param::Type::e_uint32);
 		insert_param_info("-skipfhdr", &m_bskipflashheader, Param::Type::e_bool);
 		insert_param_info("-scanterm", &m_bscanterm, Param::Type::e_bool);
+		insert_param_info("-scanlimited", &m_scan_limited, Param::Type::e_uint64);
 	}
 	int run(CmdCtx *p) override;
 
@@ -49,4 +50,5 @@ private:
 	bool m_bscanterm=0;
 	std::string m_filename;
 	uint32_t m_offset = 0;
+	uint64_t m_scan_limited = UINT64_MAX;
 };

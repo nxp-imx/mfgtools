@@ -95,7 +95,9 @@ int SDPCmdBase::get_status(HIDReport *p, uint32_t &status, uint8_t report_id)
 
 int SDPCmdBase::init_cmd()
 {
-	memset(&m_spdcmd, 0, sizeof(m_spdcmd)); return 0;
+	memset(&m_spdcmd, 0, sizeof(m_spdcmd));
+	insert_param_info("-scanlimited", &m_scan_limited, Param::Type::e_uint64);
+	return 0;
 }
 
 IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit)
@@ -152,7 +154,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 	if (!p)
 		return -1;
 
-	buff= p->request_data(0, WIC_BOOTPART_SIZE);
+	buff = p->request_data(0, m_scan_limited);
 
 	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off);
@@ -176,7 +178,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 
 	uint32_t size = (pdcd[1] << 8) | pdcd[2];
 
-	if (size >= WIC_BOOTPART_SIZE)
+	if (size >= m_scan_limited)
 	{
 		set_last_err_string("dcd bigger than 8M");
 		return -1;
@@ -234,6 +236,7 @@ SDPBootCmd::SDPBootCmd(char *p) : SDPCmdBase(p)
 	insert_param_info("-nojump", &m_nojump, Param::Type::e_bool);
 	insert_param_info("-cleardcd", &m_clear_dcd, Param::Type::e_bool);
 	insert_param_info("-dcdaddr", &m_dcd_addr, Param::Type::e_uint32);
+	insert_param_info("-scanlimited", &m_scan_limited, Param::Type::e_uint64);
 }
 
 int SDPBootCmd::run(CmdCtx *ctx)
@@ -245,13 +248,34 @@ int SDPBootCmd::run(CmdCtx *ctx)
 		str += " -dcdaddr ";
 		str += std::to_string(m_dcd_addr);
 	}
+
+	if (m_scan_limited != UINT64_MAX)
+	{
+		str += " -scanlimited ";
+		str += std::to_string(m_scan_limited);
+	}
+
 	SDPDcdCmd dcd((char *)str.c_str());
+
+	if (m_scan_limited != UINT64_MAX)
+	{
+		str += " -scanlimited ";
+		str += std::to_string(m_scan_limited);
+	}
+
 	if (dcd.parser()) return -1;
 	if (dcd.run(ctx)) return -1;
 
 	str = "SDP: write -f ";
 	str += m_filename;
 	str += " -ivt 0";
+
+	if (m_scan_limited != UINT64_MAX)
+	{
+		str += " -scanlimited ";
+		str += std::to_string(m_scan_limited);
+	}
+
 	SDPWriteCmd wr((char *)str.c_str());
 	if (wr.parser()) return -1;
 	if (wr.run(ctx)) return -1;
@@ -261,6 +285,12 @@ int SDPBootCmd::run(CmdCtx *ctx)
 	str += " -ivt 0";
 	if (m_clear_dcd)
 		str += " -cleardcd";
+
+	if (m_scan_limited != UINT64_MAX)
+	{
+		str += " -scanlimited ";
+		str += std::to_string(m_scan_limited);
+	}
 
 	SDPJumpCmd jmp((char *)str.c_str());
 	if (!m_nojump)
@@ -334,7 +364,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 	if (p1 == nullptr)
 		return -1;
 
-	fbuff = p1->request_data(0, WIC_BOOTPART_SIZE);
+	fbuff = p1->request_data(0, m_scan_limited);
 
 	if (m_Ivt < 0)
 	{
@@ -404,7 +434,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		for (int i = 0; i < m_Ivt; i++)
 		{
 			off += sizeof(IvtHeader);
-			pIvt = search_ivt_header(fbuff, off, WIC_BOOTPART_SIZE);
+			pIvt = search_ivt_header(fbuff, off, m_scan_limited);
 		}
 		if (pIvt == nullptr)
 		{
@@ -418,7 +448,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		//size = fbuff->size() - off;
 		size = pDB->ImageSize - (pIvt->SelfAddr - pDB->ImageStartAddr);
 
-		if (size >= WIC_BOOTPART_SIZE)
+		if (size >= m_scan_limited)
 		{
 			set_last_err_string("TODO: image is too big");
 			return -1;
@@ -646,10 +676,10 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 	if (!p1)
 		return -1;
 
-	buff = p1->request_data(0, WIC_BOOTPART_SIZE);
+	buff = p1->request_data(0, m_scan_limited);
 
 	size_t off = 0;
-	IvtHeader *pIVT = search_ivt_header(buff, off, WIC_BOOTPART_SIZE);
+	IvtHeader *pIVT = search_ivt_header(buff, off, m_scan_limited);
 
 	for (int i = 0; i < m_Ivt; i++)
 	{
