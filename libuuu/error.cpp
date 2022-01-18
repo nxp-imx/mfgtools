@@ -31,6 +31,7 @@
 
 #include "liberror.h"
 #include "libuuu.h"
+#include "libusb.h"
 
 using namespace std;
 
@@ -39,14 +40,20 @@ static int g_last_err_id;
 
 static uint32_t g_debug_level;
 
-void uuu_set_debug_level(uint32_t mask)
-{
-	g_debug_level = mask;
-}
-
 int get_libusb_debug_level() noexcept
 {
 	return g_debug_level & 0xFFFF;
+}
+
+void uuu_set_debug_level(uint32_t mask)
+{
+	g_debug_level = mask;
+
+#if LIBUSB_API_VERSION > 0x01000106
+		libusb_set_option(nullptr, LIBUSB_OPTION_LOG_LEVEL, get_libusb_debug_level());
+#else
+		libusb_set_debug(nullptr, get_libusb_debug_level());
+#endif
 }
 
 const char * uuu_get_last_err_string()

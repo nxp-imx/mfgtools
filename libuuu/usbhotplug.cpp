@@ -69,6 +69,11 @@ static atomic<KnownDeviceState> g_known_device_state{NoKnownDevice};
 class CAutoDeInit
 {
 public:
+	CAutoDeInit()
+	{
+		if (libusb_init(nullptr) < 0)
+				throw runtime_error{ "Call libusb_init failure" };
+	}
 	~CAutoDeInit()
 	{
 		libusb_exit(nullptr);
@@ -399,31 +404,8 @@ static int check_usb_timeout(Timer& usb_timer)
 	return 0;
 }
 
-static int ensure_libusb_initialized()
-{
-	static once_flag is_libusb_init;
-	try {
-		call_once(is_libusb_init, []{
-			if (libusb_init(nullptr) < 0)
-				throw runtime_error{"Call libusb_init failure"};
-#if LIBUSB_API_VERSION > 0x01000106
-			libusb_set_option(nullptr, LIBUSB_OPTION_LOG_LEVEL, get_libusb_debug_level());
-#else
-			libusb_set_debug(nullptr, get_libusb_debug_level());
-#endif
-		});
-	} catch(const exception& ex) {
-		set_last_err_string(ex.what());
-		return -1;
-	}
-	return 0;
-}
-
 int polling_usb(std::atomic<int>& bexit)
 {
-	if (ensure_libusb_initialized())
-		return -1;
-
 	if (run_cmds("CFG:", nullptr))
 		return -1;
 
@@ -463,9 +445,6 @@ CmdUsbCtx::~CmdUsbCtx()
 
 int CmdUsbCtx::look_for_match_device(const char *pro)
 {
-	if (ensure_libusb_initialized())
-		return -1;
-
 	if (run_cmds("CFG:", nullptr))
 		return -1;
 
@@ -535,9 +514,6 @@ int uuu_add_usbpath_filter(const char *path)
 
 int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 {
-	if (ensure_libusb_initialized())
-		return -1;
-
 	CAutoList l;
 	size_t i = 0;
 	libusb_device *dev;
