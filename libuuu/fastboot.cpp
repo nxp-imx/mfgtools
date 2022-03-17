@@ -264,7 +264,7 @@ int FBUpload::run(CmdCtx* ctx)
 	if (fb.Transport(cmd, nullptr, buff.size(), &buff))
 		return -1;
 
-	std::ofstream fout(m_filename, ios::out | ios::trunc);
+	std::ofstream fout(m_filename, ios::out | ios::trunc | ios::binary);
 	std::copy(buff.begin(), buff.end(), std::ostream_iterator<uint8_t>(fout));
 	fout.flush();
 	fout.close();
