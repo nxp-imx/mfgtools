@@ -884,10 +884,14 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 						blks.blk.back().size = i - blks.blk.back().start;
 						one.decompress_offset = blks.blk.back().decompress_offset + blks.blk.back().decompress_size;
 						one.decompress_size = (pbz->at(i + 3) - '0') * 100 * 1000; /* not l024 for bz2 */
-
+						total += one.decompress_size;
+						if (total >= p->m_MemSize)
+						{
+							if (p->reserve(total*1.2))
+								return -1;
+						}
 						blks.blk.push_back(one);
 					}
-					total += one.decompress_size;
 
 					blks.cv.notify_all();
 				}
