@@ -707,11 +707,11 @@ int runshell(int shell)
 		string cmd;
 		ofstream log("uuu.inputlog", ofstream::binary);
 		log << "uuu_version "
-			<< ((uuu_get_version() & 0xFF0000) >> 16)
+			<< ((uuu_get_version() & 0xFF000000) >> 24)
 			<< "."
-			<< ((uuu_get_version() & 0xFF00) >> 8)
+			<< ((uuu_get_version() & 0xFFF000) >> 12)
 			<< "."
-			<< ((uuu_get_version() & 0xFF))
+			<< ((uuu_get_version() & 0xFFF))
 			<< endl;
 		while (1)
 		{
