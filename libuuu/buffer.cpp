@@ -887,6 +887,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 						total += one.decompress_size;
 						if (total >= p->m_MemSize)
 						{
+							lock_guard<mutex> lock(p->m_data_mutex);
 							if (p->reserve(total*1.2))
 								return -1;
 						}
