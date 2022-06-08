@@ -1,5 +1,5 @@
 /*
-* Copyright 2018 NXP.
+* Copyright 2018, 2022 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -90,11 +90,29 @@ private:
 	const char m_separator = ':';
 };
 
+class FBCRC : public CmdBase
+{
+public:
+
+	std::string m_read_cmd = "mmc read $loadaddr";
+	size_t m_block = 512;
+	size_t m_crcblock = 0x4000000;
+	size_t m_seek = 0;
+	size_t m_skip = 0;
+	bool m_nostop = false;
+	std::string m_filename;
+
+	FBCRC(char* p);
+	int run(CmdCtx* ctx) override;
+};
+
 class FBUCmd : public FBCmd
 {
 public:
 	FBUCmd(char *p) :FBCmd(p, "UCmd") {}
 };
+
+
 
 class FBACmd : public FBCmd
 {

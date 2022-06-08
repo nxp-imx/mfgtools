@@ -1,5 +1,5 @@
 /*
-* Copyright 2018 NXP.
+* Copyright 2018, 2022 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -49,6 +49,7 @@
 #include "trans.h"
 #include <iterator>
 #include "rominfo.h"
+#include "zlib.h"
 
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {
@@ -962,4 +963,61 @@ int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> p)
 	call_notify(nt);
 
 	return 0;
+}
+
+FBCRC::FBCRC(char* p): CmdBase(p)
+{
+	insert_param_info("CRC", nullptr, Param::Type::e_null);
+	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
+	insert_param_info("-format", &m_read_cmd, Param::Type::e_string);
+	insert_param_info("-blksz", &m_block, Param::Type::e_uint32);
+	insert_param_info("-crcblock", &m_crcblock, Param::Type::e_uint32);
+	insert_param_info("-seek", &m_seek, Param::Type::e_uint32);
+	insert_param_info("-skip", &m_skip, Param::Type::e_uint32);
+	insert_param_info("-nostop", &m_nostop, Param::Type::e_bool);
+}
+
+int FBCRC::run(CmdCtx* ctx)
+{
+	BulkTrans dev{ m_timeout };
+	if (dev.open(ctx->m_dev))
+		return -1;
+	size_t crc = 0;
+	uint8_t* pbuff;
+	size_t crcblock = 0;
+	int ret = 0;
+	FastBoot fb(&dev);
+	string_ex cmd;
+	shared_ptr<FileBuffer> fbuff, p1 = get_file_buffer(m_filename, true);
+	if (p1 == nullptr)
+		return 0;
+	size_t p1size = p1->size();
+
+	for (size_t offset = m_skip; offset < p1size; offset += m_crcblock)
+	{
+		crcblock = min(p1size - offset, m_crcblock);
+		fbuff = p1->request_data(offset, crcblock);
+		if(!fbuff)
+		{
+			set_last_err_string("fail get data from file");
+			return -1;
+		}
+		pbuff = fbuff->data();
+
+		crc = crc32(0, pbuff, fbuff->size());
+
+		cmd.format("UCmd: mmc read $loadaddr 0x%x 0x%x", offset / m_block + m_seek, crcblock / m_block);
+		if (fb.Transport(cmd, nullptr, 0))
+			return -1;
+		cmd.format("UCmd: crc32 -v $loadaddr 0x%x %08x", crcblock, crc);
+		ret |= fb.Transport(cmd, nullptr, 0);
+		if ((!m_nostop) && ret)
+		{
+			string_ex err;
+			err.format("crc32 check error at 0x%llx\n", offset);
+			set_last_err_string(err);
+			return ret;
+		}
+	}
+	return ret;
 }
