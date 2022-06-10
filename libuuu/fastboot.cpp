@@ -1018,11 +1018,12 @@ int FBCRC::run(CmdCtx* ctx)
 			return -1;
 		cmd.format("UCmd: crc32 -v $loadaddr 0x%x %08x", crcblock, crc);
 		ret |= fb.Transport(cmd, nullptr, 0);
-		if ((!m_nostop) && ret)
+		if (ret)
 		{
 			err.format("crc32 check error at 0x%llx", offset);
 			set_last_err_string(err);
-			return ret;
+			if(!m_nostop)
+				return ret;
 		}
 		nt.type = uuu_notify::NOTIFY_TRANS_POS;
 		nt.total = offset;
