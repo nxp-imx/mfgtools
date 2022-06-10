@@ -986,6 +986,8 @@ int FBCRC::run(CmdCtx* ctx)
 	uint8_t* pbuff;
 	size_t crcblock = 0;
 	int ret = 0;
+	string_ex err;
+	size_t offset = 0;
 	FastBoot fb(&dev);
 	string_ex cmd;
 	shared_ptr<FileBuffer> fbuff, p1 = get_file_buffer(m_filename, true);
@@ -993,7 +995,12 @@ int FBCRC::run(CmdCtx* ctx)
 		return 0;
 	size_t p1size = p1->size();
 
-	for (size_t offset = m_skip; offset < p1size; offset += m_crcblock)
+	uuu_notify nt;
+	nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
+	nt.total = p1->size();
+	call_notify(nt);
+
+	for (offset = m_skip; offset < p1size; offset += m_crcblock)
 	{
 		crcblock = min(p1size - offset, m_crcblock);
 		fbuff = p1->request_data(offset, crcblock);
@@ -1013,11 +1020,16 @@ int FBCRC::run(CmdCtx* ctx)
 		ret |= fb.Transport(cmd, nullptr, 0);
 		if ((!m_nostop) && ret)
 		{
-			string_ex err;
-			err.format("crc32 check error at 0x%llx\n", offset);
+			err.format("crc32 check error at 0x%llx", offset);
 			set_last_err_string(err);
 			return ret;
 		}
+		nt.type = uuu_notify::NOTIFY_TRANS_POS;
+		nt.total = offset;
+		call_notify(nt);
 	}
+	nt.type = uuu_notify::NOTIFY_TRANS_POS;
+	nt.total = offset;
+	call_notify(nt);
 	return ret;
 }
