@@ -7,3 +7,6 @@
 [submodule "bzip2"]
 	path = bzip2
 	url = git://sourceware.org/git/bzip2.git
+[submodule "zstd"]
+	path = zstd
+	url = https://github.com/facebook/zstd.git
