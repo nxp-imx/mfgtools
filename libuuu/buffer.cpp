@@ -1,5 +1,5 @@
 /*
-* Copyright 2018-2019 NXP.
+* Copyright 2018-2022 NXP.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -45,6 +45,7 @@
 #include "stdio.h"
 #include <limits>
 #include "http.h"
+#include "zstd.h"
 
 #ifdef WIN32
 #define stat_os _stat64
@@ -416,6 +417,13 @@ public:
 	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override;
 }g_fsgz;
 
+static class FSzstd : public FSCompressStream
+{
+public:
+	FSzstd() { m_ext = ".ZST"; };
+	int load(const string& backfile, const string& filename, shared_ptr<FileBuffer> p, bool async) override;
+}g_FSzstd;
+
 static class FS_DATA
 {
 public:
@@ -428,6 +436,7 @@ public:
 		m_pFs.push_back(&g_fsbz2);
 		m_pFs.push_back(&g_fsfat);
 		m_pFs.push_back(&g_fsgz);
+		m_pFs.push_back(&g_FSzstd);
 		m_pFs.push_back(&g_fshttps);
 		m_pFs.push_back(&g_fshttp);
 	}
@@ -1151,6 +1160,88 @@ int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBu
 		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 		p->m_request_cv.notify_all();
 	}
+	return 0;
+}
+
+int FSzstd::load(const string& backfile, const string& filename, shared_ptr<FileBuffer>outp, bool async)
+{
+	typedef struct ZSTD_DCtx_s ZSTD_DCtx;
+	ZSTD_DCtx* const dctx = ZSTD_createDCtx();
+	size_t lastRet = 0;
+	if (!g_fs_data.exist(backfile))
+	{
+		string str;
+		str = "Failure open file:";
+		str += backfile;
+		set_last_err_string(str);
+		return -1;
+	}
+	if (filename != "*")
+	{
+		string star("/*");
+		string decompressed_name = backfile + star;
+		shared_ptr<FileBuffer> decompressed_file = get_file_buffer(decompressed_name);
+		Tar tar;
+		tar.Open(decompressed_name);
+		if (tar.get_file_buff(filename, outp))
+			return -1;
+		outp->m_avaible_size = outp->m_DataSize;
+	}
+	else
+	{
+		size_t outOffset = 0;
+		shared_ptr<FileBuffer> inp = get_file_buffer(backfile, true);
+		if (inp == nullptr)
+		{
+			return -1;
+		}
+		if (outp->reserve(inp->size() * 10))
+			return -1;
+
+		size_t offset = 0;
+		uuu_notify ut;
+		ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
+		ut.str = (char*)backfile.c_str();
+		call_notify(ut);
+		size_t const toRead = ZSTD_DStreamInSize();
+		std::shared_ptr<FileBuffer> buff;
+
+		while ((buff = inp->request_data(offset, toRead)))
+		{
+			ZSTD_inBuffer input = { buff->data(), buff->size(), 0 };
+			/* Given a valid frame, zstd won't consume the last byte of the frame
+			 * until it has flushed all of the decompressed data of the frame.
+			 * Therefore, instead of checking if the return code is 0, we can
+			 * decompress just check if input.pos < input.size.
+			 */
+			while (input.pos < min(input.size,inp->m_DataSize-offset))
+			{
+				ZSTD_outBuffer output = { outp->data() + outOffset, outp->m_MemSize - outOffset, 0 };
+				/* The return code is zero if the frame is complete, but there may
+				 * be multiple frames concatenated together. Zstd will automatically
+				 * reset the context when a frame is complete. Still, calling
+				 * ZSTD_DCtx_reset() can be useful to reset the context to a clean
+				 * state, for instance if the last decompression call returned an
+				 * error.
+				 */
+				size_t const ret = ZSTD_decompressStream(dctx, &output, &input);
+				lastRet = min(lastRet, ret);
+				outOffset += output.pos;
+				ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
+				ut.index = outOffset;
+				call_notify(ut);
+				outp->m_avaible_size = outOffset;
+				outp->m_request_cv.notify_all();
+			}
+
+			offset += toRead;
+		}
+		outp->resize(outOffset);
+		atomic_fetch_or(&outp->m_dataflags, FILEBUFFER_FLAG_LOADED);
+		outp->m_request_cv.notify_all();
+	}
+	if (lastRet < 0)
+		return -1;
 	return 0;
 }
 
