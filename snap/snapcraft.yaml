@@ -101,6 +101,7 @@ parts:
       #- cmake
       - g++
       - libbz2-dev
+      - libzstd-dev
       - libusb-1.0-0-dev
       - libssl-dev
       - libzstd-dev
