@@ -28,7 +28,7 @@ install:
     
 - cmd:    cd ..
  
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then brew install libusb pkg-config; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then brew install libusb pkg-config zstd; fi
 
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then sudo apt-get update; fi
 
