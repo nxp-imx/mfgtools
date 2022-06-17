@@ -52,6 +52,9 @@ build_script:
 - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_static_2017.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII libusb\msvc\libusb_static_2017.vcxproj}
 - ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_static_2017.vcxproj) -replace '141', '142' | Out-File -encoding ASCII libusb\msvc\libusb_static_2017.vcxproj}
 
+- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2019" (set PLATFORMTOOLSET=v142)
+- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (set PLATFORMTOOLSET=v141)
+- cmd: echo %PLATFORMTOOLSET%
 
 - cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2019" (msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /p:PlatformToolset=v142 /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll")
 #coverity tool is only available to visual studio 2017 imagine in appveyor
