@@ -34,7 +34,7 @@ set(LSTS
 	nand_burn_loader.lst
 )
 
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libuuu ${LIBUSB_LIBRARY_DIRS} ${LIBZ_LIBRARY_DIRS})
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libuuu ${LIBUSB_LIBRARY_DIRS} ${LIBZSTD_LIBRARY_DIRS} ${LIBZ_LIBRARY_DIRS})
 
 set(CLIST_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/gen_txt_include.sh)
 set(generated_files_dir "${CMAKE_BINARY_DIR}/uuu/gen")
