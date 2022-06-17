@@ -34,6 +34,8 @@ install:
 
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev libbz2-dev libzstd-dev asciidoc rename; fi
 
+ -sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" = "macOS" ]; then pkg-config --cflags libzstd; fi
+
 build_script:
 
 # below powershell actions equals to retarget projects to newest SDK and tool v142 in visual studio 2019
