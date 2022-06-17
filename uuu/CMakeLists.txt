@@ -8,6 +8,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0>=1.0.16)
 pkg_check_modules(LIBZ REQUIRED zlib)
 pkg_check_modules(LIBZSTD REQUIRED libzstd)
+find_package(libzstd REQUIRED)
 find_package(Threads)
 
 if (STATIC)
@@ -61,6 +62,7 @@ endfunction()
 preprocess_clst(CLSTS ${LSTS})
 
 include_directories(${generated_files_dir})
+include_directories(${LIBZSTD_INCLUDE_DIRS} ${UUUOPENSLL_INCLUDE_DIR} include)
 
 set(SOURCES
 	uuu.cpp

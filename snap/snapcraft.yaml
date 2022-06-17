@@ -103,6 +103,7 @@ parts:
       - libbz2-dev
       - libusb-1.0-0-dev
       - libssl-dev
+      - libzstd-dev
       - zlib1g-dev
       - pkg-config
     plugin: cmake
