@@ -32,7 +32,7 @@ install:
 
 - sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then sudo apt-get update; fi
 
-- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev libbz2-dev asciidoc rename; fi
+- sh: if [ "${APPVEYOR_BUILD_WORKER_IMAGE}" != "macOS" ]; then sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev libbz2-dev libzstd-dev asciidoc rename; fi
 
 build_script:
 
