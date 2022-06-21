@@ -1177,12 +1177,68 @@ int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBu
 	return 0;
 }
 
-
-int FSzstd::load(const string& backfile, const string& filename, shared_ptr<FileBuffer>outp, bool async)
+int zstd_async_load(const string& backfile, shared_ptr<FileBuffer>outp)
 {
 	typedef struct ZSTD_DCtx_s ZSTD_DCtx;
 	ZSTD_DCtx* const dctx = ZSTD_createDCtx();
 	size_t lastRet = 0;
+	size_t outOffset = 0;
+	shared_ptr<FileBuffer> inp = get_file_buffer(backfile, true);
+	if (inp == nullptr)
+	{
+		return -1;
+	}
+	if (outp->reserve(inp->size() * 10))
+		return -1;
+
+	size_t offset = 0;
+	uuu_notify ut;
+	ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
+	ut.str = (char*)backfile.c_str();
+	call_notify(ut);
+	size_t const toRead = ZSTD_DStreamInSize();
+	std::shared_ptr<FileBuffer> buff;
+
+	while ((buff = inp->request_data(offset, toRead)))
+	{
+		ZSTD_inBuffer input = { buff->data(), buff->size(), 0 };
+		/* Given a valid frame, zstd won't consume the last byte of the frame
+		 * until it has flushed all of the decompressed data of the frame.
+		 * Therefore, instead of checking if the return code is 0, we can
+		 * decompress just check if input.pos < input.size.
+		 */
+		while (input.pos < min(input.size, inp->m_DataSize - offset))
+		{
+			ZSTD_outBuffer output = { outp->data() + outOffset, outp->m_MemSize - outOffset, 0 };
+			/* The return code is zero if the frame is complete, but there may
+			 * be multiple frames concatenated together. Zstd will automatically
+			 * reset the context when a frame is complete. Still, calling
+			 * ZSTD_DCtx_reset() can be useful to reset the context to a clean
+			 * state, for instance if the last decompression call returned an
+			 * error.
+			 */
+			size_t const ret = ZSTD_decompressStream(dctx, &output, &input);
+			lastRet = min(lastRet, ret);
+			outOffset += output.pos;
+			ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
+			ut.index = outOffset;
+			call_notify(ut);
+			outp->m_avaible_size = outOffset;
+			outp->m_request_cv.notify_all();
+		}
+
+		offset += toRead;
+	}
+	outp->resize(outOffset);
+	atomic_fetch_or(&outp->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	outp->m_request_cv.notify_all();
+	if (lastRet < 0)
+		return -1;
+	return 0;
+}
+
+int FSzstd::load(const string& backfile, const string& filename, shared_ptr<FileBuffer>outp, bool async)
+{
 	if (!g_fs_data.exist(backfile))
 	{
 		string str;
@@ -1204,59 +1260,18 @@ int FSzstd::load(const string& backfile, const string& filename, shared_ptr<File
 	}
 	else
 	{
-		size_t outOffset = 0;
-		shared_ptr<FileBuffer> inp = get_file_buffer(backfile, true);
-		if (inp == nullptr)
-		{
+		if (!check_file_exist(backfile.substr(1)))
 			return -1;
-		}
-		if (outp->reserve(inp->size() * 10))
-			return -1;
+			outp->m_aync_thread = thread(zstd_async_load, backfile, outp);
 
-		size_t offset = 0;
-		uuu_notify ut;
-		ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
-		ut.str = (char*)backfile.c_str();
-		call_notify(ut);
-		size_t const toRead = ZSTD_DStreamInSize();
-		std::shared_ptr<FileBuffer> buff;
-
-		while ((buff = inp->request_data(offset, toRead)))
-		{
-			ZSTD_inBuffer input = { buff->data(), buff->size(), 0 };
-			/* Given a valid frame, zstd won't consume the last byte of the frame
-			 * until it has flushed all of the decompressed data of the frame.
-			 * Therefore, instead of checking if the return code is 0, we can
-			 * decompress just check if input.pos < input.size.
-			 */
-			while (input.pos < min(input.size,inp->m_DataSize-offset))
-			{
-				ZSTD_outBuffer output = { outp->data() + outOffset, outp->m_MemSize - outOffset, 0 };
-				/* The return code is zero if the frame is complete, but there may
-				 * be multiple frames concatenated together. Zstd will automatically
-				 * reset the context when a frame is complete. Still, calling
-				 * ZSTD_DCtx_reset() can be useful to reset the context to a clean
-				 * state, for instance if the last decompression call returned an
-				 * error.
-				 */
-				size_t const ret = ZSTD_decompressStream(dctx, &output, &input);
-				lastRet = min(lastRet, ret);
-				outOffset += output.pos;
-				ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
-				ut.index = outOffset;
-				call_notify(ut);
-				outp->m_avaible_size = outOffset;
-				outp->m_request_cv.notify_all();
+		if (!async) {
+			outp->m_aync_thread.join();
+			if (!outp->IsLoaded()) {
+				set_last_err_string("async data load failure\n");
+				return -1;
 			}
-
-			offset += toRead;
 		}
-		outp->resize(outOffset);
-		atomic_fetch_or(&outp->m_dataflags, FILEBUFFER_FLAG_LOADED);
-		outp->m_request_cv.notify_all();
 	}
-	if (lastRet < 0)
-		return -1;
 	return 0;
 }
 
