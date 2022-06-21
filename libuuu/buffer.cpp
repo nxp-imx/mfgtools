@@ -1085,6 +1085,61 @@ int FSBz2::load(const string &backfile, const string &filename, shared_ptr<FileB
 	return 0;
 }
 
+int gz_async_load(const string& backfile, shared_ptr<FileBuffer>p)
+{
+	gzFile fp = gzopen(backfile.c_str() + 1, "r");
+	if (fp == nullptr)
+	{
+		set_last_err_string("Open file failure");
+		return -1;
+	}
+
+	shared_ptr<FileBuffer> pb = get_file_buffer(backfile);
+
+	p->reserve(pb->size() * 8); /* guest uncompress size */
+
+	size_t sz = 0x100000;
+	if (sz > pb->size())
+		sz = p->size();
+
+	uuu_notify ut;
+	ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
+	ut.str = (char*)backfile.c_str();
+	call_notify(ut);
+
+	ut.type = uuu_notify::NOTIFY_DECOMPRESS_SIZE;
+	ut.total = pb->size();
+	call_notify(ut);
+
+	size_t cur = 0;
+	while (!gzeof(fp))
+	{
+		size_t ret = gzread(fp, p->data() + cur, sz);
+		if (sz < 0)
+		{
+			set_last_err_string("decompress error");
+			return -1;
+		}
+		cur += ret;
+		p->reserve(cur + sz);
+
+		ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
+		ut.index = gzoffset(fp);
+		call_notify(ut);
+	}
+
+	p->resize(cur);
+	p->m_avaible_size = cur;
+
+	ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
+	ut.index = pb->size();
+	call_notify(ut);
+
+	gzclose(fp);
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
+	p->m_request_cv.notify_all();
+}
+
 int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBuffer>p, bool async)
 {
 	if (!g_fs_data.exist(backfile))
@@ -1108,60 +1163,20 @@ int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBu
 	}
 	else
 	{
-		gzFile fp = gzopen(backfile.c_str() + 1, "r");
-		if (fp == nullptr)
-		{
-			set_last_err_string("Open file failure");
+		if (!check_file_exist(backfile.substr(1)))
 			return -1;
-		}
-
-		shared_ptr<FileBuffer> pb = get_file_buffer(backfile);
-
-		p->reserve(pb->size() * 4); /* guest uncompress size */
-
-		size_t sz = 0x100000;
-		if (sz > pb->size() * 4)
-			sz = p->size();
-
-		uuu_notify ut;
-		ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
-		ut.str = (char*)backfile.c_str();
-		call_notify(ut);
-
-		ut.type = uuu_notify::NOTIFY_DECOMPRESS_SIZE;
-		ut.total = pb->size();
-		call_notify(ut);
-
-		size_t cur = 0;
-		while (!gzeof(fp))
-		{
-			size_t ret = gzread(fp, p->data() + cur, sz);
-			if (sz < 0)
-			{
-				set_last_err_string("decompress error");
+		p->m_aync_thread = thread(gz_async_load, backfile,  p);
+		if (!async) {
+			p->m_aync_thread.join();
+			if (!p->IsLoaded()) {
+				set_last_err_string("async data load failure\n");
 				return -1;
 			}
-			cur += ret;
-			p->reserve(cur + sz);
-
-			ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
-			ut.index = gzoffset(fp);
-			call_notify(ut);
 		}
-
-		p->resize(cur);
-		p->m_avaible_size = cur;
-
-		ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
-		ut.index = pb->size();
-		call_notify(ut);
-
-		gzclose(fp);
-		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
-		p->m_request_cv.notify_all();
 	}
 	return 0;
 }
+
 
 int FSzstd::load(const string& backfile, const string& filename, shared_ptr<FileBuffer>outp, bool async)
 {
