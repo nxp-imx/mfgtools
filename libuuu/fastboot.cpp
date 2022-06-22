@@ -1013,7 +1013,7 @@ int FBCRC::run(CmdCtx* ctx)
 
 		crc = crc32(0, pbuff, fbuff->size());
 
-		cmd.format("UCmd: mmc read $loadaddr 0x%x 0x%x", offset / m_block + m_seek, crcblock / m_block);
+		cmd.format("UCmd: %s 0x%x 0x%x", m_read_cmd.c_str(), offset / m_block + m_seek, crcblock / m_block);
 		if (fb.Transport(cmd, nullptr, 0))
 			return -1;
 		cmd.format("UCmd: crc32 -v $loadaddr 0x%x %08x", crcblock, crc);

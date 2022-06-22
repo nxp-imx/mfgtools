@@ -175,7 +175,7 @@ int CmdBase::parser(char *p)
 		{
 			if (!m_NoKeyParam)
 				param = get_next_param(m_cmd, pos);
-			*(string*)pp->pData = param;
+			*(string*)pp->pData = remove_quota(param);
 		}
 
 		if (pp->type == Param::Type::e_bool)
