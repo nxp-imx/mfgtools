@@ -250,19 +250,33 @@ void BuiltInScriptMap::ShowCmds(FILE * const file) const
  */
 static std::string replace_str(std::string str, std::string key, std::string replace)
 {
+	std::string s5, s4;
+	std::string match[] = { ".BZ2", ".ZST" };
 	if (replace.size() > 4)
 	{
 		if (replace[replace.size() - 1] == '\"')
 		{
-			if (str_to_upper(replace.substr(replace.size() - 5)) == ".BZ2\"")
+			s5 = str_to_upper(replace.substr(replace.size() - 5));
+			for (std::string it : match)
 			{
-				replace = replace.substr(0, replace.size() - 1);
-				replace += "/*\"";
+				if (s5 == it)
+				{
+					replace = replace.substr(0, replace.size() - 1);
+					replace += "/*\"";
+				}
 			}
 
-		}else if (str_to_upper(replace.substr(replace.size() - 4)) == ".BZ2")
+		}
+		else
 		{
-			replace += "/*";
+			s4 = str_to_upper(replace.substr(replace.size() - 4));
+			for (std::string it : match)
+			{
+				if (it == s4)
+				{
+					replace += "/*";
+				}
+			}
 		}
 	}
 
