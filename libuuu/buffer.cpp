@@ -1067,9 +1067,7 @@ int FSBz2::load(const string &backfile, const string &filename, shared_ptr<FileB
 	}
 	else
 	{
-		if(!check_file_exist(backfile.substr(1)))
-			return -1;
-		if(is_pbzip2_file(backfile.substr(1))==true)//the bz2 file can be decompressed with multithreading
+		if(is_pbzip2_file(backfile)==true)//the bz2 file can be decompressed with multithreading
 			p->m_aync_thread = thread(bz_async_load, backfile, p);
 		else//the bz2 file can only be decompressed using single thread
 			p->m_aync_thread = thread(decompress_single_thread, backfile, p);
@@ -1163,8 +1161,6 @@ int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBu
 	}
 	else
 	{
-		if (!check_file_exist(backfile.substr(1)))
-			return -1;
 		p->m_aync_thread = thread(gz_async_load, backfile,  p);
 		if (!async) {
 			p->m_aync_thread.join();
@@ -1260,8 +1256,6 @@ int FSzstd::load(const string& backfile, const string& filename, shared_ptr<File
 	}
 	else
 	{
-		if (!check_file_exist(backfile.substr(1)))
-			return -1;
 			outp->m_aync_thread = thread(zstd_async_load, backfile, outp);
 
 		if (!async) {
