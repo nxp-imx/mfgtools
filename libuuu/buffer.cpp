@@ -797,7 +797,7 @@ int bz2_decompress(shared_ptr<FileBuffer> pbz, shared_ptr<FileBuffer> p, bz2_blk
 
 		{
 			lock_guard<mutex> lock(p->m_data_mutex);
-			if (p->size() < one.decompress_offset + one.actual_size)
+			if (p->m_MemSize < one.decompress_offset + one.actual_size)
 				if(p->resize(one.decompress_offset + one.actual_size))
 					return -1;
 
@@ -832,8 +832,6 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 
 	size_t total = 0;
 
-	uint8_t *p1 = &pbz->at(0);
-
 	int nthread = thread::hardware_concurrency();
 
 	vector<thread> threads;
@@ -843,6 +841,8 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 		set_last_err_string("Out of memory");
 		return -1;
 	}
+
+	uint8_t* p1 = &pbz->at(0);//buffer of pbz no longer changes after calling size()
 
 	for (int i = 0; i < nthread; i++)
 	{
@@ -1067,18 +1067,10 @@ int FSBz2::load(const string &backfile, const string &filename, shared_ptr<FileB
 	}
 	else
 	{
-		if(is_pbzip2_file(backfile)==true)//the bz2 file can be decompressed with multithreading
-			p->m_aync_thread = thread(bz_async_load, backfile, p);
+		if (is_pbzip2_file(backfile) == true)//the bz2 file can be decompressed with multithreading
+			return bz_async_load(backfile, p);
 		else//the bz2 file can only be decompressed using single thread
-			p->m_aync_thread = thread(decompress_single_thread, backfile, p);
-
-		if (!async) {
-			p->m_aync_thread.join();
-			if (! p->IsLoaded()) {
-				set_last_err_string("async data load failure\n");
-				return -1;
-			}
-		}
+			return decompress_single_thread(backfile, p);
 	}
 	return 0;
 }
@@ -1161,14 +1153,7 @@ int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBu
 	}
 	else
 	{
-		p->m_aync_thread = thread(gz_async_load, backfile,  p);
-		if (!async) {
-			p->m_aync_thread.join();
-			if (!p->IsLoaded()) {
-				set_last_err_string("async data load failure\n");
-				return -1;
-			}
-		}
+		return gz_async_load(backfile, p);
 	}
 	return 0;
 }
@@ -1256,15 +1241,7 @@ int FSzstd::load(const string& backfile, const string& filename, shared_ptr<File
 	}
 	else
 	{
-			outp->m_aync_thread = thread(zstd_async_load, backfile, outp);
-
-		if (!async) {
-			outp->m_aync_thread.join();
-			if (!outp->IsLoaded()) {
-				set_last_err_string("async data load failure\n");
-				return -1;
-			}
-		}
+		return zstd_async_load(backfile, outp);
 	}
 	return 0;
 }
@@ -1474,20 +1451,29 @@ int FileBuffer::ref_other_buffer(shared_ptr<FileBuffer> p, size_t offset, size_t
 	m_avaible_size = m_DataSize;
 	m_allocate_way = ALLOCATION_WAYS::REF;
 	m_ref = p;
+
+	atomic_fetch_or(&m_dataflags, FILEBUFFER_FLAG_LOADED);
 	return 0;
 }
 
 int FileBuffer::reload(string filename, bool async)
 {
-	atomic_init(&this->m_dataflags, 0);
-
-	if (g_fs_data.load(filename, shared_from_this(), async) == 0)
-	{
-		m_timesample = get_file_timesample(filename);
-		return 0;
+	if(async) {
+		m_request_cv;
+		if(!g_fs_data.exist(filename))
+			return - 1;
+		m_aync_thread = thread(&FS_DATA::load, &g_fs_data, filename, shared_from_this(), async);
 	}
-	return -1;
+	else
+	{
+		m_request_cv;
+		if(g_fs_data.load(filename, shared_from_this(), async))
+			return - 1;
+	}
+	m_timesample = get_file_timesample(filename);
+	return 0;
 }
+
 
 int FileBuffer::request_data(size_t sz)
 {
@@ -1703,7 +1689,13 @@ int FileBuffer::unmapfile()
 
 bool check_file_exist(string filename, bool start_async_load)
 {
-	return get_file_buffer(filename, true) != nullptr;
+	string_ex fn;
+	fn += remove_quota(filename);
+	fn.replace('\\', '/');
+
+	if (fn.empty())
+		fn += "./";
+	return g_fs_data.exist(fn);
 }
 
 #ifdef WIN32

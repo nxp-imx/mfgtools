@@ -134,8 +134,15 @@ public:
 		return m_pDatabuffer ;
 	}
 
-	size_t size() const noexcept
+	size_t size()
 	{
+		if (IsKnownSize())
+			return m_DataSize;
+
+		std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
+		while (!(m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT))
+			m_request_cv.wait(lck);
+
 		return m_DataSize;
 	}
 
@@ -162,7 +169,7 @@ public:
 	int unmapfile();
 	//Read write lock;
 	uint64_t m_timesample;
-	int reload(std::string filename, bool async=false);
+	int reload(std::string filename, bool async = false);
 
 private:
 	ALLOCATION_WAYS m_allocate_way = ALLOCATION_WAYS::MALLOC;
