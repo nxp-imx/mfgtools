@@ -1010,6 +1010,11 @@ int decompress_single_thread(string name,shared_ptr<FileBuffer>p)
 	strm.bzfree   = nullptr;
 	strm.opaque   = nullptr;
 
+	uuu_notify ut;
+	ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
+	ut.str = (char*)name.c_str();
+	call_notify(ut);
+
 	int ret;
 	ret = BZ2_bzDecompressInit (&strm,0, 0 );
 	if (ret != BZ_OK)
@@ -1026,7 +1031,11 @@ int decompress_single_thread(string name,shared_ptr<FileBuffer>p)
 
 		ret=BZ2_bzDecompress(&strm);
 		decompressed_size+=decompress_amount;
-
+		ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
+		ut.index = decompressed_size;
+		call_notify(ut);
+		p->m_avaible_size = decompressed_size;
+		p->m_request_cv.notify_all();
 		if(ret==BZ_STREAM_END)
 		{
 			decompressed_size-= strm.avail_out;
