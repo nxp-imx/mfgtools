@@ -399,6 +399,8 @@ public:
 class FSCompressStream : public FSBackFile
 {
 public:
+	int load(const string& backfile, const string& filename, shared_ptr<FileBuffer>outp, bool async);
+	virtual int Decompress(const string& backfile, shared_ptr<FileBuffer>outp) = 0;
 	bool exist(const string &backfile, const string &filename) override;
 	int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) override;
 };
@@ -407,21 +409,21 @@ static class FSBz2 : public FSCompressStream
 {
 public:
 	FSBz2() { m_ext = ".BZ2"; };
-	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override;
+	virtual int Decompress(const string& backfile, shared_ptr<FileBuffer>outp) override;
 }g_fsbz2;
 
 static class FSGz : public FSCompressStream
 {
 public:
 	FSGz() { m_ext = ".GZ"; };
-	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override;
+	virtual int Decompress(const string& backfile, shared_ptr<FileBuffer>outp) override;
 }g_fsgz;
 
 static class FSzstd : public FSCompressStream
 {
 public:
 	FSzstd() { m_ext = ".ZST"; };
-	int load(const string& backfile, const string& filename, shared_ptr<FileBuffer> p, bool async) override;
+	virtual int Decompress(const string& backfile, shared_ptr<FileBuffer>outp) override;
 }g_FSzstd;
 
 static class FS_DATA
@@ -1053,38 +1055,15 @@ int decompress_single_thread(string name,shared_ptr<FileBuffer>p)
 }
 
 
-int FSBz2::load(const string &backfile, const string &filename, shared_ptr<FileBuffer>p, bool async)
+int FSBz2::Decompress(const string &backfile, shared_ptr<FileBuffer>p)
 {
-	if (!g_fs_data.exist(backfile))
-	{
-		string str;
-		str = "Failure open file:";
-		str += backfile;
-		set_last_err_string(str);
-		return -1;
-	}
-	if (filename != "*")
-	{
-		string star ("/*");
-		string decompressed_name= backfile+ star;
-		shared_ptr<FileBuffer> decompressed_file=get_file_buffer(decompressed_name);
-		Tar tar;
-		tar.Open(decompressed_name);
-		if (tar.get_file_buff(filename, p))
-			return -1;
-		p->m_avaible_size = p->m_DataSize;
-	}
-	else
-	{
-		if (is_pbzip2_file(backfile) == true)//the bz2 file can be decompressed with multithreading
-			return bz_async_load(backfile, p);
-		else//the bz2 file can only be decompressed using single thread
-			return decompress_single_thread(backfile, p);
-	}
-	return 0;
+	if (is_pbzip2_file(backfile) == true)//the bz2 file can be decompressed with multithreading
+		return bz_async_load(backfile, p);
+	else//the bz2 file can only be decompressed using single thread
+		return decompress_single_thread(backfile, p);
 }
 
-int gz_async_load(const string& backfile, shared_ptr<FileBuffer>p)
+int FSGz::Decompress(const string& backfile, shared_ptr<FileBuffer>p)
 {
 	gzFile fp = gzopen(backfile.c_str() + 1, "r");
 	if (fp == nullptr)
@@ -1139,35 +1118,7 @@ int gz_async_load(const string& backfile, shared_ptr<FileBuffer>p)
 	p->m_request_cv.notify_all();
 }
 
-int FSGz::load(const string &backfile, const string &filename, shared_ptr<FileBuffer>p, bool async)
-{
-	if (!g_fs_data.exist(backfile))
-	{
-		string str;
-		str = "Failure open file:";
-		str += backfile;
-		set_last_err_string(str);
-		return -1;
-	}
-	if (filename != "*")
-	{
-		string star("/*");
-		string decompressed_name = backfile + star;
-		shared_ptr<FileBuffer> decompressed_file = get_file_buffer(decompressed_name);
-		Tar tar;
-		tar.Open(decompressed_name);
-		if (tar.get_file_buff(filename, p))
-			return -1;
-		p->m_avaible_size = p->m_DataSize;
-	}
-	else
-	{
-		return gz_async_load(backfile, p);
-	}
-	return 0;
-}
-
-int zstd_async_load(const string& backfile, shared_ptr<FileBuffer>outp)
+int FSzstd::Decompress(const string& backfile, shared_ptr<FileBuffer>outp)
 {
 	typedef struct ZSTD_DCtx_s ZSTD_DCtx;
 	ZSTD_DCtx* const dctx = ZSTD_createDCtx();
@@ -1224,34 +1175,6 @@ int zstd_async_load(const string& backfile, shared_ptr<FileBuffer>outp)
 	outp->m_request_cv.notify_all();
 	if (lastRet < 0)
 		return -1;
-	return 0;
-}
-
-int FSzstd::load(const string& backfile, const string& filename, shared_ptr<FileBuffer>outp, bool async)
-{
-	if (!g_fs_data.exist(backfile))
-	{
-		string str;
-		str = "Failure open file:";
-		str += backfile;
-		set_last_err_string(str);
-		return -1;
-	}
-	if (filename != "*")
-	{
-		string star("/*");
-		string decompressed_name = backfile + star;
-		shared_ptr<FileBuffer> decompressed_file = get_file_buffer(decompressed_name);
-		Tar tar;
-		tar.Open(decompressed_name);
-		if (tar.get_file_buff(filename, outp))
-			return -1;
-		outp->m_avaible_size = outp->m_DataSize;
-	}
-	else
-	{
-		return zstd_async_load(backfile, outp);
-	}
 	return 0;
 }
 
@@ -1752,4 +1675,28 @@ int uuu_for_each_ls_file(uuu_ls_file fn, const char *file_path, void *p)
 
 	f = path;
 	return g_fs_data.for_each_ls(fn, f, p);
+}
+
+int FSCompressStream::load(const string& backfile, const string& filename, shared_ptr<FileBuffer>outp, bool async)
+{
+	if (!g_fs_data.exist(backfile))
+	{
+		string str;
+		str = "Failure open file:";
+		str += backfile;
+		set_last_err_string(str);
+		return -1;
+	}
+	if (filename != "*")
+	{
+		string star("/*");
+		string decompressed_name = backfile + star;
+		shared_ptr<FileBuffer> decompressed_file = get_file_buffer(decompressed_name);
+		Tar tar;
+		tar.Open(decompressed_name);
+		if (tar.get_file_buff(filename, outp))
+			return -1;
+		outp->m_avaible_size = outp->m_DataSize;
+	}
+	Decompress(backfile, outp);
 }
