@@ -149,7 +149,12 @@ public:
 	bool exist(const string &backfile, const string &filename) override
 	{
 		struct stat_os st;
-		return stat_os(backfile.c_str() + 1, &st) == 0 && ((st.st_mode & S_IFDIR) == 0);
+		int off = 1;
+
+		if (backfile[0] == MAGIC_PATH)
+			off = 0;
+
+		return stat_os(backfile.c_str() + off, &st) == 0 && ((st.st_mode & S_IFDIR) == 0);
 	}
 
 	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override
@@ -1273,6 +1278,8 @@ FileBuffer::FileBuffer(void *p, size_t sz)
 
 	memcpy(m_pDatabuffer, p, sz);
 	m_dataflags = 0;
+
+	atomic_fetch_or(&m_dataflags, FILEBUFFER_FLAG_LOADED);
 }
 
 FileBuffer::~FileBuffer()
@@ -1536,6 +1543,9 @@ std::shared_ptr<FileBuffer> FileBuffer::request_data(size_t offset, size_t sz)
 		p->ref_other_buffer(shared_from_this(), offset, size);
 		return p;
 	}
+
+	if (sz == UINT64_MAX)
+		sz = size() - offset;
 
 	p->reserve(sz);
 	int64_t ret = request_data(p->m_pDatabuffer, offset, sz);
