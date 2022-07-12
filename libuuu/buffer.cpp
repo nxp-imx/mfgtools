@@ -151,7 +151,7 @@ public:
 		struct stat_os st;
 		int off = 1;
 
-		if (backfile[0] != MAGIC_PATH)
+		if (backfile[0] == MAGIC_PATH)
 			off = 0;
 
 		return stat_os(backfile.c_str() + off, &st) == 0 && ((st.st_mode & S_IFDIR) == 0);
