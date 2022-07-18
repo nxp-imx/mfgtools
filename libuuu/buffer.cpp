@@ -332,40 +332,6 @@ int http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string file
 	return 0;
 }
 
-int FSHttp::load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async)
-{
-	shared_ptr<HttpStream> http = make_shared<HttpStream>();
-
-	if (http->HttpGetHeader(backfile, filename, m_Port, typeid(*this) == typeid(FSHttps)))
-		return -1;
-
-	size_t sz = http->HttpGetFileSize();
-
-	p->resize(sz);
-
-	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
-	p->m_request_cv.notify_all();
-
-	if (async)
-	{
-		p->m_aync_thread = thread(http_load, http, p, backfile + filename);
-#ifdef WIN32
-		SetThreadPriority(p->m_aync_thread.native_handle(), THREAD_PRIORITY_BELOW_NORMAL);
-#endif
-	}
-	else
-	{
-		if (http_load(http, p, backfile + filename))
-			return -1;
-
-		p->m_avaible_size = p->m_DataSize;
-		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
-		p->m_request_cv.notify_all();
-	}
-
-	return 0;
-}
-
 class FSBackFile : public FSBasic
 {
 public:
@@ -1709,4 +1675,21 @@ int FSCompressStream::load(const string& backfile, const string& filename, share
 		outp->m_avaible_size = outp->m_DataSize;
 	}
 	Decompress(backfile, outp);
+}
+
+int FSHttp::load(const string& backfile, const string& filename, shared_ptr<FileBuffer> p, bool async)
+{
+	shared_ptr<HttpStream> http = make_shared<HttpStream>();
+
+	if (http->HttpGetHeader(backfile, filename, m_Port, typeid(*this) == typeid(FSHttps)))
+		return -1;
+
+	size_t sz = http->HttpGetFileSize();
+
+	p->resize(sz);
+
+	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
+	p->m_request_cv.notify_all();
+
+	return http_load(http, p, backfile);
 }
