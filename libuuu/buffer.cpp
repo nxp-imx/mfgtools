@@ -1599,11 +1599,19 @@ bool check_file_exist(string filename, bool start_async_load)
 {
 	string_ex fn;
 	fn += remove_quota(filename);
-	fn.replace('\\', '/');
+	string_ex path;
+	if (!fn.empty() && fn[0] != MAGIC_PATH)
+	{
+		if (fn == "..")
+			path += g_current_dir.substr(0, g_current_dir.size() - 1);
+		else
+			path += g_current_dir + fn;
+	}
+	path.replace('\\', '/');
 
-	if (fn.empty())
-		fn += "./";
-	return g_fs_data.exist(fn);
+	if (path.empty())
+		path += "./";
+	return g_fs_data.exist(path);
 }
 
 #ifdef WIN32
