@@ -667,6 +667,9 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 		shared_ptr<FileBuffer> pdata = get_file_buffer(m_filename, true);
 
+		if (pdata == nullptr)
+			return -1;
+
 		if (isffu(pdata))
 		{
 			string str;

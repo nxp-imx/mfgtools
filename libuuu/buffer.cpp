@@ -110,7 +110,9 @@ public:
 		size_t pos = path.rfind(ext);
 		if (pos == string::npos)
 		{
-			set_last_err_string("can't find ext name in path");
+			string err = "can't find ext name in path: ";
+			err += filename;
+			set_last_err_string(err);
 			return -1;
 		}
 
@@ -280,7 +282,15 @@ static class FSHttp : public FSNetwork
 public:
 	FSHttp() { m_Prefix = "HTTP://"; m_Port = 80; }
 	int load(const string &backfile, const string &filename, shared_ptr<FileBuffer> p, bool async) override;
-	virtual bool exist(const string &backfile, const string &filename) override { return true; };
+	virtual bool exist(const string &backfile, const string &filename) override
+	{
+		shared_ptr<HttpStream> http = make_shared<HttpStream>();
+
+		if (http->HttpGetHeader(backfile, filename, m_Port, typeid(*this) != typeid(FSHttp)))
+			return false;
+
+		return true;
+	};
 	int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) override { return 0; };
 	int get_file_timesample(const string &filename, uint64_t *ptime) override { return 0; };
 }g_fshttp;
@@ -654,6 +664,9 @@ int FSFat::for_each_ls(uuu_ls_file fn, const string &backfile, const string &fil
 
 bool FSCompressStream::exist(const string &backfile, const string &filename)
 {
+	if (!g_fs_data.exist(backfile))
+		return false;
+
 	if (filename == "*")
 		return true;
 

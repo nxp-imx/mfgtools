@@ -160,7 +160,10 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 
 	if (status != HTTP_STATUS_OK)
 	{
-		set_last_err_string("HTTP status is not okay");
+		string err = "HTTP status is not okay: ";
+		err += host;
+		err += path;
+		set_last_err_string(err);
 		return -1;
 	}
 	return 0;
