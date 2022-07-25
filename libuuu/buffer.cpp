@@ -850,7 +850,7 @@ int bz_async_load(string filename, shared_ptr<FileBuffer> p)
 		if (*header == 0x5a42) //"BZ"
 		{
 			uint32_t *magic1 = (uint32_t *)&pbz->at(i+4);
-			if (*magic1 == 0x26594131) //PI 3.1415926
+			if (*magic1 == 0x26594131 && pbz->at(i + 2) == 'h') //PI 3.1415926
 			{
 				uint16_t *magic2 = (uint16_t *)&pbz->at(i + 8);
 				if (*magic2 == 0x5953)
