@@ -273,7 +273,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev, short bcddevice)
 	ctx.m_config_item = item;
 	ctx.m_current_bcd = bcddevice;
 
-	if (ret = open_libusb(dev, &(ctx.m_dev)))
+	if ((ret = open_libusb(dev, &(ctx.m_dev))))
 	{
 		nt.type = uuu_notify::NOTIFY_CMD_END;
 		nt.status = -1;
@@ -483,7 +483,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 					m_current_bcd = desc.bcdDevice;
 
 					int ret;
-					if (ret = open_libusb(dev, &(m_dev)))
+					if ((ret = open_libusb(dev, &(m_dev))))
 						return ret;
 
 					nt.str = (char*)str.c_str();

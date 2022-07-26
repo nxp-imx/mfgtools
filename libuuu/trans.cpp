@@ -188,7 +188,7 @@ int HIDTrans::read(void *buff, size_t size, size_t *rsize)
 
 int BulkTrans::write(void *buff, size_t size)
 {
-	int ret;
+	int ret = 0;
 	int actual_lenght;
 	for (size_t i = 0; i < size; i += m_MaxTransPreRequest)
 	{
