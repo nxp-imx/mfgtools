@@ -50,6 +50,7 @@
 #include <iterator>
 #include "rominfo.h"
 #include "zlib.h"
+#include "libusb.h"
 
 int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
 {

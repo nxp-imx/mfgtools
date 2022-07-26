@@ -46,6 +46,7 @@
 #include <limits>
 #include "http.h"
 #include "zstd.h"
+#include "libusb.h"
 
 #ifdef WIN32
 #define stat_os _stat64
