@@ -357,7 +357,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 {
 	size_t size;
 	uint8_t *pbuff;
-	int offset = 0;
+	ssize_t offset = 0;
 
 	shared_ptr<FileBuffer> fbuff, p1= get_file_buffer(m_filename, true);
 
