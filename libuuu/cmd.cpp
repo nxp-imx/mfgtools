@@ -107,7 +107,7 @@ int CmdBase::parser(char *p)
 	if (param.find(':') != string::npos)
 		param = get_next_param(m_cmd, pos);
 
-	int index = 0;
+	size_t index = 0;
 
 	while (pos < m_cmd.size())
 	{
@@ -646,7 +646,7 @@ int CmdError::parser(char *p)
 	return 0;
 }
 
-int CmdError::run(CmdCtx *pCtx)
+int CmdError::run(CmdCtx * /*pCtx*/)
 {
 	set_last_err_string(m_error);
 	return -1;
@@ -824,7 +824,7 @@ int CmdIf::parser(char *p)
 	size_t lc = pos;
 	get_next_param(m_cmd, pos);
 
-	int end = m_cmd.find("then", pos);
+	size_t end = m_cmd.find("then", pos);
 
 	if (end == string::npos)
 	{
@@ -1040,7 +1040,7 @@ int check_version(string str)
 	return 0;
 }
 
-int uuu_run_cmd_script(const char * buff, int dry)
+int uuu_run_cmd_script(const char * buff, int /*dry*/)
 {
 	shared_ptr<FileBuffer> p(new FileBuffer((void*)buff, strlen(buff)));
 	
