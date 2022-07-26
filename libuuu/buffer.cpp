@@ -1614,6 +1614,10 @@ bool check_file_exist(string filename, bool /*start_async_load*/)
 		else
 			path += g_current_dir + fn;
 	}
+	else {
+		path = fn;
+	}
+
 	path.replace('\\', '/');
 
 	if (path.empty())
