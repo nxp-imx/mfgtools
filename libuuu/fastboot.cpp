@@ -713,7 +713,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 				set_last_err_string("This wic have NOT terminate tag after bootloader, please use new yocto");
 				return -1;
 			}
-			size_t offset = pos - length;
+			ssize_t offset = pos - length;
 			if (offset < 0)
 			{
 				set_last_err_string("This wic boot length is wrong");
@@ -935,7 +935,6 @@ int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> p)
 			for (uint32_t loc = 0; loc < entry->dwLocationCount; loc++)
 			{
 				//printf("block 0x%x write to 0x%x seek %d\n", currrent_block, entry->rgDiskLocations[loc].dwBlockIndex, entry->rgDiskLocations[loc].dwDiskAccessMethod);
-				uint32_t access = entry->rgDiskLocations[loc].dwDiskAccessMethod;
 				uint32_t blockindex;
 				if (entry->rgDiskLocations[loc].dwDiskAccessMethod == DISK_BEGIN)
 					blockindex = entry->rgDiskLocations[loc].dwBlockIndex;
