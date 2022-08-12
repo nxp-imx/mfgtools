@@ -1109,7 +1109,7 @@ int FSzstd::Decompress(const string& backfile, shared_ptr<FileBuffer>outp)
 	{
 		return -1;
 	}
-	if (outp->reserve(inp->size() * 10))
+	if (outp->reserve(inp->size() * 16))
 		return -1;
 
 	size_t offset = 0;
