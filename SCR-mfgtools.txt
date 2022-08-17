@@ -1,0 +1,22 @@
+
+Package:                     mfgtools.git
+Version:                     3
+Outgoing License:            BSD-3-Clause 
+License File:                LICENSE
+Type of Content:             source
+Description and comments:    NXP I.MX Chip image deploy tools. Use uuu.
+Release Location:            https://github.com/NXPmicro/mfgtools -b master
+Origin:                      NXP (BSD-3-clause)
+                             zlib (zlib) - https://github.com/madler/zlib
+                             libusb (LGPL-2.1) - https://github.com/libusb/libusb.git
+                             Android Open Source Project (Apache-2.0) [sparse_format.h] - https://developer.android.com/
+
+Generated Binary:            uuu, uuu.exe, uuu_mac
+Outgoing License:            BSD-3-Clause
+Description and comments:    NXP I.MX Chip image deploy tools
+Release Location:            https://github.com/NXPmicro/mfgtools/releases
+Origin:                      NXP (BSD-3-clause)
+                             bzip2 (BSD-4-Clause) -  https://github.com/enthought/bzip2-1.0.6
+                             zlib (zlib) - https://github.com/madler/zlib
+                             libusb (LGPL-2.1) - https://github.com/libusb/libusb.git
+                             Android Open Source Project (Apache-2.0) [sparse_format.h] - https://developer.android.com/
