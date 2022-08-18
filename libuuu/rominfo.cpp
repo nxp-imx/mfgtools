@@ -124,7 +124,7 @@ static constexpr uint32_t IMG_V2X = 0x0B;
 #pragma pack ()
 
 
-size_t GetContainerActualSize(shared_ptr<FileBuffer> p, size_t offset, bool bROMAPI)
+size_t GetContainerActualSize(shared_ptr<DataBuffer> p, size_t offset, bool bROMAPI)
 {
 	if(bROMAPI)
 		return p->size() - offset;
@@ -185,7 +185,7 @@ bool CheckHeader(uint32_t *p)
 	return false;
 }
 
-size_t GetFlashHeaderSize(shared_ptr<FileBuffer> p, size_t offset)
+size_t GetFlashHeaderSize(shared_ptr<DataBuffer> p, size_t offset)
 {
 	static constexpr std::array<size_t, 4> offsets
 	{
@@ -196,7 +196,7 @@ size_t GetFlashHeaderSize(shared_ptr<FileBuffer> p, size_t offset)
 	};
 
 	for (const auto test_offset : offsets) {
-		if (p->m_avaible_size < (offset + test_offset)) {
+		if (p->size() < (offset + test_offset)) {
 			return 0;
 		}
 
@@ -208,7 +208,7 @@ size_t GetFlashHeaderSize(shared_ptr<FileBuffer> p, size_t offset)
 	return 0;
 }
 
-bool IsMBR(shared_ptr<FileBuffer> p)
+bool IsMBR(shared_ptr<DataBuffer> p)
 {
 	uint16_t * m = (uint16_t *)(p->data() + 510);
 	if (*m == 0xaa55)
@@ -216,12 +216,12 @@ bool IsMBR(shared_ptr<FileBuffer> p)
 	return false;
 }
 
-size_t ScanTerm(std::shared_ptr<FileBuffer> p, size_t &pos, size_t offset, size_t limited)
+size_t ScanTerm(std::shared_ptr<DataBuffer> p, size_t &pos, size_t offset, size_t limited)
 {
 	const char *tag = "UUUBURNXXOEUZX7+A-XY5601QQWWZ";
 
-	if (limited >= p->m_avaible_size)
-		limited = p->m_avaible_size;
+	if (limited >= p->size())
+		limited = p->size();
 
 	limited = limited - strlen(tag) - 64;
 

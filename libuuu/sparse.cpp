@@ -35,22 +35,6 @@
 #include <cstddef>
 #include <cstring>
 
-chunk_header_t * SparseFile::get_next_chunk(uint8_t *p, size_t &pos)
-{
-	if (pos == 0)
-	{
-		sparse_header *pheader = (sparse_header*)p;
-		if (pheader->magic != SPARSE_HEADER_MAGIC) {
-			set_last_err_string("Sparse heade Magic missed");
-			return nullptr;
-		}
-		pos += pheader->file_hdr_sz;
-	}
-
-	chunk_header_t *pchunk = (chunk_header_t*)(p + pos);
-	pos += pchunk->total_sz;
-	return pchunk;
-}
 
 int SparseFile::init_header(size_t blsz, int blcount)
 {

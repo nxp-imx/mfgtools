@@ -78,7 +78,7 @@ bool is_env_exist(string key)
 }
 
 int get_string_in_square_brackets(const std::string &cmd, std::string &context);
-int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap = nullptr);
+int parser_cmd_list_file(shared_ptr<DataBuffer> pbuff, CmdMap *pCmdMap = nullptr);
 std::string remove_square_brackets(const std::string &cmd);
 
 template <class T>
@@ -919,9 +919,11 @@ int run_cmds(const char *procotal, CmdCtx *p)
 
 	if (!g_cmd_list_file.empty())
 	{
-		shared_ptr<FileBuffer> pbuff = get_file_buffer(g_cmd_list_file);
-		if (pbuff == nullptr)
+		shared_ptr<FileBuffer> pin = get_file_buffer(g_cmd_list_file);
+		if (pin == nullptr)
 			return -1;
+
+		shared_ptr<DataBuffer> pbuff = pin->request_data(0, UINT64_MAX);
 		if(parser_cmd_list_file(pbuff, &cmdmap))
 			return -1;
 		pCmdMap = &cmdmap;
@@ -1048,12 +1050,12 @@ int check_version(string str)
 
 int uuu_run_cmd_script(const char * buff, int /*dry*/)
 {
-	shared_ptr<FileBuffer> p(new FileBuffer((void*)buff, strlen(buff)));
+	shared_ptr<DataBuffer> p(new DataBuffer((void*)buff, strlen(buff)));
 	
 	return parser_cmd_list_file(p);
 }
 
-int parser_cmd_list_file(shared_ptr<FileBuffer> pbuff, CmdMap *pCmdMap)
+int parser_cmd_list_file(shared_ptr<DataBuffer> pbuff, CmdMap *pCmdMap)
 {
 	char uuu_version[] = "uuu_version";
 	string str;
@@ -1122,7 +1124,8 @@ int uuu_auto_detect_file(const char *filename)
 	}
 
 	string str= "uuu_version";
-	void *p1 = buffer->data();
+	shared_ptr<DataBuffer> pData = buffer->request_data(0, UINT_MAX);
+	void *p1 = pData->data();
 	void *p2 = (void*)str.data();
 	if (memcmp(p1, p2, str.size()) == 0)
 	{
@@ -1132,7 +1135,7 @@ int uuu_auto_detect_file(const char *filename)
 
 		g_cmd_list_file = fn.substr(pos+1);
 
-		return parser_cmd_list_file(buffer);
+		return parser_cmd_list_file(pData);
 	}
 
 	//flash.bin or uboot.bin
@@ -1170,6 +1173,7 @@ int uuu_wait_uuu_finish(int deamon, int dry)
 	if(polling_usb(exit))
 		return -1;
 
+	clean_up_filemap();
 	return 0;
 }
 

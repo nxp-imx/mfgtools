@@ -100,10 +100,10 @@ int SDPCmdBase::init_cmd()
 	return 0;
 }
 
-IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<FileBuffer> data, size_t &off, size_t limit)
+IvtHeader *SDPCmdBase::search_ivt_header(shared_ptr<DataBuffer> data, size_t &off, size_t limit)
 {
-	if (limit >= data->m_avaible_size)
-		limit = data->m_avaible_size;
+	if (limit >= data->size())
+		limit = data->size();
 
 	for (; off < limit; off += 0x4)
 	{
@@ -149,11 +149,12 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 	}
 	init_cmd();
 
-	shared_ptr<FileBuffer> buff, p = get_file_buffer(m_filename, true);
+	shared_ptr<FileBuffer> p = get_file_buffer(m_filename, true);
 
 	if (!p)
 		return -1;
 
+	shared_ptr<DataBuffer> buff;
 	buff = p->request_data(0, m_scan_limited);
 
 	size_t off = 0;
@@ -359,10 +360,12 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 	uint8_t *pbuff;
 	ssize_t offset = 0;
 
-	shared_ptr<FileBuffer> fbuff, p1= get_file_buffer(m_filename, true);
+	shared_ptr<FileBuffer> p1= get_file_buffer(m_filename, true);
 
 	if (p1 == nullptr)
 		return -1;
+
+	shared_ptr<DataBuffer> fbuff;
 
 	fbuff = p1->request_data(0, m_scan_limited);
 
@@ -418,7 +421,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 				offset += GetContainerActualSize(fbuff, offset);
 			}
 
-			if (offset >= fbuff->m_avaible_size)
+			if (offset >= fbuff->size())
 			{
 				set_last_err_string("Unknown Image type, can't use skipspl format");
 				return -1;
@@ -672,10 +675,11 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 		return 0;
 	}
 
-	shared_ptr<FileBuffer> buff, p1 = get_file_buffer(m_filename, true);
+	shared_ptr<FileBuffer> p1 = get_file_buffer(m_filename, true);
 	if (!p1)
 		return -1;
 
+	shared_ptr<DataBuffer> buff;
 	buff = p1->request_data(0, m_scan_limited);
 
 	size_t off = 0;

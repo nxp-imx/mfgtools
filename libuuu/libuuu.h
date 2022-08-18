@@ -139,4 +139,8 @@ void uuu_set_poll_period(int period_in_milliseconds);
  */
 void uuu_set_debug_level(uint32_t mask);
 
+/*
+ * 0 disable small memory mode, buffer all data, it is used for multi-board program.
+ */
+void uuu_set_small_mem(uint32_t val);
 #endif
