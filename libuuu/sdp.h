@@ -106,7 +106,7 @@ protected:
 	HAB_t get_hab_type(HIDReport *report);
 	int get_status(HIDReport *p, uint32_t &status, uint8_t report_id);
 	int init_cmd();
-	IvtHeader * search_ivt_header(std::shared_ptr<FileBuffer> data, size_t &off, size_t limit=ULLONG_MAX);
+	IvtHeader * search_ivt_header(std::shared_ptr<DataBuffer> data, size_t &off, size_t limit=ULLONG_MAX);
 
 	std::string m_filename;
 	SDPCmd m_spdcmd;

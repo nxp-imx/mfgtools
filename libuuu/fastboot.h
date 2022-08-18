@@ -37,6 +37,7 @@
 
 class FBFlashCmd;
 class FileBuffer;
+class DataBuffer;
 class TransBase;
 
 /*

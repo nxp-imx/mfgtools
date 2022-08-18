@@ -882,6 +882,8 @@ int main(int argc, char **argv)
 			if (s == "-d")
 			{
 				deamon = 1;
+				uuu_set_small_mem(0);
+
 			}else if (s == "-s")
 			{
 				shell = 1;

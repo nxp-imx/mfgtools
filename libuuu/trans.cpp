@@ -33,6 +33,7 @@
 #include "libuuu.h"
 #include "liberror.h"
 #include "libusb.h"
+#include "zip.h"
 
 extern "C"
 {
@@ -121,6 +122,7 @@ int HIDTrans::write(void *buff, size_t size)
 	int ret;
 	uint8_t *p = (uint8_t *)buff;
 	int actual_size;
+
 	if (m_outEP)
 	{
 		ret = libusb_interrupt_transfer(

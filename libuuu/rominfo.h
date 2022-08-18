@@ -37,6 +37,7 @@
 
 class ConfigItem;
 class FileBuffer;
+class DataBuffer;
 
 constexpr uint32_t ROM_INFO_HID = 0x1;
 constexpr uint32_t ROM_INFO_HID_MX23 = 0x2;
@@ -66,7 +67,6 @@ struct ROM_INFO
 const ROM_INFO * search_rom_info(const std::string &s);
 const ROM_INFO * search_rom_info(const ConfigItem *item);
 
-size_t GetContainerActualSize(std::shared_ptr<FileBuffer> p, size_t offset, bool bROMAPI=false);
-size_t GetFlashHeaderSize(std::shared_ptr<FileBuffer> p, size_t offset = 0);
-bool IsMBR(std::shared_ptr<FileBuffer> p);
-size_t ScanTerm(std::shared_ptr<FileBuffer> p, size_t &pos,  size_t offset=512, size_t limited=0x800000);
+size_t GetContainerActualSize(std::shared_ptr<DataBuffer> p, size_t offset, bool bROMAPI=false);
+size_t GetFlashHeaderSize(std::shared_ptr<DataBuffer> p, size_t offset = 0);
+

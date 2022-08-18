@@ -98,10 +98,11 @@ int SDPSCmd::run(CmdCtx *pro)
 	if(dev.open(pro->m_dev))
 		return -1;
 
-	shared_ptr<FileBuffer> p, p1 = get_file_buffer(m_filename, true);
+	shared_ptr<FileBuffer> p1 = get_file_buffer(m_filename, true);
 	if (!p1)
 		return -1;
 
+	shared_ptr<DataBuffer> p;
 	HIDReport report(&dev);
 	report.set_skip_notify(false);
 
@@ -133,7 +134,7 @@ int SDPSCmd::run(CmdCtx *pro)
 	}
 	else
 	{
-		p = get_file_buffer(m_filename); //request all data
+		p = p1->request_data(0, UINT64_MAX); //request all data
 	}
 
 	if (m_bskipflashheader)
