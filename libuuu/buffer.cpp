@@ -1109,8 +1109,24 @@ int FSzstd::Decompress(const string& backfile, shared_ptr<FileBuffer>outp)
 	{
 		return -1;
 	}
-	if (outp->reserve(inp->size() * 16))
-		return -1;
+
+	shared_ptr<FileBuffer> buff;
+	buff = inp->request_data(0, 0x1000);
+	size_t decompress_size = ZSTD_getFrameContentSize(buff->data(), 0x1000);
+
+	if (decompress_size < inp->size())
+	{
+		decompress_size = inp->size() * 16;
+		if (outp->reserve(decompress_size))
+			return -1;
+	}
+	else
+	{
+		atomic_fetch_or(&outp->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
+		if (outp->resize(decompress_size))
+			return -1;
+
+	}
 
 	size_t offset = 0;
 	uuu_notify ut;
@@ -1118,7 +1134,6 @@ int FSzstd::Decompress(const string& backfile, shared_ptr<FileBuffer>outp)
 	ut.str = (char*)backfile.c_str();
 	call_notify(ut);
 	size_t const toRead = ZSTD_DStreamInSize();
-	std::shared_ptr<FileBuffer> buff;
 
 	while ((buff = inp->request_data(offset, toRead)))
 	{
