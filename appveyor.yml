@@ -1,7 +1,7 @@
 version: 1.4.{build}
 image:
  - Visual Studio 2019
- - Visual Studio 2017
+ - Visual Studio 2022
  - Ubuntu1804
  - macOS
 
@@ -37,24 +37,15 @@ install:
 build_script:
 
 # below powershell actions equals to retarget projects to newest SDK and tool v142 in visual studio 2019
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\uuu.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\uuu.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\bzip2.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\bzip2.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\libuuu.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\libuuu.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\zlib.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\zlib.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_dll_2017.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII libusb\msvc\libusb_dll_2017.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc msvc\uuu-static-link.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII msvc\uuu-static-link.vcxproj}
-- ps: If($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019")  {(gc libusb\msvc\libusb_static_2017.vcxproj) -replace '10.0.16299.0', '10.0' | Out-File -encoding ASCII libusb\msvc\libusb_static_2017.vcxproj}
-
 - cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2019" (set PLATFORMTOOLSET=v142)
-- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (set PLATFORMTOOLSET=v141)
+- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2022" (set PLATFORMTOOLSET=v143)
 
 - cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2019" (msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /p:PlatformToolset=%PLATFORMTOOLSET% /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll")
+
 #coverity tool is only available to visual studio 2017 imagine in appveyor
-- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /p:PlatformToolset=%PLATFORMTOOLSET% /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll")
-
-- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (7z a -tzip mfg.zip cov-int)
-
-- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (curl --form token=%coverity_token% --form email=frank.li@nxp.com --form file=@mfg.zip --form version="automation test"  --form description="testing coverity automation" https://scan.coverity.com/builds?project=NXPmicro%2Fmfgtools)
+#- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (cov-build --dir cov-int msbuild %APPVEYOR_BUILD_FOLDER%/msvc/uuu.sln /p:PlatformToolset=%PLATFORMTOOLSET% /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll")
+#- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (7z a -tzip mfg.zip cov-int)
+#- cmd: if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" (curl --form token=%coverity_token% --form email=frank.li@nxp.com --form file=@mfg.zip --form version="automation test"  --form description="testing coverity automation" https://scan.coverity.com/builds?project=NXPmicro%2Fmfgtools)
 
 - cmd: git clean -dxf .
 
