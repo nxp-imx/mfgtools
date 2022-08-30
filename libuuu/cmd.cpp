@@ -791,7 +791,9 @@ int CmdEnv::parser(char *p)
 			last_pos = i.second;
 		}
 	}
-	m_unfold_cmd.append(&*last_pos);
+
+	if(last_pos != cmd.end())
+		m_unfold_cmd.append(&*last_pos);
 
 	return 0;
 }
