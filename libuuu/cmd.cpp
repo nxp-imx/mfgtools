@@ -772,8 +772,12 @@ int CmdEnv::parser(char *p)
 #else
 				size_t len;
 				getenv_s(&len, nullptr, 0, key.c_str());
-				if (!len)
-					return {false, {}};
+				if (!len){
+					/* To have the same behavior as Linux when uuu is provided with variables in the way : -e var=
+					 * We return null char as windows cannot store empty environment variables
+					 */
+					return {true, "\0"};
+				}
 				string value(len-1, '\0');
 				getenv_s(&len, &value[0], len, key.c_str());
 				return {true, value};
