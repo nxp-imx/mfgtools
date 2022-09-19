@@ -520,11 +520,55 @@ public:
 
 }g_fsbz2;
 
+class Gzstream : public CommonStream
+{
+	z_stream m_strm;
+	size_t m_in_size = 0;
+	size_t m_out_size = 0;
+
+public:
+	Gzstream()
+	{
+		memset(&m_strm, 0, sizeof(m_strm));
+		inflateInit2(&m_strm, 15 + 16);
+	}
+	~Gzstream()
+	{
+		deflateEnd(&m_strm);
+	}
+	virtual int set_input_buff(void* p, size_t sz) override
+	{
+		m_strm.next_in = (Bytef*)p;
+		m_strm.avail_in = m_in_size = sz;
+		return 0;
+	};
+	virtual int set_output_buff(void* p, size_t sz) override
+	{
+		m_strm.next_out = (Bytef*)p;
+		m_strm.avail_out = m_out_size = sz;
+		return 0;
+	};
+	virtual size_t get_input_pos()
+	{
+		return m_in_size - m_strm.avail_in;
+	};
+	virtual size_t get_output_pos()
+	{
+		return m_out_size - m_strm.avail_out;
+	};
+	virtual int decompress()
+	{
+		return inflate(&m_strm, Z_SYNC_FLUSH);
+	};
+
+	virtual size_t get_default_input_size() { return 0x10000; }
+};
+
 static class FSGz : public FSCompressStream
 {
 public:
 	FSGz() { m_ext = ".GZ"; };
-	virtual int Decompress(const string& backfile, shared_ptr<FileBuffer>outp) override;
+	virtual std::shared_ptr<CommonStream> create_stream() { return std::make_shared<Gzstream>(); }
 }g_fsgz;
 
 class ZstdStream:public CommonStream
@@ -973,64 +1017,6 @@ bool FSBz2::seekable(const string& backfile)
 	}
 
 	return false;
-}
-
-
-int FSGz::Decompress(const string& backfile, shared_ptr<FileBuffer>p)
-{
-	gzFile fp = gzopen(backfile.c_str() + 1, "r");
-	if (fp == nullptr)
-	{
-		set_last_err_string("Open file failure");
-		return -1;
-	}
-
-	shared_ptr<FileBuffer> pb = get_file_buffer(backfile);
-
-	p->reserve(pb->size() * 8); /* guest uncompress size */
-
-	ssize_t sz = 0x100000;
-	if (sz > pb->size())
-		sz = p->size();
-
-	uuu_notify ut;
-	ut.type = uuu_notify::NOTIFY_DECOMPRESS_START;
-	ut.str = (char*)backfile.c_str();
-	call_notify(ut);
-
-	ut.type = uuu_notify::NOTIFY_DECOMPRESS_SIZE;
-	ut.total = pb->size();
-	call_notify(ut);
-
-	size_t cur = 0;
-	while (!gzeof(fp))
-	{
-		size_t ret = gzread(fp, p->data() + cur, sz);
-		if (sz < 0)
-		{
-			set_last_err_string("decompress error");
-			return -1;
-		}
-		cur += ret;
-		p->reserve(cur + sz);
-
-		ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
-		ut.index = gzoffset(fp);
-		call_notify(ut);
-	}
-
-	p->resize(cur);
-	p->m_avaible_size = cur;
-
-	ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
-	ut.index = pb->size();
-	call_notify(ut);
-
-	gzclose(fp);
-	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
-	p->m_request_cv.notify_all();
-
-	return 0;
 }
 
 bool FSzstd::seekable(const string& backfile)
