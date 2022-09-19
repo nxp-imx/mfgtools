@@ -456,6 +456,7 @@ public:
 	virtual int decompress() = 0;
 
 	virtual size_t get_default_input_size() { return 0x1000; }
+	virtual size_t decompress_size(const string& backfile) { return 0; }
 };
 
 class FSCompressStream : public FSBackFile
@@ -494,7 +495,7 @@ public:
 		m_strm.avail_out = m_out_size = sz;
 		return 0;
 	};
-	virtual size_t get_input_pos()
+	virtual size_t get_input_pos() override
 	{
 		return m_in_size - m_strm.avail_in;
 	};
@@ -502,12 +503,12 @@ public:
 	{
 		return m_out_size - m_strm.avail_out;
 	};
-	virtual int decompress()
+	virtual int decompress() override
 	{
 		return BZ2_bzDecompress(&m_strm);
 	};
 
-	virtual size_t get_default_input_size() { return 0x10000; }
+	virtual size_t get_default_input_size() override { return 0x10000; }
 };
 
 static class FSBz2 : public FSCompressStream
@@ -611,6 +612,19 @@ public:
 		return ZSTD_DStreamInSize();
 	}
 
+	size_t decompress_size(const string& backfile)
+	{
+		shared_ptr<FileBuffer> inp = get_file_buffer(backfile, true);
+		if (inp == nullptr)
+		{
+			return 0;
+		}
+		size_t sz = ZSTD_DStreamInSize();
+		shared_ptr<DataBuffer> pb = inp->request_data(0, sz);
+		size_t decompressed_sz = ZSTD_getFrameContentSize(pb->data(), sz);
+
+		return decompressed_sz;
+	}
 	ZstdStream()
 	{
 		m_dctx = ZSTD_createDCtx();
@@ -1073,6 +1087,13 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 	if (inp == nullptr)
 	{
 		return -1;
+	}
+
+	size_t sz = cs->decompress_size(backfile);
+	if (sz)
+	{
+		outp->resize(sz);
+		atomic_fetch_or(&outp->m_dataflags, FILEBUFFER_FLAG_KNOWN_SIZE);
 	}
 
 	std::shared_ptr<DataBuffer> buff;
