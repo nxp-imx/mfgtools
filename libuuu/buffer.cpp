@@ -382,7 +382,7 @@ int FSHttp::http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, str
 	ut.total = p->size();
 	call_notify(ut);
 
-	for (size_t i = 0; i < p->size(); i += max)
+	for (size_t i = 0; i < p->size() && !p->m_reset_stream; i += max)
 	{
 		size_t sz = p->size() - i;
 		if (sz > max)
