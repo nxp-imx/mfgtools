@@ -156,6 +156,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 
 	shared_ptr<DataBuffer> buff;
 	buff = p->request_data(0, m_scan_limited);
+	if (!buff) return -1;
 
 	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off);
@@ -368,6 +369,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 	shared_ptr<DataBuffer> fbuff;
 
 	fbuff = p1->request_data(0, m_scan_limited);
+	if (!fbuff) return -1;
 
 	if (m_Ivt < 0)
 	{
@@ -681,6 +683,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 
 	shared_ptr<DataBuffer> buff;
 	buff = p1->request_data(0, m_scan_limited);
+	if (!buff) return -1;
 
 	size_t off = 0;
 	IvtHeader *pIVT = search_ivt_header(buff, off, m_scan_limited);
