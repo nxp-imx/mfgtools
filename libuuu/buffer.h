@@ -41,7 +41,7 @@
 #include <map>
 #include <queue>
 #include "liberror.h"
-
+#include <cstring>
 #ifdef _MSC_VER
 #include <Windows.h>
 #else
@@ -92,9 +92,9 @@ public:
 	size_t m_output_size = 0;
 	size_t m_output_offset = 0;
 	virtual int DataConvert() { return -1; };
-	std::vector<byte> m_data;
+	std::vector<uint8_t> m_data;
 	std::mutex m_mutex;
-	std::atomic_int m_dataflags = 0;
+	std::atomic_int m_dataflags{0};
 	uint8_t* m_pData = NULL;
 	uint8_t* data()
 	{
@@ -204,7 +204,7 @@ public:
 	std::shared_ptr<FragmentBlock> m_last_db;
 	size_t m_seg_blk_size = 0x800000;
 	size_t m_totall_buffer_size = 8 * m_seg_blk_size;
-	std::atomic_bool m_reset_stream = false;
+	std::atomic_bool m_reset_stream { false };
 
 	//used for continue decompress\loading only
 	std::shared_ptr<FragmentBlock> request_new_blk();
