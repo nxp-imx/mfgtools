@@ -621,6 +621,8 @@ public:
 		}
 		size_t sz = ZSTD_DStreamInSize();
 		shared_ptr<DataBuffer> pb = inp->request_data(0, sz);
+		if (!pb)
+			return 0;
 		size_t decompressed_sz = ZSTD_getFrameContentSize(pb->data(), sz);
 
 		return decompressed_sz;
@@ -940,6 +942,8 @@ public:
 		m_data.resize(m_output_size);
 
 		shared_ptr<DataBuffer> input = m_input->request_data(m_input_offset, m_input_sz);
+		if (!input)
+			return -1;
 		unsigned int len = m_output_size;
 		m_ret = BZ2_bzBuffToBuffDecompress((char*)m_data.data(),
 			&len,
@@ -969,6 +973,8 @@ shared_ptr<FragmentBlock> FSBz2::ScanCompressblock(const string& backfile, size_
 
 	size_t request_size = 1 * 1000 * 1000;
 	shared_ptr<DataBuffer> pd = pbz->request_data(input_offset, request_size);
+	if (!pd)
+		return NULL;
 
 	uint8_t* p1 = pd->data();
 
@@ -1012,6 +1018,9 @@ bool FSBz2::seekable(const string& backfile)
 	shared_ptr<FileBuffer> file = get_file_buffer(backfile, true);
 	shared_ptr<DataBuffer> p = file->request_data(0, 1024*1024);
 
+	if (!p)
+		return false;
+
 	int header_num = 0;
 	uint8_t* ptr = p->data();
 
@@ -1053,6 +1062,8 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 
 	std::shared_ptr<DataBuffer> buff;
 	buff = inp->request_data(0, 0x1000);
+	if (!buff)
+		return -1;
 
 	size_t offset = 0;
 	uuu_notify ut;
@@ -1071,6 +1082,9 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 
 	while ((buff = inp->request_data(offset, cs->get_default_input_size())))
 	{
+		if (!buff)
+			return -1;
+
 		//ZSTD_inBuffer input = { buff->data(), buff->size(), 0 };
 		cs->set_input_buff(buff->data(), buff->size());
 		/* Given a valid frame, zstd won't consume the last byte of the frame
@@ -1093,10 +1107,13 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 			outOffset += cs->get_output_pos() - old;
 
 			if (ret < 0) {
-				set_last_err_string("zdecompress errror");
+				blk->m_ret = ret;
+				set_last_err_string("decompress errror");
+				outp->m_request_cv.notify_all();
 				return -1;
 			}
 
+			blk->m_ret = 0;
 			blk->m_actual_size = cs->get_output_pos();
 
 			atomic_fetch_or(&blk->m_dataflags, FragmentBlock::CONVERT_PARTIAL);
@@ -1472,6 +1489,9 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 						}
 					}
 				}
+
+				if (blk->m_ret)
+					return -1;
 
 				if ((blk->m_dataflags & FragmentBlock::CONVERT_DONE))
 				{

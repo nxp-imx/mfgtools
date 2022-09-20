@@ -243,6 +243,8 @@ int FBDownload::run(CmdCtx *ctx)
 		return -1;
 
 	shared_ptr<DataBuffer> pdata = buff->request_data(0, UINT64_MAX);
+	if (!pdata)
+		return -1;
 	string_ex cmd;
 	cmd.format("download:%08x", pdata->size());
 
@@ -356,6 +358,8 @@ int FBCopy::run(CmdCtx *ctx)
 			return -1;
 		}
 		shared_ptr<DataBuffer> buff = pin->request_data(0, UINT64_MAX);
+		if (!buff)
+			return -1;
 		cmd.format("WOpen:%s", m_target_file.c_str());
 		if (fb.Transport(cmd, nullptr, 0))
 		{
@@ -709,6 +713,8 @@ int FBFlashCmd::run(CmdCtx *ctx)
 	if (m_scanterm)
 	{
 		pb = pin->request_data(0, m_scan_limited);
+		if (!pb)
+			return -1;
 		size_t length,pos=0;
 		if (IsMBR(pb))
 		{
@@ -731,6 +737,8 @@ int FBFlashCmd::run(CmdCtx *ctx)
 	if (pin->size() <= max)
 	{
 		pb = pin->request_data(0, pin->size());
+		if (!pb)
+			return -1;
 
 		if (flash(&fb, pb->data(), pb->size()))
 			return -1;
@@ -739,6 +747,8 @@ int FBFlashCmd::run(CmdCtx *ctx)
 	{
 		size_t pos = 0;
 		pb = pin->request_data(0, sizeof(sparse_header));
+		if (!pb)
+			return -1;
 		sparse_header * pfile = (sparse_header *)pb->data();
 
 		if (!SparseFile::is_validate_sparse_file(pb->data(), sizeof(sparse_header)))
@@ -763,10 +773,14 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		for(size_t nblk=0; nblk < pfile->total_chunks && pos <= pin->size(); nblk++)
 		{
 			pb = pin->request_data(pos, sizeof(chunk_header_t));
+			if (!pb)
+				return -1;
 			pheader = (chunk_header_t*)pb->data();
 			size_t oldpos = pos;
 			pos += pheader->total_sz;
 			pb = pin->request_data(oldpos, pos - oldpos);
+			if (!pb)
+				return -1;
 			pheader = (chunk_header_t*)pb->data();
 
 			size_t sz = sf.push_one_chuck(pheader, pheader + 1);
@@ -851,6 +865,8 @@ bool FBFlashCmd::isffu(shared_ptr<FileBuffer> p)
 {
 	shared_ptr<DataBuffer> data = p->request_data(0, sizeof(FFU_SECURITY_HEADER));
 
+	if (!data)
+		return -1;
 	FFU_SECURITY_HEADER *h = (FFU_SECURITY_HEADER*)data->data();
 	if (strncmp((const char*)h->signature, FFU_SECURITY_SIGNATURE, sizeof(h->signature)) == 0)
 		return true;
@@ -866,7 +882,8 @@ int FBFlashCmd::flash_ffu_oneblk(FastBoot *fb, shared_ptr<FileBuffer> pin, size_
 	
 	shared_ptr<DataBuffer> p;
 	p = pin->request_data(off, blksz);
-
+	if (!p)
+		return -1;
 	chunk_header_t ct;
 	ct.chunk_type = CHUNK_TYPE_DONT_CARE;
 	ct.chunk_sz = blkindex;
@@ -884,6 +901,8 @@ int FBFlashCmd::flash_ffu_oneblk(FastBoot *fb, shared_ptr<FileBuffer> pin, size_
 int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> pin)
 {
 	shared_ptr<DataBuffer> p = pin->request_data(0, sizeof(FFU_SECURITY_HEADER));
+	if (!p)
+		return -1;
 	FFU_SECURITY_HEADER *h = (FFU_SECURITY_HEADER*)p->data();
 	if (strncmp((const char*)h->signature, FFU_SECURITY_SIGNATURE, sizeof(h->signature)) != 0)
 	{
@@ -896,6 +915,8 @@ int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> pin)
 	off = round_up(off, (size_t)h->dwChunkSizeInKb * 1024);
 
 	p = pin->request_data(0, off + sizeof(FFU_IMAGE_HEADER));
+	if (!p)
+		return -1;
 
 	FFU_IMAGE_HEADER *pIh = (FFU_IMAGE_HEADER *)(p->data() + off);
 
@@ -909,6 +930,7 @@ int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> pin)
 	off = round_up(off, (size_t)h->dwChunkSizeInKb * 1024);
 
 	p = pin->request_data(0, off + sizeof(FFU_STORE_HEADER));
+	if (!p) return -1;
 	FFU_STORE_HEADER *pIs = (FFU_STORE_HEADER*) (p->data() + off);
 
 	if(pIs->MajorVersion == 1)
@@ -917,7 +939,7 @@ int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> pin)
 		off += pIs->dwValidateDescriptorLength + sizeof(FFU_STORE_HEADER);
 
 	p = pin->request_data(0, off + pIs->dwWriteDescriptorLength);
-
+	if (!p) return -1;
 	size_t block_off = off + pIs->dwWriteDescriptorLength;
 	block_off = round_up(block_off, (size_t)h->dwChunkSizeInKb * 1024);
 

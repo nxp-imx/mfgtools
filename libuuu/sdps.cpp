@@ -113,6 +113,9 @@ int SDPSCmd::run(CmdCtx *pro)
 	if (m_bscanterm)
 	{
 		p = p1->request_data(0, m_scan_limited);
+		if (!p)
+			return -1;
+
 		if (IsMBR(p))
 		{
 			size_t pos = 0, length;
@@ -135,6 +138,7 @@ int SDPSCmd::run(CmdCtx *pro)
 	else
 	{
 		p = p1->request_data(0, UINT64_MAX); //request all data
+		if (!p) return -1;
 	}
 
 	if (m_bskipflashheader)
