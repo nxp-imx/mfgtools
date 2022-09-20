@@ -973,7 +973,7 @@ shared_ptr<FragmentBlock> FSBz2::ScanCompressblock(const string& backfile, size_
 	size_t request_size = 1 * 1000 * 1000;
 	shared_ptr<DataBuffer> pd = pbz->request_data(input_offset, request_size);
 
-	byte* p1 = pd->data();
+	uint8_t* p1 = pd->data();
 
 	size_t sz = min(request_size - 10, pd->size());
 
@@ -1040,38 +1040,6 @@ bool FSzstd::seekable(const string& backfile)
 
 shared_ptr<FragmentBlock> FSzstd::ScanCompressblock(const string& backfile, size_t& input_offset, size_t& output_offset)
 {
-	shared_ptr<FileBuffer> inp = get_file_buffer(backfile, true);
-	if (inp == nullptr)
-	{
-		return NULL;
-	}
-	size_t sz = ZSTD_DStreamInSize();
-
-	shared_ptr<DataBuffer> pb = inp->request_data(input_offset, sz);
-
-	size_t decompressed_sz = ZSTD_getFrameContentSize(pb->data(), sz );
-
-	uint32_t const magic = *(uint32_t*) pb->data();
-
-	if ((magic & ZSTD_MAGIC_SKIPPABLE_MASK) == ZSTD_MAGIC_SKIPPABLE_START) 
-	{
-		shared_ptr<FragmentBlock> p = shared_ptr<FragmentBlock>(new Bz2FragmentBlock);
-		size_t compress_size = *(uint32_t*)(pb->data() + 8);
-
-		size_t decompressed_sz = ZSTD_getFrameContentSize(pb->data() + 12, sz - 12);
-
-		pb = inp->request_data(input_offset, compress_size + 12);
-		size_t x = ZSTD_findFrameCompressedSize(pb->data() + 12, compress_size);
-
-		p->m_output_offset = output_offset;
-		p->m_input_offset = input_offset;
-		p->m_input_sz = compress_size;
-
-		input_offset += compress_size + 12;
-		output_offset += decompressed_sz;
-
-		return p;
-	}
 	return NULL;
 };
 
@@ -1464,7 +1432,7 @@ void FileBuffer::truncate_old_data_in_pool()
 		{
 			blk->m_dataflags = 0;
 			blk->m_actual_size = 0;
-			vector<byte> v;
+			vector<uint8_t> v;
 			free_sz += blk->m_data.size();
 			blk->m_data.swap(v);
 		}
@@ -1551,7 +1519,7 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 			else
 			{
 				memcpy(data, blk->m_data.data() + off, item_sz);
-				data = ((byte*)data) + item_sz;
+				data = ((uint8_t*)data) + item_sz;
 				sz -= item_sz;
 				offset += item_sz;
 
