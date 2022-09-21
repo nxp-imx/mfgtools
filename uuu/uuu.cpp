@@ -139,6 +139,7 @@ void print_help(bool detail = false)
 		"    -T          Timeout second for wait next known usb device appeared at stage switch\n"
 		"    -e          set environment variable key=value\n"
 		"    -pp         usb polling period in milliseconds\n"
+		"    -dm         disable small memory\n"
 		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
 		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
 		"uuu -udev       linux: show udev rule to avoid sudo each time \n"
@@ -884,7 +885,12 @@ int main(int argc, char **argv)
 				deamon = 1;
 				uuu_set_small_mem(0);
 
-			}else if (s == "-s")
+			}
+			else if (s == "-dm")
+			{
+				uuu_set_small_mem(0);
+			}
+			else if (s == "-s")
 			{
 				shell = 1;
 				g_verbose = 1;
