@@ -84,6 +84,7 @@ public:
 		CONVERT_START = 0x4,
 		CONVERT_PARTIAL = 0x8,
 	};
+	int m_magic_number = 0x67890123;
 	size_t m_input_offset = 0;
 	size_t m_input_sz = 0;
 	std::shared_ptr<FileBuffer> m_input;
