@@ -1463,11 +1463,12 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 				if(offset >= this->m_DataSize)
 					return -1;
 			}
-			m_request_cv.wait(lck);
+			auto now = std::chrono::system_clock::now();
+			m_request_cv.wait_until(lck, now + 500ms);
 		}
 		do
 		{
-			{
+			{   /*lock hold*/
 				std::unique_lock<std::mutex> lock(blk->m_mutex);
 
 				if (blk->m_actual_size >= (offset + sz - blk->m_output_offset))
@@ -1480,12 +1481,7 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 						if (offset < m_last_db->m_output_offset && !(blk->m_dataflags & FragmentBlock::CONVERT_DONE))
 						{
 							m_reset_stream = true;
-							m_dataflags = 0;
-							m_avaible_size = 0;
-							this->m_aync_thread.join();
-							m_reset_stream = false;
-
-							this->reload(m_filename, true);
+							break;
 						}
 					}
 				}
@@ -1499,10 +1495,22 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 					break;
 				}
 			}
-			m_request_cv.wait(lck);
+			auto now = std::chrono::system_clock::now();
+			m_request_cv.wait_until(lck, now + 500ms);
 		} while (1);
 
+		if (m_reset_stream)
 		{
+			m_dataflags = 0;
+			m_avaible_size = 0;
+			this->m_aync_thread.join();
+			m_reset_stream = false;
+
+			this->reload(m_filename, true);
+			continue;
+		}
+
+		{   /*hold lock*/
 			std::unique_lock<std::mutex> lock(blk->m_mutex);
 
 			size_t off = offset - blk->m_output_offset;
@@ -1513,7 +1521,7 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 
 			if (item_sz >= sz)
 			{
-				memcpy(data, blk->m_data.data() + off, sz);
+				memcpy(data, blk->data() + off, sz);
 				atomic_fetch_and(&blk->m_dataflags, ~FragmentBlock::USING);
 
 				return_sz += sz;
@@ -1610,6 +1618,7 @@ std::shared_ptr<FragmentBlock> FileBuffer::request_new_blk()
 		if (m_seg_map.empty())
 		{
 			std::shared_ptr<FragmentBlock> p(new FragmentBlock);
+			lock_guard<mutex> lock(m_seg_map_mutex);
 			p->m_output_size = m_seg_blk_size;
 			p->m_data.resize(m_seg_blk_size);
 			m_seg_map[0] = p;
@@ -1630,6 +1639,8 @@ std::shared_ptr<FragmentBlock> FileBuffer::request_new_blk()
 
 			while (offset > m_last_request_offset + m_totall_buffer_size)
 			{
+				if (m_reset_stream)
+					return NULL;
 				std::unique_lock<std::mutex> lck(m_pool_load_cv_mutex);
 				m_pool_load_cv.wait(lck);
 			}
