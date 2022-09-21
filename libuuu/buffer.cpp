@@ -1519,6 +1519,9 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 
 			size_t item_sz = blk->m_actual_size - off;
 
+			if (off > blk->m_actual_size)
+				return -1;
+
 			if (item_sz >= sz)
 			{
 				memcpy(data, blk->data() + off, sz);
