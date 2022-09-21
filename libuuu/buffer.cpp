@@ -137,9 +137,9 @@ public:
 	virtual bool exist(const string &backfile, const string &filename) = 0;
 	virtual int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) = 0;
 
-	virtual int Decompress(const string& backfifle, shared_ptr<FileBuffer>outp) { return 0; };
-	virtual bool seekable(const string& backfile) { return false; }
-	virtual std::shared_ptr<FragmentBlock> ScanCompressblock(const string& backfile, size_t& input_offset, size_t& output_offset) { return NULL; };
+	virtual int Decompress(const string& /*backfifle*/, shared_ptr<FileBuffer> /*outp*/) { return 0; };
+	virtual bool seekable(const string& /*backfile*/) { return false; }
+	virtual std::shared_ptr<FragmentBlock> ScanCompressblock(const string& /*backfile*/, size_t& /*input_offset*/, size_t& /*output_offset*/) { return NULL; };
 	virtual int PreloadWorkThread(shared_ptr<FileBuffer>outp);
 
 	virtual int split(const string &filename, string *outbackfile, string *outfilename, bool dir=false)
@@ -456,7 +456,7 @@ public:
 	virtual int decompress() = 0;
 
 	virtual size_t get_default_input_size() { return 0x1000; }
-	virtual size_t decompress_size(const string& backfile) { return 0; }
+	virtual size_t decompress_size(const string& /*backfile*/) { return 0; }
 };
 
 class FSCompressStream : public FSBackFile
@@ -639,10 +639,7 @@ static class FSzstd : public FSCompressStream
 {
 public:
 	FSzstd() { m_ext = ".ZST"; };
-	virtual std::shared_ptr<FragmentBlock> ScanCompressblock(const string& backfile, size_t& input_offset, size_t& output_offset) override;
 	virtual std::shared_ptr<CommonStream> create_stream() { return make_shared<ZstdStream>(); };
-	virtual bool seekable(const string& backfile) override;
-
 }g_FSzstd;
 
 static class FS_DATA
@@ -1032,16 +1029,6 @@ bool FSBz2::seekable(const string& backfile)
 
 	return false;
 }
-
-bool FSzstd::seekable(const string& backfile)
-{
-	return false;
-}
-
-shared_ptr<FragmentBlock> FSzstd::ScanCompressblock(const string& backfile, size_t& input_offset, size_t& output_offset)
-{
-	return NULL;
-};
 
 int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>outp)
 {
