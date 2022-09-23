@@ -257,6 +257,20 @@ int HttpStream::RecvPacket(char *buff, size_t sz)
 	return recv(m_socket, buff, sz, 0);
 }
 
+class CAutoAddrInfo
+{
+addrinfo *m_p;
+public:
+	CAutoAddrInfo(addrinfo *pAddrInfo)
+	{
+		m_p = pAddrInfo;
+	}
+	~CAutoAddrInfo()
+	{
+		freeaddrinfo(m_p);
+	}
+};
+
 int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool ishttps)
 {
 	int ret;
@@ -269,6 +283,8 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 		set_last_err_string("get network address error");
 		return -1;
 	}
+
+	CAutoAddrInfo A(pAddrInfo);
 
 	m_socket = socket(pAddrInfo->ai_family, pAddrInfo->ai_socktype, pAddrInfo->ai_protocol);
 
