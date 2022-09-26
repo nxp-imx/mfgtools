@@ -957,7 +957,7 @@ public:
 
 		assert(m_output_size >= m_actual_size);
 
-		atomic_fetch_or(&m_dataflags, CONVERT_DONE);
+		atomic_fetch_or(&m_dataflags, (int)CONVERT_DONE);
 		return m_ret;
 	}
 };
@@ -1119,7 +1119,7 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 			blk->m_ret = 0;
 			blk->m_actual_size = cs->get_output_pos();
 
-			atomic_fetch_or(&blk->m_dataflags, FragmentBlock::CONVERT_PARTIAL);
+			atomic_fetch_or(&blk->m_dataflags, (int)FragmentBlock::CONVERT_PARTIAL);
 
 			ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
 			ut.index = outOffset;
@@ -1130,7 +1130,7 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 
 			if (cs->get_output_pos() == blk->m_output_size)
 			{
-				atomic_fetch_or(&blk->m_dataflags, FragmentBlock::CONVERT_DONE);
+				atomic_fetch_or(&blk->m_dataflags, (int)FragmentBlock::CONVERT_DONE);
 				if (!(cs->get_input_pos() == buff->size() &&
 					buff->size() == (inp->size() - offset)))
 				{
@@ -1157,7 +1157,7 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 	}
 	outp->resize(outOffset);
 
-	atomic_fetch_or(&blk->m_dataflags, FragmentBlock::CONVERT_DONE);
+	atomic_fetch_or(&blk->m_dataflags, (int)FragmentBlock::CONVERT_DONE);
 	atomic_fetch_or(&outp->m_dataflags, FILEBUFFER_FLAG_LOADED);
 
 	outp->m_request_cv.notify_all();
@@ -1504,7 +1504,7 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 
 				if ((blk->m_dataflags & FragmentBlock::CONVERT_DONE))
 				{
-					atomic_fetch_or(&blk->m_dataflags, FragmentBlock::USING);
+					atomic_fetch_or(&blk->m_dataflags, (int)FragmentBlock::USING);
 					break;
 				}
 			}
@@ -1982,7 +1982,7 @@ int FSBasic::PreloadWorkThread(shared_ptr<FileBuffer>outp)
 			if (low != outp->m_seg_map.end()) {
 				if (!(low->second->m_dataflags & FragmentBlock::CONVERT_START))
 				{
-					atomic_fetch_or(&low->second->m_dataflags, FragmentBlock::CONVERT_START);
+					atomic_fetch_or(&low->second->m_dataflags, (int)FragmentBlock::CONVERT_START);
 					blk = low->second;
 				}
 			}
@@ -2005,7 +2005,7 @@ int FSBasic::PreloadWorkThread(shared_ptr<FileBuffer>outp)
 				continue;
 		}
 
-		atomic_fetch_or(&blk->m_dataflags, FragmentBlock::CONVERT_DONE);
+		atomic_fetch_or(&blk->m_dataflags, (int)FragmentBlock::CONVERT_DONE);
 		outp->m_request_cv.notify_all();
 	}
 	return 0;
