@@ -84,7 +84,6 @@ public:
 		CONVERT_START = 0x4,
 		CONVERT_PARTIAL = 0x8,
 	};
-	int m_magic_number = 0x67890123;
 	size_t m_input_offset = 0;
 	size_t m_input_sz = 0;
 	std::shared_ptr<FileBuffer> m_input;
@@ -103,7 +102,6 @@ public:
 			return m_pData;
 		return m_data.data();
 	}
-
 };
 
 
@@ -219,13 +217,6 @@ public:
 	}
 	std::shared_ptr<FragmentBlock> get_map_it(size_t offset, bool alloc = false)
 	{
-		if (m_last_db)
-		{
-			if (check_offset_in_seg(offset, m_last_db))
-				return m_last_db;
-
-		}
-
 		{
 			std::lock_guard<std::mutex> lock(m_seg_map_mutex);
 			auto it = m_seg_map.lower_bound(offset);
@@ -333,7 +324,7 @@ protected:
 
 	int swap(FileBuffer & a);
 
-	int mapfile(std::string filename, size_t sz);
+	int mapfile(const std::string &filename, size_t sz);
 
 	int unmapfile();
 	//Read write lock;

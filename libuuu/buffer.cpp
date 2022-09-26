@@ -1076,7 +1076,10 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 	if (!blk)
 		blk = outp->request_new_blk();
 
-	outp->m_last_db = blk;
+	{
+		lock_guard<mutex> l(outp->m_seg_map_mutex);
+		outp->m_last_db = blk;
+	}
 
 	cs->set_output_buff(blk->data(), blk->m_output_size);
 
@@ -1135,7 +1138,11 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 					if(!blk)
 						blk = outp->request_new_blk();
 					cs->set_output_buff(blk->data(), blk->m_output_size);
-					outp->m_last_db = blk;
+
+					{
+						lock_guard<mutex> l(outp->m_seg_map_mutex);
+						outp->m_last_db = blk;
+					}
 				}
 			}
 
@@ -1274,7 +1281,7 @@ FileBuffer::~FileBuffer()
 	}
 }
 
-int FileBuffer::mapfile(string filename, size_t sz)
+int FileBuffer::mapfile(const string &filename, size_t sz)
 {
 #ifdef _MSC_VER
 
@@ -1468,6 +1475,12 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 		}
 		do
 		{
+			shared_ptr<FragmentBlock> last_decompress_db;
+			{
+				std::unique_lock<std::mutex> lock(m_seg_map_mutex);
+				last_decompress_db = m_last_db;
+			}
+
 			{   /*lock hold*/
 				std::unique_lock<std::mutex> lock(blk->m_mutex);
 
@@ -1476,9 +1489,9 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 
 				if (!(m_dataflags & FILEBUFFER_FLAG_PARTIAL_RELOADABLE))
 				{
-					if (m_last_db)
+					if (last_decompress_db)
 					{
-						if (offset < m_last_db->m_output_offset && !(blk->m_dataflags & FragmentBlock::CONVERT_DONE))
+						if (offset < last_decompress_db->m_output_offset && !(blk->m_dataflags & FragmentBlock::CONVERT_DONE))
 						{
 							m_reset_stream = true;
 							break;
