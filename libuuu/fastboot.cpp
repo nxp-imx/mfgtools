@@ -997,26 +997,41 @@ int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> pin)
 	return 0;
 }
 
-FBCRC::FBCRC(char* p): CmdBase(p)
+FBLoop::FBLoop(char* p): CmdBase(p)
 {
-	insert_param_info("CRC", nullptr, Param::Type::e_null);
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
-	insert_param_info("-format", &m_read_cmd, Param::Type::e_string);
-	insert_param_info("-blksz", &m_block, Param::Type::e_uint32);
-	insert_param_info("-crcblock", &m_crcblock, Param::Type::e_uint32);
+	insert_param_info("-format", &m_uboot_cmd, Param::Type::e_string);
+	insert_param_info("-blksz", &m_blksize, Param::Type::e_uint32);
+	insert_param_info("-each", &m_each, Param::Type::e_uint32);
 	insert_param_info("-seek", &m_seek, Param::Type::e_uint32);
 	insert_param_info("-skip", &m_skip, Param::Type::e_uint32);
 	insert_param_info("-nostop", &m_nostop, Param::Type::e_bool);
 }
 
-int FBCRC::run(CmdCtx* ctx)
+string FBLoop::build_cmd(string& cmd, size_t off, size_t sz)
+{
+	string ucmd="UCmd: ";
+	ucmd += cmd;
+
+	string_ex ex;
+	ex.format("0x%llx", off);
+
+	size_t pos= ucmd.find("@off");
+	ucmd = ucmd.replace(pos, 4, ex);
+
+	ex.format("0x%llx", sz);
+	pos = ucmd.find("@size");
+	ucmd = ucmd.replace(pos, 5, ex);
+
+	return ucmd;
+}
+
+int FBLoop::run(CmdCtx* ctx)
 {
 	BulkTrans dev{ m_timeout };
 	if (dev.open(ctx->m_dev))
 		return -1;
-	size_t crc = 0;
-	uint8_t* pbuff;
-	size_t crcblock = 0;
+
 	int ret = 0;
 	string_ex err;
 	size_t offset = 0;
@@ -1027,44 +1042,91 @@ int FBCRC::run(CmdCtx* ctx)
 		return 0;
 
 	shared_ptr<DataBuffer> fbuff;
-	size_t p1size = p1->size();
 
+	bool bload = p1->IsKnownSize();
 	uuu_notify nt;
 	nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
-	nt.total = p1->size();
+	if (bload)
+		nt.total = p1->size();
+	else
+		nt.total = 0;
 	call_notify(nt);
 
-	for (offset = m_skip; offset < p1size; offset += m_crcblock)
+	offset = m_skip;
+
+	while((fbuff = p1->request_data(offset, m_each)))
 	{
-		crcblock = min(p1size - offset, m_crcblock);
-		fbuff = p1->request_data(offset, crcblock);
-		if(!fbuff)
-		{
-			set_last_err_string("fail get data from file");
-			return -1;
-		}
-		pbuff = fbuff->data();
+		ret = this->each(fb, fbuff, offset);
+		offset += fbuff->size();
 
-		crc = crc32(0, pbuff, fbuff->size());
+		if (!m_nostop && ret)
+			return ret;
 
-		cmd.format("UCmd: %s 0x%x 0x%x", m_read_cmd.c_str(), offset / m_block + m_seek, crcblock / m_block);
-		if (fb.Transport(cmd, nullptr, 0))
-			return -1;
-		cmd.format("UCmd: crc32 -v $loadaddr 0x%x %08x", crcblock, crc);
-		ret |= fb.Transport(cmd, nullptr, 0);
-		if (ret)
-		{
-			err.format("crc32 check error at 0x%llx", offset);
-			set_last_err_string(err);
-			if(!m_nostop)
-				return ret;
-		}
 		nt.type = uuu_notify::NOTIFY_TRANS_POS;
 		nt.total = offset;
 		call_notify(nt);
+
+		if (bload != p1->IsKnownSize())
+		{
+			nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
+			nt.total = p1->size();
+			call_notify(nt);
+
+			bload = p1->IsKnownSize();
+		}
 	}
+
+	if (!p1->IsKnownSize())
+	{
+		set_last_err_string("Have not get all data");
+		return -1;
+	}
+
+	if (offset != p1->size())
+	{
+		set_last_err_string("some data missed");
+		return -1;
+	}
+
 	nt.type = uuu_notify::NOTIFY_TRANS_POS;
 	nt.total = offset;
 	call_notify(nt);
 	return ret;
+}
+
+int FBCRC::each(FastBoot& fb, std::shared_ptr<DataBuffer> fbuff, size_t off)
+{
+	uint32_t crc = crc32(0, fbuff->data(), fbuff->size());
+
+	string cmd = build_cmd(m_uboot_cmd, (off + m_seek) / m_blksize, fbuff->size() / m_blksize);
+
+	if (fb.Transport(cmd, nullptr, 0))
+		return -1;
+
+	string_ex crc_cmd;
+	crc_cmd.format("UCmd: crc32 -v $loadaddr 0x%x %08x", min(m_each, fbuff->size()), crc);
+
+	int ret = fb.Transport(crc_cmd, nullptr, 0);
+	if (ret)
+	{
+		string_ex err;
+		err.format("crc32 check error at 0x%llx", off);
+		set_last_err_string(err);
+	}
+	return ret;
+}
+
+int FBWrite::each(FastBoot& fb, std::shared_ptr<DataBuffer> fbuff, size_t off)
+{
+	string_ex cmd;
+	cmd.format("download:%08x", fbuff->size());
+
+	if (fb.Transport(cmd, fbuff->data(), fbuff->size()))
+		return -1;
+
+	string cmd_w = build_cmd(m_uboot_cmd, off/m_blksize, fbuff->size()/m_blksize);
+	if (fb.Transport(cmd_w, nullptr, 0))
+		return -1;
+
+	return 0;
 }

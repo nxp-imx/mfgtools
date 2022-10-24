@@ -446,6 +446,8 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FASTBOOT:UCMD"] = new_cmd_obj<FBUCmd>;
 	(*this)["FB:CRC"] = new_cmd_obj<FBCRC>;
 	(*this)["FASTBOOT:CRC"] = new_cmd_obj<FBCRC>;
+	(*this)["FB:WRITE"] = new_cmd_obj<FBWrite>;
+	(*this)["FASTBOOT:WRITE"] = new_cmd_obj<FBWrite>;
 	(*this)["FB:ACMD"] = new_cmd_obj<FBACmd>;
 	(*this)["FASTBOOT:ACMD"] = new_cmd_obj<FBACmd>;
 	(*this)["FB:DOWNLOAD"] = new_cmd_obj<FBDownload>;

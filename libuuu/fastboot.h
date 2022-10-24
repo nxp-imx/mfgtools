@@ -91,20 +91,43 @@ private:
 	const char m_separator = ':';
 };
 
-class FBCRC : public CmdBase
+class FBLoop : public CmdBase
 {
 public:
-
-	std::string m_read_cmd = "mmc read $loadaddr";
-	size_t m_block = 512;
-	size_t m_crcblock = 0x4000000;
-	size_t m_seek = 0;
-	size_t m_skip = 0;
+	std::string m_uboot_cmd = "mmc read $loadaddr";
+	size_t m_blksize = 512;
+	size_t m_each = 0x4000000;  //byte address
+	size_t m_seek = 0;			//byte address
+	size_t m_skip = 0;			//byte address
 	bool m_nostop = false;
+
 	std::string m_filename;
 
-	FBCRC(char* p);
+	FBLoop(char* p);
+
+	virtual int each(FastBoot& fb, std::shared_ptr<DataBuffer> fbuff, size_t off) = 0;
 	int run(CmdCtx* ctx) override;
+	std::string build_cmd(std::string& cmd, size_t off, size_t sz);
+};
+
+class FBCRC : public FBLoop
+{
+public:
+	int each(FastBoot& fb, std::shared_ptr<DataBuffer> fbuff, size_t off) override;
+	FBCRC(char* p) : FBLoop(p) {
+		m_uboot_cmd = "mmc read $loadaddr @off @size";
+		insert_param_info("CRC", nullptr, Param::Type::e_null);
+	};
+};
+
+class FBWrite : public FBLoop
+{
+public:
+	int each(FastBoot& fb, std::shared_ptr<DataBuffer> fbuff, size_t off) override;
+	FBWrite(char* p) : FBLoop(p) {
+		m_uboot_cmd = "mmc write ${fastboot_buffer} @off @size";
+		insert_param_info("WRITE", nullptr, Param::Type::e_null);
+	};
 };
 
 class FBUCmd : public FBCmd
@@ -112,8 +135,6 @@ class FBUCmd : public FBCmd
 public:
 	FBUCmd(char *p) :FBCmd(p, "UCmd") {}
 };
-
-
 
 class FBACmd : public FBCmd
 {
