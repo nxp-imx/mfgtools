@@ -1,0 +1,34 @@
+uuu_version 1.4.149
+
+# @_flash.bin            | bootloader, which can extract from wic image
+# @_image   [_flash.bin] | wic image burn to emmc.
+
+
+# This command will be run when i.MX6/7 i.MX8MM, i.MX8MQ
+SDP: boot -f _flash.bin -scanlimited 0x800000
+
+# This command will be run when ROM support stream mode
+# i.MX8QXP, i.MX8QM
+SDPS: boot -scanterm -f _flash.bin -scanlimited 0x800000
+
+# These commands will be run when use SPL and will be skipped if no spl
+# SDPU will be deprecated. please use SDPV instead of SDPU
+# {
+SDPU: delay 1000
+SDPU: write -f _flash.bin -offset 0x57c00
+SDPU: jump -scanlimited 0x800000
+# }
+
+# These commands will be run when use SPL and will be skipped if no spl
+# if (SPL support SDPV)
+# {
+SDPV: delay 1000
+SDPV: write -f _flash.bin -skipspl -scanterm -scanlimited 0x800000
+SDPV: jump -scanlimited 0x800000
+# }
+
+FB: ucmd pci
+FB: ucmd nvme scan
+FB: ucmd setenv fastboot_buffer ${loadaddr}
+FB: write -format "nvme write ${fastboot_buffer} @off @size"  -blksz 512 -f _image
+FB: done

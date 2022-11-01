@@ -353,6 +353,11 @@ static constexpr BuiltInScriptRawData g_builtin_cmd[] =
 		,"boot spl and uboot"
 	},
 	{
+		"nvme_all",
+#include "nvme_burn_all.clst"
+		,"burn whole image io nvme storage"
+	},
+	{
 		nullptr,
 		nullptr,
 		nullptr,
