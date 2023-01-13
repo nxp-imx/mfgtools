@@ -120,6 +120,35 @@ public:
 	}
 };
 
+#ifdef _WIN32
+#include <conio.h>
+#endif
+
+int ask_passwd(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN])
+{
+	cout << endl << prompt << " Required Login"<<endl;
+	cout << "Username:";
+	cin.getline(user, 128);
+	cout << "Password:";
+
+	int i = 0;
+	while ((passwd[i] = _getch()) != '\r') {
+		if (passwd[i] == '\b') {
+			if (i != 0) {
+				cout << "\b \b";
+				i--;
+			}
+		}
+		else {
+			cout << '*';
+			i++;
+		}
+	}
+
+	passwd[i] = 0;
+	return 0;
+}
+
 void print_help(bool detail = false)
 {
 	const char help[] =
@@ -786,6 +815,7 @@ void print_lsusb()
 }
 
 #ifdef WIN32
+
 int ignore_serial_number(const char *pro, const char *chip, const char */*comp*/, uint16_t vid, uint16_t pid, uint16_t /*bcdlow*/, uint16_t /*bcdhigh*/, void */*p*/)
 {
 	printf("\t %s\t %s\t 0x%04X\t0x%04X\n", chip, pro, vid, pid);
@@ -1039,6 +1069,8 @@ int main(int argc, char **argv)
 	}
 
 	signal(SIGINT, ctrl_c_handle);
+
+	uuu_set_askpasswd(ask_passwd);
 
 	if (deamon && shell)
 	{

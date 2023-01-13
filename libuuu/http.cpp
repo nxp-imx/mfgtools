@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 NXP.
+ * Copyright 2019, 2023 NXP.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -47,9 +47,19 @@
 #include "http.h"
 #include "libuuu.h"
 #include "liberror.h"
+#include "libcomm.h"
 #include <string.h>
 #include <locale>
 #include <codecvt>
+
+uuu_askpasswd g_ask_passwd;
+int uuu_set_askpasswd(uuu_askpasswd ask)
+{
+	g_ask_passwd = ask;
+	return 0;
+}
+
+map<string, pair<string, string>> g_passwd_map;
 
 #ifdef UUUSSL
 #include <openssl/ssl.h>
@@ -77,12 +87,26 @@ public:
 static CUUUSSL g_uuussl;
 
 #endif
-
-
 using namespace std;
 
 #ifdef _WIN32
 /* Win32 implement*/
+
+DWORD ChooseAuthScheme(DWORD dwSupportedSchemes)
+{
+	if (dwSupportedSchemes & WINHTTP_AUTH_SCHEME_NEGOTIATE)
+		return WINHTTP_AUTH_SCHEME_NEGOTIATE;
+	else if (dwSupportedSchemes & WINHTTP_AUTH_SCHEME_NTLM)
+		return WINHTTP_AUTH_SCHEME_NTLM;
+	else if (dwSupportedSchemes & WINHTTP_AUTH_SCHEME_PASSPORT)
+		return WINHTTP_AUTH_SCHEME_PASSPORT;
+	else if (dwSupportedSchemes & WINHTTP_AUTH_SCHEME_DIGEST)
+		return WINHTTP_AUTH_SCHEME_DIGEST;
+	else if (dwSupportedSchemes & WINHTTP_AUTH_SCHEME_BASIC)
+		return WINHTTP_AUTH_SCHEME_BASIC;
+
+	return 0;
+}
 
 HttpStream::HttpStream()
 {
@@ -133,40 +157,114 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 		return -1;
 	}
 
-	bResults = WinHttpSendRequest(m_hRequest,
+	DWORD dwProxyAuthScheme = 0;
+	int retry = 3;
+
+	pair<string, string> up = g_passwd_map[host];
+
+	while (1)
+	{
+		DWORD status = 0;
+		DWORD dwSize = sizeof(status);
+
+		bResults = WinHttpSendRequest(m_hRequest,
 			WINHTTP_NO_ADDITIONAL_HEADERS, 0,
 			WINHTTP_NO_REQUEST_DATA, 0,
 			0, 0);
 
-	if (!bResults)
-	{
-		set_last_err_string("Fail WinHttpSendRequest");
-		return -1;
+		// End the request.
+		if (bResults)
+			bResults = WinHttpReceiveResponse(m_hRequest, NULL);
+
+		// Resend the request in case of
+		// ERROR_WINHTTP_RESEND_REQUEST error.
+		if (!bResults && GetLastError() == ERROR_WINHTTP_RESEND_REQUEST)
+			continue;
+
+		// Check the status code.
+		if (bResults)
+			bResults = WinHttpQueryHeaders(m_hRequest,
+				WINHTTP_QUERY_STATUS_CODE |
+				WINHTTP_QUERY_FLAG_NUMBER,
+				NULL,
+				&status,
+				&dwSize,
+				NULL);
+
+		if (bResults)
+		{
+			DWORD dwSupportedSchemes;
+			DWORD dwFirstScheme;
+			DWORD dwSelectedScheme;
+			DWORD dwTarget;
+
+			switch (status)
+			{
+			case HTTP_STATUS_OK: //200
+				g_passwd_map[host] = up;
+				return 0;
+
+			case HTTP_STATUS_DENIED: //401
+				// The server requires authentication.
+				if(g_passwd_map[host].first.empty())
+				{
+					char user[MAX_USER_LEN];
+					char passwd[MAX_USER_LEN];
+					if (g_ask_passwd((char*)host.c_str(), user, passwd))
+						return -1;
+
+					up.first = user;
+					up.second = passwd;
+				}
+				// Obtain the supported and preferred schemes.
+				bResults = WinHttpQueryAuthSchemes(m_hRequest,
+					&dwSupportedSchemes,
+					&dwFirstScheme,
+					&dwTarget);
+
+				// Set the credentials before resending the request.
+				if (bResults)
+				{
+					dwSelectedScheme = ChooseAuthScheme(dwSupportedSchemes);
+
+					std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
+
+					if (dwSelectedScheme == 0)
+					{
+						set_last_err_string("unsupported http auth");
+						return -1;
+					}
+					else
+						bResults = WinHttpSetCredentials(m_hRequest,
+							dwTarget,
+							dwSelectedScheme,
+							convert.from_bytes(up.first).c_str(),
+							convert.from_bytes(up.second).c_str(),
+							NULL);
+				}
+
+				retry--;
+				if (!retry)
+					return -1;
+
+				break;
+
+			case HTTP_STATUS_PROXY_AUTH_REQ:
+				set_last_err_string("unsupport proxy auth");
+				return -1;
+
+			default:
+				g_passwd_map[host] = up;
+				// The status code does not indicate success.
+				string_ex str;
+				str.format("Error. Status code %d returned.\n", status);
+				set_last_err_string(str);
+				return -1;
+			}
+		}
 	}
 
-	bResults = WinHttpReceiveResponse(m_hRequest, nullptr);
-
-	if (!bResults)
-	{
-		set_last_err_string("Fail WinHttpReceiveResponse");
-		return -1;
-	}
-
-	DWORD status = 0;
-	DWORD dwSize = sizeof(status);
-	WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER,
-		WINHTTP_HEADER_NAME_BY_INDEX, &status,
-		&dwSize, WINHTTP_NO_HEADER_INDEX);
-
-	if (status != HTTP_STATUS_OK)
-	{
-		string err = "HTTP status is not okay: ";
-		err += host;
-		err += path;
-		set_last_err_string(err);
-		return -1;
-	}
-	return 0;
+	return -1;
 }
 
 size_t HttpStream::HttpGetFileSize()

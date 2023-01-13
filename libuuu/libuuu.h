@@ -143,4 +143,9 @@ void uuu_set_debug_level(uint32_t mask);
  * 0 disable small memory mode, buffer all data, it is used for multi-board program.
  */
 void uuu_set_small_mem(uint32_t val);
+
+#define MAX_USER_LEN 128
+typedef int (*uuu_askpasswd)(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN]);
+int uuu_set_askpasswd(uuu_askpasswd ask);
+
 #endif
