@@ -130,8 +130,9 @@ int ask_passwd(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN])
 	cout << "Username:";
 	cin.getline(user, 128);
 	cout << "Password:";
-
 	int i = 0;
+
+#ifdef _WIN32
 	while ((passwd[i] = _getch()) != '\r') {
 		if (passwd[i] == '\b') {
 			if (i != 0) {
@@ -144,7 +145,7 @@ int ask_passwd(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN])
 			i++;
 		}
 	}
-
+#endif
 	passwd[i] = 0;
 	return 0;
 }
