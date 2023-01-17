@@ -37,3 +37,4 @@ void set_last_err_string(const std::string &str);
 void set_last_err_id(int id);
 
 #define ERR_OUT_MEMORY -2
+#define ERR_ACESS_DENIED -3

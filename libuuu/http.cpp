@@ -65,6 +65,52 @@ map<string, pair<string, string>> g_passwd_map;
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
+static const char* base64_table =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	"abcdefghijklmnopqrstuvwxyz"
+	"0123456789+/";
+
+static string base64_encode(string str)
+{
+	string ret;
+	for (int i = 0; i < str.length(); i += 3)
+	{
+		ret.push_back(base64_table[(str[i] >> 2) & 0x3f]);
+		if (i + 1 < str.length())
+		{
+			int index;
+			index = ((str[i] & 3) << 4)
+				+ ((str[i + 1] >> 4) & 0xf);
+			ret.push_back(base64_table[index]);
+		}
+		else
+		{
+			ret.push_back(base64_table[(str[i] & 0x3) << 4]);
+			ret.push_back('=');
+			ret.push_back('=');
+			return ret;
+		}
+
+		if (i + 2 < str.length())
+		{
+			int index;
+			index = (((str[i + 1]) & 0xF) << 2)
+				+ (((str[i + 2]) >> 6) & 0x3);
+			ret.push_back(base64_table[index]);
+			index = str[i + 2] & 0x3f;
+			ret.push_back(base64_table[index]);
+
+		}
+		else
+		{
+			ret.push_back(base64_table[((str[i + 1]) & 0xF) << 2]);
+			ret.push_back('=');
+			return ret;
+		}
+	}
+	return ret;
+}
+
 class CUUUSSL
 {
 public:
@@ -368,7 +414,7 @@ public:
 		freeaddrinfo(m_p);
 	}
 };
-
+#include <iostream>
 int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool ishttps)
 {
 	int ret;
@@ -443,55 +489,87 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 #endif
         }
 
-	if(ishttps)
-		path = "https://" + host + path;
-
-	string request = "GET " + path + " HTTP/1.1\r\n";
-	request += "Host: " + host + "\r\n\r\n";
-
-	ret = SendPacket((char*)request.c_str(), request.size());
-	if (ret != request.size())
+	int retry = 3;
+	pair<string, string> up = g_passwd_map[host];
+	while(retry--)
 	{
-		set_last_err_string("http send error");
-		return -1;
-	}
+		string userpd = up.first + ":" + up.second;
+		string httppath = path;
 
-	m_buff.resize(1024);
-	ret = RecvPacket((char*)m_buff.data(), m_buff.size());
-	if (ret < 0)
-	{
-		set_last_err_string("http recv Error");
-		return -1;
-	}
+		if(ishttps)
+			httppath = "https://" + host + path;
 
-	int i;
-	for (i = 0; i < 1024 - 4; i++)
-	{
-		if (m_buff[i] == 0xd &&
-			m_buff[i + 1] == 0xa &&
-			m_buff[i + 2] == 0xd &&
-			m_buff[i + 3] == 0xa)
+		string request = "GET " + httppath + " HTTP/1.1\r\n";
+		request += "Host: " + host + "\r\n";
+
+		if (!up.first.empty())
+			request += "Authorization: Basic " + base64_encode(userpd) + "\r\n";
+
+		request += "\r\n";
+
+		ret = SendPacket((char*)request.c_str(), request.size());
+		if (ret != request.size())
 		{
-			break;
+			set_last_err_string("http send error");
+			return -1;
 		}
+
+		m_buff.resize(1024);
+		ret = RecvPacket((char*)m_buff.data(), m_buff.size());
+		if (ret < 0)
+		{
+			set_last_err_string("http recv Error");
+			return -1;
+		}
+
+		int i;
+		for (i = 0; i < 1024 - 4; i++)
+		{
+			if (m_buff[i] == 0xd &&
+				m_buff[i + 1] == 0xa &&
+				m_buff[i + 2] == 0xd &&
+				m_buff[i + 3] == 0xa)
+			{
+				break;
+			}
+		}
+
+		if (i >= 1024 - 4)
+		{
+			set_last_err_string("Can't find termaniate");
+			return -1;
+		}
+
+		m_data_start = i + 4;
+
+		string str;
+		str.resize(i + 2);
+		memcpy((void*)str.c_str(), m_buff.data(), i + 2);
+
+		int ret = parser_response(str);
+		if (ret == ERR_ACESS_DENIED)
+		{
+			if(g_passwd_map[host].first.empty())
+			{
+				char user[MAX_USER_LEN];
+				char passwd[MAX_USER_LEN];
+				if (g_ask_passwd((char*)host.c_str(), user, passwd))
+					return -1;
+
+				up.first = user;
+				up.second = passwd;
+			}
+			continue;
+		}
+		else if(ret == 0)
+		{
+			g_passwd_map[host] = up;
+			return 0;
+		}
+		g_passwd_map[host] = up;
 	}
 
-	if (i >= 1024 - 4)
-	{
-		set_last_err_string("Can't find termaniate");
-		return -1;
-	}
-
-	m_data_start = i + 4;
-
-	string str;
-	str.resize(i + 2);
-	memcpy((void*)str.c_str(), m_buff.data(), i + 2);
-
-	if (parser_response(str))
-		return -1;
-
-	return 0;
+	return -1;
 }
 
 size_t HttpStream::HttpGetFileSize()
@@ -509,6 +587,9 @@ int HttpStream::parser_response(string rep)
 	}
 
 	string str = rep.substr(0, pos);
+	if (str == "HTTP/1.1 401 Unauthorized")
+		return ERR_ACESS_DENIED;
+
 	if (str != "HTTP/1.1 200 OK")
 	{
 		set_last_err_string(str);

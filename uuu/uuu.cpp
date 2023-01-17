@@ -122,6 +122,9 @@ public:
 
 #ifdef _WIN32
 #include <conio.h>
+#else
+#include <termios.h>
+#include <unistd.h>
 #endif
 
 int ask_passwd(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN])
@@ -145,6 +148,22 @@ int ask_passwd(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN])
 			i++;
 		}
 	}
+#else
+	struct termios old, tty;
+	tcgetattr(STDIN_FILENO, &tty);
+	old = tty;
+	tty.c_lflag &= ~ECHO;
+	tcsetattr(STDIN_FILENO, TCSANOW, &tty);
+
+	string pd;
+	getline(cin, pd);
+
+	tcsetattr(STDIN_FILENO, TCSANOW, &old);
+	if(pd.size() > MAX_USER_LEN -1)
+		return -1;
+	memcpy(passwd, pd.data(), pd.size());
+	i=pd.size();
+
 #endif
 	passwd[i] = 0;
 	return 0;
