@@ -166,6 +166,7 @@ int ask_passwd(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN])
 
 #endif
 	passwd[i] = 0;
+	cout << endl;
 	return 0;
 }
 
