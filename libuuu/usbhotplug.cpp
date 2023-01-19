@@ -307,7 +307,6 @@ static int usb_add(libusb_device *dev)
 		return -1;
 
 	ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
-	this_thread::sleep_for(g_usb_poll_period.load());
 
 	if (item)
 	{
