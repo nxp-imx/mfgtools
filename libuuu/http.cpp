@@ -505,6 +505,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 		if (!up.first.empty())
 			request += "Authorization: Basic " + base64_encode(userpd) + "\r\n";
 
+		request += "User-Agent:uuu\r\nAccept: */*\r\n";
 		request += "\r\n";
 
 		ret = SendPacket((char*)request.c_str(), request.size());
