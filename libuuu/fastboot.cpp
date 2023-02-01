@@ -845,7 +845,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 					nt.total = startblock;
 					call_notify(nt);
 
-				} while (off < pos);
+				} while (off + oldpos < pos);
 			}
 		}
 
