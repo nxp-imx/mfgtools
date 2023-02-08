@@ -1,6 +1,6 @@
 # uuu (Universal Update Utility), mfgtools 3.0
 
-[![Build status](https://ci.appveyor.com/api/projects/status/github/nxp-imx/mfgtools?svg=true)](https://ci.appveyor.com/project/nxpfrankli/mfgtools-kvqcg)
+[![Build status](https://ci.appveyor.com/api/projects/status/evp1xvj88ybuhfwi?svg=true)](https://ci.appveyor.com/project/nxpfrankli/mfgtools-kvqcg)
 [![Build Status](https://travis-ci.com/NXPmicro/mfgtools.svg?branch=master)](https://travis-ci.com/NXPmicro/mfgtools)
 
 ![GitHub](https://img.shields.io/github/license/nxp-imx/mfgtools.svg) 
