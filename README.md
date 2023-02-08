@@ -1,9 +1,9 @@
 # uuu (Universal Update Utility), mfgtools 3.0
 
-[![Build status](https://ci.appveyor.com/api/projects/status/github/NXPmicro/mfgtools?svg=true)](https://ci.appveyor.com/project/nxpfrankli/mfgtools-kvqcg)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/nxp-imx/mfgtools?svg=true)](https://ci.appveyor.com/project/nxpfrankli/mfgtools-kvqcg)
 [![Build Status](https://travis-ci.com/NXPmicro/mfgtools.svg?branch=master)](https://travis-ci.com/NXPmicro/mfgtools)
 
-![GitHub](https://img.shields.io/github/license/NXPmicro/mfgtools.svg) 
+![GitHub](https://img.shields.io/github/license/nxp-imx/mfgtools.svg) 
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/universal-update-utility) sudo snap install universal-update-utility;
 
@@ -49,13 +49,13 @@ Freescale/NXP I.MX Chip image deploy tools.
 # Prebuilt Image and pdf document
 
 The prebuilt image and document are here:
-  - https://github.com/NXPmicro/mfgtools/releases
-  - UUU.pdf is snapshot of [wiki](https://github.com/NXPmicro/mfgtools/wiki)
+  - https://github.com/nxp-imx/mfgtools/releases
+  - UUU.pdf is snapshot of [wiki](https://github.com/nxp-imx/mfgtools/wiki)
 
 # How to Build:
 
 ## Windows
-- `git clone https://github.com/NXPmicro/mfgtools.git`
+- `git clone https://github.com/nxp-imx/mfgtools.git`
 - `cd mfgtools`
 - `git submodule init`
 - `git submodule update`
@@ -66,7 +66,7 @@ Visual Studio
 Note that, since uuu is an OSI compliant Open Source project, you are entitled to download and use the freely available Visual Studio Community Edition to build, run or develop for uuu. As per the Visual Studio Community Edition license this applies regardless of whether you are an individual or a corporate user.
 
 ## Linux
-- `git clone https://github.com/NXPmicro/mfgtools.git`
+- `git clone https://github.com/nxp-imx/mfgtools.git`
 - `cd mfgtools`
 - `sudo apt-get install libusb-1.0-0-dev libbz2-dev libzstd-dev pkg-config cmake libssl-dev g++`
 - `cmake . && make`
@@ -81,7 +81,7 @@ For cmake prior 3.13:
 - `cmake .. && make`
 
 ## macOS
-- `git clone https://github.com/NXPmicro/mfgtools.git`
+- `git clone https://github.com/nxp-imx/mfgtools.git`
 - `cd mfgtools`
 - `brew install cmake libusb openssl pkg-config`
 - `cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . && make`
