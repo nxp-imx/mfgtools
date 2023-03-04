@@ -415,8 +415,11 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 			IvtHeader *pIvt = search_ivt_header(fbuff, off, 0x100000);
 			if (pIvt)
 			{
-				BootData *pDB = (BootData *) &(fbuff->at(off + pIvt->BootData - pIvt->SelfAddr));
-				offset = off + pDB->ImageSize - (pIvt->SelfAddr - pDB->ImageStartAddr);
+				if (pIvt->BootData)
+				{
+					BootData *pDB = (BootData *) &(fbuff->at(off + pIvt->BootData - pIvt->SelfAddr));
+					offset = off + pDB->ImageSize - (pIvt->SelfAddr - pDB->ImageStartAddr);
+				}
 			}
 			else
 			{
