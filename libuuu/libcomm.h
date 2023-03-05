@@ -152,6 +152,12 @@ inline T round_up(T x, T align)
 	return (x + align - 1) / align * align;
 }
 
+template <class T>
+inline T div_round_up(T x, T align)
+{
+	return (x + align - 1) / align;
+}
+
 inline std::string trim(const std::string &s)
 {
 	auto  wsfront = std::find_if_not(s.begin(), s.end(), [](int c) {return std::isspace(c); });
