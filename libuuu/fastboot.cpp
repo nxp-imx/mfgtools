@@ -1101,7 +1101,7 @@ int FBCRC::each(FastBoot& fb, std::shared_ptr<DataBuffer> fbuff, size_t off)
 {
 	uint32_t crc = crc32(0, fbuff->data(), fbuff->size());
 
-	string cmd = build_cmd(m_uboot_cmd, off / m_blksize, fbuff->size() / m_blksize);
+	string cmd = build_cmd(m_uboot_cmd, off / m_blksize, div_round_up(fbuff->size(), m_blksize));
 
 	if (fb.Transport(cmd, nullptr, 0))
 		return -1;
@@ -1127,7 +1127,7 @@ int FBWrite::each(FastBoot& fb, std::shared_ptr<DataBuffer> fbuff, size_t off)
 	if (fb.Transport(cmd, fbuff->data(), fbuff->size()))
 		return -1;
 
-	string cmd_w = build_cmd(m_uboot_cmd, off/m_blksize, fbuff->size()/m_blksize);
+	string cmd_w = build_cmd(m_uboot_cmd, off / m_blksize, div_round_up(fbuff->size(), m_blksize));
 	if (fb.Transport(cmd_w, nullptr, 0))
 		return -1;
 
