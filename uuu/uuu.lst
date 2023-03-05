@@ -34,11 +34,18 @@ uuu_version 1.0.0
 #                      acmd <any never returned uboot command, like booti, reboot>
 #                      flash [-raw2sparse] <partition> <filename>
 #                      download -f <filename>
-#                      crc -f <filename> [-format "mmc read $loadaddr"] [-blksz 512][ -crcblock 0x4000000]
+#                      crc -f <filename> [-format "mmc read $loadaddr"] [-blksz 512] [-each 0x4000000]
 #                                        [-seek 0] [-skip 0] [-nostop]
-#                                          seek          skip block number from storage
-#                                          skip          skips byte from -f
+#                                          each          CRC size each loop
+#                                          seek          skip bytes from storage
+#                                          skip          skip bytes from -f
 #                                          nostop        continue check even if found mismatch
+#                      write -f <filename> [-format "mmc write $loadaddr"] [-blksz 512] [-each 0x4000000]
+#                                        [-seek 0] [-skip 0] [-nostop]
+#                                          each          write size each loop
+#                                          seek          skip bytes from storage
+#                                          skip          skip bytes from -f
+#                                          nostop        continue write even if error occurs
 #
 #
 #          FBK: community with kernel with fastboot protocol. DO NOT compatible with fastboot tools.

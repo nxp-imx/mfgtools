@@ -1035,6 +1035,7 @@ int FBLoop::run(CmdCtx* ctx)
 	int ret = 0;
 	string_ex err;
 	size_t offset = 0;
+	size_t seek = 0;
 	FastBoot fb(&dev);
 	string_ex cmd;
 	shared_ptr<FileBuffer> p1 = get_file_buffer(m_filename, true);
@@ -1053,11 +1054,13 @@ int FBLoop::run(CmdCtx* ctx)
 	call_notify(nt);
 
 	offset = m_skip;
+	seek = m_seek;
 
 	while((fbuff = p1->request_data(offset, m_each)))
 	{
-		ret = this->each(fb, fbuff, offset);
+		ret = this->each(fb, fbuff, seek);
 		offset += fbuff->size();
+		seek += fbuff->size();
 
 		if (!m_nostop && ret)
 			return ret;
@@ -1098,7 +1101,7 @@ int FBCRC::each(FastBoot& fb, std::shared_ptr<DataBuffer> fbuff, size_t off)
 {
 	uint32_t crc = crc32(0, fbuff->data(), fbuff->size());
 
-	string cmd = build_cmd(m_uboot_cmd, (off + m_seek) / m_blksize, fbuff->size() / m_blksize);
+	string cmd = build_cmd(m_uboot_cmd, off / m_blksize, fbuff->size() / m_blksize);
 
 	if (fb.Transport(cmd, nullptr, 0))
 		return -1;
