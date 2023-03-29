@@ -270,7 +270,10 @@ int FBUpload::run(CmdCtx* ctx)
 	FastBoot fb(&dev);
 	
 	string_ex cmd;
-	cmd.format("upload");
+	if (m_var.length())
+		cmd.format("upload:%s", m_var.c_str());
+	else
+		cmd.format("upload");
 
 	std::vector<uint8_t> buff;
 	if (fb.Transport(cmd, nullptr, buff.size(), &buff))
