@@ -300,11 +300,13 @@ public:
 	FBUpload(char* p) : CmdBase(p)
 	{
 		insert_param_info("upload", nullptr, Param::Type::e_null);
+		insert_param_info("-v", &m_var, Param::Type::e_string);
 		insert_param_info("-f", &m_filename, Param::Type::e_string);
 	}
 
 	int run(CmdCtx* ctx) override;
 
 private:
+	std::string m_var;
 	std::string m_filename;
 };
