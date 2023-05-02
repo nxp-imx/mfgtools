@@ -74,11 +74,18 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 
 			if (input)
 			{
+				size_t rz, rsize = 0;
+
 				input->resize(sz);
-				size_t rz;
-				if (m_pTrans->read(input->data(), sz, &rz))
-					return -1;
-				input->resize(rz);
+				while (rsize < sz)
+				{
+					if (m_pTrans->read(input->data() + rsize, sz - rsize, &rz))
+					{
+						set_last_err_string("Error on DATA read!");
+						return -1;
+					}
+					rsize += rz;
+				}
 			}
 			else
 			{
