@@ -3,7 +3,7 @@ name: Build for ARM64
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build:
