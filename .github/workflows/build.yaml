@@ -1,0 +1,26 @@
+name: Build for ARM64
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build for ARM64
+    runs-on: ubuntu-latest-arm64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up environment
+        run: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev libbz2-dev libzstd-dev asciidoc rename
+
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make
+
