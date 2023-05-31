@@ -172,7 +172,6 @@ private:
 	size_t m_compressedsize;
 	size_t m_offset;
 	z_stream m_strm;
-	bool m_decompressed;
 
 	friend Zip;
 };
