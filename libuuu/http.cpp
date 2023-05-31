@@ -537,7 +537,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 
 		if (i >= 1024 - 4)
 		{
-			set_last_err_string("Can't find termaniate");
+			set_last_err_string("Can't find terminate");
 			return -1;
 		}
 
