@@ -141,7 +141,7 @@ static struct {
 	void push_back(string filter)
 	{
 		lock_guard<mutex> guard{lock};
-		list.emplace_back(move(filter));
+		list.emplace_back(std::move(filter));
 	}
 
 	bool is_valid(const string& path)
