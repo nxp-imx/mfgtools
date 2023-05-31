@@ -1,7 +1,10 @@
 # uuu (Universal Update Utility), mfgtools 3.0
 
 [![Build status](https://ci.appveyor.com/api/projects/status/evp1xvj88ybuhfwi?svg=true)](https://ci.appveyor.com/project/nxpfrankli/mfgtools-kvqcg)
-[![Build Status](https://travis-ci.com/NXPmicro/mfgtools.svg?branch=master)](https://travis-ci.com/NXPmicro/mfgtools)
+
+[![macOS Build](https://github.com/nxp-imx/mfgtools/actions/workflows/macOS.yaml/badge.svg?branch=master)](https://github.com/nxp-imx/mfgtools/actions/workflows/macOS.yaml)
+[![Build with VS Studio](https://github.com/nxp-imx/mfgtools/actions/workflows/win.yaml/badge.svg)](https://github.com/nxp-imx/mfgtools/actions/workflows/win.yaml)
+[![Build for x64 ubuntu-lastest](https://github.com/nxp-imx/mfgtools/actions/workflows/build.yaml/badge.svg)](https://github.com/nxp-imx/mfgtools/actions/workflows/build.yaml)
 
 ![GitHub](https://img.shields.io/github/license/nxp-imx/mfgtools.svg) 
 
