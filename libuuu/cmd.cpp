@@ -397,19 +397,19 @@ T str_to_uint(const std::string &str, bool * conversion_succeeded)
 	return MAX_VAL;
 }
 
-uint16_t str_to_uint16(const string &str, bool * conversion_suceeded)
+uint16_t str_to_uint16(const string &str, bool * conversion_succeeded)
 {
-	return str_to_uint<uint16_t, UINT16_MAX>(str, conversion_suceeded);
+	return str_to_uint<uint16_t, UINT16_MAX>(str, conversion_succeeded);
 }
 
-uint32_t str_to_uint32(const string &str, bool * conversion_suceeded)
+uint32_t str_to_uint32(const string &str, bool * conversion_succeeded)
 {
-	return str_to_uint<uint32_t, UINT32_MAX>(str, conversion_suceeded);
+	return str_to_uint<uint32_t, UINT32_MAX>(str, conversion_succeeded);
 }
 
-uint64_t str_to_uint64(const string &str, bool * conversion_suceeded)
+uint64_t str_to_uint64(const string &str, bool * conversion_succeeded)
 {
-	return str_to_uint<uint64_t, UINT64_MAX>(str, conversion_suceeded);
+	return str_to_uint<uint64_t, UINT64_MAX>(str, conversion_succeeded);
 }
 
 template <class T> shared_ptr<CmdBase> new_cmd_obj(char *p)
