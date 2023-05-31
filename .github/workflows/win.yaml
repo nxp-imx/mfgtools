@@ -11,7 +11,6 @@ jobs:
 
     strategy:
       matrix:
-        vs-version: ['2022', '2019', '2017']
         configuration: ['Debug', 'Release']
         platform: ['x86', 'x64']
 
@@ -22,10 +21,8 @@ jobs:
         fetch-depth: 0
     
     - name: Set up Visual Studio
-      uses: actions/setup-vs@v1
-      with:
-        vs-version: ${{ matrix.vs-version }}
-    
+      uses: microsoft/setup-msbuild@v1.1
+  
     - name: Restore NuGet packages
       run: nuget restore YourSolution.sln
     
