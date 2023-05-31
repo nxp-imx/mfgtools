@@ -1430,8 +1430,6 @@ void FileBuffer::truncate_old_data_in_pool()
 
 	size_t off = m_last_request_offset - m_totall_buffer_size/2;
 
-	size_t free_sz = 0;
-
 	for (auto it= m_seg_map.lower_bound(off); it != m_seg_map.end(); it++)
 	{
 		auto blk = it->second;
@@ -1444,7 +1442,6 @@ void FileBuffer::truncate_old_data_in_pool()
 			blk->m_dataflags = 0;
 			blk->m_actual_size = 0;
 			vector<uint8_t> v;
-			free_sz += blk->m_data.size();
 			blk->m_data.swap(v);
 		}
 	}
