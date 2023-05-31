@@ -619,25 +619,25 @@ int HttpStream::HttpDownload(char *buff, size_t sz)
 	size_t left = 0;
 	if (m_data_start < m_buff.size())
 		left = m_buff.size() - m_data_start;
-	
-	size_t trim_transfered = 0;
+
+	size_t trim_transferred = 0;
 
 	if (left)
 	{
-		
-		trim_transfered = sz;
-		if (trim_transfered > left)
-			trim_transfered = left;
 
-		memcpy(buff, m_buff.data() + m_data_start, trim_transfered);
-		m_data_start += trim_transfered;
+		trim_transferred = sz;
+		if (trim_transferred > left)
+			trim_transferred = left;
+
+		memcpy(buff, m_buff.data() + m_data_start, trim_transferred);
+		m_data_start += trim_transferred;
 	}
 
-	if (trim_transfered < sz)
+	if (trim_transferred < sz)
 	{
 		int ret = 0;
-		sz -= trim_transfered;
-		buff += trim_transfered;
+		sz -= trim_transferred;
+		buff += trim_transferred;
 		while (sz && ((ret = RecvPacket(buff, sz)) > 0))
 		{
 			buff += ret;
