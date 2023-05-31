@@ -57,7 +57,7 @@ class CmdUsbCtx : public CmdCtx
 {
 public:
 	~CmdUsbCtx() override;
-	int look_for_match_device(const char * procotol);
+	int look_for_match_device(const char * protocol);
 };
 
 struct Param
@@ -97,7 +97,7 @@ public:
 	{
 		m_param.emplace_back(Param{key, pD, tp, ignore_case, err});
 	}
-	virtual int parser_protocal(char *p, size_t &pos);
+	virtual int parser_protocol(char *p, size_t &pos);
 	virtual int parser(char *p = nullptr);
 	virtual int run(CmdCtx *p) = 0;
 
@@ -161,7 +161,7 @@ public:
 
 private:
 	bool m_dyn = false;
-	std::string m_protocal;
+	std::string m_protocol;
 	std::string m_shellcmd;
 };
 
@@ -175,7 +175,7 @@ public:
 
 private:
 	std::string m_condtion;
-	std::string m_protocal;
+	std::string m_protocol;
 	std::string m_true_cmd;
 	void build_map(CmdCtx *p);
 };
@@ -201,7 +201,7 @@ public:
 class CmdMap : public std::map<std::string, std::shared_ptr<CmdList>>
 {
 public:
-	int run_all(const std::string &protocal, CmdCtx *p,  bool dry_run = false);
+	int run_all(const std::string &protocol, CmdCtx *p,  bool dry_run = false);
 };
 
 class CfgCmd :public CmdBase
@@ -213,7 +213,7 @@ public:
 	int run(CmdCtx *p) override;
 };
 
-int run_cmds(const char *procotal, CmdCtx *p);
+int run_cmds(const char *protocol, CmdCtx *p);
 int run_cmd(CmdCtx *pCtx, const char * cmd, int dry);
 
 int insert_env_variable(std::string key, std::string value);
