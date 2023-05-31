@@ -661,17 +661,17 @@ public:
 		m_pFs.push_back(&g_fshttp);
 	}
 
-	int get_file_timesample(const string &filename, uint64_t *ptimesame)
+	int get_file_timesample(const string &filename, uint64_t *ptimesample)
 	{
-		if (ptimesame == nullptr)
+		if (ptimesample == nullptr)
 		{
-			set_last_err_string("ptimesame is null\n");
+			set_last_err_string("ptimesample is null\n");
 			return -1;
 		}
 
 		for (size_t i = 0; i < m_pFs.size(); i++)
 		{
-			if (!m_pFs[i]->get_file_timesample(filename, ptimesame))
+			if (!m_pFs[i]->get_file_timesample(filename, ptimesample))
 				return 0;
 		}
 
