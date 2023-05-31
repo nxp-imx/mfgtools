@@ -479,7 +479,7 @@ class Bz2stream : public CommonStream
 
 public:
 	Bz2stream() { memset(&m_strm, 0, sizeof(m_strm));  BZ2_bzDecompressInit(&m_strm, 0, 0); }
-	~Bz2stream()
+	virtual ~Bz2stream()
 	{
 		BZ2_bzDecompressEnd(&m_strm);
 	}
@@ -533,7 +533,7 @@ public:
 		memset(&m_strm, 0, sizeof(m_strm));
 		inflateInit2(&m_strm, 15 + 16);
 	}
-	~Gzstream()
+	virtual ~Gzstream()
 	{
 		deflateEnd(&m_strm);
 	}
@@ -631,7 +631,7 @@ public:
 	{
 		m_dctx = ZSTD_createDCtx();
 	};
-	~ZstdStream()
+	virtual ~ZstdStream()
 	{
 		ZSTD_freeDCtx(m_dctx);
 	}
@@ -934,6 +934,7 @@ int FSCompressStream::for_each_ls(uuu_ls_file fn, const string &backfile, const 
 class Bz2FragmentBlock: public FragmentBlock
 {
 public:
+	virtual ~Bz2FragmentBlock() {}
 	int DataConvert() override
 	{
 		std::lock_guard<mutex> lock(m_mutex);
