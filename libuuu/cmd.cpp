@@ -840,7 +840,7 @@ int CmdIf::parser(char *p)
 		return -1;
 	}
 
-	m_condtion = m_cmd.substr(lc, end - lc);
+	m_condition = m_cmd.substr(lc, end - lc);
 	m_true_cmd = m_cmd.substr(end + 4);
 	return 0;
 }
@@ -869,11 +869,11 @@ int CmdIf::run(CmdCtx *p)
 	int i = 0;
 	for (i = 0; !cmp[i].empty(); i++)
 	{
-		size_t pos = m_condtion.find(cmp[i], 0);
+		size_t pos = m_condition.find(cmp[i], 0);
 		if (pos != string::npos)
 		{
-			l = m_condtion.substr(0, pos);
-			r = m_condtion.substr(pos + cmp[i].size() + 1);
+			l = m_condition.substr(0, pos);
+			r = m_condition.substr(pos + cmp[i].size() + 1);
 			break;
 		}
 	}

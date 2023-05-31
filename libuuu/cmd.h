@@ -174,7 +174,7 @@ public:
 	int run(CmdCtx *p) override;
 
 private:
-	std::string m_condtion;
+	std::string m_condition;
 	std::string m_protocol;
 	std::string m_true_cmd;
 	void build_map(CmdCtx *p);
