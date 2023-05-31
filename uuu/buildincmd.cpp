@@ -193,7 +193,7 @@ BuiltInScriptMap::BuiltInScriptMap(const BuiltInScriptRawData*p)
 
 /**
  * @brief Auto-complete names of built-in scripts if they match `match`
- * @param[in] match The string against which the scripts' names will be machted
+ * @param[in] match The string against which the scripts' names will be matched
  * @param[in] space A separator character which shall be printed after the
  * completed script name
  */
