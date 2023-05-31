@@ -191,7 +191,7 @@ int HIDTrans::read(void *buff, size_t size, size_t *rsize)
 int BulkTrans::write(void *buff, size_t size)
 {
 	int ret = 0;
-	int actual_lenght;
+	int actual_length;
 	for (size_t i = 0; i < size; i += m_MaxTransPreRequest)
 	{
 		uint8_t *p = (uint8_t *)buff;
@@ -206,7 +206,7 @@ int BulkTrans::write(void *buff, size_t size)
 			m_ep_out.addr,
 			p,
 			sz,
-			&actual_lenght,
+			&actual_length,
 			m_timeout
 		);
 
@@ -229,7 +229,7 @@ int BulkTrans::write(void *buff, size_t size)
 			m_ep_out.addr,
 			nullptr,
 			0,
-			&actual_lenght,
+			&actual_length,
 			2000
 		);
 
@@ -267,7 +267,7 @@ int BulkTrans::open(void *p)
 int BulkTrans::read(void *buff, size_t size, size_t *rsize)
 {
 	int ret;
-	int actual_lenght;
+	int actual_length;
 	uint8_t *p = (uint8_t *)buff;
 
 	if (size == 0)
@@ -281,11 +281,11 @@ int BulkTrans::read(void *buff, size_t size, size_t *rsize)
 		m_ep_in.addr,
 		p,
 		size,
-		&actual_lenght,
+		&actual_length,
 		m_timeout
 	);
 
-	*rsize = actual_lenght;
+	*rsize = actual_length;
 
 	if (ret < 0)
 	{
