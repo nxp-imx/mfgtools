@@ -57,7 +57,7 @@ struct FatDirEntry
 	uint8_t ext[3];
 	uint8_t attr;
 	uint8_t user_attr;
-	uint8_t delele_char;
+	uint8_t delete_char;
 	uint16_t create_time;
 	uint16_t create_date;
 	uint16_t userid;
