@@ -166,8 +166,8 @@ int FBCmd::parser(char *p)
 
 	size_t pos = 0;
 	string s;
-	
-	if (parser_protocal(p, pos))
+
+	if (parser_protocol(p, pos))
 		return -1;
 	
 	s = get_next_param(m_cmd, pos);

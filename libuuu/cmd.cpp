@@ -202,7 +202,7 @@ int CmdBase::parser(char *p)
 	return 0;
 }
 
-int CmdBase::parser_protocal(char *p, size_t &pos)
+int CmdBase::parser_protocol(char *p, size_t &pos)
 {
 	if (p)
 		m_cmd = *p;
@@ -638,7 +638,7 @@ int CmdError::parser(char *p)
 	size_t pos = 0;
 	string s;
 
-	if (parser_protocal(p, pos))
+	if (parser_protocol(p, pos))
 		return -1;
 
 	s = get_next_param(m_cmd, pos);
@@ -662,10 +662,10 @@ int CmdShell::parser(char * p)
 	size_t pos = 0;
 	string s;
 
-	if (parser_protocal(p, pos))
+	if (parser_protocol(p, pos))
 		return -1;
 
-	m_protocal = m_cmd.substr(0, pos);
+	m_protocol = m_cmd.substr(0, pos);
 
 	s = get_next_param(m_cmd, pos);
 
@@ -700,7 +700,7 @@ int CmdShell::run(CmdCtx*pCtx)
 		if (m_dyn)
 		{
 			string cmd;
-			cmd = m_protocal;
+			cmd = m_protocol;
 			str.resize(strlen(str.c_str()));
 			cmd += ' ';
 			cmd += str;
@@ -745,7 +745,7 @@ int CmdEnv::parser(char *p)
 
 	size_t pos = 0;
 
-	if (parser_protocal(p, pos))
+	if (parser_protocol(p, pos))
 		return -1;
 	if (pos == string::npos || pos >= m_cmd.size())
 		return -1;
@@ -813,10 +813,10 @@ int CmdIf::parser(char *p)
 
 	size_t pos = 0;
 
-	if (parser_protocal(p, pos))
+	if (parser_protocol(p, pos))
 		return -1;
 
-	m_protocal = m_cmd.substr(0, pos);
+	m_protocol = m_cmd.substr(0, pos);
 
 	if (pos == string::npos || pos >= m_cmd.size())
 		return -1;
@@ -904,7 +904,7 @@ int CmdIf::run(CmdCtx *p)
 	}
 
 	//Pass condition check;
-	string cmd = m_protocal;
+	string cmd = m_protocol;
 	cmd += ' ';
 	cmd += this->m_true_cmd;
 	return run_cmd(p, cmd.c_str(), 0);
@@ -915,7 +915,7 @@ int CmdEnv::run(CmdCtx *p)
 	return run_cmd(p, m_unfold_cmd.c_str(), 0);
 }
 
-int run_cmds(const char *procotal, CmdCtx *p)
+int run_cmds(const char *protocol, CmdCtx *p)
 {
 	CmdMap cmdmap, *pCmdMap;
 
@@ -937,12 +937,12 @@ int run_cmds(const char *procotal, CmdCtx *p)
 		pCmdMap = &g_cmd_map;
 	}
 
-	if (pCmdMap->find(procotal) == pCmdMap->end())
+	if (pCmdMap->find(protocol) == pCmdMap->end())
 	{
 		return 0;
 	}
 
-	return (*pCmdMap)[procotal]->run_all(p);
+	return (*pCmdMap)[protocol]->run_all(p);
 }
 
 static int insert_one_cmd(const char * cmd, CmdMap *pCmdMap)

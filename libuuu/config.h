@@ -63,7 +63,7 @@ class Config :public std::vector<ConfigItem>
 public:
 	Config();
 	ConfigItem *find(uint16_t vid, uint16_t pid, uint16_t ver);
-	Config find(const std::string &protocal);
+	Config find(const std::string &protocol);
 };
 
 Config * get_config() noexcept;
