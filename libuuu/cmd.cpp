@@ -305,7 +305,7 @@ int CmdMap::run_all(const std::string &protocol, CmdCtx *p, bool dry_run)
 	return at(protocol)->run_all(p, dry_run);
 }
 
-string get_next_param(const string &cmd, size_t &pos, char sperate)
+string get_next_param(const string &cmd, size_t &pos, char separate)
 {
 	string str;
 	if (pos == string::npos)
@@ -314,7 +314,7 @@ string get_next_param(const string &cmd, size_t &pos, char sperate)
 		return str;
 
 	//trim left space
-	while (cmd[pos] == sperate && pos < cmd.size())
+	while (cmd[pos] == separate && pos < cmd.size())
 		pos++;
 
 	bool quate = false;
@@ -325,7 +325,7 @@ string get_next_param(const string &cmd, size_t &pos, char sperate)
 		if (cmd[s] == '"')
 			quate = !quate;
 
-		if (!quate && cmd[s] == sperate)
+		if (!quate && cmd[s] == separate)
 		{
 			end = s;
 			break;

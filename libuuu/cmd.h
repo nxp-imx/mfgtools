@@ -38,7 +38,7 @@
 
 class ConfigItem;
 
-std::string get_next_param(const std::string &cmd, size_t &pos, char sperate = ' ');
+std::string get_next_param(const std::string &cmd, size_t &pos, char separate = ' ');
 
 class CmdCtx
 {
