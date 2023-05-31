@@ -254,7 +254,7 @@ static int open_libusb(libusb_device *dev, void **usb_device_handle)
  Before start thread, need call libusb_ref_device to dev is free
 
  libusb_get_list()
- libusb_ref_devive        // avoid free at libusb_free_list if run_usb_cmd have not open device in time.
+ libusb_ref_device        // avoid free at libusb_free_list if run_usb_cmd have not open device in time.
  thread start run_usb_cmds;
  libusb_free_list()
 */
