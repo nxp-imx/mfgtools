@@ -36,6 +36,7 @@
 #include "buffer.h"
 #include "sdp.h"
 #include "trans.h"
+#include <libusb.h>
 
 #include <cstring>
 
