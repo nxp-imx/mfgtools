@@ -357,7 +357,7 @@ public:
 
 	bool update(uuu_notify nt)
 	{
-		if (nt.type == uuu_notify::NOFITY_DEV_ATTACH)
+		if (nt.type == uuu_notify::NOTIFY_DEV_ATTACH)
 		{
 			m_dev = nt.str;
 			m_done = 0;
@@ -445,7 +445,7 @@ public:
 		if (this->m_dev == "Prep" && g_start_usb_transfer)
 			return;
 
-		if (nt->type == uuu_notify::NOFITY_DEV_ATTACH)
+		if (nt->type == uuu_notify::NOTIFY_DEV_ATTACH)
 		{
 			cout << "New USB Device Attached at " << nt->str << endl;
 		}
