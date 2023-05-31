@@ -112,7 +112,7 @@ int Zip::BuildDirInfo()
 		info.m_filename.append((char*)pdir->filename, pdir->file_name_length);
 		info.m_offset = pdir->offset;
 		info.m_filesize = pdir->uncompressed_size;
-		info.m_timestamp = (pdir->last_modidfy_date << 16) + pdir->last_modidfy_time;
+		info.m_timestamp = (pdir->last_modify_date << 16) + pdir->last_modify_time;
 		info.m_compressedsize = pdir->compressed_size;
 
 		if (pdir->extrafield_length)
