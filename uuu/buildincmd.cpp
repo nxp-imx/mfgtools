@@ -245,7 +245,7 @@ void BuiltInScriptMap::ShowCmds(FILE * const file) const
  * @param[in] str The string of which a copy with the replacements shall be
  * created
  * @param[in] key The string which shall be replaced
- * @param[in] replace The string that shall replace ocurrences of `key`
+ * @param[in] replace The string that shall replace occurrences of `key`
  * @return A new string instance with the replacements conducted on it
  */
 static std::string replace_str(std::string str, std::string key, std::string replace)
