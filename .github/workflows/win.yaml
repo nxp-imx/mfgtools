@@ -23,10 +23,7 @@ jobs:
     
     - name: Set up Visual Studio
       uses: microsoft/setup-msbuild@v1.1
-  
-    - name: Restore NuGet packages
-      run: nuget restore msvc/uuu-static-link.sln
-    
+
     - name: Build static solution
       run: msbuild /p:Configuration=${{ matrix.configuration }} /p:PlatformToolset=v143 /p:Platform=${{ matrix.platform }} msvc/uuu-static-link.sln
       
