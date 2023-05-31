@@ -257,7 +257,7 @@ int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 
 	if (file_desc->compress_method != 8)
 	{
-		set_last_err_string("Unsupport compress method");
+		set_last_err_string("Unsupported compress method");
 		return -1;
 	}
 

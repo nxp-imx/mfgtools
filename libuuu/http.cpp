@@ -296,7 +296,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 				break;
 
 			case HTTP_STATUS_PROXY_AUTH_REQ:
-				set_last_err_string("unsupport proxy auth");
+				set_last_err_string("unsupported proxy auth");
 				return -1;
 
 			default:
