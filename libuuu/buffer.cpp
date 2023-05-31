@@ -463,7 +463,7 @@ class FSCompressStream : public FSBackFile
 {
 public:
 	FSCompressStream() { m_small_pool = g_small_memory; }
-	int load(const string& backfile, const string& filename, shared_ptr<FileBuffer>outp);
+	int load(const string& backfile, const string& filename, shared_ptr<FileBuffer>outp) override;
 	bool exist(const string& backfile, const string& filename) override;
 	int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) override;
 	int Decompress(const string& backfile, shared_ptr<FileBuffer>outp) override;
@@ -499,7 +499,7 @@ public:
 	{
 		return m_in_size - m_strm.avail_in;
 	};
-	virtual size_t get_output_pos()
+	virtual size_t get_output_pos() override
 	{
 		return m_out_size - m_strm.avail_out;
 	};
@@ -516,7 +516,7 @@ static class FSBz2 : public FSCompressStream
 public:
 	FSBz2() { m_ext = ".BZ2"; };
 	virtual bool seekable(const string& backfile) override;
-	virtual std::shared_ptr<CommonStream> create_stream() { return std::make_shared<Bz2stream>(); }
+	virtual std::shared_ptr<CommonStream> create_stream() override { return std::make_shared<Bz2stream>(); }
 	virtual std::shared_ptr<FragmentBlock> ScanCompressblock(const string& backfile, size_t& input_offset, size_t& output_offset) override;
 
 }g_fsbz2;
@@ -549,20 +549,20 @@ public:
 		m_strm.avail_out = m_out_size = sz;
 		return 0;
 	};
-	virtual size_t get_input_pos()
+	virtual size_t get_input_pos() override
 	{
 		return m_in_size - m_strm.avail_in;
 	};
-	virtual size_t get_output_pos()
+	virtual size_t get_output_pos() override
 	{
 		return m_out_size - m_strm.avail_out;
 	};
-	virtual int decompress()
+	virtual int decompress() override
 	{
 		return inflate(&m_strm, Z_SYNC_FLUSH);
 	};
 
-	virtual size_t get_default_input_size() { return 0x10000; }
+	virtual size_t get_default_input_size() override { return 0x10000; }
 };
 
 static class FSGz : public FSCompressStream
@@ -612,7 +612,7 @@ public:
 		return ZSTD_DStreamInSize();
 	}
 
-	size_t decompress_size(const string& backfile)
+	size_t decompress_size(const string& backfile) override
 	{
 		shared_ptr<FileBuffer> inp = get_file_buffer(backfile, true);
 		if (inp == nullptr)
