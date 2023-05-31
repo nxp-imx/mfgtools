@@ -297,7 +297,7 @@ static int usb_add(libusb_device *dev)
 	struct libusb_device_descriptor desc;
 	int r = libusb_get_device_descriptor(dev, &desc);
 	if (r < 0) {
-		set_last_err_string("failure get device descrior");
+		set_last_err_string("failure get device descriptor");
 		return r;
 	}
 
@@ -465,7 +465,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 			struct libusb_device_descriptor desc;
 			int r = libusb_get_device_descriptor(dev, &desc);
 			if (r < 0) {
-				set_last_err_string("failure get device descrior");
+				set_last_err_string("failure get device descriptor");
 				return -1;
 			}
 			string str = get_device_path(dev);
@@ -526,7 +526,7 @@ int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 		struct libusb_device_descriptor desc;
 		int r = libusb_get_device_descriptor(dev, &desc);
 		if (r < 0) {
-			set_last_err_string("failure get device descrior");
+			set_last_err_string("failure get device descriptor");
 			return -1;
 		}
 		string str = get_device_path(dev);
