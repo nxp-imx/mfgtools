@@ -102,6 +102,8 @@ public:
 			return m_pData;
 		return m_data.data();
 	}
+
+	virtual ~FragmentBlock() {}
 };
 
 
@@ -148,7 +150,7 @@ public:
 	{
 		return (*this)[index];
 	}
-	~DataBuffer()
+	virtual ~DataBuffer()
 	{
 		if (m_allocate_way == ALLOCATION_WAYS::MALLOC)
 		{
