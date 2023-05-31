@@ -73,7 +73,7 @@ static const char* base64_table =
 static string base64_encode(string str)
 {
 	string ret;
-	for (int i = 0; i < str.length(); i += 3)
+	for (size_t i = 0; i < str.length(); i += 3)
 	{
 		ret.push_back(base64_table[(str[i] >> 2) & 0x3f]);
 		if (i + 1 < str.length())
@@ -509,7 +509,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 		request += "\r\n";
 
 		ret = SendPacket((char*)request.c_str(), request.size());
-		if (ret != request.size())
+		if ((size_t)(ret) != request.size())
 		{
 			set_last_err_string("http send error");
 			return -1;
