@@ -34,7 +34,7 @@ Freescale/NXP I.MX Chip image deploy tools.
 
   uuu -v u-boot.imx         verbose mode
 
-  uuu -d u-boot.imx         Once it detects the attachement of a known device, download boot.imx.
+  uuu -d u-boot.imx         Once it detects the attachment of a known device, download boot.imx.
 
                             u-boot.imx can be replaced, new file will be download once board reset.
 
