@@ -1,4 +1,4 @@
-name: Build for ARM64
+name: Build for x64 ubuntu-lastest
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build for ARM64
+    name: Build for x64 ubuntu-lastest
     runs-on: ubuntu-latest
 
     steps:
