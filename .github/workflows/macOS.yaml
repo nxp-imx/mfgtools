@@ -1,0 +1,24 @@
+name: macOS Build
+
+on:
+  push:
+    branches:
+      - master
+      
+jobs:
+  build:
+    name: macOS Build
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up environment
+        run: brew install libusb pkg-config zstd
+        
+      - name: Build
+        run: export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; pkg-config --list-all; cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . ; make
+    
