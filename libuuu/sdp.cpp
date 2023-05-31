@@ -186,7 +186,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 		return -1;
 	}
 
-	// point maybe change after new requestion buffer.
+	// point maybe change after new requisition buffer.
 	pdcd = &(buff->at(off + pIVT->DCDAddress - pIVT->SelfAddr));
 
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_DCD_WRITE;
