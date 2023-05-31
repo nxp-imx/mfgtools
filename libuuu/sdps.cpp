@@ -127,7 +127,7 @@ int SDPSCmd::run(CmdCtx *pro)
 			}
 
 			offset = pos - length;
-			if (offset < 0)
+			if (ssize_t(offset) < 0)
 			{
 				set_last_err_string("This wic boot length is wrong");
 				return -1;

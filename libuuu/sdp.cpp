@@ -426,7 +426,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 				offset += GetContainerActualSize(fbuff, offset);
 			}
 
-			if (offset >= fbuff->size())
+			if (size_t(offset) >= fbuff->size())
 			{
 				set_last_err_string("Unknown Image type, can't use skipspl format");
 				return -1;
