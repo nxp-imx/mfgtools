@@ -55,8 +55,8 @@ struct Zip_file_desc
 	uint16_t version_mini_extract;
 	uint16_t flags;
 	uint16_t compress_method;
-	uint16_t last_modidfy_time;
-	uint16_t last_modidfy_date;
+	uint16_t last_modify_time;
+	uint16_t last_modify_date;
 	uint32_t crc;
 	uint32_t compressed_size;
 	uint32_t uncompressed_size;
@@ -71,8 +71,8 @@ struct Zip_central_dir
 	uint16_t version_mini_extract;
 	uint16_t flags;
 	uint16_t compress_method;
-	uint16_t last_modidfy_time;
-	uint16_t last_modidfy_date;
+	uint16_t last_modify_time;
+	uint16_t last_modify_date;
 	uint32_t crc;
 	uint32_t compressed_size;
 	uint32_t uncompressed_size;
@@ -93,8 +93,8 @@ struct Zip64_central_dir
 	uint16_t version_mini_extract;
 	uint16_t flags;
 	uint16_t compress_method;
-	uint16_t last_modidfy_time;
-	uint16_t last_modidfy_date;
+	uint16_t last_modify_time;
+	uint16_t last_modify_date;
 	uint32_t crc;
 	uint32_t compressed_size;
 	uint32_t uncompressed_size;
