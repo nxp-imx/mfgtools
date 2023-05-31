@@ -548,7 +548,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 		memcpy((void*)str.c_str(), m_buff.data(), i + 2);
 
 		int ret = parser_response(str);
-		if (ret == ERR_ACESS_DENIED)
+		if (ret == ERR_ACCESS_DENIED)
 		{
 			if(g_passwd_map[host].first.empty())
 			{
@@ -589,7 +589,7 @@ int HttpStream::parser_response(string rep)
 
 	string str = rep.substr(0, pos);
 	if (str == "HTTP/1.1 401 Unauthorized")
-		return ERR_ACESS_DENIED;
+		return ERR_ACCESS_DENIED;
 
 	if (str != "HTTP/1.1 200 OK")
 	{
