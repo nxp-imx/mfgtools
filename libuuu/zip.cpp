@@ -293,7 +293,7 @@ int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 		}
 		size_t have = each_out_size - m_strm.avail_out;
 
-		p->m_avaible_size = pos;
+		p->m_available_size = pos;
 		p->m_request_cv.notify_all();
 
 		pos += have;
@@ -318,7 +318,7 @@ int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 		return -1;
 	}
 
-	p->m_avaible_size = m_filesize;
+	p->m_available_size = m_filesize;
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 	p->m_request_cv.notify_all();
 

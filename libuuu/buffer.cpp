@@ -239,8 +239,8 @@ public:
 		if (p->mapfile(backfile.substr(1), st.st_size))
 			return -1;
 
-		p->m_avaible_size = st.st_size;
-		
+		p->m_available_size = st.st_size;
+
 		atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED | FILEBUFFER_FLAG_NEVER_FREE);
 		p->m_request_cv.notify_all();
 
@@ -393,7 +393,7 @@ int FSHttp::http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, str
 			p->m_request_cv.notify_all();
 			return -1;
 		}
-		p->m_avaible_size = i + sz;
+		p->m_available_size = i + sz;
 		p->m_request_cv.notify_all();
 
 		ut.type = uuu_notify::NOTIFY_TRANS_POS;
@@ -784,7 +784,7 @@ int zip_async_load(string zipfile, string fn, shared_ptr<FileBuffer> buff)
 	if(zip.get_file_buff(fn, buff))
 		return -1;
 
-	buff->m_avaible_size = buff->m_DataSize;
+	buff->m_available_size = buff->m_DataSize;
 	atomic_fetch_or(&buff->m_dataflags, FILEBUFFER_FLAG_LOADED);
 
 	buff->m_request_cv.notify_all();
@@ -852,7 +852,7 @@ int FSTar::load(const string &backfile, const string &filename, shared_ptr<FileB
 
 	if(tar.get_file_buff(filename, p))
 		return -1;
-	p->m_avaible_size = p->m_DataSize;
+	p->m_available_size = p->m_DataSize;
 	atomic_fetch_or(&p->m_dataflags, FILEBUFFER_FLAG_LOADED);
 	p->m_request_cv.notify_all();
 	return 0;
@@ -1124,7 +1124,7 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 			ut.type = uuu_notify::NOTIFY_DECOMPRESS_POS;
 			ut.index = outOffset;
 			call_notify(ut);
-			outp->m_avaible_size = outOffset;
+			outp->m_available_size = outOffset;
 			outp->m_request_cv.notify_all();
 
 
@@ -1247,7 +1247,7 @@ FileBuffer::FileBuffer()
 	m_DataSize = 0;
 	m_MemSize = 0;
 	m_dataflags = 0;
-	m_avaible_size = 0;
+	m_available_size = 0;
 }
 
 FileBuffer::FileBuffer(void *p, size_t sz)
@@ -1373,7 +1373,7 @@ int FileBuffer::ref_other_buffer(shared_ptr<FileBuffer> p, size_t offset, size_t
 {
 	m_pDatabuffer = p->data() + offset;
 	m_DataSize = m_MemSize = size;
-	m_avaible_size = m_DataSize;
+	m_available_size = m_DataSize;
 	m_allocate_way = ALLOCATION_WAYS::REF;
 	m_ref = p;
 
@@ -1515,7 +1515,7 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 		if (m_reset_stream)
 		{
 			m_dataflags = 0;
-			m_avaible_size = 0;
+			m_available_size = 0;
 			this->m_aync_thread.join();
 			m_reset_stream = false;
 
@@ -1585,7 +1585,7 @@ int64_t FileBuffer::request_data(void *data, size_t offset, size_t sz)
 			return request_data_from_segment(data, offset, sz);
 
 		std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
-		while ((offset + sz > m_avaible_size) && !IsLoaded())
+		while ((offset + sz > m_available_size) && !IsLoaded())
 		{
 			if (IsError())
 			{
@@ -1597,7 +1597,7 @@ int64_t FileBuffer::request_data(void *data, size_t offset, size_t sz)
 
 		if (IsLoaded())
 		{
-			if (offset > m_avaible_size)
+			if (offset > m_available_size)
 			{
 				set_last_err_string("request offset execeed memory size");
 				return -1;
@@ -1607,8 +1607,8 @@ int64_t FileBuffer::request_data(void *data, size_t offset, size_t sz)
 	}
 
 	size_t size = sz;
-	if (offset + size >= m_avaible_size)
-		size = m_avaible_size - offset;
+	if (offset + size >= m_available_size)
+		size = m_available_size - offset;
 
 	if (needlock) m_data_mutex.lock();
 
@@ -1889,7 +1889,7 @@ int FSCompressStream::load(const string& backfile, const string& filename, share
 		tar.Open(decompressed_name);
 		if (tar.get_file_buff(filename, outp))
 			return -1;
-		outp->m_avaible_size = outp->m_DataSize;
+		outp->m_available_size = outp->m_DataSize;
 	}
 
 	if (seekable(backfile))

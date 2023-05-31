@@ -242,7 +242,7 @@ public:
 
 	std::thread m_aync_thread;
 
-	std::atomic_size_t m_avaible_size;
+	std::atomic_size_t m_available_size;
 	std::condition_variable m_request_cv;
 	std::mutex m_requext_cv_mutex;
 
