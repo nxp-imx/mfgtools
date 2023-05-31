@@ -262,7 +262,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev, short bcddevice)
 {
 	int ret;
 	uuu_notify nt;
-	nt.type = uuu_notify::NOFITY_DEV_ATTACH;
+	nt.type = uuu_notify::NOTIFY_DEV_ATTACH;
 
 	string str;
 	str = get_device_path(dev);
@@ -477,7 +477,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 			if (item && item->m_protocol == str_to_upper(pro))
 				{
 					uuu_notify nt;
-					nt.type = uuu_notify::NOFITY_DEV_ATTACH;
+					nt.type = uuu_notify::NOTIFY_DEV_ATTACH;
 					m_config_item = item;
 					m_current_bcd = desc.bcdDevice;
 
