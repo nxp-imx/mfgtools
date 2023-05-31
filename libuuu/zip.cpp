@@ -103,7 +103,7 @@ int Zip::BuildDirInfo()
 	while (i < total)
 	{
 		Zip_central_dir *pdir = (Zip_central_dir *)(zipfile->data() + i);
-		if (pdir->sign != DIR_SIGNTURE)
+		if (pdir->sign != DIR_SIGNATURE)
 		{
 			set_last_err_string("DIR signature mismatched");
 			return -1;
