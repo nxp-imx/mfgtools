@@ -317,15 +317,15 @@ string get_next_param(const string &cmd, size_t &pos, char separate)
 	while (cmd[pos] == separate && pos < cmd.size())
 		pos++;
 
-	bool quate = false;
+	bool quote = false;
 	size_t end = string::npos;
 
 	for (size_t s = pos; s < cmd.size(); s++)
 	{
 		if (cmd[s] == '"')
-			quate = !quate;
+			quote = !quote;
 
-		if (!quate && cmd[s] == separate)
+		if (!quote && cmd[s] == separate)
 		{
 			end = s;
 			break;
