@@ -31,5 +31,5 @@ jobs:
     - name: Build static solution
       run: msbuild /p:Configuration=${{ matrix.configuration }} /p:PlatformToolset=v143 /p:Platform=${{ matrix.platform }} msvc/uuu-static-link.sln
       
-    - name: Build dymatic solution
+    - name: Build dynamic solution
       run: msbuild /p:Configuration=${{ matrix.configuration }} /p:PlatformToolset=v143 /p:Platform=${{ matrix.platform }} msvc/uuu.sln
