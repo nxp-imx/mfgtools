@@ -1426,10 +1426,10 @@ void FileBuffer::truncate_old_data_in_pool()
 
 	std::unique_lock<std::mutex> lock(this->m_seg_map_mutex);
 
-	if (m_last_request_offset < m_totall_buffer_size/2)
+	if (m_last_request_offset < m_total_buffer_size/2)
 		return;
 
-	size_t off = m_last_request_offset - m_totall_buffer_size/2;
+	size_t off = m_last_request_offset - m_total_buffer_size/2;
 
 	for (auto it= m_seg_map.lower_bound(off); it != m_seg_map.end(); it++)
 	{
@@ -1651,7 +1651,7 @@ std::shared_ptr<FragmentBlock> FileBuffer::request_new_blk()
 				offset = p->m_output_offset;
 			}
 
-			while (offset > m_last_request_offset + m_totall_buffer_size)
+			while (offset > m_last_request_offset + m_total_buffer_size)
 			{
 				if (m_reset_stream)
 					return NULL;

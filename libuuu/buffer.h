@@ -204,7 +204,7 @@ public:
 	std::mutex m_pool_load_cv_mutex;
 	std::shared_ptr<FragmentBlock> m_last_db;
 	size_t m_seg_blk_size = 0x800000;
-	size_t m_totall_buffer_size = 8 * m_seg_blk_size;
+	size_t m_total_buffer_size = 8 * m_seg_blk_size;
 	std::atomic_bool m_reset_stream { false };
 
 	//used for continue decompress\loading only
