@@ -242,7 +242,7 @@ public:
 
 	std::atomic_int m_dataflags;
 
-	std::thread m_aync_thread;
+	std::thread m_async_thread;
 
 	std::atomic_size_t m_available_size;
 	std::condition_variable m_request_cv;
@@ -339,7 +339,7 @@ private:
 	ALLOCATION_WAYS m_allocate_way = ALLOCATION_WAYS::MALLOC;
 };
 
-std::shared_ptr<FileBuffer> get_file_buffer(std::string filename, bool aysnc=false);
+std::shared_ptr<FileBuffer> get_file_buffer(std::string filename, bool async=false);
 bool check_file_exist(std::string filename, bool start_async_load=true);
 
 void set_current_dir(const std::string &dir);
