@@ -1229,8 +1229,8 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 		{
 			std::lock_guard<mutex> lock(p->m_async_mutex);
 
-			if(p->m_aync_thread.joinable())
-				p->m_aync_thread.join();
+			if(p->m_async_thread.joinable())
+				p->m_async_thread.join();
 
 			if(!p->IsLoaded())
 			{
@@ -1270,8 +1270,8 @@ FileBuffer::~FileBuffer()
 {
 	m_reset_stream = true;
 
-	if(m_aync_thread.joinable())
-		m_aync_thread.join();
+	if(m_async_thread.joinable())
+		m_async_thread.join();
 
 	if (m_pDatabuffer)
 	{
@@ -1391,7 +1391,7 @@ int FileBuffer::reload(string filename, bool async)
 		if (g_fs_data.need_small_mem(filename))
 			m_allocate_way = ALLOCATION_WAYS::SEGMENT;
 
-		m_aync_thread = thread(&FS_DATA::load, &g_fs_data, filename, shared_from_this());
+		m_async_thread = thread(&FS_DATA::load, &g_fs_data, filename, shared_from_this());
 	}
 	else
 	{
@@ -1514,7 +1514,7 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 		{
 			m_dataflags = 0;
 			m_available_size = 0;
-			this->m_aync_thread.join();
+			this->m_async_thread.join();
 			m_reset_stream = false;
 
 			this->reload(m_filename, true);
@@ -2037,8 +2037,8 @@ void clean_up_filemap()
 	{
 		it.second->m_reset_stream = true;
 		it.second->m_pool_load_cv.notify_all();
-		if (it.second->m_aync_thread.joinable())
-			it.second->m_aync_thread.join();
+		if (it.second->m_async_thread.joinable())
+			it.second->m_async_thread.join();
 	}
 	g_filebuffer_map.clear();
 }
