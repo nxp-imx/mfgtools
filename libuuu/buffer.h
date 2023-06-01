@@ -246,7 +246,7 @@ public:
 
 	std::atomic_size_t m_available_size;
 	std::condition_variable m_request_cv;
-	std::mutex m_requext_cv_mutex;
+	std::mutex m_request_cv_mutex;
 
 #ifdef WIN32
 	OVERLAPPED m_OverLapped;
@@ -295,7 +295,7 @@ public:
 		if (IsKnownSize())
 			return m_DataSize;
 
-		std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
+		std::unique_lock<std::mutex> lck(m_request_cv_mutex);
 		while (!(m_dataflags & FILEBUFFER_FLAG_KNOWN_SIZE_BIT))
 			m_request_cv.wait(lck);
 

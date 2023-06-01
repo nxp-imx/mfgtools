@@ -1455,7 +1455,7 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 	do
 	{
 		m_last_request_offset = offset;
-		std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
+		std::unique_lock<std::mutex> lck(m_request_cv_mutex);
 
 		shared_ptr<FragmentBlock> blk;
 
@@ -1582,7 +1582,7 @@ int64_t FileBuffer::request_data(void *data, size_t offset, size_t sz)
 		if (this->m_allocate_way == FileBuffer::ALLOCATION_WAYS::SEGMENT)
 			return request_data_from_segment(data, offset, sz);
 
-		std::unique_lock<std::mutex> lck(m_requext_cv_mutex);
+		std::unique_lock<std::mutex> lck(m_request_cv_mutex);
 		while ((offset + sz > m_available_size) && !IsLoaded())
 		{
 			if (IsError())
