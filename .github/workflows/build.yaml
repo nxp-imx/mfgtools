@@ -30,3 +30,19 @@ jobs:
           cmake ..
           make
 
+      - name: Create or Update Release
+        id: create_or_update_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: UUU_1.5.${{ github.run_id }}_TEST
+          release_name: Release UUU_1.5.${{ github.sha }}_TEST
+          draft: true
+          prerelease: true
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: uuu
+          path: ./build/uuu/uuu
