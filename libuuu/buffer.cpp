@@ -1569,7 +1569,7 @@ int64_t FileBuffer::request_data(void *data, size_t offset, size_t sz)
 	{
 		if (offset >= this->size())
 		{
-			set_last_err_string("request offset execeed memory size");
+			set_last_err_string("request offset exceed memory size");
 			return -1;
 		}
 
