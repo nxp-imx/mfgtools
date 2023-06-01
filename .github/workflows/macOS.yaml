@@ -25,4 +25,23 @@ jobs:
         
       - name: Build
         run: export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; pkg-config --list-all; cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . ; make
+
+      - name: Rename
+        run: cp uuu/uuu uuu_mac
     
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: uuu_mac
+          path: ./build/uuu/uuu
+
+      - name: Create or Update Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Release UUU_1.5.${{ github.sha }}_TEST
+          tag: UUU_1.5.${{ github.sha }}_TEST
+          commit: ${{ github.hash }}
+          allowUpdates: true
+          draft: true
+          prerelease: true
+          artifacts: "uuu_mac"

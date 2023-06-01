@@ -30,29 +30,19 @@ jobs:
           cmake ..
           make
 
-      - name: Create or Update Release
-        id: create_or_update_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: UUU_1.5.${{ github.run_id }}_TEST
-          release_name: Release UUU_1.5.${{ github.sha }}_TEST
-          draft: true
-          prerelease: true
-
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v2
         with:
           name: uuu
           path: ./build/uuu/uuu
 
-      - name: Upload Assets
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create or Update Release
+        uses: ncipollo/release-action@v1
         with:
-          upload_url: ${{ steps.create_or_update_release.outputs.upload_url }}
-          asset_path: ./build/uuu/uuu
-          asset_name: uuu
-          asset_content_type: application/octet-stream
+          name: Release UUU_1.5.${{ github.sha }}_TEST
+          tag: UUU_1.5.${{ github.sha }}_TEST
+          commit: ${{ github.hash }}
+          allowUpdates: true
+          draft: true
+          prerelease: true
+          artifacts: "./build/uuu/uuu"
