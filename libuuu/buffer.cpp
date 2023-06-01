@@ -1112,7 +1112,7 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 
 			if (ret < 0) {
 				blk->m_ret = ret;
-				set_last_err_string("decompress errror");
+				set_last_err_string("decompress error");
 				outp->m_request_cv.notify_all();
 				return -1;
 			}
