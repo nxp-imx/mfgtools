@@ -46,3 +46,13 @@ jobs:
         with:
           name: uuu
           path: ./build/uuu/uuu
+
+      - name: Upload Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_or_update_release.outputs.upload_url }}
+          asset_path: ./build/uuu/uuu
+          asset_name: uuu
+          asset_content_type: application/octet-stream
