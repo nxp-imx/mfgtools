@@ -288,6 +288,12 @@ private:
 	std::string m_target_file;
 };
 
+class FBBootCmd : public FBCmd
+{
+public:
+	FBBootCmd(char *p) : FBCmd(p, "boot") {}
+};
+
 class FBContinueCmd : public FBCmd
 {
 public:
