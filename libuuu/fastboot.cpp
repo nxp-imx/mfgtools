@@ -958,15 +958,15 @@ int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> pin)
 	nt.total = pIs->dwWriteDescriptorCount;
 	call_notify(nt);
 
-	size_t currrent_block = 0;
+	size_t current_block = 0;
 	size_t i;
 	for (i = 0; i < pIs->dwWriteDescriptorCount; i++)
 	{
 		FFU_BLOCK_DATA_ENTRY *entry = (FFU_BLOCK_DATA_ENTRY*)(p->data() + off);
-		
+
 		off += sizeof(FFU_BLOCK_DATA_ENTRY) + (entry->dwLocationCount -1) * sizeof(_DISK_LOCATION);
 
-		if (currrent_block >= pIs->dwInitialTableIndex && currrent_block < pIs->dwInitialTableIndex + pIs->dwInitialTableCount)
+		if (current_block >= pIs->dwInitialTableIndex && current_block < pIs->dwInitialTableIndex + pIs->dwInitialTableCount)
 		{
 			//Skip Init Block
 		}
@@ -974,7 +974,7 @@ int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> pin)
 		{
 			for (uint32_t loc = 0; loc < entry->dwLocationCount; loc++)
 			{
-				//printf("block 0x%x write to 0x%x seek %d\n", currrent_block, entry->rgDiskLocations[loc].dwBlockIndex, entry->rgDiskLocations[loc].dwDiskAccessMethod);
+				//printf("block 0x%x write to 0x%x seek %d\n", current_block, entry->rgDiskLocations[loc].dwBlockIndex, entry->rgDiskLocations[loc].dwDiskAccessMethod);
 				uint32_t blockindex;
 				if (entry->rgDiskLocations[loc].dwDiskAccessMethod == DISK_BEGIN)
 					blockindex = entry->rgDiskLocations[loc].dwBlockIndex;
@@ -985,7 +985,7 @@ int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> pin)
 				{
 					if (flash_ffu_oneblk(fb,
 							pin,
-							block_off + (currrent_block + blk) * pIs->dwBlockSizeInBytes,
+							block_off + (current_block + blk) * pIs->dwBlockSizeInBytes,
 							pIs->dwBlockSizeInBytes,
 							blockindex + blk))
 						return -1;
@@ -997,7 +997,7 @@ int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> pin)
 		nt.total = i;
 		call_notify(nt);
 
-		currrent_block += entry->dwBlockCount;
+		current_block += entry->dwBlockCount;
 	}
 
 	nt.type = uuu_notify::NOTIFY_TRANS_POS;
