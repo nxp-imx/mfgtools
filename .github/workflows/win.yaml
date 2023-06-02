@@ -20,7 +20,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         submodules: true
@@ -33,7 +33,7 @@ jobs:
 
     - name: Upload Build Artifacts
       if: matrix.configuration == 'Release' && matrix.platform == 'x64'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: uuu.exe
         path: msvc/x64/Release/uuu.exe

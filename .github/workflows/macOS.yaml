@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -30,10 +30,10 @@ jobs:
         run: cp uuu/uuu uuu_mac
     
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: uuu_mac
-          path: ./build/uuu/uuu
+          path: uuu/uuu
 
       - name: Create or Update Release
         uses: ncipollo/release-action@v1

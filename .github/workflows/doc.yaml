@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           repository: nxp-imx/mfgtools.wiki.git
@@ -36,7 +36,7 @@ jobs:
           a2x -L -a docinfo UUU
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: UUU.pdf
           path: wiki/UUU.pdf
