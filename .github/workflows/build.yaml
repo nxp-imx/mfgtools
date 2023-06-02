@@ -1,4 +1,4 @@
-name: Build for x64 ubuntu-latest
+name: Build for x64 ubuntu
 
 on:
   push:
@@ -13,12 +13,18 @@ on:
 
 jobs:
   build:
-    name: Build for x64 ubuntu-latest
-    runs-on: ubuntu-latest
+    name: Build for x64 ubuntu
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-18.04
+          - ubuntu-20.04
+          - ubuntu-22.04
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -33,12 +39,14 @@ jobs:
           make
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v2
+        if: ${{ matrix.os }} == 'ubuntu-18.04'
+        uses: actions/upload-artifact@v3
         with:
           name: uuu
           path: ./build/uuu/uuu
 
       - name: Create or Update Release
+        if: ${{ matrix.os }} == 'ubuntu-18.04'
         uses: ncipollo/release-action@v1
         with:
           name: Release UUU_1.5.${{ github.sha }}_TEST
