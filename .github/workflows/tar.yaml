@@ -1,0 +1,50 @@
+name: Create source package
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - uuu*
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  build:
+    name: Create source package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Build
+        run: |
+          git archive --prefix "uuu-1.5.${{ github.sha }}/" -o "uuu_source-1.5.${{ github.sha }}.tar" HEAD ;
+          git submodule foreach --recursive "git archive --prefix=uuu-1.5.${{ github.sha }}/\$path/ --output=\$sha1.tar HEAD && tar --concatenate --file=$(pwd)/uuu_source-1.5.${{ github.sha }}.tar \$sha1.tar && rm \$sha1.tar"
+          mkdir uuu-1.5.${{ github.sha }}; git describe --tags --long >uuu-1.5.${{ github.sha }}/.tarball-version
+          tar -r uuu-1.5.${{ github.sha }}/.tarball-version -f uuu_source-1.5.${{ github.sha }}.tar
+          gzip uuu_source-1.5.${{ github.sha }}.tar
+          tar xzf uuu_source-1.5.${{ github.sha }}.tar.gz && zip uuu_source-1.5.${{ github.sha }}.zip $(tar tf uuu_source-1.5.${{ github.sha }}.tar.gz)
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: uuu_source-1.5.${{ github.sha }}.tar.gz
+          path: uuu_source-1.5.${{ github.sha }}.tar.gz
+
+      - name: Create or Update Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Release UUU_1.5.${{ github.sha }}_TEST
+          tag: UUU_1.5.${{ github.sha }}_TEST
+          commit: ${{ github.hash }}
+          allowUpdates: true
+          draft: true
+          prerelease: true
+          artifacts: "uuu_source-1.5.${{ github.sha }}.tar.gz, uuu_source-1.5.${{ github.sha }}.zip"
