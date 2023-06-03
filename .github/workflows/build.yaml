@@ -52,6 +52,5 @@ jobs:
           tag: ${{ github.ref_name }}
           commit: ${{ github.sha }}
           allowUpdates: true
-          draft: true
           prerelease: true
           artifacts: "./build/uuu/uuu"

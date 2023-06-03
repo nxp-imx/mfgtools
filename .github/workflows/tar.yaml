@@ -45,6 +45,5 @@ jobs:
           tag: ${{ github.ref_name }}
           commit: ${{ github.sha }}
           allowUpdates: true
-          draft: true
           prerelease: true
           artifacts: "uuu_source-${{ github.ref_name }}.tar.gz, uuu_source-${{ github.ref_name }}.zip"
