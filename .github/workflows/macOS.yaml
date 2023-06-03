@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - uuu*
   pull_request:
     types:
       - opened
@@ -38,9 +40,9 @@ jobs:
       - name: Create or Update Release
         uses: ncipollo/release-action@v1
         with:
-          name: Release UUU_1.5.${{ github.sha }}_TEST
-          tag: UUU_1.5.${{ github.sha }}_TEST
-          commit: ${{ github.hash }}
+          name: Release ${{ github.ref_name }}
+          tag: ${{ github.ref_name }}
+          commit: ${{ github.sha }}
           allowUpdates: true
           draft: true
           prerelease: true
