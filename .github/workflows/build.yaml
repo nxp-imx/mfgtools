@@ -48,9 +48,9 @@ jobs:
         if: ${{ matrix.os }} == 'ubuntu-20.04'
         uses: ncipollo/release-action@v1
         with:
-          name: Release UUU_1.5.${{ github.sha }}_TEST
-          tag: UUU_1.5.${{ github.sha }}_TEST
-          commit: ${{ github.hash }}
+          name: Release ${{ github.ref_name }}
+          tag: ${{ github.ref_name }}
+          commit: ${{ github.sha }}
           allowUpdates: true
           draft: true
           prerelease: true
