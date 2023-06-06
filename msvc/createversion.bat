@@ -10,7 +10,7 @@ IF ERRORLEVEL 1 (
 		git tag -m "uuu %APPVEYOR_BUILD_VERSION%" uuu_%APPVEYOR_BUILD_VERSION%
 	) 
 
-	FOR /F "tokens=*" %%a in ('call git describe --tags --long') do (
+	FOR /F "tokens=*" %%a in ('call git describe --long') do (
 		echo #define GIT_VERSION "lib%%a" > %1/gitversion.h
 	)
 )
