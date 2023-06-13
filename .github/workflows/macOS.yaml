@@ -26,7 +26,9 @@ jobs:
         run: brew install libusb pkg-config zstd
         
       - name: Build
-        run: export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; pkg-config --list-all; cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . ; make
+        run: |
+          git fetch --tags --force # Retrieve annotated tags. #issue 290
+          export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; pkg-config --list-all; cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . ; make
 
       - name: Rename
         run: cp uuu/uuu uuu_mac

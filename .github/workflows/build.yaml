@@ -32,6 +32,7 @@ jobs:
 
       - name: Build
         run: |
+          git fetch --tags --force # Retrieve annotated tags. #issue 290
           mkdir build
           cd build
           cmake ..
