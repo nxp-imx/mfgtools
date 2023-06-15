@@ -64,7 +64,7 @@ jobs:
           run: |
             git config --global --add safe.directory /mfgtools
             cd /mfgtools
-            cmake .
+            cmake -D 'STATIC=1' .
             make
 
       - name: Rename

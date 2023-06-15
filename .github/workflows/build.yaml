@@ -35,7 +35,7 @@ jobs:
           git fetch --tags --force # Retrieve annotated tags. #issue 290
           mkdir build
           cd build
-          cmake ..
+          cmake -D 'STATIC=1' ..
           make
 
       - name: Upload Build Artifacts
