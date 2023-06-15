@@ -1,0 +1,88 @@
+name: Build for arm ubuntu
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - uuu*
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  build_job:
+    # The host should always be linux
+    runs-on: ubuntu-latest
+    name: Build on ${{ matrix.distro }} ${{ matrix.arch }}
+
+    # Run steps on a matrix of 4 arch/distro combinations
+    strategy:
+      matrix:
+        include:
+          - arch: aarch64
+            distro: ubuntu20.04
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: uraimo/run-on-arch-action@v2
+        name: Build artifact
+        id: build
+        with:
+          arch: ${{ matrix.arch }}
+          distro: ${{ matrix.distro }}
+
+          # Not required, but speeds up builds
+          githubToken: ${{ github.token }}
+
+          # Mount the artifacts directory as /artifacts in the container
+          dockerRunArgs: |
+            --volume "${PWD}:/mfgtools"
+
+          # Pass some environment variables to the container
+          env: | # YAML, but pipe character is necessary
+            artifact_name: git-${{ matrix.distro }}_${{ matrix.arch }}
+
+          # The shell to run commands with in the container
+          shell: /bin/sh
+
+          # Install some dependencies in the container. This speeds up builds if
+          # you are also using githubToken. Any dependencies installed here will
+          # be part of the container image that gets cached, so subsequent
+          # builds don't have to re-install them. The image layer is cached
+          # publicly in your project's package repository, so it is vital that
+          # no secrets are present in the container state or logs.
+          install: |
+            apt-get update -q -y
+            apt-get install -q -y libusb-1.0-0-dev libbz2-dev libzstd-dev pkg-config cmake libssl-dev g++ zlib1g-dev git
+
+          # Produce a binary artifact and place it in the mounted volume
+          run: |
+            git config --global --add safe.directory /mfgtools
+            cd /mfgtools
+            cmake .
+            make
+
+      - name: Rename
+        run: cp uuu/uuu uuu_${{ matrix.arch }}
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: uuu_${{ matrix.arch }}
+          path: uuu_${{ matrix.arch }}
+
+      - name: Create or Update Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Release ${{ github.ref_name }}
+          tag: ${{ github.ref_name }}
+          commit: ${{ github.sha }}
+          allowUpdates: true
+          prerelease: true
+          artifacts: "uuu_${{ matrix.arch }}"
+
