@@ -23,7 +23,8 @@ jobs:
         include:
           - arch: aarch64
             distro: ubuntu20.04
-
+          - arch: armv7
+            distro: ubuntu18.04
     steps:
       - uses: actions/checkout@v3
         with:
