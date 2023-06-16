@@ -43,7 +43,7 @@ jobs:
         path: msvc/x64/Release/uuu.exe
 
     - name: Create or Update Release
-      if: matrix.configuration == 'Release' && matrix.platform == 'x64' && ${{ github.ref_type }} == 'tag'
+      if: matrix.configuration == 'Release' && matrix.platform == 'x64' && github.ref_type == 'tag'
       uses: ncipollo/release-action@v1
       with:
         name: Release ${{ github.ref_name }}

@@ -40,7 +40,7 @@ jobs:
           path: uuu/uuu
 
       - name: Create or Update Release
-        if: ${{ github.ref_type }} == 'tag'
+        if: github.ref_type == 'tag'
         uses: ncipollo/release-action@v1
         with:
           name: Release ${{ github.ref_name }}

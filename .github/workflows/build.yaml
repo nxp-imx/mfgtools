@@ -39,14 +39,14 @@ jobs:
           make
 
       - name: Upload Build Artifacts
-        if: ${{ matrix.os }} == 'ubuntu-20.04'
+        if: matrix.os == 'ubuntu-20.04'
         uses: actions/upload-artifact@v3
         with:
           name: uuu
           path: ./build/uuu/uuu
 
       - name: Create or Update Release
-        if: ${{ matrix.os }} == 'ubuntu-20.04' && ${{ github.ref_type }} == 'tag'
+        if: matrix.os == 'ubuntu-20.04' && github.ref_type == 'tag'
         uses: ncipollo/release-action@v1
         with:
           name: Release ${{ github.ref_name }}
