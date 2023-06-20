@@ -91,7 +91,7 @@ private:
 class BulkTrans : public USBTrans
 {
 public:
-	BulkTrans(uint64_t timeout = 2000) : m_timeout{timeout} {}
+	BulkTrans(int timeout = 2000) : m_timeout{timeout} {}
 	~BulkTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
 
 	int open(void *p) override;
@@ -103,7 +103,7 @@ private:
 	int m_b_send_zero = 0;
 	EPInfo m_ep_in;
 	EPInfo m_ep_out;
-	uint64_t m_timeout = 2000;
+	int m_timeout = 2000;
 };
 
 int polling_usb(std::atomic<int>& bexit);
