@@ -98,14 +98,11 @@ CmdBase::~CmdBase()
 
 int CmdBase::parser(char *p)
 {
-	if (p != nullptr)
-		m_cmd = p;
-
 	size_t pos = 0;
-	string param = get_next_param(m_cmd, pos);
+	string param;
 
-	if (param.find(':') != string::npos)
-		param = get_next_param(m_cmd, pos);
+	if (parser_protocol(p, pos))
+		return -1;
 
 	size_t index = 0;
 
