@@ -193,7 +193,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 	m_spdcmd.m_addr = EndianSwap(m_dcd_addr ? m_dcd_addr : rom->free_addr);
 	m_spdcmd.m_count = EndianSwap(size);
 
-	HIDTrans dev;
+	HIDTrans dev(m_timeout);
 	if (dev.open(ctx->m_dev))
 		return -1;
 
@@ -217,7 +217,7 @@ SDPSkipDCDCmd::SDPSkipDCDCmd(char *p) : SDPCmdBase(p)
 
 int SDPSkipDCDCmd::run(CmdCtx*ctx)
 {
-	HIDTrans dev;
+	HIDTrans dev(m_timeout);
 	if (dev.open(ctx->m_dev))
 		return -1;
 
@@ -315,7 +315,7 @@ SDPStatusCmd::SDPStatusCmd(char *p) : SDPCmdBase(p)
 
 int SDPStatusCmd::run(CmdCtx *ctx)
 {
-	HIDTrans dev;
+	HIDTrans dev(m_timeout);
 	if (dev.open(ctx->m_dev))
 		return -1;
 
@@ -474,7 +474,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 
 int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 {
-	HIDTrans dev;
+	HIDTrans dev(m_timeout);
 	if (dev.open(ctx->m_dev))
 		return -1;
 
@@ -529,7 +529,7 @@ SDPReadMemCmd::SDPReadMemCmd(char *p) : SDPCmdBase(p)
 
 int SDPReadMemCmd::run(CmdCtx *ctx)
 {
-	HIDTrans dev;
+	HIDTrans dev(m_timeout);
 	if (dev.open(ctx->m_dev))
 		return -1;
 
@@ -595,7 +595,7 @@ SDPWriteMemCmd::SDPWriteMemCmd(char *p) : SDPCmdBase(p)
 
 int SDPWriteMemCmd::run(CmdCtx *ctx)
 {
-	HIDTrans dev;
+	HIDTrans dev(m_timeout);
 	if (dev.open(ctx->m_dev))
 		return -1;
 
@@ -655,7 +655,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 {
 	const ROM_INFO * rom = search_rom_info(ctx->m_config_item);
 
-	HIDTrans dev;
+	HIDTrans dev(m_timeout);
 	if (dev.open(ctx->m_dev))
 		return -1;
 

@@ -92,7 +92,7 @@ int SDPSCmd::run(CmdCtx *pro)
 		return -1;
 	}
 
-	HIDTrans dev;
+	HIDTrans dev(m_timeout);
 	if (rom->flags & ROM_INFO_HID_EP1)
 		dev.set_hid_out_ep(1);
 
