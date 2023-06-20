@@ -131,7 +131,7 @@ int HIDTrans::write(void *buff, size_t size)
 			p,
 			size,
 			&actual_size,
-			1000
+			m_timeout
 		);
 	}
 	else
@@ -144,7 +144,7 @@ int HIDTrans::write(void *buff, size_t size)
 			0,
 			p,
 			size,
-			1000
+			m_timeout
 		);
 	}
 
@@ -170,7 +170,7 @@ int HIDTrans::read(void *buff, size_t size, size_t *rsize)
 		(uint8_t*)buff,
 		size,
 		&actual,
-		m_read_timeout
+		m_timeout
 	);
 
 	*rsize = actual;
