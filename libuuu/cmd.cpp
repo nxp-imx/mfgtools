@@ -104,6 +104,9 @@ int CmdBase::parser(char *p)
 	if (parser_protocol(p, pos))
 		return -1;
 
+	if (pos < m_cmd.size())
+		param = get_next_param(m_cmd, pos);
+
 	size_t index = 0;
 
 	while (pos < m_cmd.size())
