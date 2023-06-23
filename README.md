@@ -53,6 +53,7 @@ Freescale/NXP I.MX Chip image deploy tools.
 
 The prebuilt image and document are here:
   - https://github.com/nxp-imx/mfgtools/releases
+  - **ubuntu 22.04, 'apt-get install uuu'**
   - UUU.pdf is snapshot of [wiki](https://github.com/nxp-imx/mfgtools/wiki)
 
 # How to Build:
