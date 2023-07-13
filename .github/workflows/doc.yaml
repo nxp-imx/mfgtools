@@ -26,7 +26,9 @@ jobs:
           ref: master
 
       - name: Set up environment
-        run: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install asciidoc rename
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install asciidoc rename
 
       - name: Build
         run: |
