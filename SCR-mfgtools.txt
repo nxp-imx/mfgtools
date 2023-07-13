@@ -18,6 +18,7 @@ Release Location:            https://github.com/NXPmicro/mfgtools/releases
 Origin:                      NXP (BSD-3-clause)
                              bzip2 (BSD-4-Clause) -  https://github.com/enthought/bzip2-1.0.6
                              zlib (zlib) - https://github.com/madler/zlib
+                             zstd (BSD-3-clause) - https://github.com/facebook/zstd
                              libusb (LGPL-2.1) - https://github.com/libusb/libusb.git
                              Android Open Source Project (Apache-2.0) [sparse_format.h] - https://developer.android.com/
                              snapcraft.yaml allows uuu to be built by snap (MIT) -  https://snapcraft.io/
