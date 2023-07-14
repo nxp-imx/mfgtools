@@ -1,0 +1,70 @@
+.u-flex {
+    display: flex;
+}
+
+.u-row {
+    flex-direction: row;
+}
+.u-column {
+    flex-direction: column;
+}
+
+.u-row-reverse {
+    flex-direction: row-reverse;
+}
+
+.u-space-between {
+    justify-content: space-between;
+}
+
+.u-center {
+    justify-content: center;
+}
+
+.u-inline-block {
+    display: inline-block;
+}
+
+.link-container{
+    display: inline-block;
+    width : 16rem;
+}
+
+.popup-loc {
+    position: relative;
+}
+
+.popup-container {
+    background-color: white;
+    position: absolute;
+    display: inline-block;
+
+    border: thin black solid;
+    border-radius: 4px;
+
+    padding: 1rem;
+    width: 24rem;
+}
+
+.popup-container li {
+    padding-bottom: 1rem;
+}
+
+.popup-button {
+    width:2rem
+}
+
+.input {
+    display: none;
+}
+
+.custom-file-upload {
+    border: thin black solid;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.file-name {
+    display: inline-block;
+    width: 32rem;
+}

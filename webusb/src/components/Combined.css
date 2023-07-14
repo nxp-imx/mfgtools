@@ -1,0 +1,26 @@
+.checkbox-container {
+    width: 1rem;
+}
+
+.checkbox {
+    margin:0;
+    padding-right: 1rem;
+}
+
+.boot-image {
+    width:100%;
+    height:auto;
+    border-radius: 50%;
+}
+
+.Popup-list {
+    margin:0;
+    padding-left: 1rem;
+    list-style-position: outside;
+    list-style-type: none;
+}
+
+.image-container {
+    width: 8rem;
+    height: 8rem;
+}
