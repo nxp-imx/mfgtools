@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Combined from "./components/Combined";
+import Decompress2 from "./components/Decompress";
 import usePopup from "./logic/usePopup";
 
 import './App.css'
@@ -12,6 +13,9 @@ const App = () => {
     return (
     <div className="App">
         <div className="u-flex u-column">
+            <div>
+                <Decompress2 />
+            </div>
             <div className="u-row">
                 <span className="link-container">bootloader [optional]: </span>
                 <span className="file-name">{bootFile? bootFile.name:""}</span>
