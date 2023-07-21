@@ -79,14 +79,12 @@ export function build_chunk_header (chunk_type, raw_data_bytelength, i) {
     }
 
     if (chunk_type === CHUNK_TYPE_DONT_CARE) {
-        chunk_format.chunk_sz = CHUNK_SZ * i; // don't care
+        chunk_format.chunk_sz = CHUNK_SZ * i; 
         chunk_format.total_sz = CHUNK_SZ*BLK_SZ * i + CHUNK_HEADER_SZ; // bytes raw_data + header
     }
-    else if (chunk_type === CHUNK_TYPE_RAW) { // raw_data
+    else if (chunk_type === CHUNK_TYPE_RAW) { 
         chunk_format.chunk_sz = Math.ceil(raw_data_bytelength/BLK_SZ);
         chunk_format.total_sz = raw_data_bytelength + CHUNK_HEADER_SZ;
-
-        console.log(chunk_format)
     }
 
     return obj_to_arr(chunk_format, chunk_header, CHUNK_HEADER_SZ);

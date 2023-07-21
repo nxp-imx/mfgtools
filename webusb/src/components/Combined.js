@@ -1,4 +1,3 @@
-import {useEffect, useState} from 'react';
 import ProgressBar from './ProgressBar';
 import useHIDBoot from '../logic/useHIDBoot';
 import useUSBFlash from '../logic/useUSBFlash'
@@ -7,19 +6,8 @@ import imgSrc from '../images/imx8qxp_mek_bootmode.png'
 import "./Combined.css"
 
 const Combined = ({bootFile, flashFile}) => {
-    // const [imgUrl, setImgUrl] = useState();
-
     const [{ requestHIDDevice, HIDdevice, bootProgress, bootTotal }] = useHIDBoot(bootFile);
     const [{ requestUSBDevice, USBDevice, flashProgress, flashTotal}] = useUSBFlash(flashFile);
-
-    // useEffect(() => {
-    //     const dothis = async()=>{
-    //         const response = await fetch("mode");
-    //         const blob = await response.blob();
-    //         setImgUrl(URL.createObjectURL(blob));
-    //     }
-    //     dothis();
-    // }, [])
 
     return(
         <div>
@@ -28,7 +16,7 @@ const Combined = ({bootFile, flashFile}) => {
                     <span>1. Switch Boot Mode to "SERIAL"</span>
                     <div className="u-flex u-center">
                         <div className="image-container">
-                        {imgSrc? <img className="boot-image" src={imgSrc}/>: ""}
+                        {imgSrc? <img className="boot-image" src={imgSrc} alt="boot mode switches"/>: ""}
                         </div>
                     </div>
                 </li>
@@ -55,7 +43,9 @@ const Combined = ({bootFile, flashFile}) => {
                         <div>
                             <span>3. </span>
                             <button onClick={requestUSBDevice}>Pair USBDevice </button>
-                            <div className="Popup-empty"> {USBDevice? `connected: ${USBDevice.productName}`: ""} </div>
+                            <div className="Popup-empty"> 
++                                {USBDevice? `connected: ${USBDevice.productName}`: ""} 
++                            </div>
                         </div>
                     </div>
                 </li>

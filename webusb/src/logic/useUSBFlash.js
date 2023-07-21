@@ -31,7 +31,7 @@
 
 import {useEffect, useState} from 'react';
 import {str_to_arr, ab_to_str} from '../helper/functions.js'
-import {CHUNK_SZ, BLK_SZ, CHUNK_TYPE_RAW, CHUNK_TYPE_DONT_CARE, build_sparse_header, build_chunk_header} from '../helper/sparse.js'
+import {CHUNK_SZ, BLK_SZ, PACKET_SZ, CHUNK_TYPE_RAW, CHUNK_TYPE_DONT_CARE, build_sparse_header, build_chunk_header} from '../helper/sparse.js'
 
 const USBrequestParams = { filters: [{ vendorId: 8137, productId: 0x0152 }] };
 
@@ -77,7 +77,6 @@ const useUSBFlash = (flashFile) => {
 
     const doFlash = async () => {
         // downloads and splits image into chunks to be processed
-        const PACKET_SZ = 0x10000;
         const DATA_SZ = CHUNK_SZ * BLK_SZ; // in bytes
         if (flashFile===null) {return;}
 
