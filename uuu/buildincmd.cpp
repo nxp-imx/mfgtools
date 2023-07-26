@@ -338,6 +338,11 @@ static constexpr BuiltInScriptRawData g_builtin_cmd[] =
 		,"burn boot loader to qspi nor flash"
 	},
 	{
+		"spi_nand",
+#include "fspinand_burn_loader.clst"
+		,"burn boot loader to spi nand flash"
+	},
+	{
 		"sd",
 #include "sd_burn_loader.clst"
 		,"burn boot loader to sd card"

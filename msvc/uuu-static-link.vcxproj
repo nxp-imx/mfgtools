@@ -128,6 +128,9 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
 type $(SolutionDir)\..\uuu\qspi_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
+type $(SolutionDir)\..\uuu\fspinand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst
 type $(SolutionDir)\..\uuu\nvme_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst
@@ -181,6 +184,9 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
 type $(SolutionDir)\..\uuu\qspi_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
+type $(SolutionDir)\..\uuu\fspinand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst
 type $(SolutionDir)\..\uuu\nvme_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst
@@ -237,6 +243,9 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
 type $(SolutionDir)\..\uuu\qspi_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
+type $(SolutionDir)\..\uuu\fspinand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst
 type $(SolutionDir)\..\uuu\nvme_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst
@@ -293,6 +302,9 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\emmc_burn_loader.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
 type $(SolutionDir)\..\uuu\qspi_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\qspi_burn_loader.clst
+echo R^"####( &gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
+type $(SolutionDir)\..\uuu\fspinand_burn_loader.lst &gt;&gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
+echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\fspinand_burn_loader.clst
 echo R^"####( &gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst
 type $(SolutionDir)\..\uuu\nvme_burn_all.lst &gt;&gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst
 echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nvme_burn_all.clst

@@ -28,6 +28,7 @@ set(LSTS
 	emmc_burn_all.lst
 	fat_write.lst
 	qspi_burn_loader.lst
+	fspinand_burn_loader.lst
 	sd_burn_loader.lst
 	spl_boot.lst
 	sd_burn_all.lst
