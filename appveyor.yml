@@ -91,13 +91,13 @@ artifacts:
 
 before_deploy:
 - cmd: ''
-deploy:
-- provider: GitHub
-  description: prebuild for $(APPVEYOR_REPO_COMMIT) \n\n $(APPVEYOR_REPO_COMMIT_MESSAGE)
-  auth_token:
-    secure: SWWVkwSfPyVIaPChBBl+uAA3Fau9Rl5iNPQ9VRL8yyggXvc6wPcr/O9iXBMVM7Ju
-  artifact: uuu.exe; uuu/uuu; uuu/uuu_mac; mfgtools.wiki/UUU.pdf; uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz; uuu_source-${APPVEYOR_BUILD_VERSION}.zip
-  draft: true
+#deploy:
+#- provider: GitHub
+#  description: prebuild for $(APPVEYOR_REPO_COMMIT) \n\n $(APPVEYOR_REPO_COMMIT_MESSAGE)
+#  auth_token:
+#    secure: SWWVkwSfPyVIaPChBBl+uAA3Fau9Rl5iNPQ9VRL8yyggXvc6wPcr/O9iXBMVM7Ju
+#  artifact: uuu.exe; uuu/uuu; uuu/uuu_mac; mfgtools.wiki/UUU.pdf; uuu_source-${APPVEYOR_BUILD_VERSION}.tar.gz; uuu_source-${APPVEYOR_BUILD_VERSION}.zip
+#  draft: true
 
 environment:
   coverity_token:
