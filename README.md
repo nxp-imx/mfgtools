@@ -92,6 +92,12 @@ For cmake prior 3.13:
 
 Note that we assume [brew](https://brew.sh) is installed and can be used to resolve dependencies as shown above. The remaining dependency `libbz2` can be resolved via the XCode supplied libraries.
 
+Note if you meet "can't detach kernel driver" try to check libusb version. 
+```
+brew info libusb
+==> libusb: stable 1.0.26 (bottled), HEAD
+```
+
 # Run environment
  - Windows 10 64 bit
  - Linux (Ubuntu) 64 bit
