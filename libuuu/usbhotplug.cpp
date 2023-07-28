@@ -48,6 +48,7 @@
 #include "libuuu.h"
 #include "vector"
 #include <time.h>
+#include "hidapi.h"
 
 using chrono::milliseconds;
 using chrono::operator ""ms;
@@ -57,6 +58,12 @@ using chrono::operator ""s;
 static atomic<seconds> g_wait_usb_timeout{-1s};
 static atomic<milliseconds> g_usb_poll_period{200ms};
 static atomic<seconds> g_wait_next_usb_timeout{-1s};
+
+bool g_using_hidapi = true;
+
+#ifndef WIN32
+#define _strdup strdup
+#endif
 
 enum KnownDeviceState {
 	NoKnownDevice,
@@ -73,10 +80,14 @@ public:
 	{
 		if (libusb_init(nullptr) < 0)
 				throw runtime_error{ "Call libusb_init failure" };
+
+		if (hid_init())
+			throw runtime_error{ "Call hid_init failure" };
 	}
 	~CAutoDeInit()
 	{
 		libusb_exit(nullptr);
+		hid_exit();
 	}
 } g_autoDeInit;
 
@@ -134,6 +145,45 @@ private:
 	int m_rc = 0;
 };
 
+class CAutoHIDList
+{
+public:
+	struct hid_device_info* m_list;
+
+	CAutoHIDList(struct hid_device_info* list)
+	{
+		m_list = list;
+	}
+
+	CAutoHIDList()
+	{
+		m_list = hid_enumerate(0, 0);
+		if (!m_list)
+			set_last_err_string("Failure get HID devices or failure at hid_enumerate()");
+	}
+	~CAutoHIDList()
+	{
+		if (m_list != nullptr) {
+			hid_free_enumeration(m_list);
+		}
+	}
+
+	CAutoHIDList(CAutoHIDList&& other)
+	{
+		this->m_list = other.m_list;
+		other.m_list = nullptr;
+	}
+
+	CAutoHIDList& operator=(CAutoHIDList&& other)
+	{
+		this->m_list = other.m_list;
+		return *this;
+	}
+
+	CAutoHIDList& operator=(const CAutoHIDList&) = delete;	// Prevent copy, allow move only
+	CAutoHIDList(const CAutoHIDList&) = delete;	// Prevent copy, allow move only
+
+};
 static struct {
 	vector<string> list;
 	mutex lock;
@@ -258,14 +308,18 @@ static int open_libusb(libusb_device *dev, void **usb_device_handle)
  thread start run_usb_cmds;
  libusb_free_list()
 */
-static int run_usb_cmds(ConfigItem *item, libusb_device *dev, short bcddevice)
+static int run_usb_cmds(ConfigItem *item, void *dev, short bcddevice)
 {
 	int ret;
 	uuu_notify nt;
 	nt.type = uuu_notify::NOTIFY_DEV_ATTACH;
 
 	string str;
-	str = get_device_path(dev);
+
+	if (is_using_hidapi() && item->m_bHID)
+		str = "HID";
+	else
+		str = get_device_path((libusb_device*)dev);
 	nt.str = (char*)str.c_str();
 	call_notify(nt);
 
@@ -273,7 +327,19 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev, short bcddevice)
 	ctx.m_config_item = item;
 	ctx.m_current_bcd = bcddevice;
 
-	if ((ret = open_libusb(dev, &(ctx.m_dev))))
+	if (is_using_hidapi() && item->m_bHID)
+	{
+		ctx.m_dev = hid_open_path((char*)dev);
+		ctx.m_bHIDAPI = true;
+		if (!ctx.m_dev)
+		{
+			nt.status = -1;
+			call_notify(nt);
+			set_last_err_string("failure open HID devices");
+			return -1;
+		}
+	}
+	else if ((ret = open_libusb((libusb_device*)dev, &(ctx.m_dev))))
 	{
 		nt.type = uuu_notify::NOTIFY_CMD_END;
 		nt.status = -1;
@@ -287,7 +353,15 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev, short bcddevice)
 	nt.type = uuu_notify::NOTIFY_THREAD_EXIT;
 	call_notify(nt);
 
-	libusb_unref_device(dev); //ref_device when start thread
+	if (ctx.m_bHIDAPI)
+	{
+		hid_close((hid_device*)ctx.m_dev);
+		free(dev);
+	}
+	else
+	{
+		libusb_unref_device((libusb_device*)dev); //ref_device when start thread
+	}
 	clear_env();
 	return ret;
 }
@@ -325,7 +399,27 @@ static int usb_add(libusb_device *dev)
 
 static int usb_remove(libusb_device * /*dev*/)
 {
+	return 0;
+}
 
+static int usb_hid_add(hid_device_info* info)
+{
+#if HID_API_VERSION_MINOR >= 13
+	if (info->bus_type != HID_API_BUS_USB)
+		return 0;
+#endif
+
+	ConfigItem* item = get_config()->find(info->vendor_id, info->product_id, info->release_number);
+	if (item)
+	{
+		g_known_device_state = KnownDeviceToDo;
+		std::thread(run_usb_cmds, item, _strdup(info->path), info->release_number).detach();
+	}
+	return 0;
+}
+
+static int usb_hid_remove(hid_device_info* info)
+{
 	return 0;
 }
 
@@ -371,6 +465,61 @@ void compare_list(libusb_device ** old, libusb_device **nw)
 	}
 }
 
+void compare_hid_list(struct hid_device_info* old_list, struct hid_device_info* nw_list)
+{
+	char* dev;
+	hid_device_info* old = old_list;
+	hid_device_info* nw = nw_list;
+
+	if (old == nullptr)
+	{
+		while (nw)
+		{
+			dev = nw->path;
+			usb_hid_add(nw);
+			nw = nw->next;
+		}
+		return;
+	}
+
+	while (nw)
+	{
+		hid_device_info* p = old_list;
+		dev = nw->path;
+
+		while (p)
+		{
+			if (strcmp(p->path, dev) == 0)
+				break;//find it.
+			p = p->next;
+		};
+
+		if (!p)
+			usb_hid_add(nw);
+
+		nw = nw->next;
+	}
+
+	old = old_list;
+
+	while (old)
+	{
+		nw = nw_list;
+		while (nw)
+		{
+			if (strcmp(nw->path, old->path) == 0)
+				break;//find it.
+
+			nw = nw->next;
+		};
+
+		if (!nw)
+			usb_hid_remove(old);
+
+		old = old->next;
+	}
+}
+
 static int check_usb_timeout(Timer& usb_timer)
 {
 	auto known_device_state = g_known_device_state.load();
@@ -411,6 +560,7 @@ int polling_usb(std::atomic<int>& bexit)
 	Timer usb_timer;
 
 	CAutoList oldlist(nullptr);
+	CAutoHIDList oldHIDList(nullptr);
 
 	while(!bexit)
 	{
@@ -423,6 +573,13 @@ int polling_usb(std::atomic<int>& bexit)
 		compare_list(oldlist.list, newlist.list);
 
 		std::swap(oldlist, newlist);
+
+		if (is_using_hidapi())
+		{
+			CAutoHIDList newHIDList;
+			compare_hid_list(oldHIDList.m_list, newHIDList.m_list);
+			std::swap(oldHIDList, newHIDList);
+		}
 
 		this_thread::sleep_for(g_usb_poll_period.load());
 
@@ -437,7 +594,10 @@ CmdUsbCtx::~CmdUsbCtx()
 {
 	if (m_dev)
 	{
-		libusb_close((libusb_device_handle*)m_dev);
+		if (this->m_bHIDAPI)
+			hid_close((hid_device*)m_dev);
+		else
+			libusb_close((libusb_device_handle*)m_dev);
 		m_dev = 0;
 	}
 }
@@ -474,6 +634,10 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 				continue;
 
 			ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
+
+			if (is_using_hidapi() && item && item->m_bHID)
+				continue;
+
 			if (item && item->m_protocol == str_to_upper(pro))
 				{
 					uuu_notify nt;
@@ -490,6 +654,42 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 
 					return 0;
 				}
+		}
+
+		//scan HID devices
+		if (is_using_hidapi())
+		{
+			CAutoHIDList l;
+			hid_device_info* p = l.m_list;
+			while (p)
+			{
+#if HID_API_VERSION_MINOR >= 13
+				if (p->bus_type == HID_API_BUS_USB)
+#endif
+				{
+					ConfigItem* item = get_config()->find(p->vendor_id, p->product_id, p->release_number);
+
+					if (item && item->m_protocol == str_to_upper(pro))
+					{
+						uuu_notify nt;
+						nt.type = uuu_notify::NOTIFY_DEV_ATTACH;
+						m_config_item = item;
+						m_current_bcd = p->release_number;
+						m_bHIDAPI = true;
+						m_dev = hid_open_path(p->path);
+						if (!m_dev)
+						{
+							set_last_err_string("open HID failure");
+							return -1;
+						}
+						nt.str = (char*)"HID";
+						call_notify(nt);
+
+						return 0;
+					}
+				}
+				p = p->next;
+			}
 		}
 
 		this_thread::sleep_for(200ms);
@@ -560,4 +760,14 @@ int uuu_set_wait_next_timeout(int timeout_in_seconds)
 {
 	g_wait_next_usb_timeout = seconds{timeout_in_seconds};
 	return 0;
+}
+
+void uuu_set_using_hidapi(uint32_t val)
+{
+	g_using_hidapi = !!val;
+}
+
+bool is_using_hidapi()
+{
+	return g_using_hidapi;
 }

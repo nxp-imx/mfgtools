@@ -51,6 +51,7 @@ public:
 	ConfigItem *m_config_item = nullptr;
 	void *m_dev = nullptr;
 	short m_current_bcd;
+	bool m_bHIDAPI = false;
 };
 
 class CmdUsbCtx : public CmdCtx
@@ -220,3 +221,4 @@ int insert_env_variable(std::string key, std::string value);
 std::string get_env_variable(std::string key);
 int clear_env();
 bool is_evn_exist(std::string key);
+bool is_using_hidapi();

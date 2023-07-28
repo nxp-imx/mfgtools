@@ -8,6 +8,11 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0>=1.0.16)
 pkg_check_modules(LIBZ REQUIRED zlib)
 pkg_check_modules(LIBZSTD REQUIRED libzstd)
+if(APPLE)
+pkg_check_modules(LIBHID REQUIRED hidapi)
+else()
+pkg_check_modules(LIBHID REQUIRED hidapi-libusb)
+endif()
 find_package(Threads)
 
 if (STATIC)
@@ -36,7 +41,7 @@ set(LSTS
 	nvme_burn_all.lst
 )
 
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libuuu ${LIBUSB_LIBRARY_DIRS} ${LIBZSTD_LIBRARY_DIRS} ${LIBZ_LIBRARY_DIRS})
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libuuu ${LIBUSB_LIBRARY_DIRS} ${LIBZSTD_LIBRARY_DIRS} ${LIBZ_LIBRARY_DIRS} ${LIBHID_LIBRARY_DIRS})
 
 set(CLIST_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/gen_txt_include.sh)
 set(generated_files_dir "${CMAKE_BINARY_DIR}/uuu/gen")
@@ -62,7 +67,7 @@ endfunction()
 
 preprocess_clst(CLSTS ${LSTS})
 
-include_directories(${generated_files_dir})
+include_directories(${HIDAPI_INC} ${generated_files_dir})
 
 set(SOURCES
 	uuu.cpp
@@ -72,9 +77,11 @@ set(SOURCES
 )
 
 add_executable(uuu ${SOURCES})
-target_link_libraries(uuu uuc_s ${OPENSSL_LIBRARIES} ${LIBUSB_LIBRARIES} ${LIBZ_LIBRARIES} ${LIBZSTD_LIBRARIES}  dl bz2)
+
+target_link_libraries(uuu uuc_s ${OPENSSL_LIBRARIES} ${LIBUSB_LIBRARIES} ${LIBZ_LIBRARIES} ${LIBZSTD_LIBRARIES} ${LIBHID_LIBRARIES} dl bz2)
 
 install(TARGETS uuu DESTINATION bin)
 target_compile_definitions(uuu
     PRIVATE "TARGET_PATH=\"${CMAKE_INSTALL_PREFIX}/bin/uuu\""
 )
+

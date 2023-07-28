@@ -6,6 +6,11 @@ set(CMAKE_SKIP_RPATH ON)
 
 find_package(BZip2 REQUIRED)
 find_package(PkgConfig REQUIRED)
+if(APPLE)
+pkg_check_modules(LIBHID REQUIRED hidapi)
+else()
+pkg_check_modules(LIBHID REQUIRED hidapi-libusb)
+endif()
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0>=1.0.16)
 pkg_check_modules(LIBZSTD REQUIRED libzstd)
 find_package(Threads)
@@ -21,7 +26,7 @@ set(UUUSSL "-DUUUSSL")
 set(UUUOPENSLL_INCLUDE_DIR ${OPENSSL_INCLUDE_DIR})
 endif()
 
-include_directories(${LIBUSB_INCLUDE_DIRS} ${LIBZSTD_INCLUDE_DIRS} ${UUUOPENSLL_INCLUDE_DIR} include)
+include_directories(${LIBUSB_INCLUDE_DIRS} ${LIBZSTD_INCLUDE_DIRS} ${UUUOPENSLL_INCLUDE_DIR} ${LIBHID_INCLUDE_DIRS} include)
 
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wstrict-aliasing -Wextra ${UUUSSL}")

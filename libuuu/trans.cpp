@@ -34,6 +34,8 @@
 #include "liberror.h"
 #include "libusb.h"
 #include "zip.h"
+#include "cmd.h"
+#include "hidapi.h"
 
 extern "C"
 {
@@ -105,6 +107,11 @@ int USBTrans::close()
 
 int HIDTrans::open(void *p)
 {
+	m_devhandle = p;
+
+	if (is_using_hidapi())
+		return 0;
+
 	if (USBTrans::open(p))
 		return -1;
 
@@ -120,6 +127,16 @@ int HIDTrans::open(void *p)
 int HIDTrans::write(void *buff, size_t size)
 {
 	int ret;
+
+	if (is_using_hidapi())
+	{
+		ret = hid_write((hid_device*)m_devhandle, (const unsigned char *)buff, size);
+		if (ret < 0)
+			set_last_err_string("hid_write() error");
+
+		return ret;
+	}
+
 	uint8_t *p = (uint8_t *)buff;
 	int actual_size;
 
@@ -163,6 +180,19 @@ int HIDTrans::write(void *buff, size_t size)
 int HIDTrans::read(void *buff, size_t size, size_t *rsize)
 {
 	int ret;
+
+	if (is_using_hidapi())
+	{
+		ret = hid_read_timeout((hid_device*)m_devhandle, (unsigned char*)buff, size, m_timeout);
+		if (ret < 0)
+		{
+			set_last_err_string("hid_read() error");
+			return ret;
+		}
+		*rsize = ret;
+		return 0;
+	}
+
 	int actual;
 	ret = libusb_interrupt_transfer(
 		(libusb_device_handle *)m_devhandle,

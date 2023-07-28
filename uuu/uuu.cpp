@@ -923,6 +923,8 @@ int main(int argc, char **argv)
 	string cmd;
 	int ret;
 	int dryrun  = 0;
+	int hidapi = 0;
+	int filter_port = 0;
 
 	string cmd_script;
 
@@ -972,6 +974,7 @@ int main(int argc, char **argv)
 			else if (s == "-m")
 			{
 				i++;
+				filter_port = 1;
 				uuu_add_usbpath_filter(argv[i]);
 				g_usb_path_filter.push_back(argv[i]);
 			}
@@ -998,6 +1001,11 @@ int main(int argc, char **argv)
 			else if (s == "-IgSerNum")
 			{
 				return set_ignore_serial_number();
+			}
+			else if (s == "-hidapi")
+			{
+				uuu_set_using_hidapi(1);
+				hidapi = 1;
 			}
 			else if (s == "-e")
 			{
@@ -1087,6 +1095,12 @@ int main(int argc, char **argv)
 			filename = s;
 			break;
 		}
+	}
+
+	if (filter_port && hidapi)
+	{
+		printf("-hidapi and -m can't use together\n");
+		return -1;
 	}
 
 	signal(SIGINT, ctrl_c_handle);

@@ -34,6 +34,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <string.h>
 
 class ConfigItem
 {
@@ -48,6 +49,10 @@ public:
 			m_chip = chip;
 		if (comp)
 			m_compatible = comp;
+
+		m_bHID =   (strcmp(pro, "SDP:") == 0)
+				|| (strcmp(pro, "SDPS:") == 0)
+				|| (strcmp(pro, "SDPV:") == 0);
 	}
 	std::string m_protocol;
 	std::string m_chip;
@@ -56,6 +61,7 @@ public:
 	uint16_t m_vid = 0;
 	uint16_t m_bcdVerMin = 0;
 	uint16_t m_bcdVerMax = UINT16_MAX;
+	bool m_bHID;
 };
 
 class Config :public std::vector<ConfigItem>
