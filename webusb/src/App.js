@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Combined from "./components/Combined";
-import Decompress2 from "./components/Decompress";
+import Decompress from "./components/Decompress";
+import Decompress2 from "./components/Decompress2"
 import usePopup from "./logic/usePopup";
 
 import './App.css'
@@ -14,6 +15,11 @@ const App = () => {
     <div className="App">
         <div className="u-flex u-column">
             <div>
+                Decompress (stream)
+                <Decompress />
+            </div>
+            <div>
+                Decompress (callback)
                 <Decompress2 />
             </div>
             <div className="u-row">
@@ -38,12 +44,14 @@ const App = () => {
                 <button onClick = {showPopup}>USB_down</button>
             </div>
 
-            <div className="popup-loc ">
+            <Combined bootFile={bootFile} flashFile={flashFile}/>
+
+            {/* <div className="popup-loc ">
                 <div className="popup-container" style={show?{}:{display:'none'}}>
                     <Combined bootFile={bootFile} flashFile={flashFile}/>
                     <button onClick={()=>closePopup()}>close</button>
                 </div>
-            </div>
+            </div> */}
             <span>{error}</span>
         </div>
 

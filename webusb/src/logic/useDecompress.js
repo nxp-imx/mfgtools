@@ -151,12 +151,13 @@ const useDecompress = (flashFile) => {
         }
 
         const stream = new binding.ZstdDecompressStreamBinding();
-        const transform = new TransformStream();
-        const writer = transform.writable.getWriter();
+        // const transform = new TransformStream();
+        // const writer = transform.writable.getWriter();
 
         const callback = (decompressed) => {
-            totalBytes += decompressed.length;
-            writer.write(decompressed);
+            // totalBytes += decompressed.length;
+            // writer.write(decompressed);
+            console.log(decompressed);
         }
 
         if (!stream.begin()) {
@@ -185,10 +186,10 @@ const useDecompress = (flashFile) => {
             return null;
         }
 
-        console.log("finishing unzipping");
+        // console.log("finishing unzipping");
 
-        const readable = transform.readable;
-        doFlash(readable, PACKET_SZ, totalBytes);
+        // const readable = transform.readable;
+        // doFlash(readable, PACKET_SZ, totalBytes);
     }
 
     const doFlash = async(readable, size, totalSize) => {

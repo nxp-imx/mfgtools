@@ -98,7 +98,7 @@ const useHIDBoot = (bootFile) => {
             const packet = await bootFile.slice(1024*i, 1024*i+len).arrayBuffer();
             await HIDdevice.sendReport(outputReportId, packet)
             setBootProgress((1024*i + len));
-            console.log(1024*i + len)
+            // console.log(1024*i + len)
         }
     }
 
