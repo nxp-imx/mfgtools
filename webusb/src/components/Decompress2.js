@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import useDecompress4 from '../logic/useDecompress4'
+import useDecompress4 from '../logic/useDecompress2'
 import { DATA_SZ, BLK_SZ, PACKET_SZ } from "../helper/sparse";
 
 const Decompress2 = () => {
@@ -15,6 +15,7 @@ const Decompress2 = () => {
         console.log(window.binding);
     }, [])
 
+    // async test
     // useEffect(()=> {
     //     function sleep(ms) {
     //         let p1 = new Promise(resolve => setTimeout(resolve, ms));
