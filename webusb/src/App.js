@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Combined from "./components/Combined";
 import Decompress2 from "./components/Decompress";
 import Decompress from "./components/Decompress";
+import DecompressAlt from "./components/DecompressAlt"
 import usePopup from "./logic/usePopup";
 
 import './App.css'
@@ -17,6 +18,7 @@ const App = () => {
             <div>
                 <Decompress2 />
                 <Decompress />
+                <DecompressAlt />
             </div>
             <div className="u-row">
                 <span className="link-container">bootloader [optional]: </span>
@@ -39,13 +41,17 @@ const App = () => {
             <div className="popup-button">
                 <button onClick = {showPopup}>USB_down</button>
             </div>
-
-            <div className="popup-loc ">
+            
+            {/* for testing purpose, just let you input files without waiting */}
+            {/* <div className="popup-loc ">
                 <div className="popup-container" style={show?{}:{display:'none'}}>
                     <Combined bootFile={bootFile} flashFile={flashFile}/>
                     <button onClick={()=>closePopup()}>close</button>
                 </div>
-            </div>
+            </div> */}
+
+            <Combined bootFile={bootFile} flashFile={flashFile}/>
+
             <span>{error}</span>
         </div>
 
