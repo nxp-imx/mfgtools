@@ -1,4 +1,4 @@
-
+// stream reader version
 import {useEffect, useState} from 'react';
 import {str_to_arr, ab_to_str} from '../helper/functions.js'
 import {CHUNK_SZ, BLK_SZ, CHUNK_TYPE_RAW, CHUNK_TYPE_DONT_CARE, build_sparse_header, build_chunk_header} from '../helper/sparse.js'

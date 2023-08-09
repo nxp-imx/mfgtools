@@ -16,7 +16,7 @@ const App = () => {
     <div className="App">
         <div className="u-flex u-column">
             <div>
-                <Decompress2 />
+                <Decompress2 /> (2)
                 <Decompress />
                 <DecompressAlt />
             </div>
