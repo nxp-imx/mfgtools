@@ -12,6 +12,8 @@ const DATA_SZ = CHUNK_SZ * BLK_SZ; // in bytes
 
 const size = 1024*1024;
 
+let total = 0;
+
 const useDecompress2 = (flashFile) => {
     const [USBDevice, setUSBDevice] = useState();
     const [flashProgress, setFlashProgress] = useState();
@@ -113,12 +115,15 @@ const useDecompress2 = (flashFile) => {
         // console.log(res);
 
         console.log(decompressed);
+        total += decompressed.length;
+
+        // uncomment below this
         if (!stream.read(callback)){
             // load in a new chunk
             console.log("NEED NEW CHUNK NOM")
 
             //test this next:
-            // doLoad();
+            doLoad();
         }
     }
 
@@ -137,11 +142,22 @@ const useDecompress2 = (flashFile) => {
         if (!chunk) return;
 
         let new_i = i+1;
+        console.log("already eaten", i*size, "of the data");
         setI(new_i);
     }, [chunk])
 
     const doLoad = async() => {
-        // if size*i < data.length? needed?
+        // reached the end of processing data
+        if (size*i >= data.length) {
+            console.log("at the end")
+            console.log(total);
+            if(!stream.end(callback)) {
+                console.log("stream.end() fail");
+                return;
+            }
+            return;
+        }
+
         let chunk = data.slice(size*i, Math.min(size*(i+1), data.length));
         setChunk(chunk);
     }
@@ -150,19 +166,10 @@ const useDecompress2 = (flashFile) => {
         if (!stream) return;
 
         (async() => {
-            // let data = new Uint8Array(await flashFile.arrayBuffer());
-            // let chunk = data.slice(0, size);
-            // i++;
             if (!stream.begin()) {
                 console.log("stream.begin() error");
                 return null;
             }
-            // if (!stream.load(chunk)) {
-            //     console.log("stream.load() error");
-            //     return null;
-            // }
-
-            // stream.read(callback);
 
             doLoad();
         })()
