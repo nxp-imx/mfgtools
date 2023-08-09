@@ -24,8 +24,12 @@ endif()
 include_directories(${LIBUSB_INCLUDE_DIRS} ${LIBZSTD_INCLUDE_DIRS} ${UUUOPENSLL_INCLUDE_DIR} include)
 
 
-set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wstrict-aliasing -Wextra ${UUUSSL}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 ${UUUSSL}")
+if (FORCE_OLD)
+set(FORCE_OLDLIBUSB "-DFORCE_OLDLIBUSB")
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Wstrict-aliasing -Wextra ${UUUSSL} ${FORCE_OLDLIBUSB}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 ${UUUSSL} ${FORCE_OLDLIBUSB}")
 
 set(SOURCES
 	error.cpp

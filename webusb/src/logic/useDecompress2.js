@@ -13,72 +13,58 @@ let promise1 = Promise.resolve(0)
 
 let cap = 2;
 
+const size = 1024*1024;
+
+let counter = 0;
+
 const useDecompress2 = (flashFile) => {
     const [USBDevice, setUSBDevice] = useState();
     const [flashProgress, setFlashProgress] = useState();
     const [flashTotal, setFlashTotal] = useState();
+    const [chunk, setChunk] = useState();
+
+    const [data, setData] = useState();
+    const [i, setI] = useState(0);
+    const [stream, setStream] = useState();
+
+    const [currOffset, setCurrOffset] = useState(0);
+    const [prevOffset, setPrevOffset] = useState(0);
+    const [currPos, setCurrPos] = useState(0);
 
     useEffect (()=> {
-        if (USBDevice) {
-            USBDevice.open().then(()=>{
-                console.log(`Opened USB Device: ${USBDevice.productName}`);
-            }, (err)=> {
-                console.log(err)
-            })
-            .then(()=> {
-                if (flashFile)
-                    decompressFileToTransform();
-            })
-        }
+        // if (USBDevice) {
+        //     USBDevice.open().then(()=>{
+        //         console.log(`Opened USB Device: ${USBDevice.productName}`);
+        //     }, (err)=> {
+        //         console.log(err)
+        //     })
+        //     .then(()=> {
+        //         if (flashFile)
+        //             doDecompress();
+        //     })
+        // }
+
+        if (flashFile) doDecompress();
 
     }, [USBDevice])
 
     const requestUSBDevice = () => { // first thing called with button
-        navigator.usb
-        .requestDevice(USBrequestParams)
-        .then((device) => {
-            setUSBDevice(device);
-        })
-        .catch((e) => {
-            console.error(`There is no device. ${e}`);
-        });
+        // navigator.usb
+        // .requestDevice(USBrequestParams)
+        // .then((device) => {
+        //     setUSBDevice(device);
+        // })
+        // .catch((e) => {
+        //     console.error(`There is no device. ${e}`);
+        // });
+
+        setUSBDevice(1);
     }   
 
-    async function preBoot () {
-        console.log("start preBoot");
-        await USBDevice.claimInterface(0);
-
-        send_data(str_to_arr("UCmd:setenv fastboot_dev mmc"), "OKAY");
-        send_data(str_to_arr("UCmd:setenv mmcdev ${emmc_dev}"), "OKAY");
-        send_data(str_to_arr("UCmd:mmc dev ${emmc_dev}"), "OKAY");
-
-        console.log("preboot complete")
-    }
-
-    async function send_headers(raw_data_bytelength, i) {
-        
-    }
-
-    async function send_packet(raw_data) {
-        
-    }
-
-    /*
-    * data: string or arraybuffer
-    * success_str: checks response of usb
-    * Throws error if USB input does not match success_str
-    */
-    async function send_data(data, success_str) {
-        
-    }
-
-    async function flash_all () {
-       
-    }
 
     // async test
     async function dothingsinorder (a) {
-        console.log(a);
+        console.log("start of", a);
 
         function sleep(i, ms){
             let pq = new Promise((resolve, reject) => {
@@ -98,10 +84,123 @@ const useDecompress2 = (flashFile) => {
 
         console.log("end of ", a);
     }
+    
+    const cb = async(decompressed) => {
+        console.log(counter, decompressed);
+        counter ++;
+
+        if (counter < 3) {
+            stream.read(cb);
+        }
+    }
+
+    useEffect(()=> {
+        (async()=> {
+            if (!stream) return;
+
+            if (!stream.begin()) {
+                console.log("stream.begin() error");
+                return null;
+            }
+
+            // get first chunk
+            let data = new Uint8Array(await flashFile.arrayBuffer());
+            let chunk = data.slice(0, size);
+
+            if (!stream.load(chunk)) {
+                console.log("failed");
+                return null;
+            }
+
+            stream.read(cb);
+
+        })();
+
+    }, [stream])
+
+    const doDecompress = async(e) => {
+        //get data
         
 
+        if (!window.binding) {
+            console.log("no binding");
+            return;
+        }
+
+        // const stream = new binding.ZstdDecompressStreamBinding();
+        // setStream(stream);
+        const s = new binding.ZstdDecompressReadBinding();
+        setStream(s);  
+    }
+    
+    const doDecompress1 = async(e) => {
+        const file = flashFile;
+        let data = new Uint8Array(await file.arrayBuffer());
+
+        // setup stream
+        if (!window.binding) {
+            console.log("no binding");
+            return;
+        }
+
+        const stream = new binding.ZstdDecompressStreamBinding();
+        if (!stream.begin()) {
+            console.log("stream.begin() error");
+            return null;
+        }
+
+        // setup decompress loop
+        let prev_chunk_offset = 0;
+        let curr_chunk_offset = 0;
+        let curr_pos = 0;
+
+        let i = 0;
+        const size = 1024*1024;
+
+        const callback = async(decompressed) => {
+            console.log(decompressed);
+        }
+
+        while (size*i < size) {
+            // for every chunk
+            let chunk = data.slice(size*i, Math.min(size*(i+1), data.length));
+            console.log(chunk);
+
+            while (curr_chunk_offset < size) {
+                // keep running transform
+                let pos = await stream.transform(chunk, curr_chunk_offset, curr_pos, callback);
+
+                if (pos == 0) {
+                    //  means that when we 
+                    prev_chunk_offset = curr_chunk_offset;
+                    continue;
+                }
+
+                curr_chunk_offset = prev_chunk_offset + pos;
+                curr_pos = 0 + pos;
+                console.log("offset in chunk,", curr_chunk_offset);
+                console.log("offset in src_bytes_", curr_pos);
+                await dothingsinorder(pos); // still doesn't work how I want it to
+            }
+
+            //reset chunk offsets
+            curr_chunk_offset = 0;
+            prev_chunk_offset = 0;
+            i++
+        } // this should look like 131072 bytes, pos 1, pos 2, pos 3
+
+       
+
+
+        // const stream = new binding.ZstdDecompressStreamBinding();
+        // let pos = await stream.transform(chunk, 0, 0, callback);
+
+        // when you get -2 from transform -> need to feed a new chunk to transform
+        // when you get 0 from transform -> src_bytes have already finished, need to set pos to 0
+    }
+
  
-    const decompressFileToTransform = async(e) => {
+    const decompressFileToTransform2 = async(e) => {
         console.log(USBDevice);
 
         if (!flashFile) return;
@@ -174,7 +273,7 @@ const useDecompress2 = (flashFile) => {
 
     return [{
         requestUSBDevice,
-        decompressFileToTransform
+        doDecompress
     }]
 }
 

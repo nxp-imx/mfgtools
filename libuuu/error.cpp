@@ -53,7 +53,7 @@ void uuu_set_debug_level(uint32_t mask)
 {
 	g_debug_level = mask;
 
-#if LIBUSB_API_VERSION > 0x01000106
+#if LIBUSB_API_VERSION > 0x01000106 && !defined(FORCE_OLDLIBUSB)
 		libusb_set_option(nullptr, LIBUSB_OPTION_LOG_LEVEL, get_libusb_debug_level());
 #else
 		libusb_set_debug(nullptr, get_libusb_debug_level());

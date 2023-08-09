@@ -22,3 +22,4 @@ Origin:                      NXP (BSD-3-clause)
                              libusb (LGPL-2.1) - https://github.com/libusb/libusb.git
                              Android Open Source Project (Apache-2.0) [sparse_format.h] - https://developer.android.com/
                              snapcraft.yaml allows uuu to be built by snap (MIT) -  https://snapcraft.io/
+                             create-react-app (MIT) -  https://github.com/facebook/create-react-app/
