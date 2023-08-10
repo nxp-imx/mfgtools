@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react"
-// import useDecompress from '../logic/useDecompress'
 import useDecompress2 from '../logic/useDecompress2'
-import { DATA_SZ, BLK_SZ, PACKET_SZ } from "../helper/sparse";
 
 const Decompress = () => {
     const [flashFile, setFlashFile] = useState();
