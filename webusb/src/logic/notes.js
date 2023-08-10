@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 let buffer = new Uint8Array();
 
 let decompress_sz = 1024*64;
@@ -74,3 +75,33 @@ function sleep(ms) {
     console.log("End");
   })();
 
+=======
+async function callback() {
+
+    await send_data();
+
+    callback();
+}
+
+function caller () {
+    stream.transform(chunk_offset, slice, callback);
+}
+
+///
+
+function transform (chunk, callback){
+    // fill up a src_bytes worth from chunk
+    decompress(src_bytes);
+}
+
+function decompress(src_bytes) {
+    // loop over src_bytes
+
+    while (condition){
+        let decompressed = zstd_decompress(src_bytes);
+        callback(decompressed)
+    }
+
+    src_bytes.clear();
+}
+>>>>>>> 8ab6186ba1f75467c69e0196e4293e4c0bde5a9c

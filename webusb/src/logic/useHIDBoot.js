@@ -49,6 +49,7 @@ const useHIDBoot = (bootFile) => {
     useEffect(() => {
         const downloadBoot = async() => {
             if (!HIDdevice) return;
+            console.log(HIDdevice);
             await HIDdevice.open();
             console.log("Opened device: " + HIDdevice.productName);
 

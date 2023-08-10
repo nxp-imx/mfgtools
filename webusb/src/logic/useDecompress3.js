@@ -1,4 +1,4 @@
-// stream reader version
+
 import {useEffect, useState} from 'react';
 import {str_to_arr, ab_to_str} from '../helper/functions.js'
 import {CHUNK_SZ, BLK_SZ, CHUNK_TYPE_RAW, CHUNK_TYPE_DONT_CARE, build_sparse_header, build_chunk_header} from '../helper/sparse.js'
@@ -151,12 +151,9 @@ const useDecompress = (flashFile) => {
         }
 
         const stream = new binding.ZstdDecompressStreamBinding();
-        const transform = new TransformStream();
-        const writer = transform.writable.getWriter();
 
         const callback = (decompressed) => {
-            totalBytes += decompressed.length;
-            writer.write(decompressed);
+            console.log(decompressed);
         }
 
         if (!stream.begin()) {
@@ -168,7 +165,7 @@ const useDecompress = (flashFile) => {
 
         let i = 0;
         const size = 1024*1024*2;
-        while (size*i < data.length) {
+        while (i < 3) {
             let end = Math.min(size*(i+1), data.length);
             let slice = data.slice(size*i, end);
 
@@ -180,101 +177,8 @@ const useDecompress = (flashFile) => {
             i++;
         }
 
-        if (!stream.end(callback)) {
-            console.log("stream.end() error");
-            return null;
-        }
-
-        console.log("finishing unzipping");
-
-        const readable = transform.readable;
-        doFlash(readable, PACKET_SZ, totalBytes);
     }
 
-    const doFlash = async(readable, size, totalSize) => {
-        await preBoot();
-
-        const reader = readable.getReader();
-
-        let offset = 0;
-        let sofar = new Uint8Array(size);
-        let i=0;
-        let totalBytes = 0;
-
-        let i_last = Math.floor(totalSize/DATA_SZ);
-        let last_len = totalSize - Math.floor(totalSize/DATA_SZ)*DATA_SZ;
-
-        console.log(i_last, last_len);
-
-        let isFirst = true;
-        let bytesChunk = 0;
-
-        reader.read().then(async function processText ({ done, value }) {
-            // Result objects contain two properties:
-            // done  - true if the stream has already given you all its data.
-            // value - some data. Always undefined when done is true.
-
-            totalBytes += value.length;
-            console.log(totalBytes);
-
-            // Send chunk headers
-            if (isFirst) {
-                let send_len;
-                if (i==i_last) {
-                    send_len = Math.ceil(last_len/BLK_SZ)*BLK_SZ
-                }
-                else {
-                    send_len = DATA_SZ;
-                }
-                await send_chunk_headers(send_len, i);
-                console.log("Sent headers", send_len, i)
-
-                isFirst = false;
-            }
-
-            while (offset + value.length >= size) {
-                sofar.set(value.slice(0, size-offset), offset); // Whole packet is ready to send
-                bytesChunk += size-offset;
-                await send_packet(sofar);
-
-                console.log("bytes", bytesChunk, i);
-
-                if (bytesChunk == DATA_SZ) {
-                    await send_flash();
-                    bytesChunk = 0;
-                    i++;
-                    isFirst = true;
-                }
-                value = value.slice(size-offset, value.length);
-                offset = 0;
-            }
-
-            sofar.set(value, offset);
-            offset += value.length;
-            bytesChunk += value.length
-
-            if (i==i_last && bytesChunk==last_len) {
-                console.log("reached last send", i, bytesChunk);
-
-                // Pad last packet with zeros
-                let fill_len = Math.ceil(last_len/BLK_SZ)*BLK_SZ - last_len;
-                sofar.set(new Uint8Array(fill_len), offset);
-                sofar = sofar.slice(0, offset+fill_len);
-
-                console.log(sofar);
-
-                await send_packet(sofar);
-                await send_flash();
-            }
-
-            if (done) {
-                console.log("stream done")
-                return;
-            }
-            // Read some more, and call this function again
-            return reader.read().then(processText);
-          });
-    }
 
     return [{
         requestUSBDevice,

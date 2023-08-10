@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react"
-import useDecompress4 from '../logic/useDecompress2'
+import useDecompress2 from '../logic/useDecompress2'
 import { DATA_SZ, BLK_SZ, PACKET_SZ } from "../helper/sparse";
 
 const Decompress2 = () => {
     const [flashFile, setFlashFile] = useState();
 
     const [{
-        requestUSBDevice,
-        decompressFileToTransform
-    }] = useDecompress4(flashFile);
+        // requestUSBDevice,
+    }] = useDecompress2(flashFile);
 
     useEffect(()=> {
         console.log(ZstdCodec)
@@ -47,7 +46,7 @@ const Decompress2 = () => {
             file to decompress:
             <input type="file" onChange={(e) => setFlashFile(e.target.files[0])}/>
 
-            <button onClick={requestUSBDevice}>Choose USB Dev </button>
+            {/* <button onClick={requestUSBDevice}>Choose USB Dev </button> */}
         </div>
     )
 }
