@@ -1,20 +1,13 @@
 
 
-import {useEffect, useRef, useState} from 'react';
-import {str_to_arr, ab_to_str} from '../helper/functions.js'
-import {CHUNK_SZ, BLK_SZ, CHUNK_TYPE_RAW, CHUNK_TYPE_DONT_CARE, build_sparse_header, build_chunk_header} from '../helper/sparse.js'
+import { useEffect, useRef, useState } from 'react';
+import { CHUNK_SZ, BLK_SZ } from '../helper/sparse.js'
+import ChunkProcessor from './ChunkProcessor.js';
+import { preboot, process_chunk } from './useFlash.js'
 
 const USBrequestParams = { filters: [{ vendorId: 8137, productId: 0x0152 }] };
-
-const PACKET_SZ = 0x10000;
 const DATA_SZ = CHUNK_SZ * BLK_SZ; // in bytes
-
-const size = 1024*1024;
-
-const test_data_sz = 262144;
-
-import ChunkProcessor from './flashMachine.js';
-import {preboot, process_chunk} from './useFlash.js'
+const size = 1024*1024; // for decompressing
 
 const useDecompress2 = (flashFile) => {
     const chunk_processor = useRef();
@@ -23,7 +16,6 @@ const useDecompress2 = (flashFile) => {
     const data = useRef();
     const i = useRef(0); // for indexing through flashfile
     const chunk_i = useRef(0); // for building chunk headers
-
 
     const [USBDevice, setUSBDevice] = useState();
     const [flashProgress, setFlashProgress] = useState();
@@ -42,14 +34,9 @@ const useDecompress2 = (flashFile) => {
     // things to test: do you have to await on 
     const processChunk = async(chunk) => {
         console.log('processing...');
-        // let res = await p2();
-        // console.log(res);
-        // res = await p3();
-        // console.log(res);
-        // await p3();
 
         await process_chunk(USBDevice, chunk, chunk_i.current);
-        chunk_i.current += 1; //TODO: CHANGE THIS FOR ME
+        chunk_i.current ++;
 
         console.log("COMPLETED ONE CHUNK");
         console.log(chunk);
@@ -81,8 +68,6 @@ const useDecompress2 = (flashFile) => {
     }, [USBDevice])
 
     const requestUSBDevice = () => { // first thing called with button
-        // change back
-        // setUSBDevice(1);
         navigator.usb
         .requestDevice(USBrequestParams)
         .then((device) => {
@@ -134,7 +119,6 @@ const useDecompress2 = (flashFile) => {
         console.log(decompressed);
         total.current += decompressed.length;
 
-        // await chunk_processor.current.push_data(decompressed);
         await chunk_processor.current.push_data(decompressed);
 
         // uncomment below this
@@ -161,8 +145,8 @@ const useDecompress2 = (flashFile) => {
             return;
         }
 
-        let chunk = data.current.slice(size*i.current, Math.min(size*(i.current+1), data.current.length)); //TODO: maybe don't need min thigs, handled automatically
-        i.current += 1;
+        let chunk = data.current.slice(size*i.current, size*(i.current+1));
+        i.current ++;
 
         if (!stream.current.load(chunk)) {
             console.log("stream.load() error");

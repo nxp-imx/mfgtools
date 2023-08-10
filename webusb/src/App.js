@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Combined from "./components/Combined";
 import Decompress from "./components/Decompress";
 import usePopup from "./logic/usePopup";
