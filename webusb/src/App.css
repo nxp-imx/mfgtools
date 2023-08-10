@@ -25,6 +25,10 @@
     display: inline-block;
 }
 
+.h3 {
+    font-weight: 700;
+}
+
 .link-container{
     display: inline-block;
     width : 16rem;

@@ -1,0 +1,16 @@
+.new-app {
+    font-family: Arial,sans-serif;
+}
+
+.button {
+    background-color: white;
+    border: none;
+    color: black;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    border: thin black solid;
+    text-transform: uppercase;
+}
