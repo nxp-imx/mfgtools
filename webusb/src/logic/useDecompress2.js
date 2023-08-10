@@ -21,8 +21,8 @@ const useDecompress2 = (flashFile) => {
     const total = useRef(0);
     const stream = useRef();
     const data = useRef();
-    const i = useRef(0);
-    const chunk_i = useRef(0);
+    const i = useRef(0); // for indexing through flashfile
+    const chunk_i = useRef(0); // for building chunk headers
 
 
     const [USBDevice, setUSBDevice] = useState();
@@ -42,14 +42,14 @@ const useDecompress2 = (flashFile) => {
     // things to test: do you have to await on 
     const processChunk = async(chunk) => {
         console.log('processing...');
-        let res = await p2();
-        console.log(res);
-        res = await p3();
-        console.log(res);
-        await p3();
+        // let res = await p2();
+        // console.log(res);
+        // res = await p3();
+        // console.log(res);
+        // await p3();
 
-        await process_chunk(USBDevice, chunk);
-        // chunk_i.current += 1; TODO: CHANGE THIS FOR ME
+        await process_chunk(USBDevice, chunk, chunk_i.current);
+        chunk_i.current += 1; //TODO: CHANGE THIS FOR ME
 
         console.log("COMPLETED ONE CHUNK");
         console.log(chunk);
@@ -157,10 +157,11 @@ const useDecompress2 = (flashFile) => {
                 console.log("stream.end() fail");
                 return;
             }
+            chunk_processor.current.flush(processChunk);
             return;
         }
 
-        let chunk = data.current.slice(size*i.current, Math.min(size*(i.current+1), data.current.length));
+        let chunk = data.current.slice(size*i.current, Math.min(size*(i.current+1), data.current.length)); //TODO: maybe don't need min thigs, handled automatically
         i.current += 1;
 
         if (!stream.current.load(chunk)) {
