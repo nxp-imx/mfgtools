@@ -17,8 +17,11 @@ const useDecompress2 = (flashFile) => {
     const i = useRef(0); // for indexing through flashfile
     const chunk_i = useRef(0); // for building chunk headers
 
+    // const flashProgress = useRef();
+    // const flashTotal = useRef();
+
     const [USBDevice, setUSBDevice] = useState();
-    const [flashProgress, setFlashProgress] = useState();
+    const [flashProgress, setFlashProgress] = useState(0);
     const [flashTotal, setFlashTotal] = useState();
 
     useEffect(()=> {
@@ -26,6 +29,7 @@ const useDecompress2 = (flashFile) => {
         // change back
         if (!flashFile) return;
 
+        // sets data from flashFile
         (async() => {
             data.current = new Uint8Array(await flashFile.arrayBuffer());
         })()
@@ -119,6 +123,8 @@ const useDecompress2 = (flashFile) => {
         console.log(decompressed);
         total.current += decompressed.length;
 
+        
+
         await chunk_processor.current.push_data(decompressed);
 
         // uncomment below this
@@ -134,6 +140,8 @@ const useDecompress2 = (flashFile) => {
     // // need to load a chunk of data into zstd-read stream
     const doLoad = () => {
         // reached the end of processing data
+        setFlashProgress(Math.min(i.current*size, data.current.length));
+        
         if (size*i.current >= data.current.length) {
             console.log("at the end")
             console.log(total.current);
@@ -144,8 +152,8 @@ const useDecompress2 = (flashFile) => {
             chunk_processor.current.flush(processChunk);
             return;
         }
-
         let chunk = data.current.slice(size*i.current, size*(i.current+1));
+        
         i.current ++;
 
         if (!stream.current.load(chunk)) {
@@ -157,6 +165,9 @@ const useDecompress2 = (flashFile) => {
 
     const decompressFileToTransform = async(e) => {
         console.log("decompressFileToTransform", data.current);
+
+        setFlashTotal(data.current.length);
+        // flashTotal.current = data.current.length;
 
         await preboot(USBDevice);
 
@@ -177,6 +188,9 @@ const useDecompress2 = (flashFile) => {
 
     return [{
         requestUSBDevice,
+        USBDevice,
+        flashProgress,
+        flashTotal,
     }]
 }
 

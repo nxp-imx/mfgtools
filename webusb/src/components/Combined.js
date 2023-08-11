@@ -27,6 +27,7 @@ const Combined = ({bootFile, flashFile}) => {
                         </div>
                         <div>
                             <span>2. </span>
+                            
                             <button className="Popup-button" onClick={requestHIDDevice}> Pair HIDdevice </button>
                             <span>{bootProgress? `${bootProgress} bytes out of ${bootTotal} downloaded`: ""}</span>
                             <div className="Popup-empty">
@@ -42,6 +43,7 @@ const Combined = ({bootFile, flashFile}) => {
                         </div>
                         <div>
                             <span>3. </span>
+                            
                             <button onClick={requestUSBDevice}>Pair USBDevice </button>
                             <div className="Popup-empty"> 
 +                                {USBDevice? `connected: ${USBDevice.productName}`: ""} 

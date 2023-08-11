@@ -4,13 +4,67 @@
 
 .button {
     background-color: white;
-    border: none;
     color: black;
     padding: 5px 10px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 14px;
+    font-size: 10px;
     border: thin black solid;
     text-transform: uppercase;
+    font-weight: 600;
+}
+
+.button-secondary {
+    background-color: darkorange;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    border: thin darkorange solid;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.file-action-container{
+    width: 14rem;
+}
+
+.file-name-container {
+    align-items: center;
+    margin-right: 4rem;
+}
+
+.popup-container {
+    width: 40rem; 
+}
+
+.file-input-container {
+    background-color: white;
+    color: black;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    border: thin black solid;
+    text-transform: uppercase;
+    font-weight: 400; 
+}
+.file-input {
+    display: none;
+}
+
+.instruction-title {
+    margin-bottom: 1rem;
+}
+
+.instruction-elt {
+    margin-bottom: 0.5rem;
+}
+
+.instruction-container {
+    flex:1;
 }
