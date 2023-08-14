@@ -59,10 +59,8 @@ The prebuilt image and document are here:
 # How to Build:
 
 ## Windows
-- `git clone https://github.com/nxp-imx/mfgtools.git`
+- `git clone --recurse-submodules https://github.com/nxp-imx/mfgtools.git`
 - `cd mfgtools`
-- `git submodule init`
-- `git submodule update`
 - `open msvs/uuu.sln with Visual Studio 2017`
 
 Visual Studio
