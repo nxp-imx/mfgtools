@@ -1,5 +1,6 @@
 .new-app {
     font-family: Arial,sans-serif;
+    padding-left: 2rem;
 }
 
 .button {
@@ -13,6 +14,7 @@
     border: thin black solid;
     text-transform: uppercase;
     font-weight: 600;
+    cursor: pointer;
 }
 
 .button-secondary {
@@ -26,6 +28,7 @@
     border: thin darkorange solid;
     text-transform: uppercase;
     font-weight: 600;
+    cursor: pointer;
 }
 
 .file-action-container{
@@ -67,4 +70,8 @@
 
 .instruction-container {
     flex:1;
+}
+
+.popup {
+    margin-top: 2rem;
 }

@@ -45,13 +45,12 @@ const NewPopup = () => {
                                     choose file
                                     <input className="file-input" type="file" onChange={(e) => setBootFile(e.target.files[0])}/>
                                 </label>
-                                <span>{bootFile?(bootFile.name.length>10 ? `${bootFile.name.slice(0,10)}...`:bootFile.name):""}</span>
+                                <span>{bootFile?(bootFile.name.length>15 ? `${bootFile.name.slice(0,10)}...`:bootFile.name):""}</span>
                             </div>
                             <div className="instruction-elt">
                                 <button className="button-secondary" onClick={requestHIDDevice}> Pair HIDdevice </button>
                             </div>
                             <div>
-                                {/* <span>{bootProgress? `${bootProgress} bytes out of ${bootTotal} downloaded`: ""}</span> */}
                                 <div className="Popup-empty">
                                     {bootProgress&&(bootProgress===bootTotal)?
                                     `connected: ${HIDdevice.productName}`
@@ -75,13 +74,13 @@ const NewPopup = () => {
                                     choose file
                                     <input className="file-input" type="file" onChange={(e) => {setFlashFile(e.target.files[0])}}/>
                                 </label>
-                                <span>{flashFile?(flashFile.name.length>10 ? `${flashFile.name.slice(0,10)}...`:flashFile.name):""}</span>
+                                <span>{flashFile?(flashFile.name.length>15 ? `${flashFile.name.slice(0,10)}...`:flashFile.name):""}</span>
                             </div>
                             <div className="instruction-elt">
                                 <button className="button-secondary" onClick={requestUSBDevice}>Pair USBDevice </button>
                             </div>
                             <div className="Popup-empty">
-                                {flashProgress&&(flashProgress===flashTotal)?`connected: ${USBDevice.productName}`: (flashProgress?`Pairing`:"")}
+                                {flashProgress&&(flashProgress===flashTotal)?`Success: ${USBDevice.productName}`: (flashProgress?`Pairing`:"")}
                             </div>
                             <ProgressBar
                                 soFar = {flashProgress}
@@ -102,6 +101,7 @@ const NewApp = () => {
 
     return(
         <div className="new-app">
+            <h1>WebUUU</h1>
             <div className="u-flex u-column list-files-container">
                 <div className="u-flex file-option-container">
                     <div className="u-flex u-align-center file-name-container">
