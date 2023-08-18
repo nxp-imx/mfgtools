@@ -30,11 +30,11 @@ const ProgressBar = (props) => {
             >
                 <div style = {Childdiv}></div>
             </div>
-            {
+            {/* {
                 soFar&&total?
                 (soFar===total? "Done":
                 <span>{soFar} out of {total} bytes downloaded</span>):""
-            }
+            } */}
         </div>
     )
 }

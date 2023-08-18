@@ -13,6 +13,10 @@
     border-radius: 50%;
 }
 
+.popup-container {
+    width: 40rem; 
+}
+
 .Popup-list {
     margin:0;
     padding-left: 1rem;

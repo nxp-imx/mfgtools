@@ -1,0 +1,5 @@
+errors you keep running into: 
+
+must init git submodule for zstd
+must start the emsdk thing to use emcc in terminal
+updating node version to do serve -s build

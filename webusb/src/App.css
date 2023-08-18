@@ -25,6 +25,18 @@
     display: inline-block;
 }
 
+.u-align-center {
+    align-content: center;
+}
+
+.h3 {
+    font-weight: 700;
+}
+
+.h4 {
+    font-weight: 500;
+}
+
 .link-container{
     display: inline-block;
     width : 16rem;
