@@ -4,6 +4,7 @@
 
 .u-row {
     flex-direction: row;
+    padding-bottom: 1rem;
 }
 .u-column {
     flex-direction: column;
@@ -27,7 +28,7 @@
 
 .link-container{
     display: inline-block;
-    width : 16rem;
+    width : 8rem;
 }
 
 .popup-loc {
