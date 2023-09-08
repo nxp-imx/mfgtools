@@ -499,7 +499,8 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 		nt.str = (char*)"Wait for Known USB";
 		call_notify(nt);
 
-		check_usb_timeout(usb_timer);
+		if (check_usb_timeout(usb_timer))
+			return -1;
 	}
 
 	return -1;
