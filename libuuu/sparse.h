@@ -49,7 +49,7 @@ public:
 	static bool is_validate_sparse_file(void *p, size_t sz);
 
 	int push(void *p, size_t sz);
-	int push_one_block(void *data);
+	int push_one_block(void *data, bool skip=false);
 	size_t push_one_chuck(chunk_header_t *p, void *data);
 	size_t push_raw_data(void *data, size_t sz);
 

@@ -504,6 +504,13 @@ int FBFlashCmd::parser(char *p)
 	if (m_partition == "-raw2sparse")
 	{
 		m_raw2sparse = true;
+		if (m_partition == "-no-bmap")
+		{
+			m_use_bmap = false;
+		} else if (m_partition == "-bmap")
+		{
+			m_bmap_filename = get_next_param(subcmd, pos);
+		}
 		m_partition = get_next_param(subcmd, pos);
 	}
 
@@ -550,8 +557,32 @@ int FBFlashCmd::parser(char *p)
 		return -1;
 	}
 
-	if (!check_file_exist(m_filename))
+	if (!check_file_exist(m_filename)) {
+		set_last_err_string("FB: image file not found");
 		return -1;
+	}
+
+	if (m_use_bmap && m_bmap_filename.size() && !check_file_exist(m_bmap_filename)) {
+		set_last_err_string("FB: bmap file not found");
+		return -1;
+	}
+
+	if (m_use_bmap && m_bmap_filename.empty()) {
+		m_bmap_filename = m_filename;
+		auto p = m_bmap_filename.rfind('.');
+		if (p != string::npos) {
+			m_bmap_filename.replace(p, string::npos, ".bmap");
+			if (check_file_exist(m_bmap_filename))
+				return 0;
+		}
+
+		m_bmap_filename = m_filename;
+		m_bmap_filename.append(".bmap");
+		if (check_file_exist(m_bmap_filename))
+			return 0;
+
+		m_use_bmap = false;
+	}
 
 	return 0;
 }
@@ -571,7 +602,7 @@ int FBFlashCmd::flash(FastBoot *fb, void * pdata, size_t sz)
 	return 0;
 }
 
-int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, size_t block_size, size_t max)
+int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, size_t max)
 {
 	SparseFile sf;
 
@@ -580,7 +611,9 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, siz
 	if (max > m_sparse_limit)
 		 max = m_sparse_limit;
 
-	sf.init_header(block_size, (max + block_size -1) / block_size);
+	size_t block_size = m_bmap.block_size();
+
+	sf.init_header(m_bmap.block_size(), (max + block_size - 1) / block_size);
 
 	data.resize(block_size);
 
@@ -595,12 +628,11 @@ int FBFlashCmd::flash_raw2sparse(FastBoot *fb, shared_ptr<FileBuffer> pdata, siz
 
 	call_notify(nt);
 	
-
 	size_t i = 0;
 	int r;
 	while (!(r=pdata->request_data(data, i*block_size, block_size)))
 	{
-		int ret = sf.push_one_block(data.data());
+		int ret = sf.push_one_block(data.data(), !m_bmap.is_mapped_block(i));
 		if (ret)
 		{
 			if (flash(fb, sf.m_data.data(), sf.m_data.size()))
@@ -668,16 +700,23 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 	if (m_raw2sparse)
 	{
-		size_t block_size = 4096;
+		// fully mapped image
+		if (!m_use_bmap) {
+			size_t block_size = 4096;
+			if (getvar.parser((char*)"FB: getvar logical-block-size"))
+				return -1;
+			if (!getvar.run(ctx))
+				block_size = str_to_uint32(getvar.m_val);
 
-		if (getvar.parser((char*)"FB: getvar logical-block-size"))
-			return -1;
-		if (!getvar.run(ctx))
-			block_size = str_to_uint32(getvar.m_val);
+			if (block_size == 0) {
+				set_last_err_string("Device report block_size is 0");
+				return -1;
+			}
 
-		if (block_size == 0)
-		{
-			set_last_err_string("Device report block_size is 0");
+			m_bmap = bmap_t{SIZE_MAX, block_size};
+		// load mappings from the file
+		} else if (!load_bmap(m_bmap_filename, m_bmap)) {
+			set_last_err_string("Failed to load BMAP");
 			return -1;
 		}
 
@@ -703,7 +742,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 			return flash_ffu(&fb, pdata);
 		}
 
-		return flash_raw2sparse(&fb, pdata, block_size, max);
+		return flash_raw2sparse(&fb, pdata, max);
 	}
 
 	shared_ptr<FileBuffer> pin = get_file_buffer(m_filename, true);
