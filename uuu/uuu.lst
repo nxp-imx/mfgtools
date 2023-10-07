@@ -32,7 +32,7 @@ uuu_version 1.0.0
 #                      getvar
 #                      ucmd <any uboot command>
 #                      acmd <any never returned uboot command, like booti, reboot>
-#                      flash [-raw2sparse] <partition> <filename>
+#                      flash [-raw2sparse [{-no-bmap|-bmap <bmap_filename}]] <partition> <filename>
 #                      download -f <filename>
 #                      crc -f <filename> [-format "mmc read $loadaddr"] [-blksz 512] [-each 0x4000000]
 #                                        [-seek 0] [-skip 0] [-nostop]

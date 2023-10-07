@@ -106,7 +106,7 @@ int SparseFile::push(void *p, size_t sz)
 	return 0;
 }
 
-int SparseFile::push_one_block(void *data)
+int SparseFile::push_one_block(void *data, bool skip)
 {
 	chunk_header_t *pchunk;
 	pchunk = (chunk_header_t *)(m_data.data() + m_cur_chunk_header_pos);
@@ -117,15 +117,18 @@ int SparseFile::push_one_block(void *data)
 	pheader->total_blks++;
 
 	//int type = is_same_value(data, pheader->blk_sz) ? CHUNK_TYPE_FILL : CHUNK_TYPE_RAW;
-	int type = CHUNK_TYPE_RAW;
+	int type = skip ? CHUNK_TYPE_DONT_CARE : CHUNK_TYPE_RAW;
 
 	if (!is_append_old_chuck(type, data))
 	{
 		chunk_header_t header;
 		header.chunk_type = type;
 		header.chunk_sz = 1;
-		header.total_sz = (type == CHUNK_TYPE_FILL) ? sizeof(uint32_t) : pheader->blk_sz;
-		header.total_sz += sizeof(chunk_header_t);
+		header.total_sz = sizeof(chunk_header_t);
+		if (type == CHUNK_TYPE_FILL)
+			header.total_sz += sizeof(uint32_t);
+		if (type == CHUNK_TYPE_RAW)
+			header.total_sz += pheader->blk_sz;
 		header.reserved1 = 0;
 
 		pheader->total_chunks++;
@@ -136,7 +139,7 @@ int SparseFile::push_one_block(void *data)
 
 		if (type == CHUNK_TYPE_RAW)
 			push(data, pheader->blk_sz);
-		else
+		else if (type == CHUNK_TYPE_FILL)
 			push(data, sizeof(uint32_t));
 	}
 	else
@@ -149,8 +152,9 @@ int SparseFile::push_one_block(void *data)
 		}
 	}
 
-	if (m_data.size() + 2 * pheader->blk_sz > m_max_size )
+	if (m_data.size() + 2 * pheader->blk_sz > m_max_size ) {
 		return -1;
+	}
 
 	return 0;
 }

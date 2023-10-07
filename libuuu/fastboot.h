@@ -32,6 +32,7 @@
 #pragma once
 
 #include "cmd.h"
+#include "bmap.h"
 
 #include <cstdint>
 
@@ -167,15 +168,18 @@ public:
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
 	int flash(FastBoot *fb, void *p, size_t sz);
-	int flash_raw2sparse(FastBoot *fb, std::shared_ptr<FileBuffer> p, size_t blksz, size_t max);
+	int flash_raw2sparse(FastBoot *fb, std::shared_ptr<FileBuffer> p, size_t max);
 	bool isffu(std::shared_ptr<FileBuffer> p);
 	int flash_ffu(FastBoot *fb, std::shared_ptr<FileBuffer> p);
 	int flash_ffu_oneblk(FastBoot *fb, std::shared_ptr<FileBuffer> p, size_t off, size_t blksz, size_t blkindex);
 
 private:
+	bmap_t m_bmap;
 	std::string m_filename;
+	std::string m_bmap_filename;
 	std::string m_partition;
 	bool m_raw2sparse = false;
+	bool m_use_bmap = true;
 	size_t m_sparse_limit = 0x1000000;
 	uint64_t m_totalsize;
 	bool m_scanterm = false;
