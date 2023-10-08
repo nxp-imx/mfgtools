@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up environment
-        run: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev libbz2-dev libzstd-dev
+        run: sudo DEBIAN_FRONTEND=noninteractive apt-get  --yes --force-yes install libusb-1.0-0-dev libbz2-dev libzstd-dev libtinyxml2-dev
 
       - name: Build
         run: |

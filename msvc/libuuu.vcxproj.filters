@@ -63,6 +63,9 @@
     <ClInclude Include="..\libuuu\http.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\libuuu\bmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libuuu\error.cpp">
@@ -117,6 +120,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\libuuu\http.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuuu\bmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
