@@ -30,6 +30,7 @@
 */
 
 #include <string>
+#include "config.h"
 #include "sdps.h"
 #include "hidreport.h"
 #include "liberror.h"
@@ -239,6 +240,45 @@ SDPBootCmd::SDPBootCmd(char *p) : SDPCmdBase(p)
 	insert_param_info("-cleardcd", &m_clear_dcd, Param::Type::e_bool);
 	insert_param_info("-dcdaddr", &m_dcd_addr, Param::Type::e_uint32);
 	insert_param_info("-scanlimited", &m_scan_limited, Param::Type::e_uint64);
+	insert_param_info("-barebox", &m_barebox, Param::Type::e_bool);
+}
+
+int SDPBootCmd::load_barebox(CmdCtx *ctx)
+{
+	const ROM_INFO *rom = search_rom_info(ctx->m_config_item);
+
+	if (!rom)
+		return 0;
+
+	// The barebox USB loading mechanism differs between SoCs due to SRAM
+	// size limitations.
+	//
+	// E.g. all i.MX8M SoCs require a two stage loading, first the
+	// pre-bootloader (PBL) is loaded to the internal SRAM and started. The
+	// PBL intialize the DDR and uses the BootROM initialized USB
+	// controller to load the remaining "full barebox image" to the DDR.
+	//
+	// On i.MX6 devices this is not the case since the DDR setup is done
+	// via the DCD and we can load the image directly to the DDR.
+	//
+	// The ROM_INFO_NEED_BAREBOX_FULL_IMAGE flag indicates if the two-stage
+	// load mechanism is required for a specific SoC. So the user can
+	// always specify '-barebox' no matter if it's required or not:
+	//
+	// SDP: boot -barebox -f <barebox.img>
+	if (!(rom->flags & ROM_INFO_NEED_BAREBOX_FULL_IMAGE))
+		return 0;
+
+	string str;
+	str = "SDP: write -f ";
+	str += m_filename;
+	str += " -ivt 0";
+	str += " -barebox-bl33";
+
+	SDPWriteCmd wr((char *)str.c_str());
+	if (wr.parser()) return -1;
+
+	return wr.run(ctx);
 }
 
 int SDPBootCmd::run(CmdCtx *ctx)
@@ -299,6 +339,11 @@ int SDPBootCmd::run(CmdCtx *ctx)
 	{
 		if (jmp.parser()) return -1;
 		if (jmp.run(ctx)) return -1;
+	}
+
+	if (m_barebox)
+	{
+		if (load_barebox(ctx)) return -1;
 	}
 
 	SDPBootlogCmd log(nullptr);
