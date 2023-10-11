@@ -213,7 +213,10 @@ public:
 	int run(CmdCtx *p) override;
 
 private:
+	int load_barebox(CmdCtx *ctx);
+
 	bool m_clear_dcd = false;
 	uint32_t m_dcd_addr = 0;
 	bool m_nojump = false;
+	bool m_barebox = false;
 };

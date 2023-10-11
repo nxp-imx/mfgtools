@@ -56,6 +56,7 @@ constexpr uint32_t ROM_INFO_HID_PACK_SIZE_1020 = 0x2000;
 constexpr uint32_t ROM_INFO_HID_SDP_NO_MAX_PER_TRANS = 0x4000;
 constexpr uint32_t ROM_INFO_AUTO_SCAN_UBOOT_POS = 0x8000;
 constexpr uint32_t ROM_INFO_HID_ROMAPI = 0x10000;
+constexpr uint32_t ROM_INFO_NEED_BAREBOX_FULL_IMAGE = 0x20000;
 
 struct ROM_INFO
 {
