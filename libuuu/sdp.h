@@ -176,6 +176,7 @@ private:
 	bool m_bskipspl = false;
 	bool m_bskipfhdr = false;
 	bool m_bscanterm = false;
+	bool m_barebox_bl33 = false;
 };
 
 class SDPJumpCmd : public SDPCmdBase
