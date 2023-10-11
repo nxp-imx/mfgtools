@@ -344,11 +344,13 @@ SDPWriteCmd::SDPWriteCmd(char *p) : SDPCmdBase(p)
 	m_download_addr = 0;
 	m_bskipspl = false;
 	m_bscanterm = false;
+	m_barebox_bl33 = false;
 
 	insert_param_info("write", nullptr, Param::Type::e_null);
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
 	insert_param_info("-ivt", &m_Ivt, Param::Type::e_uint32);
 	insert_param_info("-addr", &m_download_addr, Param::Type::e_uint32);
+	insert_param_info("-barebox-bl33", &m_barebox_bl33, Param::Type::e_bool);
 	insert_param_info("-offset", &m_offset, Param::Type::e_uint32);
 	insert_param_info("-skipspl", &m_bskipspl, Param::Type::e_bool);
 	insert_param_info("-skipfhdr", &m_bskipfhdr, Param::Type::e_bool);
@@ -360,6 +362,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 	size_t size;
 	uint8_t *pbuff;
 	ssize_t offset = 0;
+	bool validate_run = true;
 
 	shared_ptr<FileBuffer> p1= get_file_buffer(m_filename, true);
 
@@ -467,9 +470,23 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 		if (size > fbuff->size() - off)
 			size = fbuff->size() - off;
 
+		if (m_barebox_bl33) {
+			if (pIvt->IvtBarker != IVT_BARKER_HEADER) {
+				set_last_err_string("Barebox BL33 loading is only support for IVT Header V2");
+				return -1;
+			}
+			offset = pIvt->ImageStartAddr - pIvt->SelfAddr;
+			size = fbuff->size() - off - offset;
+			m_download_addr = 0;
+
+			// Barebox does start as soon as the bl33 was loaded
+			// and the check_ack() fails
+			validate_run = false;
+		}
+
 		pbuff = (uint8_t*)pIvt;
 	}
-	return run(ctx, pbuff + offset, size, m_download_addr);
+	return run(ctx, pbuff + offset, size, m_download_addr, validate_run);
 }
 
 int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr, bool validate)
