@@ -472,7 +472,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 	return run(ctx, pbuff + offset, size, m_download_addr);
 }
 
-int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
+int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr, bool validate)
 {
 	HIDTrans dev(m_timeout);
 	if (dev.open(ctx->m_dev))
@@ -511,7 +511,7 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr)
 		if (report.write(((uint8_t*)pbuff)+i, sz, 2))
 			return -1;
 
-		if (check_ack(&report, ROM_STATUS_ACK))
+		if (validate && check_ack(&report, ROM_STATUS_ACK))
 			return -1;
 	}
 
