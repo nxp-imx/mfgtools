@@ -83,7 +83,7 @@ int HIDReport::write(const void *p, size_t sz, uint8_t report_id)
 
 		memcpy(m_out_buff.data() + m_size_payload, buff + off, s);
 
-		int ret = m_pdev->write(m_out_buff.data(), report_id == 1? s + m_size_payload: m_size_out + m_size_payload);
+		int ret = m_pdev->write(m_out_buff.data(), s + m_size_payload);
 
 		if (ret < 0)
 			return -1;
