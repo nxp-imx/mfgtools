@@ -164,7 +164,7 @@ public:
 	SDPWriteCmd(char*p);
 
 	int run(CmdCtx *p) override;
-	int run(CmdCtx *p, void *buff, size_t size, uint32_t addr);
+	int run(CmdCtx *p, void *buff, size_t size, uint32_t addr, bool validate = true);
 
 private:
 	uint32_t m_download_addr;
