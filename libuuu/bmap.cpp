@@ -1,9 +1,10 @@
-#include <iostream>
 #include <map>
 #include <tinyxml2.h>
 
 #include "bmap.h"
 #include "buffer.h"
+#include "libcomm.h"
+#include "libuuu.h"
 
 extern int g_verbose;
 
@@ -40,7 +41,7 @@ static bool parse_image_size(bmap_t &bmap, const tinyxml2::XMLElement* elem)
 {
 	auto img_size = elem->Unsigned64Text();
 	if (!img_size) {
-		std::cerr << "Invalid image size." << std::endl;
+		set_last_err_string("Invalid image size.");
 		return false;
 	}
 	bmap.set_image_size(img_size);
@@ -51,7 +52,7 @@ static bool parse_block_size(bmap_t &bmap, const tinyxml2::XMLElement* elem)
 {
 	auto blk_size = elem->Unsigned64Text();
 	if (!blk_size) {
-		std::cerr << "Invalid block size." << std::endl;
+		set_last_err_string("Invalid block size.");
 		return false;
 	}
 	bmap.set_block_size(blk_size);
@@ -62,7 +63,7 @@ static bool parse_blocks_count(bmap_t &bmap, const tinyxml2::XMLElement* elem)
 {
 	auto blk_count = elem->Unsigned64Text();
 	if (!blk_count) {
-		std::cerr << "Invalid blocks count." << std::endl;
+		set_last_err_string("Invalid blocks count.");
 		return false;
 	}
 	bmap.set_blocks_count(blk_count);
@@ -98,6 +99,14 @@ static const std::map<std::string, bool (*)(bmap_t &, const tinyxml2::XMLElement
 	{ "BlockMap", parse_block_map },
 };
 
+void send_info(std::string msg)
+{
+	uuu_notify nt;
+	nt.type = uuu_notify::NOTIFY_CMD_INFO;
+	nt.str = (char*)msg.c_str();
+	call_notify(nt);
+}
+
 bool load_bmap(const std::string& filename, bmap_t& bmap)
 {
 	tinyxml2::XMLDocument doc;
@@ -119,13 +128,13 @@ bool load_bmap(const std::string& filename, bmap_t& bmap)
 	auto elem = doc.FirstChildElement();
 
 	if (!elem) {
-		std::cerr << "No bmap element" << std::endl;
+		set_last_err_string("No bmap element");
 		return -1;
 	}
 
 	if (elem) {
 		if (!elem->Attribute("version", "2.0")) {
-			std::cerr << "Invalid bmap version. 2.0 is expected." << std::endl;
+			set_last_err_string("Invalid bmap version. 2.0 is expected.");
 			return -1;
 		}
 	}
@@ -139,17 +148,19 @@ bool load_bmap(const std::string& filename, bmap_t& bmap)
 	}
 
 	if (g_verbose) {
-		std::cout << std::endl << "Using block map:" << std::endl;
-		std::cout << "  ImageSize: " << bmap.image_size() << std::endl;
-		std::cout << "  BlockSize: " << bmap.block_size() << std::endl;
-		std::cout << "  BlocksCount: " << bmap.blocks_count() << std::endl;
-		std::cout << "  BlockMap:" <<  std::endl;
+		auto info = std::string("\nUsing block map:") +
+				"\n  ImageSize: " + std::to_string(bmap.image_size()) +
+				"\n  BlockSize: " + std::to_string(bmap.block_size()) +
+				"\n  BlocksCount: " + std::to_string(bmap.blocks_count()) +
+				"\n  BlockMap:";
 		for (auto& r: bmap.mapped_ranges()) {
 			if (r.first == r.second)
-				std::cout << "    Range:  " << r.first << std::endl;
+				info += "\n    Range:  " + std::to_string(r.first);
 			else
-				std::cout << "    Range:  " << r.first << "-" << r.second << std::endl;
+				info += "\n    Range:  " + std::to_string(r.first) +
+						"-" + std::to_string(r.second);
 		}
+		send_info(info + "\n");
 	}
 
 	return true;

@@ -4,7 +4,7 @@
 #include <vector>
 
 struct bmap_t {
-	using map_type = std::vector<std::pair<size_t, size_t>>;
+	using bmap_type = std::vector<std::pair<size_t, size_t>>;
 
 	bmap_t() = default;
 	// fully mapped image
@@ -47,7 +47,7 @@ struct bmap_t {
 	size_t block_size() const { return m_blk_size; }
 	size_t blocks_count() const { return m_blk_count; }
 
-	const map_type& mapped_ranges() const { return m_blk_map; }
+	const bmap_type& mapped_ranges() const { return m_blk_map; }
 
 	bool is_mapped_block(size_t index) const;
 
@@ -55,7 +55,7 @@ private:
 	size_t m_img_size = 0;
 	size_t m_blk_size = 4096;
 	size_t m_blk_count = 0;
-	map_type m_blk_map;
+	bmap_type m_blk_map;
 	mutable bool m_gap_set = false;
 	mutable size_t m_gap_begin = 0;
 	mutable size_t m_gap_end = 0;
