@@ -78,7 +78,14 @@ int HIDReport::write(const void *p, size_t sz, uint8_t report_id)
 		m_out_buff[0] = report_id;
 
 		size_t s = sz - off;
-		if (s > m_size_out)
+
+		/*
+		 * The Windows HIDAPI is ver strict. It always require to send
+		 * buffers of the size reported by the HID Report Descriptor.
+		 * Therefore we must to send m_size_out buffers for HID ID 2
+		 * albeit it may not required for the last buffer.
+		 */
+		if (s > m_size_out || report_id == 2)
 			s = m_size_out;
 
 		memcpy(m_out_buff.data() + m_size_payload, buff + off, s);
