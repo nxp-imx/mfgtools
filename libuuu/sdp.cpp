@@ -243,6 +243,25 @@ SDPBootCmd::SDPBootCmd(char *p) : SDPCmdBase(p)
 	insert_param_info("-barebox", &m_barebox, Param::Type::e_bool);
 }
 
+# define BAREBOX_MAGIC_OFFSET	0x20
+
+bool SDPBootCmd::is_barebox_img(void)
+{
+	shared_ptr<FileBuffer> fbuf= get_file_buffer(m_filename, true);
+	if (fbuf == nullptr)
+		return false;
+
+	string barebox_magic ("barebox");
+
+	shared_ptr<DataBuffer> dbuf = fbuf->request_data(0, BAREBOX_MAGIC_OFFSET + barebox_magic.length());
+	if (dbuf == nullptr)
+		return false;
+
+	string img ((const char *)&dbuf->at(BAREBOX_MAGIC_OFFSET), barebox_magic.length());
+
+	return img.compare(barebox_magic) == 0 ? true : false;
+}
+
 int SDPBootCmd::load_barebox(CmdCtx *ctx)
 {
 	const ROM_INFO *rom = search_rom_info(ctx->m_config_item);
@@ -341,7 +360,7 @@ int SDPBootCmd::run(CmdCtx *ctx)
 		if (jmp.run(ctx)) return -1;
 	}
 
-	if (m_barebox)
+	if (m_barebox || is_barebox_img())
 	{
 		if (load_barebox(ctx)) return -1;
 	}

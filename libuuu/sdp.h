@@ -213,6 +213,7 @@ public:
 	int run(CmdCtx *p) override;
 
 private:
+	bool is_barebox_img(void);
 	int load_barebox(CmdCtx *ctx);
 
 	bool m_clear_dcd = false;
