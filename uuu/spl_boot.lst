@@ -5,7 +5,7 @@ SDP: boot -f _flash.bin
 
 # This command will be run when ROM support stream mode
 # i.MX8QXP, i.MX8QM
-SDPS: boot -f _flash.bin
+SDPS[-t 10000]: boot -f _flash.bin
 
 # These commands will be run when use SPL and will be skipped if no spl
 # SDPU will be deprecated. please use SDPV instead of SDPU
