@@ -106,7 +106,7 @@ protected:
 	std::string m_cmd;
 	bool m_lastcmd = false;
 	bool m_NoKeyParam = false;
-	int m_timeout = 2000;
+	int m_timeout = 10000;
 
 private:
 	std::vector<Param> m_param;
