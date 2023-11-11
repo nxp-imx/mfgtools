@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up environment
-        run: brew install libusb pkg-config zstd
+        run: brew install libusb pkg-config zstd tinyxml2
         
       - name: Build
         run: |
