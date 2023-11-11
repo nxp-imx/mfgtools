@@ -229,7 +229,7 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\libusb\$(LibusbRootDir)build\$(PlatformToolset)\$(Platform)\$(Configuration)\dll\libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib;$(SolutionDir)bin\$(Platform)_$(Configuration)\libzstd_static.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\libusb\$(LibusbRootDir)build\$(PlatformToolset)\$(Platform)\$(Configuration)\dll\libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib;$(SolutionDir)bin\$(Platform)_$(Configuration)\libzstd_static.lib;$(Platform)/$(Configuration)/tinyxml2.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
@@ -290,7 +290,7 @@ echo )####^" &gt;&gt; $(SolutionDir)\..\uuu\nand_burn_loader.clst</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\libusb\$(LibusbRootDir)build\$(PlatformToolset)\$(Platform)\$(Configuration)\dll\libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib;$(SolutionDir)bin\$(Platform)_$(Configuration)\libzstd_static.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\libusb\$(LibusbRootDir)build\$(PlatformToolset)\$(Platform)\$(Configuration)\dll\libusb-1.0.lib;$(Platform)/$(Configuration)/libuuu.lib;$(Platform)/$(Configuration)/zlib.lib;%(AdditionalDependencies);$(Platform)/$(Configuration)/bzip2.lib;$(SolutionDir)bin\$(Platform)_$(Configuration)\libzstd_static.lib;$(Platform)/$(Configuration)/tinyxml2.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>echo R^"####( &gt; $(SolutionDir)\..\uuu\uuu.clst
