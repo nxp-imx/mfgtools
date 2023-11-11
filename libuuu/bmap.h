@@ -40,7 +40,7 @@ struct bmap_t {
 	}
 
 	static size_t default_blocks_count(size_t img_size, size_t blk_size) {
-		return img_size / blk_size + (img_size % blk_size) ? 1 : 0;
+		return img_size / blk_size + (img_size % blk_size ? 1 : 0);
 	}
 
 	size_t image_size() const { return m_img_size; }
