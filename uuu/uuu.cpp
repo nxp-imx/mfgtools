@@ -82,6 +82,8 @@ vector<string> g_usb_path_filter;
 int g_verbose = 0;
 static bool g_start_usb_transfer;
 
+bmap_mode g_bmap_mode = bmap_mode::Default;
+
 class AutoCursor
 {
 public:
@@ -173,7 +175,7 @@ int ask_passwd(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN])
 void print_help(bool detail = false)
 {
 	const char help[] =
-		"uuu [-d -m -v -V] <" "bootloader|cmdlists|cmd" ">\n\n"
+		"uuu [-d -m -v -V -bmap -no-bmap] <" "bootloader|cmdlists|cmd" ">\n\n"
 		"    bootloader  download bootloader to board by usb\n"
 		"    cmdlist     run all commands in cmdlist file\n"
 		"                If it is path, search uuu.auto in dir\n"
@@ -183,6 +185,8 @@ void print_help(bool detail = false)
 		"    -d          Daemon mode, wait for forever.\n"
 		"    -v -V       verbose mode, -V enable libusb error\\warning info\n"
 		"    -dry        Dry run mode, check if script or cmd correct \n"
+		"    -bmap       Try using .bmap files even if flash commands do not specify them\n"
+		"    -no-bmap    Ignore .bmap files even if flash commands specify them\n"
 		"    -m          USBPATH Only monitor these paths.\n"
 		"                    -m 1:2 -m 1:3\n\n"
 		"    -t          Timeout second for wait known usb device appeared\n"
@@ -198,7 +202,7 @@ void print_help(bool detail = false)
 		"uuu -h          show general help\n"
 		"uuu -H          show general help and detailed help for commands\n\n";
 	printf("%s", help);
-	printf("uuu [-d -m -v] -b[run] ");
+	printf("uuu [-d -m -v -bmap -no-bmap] -b[run] ");
 	g_BuildScripts.ShowCmds();
 	printf(" arg...\n");
 	printf("\tRun Built-in scripts\n");
@@ -998,6 +1002,14 @@ int main(int argc, char **argv)
 			else if (s == "-IgSerNum")
 			{
 				return set_ignore_serial_number();
+			}
+			else if (s == "-bmap")
+			{
+				g_bmap_mode = bmap_mode::Force;
+			}
+			else if (s == "-no-bmap")
+			{
+				g_bmap_mode = bmap_mode::Ignore;
 			}
 			else if (s == "-e")
 			{

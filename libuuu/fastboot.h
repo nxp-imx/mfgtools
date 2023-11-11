@@ -179,7 +179,7 @@ private:
 	std::string m_bmap_filename;
 	std::string m_partition;
 	bool m_raw2sparse = false;
-	bool m_use_bmap = true;
+	bool m_use_bmap = false;
 	size_t m_sparse_limit = 0x1000000;
 	uint64_t m_totalsize;
 	bool m_scanterm = false;

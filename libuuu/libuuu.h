@@ -148,4 +148,24 @@ void uuu_set_small_mem(uint32_t val);
 typedef int (*uuu_askpasswd)(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN]);
 int uuu_set_askpasswd(uuu_askpasswd ask);
 
+enum class bmap_mode {
+	Default,
+	Force,
+	Ignore
+};
+
+/*Get .bmap handling mode*/
+static inline bmap_mode uuu_get_bmap_mode() {
+	extern bmap_mode g_bmap_mode;
+	return g_bmap_mode;
+}
+
+static inline int uuu_force_bmap() {
+	return uuu_get_bmap_mode() == bmap_mode::Force;
+}
+
+static inline int uuu_ignore_bmap() {
+	return uuu_get_bmap_mode() == bmap_mode::Ignore;
+}
+
 #endif
