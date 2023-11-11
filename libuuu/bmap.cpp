@@ -39,8 +39,8 @@ bool bmap_t::is_mapped_block(size_t index) const
 
 static bool parse_image_size(bmap_t &bmap, const tinyxml2::XMLElement* elem)
 {
-	auto img_size = elem->Unsigned64Text();
-	if (!img_size) {
+	auto img_size = elem->Int64Text();
+	if (img_size <= 0) {
 		set_last_err_string("Invalid image size.");
 		return false;
 	}
@@ -50,8 +50,8 @@ static bool parse_image_size(bmap_t &bmap, const tinyxml2::XMLElement* elem)
 
 static bool parse_block_size(bmap_t &bmap, const tinyxml2::XMLElement* elem)
 {
-	auto blk_size = elem->Unsigned64Text();
-	if (!blk_size) {
+	auto blk_size = elem->Int64Text();
+	if (blk_size <= 0) {
 		set_last_err_string("Invalid block size.");
 		return false;
 	}
@@ -61,8 +61,8 @@ static bool parse_block_size(bmap_t &bmap, const tinyxml2::XMLElement* elem)
 
 static bool parse_blocks_count(bmap_t &bmap, const tinyxml2::XMLElement* elem)
 {
-	auto blk_count = elem->Unsigned64Text();
-	if (!blk_count) {
+	auto blk_count = elem->Int64Text();
+	if (blk_count <= 0) {
 		set_last_err_string("Invalid blocks count.");
 		return false;
 	}
