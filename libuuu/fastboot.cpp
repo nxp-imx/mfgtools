@@ -501,22 +501,29 @@ int FBFlashCmd::parser(char *p)
 	size_t pos = 0;
 	m_partition = get_next_param(subcmd, pos);
 
-	if (uuu_force_bmap())
-		m_use_bmap = true;
-
 	if (m_partition == "-raw2sparse")
 	{
 		m_raw2sparse = true;
+
+		if (uuu_force_bmap())
+			m_use_bmap = true;
+
 		m_partition = get_next_param(subcmd, pos);
+
 		if (m_partition == "-no-bmap")
 		{
 			m_use_bmap = false;
-		} else if (m_partition == "-bmap")
+			m_partition = get_next_param(subcmd, pos);
+		}
+		else if (m_partition == "-bmap")
 		{
 			m_use_bmap = true;
 			m_bmap_filename = get_next_param(subcmd, pos);
+			m_partition = get_next_param(subcmd, pos);
 		}
-		m_partition = get_next_param(subcmd, pos);
+
+		if (uuu_ignore_bmap())
+			m_use_bmap = false;
 	}
 
 	if (m_partition == "-scanterm")
@@ -566,9 +573,6 @@ int FBFlashCmd::parser(char *p)
 		set_last_err_string("FB: image file not found");
 		return -1;
 	}
-
-	if (uuu_ignore_bmap())
-		m_use_bmap = false;
 
 	if (m_use_bmap && m_bmap_filename.size() && !check_file_exist(m_bmap_filename)) {
 		set_last_err_string("FB: bmap file not found");
