@@ -249,7 +249,7 @@ int FBDownload::run(CmdCtx *ctx)
 	if (buff == nullptr)
 		return -1;
 
-	shared_ptr<DataBuffer> pdata = buff->request_data(0, UINT64_MAX);
+	shared_ptr<DataBuffer> pdata = buff->request_data(0, SIZE_MAX);
 	if (!pdata)
 		return -1;
 	string_ex cmd;
@@ -367,7 +367,7 @@ int FBCopy::run(CmdCtx *ctx)
 		{
 			return -1;
 		}
-		shared_ptr<DataBuffer> buff = pin->request_data(0, UINT64_MAX);
+		shared_ptr<DataBuffer> buff = pin->request_data(0, SIZE_MAX);
 		if (!buff)
 			return -1;
 		cmd.format("WOpen:%s", m_target_file.c_str());

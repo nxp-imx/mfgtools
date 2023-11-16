@@ -150,7 +150,7 @@ int SDPSCmd::run(CmdCtx *pro)
 	}
 	else
 	{
-		p = p1->request_data(0, UINT64_MAX); //request all data
+		p = p1->request_data(0, SIZE_MAX); //request all data
 		if (!p) return -1;
 	}
 

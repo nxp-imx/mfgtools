@@ -1709,7 +1709,7 @@ std::shared_ptr<DataBuffer> FileBuffer::request_data(size_t offset, size_t sz)
 			return p;
 	}
 
-	if (sz == UINT64_MAX)
+	if (sz == SIZE_MAX)
 		sz = size() - offset;
 
 	p->resize(sz);
