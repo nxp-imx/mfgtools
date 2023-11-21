@@ -1024,14 +1024,18 @@ string FBLoop::build_cmd(string& cmd, size_t off, size_t sz)
 	ucmd += cmd;
 
 	string_ex ex;
-	ex.format("0x%llx", off);
 
 	size_t pos= ucmd.find("@off");
-	ucmd = ucmd.replace(pos, 4, ex);
+	if (pos != string::npos) {
+		ex.format("0x%llx", off);
+		ucmd = ucmd.replace(pos, 4, ex);
+	}
 
-	ex.format("0x%llx", sz);
 	pos = ucmd.find("@size");
-	ucmd = ucmd.replace(pos, 5, ex);
+	if (pos != string::npos) {
+		ex.format("0x%llx", sz);
+		ucmd = ucmd.replace(pos, 5, ex);
+	}
 
 	return ucmd;
 }
