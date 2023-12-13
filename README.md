@@ -70,7 +70,7 @@ Note that, since uuu is an OSI compliant Open Source project, you are entitled t
 ## Linux
 - `git clone https://github.com/nxp-imx/mfgtools.git`
 - `cd mfgtools`
-- `sudo apt-get install libusb-1.0-0-dev libbz2-dev libzstd-dev pkg-config cmake libssl-dev g++ zlib1g-dev`
+- `sudo apt-get install libusb-1.0-0-dev libbz2-dev libzstd-dev pkg-config cmake libssl-dev g++ zlib1g-devn libtinyxml2-dev`
 - `cmake . && make`
 
 The above commands build mfgtools in source. To build it out of source
