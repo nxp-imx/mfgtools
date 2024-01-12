@@ -85,7 +85,7 @@ For cmake prior 3.13:
 ## macOS
 - `git clone https://github.com/nxp-imx/mfgtools.git`
 - `cd mfgtools`
-- `brew install cmake libusb openssl pkg-config`
+- `brew install cmake libusb openssl pkg-config tinyxml2`
 - `cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . && make`
 
 Note that we assume [brew](https://brew.sh) is installed and can be used to resolve dependencies as shown above. The remaining dependency `libbz2` can be resolved via the XCode supplied libraries.
