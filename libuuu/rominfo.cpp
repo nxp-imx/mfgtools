@@ -120,12 +120,13 @@ struct rom_bootimg {
 };
 
 
+static constexpr uint32_t IMG_FCB_COPY = 0x08;
 static constexpr uint32_t IMG_V2X = 0x0B;
 
 #pragma pack ()
 
 
-size_t GetContainerActualSize(shared_ptr<DataBuffer> p, size_t offset, bool bROMAPI)
+size_t GetContainerActualSize(shared_ptr<DataBuffer> p, size_t offset, bool bROMAPI, bool skipspl)
 {
 	if(bROMAPI)
 		return p->size() - offset;
@@ -154,6 +155,12 @@ size_t GetContainerActualSize(shared_ptr<DataBuffer> p, size_t offset, bool bROM
 	image = reinterpret_cast<struct rom_bootimg *>(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT
 		+ sizeof(struct rom_container)
 		+ sizeof(struct rom_bootimg) * (hdr->num_images - 1));
+
+	/* Check if the image is FCB copy */
+	if (((image->flags & 0xF) == IMG_FCB_COPY) && !skipspl)
+	{
+		image--;
+	}
 
 	uint32_t sz = image->size + image->offset + cindex * CONTAINER_HDR_ALIGNMENT;
 

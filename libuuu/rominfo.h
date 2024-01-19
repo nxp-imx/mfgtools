@@ -68,6 +68,6 @@ struct ROM_INFO
 const ROM_INFO * search_rom_info(const std::string &s);
 const ROM_INFO * search_rom_info(const ConfigItem *item);
 
-size_t GetContainerActualSize(std::shared_ptr<DataBuffer> p, size_t offset, bool bROMAPI=false);
+size_t GetContainerActualSize(std::shared_ptr<DataBuffer> p, size_t offset, bool bROMAPI=false, bool skipspl=false);
 size_t GetFlashHeaderSize(std::shared_ptr<DataBuffer> p, size_t offset = 0);
 

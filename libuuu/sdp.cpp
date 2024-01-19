@@ -490,7 +490,7 @@ int SDPWriteCmd::run(CmdCtx*ctx)
 			}
 			else
 			{
-				offset += GetContainerActualSize(fbuff, offset);
+				offset += GetContainerActualSize(fbuff, offset, rom->flags & ROM_INFO_HID_ROMAPI, m_bskipspl);
 			}
 
 			if (size_t(offset) >= fbuff->size())
