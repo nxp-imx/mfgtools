@@ -1,7 +1,5 @@
 # uuu (Universal Update Utility), mfgtools 3.0
 
-[![Build status](https://ci.appveyor.com/api/projects/status/evp1xvj88ybuhfwi?svg=true)](https://ci.appveyor.com/project/nxpfrankli/mfgtools-kvqcg)
-
 [![macOS Build](https://github.com/nxp-imx/mfgtools/actions/workflows/macOS.yaml/badge.svg?branch=master)](https://github.com/nxp-imx/mfgtools/actions/workflows/macOS.yaml)
 [![Build with VS Studio](https://github.com/nxp-imx/mfgtools/actions/workflows/win.yaml/badge.svg)](https://github.com/nxp-imx/mfgtools/actions/workflows/win.yaml)
 [![Build for x64 ubuntu-lastest](https://github.com/nxp-imx/mfgtools/actions/workflows/build.yaml/badge.svg)](https://github.com/nxp-imx/mfgtools/actions/workflows/build.yaml)
@@ -45,8 +43,7 @@ Freescale/NXP I.MX Chip image deploy tools.
 
   uuu -b emmc u-boot.imx    write u-boot.imx to emmc boot partition. u-boot.imx need enable fastboot
 
-  uuu -b emmc_all u-boot.imx sdcard.bz2\*
-                            decompress sdcard.bz2 file and download the whole image into emmc
+  uuu -b emmc_all wic.zst   decompress wic.zst file and download the whole image into emmc
 ```
 
 # Prebuilt Image and pdf document
@@ -110,3 +107,4 @@ The BSD licensed prebuilt Windows binary version of uuu is statically linked wit
  - zlib  (zlib license) is from https://github.com/madler/zlib.git
  - libusb (LGPL-2.1) is from  https://github.com/libusb/libusb.git
  - zstd (Dual BSD\GPLv2 Licenses) is from https://github.com/facebook/zstd
+ - tinyxml (zlib license) is from https://github.com/leethomason/tinyxml2
