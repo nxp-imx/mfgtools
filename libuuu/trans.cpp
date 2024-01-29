@@ -46,6 +46,44 @@ TransBase::~TransBase()
 {
 }
 
+int TransBase::write(void *buff, size_t size)
+{
+	int ret;
+
+	for (int retry = 0; retry < m_retry; retry++) {
+		ret = write_simple(buff, size);
+		switch (ret) {
+			case 0:
+				return 0;
+			case LIBUSB_ERROR_TIMEOUT:
+				continue;
+			default:
+				return ret;
+		}
+	}
+
+	return LIBUSB_ERROR_TIMEOUT;
+}
+
+int TransBase::read(void *buff, size_t size, size_t *return_size)
+{
+	int ret;
+
+	for (int retry = 0; retry < m_retry; retry++) {
+		ret = read_simple(buff, size, return_size);
+		switch (ret) {
+			case 0:
+				return 0;
+			case LIBUSB_ERROR_TIMEOUT:
+				continue;
+			default:
+				return ret;
+		}
+	}
+
+	return LIBUSB_ERROR_TIMEOUT;
+}
+
 int TransBase::read(vector<uint8_t> &buff)
 {
 	size_t size;
@@ -117,7 +155,7 @@ int HIDTrans::open(void *p)
 	return 0;
 }
 
-int HIDTrans::write(void *buff, size_t size)
+int HIDTrans::write_simple(void *buff, size_t size)
 {
 	int ret;
 	uint8_t *p = (uint8_t *)buff;
@@ -160,7 +198,7 @@ int HIDTrans::write(void *buff, size_t size)
 	return ret;
 }
 
-int HIDTrans::read(void *buff, size_t size, size_t *rsize)
+int HIDTrans::read_simple(void *buff, size_t size, size_t *rsize)
 {
 	int ret;
 	int actual;
@@ -188,7 +226,7 @@ int HIDTrans::read(void *buff, size_t size, size_t *rsize)
 	return 0;
 }
 
-int BulkTrans::write(void *buff, size_t size)
+int BulkTrans::write_simple(void *buff, size_t size)
 {
 	int ret = 0;
 	int actual_length;
@@ -264,7 +302,7 @@ int BulkTrans::open(void *p)
 	}
 	return 0;
 }
-int BulkTrans::read(void *buff, size_t size, size_t *rsize)
+int BulkTrans::read_simple(void *buff, size_t size, size_t *rsize)
 {
 	int ret;
 	int actual_length;
