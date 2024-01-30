@@ -21,6 +21,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O2")
 
 if (STATIC)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
+set(TINYXML2_LIBRARY_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../tinyxml2")
+set(TINYXML2_LIBRARIES "tinyxml2.a")
 endif()
 
 set(LSTS
