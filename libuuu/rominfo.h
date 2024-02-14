@@ -63,6 +63,7 @@ struct ROM_INFO
 	const char * m_name;
 	uint32_t    free_addr;
 	uint32_t	flags;
+	int serial_idx;
 };
 
 const ROM_INFO * search_rom_info(const std::string &s);

@@ -46,8 +46,10 @@
 #include "cmd.h"
 #include "libcomm.h"
 #include "libuuu.h"
+#include "rominfo.h"
 #include "vector"
 #include <time.h>
+#include <iostream>
 
 using chrono::milliseconds;
 using chrono::operator ""ms;
@@ -134,7 +136,7 @@ private:
 	int m_rc = 0;
 };
 
-static struct {
+struct filter {
 	vector<string> list;
 	mutex lock;
 
@@ -143,7 +145,9 @@ static struct {
 		lock_guard<mutex> guard{lock};
 		list.emplace_back(std::move(filter));
 	}
+};
 
+static struct: public filter {
 	bool is_valid(const string& path)
 	{
 		lock_guard<mutex> guard{lock};
@@ -155,6 +159,26 @@ static struct {
 		return pos != end;
 	}
 } g_filter_usbpath;
+
+
+static struct: public filter {
+	bool is_valid(const string& serial_no)
+	{
+		lock_guard<mutex> guard{lock};
+		if (list.empty())
+			return true;
+
+		if (serial_no.empty())
+			return false;
+
+		for(auto it: list) {
+			if (compare_str(serial_no.substr(0, it.length()), it, true))
+				return true;
+		}
+
+		return false;
+	}
+} g_filter_usbserial_no;
 
 struct Timer
 {
@@ -212,6 +236,47 @@ static string get_device_path(libusb_device *dev)
 	return str;
 }
 
+#define SERIAL_NO_MAX 512
+
+static string get_device_serial_no(libusb_device *dev, struct libusb_device_descriptor *desc, ConfigItem *item)
+{
+	string serial;
+	struct libusb_device_handle *dev_handle = NULL;
+	int sid = desc->iSerialNumber;
+	int ret;
+
+	if (!sid) {
+		const ROM_INFO *info= search_rom_info(item);
+		sid = info->serial_idx;
+	}
+
+	serial.resize(SERIAL_NO_MAX);
+	libusb_open(dev, &dev_handle);
+	if (sid && dev_handle)
+		ret = libusb_get_string_descriptor_ascii(dev_handle, sid, (unsigned char*)serial.c_str(), SERIAL_NO_MAX);
+	libusb_close(dev_handle);
+	if(ret >= 0)
+		serial.resize(ret);
+
+	return serial;
+}
+
+static string get_device_serial_no(libusb_device *dev)
+{
+	string str;
+
+	struct libusb_device_descriptor desc;
+	int r = libusb_get_device_descriptor(dev, &desc);
+	if (r < 0) {
+		set_last_err_string("failure get device descriptor");
+		return str;
+	}
+
+	ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
+
+	return get_device_serial_no(dev, &desc, item);
+}
+
 static int open_libusb(libusb_device *dev, void **usb_device_handle)
 {
 	int retry = 10;
@@ -267,6 +332,8 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev, short bcddevice)
 
 	string str;
 	str = get_device_path(dev);
+	str += "-";
+	str += get_device_serial_no(dev);
 	nt.str = (char*)str.c_str();
 	call_notify(nt);
 
@@ -311,6 +378,10 @@ static int usb_add(libusb_device *dev)
 
 	if (item)
 	{
+		string serial = get_device_serial_no(dev, &desc, item);
+		if (!g_filter_usbserial_no.is_valid(serial))
+			return -1;
+
 		g_known_device_state = KnownDeviceToDo;
 
 		/*
@@ -475,6 +546,11 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 				continue;
 
 			ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
+
+			string serial_no = get_device_serial_no(dev, &desc, item);
+			if (!g_filter_usbserial_no.is_valid(serial_no))
+				continue;
+
 			if (item && item->m_protocol == str_to_upper(pro))
 				{
 					uuu_notify nt;
@@ -513,6 +589,12 @@ int uuu_add_usbpath_filter(const char *path)
 	return 0;
 }
 
+int uuu_add_usbserial_no_filter(const char *serial_no)
+{
+	g_filter_usbserial_no.push_back(serial_no);
+	return 0;
+}
+
 int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 {
 	CAutoList l;
@@ -536,7 +618,8 @@ int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p)
 		ConfigItem *item = get_config()->find(desc.idVendor, desc.idProduct, desc.bcdDevice);
 		if (item)
 		{
-			if (fn(str.c_str(), item->m_chip.c_str(), item->m_protocol.c_str(), desc.idVendor, desc.idProduct, desc.bcdDevice, p))
+			string serial = get_device_serial_no(dev, &desc, item);
+			if (fn(str.c_str(), item->m_chip.c_str(), item->m_protocol.c_str(), desc.idVendor, desc.idProduct, desc.bcdDevice, serial.c_str(), p))
 			{
 				set_last_err_string("call back return error");
 				return -1;
