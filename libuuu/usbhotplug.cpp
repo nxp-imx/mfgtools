@@ -258,7 +258,7 @@ static string get_device_serial_no(libusb_device *dev, struct libusb_device_desc
 	if(ret >= 0)
 		serial.resize(ret);
 
-	return serial;
+	return str_to_upper(serial);
 }
 
 static string get_device_serial_no(libusb_device *dev)
