@@ -1,17 +1,17 @@
 uuu_version 1.0.0
 #
 # uuu(universal update utility) command list file
-# Firstly line must be uuu_version show minimize uuu host version number
+# First line must contain the minimum required uuu host version
 # ---------------------------------------------------------------------
 # Command Format PROTOCOL COMMAND ARG
 # PROTOCOL
-#          ALL protocol supported common command
+#          ALL protocol supported common commands
 #                      done        #last command for whole flow
 #                      delay <ms>  # delay ms
 #                      sh\shell <any shell command> #Run shell command, such as wget to file from network
 #                      <        <any shell command> #use shell command's output as uuu command
-#                               this command generally used for burn some sequence number, such production id, mac address
-#				for example:   
+#                               this command generally used to burn some sequence number, such as production id and mac address
+#                               for example:
 #                                      FB:< echo ucmd print
 #
 #          CFG:  Config protocol of specific usb device vid/pid
@@ -28,7 +28,7 @@ uuu_version 1.0.0
 #                      rdmem -addr <mem_address> -format <8|16|32>
 #                      wrmem -addr <mem_address> -format <8|16|32> -value <mem_value>
 #
-#          FB[-t timeout]:\Fastboot: android fastboot protocol. unit of timeout is ms
+#          FB[-t timeout]:\Fastboot: android fastboot protocol (timeout in ms).
 #                      getvar
 #                      ucmd <any uboot command>
 #                      acmd <any never returned uboot command, like booti, reboot>
@@ -48,19 +48,19 @@ uuu_version 1.0.0
 #                                          nostop        continue write even if error occurs
 #
 #
-#          FBK: community with kernel with fastboot protocol. DO NOT compatible with fastboot tools.
+#          FBK: community kernel with fastboot protocol (NOT compatible with fastboot tools).
 #                      ucmd <any kernel command> and wait for command finish
 #                      acmd <any kernel command> don't wait for command finish
-#                      sync                      wait for acmd process finish.
+#                      sync                      wait for acmd process to finish
 #                      ucp <soure> <destinate>   copy file from/to target
-#                                                T:<filename> means target board file.
-#                                                T:- means copy data to target's stdio pipe.
+#                                                T:<filename> means target board file
+#                                                T:- means copy data to target's stdio pipe
 #                                                copy image T:/root/image ;download image to path /root/image
-#                                                copy T:/root/image image ;upload /root/image to file image.
-#                      Example for transfer big file
+#                                                copy T:/root/image image ;upload /root/image to file image
+#                      Example on how to transfer big files:
 #                              acmd tar -            ; run tar background and get data from stdio
 #                              ucp rootfs.tar.gz T:- ; send to target stdio pipe
-#                              sync                  ; wait for tar process exit.
+#                              sync                  ; wait for tar process to exit
 #
 # For example:
 #          SDPS: boot -f <filename>
