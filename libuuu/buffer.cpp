@@ -1391,6 +1391,9 @@ int FileBuffer::reload(string filename, bool async)
 		if (g_fs_data.need_small_mem(filename))
 			m_allocate_way = ALLOCATION_WAYS::SEGMENT;
 
+		if(m_async_thread.joinable())
+                        m_async_thread.join();
+
 		m_async_thread = thread(&FS_DATA::load, &g_fs_data, filename, shared_from_this());
 	}
 	else
