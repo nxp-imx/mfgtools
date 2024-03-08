@@ -1394,6 +1394,7 @@ int FileBuffer::reload(string filename, bool async)
 		if(m_async_thread.joinable())
                         m_async_thread.join();
 
+		m_dataflags = 0;
 		m_async_thread = thread(&FS_DATA::load, &g_fs_data, filename, shared_from_this());
 	}
 	else
