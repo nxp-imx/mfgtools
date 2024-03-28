@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
