@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <stdarg.h>
 #include <locale>
