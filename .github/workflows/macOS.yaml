@@ -44,10 +44,18 @@ jobs:
         run: cp uuu/uuu uuu_mac_arm
   
       - name: Upload Build Artifacts
+        if: matrix.os == 'macos-12'
         uses: actions/upload-artifact@v3
         with:
-          name: uuu_mac
-          path: uuu_mac_*
+          name: uuu_mac_x86
+          path: uuu_mac_x86
+
+      - name: Upload Build Artifacts
+        if: matrix.os == 'macos-14'
+        uses: actions/upload-artifact@v3
+        with:
+          name: uuu_mac_arm
+          path: uuu_mac_arm
 
       - name: Create or Update Release
         if: github.ref_type == 'tag'
