@@ -14,8 +14,13 @@ on:
 jobs:
   build:
     name: macOS Build
-    runs-on: macos-latest
-
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - macos-14
+          - macos-12
+          
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -30,14 +35,19 @@ jobs:
           git fetch --tags --force # Retrieve annotated tags. #issue 290
           export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; pkg-config --list-all; cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . ; make
 
-      - name: Rename
-        run: cp uuu/uuu uuu_mac
-    
+      - name: Rename_x86
+        if: matrix.os == 'macos-12'
+        run: cp uuu/uuu uuu_mac_x86
+ 
+      - name: Rename_arm
+        if: matrix.os == 'macos-14'
+        run: cp uuu/uuu uuu_mac_arm
+  
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: uuu_mac
-          path: uuu/uuu
+          path: uuu_mac_*
 
       - name: Create or Update Release
         if: github.ref_type == 'tag'
@@ -48,4 +58,4 @@ jobs:
           commit: ${{ github.sha }}
           allowUpdates: true
           prerelease: true
-          artifacts: "uuu_mac"
+          artifacts: "uuu_mac_*"
