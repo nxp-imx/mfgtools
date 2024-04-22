@@ -247,7 +247,8 @@ static string get_device_serial_no(libusb_device *dev, struct libusb_device_desc
 
 	if (!sid) {
 		const ROM_INFO *info= search_rom_info(item);
-		sid = info->serial_idx;
+		if (info)
+			sid = info->serial_idx;
 	}
 
 	serial.resize(SERIAL_NO_MAX);
