@@ -1,0 +1,6 @@
+# package management
+build
+bump-my-version
+twine
+# code quality
+nxp-codecheck

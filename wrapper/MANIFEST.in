@@ -1,0 +1,8 @@
+include requirements*
+
+recursive-include libuuu *
+
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude .github*
+
