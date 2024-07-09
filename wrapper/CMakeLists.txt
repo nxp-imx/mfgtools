@@ -5,8 +5,15 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SKIP_RPATH ON)
 
+# Prefix all shared libraries with 'lib'.
+set(CMAKE_SHARED_LIBRARY_PREFIX "")
+# Prefix all static libraries with 'lib'.
+set(CMAKE_STATIC_LIBRARY_PREFIX "")
+
+if (WIN32)
 set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_COMPILER clang++)
+endif(WIN32)
 
 # Set the directory where generated files will be placed
 set(generated_files_dir "${CMAKE_BINARY_DIR}/libuuu/gen")
@@ -15,25 +22,32 @@ set(generated_files_dir "${CMAKE_BINARY_DIR}/libuuu/gen")
 include_directories(${generated_files_dir})
 
 # Set the path for gitversion.h in the generated files directory
-set(definitions_h "${generated_files_dir}/definitions.h")
+set(gitversion_h "${generated_files_dir}/gitversion.h")
 
 # Run git describe
 execute_process(COMMAND git describe --long --always OUTPUT_VARIABLE version OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # Add a custom command to generate definitions.h
+if (WIN32)
 add_custom_command(
-    OUTPUT ${definitions_h}
+    OUTPUT ${gitversion_h}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${generated_files_dir}
-    COMMAND ${CMAKE_COMMAND} -E echo "#include \"libuuu.h\"" >> ${definitions_h};
-    COMMAND ${CMAKE_COMMAND} -E echo "#define GIT_VERSION \"${version}\"" >> ${definitions_h};
-    COMMAND ${CMAKE_COMMAND} -E echo "int g_verbose = 1;" >> ${definitions_h}
-    COMMAND ${CMAKE_COMMAND} -E echo "bmap_mode g_bmap_mode;" >> ${definitions_h}
-    COMMAND ${CMAKE_COMMAND} -E echo "#define PLATFORM_WINDOWS 1" >> ${definitions_h}
-    COMMAND ${CMAKE_COMMAND} -E echo "#define ENABLE_LOGGING 1" >> ${definitions_h}
-    COMMAND ${CMAKE_COMMAND} -E echo "#define DEFAULT_VISIBILITY /**/" >> ${definitions_h}
-    COMMENT "Generating definitions.h"
+    COMMAND ${CMAKE_COMMAND} -E echo "#define GIT_VERSION \"${version}\"" >> ${gitversion_h};
+    COMMAND ${CMAKE_COMMAND} -E echo "#define PLATFORM_WINDOWS 1" >> ${gitversion_h}
+    COMMAND ${CMAKE_COMMAND} -E echo "#define ENABLE_LOGGING 1" >> ${gitversion_h}
+    COMMAND ${CMAKE_COMMAND} -E echo "#define DEFAULT_VISIBILITY /**/" >> ${gitversion_h}
+    COMMENT "Generating gitversion.h"
     VERBATIM
 )
+else ()
+add_custom_command(
+    OUTPUT ${gitversion_h}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${generated_files_dir}
+    COMMAND ${CMAKE_COMMAND} -E echo "#define GIT_VERSION \"${version}\"" >> ${gitversion_h};
+    COMMENT "Generating gitversion.h"
+    VERBATIM
+)
+endif (WIN32)
 
 add_library(
     libuuu 
@@ -58,19 +72,27 @@ add_library(
     ../libuuu/sparse.cpp
     ../libuuu/bmap.cpp
     ../libuuu/globals.cpp
-    ${definitions_h}
+    ${gitversion_h}
 )
 
-if (WIN32)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(libusb REQUIRED IMPORTED_TARGET libusb-1.0)
 pkg_check_modules(tinyxml2 REQUIRED IMPORTED_TARGET tinyxml2)
 pkg_check_modules(bzip2 REQUIRED IMPORTED_TARGET bzip2)
 pkg_check_modules(zstd REQUIRED IMPORTED_TARGET libzstd)
+pkg_check_modules(openssl REQUIRED IMPORTED_TARGET openssl)
+
+if (WIN32)
 pkg_check_modules(zlib REQUIRED IMPORTED_TARGET ZLIB)
-add_definitions(-D_WIN32 -DWIN32 -DDLL_EXPORT_LIBUUU)
+	add_definitions(-D_WIN32 -DWIN32 -DDLL_EXPORT_LIBUUU)
 endif(WIN32)
+
+add_definitions(-DUUUSSL)
+
+if (LINUX)
+pkg_check_modules(zlib REQUIRED IMPORTED_TARGET zlib)
+endif(LINUX)
 
 set(CMAKE_CXX_FLAGS "-g -Wall -Wstrict-aliasing -Wall -Wextra")
 
-target_link_libraries(libuuu PkgConfig::libusb PkgConfig::tinyxml2 PkgConfig::bzip2 PkgConfig::zstd PkgConfig::zlib)
+target_link_libraries(libuuu PkgConfig::libusb PkgConfig::tinyxml2 PkgConfig::bzip2 PkgConfig::zstd PkgConfig::zlib PkgConfig::openssl)

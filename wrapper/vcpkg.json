@@ -4,6 +4,7 @@
         "tinyxml2",
         "bzip2",
         "zstd",
-        "zlib"
+        "zlib",
+        "openssl"
     ]
 }
