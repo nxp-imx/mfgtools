@@ -1,0 +1,59 @@
+name: Multiplatform build of libuuu wrapper python package
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    steps:
+    - name: Checkout uuu repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        submodules: false
+
+    - name: Clone vcpkg repository
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git
+
+    - name: Set up vcpkg on windows
+      working-directory: ./vcpkg
+      if: matrix.os == 'windows-latest'
+      run: |
+        ./bootstrap-vcpkg.bat
+        $env:VCPKG_ROOT = $PWD.Path
+        $env:Path = $env:VCPKG_ROOT + ';' + $env:Path
+    
+    - name: Set up vcpkg on mac and linux
+      working-directory: ./vcpkg
+      if: matrix.os != 'windows-latest'
+      run: |
+        ./bootstrap-vcpkg.sh
+        export VCPKG_ROOT=$(pwd)
+        export PATH=$VCPKG_ROOT:$PATH
+    
+    - name: Install dependencies Ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get install gcc cmake ninja autotools-dev automake
+    - name: Build on ubuntu
+      working-directory: ./mfgtools/wrapper
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        cmake --preset=default
+        cmake --build build
+
+
+
+      
+
+
+
+
+
+
