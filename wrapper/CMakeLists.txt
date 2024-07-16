@@ -89,9 +89,9 @@ endif(WIN32)
 
 add_definitions(-DUUUSSL)
 
-if (LINUX)
+if (UNIX)
 pkg_check_modules(zlib REQUIRED IMPORTED_TARGET zlib)
-endif(LINUX)
+endif(UNIX)
 
 set(CMAKE_CXX_FLAGS "-g -Wall -Wstrict-aliasing -Wall -Wextra")
 

@@ -4,7 +4,8 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build-dlls:
+    name: Build of dynamically linked libraries
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -21,32 +22,112 @@ jobs:
       run: |
         git clone https://github.com/microsoft/vcpkg.git
 
-    - name: Set up vcpkg on windows
+    - name: Set up vcpkg on Windows
       working-directory: ./vcpkg
       if: matrix.os == 'windows-latest'
       run: |
+        echo ("VCPKG_ROOT=" + $PWD.Path) >> $env:GITHUB_ENV
         ./bootstrap-vcpkg.bat
-        $env:VCPKG_ROOT = $PWD.Path
-        $env:Path = $env:VCPKG_ROOT + ';' + $env:Path
+        
     
-    - name: Set up vcpkg on mac and linux
+    - name: Set up vcpkg on Ubuntu and MacOS
       working-directory: ./vcpkg
       if: matrix.os != 'windows-latest'
       run: |
+        echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
         ./bootstrap-vcpkg.sh
-        export VCPKG_ROOT=$(pwd)
-        export PATH=$VCPKG_ROOT:$PATH
     
     - name: Install dependencies Ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: |
-        sudo apt-get install gcc cmake ninja autotools-dev automake
-    - name: Build on ubuntu
-      working-directory: ./mfgtools/wrapper
-      if: matrix.os == 'ubuntu-latest'
+        sudo apt-get install gcc cmake ninja-build autotools-dev automake autoconf libudev-dev
+
+    - name: Install dependencies MacOS
+      if: matrix.os == 'macos-latest'
       run: |
+        brew install ninja cmake autoconf automake libtool
+
+    - name: Install dependencies Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        choco install ninja llvm cmake
+
+    - name: Build on Ubuntu and MacOS
+      working-directory: ./wrapper
+      if: matrix.os != 'windows-latest'
+      run: |
+        export PATH=$VCPKG_ROOT:$PATH
         cmake --preset=default
         cmake --build build
+
+    - name: Build on Windows
+      working-directory: ./wrapper
+      if: matrix.os == 'windows-latest'
+      run: |
+        $env:Path = $env:VCPKG_ROOT + ';' + $env:Path
+        cmake --preset=default -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+        cmake --build build
+    
+    - name: Upload artifacts Windows
+      if: matrix.os == 'windows-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: libuuu-windows
+        path: ./wrapper/build/*.dll
+
+    - name: Upload artifacts MacOS
+      if: matrix.os == 'macos-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: libuuu-macos
+        path: ./wrapper/build/libuuu.dylib
+
+    - name: Upload artifacts Ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: libuuu-ubuntu
+        path: ./wrapper/build/libuuu.so
+
+  build-libuuu-wrapper:
+    runs-on: ubuntu-latest
+    needs: build-dlls
+    steps:
+      - name: Checkout uuu repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: false
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: libuuu-*
+          merge-multiple: true
+          path: ./wrapper/libuuu/lib/
+      
+      - name: Check the path
+        run: |
+          find ./wrapper/
+
+      - name: Build the python package
+        working-directory: ./wrapper
+        run: |
+          pip install build
+          python -m build --sdist --wheel
+
+      - name: Upload the dist folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: release.zip
+          path: ./wrapper/dist/*
+
+        
+          
+    
+      
+        
+      
 
 
 
