@@ -10,7 +10,7 @@ Install from sources:
 
 ```bash
     $ git clone <url>
-    $ cd pylibuuu
+    $ cd wrapper
     # Create and activate virtual environment:
     $ python -m venv venv
     # Activate virtual env
