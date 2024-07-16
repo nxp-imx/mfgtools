@@ -178,6 +178,8 @@ def get_dll() -> str:
     """Return name of shared library based on platform."""
     if platform.system() == "Windows":
         return "libuuu.dll"
+    if platform.system() == "Darwin":
+        return "libuuu.dylib"
     return "libuuu.so"
 
 
