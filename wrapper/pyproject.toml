@@ -14,7 +14,7 @@ dynamic = ["version"]
 name = "libuuu"
 description = "A python wraper for libuuu."
 
-requires-python = ">= 3.9,<3.12"
+requires-python = ">= 3.9"
 dependencies = []
 authors = [{ name = "NXP" }]
 maintainers = []
