@@ -50,7 +50,7 @@ jobs:
     - name: Install dependencies Windows
       if: matrix.os == 'windows-latest'
       run: |
-        choco install cmake
+        choco install cmake pkgconfiglite
 
     - name: Build on Ubuntu and MacOS
       working-directory: ./wrapper
@@ -119,7 +119,7 @@ jobs:
       - name: Upload the dist folder
         uses: actions/upload-artifact@v4
         with:
-          name: release.zip
+          name: release
           path: ./wrapper/dist/*
 
         
