@@ -10,11 +10,6 @@ set(CMAKE_SHARED_LIBRARY_PREFIX "")
 # Prefix all static libraries with 'lib'.
 set(CMAKE_STATIC_LIBRARY_PREFIX "")
 
-if (WIN32)
-set(CMAKE_C_COMPILER clang)
-set(CMAKE_CXX_COMPILER clang++)
-endif(WIN32)
-
 # Set the directory where generated files will be placed
 set(generated_files_dir "${CMAKE_BINARY_DIR}/libuuu/gen")
 
@@ -82,17 +77,25 @@ pkg_check_modules(bzip2 REQUIRED IMPORTED_TARGET bzip2)
 pkg_check_modules(zstd REQUIRED IMPORTED_TARGET libzstd)
 pkg_check_modules(openssl REQUIRED IMPORTED_TARGET openssl)
 
+if (DARWIN)
+    set(CMAKE_C_COMPILER clang)
+    set(CMAKE_CXX_COMPILER clang++)
+endif(DARWIN)    
+
 if (WIN32)
-pkg_check_modules(zlib REQUIRED IMPORTED_TARGET ZLIB)
-	add_definitions(-D_WIN32 -DWIN32 -DDLL_EXPORT_LIBUUU)
+pkg_check_modules(zlib REQUIRED IMPORTED_TARGET zlib)
+add_definitions(-D_WIN32 -DWIN32 -DDLL_EXPORT_LIBUUU)
+set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 endif(WIN32)
 
 add_definitions(-DUUUSSL)
 
 if (UNIX)
 pkg_check_modules(zlib REQUIRED IMPORTED_TARGET zlib)
+set(CMAKE_CXX_FLAGS "-g -Wall -Wstrict-aliasing -Wall -Wextra")
 endif(UNIX)
 
-set(CMAKE_CXX_FLAGS "-g -Wall -Wstrict-aliasing -Wall -Wextra")
+
 
 target_link_libraries(libuuu PkgConfig::libusb PkgConfig::tinyxml2 PkgConfig::bzip2 PkgConfig::zstd PkgConfig::zlib PkgConfig::openssl)

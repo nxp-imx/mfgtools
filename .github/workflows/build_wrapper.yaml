@@ -50,14 +50,14 @@ jobs:
     - name: Install dependencies Windows
       if: matrix.os == 'windows-latest'
       run: |
-        choco install ninja llvm cmake
+        choco install cmake
 
     - name: Build on Ubuntu and MacOS
       working-directory: ./wrapper
       if: matrix.os != 'windows-latest'
       run: |
         export PATH=$VCPKG_ROOT:$PATH
-        cmake --preset=default
+        cmake --preset=unix
         cmake --build build
 
     - name: Build on Windows
@@ -65,7 +65,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         $env:Path = $env:VCPKG_ROOT + ';' + $env:Path
-        cmake --preset=default -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+        cmake --preset=windows
         cmake --build build
     
     - name: Upload artifacts Windows
@@ -73,7 +73,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: libuuu-windows
-        path: ./wrapper/build/*.dll
+        path: ./wrapper/build/Debug/*.dll
 
     - name: Upload artifacts MacOS
       if: matrix.os == 'macos-latest'
