@@ -85,7 +85,7 @@ For cmake prior 3.13:
 - `brew install cmake libusb openssl pkg-config tinyxml2`
 - `cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . && make`
 
-Note that we assume [brew](https://brew.sh) is installed and can be used to resolve dependencies as shown above. The remaining dependency `libbz2` can be resolved via the XCode supplied libraries.
+Note that we assume [homebrew](https://brew.sh) is installed and can be used to resolve dependencies as shown above. The remaining dependency `libbz2` can be resolved via the XCode supplied libraries.
 
 Note if you meet "can't detach kernel driver" try to check libusb version. 
 ```
