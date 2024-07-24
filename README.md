@@ -107,4 +107,4 @@ The BSD licensed prebuilt Windows binary version of uuu is statically linked wit
  - zlib  (zlib license) is from https://github.com/madler/zlib.git
  - libusb (LGPL-2.1) is from  https://github.com/libusb/libusb.git
  - zstd (Dual BSD\GPLv2 Licenses) is from https://github.com/facebook/zstd
- - tinyxml (zlib license) is from https://github.com/leethomason/tinyxml2
+ - tinyxml2 (zlib license) is from https://github.com/leethomason/tinyxml2
