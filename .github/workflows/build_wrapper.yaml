@@ -28,8 +28,7 @@ jobs:
       run: |
         echo ("VCPKG_ROOT=" + $PWD.Path) >> $env:GITHUB_ENV
         ./bootstrap-vcpkg.bat
-        
-    
+  
     - name: Set up vcpkg on Ubuntu and MacOS
       working-directory: ./vcpkg
       if: matrix.os != 'windows-latest'
@@ -116,11 +115,21 @@ jobs:
           pip install build
           python -m build --sdist --wheel
 
+      - name: Release package to pypi
+        env:
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+          TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
+        working-directory: ./wrapper
+        run: |
+          twine --no-color check dist/*
+          twine --no-color upload dist/*
+
       - name: Upload the dist folder
         uses: actions/upload-artifact@v4
         with:
-          name: release
-          path: ./wrapper/dist/*
+          name: dist
+          path: ./wrapper/dist
 
         
           
