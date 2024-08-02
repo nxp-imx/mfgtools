@@ -109,10 +109,13 @@ jobs:
         run: |
           find ./wrapper/
 
+      - name: Install python dependencies
+        run: |
+          pip install build twine
+
       - name: Build the python package
         working-directory: ./wrapper
         run: |
-          pip install build
           python -m build --sdist --wheel
 
       - name: Release package to pypi
