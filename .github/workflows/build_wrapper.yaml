@@ -122,11 +122,11 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
-          TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
+          #TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
         working-directory: ./wrapper
         run: |
           twine --no-color check dist/*
-          twine --no-color upload dist/*
+          twine --no-color upload --repository testpypi dist/*
 
       - name: Upload the dist folder
         uses: actions/upload-artifact@v4
