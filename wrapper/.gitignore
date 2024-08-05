@@ -7,6 +7,8 @@ __pycache__/
 *.so
 *.dll
 
+# Generated files
+libuuu/__version__.py
 
 # Distribution / packaging
 .Python

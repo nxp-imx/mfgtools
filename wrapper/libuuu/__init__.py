@@ -7,8 +7,12 @@
 
 """Wrapper for libuuu."""
 
+from .misc import get_libuuu_version
+
+version = get_libuuu_version()
+
 __author__ = """NXP"""
-__version__ = "0.1.0"
+__version__ = str(version)
 
 from .libuuu import LibUUU, UUUNotifyCallback, UUUShowConfig, UUUState
 

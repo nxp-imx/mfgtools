@@ -1,13 +1,9 @@
 [build-system]
-requires = ["setuptools >= 61.0", "wheel"]
+requires = ["setuptools >= 61.0", "wheel", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["libuuu"]
-
-[tool.setuptools.dynamic]
-version = { attr = "libuuu.__version__" }
-
 
 [project]
 dynamic = ["version"]
@@ -33,12 +29,14 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 
+[tool.setuptools_scm]
+root = ".."
+version_file = "libuuu/__version__.py"
+tag_regex = "^(?P<prefix>uuu_)(?P<version>\\d+(\\.\\d+)*)$"
+
 #[project.urls]
 #Homepage = ""
 #Issues = ""
-
-[tool.bumpversion]
-current_version = "0.1.0"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
