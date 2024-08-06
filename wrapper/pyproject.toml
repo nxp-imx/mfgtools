@@ -34,8 +34,8 @@ root = ".."
 version_file = "libuuu/__version__.py"
 tag_regex = "^(?P<prefix>uuu_)(?P<version>\\d+(\\.\\d+)*)$"
 
-#[project.urls]
-#Homepage = ""
+[project.urls]
+Homepage = "https://github.com/nxp-imx/mfgtools/wrapper"
 #Issues = ""
 
 [tool.pytest.ini_options]

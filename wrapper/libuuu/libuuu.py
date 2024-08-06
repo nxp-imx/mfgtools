@@ -220,7 +220,7 @@ class LibUUU:
     def set_small_mem(self, size: int) -> int:
         """Disable small memory mode and buffer all data.
 
-        :param value: 0 - disable
+        :param size: The size of the buffer in bytes
         """
         return self.lib.uuu_set_small_mem(c_int(size))
 
@@ -245,18 +245,18 @@ class LibUUU:
         """Get the last error code from uuu."""
         return self.lib.uuu_get_last_err()
 
-    def run_cmd(self, cmd: str, dry: int) -> int:
+    def run_cmd(self, cmd: str, dry: bool = False) -> int:
         """Run a uuu command.
 
         :param cmd: The command to run
-        :param dry: If set to 0 command will be executed, otherwise its a dry run
+        :param dry: If set to False command will be executed, otherwise its a dry run
         :return: 0 if success
         """
         # pylint: disable=attribute-defined-outside-init
         self._response.value = b""
-        return self.lib.uuu_run_cmd(c_char_p(str.encode(cmd)), c_int(dry))
+        return self.lib.uuu_run_cmd(c_char_p(str.encode(cmd)), c_int(1 if dry else 0))
 
-    def register_notify_callback(self, callback: UUUNotifyCallback, data) -> int:  # type: ignore
+    def register_notify_callback(self, callback: UUUNotifyCallback, data: any) -> int:  # type: ignore
         """Register a callback function to receive notifications from uuu.
 
         :param callback: A function that will be called when uuu sends a notification
