@@ -120,6 +120,13 @@ jobs:
         run: |
           codecheck -s
 
+      - name: Upload reports if codecheck fails
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: ./wrapper/reports/*
+
       - name: Build the python package
         working-directory: ./wrapper
         run: |
