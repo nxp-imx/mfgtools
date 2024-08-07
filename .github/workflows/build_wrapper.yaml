@@ -113,7 +113,7 @@ jobs:
         working-directory: ./wrapper
         run: |
           pip install --upgrade pip
-          pip install --force-reinstall -U build twine nxp-codecheck colorama
+          pip install --force-reinstall -U build twine nxp-codecheck colorama setuptools_scm
 
       - name: Run codecheck
         working-directory: ./wrapper
