@@ -183,6 +183,20 @@ def get_dll() -> str:
     return "libuuu.so"
 
 
+@UUUNotifyCallback
+def _default_notify_callback(struct: UUUNotifyStruct, data) -> int:  # type: ignore
+    """A default callback function that stores the response in a class variable.
+
+    :param struct: A UUUNotifyStruct object
+    :param data: A pointer to data, here it is not used
+    """
+    # pylint: disable=unused-argument
+    LibUUU._state.update(struct)
+    if struct.type == UUUNotifyType.NOTIFY_CMD_INFO:
+        LibUUU._response.value += bytes(struct.response.str)
+    return 1 if LibUUU._state.error else 0
+
+
 class LibUUU:
     """Wrapper for the libuuu library."""
 
@@ -196,7 +210,7 @@ class LibUUU:
         """Initialize the library and register the default notify callback function."""
         self._response.value = b""
         self.lib = CDLL(self.DLL, mode=1)
-        self.register_notify_callback(self._default_notify_callback, self.NULL)
+        self.register_notify_callback(_default_notify_callback, self.NULL)
 
     def set_wait_timeout(self, timeout: int) -> int:
         """Set the wait timeout for uuu in seconds."""
@@ -273,17 +287,3 @@ class LibUUU:
     def response(self) -> bytes:
         """Get the response from the last uuu command."""
         return self._response.value
-
-    @UUUNotifyCallback
-    @staticmethod
-    def _default_notify_callback(struct: UUUNotifyStruct, data) -> int:  # type: ignore
-        """A default callback function that stores the response in a class variable.
-
-        :param struct: A UUUNotifyStruct object
-        :param data: A pointer to data, here it is not used
-        """
-        # pylint: disable=unused-argument
-        LibUUU._state.update(struct)
-        if struct.type == UUUNotifyType.NOTIFY_CMD_INFO:
-            LibUUU._response.value += bytes(struct.response.str)
-        return 1 if LibUUU._state.error else 0
