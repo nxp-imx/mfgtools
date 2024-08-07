@@ -118,7 +118,7 @@ jobs:
       - name: Run codecheck
         working-directory: ./wrapper
         run: |
-          codecheck
+          codecheck -s
 
       - name: Build the python package
         working-directory: ./wrapper
