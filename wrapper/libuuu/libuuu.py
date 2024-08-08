@@ -171,7 +171,7 @@ class UUUState:
         elif struct.type == UUUNotifyType.NOTIFY_TRANS_POS:
             self.trans_pos = struct.response.total
 
-        self.logger.info(f"{self.cmd=},{self.dev=},{self.waiting=}")
+        self.logger.debug(f"{self.cmd=},{self.dev=},{self.waiting=}")
 
 
 def get_dll() -> str:
