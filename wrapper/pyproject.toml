@@ -32,7 +32,7 @@ classifiers = [
 [tool.setuptools_scm]
 root = ".."
 version_file = "libuuu/__version__.py"
-tag_regex = "^(?P<prefix>uuu_)(?P<version>\\d+(\\.\\d+)*)$"
+tag_regex = "^(?P<prefix>uuu_)?(?P<version>\\d+(\\.\\d+)*)$"
 
 [project.urls]
 Homepage = "https://github.com/nxp-imx/mfgtools/wrapper"
