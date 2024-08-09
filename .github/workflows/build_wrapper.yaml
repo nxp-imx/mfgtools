@@ -114,7 +114,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install --force-reinstall -U build twine nxp-codecheck colorama setuptools_scm
-        
+
       - name: Build the python package
         working-directory: ./wrapper
         run: |
@@ -141,7 +141,7 @@ jobs:
         working-directory: ./wrapper
         run: |
           twine --no-color check dist/*
-          twine --no-color upload --repository testpypi dist/*
+          twine --no-color upload --repository pypi dist/*
 
       - name: Upload the dist folder
         uses: actions/upload-artifact@v4
