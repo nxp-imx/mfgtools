@@ -156,17 +156,7 @@ enum class bmap_mode {
 };
 
 /*Get .bmap handling mode*/
-static inline bmap_mode uuu_get_bmap_mode() {
-	extern bmap_mode g_bmap_mode;
-	return g_bmap_mode;
-}
-
-static inline int uuu_force_bmap() {
-	return uuu_get_bmap_mode() == bmap_mode::Force;
-}
-
-static inline int uuu_ignore_bmap() {
-	return uuu_get_bmap_mode() == bmap_mode::Ignore;
-}
+EXT bmap_mode uuu_get_bmap_mode();
+EXT int uuu_set_bmap_mode(bmap_mode mode);
 
 #endif

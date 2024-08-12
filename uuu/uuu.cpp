@@ -83,8 +83,6 @@ vector<string> g_usb_serial_no_filter;
 int g_verbose = 0;
 static bool g_start_usb_transfer;
 
-bmap_mode g_bmap_mode = bmap_mode::Default;
-
 class AutoCursor
 {
 public:
@@ -1020,11 +1018,11 @@ int main(int argc, char **argv)
 			}
 			else if (s == "-bmap")
 			{
-				g_bmap_mode = bmap_mode::Force;
+				uuu_set_bmap_mode(bmap_mode::Force);
 			}
 			else if (s == "-no-bmap")
 			{
-				g_bmap_mode = bmap_mode::Ignore;
+				uuu_set_bmap_mode(bmap_mode::Ignore);
 			}
 			else if (s == "-e")
 			{

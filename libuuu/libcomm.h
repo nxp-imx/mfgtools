@@ -34,6 +34,8 @@
 #include <locale>
 #include <cctype>
 #include <algorithm>
+#include "libuuu.h"
+
 #pragma once
 
 using namespace std;
@@ -163,4 +165,12 @@ inline std::string trim(const std::string &s)
 {
 	auto  wsfront = std::find_if_not(s.begin(), s.end(), [](int c) {return std::isspace(c); });
 	return std::string(wsfront, std::find_if_not(s.rbegin(), std::string::const_reverse_iterator(wsfront), [](int c) {return std::isspace(c); }).base());
+}
+
+static inline bool uuu_force_bmap() {
+	return uuu_get_bmap_mode() == bmap_mode::Force;
+}
+
+static inline bool uuu_ignore_bmap() {
+	return uuu_get_bmap_mode() == bmap_mode::Ignore;
 }

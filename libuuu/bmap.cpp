@@ -8,6 +8,19 @@
 
 extern int g_verbose;
 
+bmap_mode g_bmap_mode = bmap_mode::Default;
+
+bmap_mode uuu_get_bmap_mode()
+{
+	return g_bmap_mode;
+}
+
+int uuu_set_bmap_mode(bmap_mode mode)
+{
+	g_bmap_mode = mode;
+	return 0;
+}
+
 bool bmap_t::is_mapped_block(size_t index) const
 {
 	if (index >= m_gap_begin && index < m_gap_end)
