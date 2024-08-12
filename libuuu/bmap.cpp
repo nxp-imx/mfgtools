@@ -6,8 +6,6 @@
 #include "libcomm.h"
 #include "libuuu.h"
 
-extern int g_verbose;
-
 bmap_mode g_bmap_mode = bmap_mode::Default;
 
 bmap_mode uuu_get_bmap_mode()
@@ -160,7 +158,7 @@ bool load_bmap(const std::string& filename, bmap_t& bmap)
 			return -1;
 	}
 
-	if (g_verbose) {
+	if (get_libuuu_debug_level() > LIBUUU_NORMAL) {
 		auto info = std::string("\nUsing block map:") +
 				"\n  ImageSize: " + std::to_string(bmap.image_size()) +
 				"\n  BlockSize: " + std::to_string(bmap.block_size()) +

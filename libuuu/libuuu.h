@@ -134,6 +134,12 @@ int uuu_set_wait_timeout(int timeout_in_seconds);
 int uuu_set_wait_next_timeout(int timeout_in_seconds);
 /*Set usb device polling period */
 void uuu_set_poll_period(int period_in_milliseconds);
+
+enum LIBUUU_DEBUG_LEVEL
+{
+	LIBUUU_NORMAL = 0,
+	LIBUUU_DETAIL = 0x8 << 16,
+};
 /*
  * bit 0:15 for libusb
  * bit 16:31 for uuu

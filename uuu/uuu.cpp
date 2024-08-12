@@ -960,11 +960,12 @@ int main(int argc, char **argv)
 			else if (s == "-v")
 			{
 				g_verbose = 1;
+				uuu_set_debug_level(LIBUUU_DETAIL);
 			}
 			else if (s == "-V")
 			{
 				g_verbose = 1;
-				uuu_set_debug_level(2);
+				uuu_set_debug_level(LIBUUU_DETAIL | 2);
 			}else if (s == "-dry")
 			{
 				dryrun = 1;
