@@ -1,0 +1,138 @@
+[build-system]
+requires = ["setuptools >= 61.0", "wheel", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["libuuu"]
+
+[project]
+dynamic = ["version", "dependencies"]
+name = "libuuu"
+description = "A python wraper for libuuu."
+
+requires-python = ">= 3.9"
+authors = [{ name = "NXP" }]
+maintainers = []
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { text = "BSD-3-Clause" }
+
+keywords = ["NXP"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+[tool.setuptools.package-data]
+libuuu = ["*.dll", "*.so", "*.dylib"]
+
+[tool.setuptools_scm]
+root = ".."
+version_file = "libuuu/__version__.py"
+tag_regex = "^(?P<prefix>uuu_)?(?P<version>\\d+(\\.\\d+)*)$"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project.urls]
+Homepage = "https://github.com/nxp-imx/mfgtools/wrapper"
+#Issues = ""
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+junit_family = "xunit1"
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311"]
+include = '\.pyi?$'
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 100
+
+[tool.mypy]
+disallow_untyped_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+
+[tool.pydocstyle]
+convention = "google"
+add_ignore = "D105,D301"
+match = '(?!test_|__version__).*\.py'
+
+[tool.pylint]
+format = { max-line-length = 120 }
+"messages control" = { disable = ["logging-fstring-interpolation"] }
+
+[tool.nxp_codecheck]
+git_parent_branch = "origin/master"
+output_directory = "reports"
+default_check_paths = ["libuuu"]
+
+# *********************************** Checker list ***********************************
+[[tool.nxp_codecheck.checkers]]
+name = "PYTEST"
+method = "check_pytest"
+# check_paths = [] # The default check paths could be overrides by local settings
+info_only = false
+kwargs = { disable_xdist = true }
+#     dependencies = ["PYTEST"]
+[[tool.nxp_codecheck.checkers]]
+name = "PYLINT"
+method = "check_pylint"
+# check_paths = [] # The default check paths could be overrides by local settings
+info_only = false
+[[tool.nxp_codecheck.checkers]]
+name = "MYPY"
+method = "check_mypy"
+# check_paths = [] # The default check paths could be overrides by local settings
+info_only = false
+[[tool.nxp_codecheck.checkers]]
+name = "PYDOCSTYLE"
+method = "check_pydocstyle"
+# check_paths = [] # The default check paths could be overrides by local settings
+info_only = false
+[[tool.nxp_codecheck.checkers]]
+name = "BLACK"
+method = "check_black"
+# check_paths = [] # The default check paths could be overrides by local settings
+info_only = false
+dependencies = []
+fixer = "fix_black"
+[[tool.nxp_codecheck.checkers]]
+name = "ISORT"
+method = "check_isort"
+# check_paths = [] # The default check paths could be overrides by local settings
+info_only = false
+dependencies = []
+fixer = "fix_isort"
+[[tool.nxp_codecheck.checkers]]
+name = "COPYRIGHT"
+method = "check_copyright_year"
+# check_paths = [] # The default check paths could be overrides by local settings
+info_only = false
+dependencies = []
+fixer = "fix_copyright_year"
+[[tool.nxp_codecheck.checkers]]
+name = "PY_HEADERS"
+method = "check_py_file_headers"
+# check_paths = [] # The default check paths could be overrides by local settings
+info_only = false
+dependencies = []
+fixer = "fix_py_file_headers"
+[[tool.nxp_codecheck.checkers]]
+name = "CYCLIC"
+method = "check_cyclic_imports"
+# check_paths = [] # The default check paths could be overrides by local settings
+info_only = false
+dependencies = []
