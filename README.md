@@ -99,6 +99,9 @@ brew info libusb
  - macOS (Catalina)
  - 32 bit systems will have problems with big files.
 
+ # Python bindings
+ We also provide Python bindings for `libuuu` to enable integration of functionality from `uuu` into your code. For more information see [wrapper](./wrapper/).
+
 # License
 uuu is licensed under the BSD license. See LICENSE.
 The BSD licensed prebuilt Windows binary version of uuu is statically linked with the LGPL libusb library, which remains LGPL.
