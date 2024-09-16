@@ -56,6 +56,8 @@ const char * g_vt_red = "\x1B[91m";
 const char * g_vt_kcyn = "\x1B[36m";
 const char * g_vt_boldwhite = "\x1B[97m";
 
+size_t MAX_PROGRESS_WIDTH = 0;
+
 void clean_vt_color() noexcept
 {
 	g_vt_yellow = "";
@@ -323,9 +325,10 @@ string build_process_bar(size_t width, size_t pos, size_t total)
 
 void print_auto_scroll(string str, size_t len, size_t start)
 {
+    MAX_PROGRESS_WIDTH = max(str.size(), MAX_PROGRESS_WIDTH);
 	if (str.size() <= len)
 	{
-		str.resize(len, ' ');
+		str.resize(MAX_PROGRESS_WIDTH, ' ');
 		cout << str;
 		return;
 	}
@@ -600,7 +603,7 @@ void print_oneline(string str)
 	}
 	else
 	{
-		str.resize(w, ' ');
+		str.resize(MAX_PROGRESS_WIDTH, ' ');
 	}
 	cout << str << endl;
 
