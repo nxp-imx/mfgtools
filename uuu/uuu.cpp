@@ -326,6 +326,7 @@ string build_process_bar(size_t width, size_t pos, size_t total)
 void print_auto_scroll(string str, size_t len, size_t start)
 {
     g_max_process_width = max(str.size(), g_max_process_width);
+    g_max_process_width = min(g_max_process_width, len);
 	if (str.size() <= len)
 	{
 		str.resize(g_max_process_width, ' ');
@@ -337,6 +338,13 @@ void print_auto_scroll(string str, size_t len, size_t start)
 		start = start % str.size();
 	else
 		start = 0;
+
+    if (str.size() >= len){
+        str.resize(len - 1);
+        str[str.size() - 1] = '.';
+        str[str.size() - 2] = '.';
+        str[str.size() - 3] = '.';
+    }
 
 	string s = str.substr(start, len);
 	s.resize(len, ' ');
@@ -594,6 +602,11 @@ void print_oneline(string str)
 	if (w <= 3)
 		return;
 
+    if (g_max_process_width == 0){
+        g_max_process_width = str.size();
+        g_max_process_width = min(g_max_process_width, w);
+    }
+
 	if (str.size() >= w)
 	{
 		str.resize(w - 1);
@@ -657,7 +670,7 @@ int progress(uuu_notify nt, void *p)
 		else
 		{
 			string_ex str;
-			str.format("\rSuccess %d    Failure %d    ", g_overall_okay, g_overall_failure);
+			str.format("\rSuccess %d    Failure %d             ", g_overall_okay, g_overall_failure);
 
 			if (g_map_path_nt.empty())
 				str += "Wait for Known USB Device Appear...";
