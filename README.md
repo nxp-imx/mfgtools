@@ -1,6 +1,5 @@
 # uuu (Universal Update Utility), mfgtools 3.0
 
-
 [![macOS Build](https://github.com/nxp-imx/mfgtools/actions/workflows/macOS.yaml/badge.svg?branch=master)](https://github.com/nxp-imx/mfgtools/actions/workflows/macOS.yaml)
 [![Build with VS Studio](https://github.com/nxp-imx/mfgtools/actions/workflows/win.yaml/badge.svg)](https://github.com/nxp-imx/mfgtools/actions/workflows/win.yaml)
 [![Build for x64 ubuntu-lastest](https://github.com/nxp-imx/mfgtools/actions/workflows/build.yaml/badge.svg)](https://github.com/nxp-imx/mfgtools/actions/workflows/build.yaml)
