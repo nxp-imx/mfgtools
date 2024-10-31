@@ -177,32 +177,32 @@ void print_help(bool detail = false)
 {
 	const char help[] =
 		"uuu [-d -m -v -V -bmap -no-bmap] <" "bootloader|cmdlists|cmd" ">\n\n"
-		"    bootloader  download bootloader to board by usb\n"
-		"    cmdlist     run all commands in cmdlist file\n"
-		"                If it is path, search uuu.auto in dir\n"
-		"                If it is zip, search uuu.auto in zip\n"
-		"    cmd         Run one command, use -H see detail\n"
-		"                example: SDPS: boot -f flash.bin\n"
-		"    -d          Daemon mode, wait for forever.\n"
-		"    -v -V       verbose mode, -V enable libusb error\\warning info\n"
-		"    -dry        Dry run mode, check if script or cmd correct \n"
-		"    -bmap       Try using .bmap files even if flash commands do not specify them\n"
-		"    -no-bmap    Ignore .bmap files even if flash commands specify them\n"
-		"    -m          USBPATH Only monitor these paths.\n"
-		"                    -m 1:2 -m 1:3\n\n"
-		"    -ms         serial_no Monitor the serial number prefix of the device using 'serial_no'.\n"
-		"    -t          Timeout second for wait known usb device appeared\n"
-		"    -T          Timeout second for wait next known usb device appeared at stage switch\n"
-		"    -e          set environment variable key=value\n"
-		"    -pp         usb polling period in milliseconds\n"
-		"    -dm         disable small memory\n"
-		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
-		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
-		"uuu -udev       linux: show udev rule to avoid sudo each time \n"
-		"uuu -lsusb      List connected know devices\n"
-		"uuu -IgSerNum   Set windows registry to ignore USB serial number for known uuu devices\n"
-		"uuu -h          show general help\n"
-		"uuu -H          show general help and detailed help for commands\n\n";
+		"    bootloader      download bootloader to board by usb\n"
+		"    cmdlist         run all commands in cmdlist file\n"
+		"                    If it is path, search uuu.auto in dir\n"
+		"                    If it is zip, search uuu.auto in zip\n"
+		"    cmd             Run one command, use -H see detail\n"
+		"                    example: SDPS: boot -f flash.bin\n"
+		"    -d              Daemon mode, wait for forever.\n"
+		"    -v -V           verbose mode, -V enable libusb error\\warning info\n"
+		"    -dry            Dry run mode, check if script or cmd correct \n"
+		"    -bmap           Try using .bmap files even if flash commands do not specify them\n"
+		"    -no-bmap        Ignore .bmap files even if flash commands specify them\n"
+		"    -m <usbpath>    Only monitor these paths.\n"
+		"                      -m 1:2 -m 1:3\n\n"
+		"    -ms <serial_no> Monitor the serial number prefix of the device using 'serial_no'.\n"
+		"    -t <timeout>    Timeout second for wait known usb device appeared\n"
+		"    -T <timeout>    Timeout second for wait next known usb device appeared at stage switch\n"
+		"    -e <key=value>  set environment variable key=value\n"
+		"    -pp <ms>        usb polling period in milliseconds\n"
+		"    -dm             disable small memory\n"
+		"uuu -s              Enter shell mode. uuu.inputlog record all input commands\n"
+		"                    you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
+		"uuu -udev           linux: show udev rule to avoid sudo each time \n"
+		"uuu -lsusb          List connected know devices\n"
+		"uuu -IgSerNum       Set windows registry to ignore USB serial number for known uuu devices\n"
+		"uuu -h              show general help\n"
+		"uuu -H              show general help and detailed help for commands\n\n";
 	printf("%s", help);
 	printf("uuu [-d -m -v -bmap -no-bmap] -b[run] ");
 	g_BuildScripts.ShowCmds();
@@ -315,7 +315,7 @@ string build_process_bar(size_t width, size_t pos, size_t total)
 
 	string_ex per;
 	per.format("%d%%", pos * 100 / total);
-	
+
 	size_t start = (width - per.size()) / 2;
 	str.replace(start, per.size(), per);
 	str.insert(start, g_vt_yellow);
@@ -445,7 +445,7 @@ public:
 				m_trans_pos = nt.index;
 				return true;
 			}
-	
+
 			if ((nt.index - m_trans_pos) < (m_trans_size / 100)
 				&& nt.index != m_trans_size)
 				return false;
