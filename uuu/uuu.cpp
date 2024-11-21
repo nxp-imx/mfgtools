@@ -841,7 +841,7 @@ void print_udev()
 {
 	uuu_for_each_cfg(print_udev_rule, NULL);
 	fprintf(stderr, "\n1: put above udev run into /etc/udev/rules.d/70-uuu.rules\n");
-	fprintf(stderr, "\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"\n");
+	fprintf(stderr, "\tsudo sh -c \"uuu -udev > /etc/udev/rules.d/70-uuu.rules\"\n");
 	fprintf(stderr, "2: update udev rule\n");
 	fprintf(stderr, "\tsudo udevadm control --reload\n");
 }
