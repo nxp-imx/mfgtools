@@ -4,7 +4,7 @@
 [![Build with VS Studio](https://github.com/nxp-imx/mfgtools/actions/workflows/win.yaml/badge.svg)](https://github.com/nxp-imx/mfgtools/actions/workflows/win.yaml)
 [![Build for x64 ubuntu-lastest](https://github.com/nxp-imx/mfgtools/actions/workflows/build.yaml/badge.svg)](https://github.com/nxp-imx/mfgtools/actions/workflows/build.yaml)
 
-![GitHub](https://img.shields.io/github/license/nxp-imx/mfgtools.svg) 
+[![GitHub](https://img.shields.io/github/license/nxp-imx/mfgtools.svg)](https://github.com/nxp-imx/mfgtools/blob/master/LICENSE) 
 
 [![universal-update-utility](https://snapcraft.io/universal-update-utility/badge.svg)](https://snapcraft.io/universal-update-utility)
 
