@@ -33,7 +33,7 @@ jobs:
           tar xzf uuu_source-${{ github.ref_name }}.tar.gz && zip uuu_source-${{ github.ref_name }}.zip $(tar tf uuu_source-${{ github.ref_name }}.tar.gz)
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: uuu_source-${{ github.ref_name }}.tar.gz
           path: uuu_source-${{ github.ref_name }}.tar.gz

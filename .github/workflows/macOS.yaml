@@ -10,7 +10,7 @@ on:
     types:
       - opened
       - synchronize
-      
+
 jobs:
   build:
     name: macOS Build
@@ -19,8 +19,8 @@ jobs:
       matrix:
         os:
           - macos-14
-          - macos-12
-          
+          - macos-13
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -29,30 +29,30 @@ jobs:
 
       - name: Set up environment
         run: brew install libusb pkg-config zstd tinyxml2
-        
+
       - name: Build
         run: |
           git fetch --tags --force # Retrieve annotated tags. #issue 290
           export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; pkg-config --list-all; cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . ; make
 
       - name: Rename_x86
-        if: matrix.os == 'macos-12'
+        if: matrix.os == 'macos-13'
         run: cp uuu/uuu uuu_mac_x86
- 
+
       - name: Rename_arm
         if: matrix.os == 'macos-14'
         run: cp uuu/uuu uuu_mac_arm
-  
+
       - name: Upload Build Artifacts
-        if: matrix.os == 'macos-12'
-        uses: actions/upload-artifact@v3
+        if: matrix.os == 'macos-13'
+        uses: actions/upload-artifact@v4
         with:
           name: uuu_mac_x86
           path: uuu_mac_x86
 
       - name: Upload Build Artifacts
         if: matrix.os == 'macos-14'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: uuu_mac_arm
           path: uuu_mac_arm
