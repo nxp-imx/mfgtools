@@ -22,13 +22,14 @@ jobs:
       matrix:
         include:
           - arch: aarch64
-            distro: ubuntu20.04
+            distro: ubuntu22.04
           - arch: armv7
-            distro: ubuntu20.04
+            distro: ubuntu22.04
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          submodules: true
 
       - uses: uraimo/run-on-arch-action@v2
         name: Build artifact
@@ -62,6 +63,7 @@ jobs:
           # Produce a binary artifact and place it in the mounted volume
           run: |
             git config --global --add safe.directory /mfgtools
+            cd /mfgtools/tinyxml2; cmake .; make;
             cd /mfgtools
             cmake -D 'STATIC=1' .
             make
