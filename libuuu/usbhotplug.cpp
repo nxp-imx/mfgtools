@@ -237,7 +237,7 @@ static string get_device_path(libusb_device *dev)
 	return str;
 }
 
-#define SERIAL_NO_MAX 512
+static constexpr int SERIAL_NO_MAX = 512;
 
 static string get_device_serial_no(libusb_device *dev, struct libusb_device_descriptor *desc, ConfigItem *item)
 {

@@ -88,11 +88,11 @@ const ROM_INFO * search_rom_info(const ConfigItem *item)
 }
 
 
-#define IV_MAX_LEN		32
-#define HASH_MAX_LEN	64
+static constexpr size_t IV_MAX_LEN = 32;
+static constexpr size_t HASH_MAX_LEN = 64;
 
-#define CONTAINER_HDR_ALIGNMENT 0x400
-#define CONTAINER_HDR_ALIGNMENT_V2 0x4000
+static constexpr uint32_t CONTAINER_HDR_ALIGNMENT = 0x400;
+static constexpr uint32_t CONTAINER_HDR_ALIGNMENT_V2 = 0x4000;
 static constexpr uint8_t CONTAINER_TAG = 0x87;
 static constexpr uint8_t V2X_TAG = 0x82; // After imx943
 
@@ -183,7 +183,7 @@ size_t GetContainerActualSize(shared_ptr<DataBuffer> p, size_t offset, bool bROM
 	uint32_t sz = image->size + image->offset + cindex * align;
 
 	/* keep v1 align for calculate spl size */
-	sz = round_up(sz, static_cast<uint32_t>(CONTAINER_HDR_ALIGNMENT));
+	sz = round_up(sz, CONTAINER_HDR_ALIGNMENT);
 
 	if (sz > (p->size() - offset))
 	{

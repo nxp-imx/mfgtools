@@ -37,7 +37,7 @@
 #include "liberror.h"
 #include "zip.h"
 
-#define CHUNK 0x10000
+static constexpr size_t CHUNK = 0x10000;
 
 int Zip::BuildDirInfo()
 {
