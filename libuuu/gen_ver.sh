@@ -7,7 +7,7 @@ set -e
 
 if [ -f ../.tarball-version ]
 then
-	echo "#define GIT_VERSION \"lib$(cat ../.tarball-version)\"" > "$file_to_write"
+	echo "inline constexpr const char * GIT_VERSION = \"lib$(cat ../.tarball-version)\";" > "$file_to_write"
 	exit 0
 fi
 
@@ -24,5 +24,5 @@ then
 	#echo "In a repo"
 	# Get the version of the last commit of the repo
 	version=`git describe --long`
-	echo "#define GIT_VERSION \"lib$version\"" > $file_to_write
+	echo "inline constexpr const char * GIT_VERSION = \"lib$version\";" > $file_to_write
 fi
