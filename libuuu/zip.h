@@ -38,13 +38,6 @@
 #include <map>
 #include <memory>
 
-/* Allow opportunistic use of the C++17 fall-through attribute . */
-#if defined(__cplusplus) && __cplusplus >= 201703L
-#define FALLTHROUGH [[fallthrough]]
-#else
-#define FALLTHROUGH
-#endif
-
 class FileBuffer;
 
 #pragma pack(1)

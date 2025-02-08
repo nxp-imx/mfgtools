@@ -286,11 +286,9 @@ int	Zip_file_Info::decompress(Zip *pZip, shared_ptr<FileBuffer>p)
 		switch (ret) {
 		case Z_NEED_DICT:
 			ret = Z_DATA_ERROR;     /* and fall through */
-			FALLTHROUGH
-			// FALLTHROUGH
+			[[fallthrough]];
 		case Z_DATA_ERROR:
-			FALLTHROUGH
-			// FALLTHROUGH
+			[[fallthrough]];
 		case Z_MEM_ERROR:
 			(void)inflateEnd(&m_strm);
 			return -1;
