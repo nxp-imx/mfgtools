@@ -61,15 +61,15 @@ int file_overwrite_monitor(std::string filename, FileBuffer *p);
 
 //bit 0, data loaded
 //bit 1, data total size known
-#define FILEBUFFER_FLAG_LOADED_BIT		0x1
-#define FILEBUFFER_FLAG_KNOWN_SIZE_BIT  0x2
-#define FILEBUFFER_FLAG_ERROR_BIT		0x4
-#define FILEBUFFER_FLAG_NEVER_FREE		0x8
-#define FILEBUFFER_FLAG_PARTIAL_RELOADABLE 0x10
-#define FILEBUFFER_FLAG_SEG_DONE		0x20
+inline constexpr int FILEBUFFER_FLAG_LOADED_BIT = 0x1;
+inline constexpr int FILEBUFFER_FLAG_KNOWN_SIZE_BIT = 0x2;
+inline constexpr int FILEBUFFER_FLAG_ERROR_BIT = 0x4;
+inline constexpr int FILEBUFFER_FLAG_NEVER_FREE = 0x8;
+inline constexpr int FILEBUFFER_FLAG_PARTIAL_RELOADABLE = 0x10;
+inline constexpr int FILEBUFFER_FLAG_SEG_DONE = 0x20;
 
-#define FILEBUFFER_FLAG_LOADED		(FILEBUFFER_FLAG_LOADED_BIT|FILEBUFFER_FLAG_KNOWN_SIZE_BIT) // LOADED must be known size
-#define FILEBUFFER_FLAG_KNOWN_SIZE	FILEBUFFER_FLAG_KNOWN_SIZE_BIT
+inline constexpr int FILEBUFFER_FLAG_LOADED = (FILEBUFFER_FLAG_LOADED_BIT|FILEBUFFER_FLAG_KNOWN_SIZE_BIT); // LOADED must be known size
+inline constexpr int FILEBUFFER_FLAG_KNOWN_SIZE = FILEBUFFER_FLAG_KNOWN_SIZE_BIT;
 
 class FileBuffer;
 class FSBasic;

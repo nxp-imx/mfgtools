@@ -38,7 +38,7 @@
 
 class FileBuffer;
 
-#define TAR_BLOCK_SIZE 512
+inline constexpr unsigned int TAR_BLOCK_SIZE = 512;
 
 #pragma pack(1)
 struct Tar_header
