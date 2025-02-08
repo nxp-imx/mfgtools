@@ -95,7 +95,7 @@ public:
 	std::vector<uint8_t> m_data;
 	std::mutex m_mutex;
 	std::atomic_int m_dataflags{0};
-	uint8_t* m_pData = NULL;
+	uint8_t* m_pData = nullptr;
 	uint8_t* data()
 	{
 		if (m_pData)
@@ -118,7 +118,7 @@ class DataBuffer : public std::enable_shared_from_this<DataBuffer>
 protected:
 
 	ALLOCATION_WAYS get_m_allocate_way() const noexcept { return m_allocate_way; }
-	uint8_t* m_pDatabuffer = NULL;
+	uint8_t* m_pDatabuffer = nullptr;
 	size_t m_DataSize = 0;
 	size_t m_MemSize = 0;
 	std::shared_ptr<FileBuffer> m_ref;
@@ -223,7 +223,7 @@ public:
 			std::lock_guard<std::mutex> lock(m_seg_map_mutex);
 			auto it = m_seg_map.lower_bound(offset);
 			if ( it == m_seg_map.end())
-				return NULL;
+				return nullptr;
 
 			auto blk = it->second;
 			if (check_offset_in_seg(offset, blk))
@@ -235,7 +235,7 @@ public:
 				}
 				return blk;
 			}
-			return NULL;
+			return nullptr;
 		}
 	}
 	void truncate_old_data_in_pool();
