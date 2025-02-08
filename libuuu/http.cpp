@@ -220,7 +220,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 
 		// End the request.
 		if (bResults)
-			bResults = WinHttpReceiveResponse(m_hRequest, NULL);
+			bResults = WinHttpReceiveResponse(m_hRequest, nullptr);
 
 		// Resend the request in case of
 		// ERROR_WINHTTP_RESEND_REQUEST error.
@@ -232,10 +232,10 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 			bResults = WinHttpQueryHeaders(m_hRequest,
 				WINHTTP_QUERY_STATUS_CODE |
 				WINHTTP_QUERY_FLAG_NUMBER,
-				NULL,
+				nullptr,
 				&status,
 				&dwSize,
-				NULL);
+				nullptr);
 
 		if (bResults)
 		{
@@ -286,7 +286,7 @@ int HttpStream::HttpGetHeader(std::string host, std::string path, int port, bool
 							dwSelectedScheme,
 							convert.from_bytes(up.first).c_str(),
 							convert.from_bytes(up.second).c_str(),
-							NULL);
+							nullptr);
 				}
 
 				retry--;
