@@ -63,7 +63,7 @@ static map<string, shared_ptr<FileBuffer>> g_filebuffer_map;
 static mutex g_mutex_map;
 static bool g_small_memory = true;
 
-#define MAGIC_PATH '>'
+static constexpr char MAGIC_PATH = '>';
 
 string g_current_dir = ">";
 
