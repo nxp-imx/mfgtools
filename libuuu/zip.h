@@ -148,12 +148,12 @@ struct Zip_ext
 	uint16_t size;
 };
 
-#define EOCD_SIGNATURE 0x06054b50
-#define DIR_SIGNATURE 0x02014b50
-#define DATA_SIGNATURE 0x08074b50
-#define FILE_SIGNATURE 0x04034b50
-#define EOCD64_LOCATOR_SIGNATURE 0x07064b50
-#define EOCD64_SIGNATURE 0x06064b50
+inline constexpr uint32_t EOCD_SIGNATURE = 0x06054b50;
+inline constexpr uint32_t DIR_SIGNATURE = 0x02014b50;
+inline constexpr uint32_t DATA_SIGNATURE = 0x08074b50;
+inline constexpr uint32_t FILE_SIGNATURE = 0x04034b50;
+inline constexpr uint32_t EOCD64_LOCATOR_SIGNATURE = 0x07064b50;
+inline constexpr uint32_t EOCD64_SIGNATURE = 0x06064b50;
 
 class Zip;
 
