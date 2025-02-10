@@ -118,7 +118,7 @@ void send_info(std::string msg)
 	call_notify(nt);
 }
 
-bool load_bmap(const std::string& filename, bmap_t& bmap)
+int load_bmap(const std::string& filename, bmap_t& bmap)
 {
 	tinyxml2::XMLDocument doc;
 	auto fbuf = get_file_buffer(filename, true);
