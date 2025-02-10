@@ -62,4 +62,4 @@ private:
 	mutable size_t m_next_gap_begin = 0;
 };
 
-bool load_bmap(const std::string& filename, bmap_t& bmap);
+int load_bmap(const std::string& filename, bmap_t& bmap);

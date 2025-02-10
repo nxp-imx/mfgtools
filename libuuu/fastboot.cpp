@@ -727,7 +727,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 			m_bmap = bmap_t{SIZE_MAX, block_size};
 		// load mappings from the file
-		} else if (!load_bmap(m_bmap_filename, m_bmap)) {
+		} else if (load_bmap(m_bmap_filename, m_bmap)) {
 			set_last_err_string("Failed to load BMAP");
 			return -1;
 		}
