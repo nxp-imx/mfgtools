@@ -121,17 +121,6 @@ ConfigItem * Config::find(uint16_t vid, uint16_t pid, uint16_t ver)
 	return nullptr;
 }
 
-Config Config::find(const string &pro)
-{
-	Config items;
-	for (auto it = begin(); it != end(); it++)
-	{
-		if (it->m_protocol == pro)
-			items.emplace_back(*it);
-	}
-	return items;
-}
-
 int CfgCmd::run(CmdCtx *)
 {
 	size_t pos = 0;
