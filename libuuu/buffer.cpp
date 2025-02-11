@@ -62,7 +62,7 @@ static map<string, shared_ptr<FileBuffer>> g_filebuffer_map;
 static mutex g_mutex_map;
 static bool g_small_memory = true;
 
-#define MAGIC_PATH '>'
+static constexpr char MAGIC_PATH = '>';
 
 string g_current_dir = ">";
 
@@ -139,7 +139,7 @@ public:
 
 	virtual int Decompress(const string& /*backfifle*/, shared_ptr<FileBuffer> /*outp*/) { return 0; };
 	virtual bool seekable(const string& /*backfile*/) { return false; }
-	virtual std::shared_ptr<FragmentBlock> ScanCompressblock(const string& /*backfile*/, size_t& /*input_offset*/, size_t& /*output_offset*/) { return NULL; };
+	virtual std::shared_ptr<FragmentBlock> ScanCompressblock(const string& /*backfile*/, size_t& /*input_offset*/, size_t& /*output_offset*/) { return nullptr; };
 	virtual int PreloadWorkThread(shared_ptr<FileBuffer>outp);
 
 	virtual int split(const string &filename, string *outbackfile, string *outfilename, bool dir=false)
@@ -969,13 +969,13 @@ shared_ptr<FragmentBlock> FSBz2::ScanCompressblock(const string& backfile, size_
 
 	pbz = get_file_buffer(backfile, true);
 	if (pbz == nullptr) {
-		return NULL;
+		return nullptr;
 	}
 
 	size_t request_size = 1 * 1000 * 1000;
 	shared_ptr<DataBuffer> pd = pbz->request_data(input_offset, request_size);
 	if (!pd)
-		return NULL;
+		return nullptr;
 
 	uint8_t* p1 = pd->data();
 
@@ -1011,7 +1011,7 @@ shared_ptr<FragmentBlock> FSBz2::ScanCompressblock(const string& backfile, size_
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool FSBz2::seekable(const string& backfile)
@@ -1658,7 +1658,7 @@ std::shared_ptr<FragmentBlock> FileBuffer::request_new_blk()
 			while (offset > m_last_request_offset + m_total_buffer_size)
 			{
 				if (m_reset_stream)
-					return NULL;
+					return nullptr;
 				std::unique_lock<std::mutex> lck(m_pool_load_cv_mutex);
 				m_pool_load_cv.wait(lck);
 			}

@@ -11,6 +11,6 @@ IF ERRORLEVEL 1 (
 	) 
 
 	FOR /F "tokens=*" %%a in ('call git describe --long') do (
-		echo #define GIT_VERSION "lib%%a" > %1/gitversion.h
+		echo inline constexpr const char * GIT_VERSION = "lib%%a"; > %1/gitversion.h
 	)
 )
