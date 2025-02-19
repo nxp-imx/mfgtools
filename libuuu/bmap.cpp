@@ -174,5 +174,5 @@ int load_bmap(const std::string& filename, bmap_t& bmap)
 		send_info(info + "\n");
 	}
 
-	return true;
+	return 0;
 }
