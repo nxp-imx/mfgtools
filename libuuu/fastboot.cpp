@@ -570,12 +570,12 @@ int FBFlashCmd::parser(char *p)
 	}
 
 	if (!check_file_exist(m_filename)) {
-		set_last_err_string("FB: image file not found");
+		set_last_err_string("FB: image file not found: " + m_filename);
 		return -1;
 	}
 
 	if (m_use_bmap && m_bmap_filename.size() && !check_file_exist(m_bmap_filename)) {
-		set_last_err_string("FB: bmap file not found");
+		set_last_err_string("FB: bmap file not found: " + m_bmap_filename);
 		return -1;
 	}
 

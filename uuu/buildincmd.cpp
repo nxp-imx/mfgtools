@@ -225,7 +225,7 @@ void BuiltInScriptMap::ShowAll() const
  */
 void BuiltInScriptMap::ShowCmds(FILE * const file) const
 {
-	fprintf(file, "<");
+	//fprintf(file, "<");
 	for (auto iCol = begin(); iCol != end(); ++iCol)
 	{
 		fprintf(file, "%s", iCol->first.c_str());
@@ -237,7 +237,7 @@ void BuiltInScriptMap::ShowCmds(FILE * const file) const
 			fprintf(file, "|");
 		}
 	}
-	fprintf(file, ">");
+	//fprintf(file, ">");
 }
 
 /**

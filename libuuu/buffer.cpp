@@ -62,6 +62,7 @@ static map<string, shared_ptr<FileBuffer>> g_filebuffer_map;
 static mutex g_mutex_map;
 static bool g_small_memory = true;
 
+// [what is the point/value of this value?]
 #define MAGIC_PATH '>'
 
 string g_current_dir = ">";
@@ -127,6 +128,9 @@ int DataBuffer::ref_other_buffer(std::shared_ptr<FileBuffer> p, size_t offset, s
 	return 0;
 };
 
+/**
+ * @brie Base class for FS things [whatever 'FS' means/is].
+ */
 class FSBasic
 {
 public:
@@ -142,29 +146,60 @@ public:
 	virtual std::shared_ptr<FragmentBlock> ScanCompressblock(const string& /*backfile*/, size_t& /*input_offset*/, size_t& /*output_offset*/) { return NULL; };
 	virtual int PreloadWorkThread(shared_ptr<FileBuffer>outp);
 
-	virtual int split(const string &filename, string *outbackfile, string *outfilename, bool dir=false)
+	/**
+	 * @brief Splits a file system path into directory and final name parts
+	 * @param path Input path
+	 * @param[out] dir_part Directory path info from input path
+	 * @param[out] name_part Final name part from input path
+	 * @param dir [what does this mean/imply?]
+	 * @return 0 for success; -1 for error
+	 * @details
+	 * If no/blank m_ext:
+	 *	 If dir:
+	 *     Load dir_part with directory path part of path; >./ if none
+	 *     Load name_part with file name part of path; blank if none
+	 *   Else:
+	 *     Load dir_part with input path
+	 * Else:
+	 *   ext = m_ext
+	 *   Append slash to ext if !dir
+	 *   Find last ext in path
+	 *   If not found: fail
+	 *   Load dir_part with path up to and including ext
+	 *   Load name_part with path after found ext
+	 * @example
+	 * path:"f",     m_ext:"",  !dir ==> ">./", "f"
+	 * path:"d/f",   m_ext:"",  !dir ==> "d", "f"
+	 * path:"d/",    m_ext:"",  !dir ==> "d", ""
+	 * path:"f",     m_ext:"z", !dir ==> error
+	 * path:"d/z/f", m_ext:"z", !dir ==> "d/z", "f"
+	 * path:"d/z/",  m_ext:"z", !dir ==> "d/z", ""
+	 * @note
+	 * Passing a bool like dir is bad style since it only controls flow.
+	 */
+	virtual int split(const string &path, string *dir_part, string *name_part, bool dir=false)
 	{
-		string path = str_to_upper(filename);
+		string upper_path = str_to_upper(path);
 		if (m_ext == nullptr || strlen(m_ext) == 0)
 		{
 			if(dir)
 			{
-				size_t pos = path.rfind("/");
+				size_t pos = upper_path.rfind("/");
 				if(pos == string::npos)
 				{
-					*outbackfile = MAGIC_PATH;
-					*outbackfile += "./";
-					*outfilename = filename;
+					*dir_part = MAGIC_PATH;
+					*dir_part += "./";
+					*name_part = path;
 				} else {
-					*outbackfile = filename.substr(0, pos);
-					if(filename.size() >= pos + 1)
-						*outfilename = filename.substr(pos + 1);
+					*dir_part = path.substr(0, pos);
+					if(path.size() >= pos + 1)
+						*name_part = path.substr(pos + 1);
 					else
-						outfilename->clear();
+						name_part->clear();
 				}
 			}else
 			{
-				*outbackfile = filename;
+				*dir_part = path;
 			}
 			return 0;
 		}
@@ -172,25 +207,25 @@ public:
 		string ext = m_ext;
 		if(!dir)
 			ext += "/";
-		size_t pos = path.rfind(ext);
+		size_t pos = upper_path.rfind(ext);
 		if (pos == string::npos)
 		{
-			string err = "can't find ext name in path: ";
-			err += filename;
+			string err = "Expected '" + ext + "' in path '" + path + "'";
 			set_last_err_string(err);
 			return -1;
 		}
 
-		*outbackfile = filename.substr(0, pos + strlen(m_ext));
+		*dir_part = path.substr(0, pos + strlen(m_ext));
 
-		if(filename.size() >= pos + strlen(m_ext) + 1)
-			*outfilename = filename.substr(pos + strlen(m_ext) + 1);
+		if(path.size() >= pos + strlen(m_ext) + 1)
+			*name_part = path.substr(pos + strlen(m_ext) + 1);
 		else
-			outfilename->clear();
+			name_part->clear();
 		return 0;
 	}
 
 protected:
+	FSBasic() {} // enforce that this class is abstract base; only creatable via a superclass
 	const char * m_ext = nullptr;
 	const char * m_Prefix = nullptr;
 public:

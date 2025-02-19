@@ -90,7 +90,7 @@ class AutoCursor
 public:
 	~AutoCursor()
 	{
-		printf("\x1b[?25h\n\n\n");
+		printf("\x1b[?25h\n");
 	}
 };
 
@@ -119,7 +119,7 @@ public:
 		std::vsnprintf((char*)c_str(), len + 1, fmt, args);
 		va_end(args);
 
-		return 0;
+		return EXIT_SUCCESS;
 	}
 };
 
@@ -163,63 +163,80 @@ int ask_passwd(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN])
 
 	tcsetattr(STDIN_FILENO, TCSANOW, &old);
 	if(pd.size() > MAX_USER_LEN -1)
-		return -1;
+		return EXIT_FAILURE;
 	memcpy(passwd, pd.data(), pd.size());
 	i=pd.size();
 
 #endif
 	passwd[i] = 0;
 	cout << endl;
-	return 0;
+	return EXIT_SUCCESS;
 }
 
-void print_help(bool detail = false)
+void print_cli_help()
 {
-	const char help[] =
-		"uuu [-d -m -v -V -bmap -no-bmap] <" "bootloader|cmdlists|cmd" ">\n\n"
-		"    bootloader  download bootloader to board by usb\n"
-		"    cmdlist     run all commands in cmdlist file\n"
-		"                If it is path, search uuu.auto in dir\n"
-		"                If it is zip, search uuu.auto in zip\n"
-		"    cmd         Run one command, use -H see detail\n"
-		"                example: SDPS: boot -f flash.bin\n"
-		"    -d          Daemon mode, wait for forever.\n"
-		"    -v -V       verbose mode, -V enable libusb error\\warning info\n"
-		"    -dry        Dry run mode, check if script or cmd correct \n"
-		"    -bmap       Try using .bmap files even if flash commands do not specify them\n"
-		"    -no-bmap    Ignore .bmap files even if flash commands specify them\n"
-		"    -m          USBPATH Only monitor these paths.\n"
-		"                    -m 1:2 -m 1:3\n\n"
-		"    -ms         serial_no Monitor the serial number prefix of the device using 'serial_no'.\n"
-		"    -t          Timeout second for wait known usb device appeared\n"
-		"    -T          Timeout second for wait next known usb device appeared at stage switch\n"
-		"    -e          set environment variable key=value\n"
-		"    -pp         usb polling period in milliseconds\n"
-		"    -dm         disable small memory\n"
-		"uuu -s          Enter shell mode. uuu.inputlog record all input commands\n"
-		"                you can use \"uuu uuu.inputlog\" next time to run all commands\n\n"
-		"uuu -udev       linux: show udev rule to avoid sudo each time \n"
-		"uuu -lsusb      List connected know devices\n"
-		"uuu -IgSerNum   Set windows registry to ignore USB serial number for known uuu devices\n"
-		"uuu -h          show general help\n"
-		"uuu -H          show general help and detailed help for commands\n\n";
-	printf("%s", help);
-	printf("uuu [-d -m -v -bmap -no-bmap] -b[run] ");
+	const char default_mode[] =
+		"uuu [OPTION...] SPEC|CMD|BOOTLOADER\n"
+		"    SPEC\tSpecifies a script to run without parameters; use -b for parameters;\n"
+		"    \t\tFor a directory, use contained uuu.auto at root;\n"
+		"    \t\tFor a zip file, expand, then use uuu.auto at root of expanded content\n"
+		"    CMD\t\tRun a command; see -H for details\n"
+		"    \t\tExample: SDPS: boot -f flash.bin\n"
+		"    BOOTLOADER\tBoot device from bootloader image file\n"
+		"    -d\t\tProduction (daemon) mode\n"
+		"    -v\t\tVerbose feedback\n"
+		"    -V\t\tExtends verbose feedback to include USB library feedback\n"
+		"    -dry\tDry-run; displays verbose output without performing actions\n"
+		"    -bmap\tUse .bmap files even if flash commands do not specify them\n"
+		"    -no-bmap\tIgnore .bmap files even if flash commands specify them\n"
+		"    -m PATH\tLimits USB port monitoring. Example: -m 1:2 -m 1:3\n"
+		"    -ms SN\tMonitor the serial number prefix of the device\n"
+		"    -t #\tSeconds to wait for a device to appear\n"
+		"    -T #\tSeconds to wait for a device to appeared at stage switch [for deamon mode?]\n"
+		"    -e KEY=VAL\tSet environment variable KEY to value VAL\n"
+		"    -pp #\tUSB polling period in milliseconds\n"
+		"    -dm\t\tDisable small memory\n";
+
+	const char param_and_builtin_mode1[] =
+		"uuu [OPTION...] -b SPEC|BUILTIN [PARAM...]\n"
+		"    SPEC\tSame as for default mode\n"
+		"    BUILTIN\tBuilt-in script: ";
+
+	const char param_and_builtin_mode2[] =
+		"    OPTION...\tSame as for default mode\n"
+		"    PARAM...\tScript parameter values\n";
+
+	const char special_modes[] =
+		"uuu -ls-devices\tList connected devices\n"
+		"uuu -ls-builtin\tList built-in scripts\n"
+		"uuu -cat-builtin BUILTIN\n"
+		"    \t\tOutput built-in script\n"
+		"uuu -s\t\tInteractive (shell) mode; records commands in uuu.inputlog\n"
+		"uuu -udev\tFor Linux, output udev rule for avoiding using sudo each time\n"
+		"uuu -IgSerNum\tFor Windows, modify registry to ignore USB serial number to find devices\n"
+		"uuu -h\t\tOutput basic help\n"
+		"uuu -h-protocol-commands\n"
+		"    \t\tOutput protocol command help info\n"
+		"uuu -h-protocol-support\n"
+		"    \t\tOutput protocol support by device info\n"
+		"uuu -h-auto-complete\n"
+		"    \t\tOutput auto/tab completion help info\n";
+
+	printf("\nDefault mode:\n%s", default_mode);
+
+	printf("\nParameter & built-in script mode:\n%s", param_and_builtin_mode1);
 	g_BuildScripts.ShowCmds();
-	printf(" arg...\n");
-	printf("\tRun Built-in scripts\n");
+	printf("\n%s", param_and_builtin_mode2);
+
+	printf("\nSpecial modes:\n%s", special_modes);
+}
+
+void print_script_directory() {
+	printf("\nBuilt-in scripts:\n");
 	g_BuildScripts.ShowAll();
-	printf("\nuuu -bshow ");
-	g_BuildScripts.ShowCmds();
-	printf("\n");
-	printf("\tShow built-in script\n");
-	printf("\n");
+}
 
-	print_autocomplete_help();
-
-	if (detail == false)
-		return;
-
+void print_protocol_help() {
 	size_t start = 0, pos = 0;
 	string str= g_sample_cmd_list;
 
@@ -241,9 +258,10 @@ void print_help(bool detail = false)
 		start = pos;
 	}
 }
-void print_version()
+
+void print_app_title()
 {
-	printf("uuu (Universal Update Utility) for nxp imx chips -- %s\n\n", uuu_get_version_string());
+	printf("Universal Update Utility for NXP i.MX chips -- %s\n", uuu_get_version_string());
 }
 
 int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, uint16_t vid, uint16_t pid, uint16_t bcdmin, uint16_t bcdmax, void * /*p*/)
@@ -258,7 +276,14 @@ int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, u
 		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\n", pro, chip, ext, vid, pid);
 	else
 		printf("\t%s\t %s\t%s 0x%04x\t 0x%04x\t [0x%04x..0x%04x]\n", pro, chip, ext, vid, pid, bcdmin, bcdmax);
-	return 0;
+	return EXIT_SUCCESS;
+}
+
+void print_protocol_support_help() {
+	printf("Protocol support for devices:\n");
+	printf("\tPctl\t Chip\t\t Vid\t Pid\t BcdVersion\t Serial_No\n");
+	printf("\t==================================================\n");
+	uuu_for_each_cfg(print_cfg, NULL);
 }
 
 int print_udev_rule(const char * /*pro*/, const char * /*chip*/, const char * /*compatible*/,
@@ -266,7 +291,7 @@ int print_udev_rule(const char * /*pro*/, const char * /*chip*/, const char * /*
 {
 	printf("SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"%04x\", ATTRS{idProduct}==\"%04x\", TAG+=\"uaccess\"\n",
 			vid, pid);
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int polling_usb(std::atomic<int>& bexit);
@@ -659,7 +684,7 @@ int progress(uuu_notify nt, void *p)
 			str.format("\rSuccess %d    Failure %d    ", g_overall_okay, g_overall_failure);
 
 			if (g_map_path_nt.empty())
-				str += "Wait for Known USB Device Appear...";
+				str += "Waiting for device...";
 
 			if (!g_usb_path_filter.empty())
 			{
@@ -699,7 +724,7 @@ int progress(uuu_notify nt, void *p)
 		if(np->find(nt.id) != np->end())
 			np->erase(nt.id);
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }
 #ifdef _MSC_VER
 
@@ -795,13 +820,14 @@ int runshell(int shell)
 				prompt = "U>";
 				cout << "Exit u-boot cmd mode" << endl;
 				cout << "Okay" << endl;
-			}else if (cmd == "help" || cmd == "?")
+			}
+			else if (cmd == "help" || cmd == "?")
 			{
-				print_help();
+				print_cli_help();
 			}
 			else if (cmd == "q" || cmd == "quit")
 			{
-				return 0;
+				return EXIT_SUCCESS;
 			}
 			else
 			{
@@ -818,25 +844,27 @@ int runshell(int shell)
 					cout << "Okay" << endl;
 			}
 		}
-		return 0;
+		return EXIT_SUCCESS;
 	}
 
-	return -1;
+	return EXIT_FAILURE;
 }
 
 void print_udev()
 {
 	uuu_for_each_cfg(print_udev_rule, NULL);
-	fprintf(stderr, "\n1: put above udev run into /etc/udev/rules.d/70-uuu.rules\n");
-	fprintf(stderr, "\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"\n");
-	fprintf(stderr, "2: update udev rule\n");
-	fprintf(stderr, "\tsudo udevadm control --reload\n");
+
+	cerr << endl <<
+		"Enable udev rules via:" << endl <<
+		"\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"" << endl <<
+		"\tsudo udevadm control --reload" << endl <<
+		"Note: These instructions output to standard error so are excluded" << endl << endl;
 }
 
 int print_usb_device(const char *path, const char *chip, const char *pro, uint16_t vid, uint16_t pid, uint16_t bcd, const char *serial_no, void * /*p*/)
 {
 	printf("\t%s\t %s\t %s\t 0x%04X\t0x%04X\t 0x%04X\t %s\n", path, chip, pro, vid, pid, bcd, serial_no);
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 void print_lsusb()
@@ -862,10 +890,10 @@ int ignore_serial_number(const char *pro, const char *chip, const char */*comp*/
 								  "SYSTEM\\CurrentControlSet\\Control\\UsbFlags",
 									sub, REG_BINARY, &value, 1);
 	if(ret == ERROR_SUCCESS)
-		return 0;
+		return EXIT_SUCCESS;
 
 	printf("Set key failure, try run as administrator permission\n");
-	return -1;
+	return EXIT_FAILURE;
 }
 #endif
 
@@ -873,179 +901,230 @@ int set_ignore_serial_number()
 {
 #ifndef WIN32
 	printf("Only windows system need set ignore serial number registry");
-	return -1;
+	return EXIT_FAILURE;
 #else
 	printf("Set window registry to ignore usb hardware serial number for known uuu device:\n");
 	return uuu_for_each_cfg(ignore_serial_number, NULL);
 #endif
 }
 
+void log_error(const string& message) {
+	cerr << "Error: " << message << endl;
+}
+
+void log_syntax_error(const string& message) {
+	log_error(message);
+	print_cli_help();
+}
+
 int main(int argc, char **argv)
 {
-	if (auto_complete(argc, argv) == 0)
-		return 0;
+	// commented out causes failure when pass script file name/path as first arg plus -v after
+	//if (auto_complete(argc, argv) == 0) return EXIT_SUCCESS;
 
+	// handle modes that should _not_ print the app title
 	if (argc >= 2)
 	{
 		string s = argv[1];
 		if(s == "-udev")
 		{
 			print_udev();
-			return 0;
+			return EXIT_SUCCESS;
 		}
-		if (s == "-bshow")
+		if (s == "-cat-builtin")
 		{
-			if (2 == argc || g_BuildScripts.find(argv[2]) == g_BuildScripts.end())
+			if (2 == argc)
 			{
-				fprintf(stderr, "Error, must be have script name: ");
+				fprintf(stderr, "Error: Missing built-in script name; options: ");
 				g_BuildScripts.ShowCmds(stderr);
-				fprintf(stderr,"\n");
-				return -1;
+				fprintf(stderr, "\n");
+				return EXIT_FAILURE;
 			}
-			else
+			if (g_BuildScripts.find(argv[2]) == g_BuildScripts.end())
 			{
-				string str = g_BuildScripts[argv[2]].m_text;
-				while (str.size() > 0 && (str[0] == '\n' || str[0] == ' '))
-					str = str.erase(0,1);
-
-				printf("%s", str.c_str());
-				return 0;
+				fprintf(stderr, "Error: Unknown built-in script name; options: ");
+				g_BuildScripts.ShowCmds(stderr);
+				fprintf(stderr, "\n");
+				return EXIT_FAILURE;
 			}
+			string str = g_BuildScripts[argv[2]].m_text;
+			while (str.size() > 0 && (str[0] == '\n' || str[0] == ' '))
+				str = str.erase(0,1);
+			printf("%s", str.c_str());
+			return EXIT_SUCCESS;
 		}
 	}
 
 	AutoCursor a;
 
-	print_version();
+	print_app_title();
 
 	if (!enable_vt_mode())
 	{
-		cout << "Your console don't support VT mode, fail back to verbose mode" << endl;
+		// [why enable verbose in this case?]
+		cout << "Warning: Console doesn't support VT mode; enabling verbose feedback" << endl;
 		g_verbose = 1;
 	}
 
 	if (argc == 1)
 	{
-		print_help();
-		return 0;
+		log_error("Invalid input");
+		print_cli_help();
+		return EXIT_FAILURE;
 	}
 
 	int deamon = 0;
 	int shell = 0;
-	string filename;
-	string cmd;
-	int ret;
-	int dryrun  = 0;
-
+	int dryrun = 0;
+	string input_path;
+	string protocol_cmd;
 	string cmd_script;
 
 	for (int i = 1; i < argc; i++)
 	{
-		string s = argv[i];
-		if (!s.empty() && s[0] == '-')
+		string arg = argv[i];
+		if (!arg.empty() && arg[0] == '-')
 		{
-			if (s == "-d")
+			if (arg == "-d")
 			{
 				deamon = 1;
 				uuu_set_small_mem(0);
-
 			}
-			else if (s == "-dm")
+			else if (arg == "-dm")
 			{
 				uuu_set_small_mem(0);
 			}
-			else if (s == "-s")
+			else if (arg == "-s")
 			{
 				shell = 1;
+				// why set verbose for shell mode?
 				g_verbose = 1;
 			}
-			else if (s == "-v")
+			else if (arg == "-v")
 			{
 				g_verbose = 1;
 			}
-			else if (s == "-V")
+			else if (arg == "-V")
 			{
 				g_verbose = 1;
 				uuu_set_debug_level(2);
-			}else if (s == "-dry")
+			}else if (arg == "-dry")
 			{
 				dryrun = 1;
+				// why is verbose set for dry-run? 
 				g_verbose = 1;
 			}
-			else if (s == "-h")
+			else if (arg == "-h")
 			{
-				print_help(false);
-				return 0;
+				print_cli_help();
+				return EXIT_SUCCESS;
 			}
-			else if (s == "-H")
+			else if (arg == "-h-auto-complete")
 			{
-				print_help(true);
-				return 0;
+				print_autocomplete_help();
+				return EXIT_SUCCESS;
 			}
-			else if (s == "-m")
+			else if (arg == "-h-protocol-commands")
 			{
-				i++;
+				print_protocol_help();
+				return EXIT_SUCCESS;
+			}
+			else if (arg == "-h-protocol-support")
+			{
+				print_protocol_support_help();
+				return EXIT_SUCCESS;
+			}
+			else if (arg == "-ls-builtin")
+			{
+				print_script_directory();
+				return EXIT_SUCCESS;
+			}
+			else if (arg == "-m")
+			{
+				if (++i >= argc)
+				{
+					log_syntax_error("Missing USB path argument");
+					return EXIT_FAILURE;
+				}
 				uuu_add_usbpath_filter(argv[i]);
 				g_usb_path_filter.push_back(argv[i]);
 			}
-			else if (s == "-ms")
+			else if (arg == "-ms")
 			{
-				i++;
+				if (++i >= argc)
+				{
+					log_syntax_error("Missing serial # argument");
+					return EXIT_FAILURE;
+				}
 				uuu_add_usbserial_no_filter(argv[i]);
 				g_usb_serial_no_filter.push_back(argv[i]);
 			}
-			else if (s == "-t")
+			else if (arg == "-t")
 			{
-				i++;
+				if (++i >= argc)
+				{
+					log_syntax_error("Missing seconds argument");
+					return EXIT_FAILURE;
+				}
 				uuu_set_wait_timeout(atoll(argv[i]));
 			}
-			else if (s == "-T")
+			else if (arg == "-T")
 			{
-				i++;
+				if (++i >= argc)
+				{
+					log_syntax_error("Missing seconds argument");
+					return EXIT_FAILURE;
+				}
 				uuu_set_wait_next_timeout(atoll(argv[i]));
 			}
-			else if (s == "-pp")
+			else if (arg == "-pp")
 			{
-				i++;
+				if (++i >= argc)
+				{
+					log_syntax_error("Missing milliseconds argument");
+					return EXIT_FAILURE;
+				}
 				uuu_set_poll_period(atoll(argv[i]));
 			}
-			else if (s == "-lsusb")
+			else if (arg == "-ls-devices")
 			{
 				print_lsusb();
-				return 0;
+				return EXIT_SUCCESS;
 			}
-			else if (s == "-IgSerNum")
+			else if (arg == "-IgSerNum")
 			{
 				return set_ignore_serial_number();
 			}
-			else if (s == "-bmap")
+			else if (arg == "-bmap")
 			{
 				g_bmap_mode = bmap_mode::Force;
 			}
-			else if (s == "-no-bmap")
+			else if (arg == "-no-bmap")
 			{
 				g_bmap_mode = bmap_mode::Ignore;
 			}
-			else if (s == "-e")
+			else if (arg == "-e")
 			{
 #ifndef WIN32
 	#define _putenv putenv
 #endif
-				i++;
+				if (++i >= argc)
+				{
+					log_syntax_error("Missing key=value argument");
+					return EXIT_FAILURE;
+				}
 				if (_putenv(argv[i]))
 				{
-					printf("error, failed to set '%s', environment parameter must have the form key=value\n", argv[i]);
-					return -1;
+					printf("Error: Failed to set '%s'. Hint: parameter must have the form key=value\n", argv[i]);
+					return EXIT_FAILURE;
 				}
 			}
-			else if (s == "-b" || s == "-brun")
+			else if (arg == "-b" || arg == "-brun")
 			{
 				if (i + 1 == argc)
 				{
-					printf("error, must be have script name: ");
-					g_BuildScripts.ShowCmds();
-					printf("\n");
-					return -1;
+					log_syntax_error("Missing path or built-in script name");
+					return EXIT_FAILURE;
 				}
 
 				vector<string> args;
@@ -1060,7 +1139,7 @@ int main(int argc, char **argv)
 					args.push_back(s);
 				}
 
-				// if script name is not build-in, try to look for a file
+				// if script name is not built-in, try to look for a file
 				if (g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end()) {
 					const string tmpCmdFileName{argv[i + 1]};
 
@@ -1070,7 +1149,7 @@ int main(int argc, char **argv)
 
 					if (fileContents.empty()) {
 						printf("%s is not built-in script or fail load external script file", tmpCmdFileName.c_str());
-						return -1;
+						return EXIT_FAILURE;
 					}
 
 					BuiltInScriptRawData tmpCmd{
@@ -1090,29 +1169,36 @@ int main(int argc, char **argv)
 			}
 			else
 			{
-				cout << "Unknown option: " << s.c_str();
-				return -1;
+				cout << "Error: Unknown option: " << arg << endl;
+				print_cli_help();
+				return EXIT_FAILURE;
 			}
-		}else if (!s.empty() && s[s.size() - 1] == ':')
+		}else if (!arg.empty() && arg[arg.size() - 1] == ':')
 		{
+			// looks like a protocol command
 			for (int j = i; j < argc; j++)
 			{
-				s = argv[j];
-				if (s.find(' ') != string::npos && s[s.size() - 1] != ':')
+				arg = argv[j];
+				if (arg.find(' ') != string::npos && arg[arg.size() - 1] != ':')
 				{
-					s.insert(s.begin(), '"');
-					s.insert(s.end(), '"');
+					arg.insert(arg.begin(), '"');
+					arg.insert(arg.end(), '"');
 				}
-				cmd.append(s);
+				protocol_cmd.append(arg);
 				if(j != (argc -1)) /* Don't add space at last arg */
-					cmd.append(" ");
+					protocol_cmd.append(" ");
 			}
 			break;
 		}
 		else
 		{
-			filename = s;
-			break;
+			// treat as a file system path
+			if (!input_path.empty())
+			{
+				printf("Error: Too many path arguments - %s\n", arg.c_str());
+				return EXIT_FAILURE;
+			}
+			input_path = arg;
 		}
 	}
 
@@ -1122,42 +1208,40 @@ int main(int argc, char **argv)
 
 	if (deamon && shell)
 	{
-		printf("Error: -d -s Can't apply at the same time\n");
-		return -1;
+		log_error("Can't use deamon (-d) and shell (-s) together");
+		return EXIT_FAILURE;
 	}
 
 	if (deamon && dryrun)
 	{
-		printf("Error: -d -dry Can't apply at the same time\n");
-		return -1;
+		log_error("Can't use deamon (-d) and dry-run (-dry) together");
+		return EXIT_FAILURE;
 	}
 
 	if (shell && dryrun)
 	{
-		printf("Error: -dry -s Can't apply at the same time\n");
-		return -1;
+		log_error("Error: Can't use shell (-s) and dry-run (-dry) together");
+		return EXIT_FAILURE;
 	}
 
 	if (g_verbose)
 	{
-		printf("%sBuild in config:%s\n", g_vt_boldwhite, g_vt_default);
-		printf("\tPctl\t Chip\t\t Vid\t Pid\t BcdVersion\t Serial_No\n");
-		printf("\t==================================================\n");
-		uuu_for_each_cfg(print_cfg, NULL);
+		// commented out since seems overkill since can jprint it via -cat-builtin
+		//if (!cmd_script.empty())
+		//	printf("\n%sRunning built-in script:%s\n %s\n\n", g_vt_boldwhite, g_vt_default, cmd_script.c_str());
 
-		if (!cmd_script.empty())
-			printf("\n%sRun built-in script:%s\n %s\n\n", g_vt_boldwhite, g_vt_default, cmd_script.c_str());
-
-		if (!shell)
-			cout << "Wait for Known USB Device Appear...";
-
-		print_usb_filter();
-
-		printf("\n");
+		// why not log for !shell? it's logged for !g_verbose regardless
+		if (!shell) {
+			cout << "Waiting for device";
+			print_usb_filter();
+			cout << "...";
+			printf("\n");
+		}
 	}
 	else {
-		cout << "Wait for Known USB Device Appear...";
+		cout << "Waiting for device";
 		print_usb_filter();
+		cout << "...";
 		cout << "\r";
 		cout << "\x1b[?25l";
 		cout.flush();
@@ -1167,15 +1251,14 @@ int main(int argc, char **argv)
 
 	uuu_register_notify_callback(progress, &nt_session);
 
-
-	if (!cmd.empty())
+	if (!protocol_cmd.empty())
 	{
-		ret = uuu_run_cmd(cmd.c_str(), dryrun);
+		int ret = uuu_run_cmd(protocol_cmd.c_str(), dryrun);
 
 		for (size_t i = 0; i < g_map_path_nt.size()+3; i++)
 			printf("\n");
 		if(ret)
-			printf("\nError: %s\n", uuu_get_last_err_string());
+			printf("Error: %s\n", uuu_get_last_err_string());
 		else
 			printf("Okay\n");
 
@@ -1183,30 +1266,33 @@ int main(int argc, char **argv)
 		return ret;
 	}
 
-	if (!cmd_script.empty())
-		ret = uuu_run_cmd_script(cmd_script.c_str(), dryrun);
-	else
-		ret = uuu_auto_detect_file(filename.c_str());
-
-	if (ret)
 	{
-		ret = runshell(shell);
-		if(ret)
-			cout << g_vt_red << "\nError: " << g_vt_default <<  uuu_get_last_err_string();
-		return ret;
+		int ret;
+		if (!cmd_script.empty())
+			ret = uuu_run_cmd_script(cmd_script.c_str(), dryrun);
+		else
+			ret = uuu_auto_detect_file(input_path.c_str());
+
+		if (ret)
+		{
+			ret = runshell(shell);
+			if (ret)
+				cout << g_vt_red << "\nError: " << g_vt_default << uuu_get_last_err_string();
+			return ret;
+		}
 	}
 
 	if (uuu_wait_uuu_finish(deamon, dryrun))
 	{
 		cout << g_vt_red << "\nError: " << g_vt_default << uuu_get_last_err_string();
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	runshell(shell);
 
-	/*Wait for the other thread exit, after send out CMD_DONE*/
+	// wait for the other thread exit, after send out CMD_DONE
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	if(!g_verbose)
-		printf("\n\n\n");
+	//if(!g_verbose)
+	//	printf("\n");
 	return g_overall_status;
 }

@@ -203,28 +203,21 @@ int auto_complete(int argc, char**argv)
 
 void print_autocomplete_help()
 {
-
+	cout << "\nEnable auto/tab completion:" << endl << endl;
 #ifndef _MSC_VER
-	{
-		cout << "Enjoy auto [tab] command complete by put below script into /etc/bash_completion.d/uuu" << endl;
-		cout << g_vt_kcyn;
-		cout << "  _uuu_autocomplete()" <<endl;
-		cout << "  {" << endl;
-		cout << "       COMPREPLY=($(" << TARGET_PATH << " $1 $2 $3))" << endl;
-		cout << "  }" << endl;
-		cout << "  complete -o nospace -F _uuu_autocomplete  uuu" << g_vt_default << endl << endl;
-	}
+	cout << "Bash: Put the following script into /etc/bash_completion.d/uuu" << endl;
+	cout << g_vt_kcyn;
+	cout << "  _uuu_autocomplete()" <<endl;
+	cout << "  {" << endl;
+	cout << "       COMPREPLY=($(" << TARGET_PATH << " $1 $2 $3))" << endl;
+	cout << "  }" << endl;
+	cout << "  complete -o nospace -F _uuu_autocomplete  uuu" << g_vt_default << endl << endl;
 #else
-	{
-		printf("Powershell: Enjoy auto [tab] command complete by run below command or put into Documents\\WindowsPowerShell\\Microsoft.PowerShell_profile.ps1\n");
-		
-		HMODULE hModule = GetModuleHandleA(NULL);
-		char path[MAX_PATH];
-		GetModuleFileNameA(hModule, path, MAX_PATH);
-
-		printf("   Register-ArgumentCompleter -CommandName uuu -ScriptBlock {param($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameter); %s -autocomplete $parameterName }\n\n",
-			path);
-	}
+	HMODULE hModule = GetModuleHandleA(NULL);
+	char path[MAX_PATH];
+	GetModuleFileNameA(hModule, path, MAX_PATH);
+	cout <<
+		"PowerShell: run the following command or put in Documents\\WindowsPowerShell\\Microsoft.PowerShell_profile.ps1" << endl <<
+		"\tRegister-ArgumentCompleter -CommandName uuu -ScriptBlock {param($commandName,$parameterName,$wordToComplete,$commandAst,$fakeBoundParameter); " << path << " -autocomplete $parameterName }" << endl;
 #endif
-
 }
