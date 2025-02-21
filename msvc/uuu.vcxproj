@@ -25,6 +25,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\uuu\buildincmd.h" />
+    <ClInclude Include="..\uuu\logger.h" />
+    <ClInclude Include="..\uuu\progress.h" />
+    <ClInclude Include="..\uuu\VtEmulation.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

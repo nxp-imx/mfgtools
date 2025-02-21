@@ -66,10 +66,11 @@ const char * uuu_get_last_err_string()
 	return g_last_error_str.c_str();
 }
 
-void set_last_err_string(const string &str)
+int set_last_err_string(const string &str)
 {
 	lock_guard<mutex> l(g_last_error_str_mutex);
 	g_last_error_str = str;
+	return -1;
 }
 
 int uuu_get_last_err()
@@ -77,7 +78,7 @@ int uuu_get_last_err()
 	return g_last_err_id.load();
 }
 
-void set_last_err_id(int id)
-{
-	g_last_err_id = id;
-}
+//void set_last_err_id(int id)
+//{
+//	g_last_err_id = id;
+//}

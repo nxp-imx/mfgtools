@@ -30,8 +30,9 @@
 */
 
 #include "buildincmd.h"
+#include "VtEmulation.h"
 
-#include <algorithm>
+#include <fstream>
 #include <locale>
 #include <regex>
 
@@ -158,19 +159,19 @@ void BuiltInScript::show() const
 }
 
 /**
- * @brief Print the script's name, its description and its arguments to stdout
+ * @brief Print the script name, description and formal arguments to stdout
  */
 void BuiltInScript::show_cmd() const
 {
-	printf("\t%s%s%s\t%s\n", g_vt_boldwhite, m_name.c_str(), g_vt_default,  m_desc.c_str());
+	printf("\t%s%s%s\t%s\n", g_vt->boldwhite, m_name.c_str(), g_vt->default_fg,  m_desc.c_str());
 	for (auto i = 0u; i < m_args.size(); ++i)
 	{
 		std::string desc{m_args[i].m_name};
 		if (m_args[i].m_flags & Arg::ARG_OPTION)
 		{
-			desc += g_vt_boldwhite;
+			desc += g_vt->boldwhite;
 			desc += "[Optional]";
-			desc += g_vt_default;
+			desc += g_vt->default_fg;
 		}
 		desc += " ";
 		desc += m_args[i].m_desc;
@@ -192,12 +193,37 @@ BuiltInScriptMap::BuiltInScriptMap(const BuiltInScriptRawData*p)
 }
 
 /**
- * @brief Auto-complete names of built-in scripts if they match `match`
- * @param[in] match The string against which the scripts' names will be matched
- * @param[in] space A separator character which shall be printed after the
- * completed script name
+ * @brief Loads a file as a script; adding it to the catalog
+ * @param path File system path
+ * @return Success indication
  */
-void BuiltInScriptMap::PrintAutoComplete(const std::string &match, const char *space) const
+bool BuiltInScriptMap::add_from_file(const std::string& path)
+{
+	std::ifstream t(path);
+	std::string fileContents((std::istreambuf_iterator<char>(t)),
+		std::istreambuf_iterator<char>());
+
+	if (fileContents.empty()) {
+		return false;
+	}
+
+	BuiltInScriptRawData script_definition{
+		path.c_str(),
+		fileContents.c_str(),
+		"Script loaded from file"
+	};
+
+	emplace(path, &script_definition);
+
+	return true;
+}
+
+/**
+ * @brief Print the name of each script that matches; for use with auto-complete
+ * @param[in] match Search text
+ * @param[in] space Text printed after each script name
+ */
+void BuiltInScriptMap::print_auto_complete(const std::string &match, const char *space) const
 {
 	for (const auto &script_pair : *this)
 	{
@@ -209,9 +235,9 @@ void BuiltInScriptMap::PrintAutoComplete(const std::string &match, const char *s
 }
 
 /**
- * @brief Print information about all contained scripts to stdout
+ * @brief Print (to stdout) usage information about each script
  */
-void BuiltInScriptMap::ShowAll() const
+void BuiltInScriptMap::print_usage() const
 {
 	for (const auto &script_pair : *this)
 	{
@@ -220,24 +246,17 @@ void BuiltInScriptMap::ShowAll() const
 }
 
 /**
- * @brief Print the names of all contained scripts to the given stream
- * @param[in] file The stream to which the names shall be printed
+ * @brief Get a string that lists each script name separated by comma
  */
-void BuiltInScriptMap::ShowCmds(FILE * const file) const
+std::string BuiltInScriptMap::get_names() const
 {
-	//fprintf(file, "<");
-	for (auto iCol = begin(); iCol != end(); ++iCol)
+	std::string text;
+	for (const auto& item : *this)
 	{
-		fprintf(file, "%s", iCol->first.c_str());
-
-		auto i = iCol;
-		i++;
-		if(i != end())
-		{
-			fprintf(file, "|");
-		}
+		text += item.first + ",";
 	}
-	//fprintf(file, ">");
+	text.pop_back();
+	return text;
 }
 
 /**
@@ -309,7 +328,7 @@ static std::string str_to_upper(const std::string &str)
 	return s;
 }
 
-//! Array containing raw information about all the built-in scripts of uuu
+//! Information about the built-in scripts
 static constexpr BuiltInScriptRawData g_builtin_cmd[] =
 {
 	{
@@ -369,5 +388,5 @@ static constexpr BuiltInScriptRawData g_builtin_cmd[] =
 	}
 };
 
-//! A map of the built-in scripts' names to their BuiltInScript representations
-BuiltInScriptMap g_BuildScripts(g_builtin_cmd);
+//! Script catalog
+BuiltInScriptMap g_ScriptCatalog(g_builtin_cmd);

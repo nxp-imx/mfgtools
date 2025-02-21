@@ -569,12 +569,12 @@ int FBFlashCmd::parser(char *p)
 		return -1;
 	}
 
-	if (!check_file_exist(m_filename)) {
+	if (verify_file_exist(m_filename)) {
 		set_last_err_string("FB: image file not found: " + m_filename);
 		return -1;
 	}
 
-	if (m_use_bmap && m_bmap_filename.size() && !check_file_exist(m_bmap_filename)) {
+	if (m_use_bmap && m_bmap_filename.size() && verify_file_exist(m_bmap_filename)) {
 		set_last_err_string("FB: bmap file not found: " + m_bmap_filename);
 		return -1;
 	}
@@ -584,13 +584,13 @@ int FBFlashCmd::parser(char *p)
 		auto p = m_bmap_filename.rfind('.');
 		if (p != string::npos) {
 			m_bmap_filename.replace(p, string::npos, ".bmap");
-			if (check_file_exist(m_bmap_filename))
+			if (!verify_file_exist(m_bmap_filename))
 				return 0;
 		}
 
 		m_bmap_filename = m_filename;
 		m_bmap_filename.append(".bmap");
-		if (check_file_exist(m_bmap_filename))
+		if (!verify_file_exist(m_bmap_filename))
 			return 0;
 
 		m_use_bmap = false;

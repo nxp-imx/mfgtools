@@ -56,6 +56,7 @@
     <ClInclude Include="..\libuuu\sdp.h" />
     <ClInclude Include="..\libuuu\sparse.h" />
     <ClInclude Include="..\libuuu\sparse_format.h" />
+    <ClInclude Include="..\libuuu\string_man.h" />
     <ClInclude Include="..\libuuu\tar.h" />
     <ClInclude Include="..\libuuu\trans.h" />
     <ClInclude Include="..\libuuu\zip.h" />

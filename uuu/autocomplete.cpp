@@ -114,7 +114,7 @@ void linux_autocomplete(int argc, char **argv)
 	}
 	else if (last == "-b")
 	{
-		return g_BuildScripts.PrintAutoComplete(cur);
+		return g_ScriptCatalog.print_auto_complete(cur);
 
 	}else if(last[0] == '-')
 	{
@@ -158,8 +158,8 @@ void power_shell_autocomplete(const char *p)
 		if (prev == "-b")
 			cur = last;
 
-		if (g_BuildScripts.find(cur) == g_BuildScripts.end())
-			g_BuildScripts.PrintAutoComplete(cur, "");
+		if (g_ScriptCatalog.find(cur) == g_ScriptCatalog.end())
+			g_ScriptCatalog.print_auto_complete(cur, "");
 
 		last.clear();
 	}

@@ -29,24 +29,29 @@
 *
 */
 
-#include <map>
 #include "buffer.h"
-#include <sys/stat.h>
-#include "liberror.h"
-#include <iostream>
-#include <fstream>
+
 #include "libcomm.h"
 #include "libuuu.h"
-#include "zip.h"
-#include "fat.h"
-#include "tar.h"
-#include <string.h>
+
 #include "bzlib.h"
-#include "stdio.h"
-#include <limits>
+#include "fat.h"
 #include "http.h"
+#include "string_man.h"
+#include "tar.h"
+#include "zip.h"
 #include "zstd.h"
+
 #include "libusb.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <map>
 
 #ifdef WIN32
 #define stat_os _stat64
@@ -752,20 +757,16 @@ public:
 	}
 	int load(const string &filename, shared_ptr<FileBuffer> p)
 	{
-		for (size_t i = 0; i < m_pFs.size(); i++)
+		for (auto& fs : m_pFs)
 		{
 			string back, fn;
-			if (m_pFs[i]->split(filename, &back, &fn) == 0) {
-				if (m_pFs[i]->load(back, fn, p) == 0)
+			if (fs->split(filename, &back, &fn) == 0) {
+				if (fs->load(back, fn, p) == 0)
 					return 0;
 			}
 		}
 
-		string err;
-		err = "fail open file: ";
-		err += filename;
-		set_last_err_string(err);
-		return -1;
+		return set_last_err_string("Unable to open file: " + filename);
 	}
 }g_fs_data;
 
@@ -1209,10 +1210,19 @@ uint64_t get_file_timesample(string filename)
 	return time;
 }
 
+/**
+ * [what does this do?]
+ * @param filename File system path
+ * @param async TBD
+ * @details
+ * As a side-effect, this conforms filename by stripping quotes and if doesn't start with
+ * MAGIC_PATH prepending g_current_dir and then replacing backslashes with forward.
+ * @note
+ * The side-effect should be eliminated since it adds to cognative load.
+ */
 shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 {
-	filename = remove_quota(filename);
-
+	filename = strip_quotes(filename);
 	if (!filename.empty() && filename[0] != MAGIC_PATH)
 	{
 		if (filename == "..")
@@ -1220,21 +1230,15 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 		else
 			filename = g_current_dir + filename;
 	}
+	replace(filename, "\\", "/");
 
-	string_ex path;
-	path += filename;
-
-	path.replace('\\', '/');
-
-	filename = path;
-
-	bool find;
+	bool found;
 	{
 		std::lock_guard<mutex> lock(g_mutex_map);
-		find = (g_filebuffer_map.find(filename) == g_filebuffer_map.end());
+		found = (g_filebuffer_map.find(filename) == g_filebuffer_map.end());
 	}
 
-	if (find)
+	if (found)
 	{
 		shared_ptr<FileBuffer> p(new FileBuffer);
 
@@ -1417,6 +1421,9 @@ int FileBuffer::ref_other_buffer(shared_ptr<FileBuffer> p, size_t offset, size_t
 	return 0;
 }
 
+/**
+ * [what does this do?]
+ */
 int FileBuffer::reload(string filename, bool async)
 {
 	if(async) {
@@ -1837,10 +1844,16 @@ int FileBuffer::unmapfile()
 	return 0;
 }
 
-bool check_file_exist(string filename, bool /*start_async_load*/)
+bool path_exists(const string& path)
+{
+	struct stat_os st;
+	return stat_os(path.c_str(), &st) == 0;
+}
+
+int verify_file_exist(string filename)
 {
 	string_ex fn;
-	fn += remove_quota(filename);
+	fn += strip_quotes(filename);
 	string_ex path;
 	if (!fn.empty() && fn[0] != MAGIC_PATH)
 	{
@@ -1857,7 +1870,13 @@ bool check_file_exist(string filename, bool /*start_async_load*/)
 
 	if (path.empty())
 		path += "./";
-	return g_fs_data.exist(path);
+
+	bool exists = g_fs_data.exist(path);
+	if (!exists)
+	{
+		return set_last_err_string("File not found: " + filename);
+	}
+	return 0;
 }
 
 #ifdef WIN32

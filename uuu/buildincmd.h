@@ -36,34 +36,31 @@
 #include <string>
 #include <vector>
 
-extern const char * g_vt_boldwhite;
-extern const char * g_vt_default;
-extern const char * g_vt_kcyn;
-extern const char * g_vt_green;
-extern const char * g_vt_red ;
-extern const char * g_vt_yellow;
-
 /**
- * @brief Structure to hold the raw data of a built-in script
+ * @brief Script definition data
  */
-struct BuiltInScriptRawData
+struct BuiltInScriptRawData final
 {
-	//! The name of the built-in script
+	//! Script name
 	const char * const m_name = nullptr;
-	//! The actual built-in script itself
+	//! Script content
 	const char * const m_text = nullptr;
-	//! A description of the built-in script's purpose
+	//! Script description/documentation
 	const char * const m_desc = nullptr;
 };
 
-class BuiltInScript
+/**
+ * @brief Parameterized script
+ * @note
+ * Is mostly for built-in scripts, but is also used for custom scripts sometimes.
+ */
+class BuiltInScript final
 {
 public:
 	/**
-	 * @brief A class for representing arguments of built-in scripts represented
-	 * by BuiltInScript
+	 * @brief Defines a formal argument to a script
 	 */
-	class Arg
+	class Arg final
 	{
 	public:
 		enum
@@ -75,14 +72,14 @@ public:
 
 		void parser(const std::string &option);
 
-		//! The name of the argument
+		//! Argument name
 		std::string m_name;
-		//! A description of the argument
+		//! Argument description/documentation
 		std::string m_desc;
-		//! Flags of the argument (basically if it's optional or not)
+		//! Flags (basically if it's optional or not)
 		uint32_t m_flags = ARG_MUST;
-		//! The argument whose value this one will fall back to if it's optional
-		//! and not given explicitly
+		//! Argument whose value this one defaults to if this is optional
+		//! and not specified
 		std::string m_fallback_option;
 	};
 
@@ -93,13 +90,13 @@ public:
 	void show() const;
 	void show_cmd() const;
 
-	//! The actual script which is being represented
+	//! Script content
 	const std::string m_text;
-	//! A description of the script's purpose
+	//! Script description/documentation
 	const std::string m_desc;
-	//! A short name of the built-in script
+	//! Script name
 	const std::string m_name;
-	//! The arguments of the built-in script
+	//! Arguments
 	std::vector<Arg> m_args;
 
 private:
@@ -107,19 +104,16 @@ private:
 };
 
 /**
- * @brief A map of all built-in scripts indexed by their names
- *
- * Each built-in script is represented by a BuiltInScript instance.
+ * @brief Script catalog; indexed by name
  */
-class BuiltInScriptMap : public std::map<std::string, BuiltInScript>
+class BuiltInScriptMap final : public std::map<std::string, BuiltInScript>
 {
 public:
-	BuiltInScriptMap(const BuiltInScriptRawData*p);
-
-	void PrintAutoComplete(const std::string &match, const char *space = " ") const;
-	void ShowAll() const;
-	void ShowCmds(FILE * file=stdout) const;
+	BuiltInScriptMap(const BuiltInScriptRawData *p);
+	bool add_from_file(const std::string& path);
+	void print_auto_complete(const std::string &match, const char *space = " ") const;
+	void print_usage() const;
+	std::string get_names() const;
 };
 
-//! A map of the built-in scripts' names to their BuiltInScript representations
-extern BuiltInScriptMap g_BuildScripts;
+extern BuiltInScriptMap g_ScriptCatalog;

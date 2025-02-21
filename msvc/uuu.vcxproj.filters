@@ -29,5 +29,14 @@
     <ClInclude Include="..\uuu\buildincmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\uuu\logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\uuu\VtEmulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\uuu\progress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

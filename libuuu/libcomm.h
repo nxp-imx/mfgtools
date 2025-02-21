@@ -121,7 +121,7 @@ inline string str_to_upper(const string &str)
 	return s;
 }
 
-inline string remove_quota(string str)
+inline string strip_quotes(string str)
 {
 	if (!str.empty())
 	{
