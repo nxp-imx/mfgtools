@@ -5,6 +5,7 @@
 #include "../libuuu/string_man.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include <iomanip>
 #include <iostream>

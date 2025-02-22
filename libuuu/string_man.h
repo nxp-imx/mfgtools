@@ -4,7 +4,7 @@
 
 #include <stdarg.h>
 
-//#include <algorithm>
+#include <algorithm>
 //#include <cctype>
 #include <locale>
 #include <string>

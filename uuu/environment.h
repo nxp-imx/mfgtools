@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <conio.h>
 #else
+#include <string.h>
 #include <termios.h>
 #include <unistd.h>
 #endif
@@ -47,7 +48,7 @@ namespace environment {
 		tty.c_lflag &= ~ECHO;
 		tcsetattr(STDIN_FILENO, TCSANOW, &tty);
 
-		string pd;
+		std::string pd;
 		getline(std::cin, pd);
 
 		tcsetattr(STDIN_FILENO, TCSANOW, &old);

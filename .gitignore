@@ -17,3 +17,4 @@ node_modules
 build
 bin/
 Docs/
+.vscode
