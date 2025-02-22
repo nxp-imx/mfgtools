@@ -43,7 +43,7 @@
 #include <time.h>
 #include <string.h>
 #include <signal.h>
-#include "Script.h"
+#include "ScriptCatalog.h"
 
 #include "../libuuu/libuuu.h"
 

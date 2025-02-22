@@ -4,6 +4,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <algorithm> 
+#include <cctype>
 #include <locale>
 #include <string>
 
@@ -11,6 +13,7 @@ namespace string_man {
 
 	/**
 	 * @brief Formats like printf with output to std::string and minimal size allocation
+	 * @param[out] text Output text
 	 */
 	inline void format(std::string s, const char* fmt, ...)
 	{
@@ -28,7 +31,7 @@ namespace string_man {
 
 	/**
 	 * @brief Replaces each occurance of a substring
-	 * @param text Input text
+	 * @param[in,out] text Input/output text
 	 * @param from Substring to replace
 	 * @param to Text to replace found substring with
 	 * @return Reference to text (supports chaining)
@@ -46,11 +49,28 @@ namespace string_man {
 	}
 
 	/**
-	 * @brief Returns the input text as uppercase
-	 * @param text Input text
-	 * @return Uppercase text
-	 */
-	static std::string toupper(const std::string& text)
+	* @brief Replaces each lowercase letter with uppercase
+	* @param[in,out] text Input/output text
+	* @return Uppercase text
+	* @return Reference to text (supports chaining)
+	*/
+	inline std::string& uppercase(std::string text)
+	{
+		const std::locale loc;
+		for (size_t i = 0; i < text.size(); ++i)
+		{
+			text.push_back(std::toupper(text[i], loc));
+		}
+		return text;
+	}
+
+	/**
+	* @brief Returns a copy of the input with lowercase letters replaced with uppercase
+	* @param[in] text Input text
+	* @return Uppercase text
+	* @return Result text
+	*/
+	inline std::string uppercase_copy(const std::string& text)
 	{
 		const std::locale loc;
 		std::string upper;
@@ -64,4 +84,71 @@ namespace string_man {
 		return upper;
 	}
 
+	/**
+	 * @brief Removes whitespace from the beginning 
+	 * @param[in,out] text Input/output text
+	 * @return Reference to text (supports chaining)
+	 */
+	inline std::string& left_trim(std::string& s) {
+		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+			return !std::isspace(ch);
+			}));
+		return s;
+	}
+
+	/**
+	 * @brief Removes whitespace from the end
+	 * @param[in,out] text Input/output text
+	 * @return Reference to text (supports chaining)
+	 */
+	inline std::string& right_trim(std::string& s) {
+		s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+			return !std::isspace(ch);
+			}).base(), s.end());
+		return s;
+	}
+
+	/**
+	 * @brief Removes whitespace from both ends
+	 * @param[in,out] text Input/output text
+	 * @return Reference to text (supports chaining)
+	 */
+	inline std::string& trim(std::string& s) {
+		right_trim(s);
+		left_trim(s);
+		return s;
+	}
+
+	/**
+	 * @brief Returns the input string but with whitespace removed from the beginning
+	 * @param[in] text Input text
+	 * @return Result text
+	 */
+	inline std::string left_trim_copy(const std::string& s) {
+		std::string copy(s);
+		left_trim(copy);
+		return copy;
+	}
+
+	/**
+	 * @brief Returns the input string but with whitespace removed from the end
+	 * @param[in] text Input text
+	 * @return Result text
+	 */
+	inline std::string right_trim_copy(const std::string& s) {
+		std::string copy(s);
+		right_trim(copy);
+		return copy;
+	}
+
+	/**
+	 * @brief Returns the input string but with whitespace removed from both ends
+	 * @param[in] text Input text
+	 * @return Result text
+	 */
+	inline std::string trim_copy(const std::string& s) {
+		std::string copy(s);
+		trim(copy);
+		return copy;
+	}
 }

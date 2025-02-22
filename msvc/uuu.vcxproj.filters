@@ -18,9 +18,6 @@
     <ClCompile Include="..\uuu\uuu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\uuu\Script.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\uuu\autocomplete.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\uuu\environment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\uuu\ScriptCatalog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

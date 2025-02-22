@@ -31,7 +31,7 @@
 
 #include "environment.h"
 #include "logger.h"
-#include "Script.h"
+#include "ScriptCatalog.h"
 #include "TransferFeedback.h"
 
 #include "../libuuu/string_man.h"
@@ -121,7 +121,8 @@ static void print_cli_help()
 		"\n"
 		"Special modes:\n"
 		"uuu -ls-devices\tList connected devices\n"
-		"uuu -ls-builtin\tList built-in scripts\n"
+		"uuu -ls-builtin [BUILTIN]\n"
+		"    \t\tList built-in script; all if none specified\n"
 		"uuu -cat-builtin BUILTIN\n"
 		"    \t\tOutput built-in script\n"
 		"uuu -s\t\tInteractive (shell) mode; records commands in uuu.inputlog\n"
@@ -143,9 +144,50 @@ static void print_syntax_error(const string& message) {
 	logger.log_info("Hint: see help output from 'uuu -h'");
 }
 
-static void print_script_catalog() {
-	printf("\nBuilt-in scripts:\n");
-	g_ScriptCatalog.print_usage();
+/**
+ * @brief Writes the name, description and arguments to stdout
+ */
+static void print_definition(const Script& script)
+{
+	std::string id_highlight = g_vt->green;
+	std::string key_highlight = g_vt->kcyn;
+	std::string no_highlight = g_vt->default_fg;
+	std::cout << id_highlight << script.name << g_vt->default_fg << ": " << script.desc << std::endl;
+	for (auto& arg : script.args)
+	{
+		std::string desc = id_highlight + arg.name + no_highlight;
+		if (!arg.default_value_arg_name.empty())
+		{
+			desc += " " +
+				key_highlight + "[default=" +
+				id_highlight + arg.default_value_arg_name +
+				key_highlight + "]" +
+				no_highlight;
+		}
+		std::cout << "\t" << desc << ": " << arg.desc << std::endl;
+	}
+}
+
+static void print_script_catalog(const std::string& script_name) {
+	auto& items = g_ScriptCatalog.get_items();
+	if (script_name.empty())
+	{
+		std::cout << std::endl << "Built-in scripts:" << std::endl;
+		for (const auto& item : items)
+		{
+			print_definition(item.second);
+		}
+	}
+	else
+	{
+		auto item = items.find(script_name);
+		if (item == items.end())
+		{
+			logger.log_error("Unknown script: " + script_name);
+			exit(EXIT_FAILURE);
+		}
+		print_definition(item->second);
+	}
 }
 
 static void print_protocol_help() {
@@ -199,6 +241,17 @@ static int print_udev_rule(const char * /*pro*/, const char * /*chip*/, const ch
 	printf("SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"%04x\", ATTRS{idProduct}==\"%04x\", TAG+=\"uaccess\"\n",
 			vid, pid);
 	return EXIT_SUCCESS;
+}
+
+static void print_udev_info()
+{
+	uuu_for_each_cfg(print_udev_rule, NULL);
+
+	cerr << endl <<
+		"Enable udev rules via:" << endl <<
+		"\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"" << endl <<
+		"\tsudo udevadm control --reload" << endl <<
+		"Note: These instructions output to standard error so are excluded" << endl << endl;
 }
 
 static void print_usb_filter()
@@ -270,15 +323,14 @@ static void proces_interactive_commands()
 	}
 }
 
-static void print_udev_info()
-{
-	uuu_for_each_cfg(print_udev_rule, NULL);
-
-	cerr << endl <<
-		"Enable udev rules via:" << endl <<
-		"\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"" << endl <<
-		"\tsudo udevadm control --reload" << endl <<
-		"Note: These instructions output to standard error so are excluded" << endl << endl;
+/**
+ * @brief Writes the content of a script to stdout
+ */
+static void print_content(const Script& script) {
+	std::string text = script.text;
+	while (text.size() > 0 && (text[0] == '\n' || text[0] == ' '))
+		text = text.erase(0, 1);
+	std::cout << text;
 }
 
 static int print_device_info(const char *path, const char *chip, const char *pro, uint16_t vid, uint16_t pid, uint16_t bcd, const char *serial_no, void * /*p*/)
@@ -295,6 +347,68 @@ static void print_device_list()
 
 	uuu_for_each_devices(print_device_info, NULL);
 }
+
+static constexpr ScriptConfig builtin_script_configs[] =
+{
+	{
+		"emmc",
+#include "emmc_burn_loader.clst"
+		,"burn boot loader to eMMC boot partition"
+	},
+	{
+		"emmc_all",
+#include "emmc_burn_all.clst"
+		,"burn whole image to eMMC"
+	},
+	{
+		"fat_write",
+#include "fat_write.clst"
+		,"update one file in fat partition, require uboot fastboot running in board"
+	},
+	{
+		"nand",
+#include "nand_burn_loader.clst"
+		,"burn boot loader to NAND flash"
+	},
+	{
+		"qspi",
+#include "qspi_burn_loader.clst"
+		,"burn boot loader to qspi nor flash"
+	},
+	{
+		"spi_nand",
+#include "fspinand_burn_loader.clst"
+		,"burn boot loader to spi nand flash"
+	},
+	{
+		"sd",
+#include "sd_burn_loader.clst"
+		,"burn boot loader to sd card"
+	},
+	{
+		"sd_all",
+#include "sd_burn_all.clst"
+		,"burn whole image to sd card"
+	},
+	{
+		"spl",
+#include "spl_boot.clst"
+		,"boot spl and uboot"
+	},
+	{
+		"nvme_all",
+#include "nvme_burn_all.clst"
+		,"burn whole image io nvme storage"
+	},
+	{
+		nullptr,
+		nullptr,
+		nullptr,
+	}
+};
+
+//! Script catalog global instance
+ScriptCatalog g_ScriptCatalog(builtin_script_configs);
 
 int main(int argc, char **argv)
 {
@@ -337,7 +451,7 @@ int main(int argc, char **argv)
 				print_syntax_error("Unknown built-in script '" + script_name + "'; options: " + g_ScriptCatalog.get_names());
 				return EXIT_FAILURE;
 			}
-			script->print_content();
+			print_content(*script);
 			return EXIT_SUCCESS;
 		}
 	}
@@ -414,7 +528,12 @@ int main(int argc, char **argv)
 			}
 			else if (arg == "-ls-builtin")
 			{
-				print_script_catalog();
+				std::string script_name;
+				if (++i < argc)
+				{
+					script_name = argv[i];
+				}
+				print_script_catalog(script_name);
 				return EXIT_SUCCESS;
 			}
 			else if (arg == "-m")

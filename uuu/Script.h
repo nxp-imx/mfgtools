@@ -31,8 +31,12 @@
 
 #pragma once
 
+#include "../libuuu/string_man.h"
+
 #include <fstream>
+#include <iostream>
 #include <map>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -42,11 +46,33 @@
 struct ScriptConfig final
 {
 	//! Script name
-	const char *m_name = nullptr;
+	const char *name = nullptr;
 	//! Script content
-	const char *m_text = nullptr;
+	const char *text = nullptr;
 	//! Script description/documentation
-	const char *m_desc = nullptr;
+	const char *desc = nullptr;
+};
+
+/**
+ * @brief Script argument definition
+ */
+class ScriptArg final
+{
+public:
+	const std::string name;
+
+	//! Argument description/documentation
+	const std::string desc;
+
+	//! Name of argument that has the default value if this is optional
+	//! and not explicitly specified; blank for no default value
+	const std::string default_value_arg_name;
+
+	ScriptArg(std::string name, std::string desc, std::string default_value_arg_name = "")
+		:
+		name(name), desc(desc), default_value_arg_name(default_value_arg_name)
+	{
+	}
 };
 
 /**
@@ -55,149 +81,161 @@ struct ScriptConfig final
 class Script final
 {
 	/**
-	 * @brief Argument definition
+	 * @brief Indicates whether the script has an argument specified by name
+	 * @param name Argument name
 	 */
-	class Arg final
+	bool has_arg(const std::string& name) const
 	{
-	public:
-		enum
-		{
-			//! Required
-			ARG_MUST = 0x1,
-			//! Optional; no default
-			ARG_OPTION = 0x2,
-			//! Optional with default from another argument
-			ARG_OPTION_KEY = 0x4,
-		};
-
-		void parser(const std::string& option);
-
-		//! Argument name
-		std::string m_name;
-		//! Argument description/documentation
-		std::string m_desc;
-		//! Optionality
-		uint32_t optionality = ARG_MUST;
-		//! Name of argument that has the default value if this is optional
-		//! and not explicitly specified
-		std::string m_default_argument_value_name;
-	};
-
-public:
-	Script(const ScriptConfig&);
-
-	std::string replace_arguments(const std::vector<std::string>& args) const;
-	void print_definition() const;
-	void print_content() const;
-
-	//! Script content
-	const std::string m_text;
-	//! Script description/documentation
-	const std::string m_desc;
-	//! Script name
-	const std::string m_name;
-	//! Arguments
-	std::vector<Arg> m_args;
-
-private:
-	bool has_arg(const std::string &arg) const;
-};
-
-/**
- * @brief Script catalog
- */
-class ScriptCatalog final
-{
-	std::map<std::string, Script> items;
-
-public:
-	/**
-	 * @brief Constructs from an array of config objects; terminated by an item with a null name
-	 * @param[in] config Pointer to the first object
-	 */
-	ScriptCatalog(const ScriptConfig configs[])
-	{
-		while (configs->m_name)
-		{
-			items.emplace(configs->m_name, *configs);
-			++configs;
-		}
+		return std::any_of(args.cbegin(), args.cend(),
+			[&name](const ScriptArg& arg) { return arg.name == name; });
 	}
 
-	/**
-	 * @brief Returns a pointer to the script specified by name or null if not found
-	 */
-	const Script* find(const std::string& name)
-	{
-		auto item = items.find(name);
-		return item == items.end() ? nullptr : &item->second;
-	}
-
-	/**
-	 * @brief Loads a file as a script; adding it to the catalog
-	 * @param path File system path
-	 * @return Pointer to the new script object or null if unable to load
-	 */
-	const Script* add_from_file(const std::string& path)
-	{
-		std::ifstream t(path);
-		std::string fileContents((std::istreambuf_iterator<char>(t)),
-			std::istreambuf_iterator<char>());
-
-		if (fileContents.empty()) {
-			return nullptr;
-		}
-
-		ScriptConfig script_definition{
-			path.c_str(),
-			fileContents.c_str(),
-			"Script loaded from file"
-		};
-
-		auto item = items.emplace(path, script_definition);
-		return &item.first->second;
-	}
-
-	/**
-	 * @brief Gets a string that lists each script name separated by comma
-	 */
-	std::string get_names() const
-	{
-		std::string text;
-		for (const auto& item : items)
+	void parse_arguments() {
+		static const std::regex arg_name_regexp{ R"####((@| )(_\S+))####" };
+		for (std::sregex_iterator i = std::sregex_iterator{ text.cbegin(), text.cend(), arg_name_regexp };
+			i != std::sregex_iterator{}; ++i)
 		{
-			text += item.first + ",";
-		}
-		text.pop_back();
-		return text;
-	}
-
-	/**
-	 * @brief Writes (to stdout) usage information about each script
-	 */
-	void print_usage() const
-	{
-		for (const auto& item : items)
-		{
-			item.second.print_definition();
-		}
-	}
-
-	/**
-	 * @brief Prints the name of each script that matches; for use with auto-complete
-	 * @param match Search text
-	 * @param space Text printed after each script name
-	 */
-	void print_auto_complete(const std::string& match, const char* space = " ") const
-	{
-		for (const auto& item : items)
-		{
-			if (item.first.substr(0, match.size()) == match)
+			const std::string arg_name{ i->str(2) };
+			if (!has_arg(arg_name))
 			{
-				printf("%s%s\n", item.first.c_str(), space);
+				std::string desc;
+				std::string default_argument_value_name;
+				const std::string name_spec = "@" + arg_name;
+				const auto name_spec_start = text.find(name_spec);
+				if (name_spec_start != std::string::npos) {
+					const auto desc_delim_start = text.find('|', name_spec_start);
+					if (desc_delim_start != std::string::npos)
+					{
+						desc = text.substr(
+							desc_delim_start + 1,
+							text.find('\n', desc_delim_start) - desc_delim_start - 1);
+						string_man::trim(desc);
+						const std::string middle_part{ text.substr(name_spec_start, desc_delim_start - name_spec_start) };
+						const auto pos = middle_part.find('[');
+						if (pos != std::string::npos)
+						{
+							default_argument_value_name = middle_part.substr(pos + 1, middle_part.find(']') - pos - 1);
+						}
+					}
+				}
+
+				ScriptArg arg(arg_name, desc, default_argument_value_name);
+				args.emplace_back(std::move(arg));
 			}
 		}
 	}
-};
 
-extern ScriptCatalog g_ScriptCatalog;
+	/**
+	 * @brief Replaces matching substrings plus unknown logic related to file extensions
+	 * @param[in,out] text Input/output string
+	 * @param[in] match Substring to be replaced
+	 * @param[in,out] replace Text to substitute for match; oddly, this is modified
+	 * @return Modified input string object
+	 */
+	static std::string replace_str(std::string text, const std::string& match, std::string replace)
+	{
+		// conform replace text
+		{
+			std::string s5, s4;
+			std::string extensions[] = { ".BZ2", ".ZST" };
+			if (replace.size() > 4)
+			{
+				if (replace[replace.size() - 1] == '\"')
+				{
+					s5 = string_man::uppercase_copy(replace.substr(replace.size() - 5));
+					for (std::string it : extensions)
+					{
+						if (s5 == it)
+						{
+							replace = replace.substr(0, replace.size() - 1);
+							replace += "/*\"";
+						}
+					}
+				}
+				else
+				{
+					s4 = string_man::uppercase_copy(replace.substr(replace.size() - 4));
+					for (std::string it : extensions)
+					{
+						if (it == s4)
+						{
+							replace += "/*";
+						}
+					}
+				}
+			}
+		}
+
+		for (size_t j = 0; (j = text.find(match, j)) != std::string::npos;)
+		{
+			if (j == 0 || (j != 0 && text[j - 1] == ' '))
+				text.replace(j, match.size(), replace);
+			j += match.size();
+		}
+
+		return text;
+	}
+
+public:
+	/**
+	 * @brief Constructs from a config object; caches the config and parses argument definitions from the text
+	 * @param config Configuation; name and desc can be null/empty, but text cannot
+	 */
+	Script(const ScriptConfig& config) :
+		name{ config.name ? config.name : "" },
+		desc{ config.desc ? config.desc : "" },
+		text{ config.text }
+	{
+		parse_arguments();
+	}
+
+	/**
+	 * @brief Returns a copy of the script content with argument references replaced with values
+	 * @param values Argument values; ordered per the arguments of the script definition
+	 * @return Script text after replacement
+	 * @details
+	 * Ignores values in excess of defined argument count.
+	 * For arguments indexed beyond the last value, if it is configured for replacement with the
+	 * value of another argument (ARG_OPTION_KEY), the other argument occurs _before_ the target
+	 * argument in the script definition, and the argument has a value in values, then argument
+	 * references are replaced with the value of the other argument.
+	 */
+	std::string replace_arguments(const std::vector<std::string>& values) const
+	{
+		std::string text = text;
+		for (size_t i = 0; i < values.size() && i < args.size(); i++)
+		{
+			auto& arg = args[i];
+			text = replace_str(text, arg.name, values[i]);
+		}
+
+		// handle optional args
+		for (size_t i = values.size(); i < args.size(); i++)
+		{
+			auto& arg = args[i];
+			if (!arg.default_value_arg_name.empty())
+			{
+				for (size_t j = 0; j < values.size(); j++)
+				{
+					if (args[j].name == arg.default_value_arg_name)
+					{
+						text = replace_str(text, arg.name, values[j]);
+						break;
+					}
+				}
+			}
+		}
+
+		return text;
+	}
+
+	const std::string name;
+
+	//! Description/documentation
+	const std::string desc;
+
+	//! Content
+	const std::string text;
+
+	std::vector<ScriptArg> args;
+};
