@@ -12,36 +12,45 @@
  */
 class Logger final
 {
-public:
-	bool is_color_output_enabled = false;
-
-	void log_error(const std::string& message) const
+	void log(const std::string& label, const std::string& message, const std::string& color) const
 	{
 		if (is_color_output_enabled)
 		{
-			std::cerr << g_vt->red << "Error: " << g_vt->default_fg << message << std::endl;
+			std::cerr << color << label << ": " << g_vt->default_fg << message << std::endl;
 		}
 		else
 		{
-			std::cerr << "Error: " << message << std::endl;
+			std::cerr << label << ": " << message << std::endl;
 		}
+	}
+
+public:
+	bool is_color_output_enabled = false;
+
+	bool is_verbose_enabled()
+	{
+		extern int g_verbose;
+		return g_verbose;
 	}
 
 	void log_internal_error(const std::string& message) const
 	{
-		if (is_color_output_enabled)
-		{
-			std::cerr << g_vt->red << "INTERNAL ERROR: " << g_vt->default_fg << message << std::endl;
-		}
-		else
-		{
-			std::cerr << "Error: " << message << std::endl;
-		}
+		log("INTERNAL ERROR", message, g_vt->red);
+	}
+
+	void log_error(const std::string& message) const
+	{
+		log("Error", message, g_vt->red);
+	}
+
+	void log_warning(const std::string& message) const
+	{
+		log("Warning", message, g_vt->yellow);
 	}
 
 	void log_info(const std::string& message) const
 	{
-		std::cout << message << std::endl;
+		log("Info", message, g_vt->green);
 	}
 
 	void log_verbose(const std::string& message) const
@@ -49,7 +58,9 @@ public:
 		extern int g_verbose;
 		if (g_verbose)
 		{
-			std::cout << "Verbose: " << message << std::endl;
+			log("Verbose", message, g_vt->kcyn);
 		}
 	}
 };
+
+extern Logger g_logger;

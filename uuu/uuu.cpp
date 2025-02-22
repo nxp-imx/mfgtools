@@ -57,8 +57,8 @@ int g_verbose = 0;
 bmap_mode g_bmap_mode = bmap_mode::Default;
 std::shared_ptr<VtEmulation> g_vt = std::make_shared<PlatformVtEmulation>();
 TransferContext g_transfer_context;
+Logger g_logger;
 
-static Logger logger;
 static TransferFeedback transfer_feedback;
 static char sample_cmd_list[] = {
 #include "uuu.clst"
@@ -140,8 +140,8 @@ static void print_cli_help()
 }
 
 static void print_syntax_error(const string& message) {
-	logger.log_error(message);
-	logger.log_info("Hint: see help output from 'uuu -h'");
+	g_logger.log_error(message);
+	g_logger.log_info("Hint: see help output from 'uuu -h'");
 }
 
 /**
@@ -183,7 +183,7 @@ static void print_script_catalog(const std::string& script_name) {
 		auto item = items.find(script_name);
 		if (item == items.end())
 		{
-			logger.log_error("Unknown script: " + script_name);
+			g_logger.log_error("Unknown script: " + script_name);
 			exit(EXIT_FAILURE);
 		}
 		print_definition(item->second);
@@ -410,6 +410,45 @@ static constexpr ScriptConfig builtin_script_configs[] =
 //! Script catalog global instance
 ScriptCatalog g_ScriptCatalog(builtin_script_configs);
 
+static std::string load_script_text(const std::string& script_spec, const vector<string>& args, std::string& script_name_feedback)
+{
+	script_name_feedback = script_spec;
+	const Script* script = g_ScriptCatalog.find(script_spec);
+	if (!script) {
+		script_name_feedback += " (custom)";
+		script = g_ScriptCatalog.add_from_file(script_spec);
+		if (!script)
+		{
+			g_logger.log_error("Unable to load script from file: " + script_spec);
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		script_name_feedback += " (built-in)";
+	}
+
+	if (args.size() > script->args.size())
+	{
+		g_logger.log_error("Too many parameters for script: " + args[script->args.size()]);
+		exit(EXIT_FAILURE);
+	}
+
+	std::string text = script->replace_arguments(args);
+
+	if (g_verbose)
+	{
+		g_logger.log_verbose("<script>");
+		std::string copy(text);
+		string_man::trim(copy);
+		string_man::replace(copy, "\n", "\n\t");
+		std::cout << "\t" << copy << std::endl;
+		g_logger.log_verbose("</script>");
+	}
+
+	return text;
+}
+
 int main(int argc, char **argv)
 {
 	// commented out since causes failure when pass script file name/path as first arg plus -v after
@@ -418,7 +457,7 @@ int main(int argc, char **argv)
 	std::unique_ptr<AutoCursor> auto_cursor;
 	if (g_vt->enable())
 	{
-		logger.is_color_output_enabled = true;
+		g_logger.is_color_output_enabled = true;
 		auto_cursor = std::make_unique<AutoCursor>();
 	}
 	else
@@ -591,7 +630,7 @@ int main(int argc, char **argv)
 			#ifdef _WIN32
 			else if (arg == "-IgSerNum")
 			{
-				return set_ignore_serial_number();
+				return environment::set_ignore_serial_number();
 			}
 			#endif
 			else if (arg == "-bmap")
@@ -610,9 +649,9 @@ int main(int argc, char **argv)
 					return EXIT_FAILURE;
 				}
 				string key_and_value = argv[i];
-				if (os_putenv(key_and_value.c_str()))
+				if (environment_putenv(key_and_value.c_str()))
 				{
-					logger.log_error("Failed to set environment variable with expression '" + key_and_value + "'. Hint: parameter must have the form: key=value");
+					g_logger.log_error("Failed to set environment variable with expression '" + key_and_value + "'. Hint: parameter must have the form: key=value");
 					return EXIT_FAILURE;
 				}
 				return EXIT_SUCCESS;
@@ -625,41 +664,13 @@ int main(int argc, char **argv)
 					return EXIT_FAILURE;
 				}
 
-				string script_spec = argv[i];
 				vector<string> args;
 				for (int j = i + 1; j < argc; j++)
 				{
-					string s = argv[j];
-					if (s.find(' ') != string::npos)
-					{
-						s.insert(s.begin(), '"');
-						s.insert(s.end(), '"');
-					}
-					args.push_back(s);
+					args.push_back(argv[j]);
 				}
 
-				script_name_feedback = script_spec;
-				const Script *script = g_ScriptCatalog.find(script_spec);
-				if (!script) {
-					script_name_feedback += " (custom)";
-					script = g_ScriptCatalog.add_from_file(script_spec);
-					if (!script)
-					{
-						logger.log_error("Unable to load script from file: " + script_spec);
-						return EXIT_FAILURE;
-					}
-				}
-				else
-				{
-					script_name_feedback += " (built-in)";
-				}
-				script_text = script->replace_arguments(args);
-				if (g_verbose)
-				{
-					std::cout << "<script>" << std::endl;
-					std::cout << script_text << std::endl;
-					std::cout << "</script>" << std::endl;
-				}
+				script_text = load_script_text(argv[i], args, script_name_feedback);
 				break;
 			}
 			else
@@ -701,19 +712,19 @@ int main(int argc, char **argv)
 
 	if (deamon && shell)
 	{
-		logger.log_error("Incompatible options: deamon (-d) and shell (-s)");
+		g_logger.log_error("Incompatible options: deamon (-d) and shell (-s)");
 		return EXIT_FAILURE;
 	}
 
 	if (deamon && dryrun)
 	{
-		logger.log_error("Incompatible options: deamon (-d) and dry-run (-dry)");
+		g_logger.log_error("Incompatible options: deamon (-d) and dry-run (-dry)");
 		return EXIT_FAILURE;
 	}
 
 	if (shell && dryrun)
 	{
-		logger.log_error("Incompatible options: shell (-s) and dry-run (-dry)");
+		g_logger.log_error("Incompatible options: shell (-s) and dry-run (-dry)");
 		return EXIT_FAILURE;
 	}
 
@@ -742,7 +753,7 @@ int main(int argc, char **argv)
 
 	signal(SIGINT, interrupt);
 
-	uuu_set_askpasswd(ask_passwd);
+	uuu_set_askpasswd(environment::ask_passwd);
 	transfer_feedback.enable();
 
 	if (shell)
@@ -752,7 +763,7 @@ int main(int argc, char **argv)
 	}
 	else if (!protocol_cmd.empty())
 	{
-		logger.log_verbose("Executing single command: " + protocol_cmd);
+		g_logger.log_verbose("Executing single command: " + protocol_cmd);
 		int ret = uuu_run_cmd(protocol_cmd.c_str(), dryrun);
 
 		// what is the purpose of printing blank lines? Don't know about success, but on error, there are several blank lines on screen
@@ -761,11 +772,11 @@ int main(int argc, char **argv)
 
 		if (ret)
 		{
-			logger.log_error(uuu_get_last_err_string());
+			g_logger.log_error(uuu_get_last_err_string());
 			return EXIT_FAILURE;
 		}
 
-		logger.log_info("Command succeeded :)");
+		g_logger.log_info("Command succeeded :)");
 
 		if (shell) proces_interactive_commands();
 
@@ -775,41 +786,43 @@ int main(int argc, char **argv)
 	{
 		if (script_name_feedback.empty())
 		{
-			logger.log_internal_error("Expected non-empty script_spec");
+			g_logger.log_internal_error("Expected non-empty script_spec");
 			return EXIT_FAILURE;
 		}
-		logger.log_verbose("Running script: " + script_name_feedback);
+		g_logger.log_verbose("Running script: " + script_name_feedback);
 		if (uuu_run_cmd_script(script_text.c_str(), dryrun))
 		{
-			logger.log_error(uuu_get_last_err_string());
+			g_logger.log_error(uuu_get_last_err_string());
 			return EXIT_FAILURE;
 		}
 	}
 	else if (!input_path.empty())
 	{
-		logger.log_verbose("Running as auto detect file: " + input_path);
+		g_logger.log_verbose("Running as auto detect file: " + input_path);
 		if (uuu_auto_detect_file(input_path.c_str()))
 		{
-			logger.log_error(uuu_get_last_err_string());
+			g_logger.log_error(uuu_get_last_err_string());
 			return EXIT_FAILURE;
 		}
 	}
 	else
 	{
-		logger.log_info("??");
+		g_logger.log_info("??");
 	}
 
 	if (uuu_wait_uuu_finish(deamon, dryrun))
 	{
-		logger.log_error(uuu_get_last_err_string());
+		g_logger.log_error(uuu_get_last_err_string());
 		return EXIT_FAILURE;
 	}
 
 	// wait for the thread exit, after send out CMD_DONE
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-	// move cursor below status area
+	// move cursor below status area; [why 3?]
 	if(!g_verbose) printf("\n\n\n");
 
-	return g_transfer_context.overall_status; // why return this value??
+	g_logger.log_info(g_transfer_context.overall_status == 0 ? "Success :)" : "Failed :(");
+
+	return g_transfer_context.overall_status; // [why return this value??]
 }

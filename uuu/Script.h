@@ -31,9 +31,10 @@
 
 #pragma once
 
+#include "logger.h"
+
 #include "../libuuu/string_man.h"
 
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <regex>
@@ -128,48 +129,57 @@ class Script final
 	/**
 	 * @brief Replaces matching sub-strings plus unknown logic related to file extensions
 	 * @param[in,out] text Input/output string
-	 * @param[in] match Substring to be replaced
-	 * @param[in,out] replace Text to substitute for match; oddly, this is modified
+	 * @param[in] arg_name Substring to be replaced
+	 * @param[in,out] arg_value Text to substitute for match; oddly, this is modified
 	 */
-	static void replace_arg(std::string& text, const std::string& match, std::string replace)
+	static void replace_arg(std::string& text, const std::string& arg_name, std::string arg_value)
 	{
 		// conform replace text
 		{
-			std::string s5, s4;
 			std::string extensions[] = { ".BZ2", ".ZST" };
-			if (replace.size() > 4)
+			if (arg_value.size() > 4)
 			{
-				if (replace[replace.size() - 1] == '\"')
+				if (arg_value[arg_value.size() - 1] == '\"')
 				{
-					s5 = string_man::uppercase_copy(replace.substr(replace.size() - 5));
-					for (std::string it : extensions)
+					std::string s5 = arg_value.substr(arg_value.size() - 5);
+					string_man::uppercase(s5);
+					for (auto& ext : extensions)
 					{
-						if (s5 == it)
+						if (s5 == ext)
 						{
-							replace = replace.substr(0, replace.size() - 1);
-							replace += "/*\"";
+							arg_value = arg_value.substr(0, arg_value.size() - 1);
+							arg_value += "/*\"";
 						}
 					}
 				}
 				else
 				{
-					s4 = string_man::uppercase_copy(replace.substr(replace.size() - 4));
-					for (std::string it : extensions)
+					std::string s4 = arg_value.substr(arg_value.size() - 4);
+					string_man::uppercase(s4);
+					for (auto& ext : extensions)
 					{
-						if (it == s4)
+						if (ext == s4)
 						{
-							replace += "/*";
+							arg_value += "/*";
 						}
 					}
 				}
 			}
 		}
 
-		for (size_t j = 0; (j = text.find(match, j)) != std::string::npos;)
+		if (arg_value.find(' ') != std::string::npos)
+		{
+			arg_value.insert(arg_value.begin(), '"');
+			arg_value.insert(arg_value.end(), '"');
+		}
+
+		g_logger.log_verbose("Replacing script parameter '" + arg_name + "' with value '" + arg_value + "'");
+
+		for (size_t j = 0; (j = text.find(arg_name, j)) != std::string::npos;)
 		{
 			if (j == 0 || (j != 0 && text[j - 1] == ' '))
-				text.replace(j, match.size(), replace);
-			j += match.size();
+				text.replace(j, arg_name.size(), arg_value);
+			j += arg_name.size();
 		}
 	}
 
@@ -202,7 +212,14 @@ public:
 		std::string text = this->text;
 		for (size_t i = 0; i < values.size() && i < args.size(); i++)
 		{
-			replace_arg(text, args[i].name, values[i]);
+			const std::string before_text = text;
+			const std::string arg_name = args[i].name;
+			const std::string arg_value = values[i];
+			replace_arg(text, arg_name, arg_value);
+			if (text == before_text)
+			{
+				g_logger.log_warning("Argument '" + arg_name + "' not found/replaced in the script text");
+			}
 		}
 
 		// handle optional args

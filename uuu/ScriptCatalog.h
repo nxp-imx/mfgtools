@@ -33,6 +33,7 @@
 
 #include "Script.h"
 
+#include <fstream>
 #include <map>
 
 /**
