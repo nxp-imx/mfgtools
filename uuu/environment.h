@@ -96,9 +96,9 @@ namespace environment {
 
 #else
 
-	static int putenv(char const* spec)
+	static int set_environment_variable(const std::string& name, const std::string& value)
 	{
-		return ::putenv(spec);
+		return ::setenv(name.c_str(), value.c_str(), true);
 	}
 
 #endif
