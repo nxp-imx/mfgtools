@@ -1,5 +1,6 @@
 
 #pragma once
+//! @file
 
 #include "../libuuu/libuuu.h"
 #include "../libuuu/string_man.h"

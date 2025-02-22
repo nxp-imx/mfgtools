@@ -28,10 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
-
 #pragma once
+//! @file
 
-#include "logger.h"
+#include "Logger.h"
 
 #include "../libuuu/string_man.h"
 

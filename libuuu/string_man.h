@@ -1,5 +1,6 @@
 
 #pragma once
+//! @file
 
 #include <stdarg.h>
 

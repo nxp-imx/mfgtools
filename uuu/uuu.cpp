@@ -28,9 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
+//! @file
 
 #include "environment.h"
-#include "logger.h"
+#include "Logger.h"
 #include "ScriptCatalog.h"
 #include "TransferFeedback.h"
 
