@@ -18,7 +18,7 @@
     <ClCompile Include="..\uuu\uuu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\uuu\buildincmd.cpp">
+    <ClCompile Include="..\uuu\Script.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\uuu\autocomplete.cpp">
@@ -26,7 +26,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\uuu\buildincmd.h">
+    <ClInclude Include="..\uuu\Script.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\uuu\logger.h">
@@ -35,7 +35,10 @@
     <ClInclude Include="..\uuu\VtEmulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\uuu\progress.h">
+    <ClInclude Include="..\uuu\TransferFeedback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\uuu\environment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

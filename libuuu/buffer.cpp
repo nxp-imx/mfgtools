@@ -1230,7 +1230,7 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 		else
 			filename = g_current_dir + filename;
 	}
-	replace(filename, "\\", "/");
+	string_man::replace(filename, "\\", "/");
 
 	bool found;
 	{

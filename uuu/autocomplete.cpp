@@ -43,7 +43,7 @@
 #include <time.h>
 #include <string.h>
 #include <signal.h>
-#include "buildincmd.h"
+#include "Script.h"
 
 #include "../libuuu/libuuu.h"
 
@@ -158,7 +158,7 @@ void power_shell_autocomplete(const char *p)
 		if (prev == "-b")
 			cur = last;
 
-		if (g_ScriptCatalog.find(cur) == g_ScriptCatalog.end())
+		if (g_ScriptCatalog.find(cur))
 			g_ScriptCatalog.print_auto_complete(cur, "");
 
 		last.clear();

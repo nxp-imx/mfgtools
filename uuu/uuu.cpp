@@ -29,9 +29,10 @@
 *
 */
 
-#include "buildincmd.h"
+#include "environment.h"
 #include "logger.h"
-#include "progress.h"
+#include "Script.h"
+#include "TransferFeedback.h"
 
 #include "../libuuu/string_man.h"
 
@@ -55,8 +56,10 @@ using namespace std;
 int g_verbose = 0;
 bmap_mode g_bmap_mode = bmap_mode::Default;
 std::shared_ptr<VtEmulation> g_vt = std::make_shared<PlatformVtEmulation>();
+TransferContext g_transfer_context;
 
 static Logger logger;
+static TransferFeedback transfer_feedback;
 static char sample_cmd_list[] = {
 #include "uuu.clst"
 };
@@ -77,56 +80,6 @@ static void interrupt(int)
 	printf("INTERRUPTED\n");
 
 	exit(1);
-}
-
-#ifdef _WIN32
-#include <conio.h>
-#else
-#include <termios.h>
-#include <unistd.h>
-#endif
-
-static int ask_passwd(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN])
-{
-	cout << endl << prompt << " Required Login"<<endl;
-	cout << "Username:";
-	cin.getline(user, 128);
-	cout << "Password:";
-	int i = 0;
-
-#ifdef _WIN32
-	while ((passwd[i] = _getch()) != '\r') {
-		if (passwd[i] == '\b') {
-			if (i != 0) {
-				cout << "\b \b";
-				i--;
-			}
-		}
-		else {
-			cout << '*';
-			i++;
-		}
-	}
-#else
-	struct termios old, tty;
-	tcgetattr(STDIN_FILENO, &tty);
-	old = tty;
-	tty.c_lflag &= ~ECHO;
-	tcsetattr(STDIN_FILENO, TCSANOW, &tty);
-
-	string pd;
-	getline(cin, pd);
-
-	tcsetattr(STDIN_FILENO, TCSANOW, &old);
-	if(pd.size() > MAX_USER_LEN -1)
-		return EXIT_FAILURE;
-	memcpy(passwd, pd.data(), pd.size());
-	i=pd.size();
-
-#endif
-	passwd[i] = 0;
-	cout << endl;
-	return EXIT_SUCCESS;
 }
 
 static void print_app_title()
@@ -182,12 +135,12 @@ static void print_cli_help()
 		"uuu -h-auto-complete\n"
 		"    \t\tOutput auto/tab completion help info\n";
 
-	cout << endl << replace(text, "[BUILTIN_NAMES]", g_ScriptCatalog.get_names());
+	cout << endl << string_man::replace(text, "[BUILTIN_NAMES]", g_ScriptCatalog.get_names());
 }
 
 static void print_syntax_error(const string& message) {
 	logger.log_error(message);
-	print_cli_help();
+	logger.log_info("Hint: see help output from 'uuu -h'");
 }
 
 static void print_script_catalog() {
@@ -250,11 +203,11 @@ static int print_udev_rule(const char * /*pro*/, const char * /*chip*/, const ch
 
 static void print_usb_filter()
 {
-	if (!usb_path_filter.empty())
+	if (!g_transfer_context.usb_path_filter.empty())
 	{
 		cout << " at path ";
-		for (size_t i = 0; i < usb_path_filter.size(); i++)
-			cout << usb_path_filter[i] << " ";
+		for (size_t i = 0; i < g_transfer_context.usb_path_filter.size(); i++)
+			cout << g_transfer_context.usb_path_filter[i] << " ";
 	}
 }
 
@@ -343,57 +296,6 @@ static void print_device_list()
 	uuu_for_each_devices(print_device_info, NULL);
 }
 
-#ifdef WIN32
-
-static int ignore_serial_number(const char *pro, const char *chip, const char */*comp*/, uint16_t vid, uint16_t pid, uint16_t /*bcdlow*/, uint16_t /*bcdhigh*/, void */*p*/)
-{
-	printf("\t %s\t %s\t 0x%04X\t0x%04X\n", chip, pro, vid, pid);
-
-	char sub[128];
-	snprintf(sub, 128, "IgnoreHWSerNum%04x%04x", vid, pid);
-	const BYTE value = 1;
-
-	LSTATUS ret = RegSetKeyValueA(HKEY_LOCAL_MACHINE,
-								  "SYSTEM\\CurrentControlSet\\Control\\UsbFlags",
-									sub, REG_BINARY, &value, 1);
-	if(ret == ERROR_SUCCESS)
-		return EXIT_SUCCESS;
-
-	printf("Set key failure, try run as administrator permission\n");
-	return EXIT_FAILURE;
-}
-
-static int set_ignore_serial_number()
-{
-	printf("Modifying registry to ignore serial number for finding devices...\n");
-	return uuu_for_each_cfg(ignore_serial_number, NULL);
-}
-
-#define os_putenv _putenv
-
-#else
-
-#define os_putenv putenv
-
-#endif
-
-static int set_environment_variable(const string& key_and_value)
-{
-	if (os_putenv(key_and_value.c_str()))
-	{
-		logger.log_error("Failed to set environment variable with expression '" + key_and_value + "'. Hint: parameter must have the form: key=value");
-		return EXIT_FAILURE;
-	}
-	return EXIT_SUCCESS;
-}
-
-static void print_script(const BuiltInScript& script) {
-	string text = script.m_text;
-	while (text.size() > 0 && (text[0] == '\n' || text[0] == ' '))
-		text = text.erase(0, 1);
-	cout << text;
-}
-
 int main(int argc, char **argv)
 {
 	// commented out since causes failure when pass script file name/path as first arg plus -v after
@@ -429,13 +331,13 @@ int main(int argc, char **argv)
 				return EXIT_FAILURE;
 			}
 			string script_name = argv[2];
-			auto item = g_ScriptCatalog.find(script_name);
-			if (item == g_ScriptCatalog.end())
+			const Script *script = g_ScriptCatalog.find(script_name);
+			if (!script)
 			{
 				print_syntax_error("Unknown built-in script '" + script_name + "'; options: " + g_ScriptCatalog.get_names());
 				return EXIT_FAILURE;
 			}
-			print_script(item->second);
+			script->print_content();
 			return EXIT_SUCCESS;
 		}
 	}
@@ -444,7 +346,7 @@ int main(int argc, char **argv)
 
 	if (argc == 1)
 	{
-		print_syntax_error("Missing arguments");
+		print_cli_help();
 		return EXIT_FAILURE;
 	}
 
@@ -453,7 +355,7 @@ int main(int argc, char **argv)
 	int dryrun = 0;
 	string input_path;
 	string protocol_cmd;
-	string script_spec;
+	string script_name_feedback;
 	string script_text;
 
 	for (int i = 1; i < argc; i++)
@@ -523,7 +425,7 @@ int main(int argc, char **argv)
 					return EXIT_FAILURE;
 				}
 				uuu_add_usbpath_filter(argv[i]);
-				usb_path_filter.push_back(argv[i]);
+				g_transfer_context.usb_path_filter.push_back(argv[i]);
 			}
 			else if (arg == "-ms")
 			{
@@ -533,7 +435,7 @@ int main(int argc, char **argv)
 					return EXIT_FAILURE;
 				}
 				uuu_add_usbserial_no_filter(argv[i]);
-				usb_serial_no_filter.push_back(argv[i]);
+				g_transfer_context.usb_serial_no_filter.push_back(argv[i]);
 			}
 			else if (arg == "-t")
 			{
@@ -567,7 +469,7 @@ int main(int argc, char **argv)
 				print_device_list();
 				return EXIT_SUCCESS;
 			}
-			#ifdef WIN32
+			#ifdef _WIN32
 			else if (arg == "-IgSerNum")
 			{
 				return set_ignore_serial_number();
@@ -588,7 +490,13 @@ int main(int argc, char **argv)
 					print_syntax_error("Missing key=value argument");
 					return EXIT_FAILURE;
 				}
-				return set_environment_variable(argv[i]);
+				string key_and_value = argv[i];
+				if (os_putenv(key_and_value.c_str()))
+				{
+					logger.log_error("Failed to set environment variable with expression '" + key_and_value + "'. Hint: parameter must have the form: key=value");
+					return EXIT_FAILURE;
+				}
+				return EXIT_SUCCESS;
 			}
 			else if (arg == "-b" || arg == "-brun")
 			{
@@ -610,22 +518,23 @@ int main(int argc, char **argv)
 					args.push_back(s);
 				}
 
-				string name = argv[i];
-				auto script = g_ScriptCatalog.find(name);
-				if (script == g_ScriptCatalog.end()) {
-					script_spec = "(custom)";
-					if (!g_ScriptCatalog.add_from_file(name))
+				string script_spec = argv[i];
+				const Script *script = g_ScriptCatalog.find(script_spec);
+				if (!script) {
+					script_name_feedback = "(custom)";
+					script = g_ScriptCatalog.add_from_file(script_spec);
+					if (!script)
 					{
-						logger.log_error("Unable to load script from file: " + name);
+						logger.log_error("Unable to load script from file: " + script_spec);
 						return EXIT_FAILURE;
 					}
 				}
 				else
 				{
-					script_spec = "(built-in)";
+					script_name_feedback = "(built-in)";
 				}
-				script_spec += name;
-				script_text = g_ScriptCatalog[name].replace_script_args(args);
+				script_name_feedback += script_spec;
+				script_text = script->replace_arguments(args);
 				break;
 			}
 			else
@@ -709,8 +618,7 @@ int main(int argc, char **argv)
 	signal(SIGINT, interrupt);
 
 	uuu_set_askpasswd(ask_passwd);
-	map<uint64_t, ShowNotify> nt_session;
-	uuu_register_notify_callback(update_progress, &nt_session);
+	transfer_feedback.enable();
 
 	if (shell)
 	{
@@ -723,7 +631,7 @@ int main(int argc, char **argv)
 		int ret = uuu_run_cmd(protocol_cmd.c_str(), dryrun);
 
 		// what is the purpose of printing blank lines? Don't know about success, but on error, there are several blank lines on screen
-		for (size_t i = 0; i < g_map_path_nt.size()+3; i++)
+		for (size_t i = 0; i < g_transfer_context.map_path_nt.size()+3; i++)
 			printf("\n");
 
 		if (ret)
@@ -740,12 +648,12 @@ int main(int argc, char **argv)
 	}
 	else if (!script_text.empty())
 	{
-		if (script_spec.empty())
+		if (script_name_feedback.empty())
 		{
 			logger.log_internal_error("Expected non-empty script_spec");
 			return EXIT_FAILURE;
 		}
-		logger.log_verbose("Running command script: " + script_spec);
+		logger.log_verbose("Running command script: " + script_name_feedback);
 		if (uuu_run_cmd_script(script_text.c_str(), dryrun))
 		{
 			logger.log_error(uuu_get_last_err_string());
@@ -774,5 +682,5 @@ int main(int argc, char **argv)
 	// move cursor below status area
 	if(!g_verbose) printf("\n\n\n");
 
-	return g_overall_status; // why return this value??
+	return g_transfer_context.overall_status; // why return this value??
 }

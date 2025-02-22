@@ -1099,7 +1099,7 @@ int parser_cmd_list_file(shared_ptr<DataBuffer> pbuff, CmdMap *pCmdMap)
 int uuu_auto_detect_file(const char *path)
 {
 	string fn = strip_quotes(path);
-	replace(fn, "\\", "/");
+	string_man::replace(fn, "\\", "/");
 	if (fn.empty())
 		fn += "./";
 	const string clean_input_path = fn;
