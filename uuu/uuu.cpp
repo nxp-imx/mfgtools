@@ -650,7 +650,7 @@ int main(int argc, char **argv)
 					return EXIT_FAILURE;
 				}
 				string key_and_value = argv[i];
-				if (environment_putenv(key_and_value.c_str()))
+				if (environment::putenv(key_and_value.c_str()))
 				{
 					g_logger.log_error("Failed to set environment variable with expression '" + key_and_value + "'. Hint: parameter must have the form: key=value");
 					return EXIT_FAILURE;

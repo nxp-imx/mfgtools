@@ -88,11 +88,17 @@ namespace environment {
 		return uuu_for_each_cfg(ignore_serial_number, NULL);
 	}
 
-#define environment_putenv _putenv
+	static int putenv(char const* spec)
+	{
+		return ::_putenv(spec);
+	}
 
 #else
 
-#define environment_putenv putenv
+	static int putenv(char const* spec)
+	{
+		return ::putenv(spec);
+	}
 
 #endif
 
