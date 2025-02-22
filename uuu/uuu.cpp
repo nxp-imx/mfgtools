@@ -649,13 +649,21 @@ int main(int argc, char **argv)
 					print_syntax_error("Missing key=value argument");
 					return EXIT_FAILURE;
 				}
-				string key_and_value = argv[i];
-				if (environment::putenv(key_and_value.c_str()))
+				string spec = argv[i];
+				size_t equal_pos = spec.find("=");
+				if (equal_pos == std::string::npos)
 				{
-					g_logger.log_error("Failed to set environment variable with expression '" + key_and_value + "'. Hint: parameter must have the form: key=value");
+					g_logger.log_error("Invalid input '" + spec + "'; must be formatted as: key=value");
 					return EXIT_FAILURE;
 				}
-				return EXIT_SUCCESS;
+				std::string name = spec.substr(0, equal_pos);
+				std::string value = spec.substr(equal_pos + 1);
+				if (environment::set_environment_variable(name, value))
+				{
+					g_logger.log_error("Failed to set environment variable with expression '" + spec + "'");
+					return EXIT_FAILURE;
+				}
+				g_logger.log_verbose("Set environment variable '" + name + "' to '" + value + "'");
 			}
 			else if (arg == "-b" || arg == "-brun")
 			{

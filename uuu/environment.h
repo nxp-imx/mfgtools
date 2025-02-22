@@ -89,9 +89,9 @@ namespace environment {
 		return uuu_for_each_cfg(ignore_serial_number, NULL);
 	}
 
-	static int putenv(char const* spec)
+	static int set_environment_variable(const std::string& name, const std::string& value)
 	{
-		return ::_putenv(spec);
+		return ::SetEnvironmentVariableA(name.c_str(), value.c_str()) ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
 
 #else
