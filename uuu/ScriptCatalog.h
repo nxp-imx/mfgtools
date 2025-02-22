@@ -1,6 +1,5 @@
-//! @file
-
 #pragma once
+//! @file
 
 #include "Script.h"
 
