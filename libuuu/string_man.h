@@ -15,17 +15,17 @@ namespace string_man {
 	 * @brief Formats like printf with output to std::string and minimal size allocation
 	 * @param[out] text Output text
 	 */
-	inline void format(std::string s, const char* fmt, ...)
+	inline void format(std::string& text, const char* fmt, ...)
 	{
 		va_list args;
 		va_start(args, fmt);
 		size_t len = std::vsnprintf(NULL, 0, fmt, args);
 		va_end(args);
 
-		s.resize(len);
+		text.resize(len);
 
 		va_start(args, fmt);
-		std::vsnprintf((char*)s.c_str(), len + 1, fmt, args);
+		std::vsnprintf((char*)text.c_str(), len + 1, fmt, args);
 		va_end(args);
 	}
 
@@ -54,7 +54,7 @@ namespace string_man {
 	* @return Uppercase text
 	* @return Reference to text (supports chaining)
 	*/
-	inline std::string& uppercase(std::string text)
+	inline std::string& uppercase(std::string& text)
 	{
 		const std::locale loc;
 		for (size_t i = 0; i < text.size(); ++i)

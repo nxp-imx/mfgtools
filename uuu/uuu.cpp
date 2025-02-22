@@ -625,8 +625,9 @@ int main(int argc, char **argv)
 					return EXIT_FAILURE;
 				}
 
+				string script_spec = argv[i];
 				vector<string> args;
-				for (int j = i + 2; j < argc; j++)
+				for (int j = i + 1; j < argc; j++)
 				{
 					string s = argv[j];
 					if (s.find(' ') != string::npos)
@@ -637,10 +638,10 @@ int main(int argc, char **argv)
 					args.push_back(s);
 				}
 
-				string script_spec = argv[i];
+				script_name_feedback = script_spec;
 				const Script *script = g_ScriptCatalog.find(script_spec);
 				if (!script) {
-					script_name_feedback = "(custom)";
+					script_name_feedback += " (custom)";
 					script = g_ScriptCatalog.add_from_file(script_spec);
 					if (!script)
 					{
@@ -650,10 +651,15 @@ int main(int argc, char **argv)
 				}
 				else
 				{
-					script_name_feedback = "(built-in)";
+					script_name_feedback += " (built-in)";
 				}
-				script_name_feedback += script_spec;
 				script_text = script->replace_arguments(args);
+				if (g_verbose)
+				{
+					std::cout << "<script>" << std::endl;
+					std::cout << script_text << std::endl;
+					std::cout << "</script>" << std::endl;
+				}
 				break;
 			}
 			else
@@ -772,7 +778,7 @@ int main(int argc, char **argv)
 			logger.log_internal_error("Expected non-empty script_spec");
 			return EXIT_FAILURE;
 		}
-		logger.log_verbose("Running command script: " + script_name_feedback);
+		logger.log_verbose("Running script: " + script_name_feedback);
 		if (uuu_run_cmd_script(script_text.c_str(), dryrun))
 		{
 			logger.log_error(uuu_get_last_err_string());
@@ -787,6 +793,10 @@ int main(int argc, char **argv)
 			logger.log_error(uuu_get_last_err_string());
 			return EXIT_FAILURE;
 		}
+	}
+	else
+	{
+		logger.log_info("??");
 	}
 
 	if (uuu_wait_uuu_finish(deamon, dryrun))

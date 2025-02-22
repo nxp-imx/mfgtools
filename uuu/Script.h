@@ -126,13 +126,12 @@ class Script final
 	}
 
 	/**
-	 * @brief Replaces matching substrings plus unknown logic related to file extensions
+	 * @brief Replaces matching sub-strings plus unknown logic related to file extensions
 	 * @param[in,out] text Input/output string
 	 * @param[in] match Substring to be replaced
 	 * @param[in,out] replace Text to substitute for match; oddly, this is modified
-	 * @return Modified input string object
 	 */
-	static std::string replace_str(std::string text, const std::string& match, std::string replace)
+	static void replace_arg(std::string& text, const std::string& match, std::string replace)
 	{
 		// conform replace text
 		{
@@ -172,8 +171,6 @@ class Script final
 				text.replace(j, match.size(), replace);
 			j += match.size();
 		}
-
-		return text;
 	}
 
 public:
@@ -202,11 +199,10 @@ public:
 	 */
 	std::string replace_arguments(const std::vector<std::string>& values) const
 	{
-		std::string text = text;
+		std::string text = this->text;
 		for (size_t i = 0; i < values.size() && i < args.size(); i++)
 		{
-			auto& arg = args[i];
-			text = replace_str(text, arg.name, values[i]);
+			replace_arg(text, args[i].name, values[i]);
 		}
 
 		// handle optional args
@@ -219,7 +215,7 @@ public:
 				{
 					if (args[j].name == arg.default_value_arg_name)
 					{
-						text = replace_str(text, arg.name, values[j]);
+						replace_arg(text, arg.name, values[j]);
 						break;
 					}
 				}
