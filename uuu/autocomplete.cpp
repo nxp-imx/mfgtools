@@ -168,6 +168,9 @@ int auto_complete(int argc, char**argv)
 {
 #ifndef _WIN32
 
+	// disabled since incorrectly does auto-complete for: uuu f.uuu foo
+	return 1;
+
 	if (argc == 4 || argc == 3)
 	{
 		string str = argv[1];
