@@ -83,9 +83,14 @@ static void interrupt(int)
 	exit(1);
 }
 
+/**
+ * @brief Prints application title
+ * @details
+ * Writes to stderr so that redirected standard output does not include this.
+ */
 static void print_app_title()
 {
-	printf("Universal Update Utility for NXP i.MX chips -- %s\n", uuu_get_version_string());
+	std::cerr << "Universal Update Utility for NXP i.MX chips -- " << uuu_get_version_string() << std::endl;
 }
 
 static void print_cli_help()
@@ -434,6 +439,8 @@ int main(int argc, char **argv)
 {
 	if (auto_complete(argc, argv) == 0) return EXIT_SUCCESS;
 
+	print_app_title();
+
 	std::unique_ptr<AutoCursor> auto_cursor;
 	if (g_vt->enable())
 	{
@@ -442,41 +449,10 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		g_logger.log_warning("Console doesn't support VT mode; enabling verbose feedback");
-
-		// [why enable verbose in this case?]
-		g_verbose = 1;
+		// note: if re-direct output to a file, then output never supports color.
+		// There may be other ways color is not supported.
+		g_logger.log_warning("Output does not support color");
 	}
-
-	// handle modes that should _not_ print the app title
-	if (argc >= 2)
-	{
-		string arg = argv[1];
-		if(arg == "-udev")
-		{
-			print_udev_info();
-			return EXIT_SUCCESS;
-		}
-		if (arg == "-cat-builtin")
-		{
-			if (2 == argc)
-			{
-				print_syntax_error("Missing built-in script name; options: " + g_ScriptCatalog.get_names());
-				return EXIT_FAILURE;
-			}
-			string script_name = argv[2];
-			const Script *script = g_ScriptCatalog.find(script_name);
-			if (!script)
-			{
-				print_syntax_error("Unknown built-in script '" + script_name + "'; options: " + g_ScriptCatalog.get_names());
-				return EXIT_FAILURE;
-			}
-			print_content(*script);
-			return EXIT_SUCCESS;
-		}
-	}
-
-	print_app_title();
 
 	if (argc == 1)
 	{
@@ -497,7 +473,76 @@ int main(int argc, char **argv)
 		string arg = argv[i];
 		if (!arg.empty() && arg[0] == '-')
 		{
-			if (arg == "-d")
+			if (arg == "-b" || arg == "-brun")
+			{
+				if (++i >= argc)
+				{
+					print_syntax_error("Missing path or built-in script name");
+					return EXIT_FAILURE;
+				}
+
+				vector<string> args;
+				for (int j = i + 1; j < argc; j++)
+				{
+					args.push_back(argv[j]);
+				}
+
+				script_text = load_script_text(argv[i], args, script_name_feedback);
+				break;
+			}
+			else if (arg == "-h")
+			{
+				print_cli_help();
+				return EXIT_SUCCESS;
+			}
+			else if (arg == "-h-auto-complete")
+			{
+				print_autocomplete_help();
+				return EXIT_SUCCESS;
+			}
+			else if (arg == "-h-protocol-commands")
+			{
+				print_protocol_help();
+				return EXIT_SUCCESS;
+			}
+			else if (arg == "-h-protocol-support")
+			{
+				print_protocol_support_info();
+				return EXIT_SUCCESS;
+			}
+			else if (arg == "-ls-devices")
+			{
+				print_device_list();
+				return EXIT_SUCCESS;
+			}
+			else if (arg == "-ls-builtin")
+			{
+				std::string script_name;
+				if (++i < argc)
+				{
+					script_name = argv[i];
+				}
+				print_script_catalog(script_name);
+				return EXIT_SUCCESS;
+			}
+			else if (arg == "-cat-builtin")
+			{
+				if (2 == argc)
+				{
+					print_syntax_error("Missing built-in script name; options: " + g_ScriptCatalog.get_names());
+					return EXIT_FAILURE;
+				}
+				string script_name = argv[2];
+				const Script* script = g_ScriptCatalog.find(script_name);
+				if (!script)
+				{
+					print_syntax_error("Unknown built-in script '" + script_name + "'; options: " + g_ScriptCatalog.get_names());
+					return EXIT_FAILURE;
+				}
+				print_content(*script);
+				return EXIT_SUCCESS;
+			}
+			else if (arg == "-d")
 			{
 				deamon = 1;
 				uuu_set_small_mem(0);
@@ -520,41 +565,12 @@ int main(int argc, char **argv)
 			{
 				g_verbose = 1;
 				uuu_set_debug_level(2);
-			}else if (arg == "-dry")
+			}
+			else if (arg == "-dry")
 			{
 				dryrun = 1;
 				// why is verbose set for dry-run? 
 				g_verbose = 1;
-			}
-			else if (arg == "-h")
-			{
-				print_cli_help();
-				return EXIT_SUCCESS;
-			}
-			else if (arg == "-h-auto-complete")
-			{
-				print_autocomplete_help();
-				return EXIT_SUCCESS;
-			}
-			else if (arg == "-h-protocol-commands")
-			{
-				print_protocol_help();
-				return EXIT_SUCCESS;
-			}
-			else if (arg == "-h-protocol-support")
-			{
-				print_protocol_support_info();
-				return EXIT_SUCCESS;
-			}
-			else if (arg == "-ls-builtin")
-			{
-				std::string script_name;
-				if (++i < argc)
-				{
-					script_name = argv[i];
-				}
-				print_script_catalog(script_name);
-				return EXIT_SUCCESS;
 			}
 			else if (arg == "-m")
 			{
@@ -603,17 +619,6 @@ int main(int argc, char **argv)
 				}
 				uuu_set_poll_period(atol(argv[i]));
 			}
-			else if (arg == "-ls-devices")
-			{
-				print_device_list();
-				return EXIT_SUCCESS;
-			}
-			#ifdef _WIN32
-			else if (arg == "-IgSerNum")
-			{
-				return environment::set_ignore_serial_number();
-			}
-			#endif
 			else if (arg == "-bmap")
 			{
 				g_bmap_mode = bmap_mode::Force;
@@ -645,23 +650,18 @@ int main(int argc, char **argv)
 				}
 				g_logger.log_verbose("Set environment variable '" + name + "' to '" + value + "'");
 			}
-			else if (arg == "-b" || arg == "-brun")
+#ifdef _WIN32
+			else if (arg == "-IgSerNum")
 			{
-				if (++i >= argc)
-				{
-					print_syntax_error("Missing path or built-in script name");
-					return EXIT_FAILURE;
-				}
-
-				vector<string> args;
-				for (int j = i + 1; j < argc; j++)
-				{
-					args.push_back(argv[j]);
-				}
-
-				script_text = load_script_text(argv[i], args, script_name_feedback);
-				break;
+				return environment::set_ignore_serial_number();
 			}
+#else
+			else if (arg == "-udev")
+			{
+				print_udev_info();
+				return EXIT_SUCCESS;
+			}
+#endif
 			else
 			{
 				print_syntax_error("Unknown option: " + arg);
