@@ -435,16 +435,15 @@ static std::string load_script_text(const std::string& script_spec, const vector
 		exit(EXIT_FAILURE);
 	}
 
-	std::string text = script->replace_arguments(args);
+	const std::string text = script->replace_arguments(args);
 
 	if (g_verbose)
 	{
-		g_logger.log_verbose("<script>");
-		std::string copy(text);
-		string_man::trim(copy);
-		string_man::replace(copy, "\n", "\n\t");
-		std::cout << "\t" << copy << std::endl;
-		g_logger.log_verbose("</script>");
+		std::string message(text);
+		string_man::trim(message);
+		string_man::replace(message, "\n", "\n\t");
+		message = "Script with parameters replaced with values:\n\t" + message;
+		g_logger.log_verbose(message);
 	}
 
 	return text;
