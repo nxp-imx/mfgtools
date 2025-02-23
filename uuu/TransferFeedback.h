@@ -143,7 +143,7 @@ class TransferNotifyItem
 		}
 		if (nt.type == uuu_notify::NOTIFY_CMD_END)
 		{
-			double diff = m_cmd_end_time - m_cmd_start_time;
+			double diff = (double)(m_cmd_end_time - m_cmd_start_time);
 			diff /= 1000;
 			if (nt.status)
 			{

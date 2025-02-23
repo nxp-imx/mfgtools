@@ -603,7 +603,7 @@ int main(int argc, char **argv)
 					print_syntax_error("Missing seconds argument");
 					return EXIT_FAILURE;
 				}
-				uuu_set_wait_timeout(atoll(argv[i]));
+				uuu_set_wait_timeout(atol(argv[i]));
 			}
 			else if (arg == "-T")
 			{
@@ -612,7 +612,7 @@ int main(int argc, char **argv)
 					print_syntax_error("Missing seconds argument");
 					return EXIT_FAILURE;
 				}
-				uuu_set_wait_next_timeout(atoll(argv[i]));
+				uuu_set_wait_next_timeout(atol(argv[i]));
 			}
 			else if (arg == "-pp")
 			{
@@ -621,7 +621,7 @@ int main(int argc, char **argv)
 					print_syntax_error("Missing milliseconds argument");
 					return EXIT_FAILURE;
 				}
-				uuu_set_poll_period(atoll(argv[i]));
+				uuu_set_poll_period(atol(argv[i]));
 			}
 			else if (arg == "-ls-devices")
 			{
