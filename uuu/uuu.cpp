@@ -95,8 +95,8 @@ static void print_cli_help()
 		"uuu [OPTION...] SPEC|CMD|BOOTLOADER\n"
 		"    SPEC\tSpecifies a script to run without parameters; use -b for parameters;\n"
 		"    \t\tFor a directory, use contained uuu.auto at root;\n"
-		"    \t\tFor a zip file, expand, then use uuu.auto at root of expanded content\n"
-		"    CMD\t\tRun a command; see -H for details\n"
+		"    \t\tFor a zip file, use uuu.auto at root of content\n"
+		"    CMD\t\tRun a command; see -h-protocol-commands\n"
 		"    \t\tExample: SDPS: boot -f flash.bin\n"
 		"    BOOTLOADER\tBoot device from bootloader image file\n"
 		"    -d\t\tProduction (daemon) mode\n"
@@ -252,7 +252,7 @@ static void print_udev_info()
 		"Enable udev rules via:" << endl <<
 		"\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"" << endl <<
 		"\tsudo udevadm control --reload" << endl <<
-		"Note: These instructions output to standard error so are excluded" << endl << endl;
+		"Note: These instructions output to standard error so are excluded from redirected standard output" << endl << endl;
 }
 
 static void print_usb_filter()
@@ -451,7 +451,7 @@ static std::string load_script_text(const std::string& script_spec, const vector
 
 int main(int argc, char **argv)
 {
-	// commented out since causes failure when pass script file name/path as first arg plus -v after
+	// commented out since causes failure when pass script (that ends with 'uuu'?) file name/path as first arg plus -v after
 	//if (auto_complete(argc, argv) == 0) return EXIT_SUCCESS;
 
 	std::unique_ptr<AutoCursor> auto_cursor;
@@ -815,7 +815,8 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		g_logger.log_info("??");
+		g_logger.log_error("No operation");
+		return EXIT_FAILURE;
 	}
 
 	if (uuu_wait_uuu_finish(deamon, dryrun))
