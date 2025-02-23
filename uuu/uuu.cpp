@@ -470,10 +470,11 @@ int main(int argc, char **argv)
 
 	for (int i = 1; i < argc; i++)
 	{
-		string arg = argv[i];
+		const string arg = argv[i];
 		if (!arg.empty() && arg[0] == '-')
 		{
-			if (arg == "-b" || arg == "-brun")
+			const string opt = arg.substr(1);
+			if (opt == "b" || opt == "brun")
 			{
 				if (++i >= argc)
 				{
@@ -490,32 +491,32 @@ int main(int argc, char **argv)
 				script_text = load_script_text(argv[i], args, script_name_feedback);
 				break;
 			}
-			else if (arg == "-h")
+			else if (opt == "h")
 			{
 				print_cli_help();
 				return EXIT_SUCCESS;
 			}
-			else if (arg == "-h-auto-complete")
+			else if (opt == "h-auto-complete")
 			{
 				print_autocomplete_help();
 				return EXIT_SUCCESS;
 			}
-			else if (arg == "-h-protocol-commands")
+			else if (opt == "h-protocol-commands")
 			{
 				print_protocol_help();
 				return EXIT_SUCCESS;
 			}
-			else if (arg == "-h-protocol-support")
+			else if (opt == "h-protocol-support")
 			{
 				print_protocol_support_info();
 				return EXIT_SUCCESS;
 			}
-			else if (arg == "-ls-devices")
+			else if (opt == "ls-devices")
 			{
 				print_device_list();
 				return EXIT_SUCCESS;
 			}
-			else if (arg == "-ls-builtin")
+			else if (opt == "ls-builtin")
 			{
 				std::string script_name;
 				if (++i < argc)
@@ -525,7 +526,7 @@ int main(int argc, char **argv)
 				print_script_catalog(script_name);
 				return EXIT_SUCCESS;
 			}
-			else if (arg == "-cat-builtin")
+			else if (opt == "cat-builtin")
 			{
 				if (2 == argc)
 				{
@@ -542,37 +543,37 @@ int main(int argc, char **argv)
 				print_content(*script);
 				return EXIT_SUCCESS;
 			}
-			else if (arg == "-d")
+			else if (opt == "d")
 			{
 				deamon = 1;
 				uuu_set_small_mem(0);
 			}
-			else if (arg == "-dm")
+			else if (opt == "dm")
 			{
 				uuu_set_small_mem(0);
 			}
-			else if (arg == "-s")
+			else if (opt == "s")
 			{
 				shell = 1;
 				// why set verbose for shell mode?
 				g_verbose = 1;
 			}
-			else if (arg == "-v")
+			else if (opt == "v")
 			{
 				g_verbose = 1;
 			}
-			else if (arg == "-V")
+			else if (opt == "V")
 			{
 				g_verbose = 1;
 				uuu_set_debug_level(2);
 			}
-			else if (arg == "-dry")
+			else if (opt == "dry")
 			{
 				dryrun = 1;
 				// why is verbose set for dry-run? 
 				g_verbose = 1;
 			}
-			else if (arg == "-m")
+			else if (opt == "m")
 			{
 				if (++i >= argc)
 				{
@@ -582,7 +583,7 @@ int main(int argc, char **argv)
 				uuu_add_usbpath_filter(argv[i]);
 				g_transfer_context.usb_path_filter.push_back(argv[i]);
 			}
-			else if (arg == "-ms")
+			else if (opt == "ms")
 			{
 				if (++i >= argc)
 				{
@@ -592,7 +593,7 @@ int main(int argc, char **argv)
 				uuu_add_usbserial_no_filter(argv[i]);
 				g_transfer_context.usb_serial_no_filter.push_back(argv[i]);
 			}
-			else if (arg == "-t")
+			else if (opt == "t")
 			{
 				if (++i >= argc)
 				{
@@ -601,7 +602,7 @@ int main(int argc, char **argv)
 				}
 				uuu_set_wait_timeout(atol(argv[i]));
 			}
-			else if (arg == "-T")
+			else if (opt == "T")
 			{
 				if (++i >= argc)
 				{
@@ -610,7 +611,7 @@ int main(int argc, char **argv)
 				}
 				uuu_set_wait_next_timeout(atol(argv[i]));
 			}
-			else if (arg == "-pp")
+			else if (opt == "pp")
 			{
 				if (++i >= argc)
 				{
@@ -619,15 +620,15 @@ int main(int argc, char **argv)
 				}
 				uuu_set_poll_period(atol(argv[i]));
 			}
-			else if (arg == "-bmap")
+			else if (opt == "bmap")
 			{
 				g_bmap_mode = bmap_mode::Force;
 			}
-			else if (arg == "-no-bmap")
+			else if (opt == "no-bmap")
 			{
 				g_bmap_mode = bmap_mode::Ignore;
 			}
-			else if (arg == "-e")
+			else if (opt == "e")
 			{
 				if (++i >= argc)
 				{
@@ -651,12 +652,12 @@ int main(int argc, char **argv)
 				g_logger.log_verbose("Set environment variable '" + name + "' to '" + value + "'");
 			}
 #ifdef _WIN32
-			else if (arg == "-IgSerNum")
+			else if (opt == "IgSerNum")
 			{
 				return environment::set_ignore_serial_number();
 			}
 #else
-			else if (arg == "-udev")
+			else if (opt == "udev")
 			{
 				print_udev_info();
 				return EXIT_SUCCESS;
@@ -674,13 +675,13 @@ int main(int argc, char **argv)
 
 			for (int j = i; j < argc; j++)
 			{
-				arg = argv[j];
-				if (arg.find(' ') != string::npos && arg[arg.size() - 1] != ':')
+				string cmd_arg = argv[j];
+				if (cmd_arg.find(' ') != string::npos && cmd_arg[cmd_arg.size() - 1] != ':')
 				{
-					arg.insert(arg.begin(), '"');
-					arg.insert(arg.end(), '"');
+					cmd_arg.insert(cmd_arg.begin(), '"');
+					cmd_arg.insert(cmd_arg.end(), '"');
 				}
-				protocol_cmd.append(arg);
+				protocol_cmd.append(cmd_arg);
 				if (j != (argc -1)) // don't add space after last arg
 					protocol_cmd.append(" ");
 			}
