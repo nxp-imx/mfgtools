@@ -53,7 +53,7 @@ extern TransferContext g_transfer_context;
 
 class TransferNotifyItem
 {
-	static constexpr char wait_chars[] = "|/-\\";
+	static constexpr const char* wait_chars = "|/-\\";
 	int wait_index;
 	int m_status = 0;
 	size_t m_cmd_total = 0;
