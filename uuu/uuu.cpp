@@ -442,8 +442,9 @@ int main(int argc, char **argv)
 	}
 	else
 	{
+		g_logger.log_warning("Console doesn't support VT mode; enabling verbose feedback");
+
 		// [why enable verbose in this case?]
-		cout << "Warning: Console doesn't support VT mode; enabling verbose feedback" << endl;
 		g_verbose = 1;
 	}
 
