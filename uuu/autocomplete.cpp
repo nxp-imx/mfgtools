@@ -29,23 +29,12 @@
 *
 */
 
-#include <iostream>
-#include <stdio.h>
-#include <thread>
-#include <atomic>
-#include <iomanip>
-#include <map>
-#include <mutex>
-#include <vector>
-#include <sstream>
-#include <fstream>
-#include <stdarg.h>
-#include <time.h>
-#include <string.h>
-#include <signal.h>
 #include "ScriptCatalog.h"
 
 #include "../libuuu/libuuu.h"
+
+#include <iostream>
+#include <string.h>
 
 #ifndef _MSC_VER
 #include <unistd.h>
@@ -56,7 +45,7 @@
 
 using namespace std;
 
-void linux_auto_arg(const char *space = " ", const char * filter = "")
+static void linux_auto_arg(const char *space = " ", const char * filter = "")
 {
 	string str = filter;
 
@@ -70,13 +59,13 @@ void linux_auto_arg(const char *space = " ", const char * filter = "")
 	}
 }
 
-int linux_autocomplete_ls(const char *path, void *p)
+static int linux_autocomplete_ls(const char *path, void *p)
 {
 	cout << path + 2 << endl;
 	return 0;
 }
 
-void linux_autocomplete(int argc, char **argv)
+static void linux_autocomplete(int argc, char **argv)
 {
 	string last;
 	string cur;
@@ -124,7 +113,7 @@ void linux_autocomplete(int argc, char **argv)
 	uuu_for_each_ls_file(linux_autocomplete_ls, cur.c_str(), NULL);
 }
 
-string get_next_word(string str, size_t &pos)
+static string get_next_word(string str, size_t &pos)
 {
 	size_t start = 0;
 	start = str.find(' ', pos);
@@ -133,7 +122,7 @@ string get_next_word(string str, size_t &pos)
 	return sub;
 }
 
-void power_shell_autocomplete(const char *p)
+static void power_shell_autocomplete(const char *p)
 {
 	string pstr = p;
 	size_t pos = 0;
@@ -177,6 +166,8 @@ void power_shell_autocomplete(const char *p)
 
 int auto_complete(int argc, char**argv)
 {
+#ifndef _WIN32
+
 	if (argc == 4 || argc == 3)
 	{
 		string str = argv[1];
@@ -188,15 +179,22 @@ int auto_complete(int argc, char**argv)
 			}
 	}
 
+#else
+
+	// disabled since crashes with runtime memory issues or something
+	return 1;
+
 	if (argc >= 2)
 	{
-		string str = argv[1];
-		if (str == "-autocomplete")
+		string arg = argv[1];
+		if (arg == "-autocomplete")
 		{
-			power_shell_autocomplete(argc == 2 ? "" : argv[2]);
+			power_shell_autocomplete(argc < 2 ? "" : argv[2]);
 			return 0;
 		}
 	}
+
+#endif
 
 	return 1;
 }
