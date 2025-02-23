@@ -13,7 +13,7 @@
  * @brief String manipulation functions
  * @details
  * Functions modify the input string and to support chaining return its reference.
- * Chaining example: uppercase(trim(s)).
+ * Chaining example: uppercase(trim(text)).
  */
 namespace string_man {
 
@@ -58,7 +58,7 @@ namespace string_man {
 	}
 
 	/**
-	* @brief Replaces each lowercase letter with uppercase
+	* @brief Replaces each uppercase letter with lowercase
 	* @param[in,out] text Input/output text
 	* @return Reference to text
 	*/
@@ -94,11 +94,11 @@ namespace string_man {
 	 * @param[in,out] text Input/output text
 	 * @return Reference to text
 	 */
-	inline std::string& left_trim(std::string& s) {
-		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+	inline std::string& left_trim(std::string& text) {
+		text.erase(text.begin(), std::find_if(text.begin(), text.end(), [](unsigned char ch) {
 			return !std::isspace(ch);
 			}));
-		return s;
+		return text;
 	}
 
 	/**
@@ -106,11 +106,11 @@ namespace string_man {
 	 * @param[in,out] text Input/output text
 	 * @return Reference to text
 	 */
-	inline std::string& right_trim(std::string& s) {
-		s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+	inline std::string& right_trim(std::string& text) {
+		text.erase(std::find_if(text.rbegin(), text.rend(), [](unsigned char ch) {
 			return !std::isspace(ch);
-			}).base(), s.end());
-		return s;
+			}).base(), text.end());
+		return text;
 	}
 
 	/**
@@ -118,9 +118,9 @@ namespace string_man {
 	 * @param[in,out] text Input/output text
 	 * @return Reference to text
 	 */
-	inline std::string& trim(std::string& s) {
-		right_trim(s);
-		left_trim(s);
-		return s;
+	inline std::string& trim(std::string& text) {
+		right_trim(text);
+		left_trim(text);
+		return text;
 	}
 }

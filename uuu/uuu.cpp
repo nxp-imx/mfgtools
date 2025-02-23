@@ -449,9 +449,9 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		// note: if re-direct output to a file, then output never supports color.
+		// note: if output is re-directed to a file, then output does not supports color.
 		// There may be other ways color is not supported.
-		g_logger.log_warning("Output does not support color");
+		g_logger.log_warning("Color output is not supported");
 	}
 
 	if (argc == 1)
