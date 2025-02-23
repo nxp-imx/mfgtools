@@ -61,7 +61,7 @@ TransferContext g_transfer_context;
 Logger g_logger;
 
 static TransferFeedback transfer_feedback;
-static char sample_cmd_list[] = {
+static const char command_help_text[] = {
 #include "uuu.clst"
 };
 
@@ -192,26 +192,7 @@ static void print_script_catalog(const std::string& script_name) {
 }
 
 static void print_protocol_help() {
-	size_t start = 0, pos = 0;
-	string str= sample_cmd_list;
-
-	bool bprint = false;
-	while ((pos = str.find('\n',pos)) != str.npos)
-	{
-		string s = str.substr(start, pos - start);
-		if (s.substr(0, 6) == "# ----")
-			bprint = true;
-
-		if (bprint)
-		{
-			if (s[0] == '#')
-			{
-				printf("%s\n", &(s[1]));
-			}
-		}
-		pos += 1;
-		start = pos;
-	}
+	std::cout << command_help_text << std::endl;
 }
 
 static int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, uint16_t vid, uint16_t pid, uint16_t bcdmin, uint16_t bcdmax, void * /*p*/)
@@ -452,7 +433,7 @@ static std::string load_script_text(const std::string& script_spec, const vector
 int main(int argc, char **argv)
 {
 	// commented out since causes failure when pass script (that ends with 'uuu'?) file name/path as first arg plus -v after
-	//if (auto_complete(argc, argv) == 0) return EXIT_SUCCESS;
+	if (auto_complete(argc, argv) == 0) return EXIT_SUCCESS;
 
 	std::unique_ptr<AutoCursor> auto_cursor;
 	if (g_vt->enable())
