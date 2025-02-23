@@ -52,8 +52,6 @@
 int auto_complete(int argc, char **argv);
 void print_autocomplete_help();
 
-using namespace std;
-
 int g_verbose = 0;
 bmap_mode g_bmap_mode = bmap_mode::Default;
 std::shared_ptr<VtEmulation> g_vt = std::make_shared<PlatformVtEmulation>();
@@ -80,11 +78,11 @@ static void interrupt(int)
 
 	printf("INTERRUPTED\n");
 
-	exit(1);
+	exit(EXIT_FAILURE);
 }
 
 /**
- * @brief Prints application title
+ * @brief Writes application name and version to stderr
  * @details
  * Writes to stderr so that redirected standard output does not include this.
  */
@@ -95,7 +93,7 @@ static void print_app_title()
 
 static void print_cli_help()
 {
-	string text =
+	std::string text =
 		"Default mode:\n"
 		"uuu [OPTION...] SPEC|CMD|BOOTLOADER\n"
 		"    SPEC\tSpecifies a script to run without parameters; use -b for parameters;\n"
@@ -142,10 +140,10 @@ static void print_cli_help()
 		"uuu -h-auto-complete\n"
 		"    \t\tOutput auto/tab completion help info\n";
 
-	cout << endl << string_man::replace(text, "[BUILTIN_NAMES]", g_ScriptCatalog.get_names());
+	std::cout << std::endl << string_man::replace(text, "[BUILTIN_NAMES]", g_ScriptCatalog.get_names());
 }
 
-static void print_syntax_error(const string& message) {
+static void print_syntax_error(const std::string& message) {
 	g_logger.log_error(message);
 	g_logger.log_info("Hint: see help output from 'uuu -h'");
 }
@@ -234,56 +232,56 @@ static void print_udev_info()
 {
 	uuu_for_each_cfg(print_udev_rule, NULL);
 
-	cerr << endl <<
-		"Enable udev rules via:" << endl <<
-		"\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"" << endl <<
-		"\tsudo udevadm control --reload" << endl <<
-		"Note: These instructions output to standard error so are excluded from redirected standard output" << endl << endl;
+	std::cerr << std::endl <<
+		"Enable udev rules via:" << std::endl <<
+		"\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"" << std::endl <<
+		"\tsudo udevadm control --reload" << std::endl <<
+		"Note: These instructions output to standard error so are excluded from redirected standard output" << std::endl << std::endl;
 }
 
 static void print_usb_filter()
 {
 	if (!g_transfer_context.usb_path_filter.empty())
 	{
-		cout << " at path ";
+		std::cout << " at path ";
 		for (size_t i = 0; i < g_transfer_context.usb_path_filter.size(); i++)
-			cout << g_transfer_context.usb_path_filter[i] << " ";
+			std::cout << g_transfer_context.usb_path_filter[i] << " ";
 	}
 }
 
 static void proces_interactive_commands()
 {
 	int uboot_cmd = 0;
-	string prompt = "U>";
+	std::string prompt = "U>";
 
-	cout << "Please input command: " << endl;
-	string cmd;
-	ofstream log("uuu.inputlog", ofstream::binary);
+	std::cout << "Please input command: " << std::endl;
+	std::string cmd;
+	std::ofstream log("uuu.inputlog", std::ofstream::binary);
 	log << "uuu_version "
 		<< ((uuu_get_version() & 0xFF000000) >> 24)
 		<< "."
 		<< ((uuu_get_version() & 0xFFF000) >> 12)
 		<< "."
 		<< ((uuu_get_version() & 0xFFF))
-		<< endl;
+		<< std::endl;
 	while (1)
 	{
-		cout << prompt;
-		getline(cin, cmd);
+		std::cout << prompt;
+		std::getline(std::cin, cmd);
 
 		if (cmd == "uboot")
 		{
 			uboot_cmd = 1;
 			prompt = "=>";
-			cout << "Enter into u-boot cmd mode" << endl;
-			cout << "Okay" << endl;
+			std::cout << "Enter into u-boot cmd mode" << std::endl;
+			std::cout << "Okay" << std::endl;
 		}
 		else if (cmd == "exit" && uboot_cmd == 1)
 		{
 			uboot_cmd = 0;
 			prompt = "U>";
-			cout << "Exit u-boot cmd mode" << endl;
-			cout << "Okay" << endl;
+			std::cout << "Exit u-boot cmd mode" << std::endl;
+			std::cout << "Okay" << std::endl;
 		}
 		else if (cmd == "help" || cmd == "?")
 		{
@@ -295,7 +293,7 @@ static void proces_interactive_commands()
 		}
 		else
 		{
-			log << cmd << endl;
+			log << cmd << std::endl;
 			log.flush();
 
 			if (uboot_cmd)
@@ -303,9 +301,9 @@ static void proces_interactive_commands()
 
 			int ret = uuu_run_cmd(cmd.c_str(), 0);
 			if (ret)
-				cout << uuu_get_last_err_string() << endl;
+				std::cout << uuu_get_last_err_string() << std::endl;
 			else
-				cout << "Okay" << endl;
+				std::cout << "Okay" << std::endl;
 		}
 	}
 }
@@ -328,7 +326,7 @@ static int print_device_info(const char *path, const char *chip, const char *pro
 
 static void print_device_list()
 {
-	cout << "Connected devices\n";
+	std::cout << "Connected devices\n";
 	printf("\tPath\t Chip\t Pro\t Vid\t Pid\t BcdVersion\t Serial_no\n");
 	printf("\t====================================================================\n");
 
@@ -397,7 +395,7 @@ static constexpr ScriptConfig builtin_script_configs[] =
 //! Script catalog global instance
 ScriptCatalog g_ScriptCatalog(builtin_script_configs);
 
-static std::string load_script_text(const std::string& script_spec, const vector<string>& args, std::string& script_name_feedback)
+static std::string load_script_text(const std::string& script_spec, const std::vector<std::string>& args, std::string& script_name_feedback)
 {
 	script_name_feedback = script_spec;
 	const Script* script = g_ScriptCatalog.find(script_spec);
@@ -463,17 +461,17 @@ int main(int argc, char **argv)
 	int deamon = 0;
 	int shell = 0;
 	int dryrun = 0;
-	string input_path;
-	string protocol_cmd;
-	string script_name_feedback;
-	string script_text;
+	std::string input_path;
+	std::string protocol_cmd;
+	std::string script_name_feedback;
+	std::string script_text;
 
 	for (int i = 1; i < argc; i++)
 	{
-		const string arg = argv[i];
+		const std::string arg = argv[i];
 		if (!arg.empty() && arg[0] == '-')
 		{
-			const string opt = arg.substr(1);
+			const std::string opt = arg.substr(1);
 			if (opt == "b" || opt == "brun")
 			{
 				if (++i >= argc)
@@ -482,7 +480,7 @@ int main(int argc, char **argv)
 					return EXIT_FAILURE;
 				}
 
-				vector<string> args;
+				std::vector<std::string> args;
 				for (int j = i + 1; j < argc; j++)
 				{
 					args.push_back(argv[j]);
@@ -533,7 +531,7 @@ int main(int argc, char **argv)
 					print_syntax_error("Missing built-in script name; options: " + g_ScriptCatalog.get_names());
 					return EXIT_FAILURE;
 				}
-				string script_name = argv[2];
+				std::string script_name = argv[2];
 				const Script* script = g_ScriptCatalog.find(script_name);
 				if (!script)
 				{
@@ -635,7 +633,7 @@ int main(int argc, char **argv)
 					print_syntax_error("Missing key=value argument");
 					return EXIT_FAILURE;
 				}
-				string spec = argv[i];
+				std::string spec = argv[i];
 				size_t equal_pos = spec.find("=");
 				if (equal_pos == std::string::npos)
 				{
@@ -675,8 +673,8 @@ int main(int argc, char **argv)
 
 			for (int j = i; j < argc; j++)
 			{
-				string cmd_arg = argv[j];
-				if (cmd_arg.find(' ') != string::npos && cmd_arg[cmd_arg.size() - 1] != ':')
+				std::string cmd_arg = argv[j];
+				if (cmd_arg.find(' ') != std::string::npos && cmd_arg[cmd_arg.size() - 1] != ':')
 				{
 					cmd_arg.insert(cmd_arg.begin(), '"');
 					cmd_arg.insert(cmd_arg.end(), '"');
@@ -693,7 +691,7 @@ int main(int argc, char **argv)
 
 			if (argc - 1 > i)
 			{
-				print_syntax_error("Too many arguments - " + string(argv[i + 1]) + "; Hint: use -b to pass parameters to a script");
+				print_syntax_error("Too many arguments - " + std::string(argv[i + 1]) + "; Hint: use -b to pass parameters to a script");
 				return EXIT_FAILURE;
 			}
 			input_path = arg;
@@ -726,19 +724,19 @@ int main(int argc, char **argv)
 
 		// why not log for !shell? it's logged for !g_verbose regardless
 		if (!shell) {
-			cout << "Waiting for device";
+			std::cout << "Waiting for device";
 			print_usb_filter();
-			cout << "...";
+			std::cout << "...";
 			printf("\n");
 		}
 	}
 	else {
-		cout << "Waiting for device";
+		std::cout << "Waiting for device";
 		print_usb_filter();
-		cout << "...";
-		cout << "\r"; // why is this needed?
-		cout << "\x1b[?25l"; // what does this do?
-		cout.flush();
+		std::cout << "...";
+		std::cout << "\r"; // why is this needed?
+		std::cout << "\x1b[?25l"; // what does this do?
+		std::cout.flush();
 	}
 
 	signal(SIGINT, interrupt);
