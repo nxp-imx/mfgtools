@@ -90,7 +90,7 @@ static void interrupt(int)
  */
 static void print_app_title()
 {
-	std::cerr << "Universal Update Utility for NXP i.MX chips -- " << uuu_get_version_string() << std::endl;
+	std::cerr << "Universal Update Utility for NXP i.MX -- v" << uuu_get_version_string() << std::endl;
 }
 
 static void print_cli_help()
