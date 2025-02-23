@@ -432,7 +432,6 @@ static std::string load_script_text(const std::string& script_spec, const vector
 
 int main(int argc, char **argv)
 {
-	// commented out since causes failure when pass script (that ends with 'uuu'?) file name/path as first arg plus -v after
 	if (auto_complete(argc, argv) == 0) return EXIT_SUCCESS;
 
 	std::unique_ptr<AutoCursor> auto_cursor;
