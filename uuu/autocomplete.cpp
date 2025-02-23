@@ -205,13 +205,13 @@ void print_autocomplete_help()
 {
 	cout << "\nEnable auto/tab completion:" << endl << endl;
 #ifndef _MSC_VER
-	cout << "Bash: Put the following script into /etc/bash_completion.d/uuu" << endl;
-	cout << g_vt_kcyn;
+	cout << "Bash: Put the following script into /etc/bash_completion.d/uuu:" << endl;
+	cout << g_vt->kcyn;
 	cout << "  _uuu_autocomplete()" <<endl;
 	cout << "  {" << endl;
 	cout << "       COMPREPLY=($(" << TARGET_PATH << " $1 $2 $3))" << endl;
 	cout << "  }" << endl;
-	cout << "  complete -o nospace -F _uuu_autocomplete  uuu" << g_vt_default << endl << endl;
+	cout << "  complete -o nospace -F _uuu_autocomplete  uuu" << g_vt->default_fg << endl << endl;
 #else
 	HMODULE hModule = GetModuleHandleA(NULL);
 	char path[MAX_PATH];
