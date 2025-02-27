@@ -66,6 +66,8 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 		memset(buff, 0, 65);
 		if (m_pTrans->read(buff, 64, &actual))
 			return -1;
+	
+		buff[actual] = '\0';
 
 		if (strncmp(buff, "DATA",4) == 0)
 		{
