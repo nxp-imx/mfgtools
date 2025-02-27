@@ -15,7 +15,8 @@
       "generator": "Visual Studio 17 2022",
       "inherits": [ "default" ],
       "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-windows-sd"
+        "VCPKG_TARGET_TRIPLET": "x64-windows-sd",
+        "CMAKE_CXX_VERSION": "19.42"
       }
     },
     {
