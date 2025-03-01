@@ -30,6 +30,7 @@
 */
 
 #include "cmd.h"
+#include <cstdint>
 
 class SDPSCmd : public CmdBase
 {
