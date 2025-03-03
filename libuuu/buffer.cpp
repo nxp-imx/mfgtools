@@ -47,6 +47,7 @@
 #include "http.h"
 #include "zstd.h"
 #include "libusb.h"
+#include <chrono>
 
 #ifdef WIN32
 #define stat_os _stat64
