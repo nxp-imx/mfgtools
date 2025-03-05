@@ -1,7 +1,10 @@
 #pragma once
 //! @file
 
+#include "Logger.h"
+
 #include "../libuuu/libuuu.h"
+#include "../libuuu/string_man.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -14,6 +17,8 @@
 
 #include <iostream>
 #include <string>
+
+extern bool g_dry_run;
 
 /**
  * @brief System environment functions
@@ -65,28 +70,83 @@ namespace environment {
 
 #ifdef _WIN32
 
-	static int ignore_serial_number(const char* pro, const char* chip, const char*/*comp*/, uint16_t vid, uint16_t pid, uint16_t /*bcdlow*/, uint16_t /*bcdhigh*/, void*/*p*/)
+	static int ignore_serial_number(const char* pro, const char* chip, const char*/*comp*/, uint16_t vid, uint16_t pid, uint16_t /*bcdlow*/, uint16_t /*bcdhigh*/, void *p)
 	{
-		printf("\t %s\t %s\t 0x%04X\t0x%04X\n", chip, pro, vid, pid);
+		bool enable = (bool)p;
+		std::string info;
+		string_man::format(info, "chip: '%s', pro: '%s', vid:0x%04X, pid:0x%04X", chip, pro, vid, pid);
+		g_logger.log_info(info);
 
-		char sub[128];
-		snprintf(sub, 128, "IgnoreHWSerNum%04x%04x", vid, pid);
+		const HKEY base_key = HKEY_LOCAL_MACHINE;
+		const char* key_path = "SYSTEM\\CurrentControlSet\\Control\\UsbFlags";
+		char value_name[128];
+		snprintf(value_name, 128, "IgnoreHWSerNum%04x%04x", vid, pid);
 		const BYTE value = 1;
+		const std::string value_desc = "HKLM\\" + std::string(key_path) + " " + value_name;
 
-		LSTATUS ret = RegSetKeyValueA(HKEY_LOCAL_MACHINE,
-			"SYSTEM\\CurrentControlSet\\Control\\UsbFlags",
-			sub, REG_BINARY, &value, 1);
-		if (ret == ERROR_SUCCESS)
-			return EXIT_SUCCESS;
-
-		printf("Set key failure, try run as administrator permission\n");
-		return EXIT_FAILURE;
+		if (enable)
+		{
+			std::string op_desc = "Writing registry value: " + value_desc;
+			if (g_dry_run)
+			{
+				g_logger.log_dry_run(op_desc);
+			}
+			else
+			{
+				g_logger.log_verbose(op_desc);
+				LSTATUS status = ::RegSetKeyValueA(base_key, key_path, value_name, REG_BINARY, &value, 1);
+				if (status != ERROR_SUCCESS)
+				{
+					g_logger.log_error("Registry write failed for " + value_desc);
+					return EXIT_FAILURE;
+				}
+			}
+		}
+		else
+		{
+			std::string op_desc = "Deleting registry value: " + value_desc;
+			if (g_dry_run)
+			{
+				g_logger.log_dry_run(op_desc);
+			}
+			else
+			{
+				g_logger.log_verbose(op_desc);
+				HKEY key;
+				if (::RegOpenKeyExA(base_key, key_path, 0, KEY_ALL_ACCESS, &key) != ERROR_SUCCESS)
+				{
+					g_logger.log_error("Unable to open registry key for value: " + value_desc);
+					return EXIT_FAILURE;
+				}
+				LSTATUS delete_status = ::RegDeleteValueA(key, value_name);
+				if (delete_status == ERROR_FILE_NOT_FOUND)
+				{
+					g_logger.log_warning("Value not found: " + value_desc);
+					::RegCloseKey(key);
+					return EXIT_SUCCESS;
+				}
+				else if (delete_status != ERROR_SUCCESS)
+				{
+					g_logger.log_error("Unable to delete registry value: " + value_desc);
+					::RegCloseKey(key);
+					return EXIT_FAILURE;
+				}
+				::RegCloseKey(key);
+			}
+		}
+		return EXIT_SUCCESS;
 	}
 
-	static int set_ignore_serial_number()
+	static int set_ignore_serial_number(bool to_enabled)
 	{
-		printf("Modifying registry to ignore serial number for finding devices...\n");
-		return uuu_for_each_cfg(ignore_serial_number, NULL);
+		const std::string op = to_enabled ? "ignore" : "match";
+		g_logger.log_info("Modifying registry to " + op + " serial number for finding devices...");
+		int status = uuu_for_each_cfg(ignore_serial_number, (void*)to_enabled);
+		if (status)
+		{
+			g_logger.log_hint("Run as administrator");
+		}
+		return status;
 	}
 
 	static int set_environment_variable(const std::string& name, const std::string& value)

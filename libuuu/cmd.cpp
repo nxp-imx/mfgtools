@@ -55,7 +55,6 @@
 static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
 static string g_cmd_list_file;
-
 static map<thread::id, map<string, string>> g_environment;
 
 int insert_env_variable(string key, string value)

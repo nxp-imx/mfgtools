@@ -54,6 +54,16 @@ public:
 		log("Info", message, g_vt->green);
 	}
 
+	void log_hint(const std::string& message) const
+	{
+		log("Hint", message, g_vt->green);
+	}
+
+	void log_dry_run(const std::string& message) const
+	{
+		log("Dry-run", message, g_vt->green);
+	}
+
 	void log_verbose(const std::string& message) const
 	{
 		extern int g_verbose;

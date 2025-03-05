@@ -41,12 +41,14 @@
 #include <stdio.h>
 
 #include <fstream>
+#include <functional>
 #include <iostream>
-#include <map>
 #include <sstream>
 #include <string>
 #include <streambuf>
+#include <sstream>
 #include <thread>
+#include <tuple>
 #include <vector>
 
 int auto_complete(int argc, char **argv);
@@ -57,11 +59,61 @@ bmap_mode g_bmap_mode = bmap_mode::Default;
 std::shared_ptr<VtEmulation> g_vt = std::make_shared<PlatformVtEmulation>();
 TransferContext g_transfer_context;
 Logger g_logger;
+bool g_dry_run = false;
 
 static TransferFeedback transfer_feedback;
 static const char command_help_text[] = {
 #include "uuu.clst"
 };
+extern std::vector<std::tuple<std::string, std::function<void(const std::vector<std::string>&)>>> command_handlers;
+
+template <typename T>
+std::string join_keys(const std::vector<T> items)
+{
+	const std::string& delimiter = "|";
+	std::ostringstream ss;
+	for (auto& item : items)
+	{
+		std::string s = std::get<0>(item);
+		ss << s << delimiter;
+	}
+	std::string text = ss.str();
+	text.erase(text.size() - delimiter.size());
+	return text;
+}
+
+[[noreturn]]
+static void exit_for_status(int status)
+{
+	g_logger.log_verbose(status == EXIT_SUCCESS ? "Success :)" : "Failed :(");
+	exit(status);
+}
+
+//[[noreturn]]
+//static void exit_for_error(const std::string& message)
+//{
+//	g_logger.log_error(message);
+//	exit_for_status(EXIT_FAILURE);
+//}
+//
+//[[noreturn]]
+//static void exit_for_happy()
+//{
+//	g_logger.log_info("Succeeded :)");
+//	exit_for_status(EXIT_SUCCESS);
+//}
+
+static void print_syntax_error(const std::string& message) {
+	g_logger.log_error(message);
+	g_logger.log_hint("See help output from 'uuu -h'");
+}
+
+[[noreturn]]
+static void exit_for_syntax_error(const std::string& message)
+{
+	print_syntax_error(message);
+	exit_for_status(EXIT_FAILURE);
+}
 
 /**
  * @brief Exits after outputting feedback about interrupt
@@ -78,7 +130,7 @@ static void interrupt(int)
 
 	printf("INTERRUPTED\n");
 
-	exit(EXIT_FAILURE);
+	exit_for_status(EXIT_FAILURE);
 }
 
 /**
@@ -91,7 +143,70 @@ static void print_app_title()
 	std::cerr << "Universal Update Utility for NXP i.MX -- " << uuu_get_version_string() << std::endl;
 }
 
-static void print_cli_help()
+static void (*print_cli_help)() = nullptr;
+
+static void print_new_cli_help()
+{
+	std::string text =
+		"uuu COMMAND\n"
+		"    COMMAND\t[CLI_COMMANDS]\n"
+		"\n"
+		"run:\n"
+		"install:\n"
+		"serial-match:\n"
+		"help:\n"
+		"OLD INFO\n"
+		"uuu [OPTION...] SPEC|CMD|BOOTLOADER\n"
+		"    SPEC\tSpecifies a script to run without parameters; use -b for parameters;\n"
+		"    \t\tFor a directory, use contained uuu.auto at root;\n"
+		"    \t\tFor a zip file, use uuu.auto at root of content\n"
+		"    CMD\t\tRun a command; see -h-protocol-commands\n"
+		"    \t\tExample: SDPS: boot -f flash.bin\n"
+		"    BOOTLOADER\tBoot device from bootloader image file\n"
+		"    -d\t\tProduction (daemon) mode\n"
+		"    -v\t\tVerbose feedback\n"
+		"    -V\t\tExtends verbose feedback to include USB library feedback\n"
+		"    -dry\tDry-run; displays verbose output without performing actions\n"
+		"    -bmap\tUse .bmap files even if flash commands do not specify them\n"
+		"    -no-bmap\tIgnore .bmap files even if flash commands specify them\n"
+		"    -m PATH\tLimits USB port monitoring. Example: -m 1:2 -m 1:3\n"
+		"    -ms SN\tMonitor the serial number prefix of the device\n"
+		"    -t #\tSeconds to wait for a device to appear\n"
+		"    -T #\tSeconds to wait for a device to appeared at stage switch [for deamon mode?]\n"
+		"    -e KEY=VAL\tSet environment variable KEY to value VAL\n"
+		"    -pp #\tUSB polling period in milliseconds\n"
+		"    -dm\t\tDisable small memory\n"
+		"\n"
+		"Parameter & built-in script mode:\n"
+		"uuu [OPTION...] -b SPEC|BUILTIN [PARAM...]\n"
+		"    SPEC\tSame as for default mode\n"
+		"    BUILTIN\tBuilt-in script: [BUILTIN_NAMES]\n"
+		"    OPTION...\tSame as for default mode\n"
+		"    PARAM...\tScript parameter values\n"
+		"\n"
+		"Special modes:\n"
+		"uuu -ls-devices\tList connected devices\n"
+		"uuu -ls-builtin [BUILTIN]\n"
+		"    \t\tList built-in script; all if none specified\n"
+		"uuu -cat-builtin BUILTIN\n"
+		"    \t\tOutput built-in script\n"
+		"uuu -s\t\tInteractive (shell) mode; records commands in uuu.inputlog\n"
+		"uuu -udev\tFor Linux, output udev rule for avoiding using sudo each time\n"
+		"uuu -IgSerNum\tFor Windows, modify registry to ignore USB serial number to find devices\n"
+		"uuu -h\t\tOutput basic help\n"
+		"uuu -h-protocol-commands\n"
+		"    \t\tOutput protocol command help info\n"
+		"uuu -h-protocol-support\n"
+		"    \t\tOutput protocol support by device info\n"
+		"uuu -h-auto-complete\n"
+		"    \t\tOutput auto/tab completion help info\n";
+
+	text = string_man::replace(text, "[BUILTIN_NAMES]", g_ScriptCatalog.get_names());
+	text = string_man::replace(text, "[CLI_COMMANDS]", join_keys(command_handlers));
+	std::cout << std::endl << text;
+}
+
+static void print_old_cli_help()
 {
 	std::string text =
 		"Default mode:\n"
@@ -115,7 +230,7 @@ static void print_cli_help()
 		"    -e KEY=VAL\tSet environment variable KEY to value VAL\n"
 		"    -pp #\tUSB polling period in milliseconds\n"
 		"    -dm\t\tDisable small memory\n"
-	    "\n"
+		"\n"
 		"Parameter & built-in script mode:\n"
 		"uuu [OPTION...] -b SPEC|BUILTIN [PARAM...]\n"
 		"    SPEC\tSame as for default mode\n"
@@ -141,11 +256,6 @@ static void print_cli_help()
 		"    \t\tOutput auto/tab completion help info\n";
 
 	std::cout << std::endl << string_man::replace(text, "[BUILTIN_NAMES]", g_ScriptCatalog.get_names());
-}
-
-static void print_syntax_error(const std::string& message) {
-	g_logger.log_error(message);
-	g_logger.log_info("Hint: see help output from 'uuu -h'");
 }
 
 /**
@@ -188,7 +298,7 @@ static void print_script_catalog(const std::string& script_name) {
 		if (item == items.end())
 		{
 			g_logger.log_error("Unknown script: " + script_name);
-			exit(EXIT_FAILURE);
+			exit_for_status(EXIT_FAILURE);
 		}
 		print_definition(item->second);
 	}
@@ -405,7 +515,7 @@ static std::string load_script_text(const std::string& script_spec, const std::v
 		if (!script)
 		{
 			g_logger.log_error("Unable to load script from file: " + script_spec);
-			exit(EXIT_FAILURE);
+			exit_for_status(EXIT_FAILURE);
 		}
 	}
 	else
@@ -416,7 +526,7 @@ static std::string load_script_text(const std::string& script_spec, const std::v
 	if (args.size() > script->args.size())
 	{
 		g_logger.log_error("Too many parameters for script: " + args[script->args.size()]);
-		exit(EXIT_FAILURE);
+		exit_for_status(EXIT_FAILURE);
 	}
 
 	const std::string text = script->replace_arguments(args);
@@ -426,41 +536,128 @@ static std::string load_script_text(const std::string& script_spec, const std::v
 		std::string message(text);
 		string_man::trim(message);
 		string_man::replace(message, "\n", "\n\t");
-		message = "Script with parameters replaced with values:\n\t" + message;
+		message = "Script content (with parameters replaced with values):\n\t" + message;
 		g_logger.log_verbose(message);
 	}
 
 	return text;
 }
 
-int main(int argc, char **argv)
+static void handle_run(const std::vector<std::string>& args)
 {
-	if (auto_complete(argc, argv) == 0) return EXIT_SUCCESS;
-
-	print_app_title();
-
-	std::unique_ptr<AutoCursor> auto_cursor;
-	if (g_vt->enable())
+	if (args.size() < 1)
 	{
-		g_logger.is_color_output_enabled = true;
-		auto_cursor = std::make_unique<AutoCursor>();
+		exit_for_syntax_error("Missing path or built-in script name");
+	}
+	if (args.size() > 1)
+	{
+		exit_for_syntax_error("Too many arguments: " + args[1]);
+	}
+
+	std::vector<std::string> params(args);
+	params.erase(params.begin());
+
+	std::string script_name_feedback;
+	std::string script_text = load_script_text(args[0], params, script_name_feedback);
+
+	if (script_name_feedback.empty())
+	{
+		g_logger.log_internal_error("Expected non-empty script_spec");
+		exit_for_status(EXIT_FAILURE);
+	}
+	g_logger.log_verbose("Running script: " + script_name_feedback);
+	if (uuu_run_cmd_script(script_text.c_str(), g_dry_run))
+	{
+		g_logger.log_error(uuu_get_last_err_string());
+		exit_for_status(EXIT_FAILURE);
+	}
+
+	exit_for_status(EXIT_SUCCESS);
+}
+
+static void handle_install(const std::vector<std::string>& args)
+{
+	exit_for_status(EXIT_SUCCESS);
+}
+
+static void handle_serial_match(const std::vector<std::string>& args)
+{
+	if (args.size() < 1)
+	{
+		exit_for_syntax_error("Missing enable/disable");
+	}
+	if (args.size() > 1)
+	{
+		exit_for_syntax_error("Too many arguments: " + args[1]);
+	}
+
+	const std::string to_arg = args[0];
+	if (to_arg == "enable")
+	{
+		exit_for_status(environment::set_ignore_serial_number(true));
+	}
+	else if (to_arg == "disable")
+	{
+		exit_for_status(environment::set_ignore_serial_number(false));
 	}
 	else
 	{
-		// note: if output is re-directed to a file, then output does not supports color.
-		// There may be other ways color is not supported.
-		g_logger.log_warning("Color output is not supported");
+		exit_for_syntax_error("Expected enable/disable; got '" + to_arg + "'");
+	}
+}
+
+static void handle_help(const std::vector<std::string>& args)
+{
+	const std::vector<std::tuple<std::string, std::function<void()>>> help_handlers
+	{
+		{ "cli", print_cli_help },
+		{ "protocol-support", print_protocol_support_info },
+		{ "protocol-commands", print_protocol_help },
+		{ "auto-complete", print_autocomplete_help },
+	};
+
+	if (args.size() > 1)
+	{
+		exit_for_syntax_error("Too many arguments: " + args[1]);
 	}
 
+	if (args.size() == 0)
+	{
+		exit_for_syntax_error("Missing help context; options: " + join_keys(help_handlers));
+	}
+	else
+	{
+		const std::string context = args[0];
+		const auto& handler = std::find_if(help_handlers.begin(), help_handlers.end(), [&](const auto& item) {
+			return std::get<0>(item) == context;
+		});
+		if (handler == help_handlers.end())
+		{
+			exit_for_syntax_error("Unknown help context '" + context + "'; options: " + join_keys(help_handlers));
+		}
+		std::get<1>(*handler)();
+	}
+	exit_for_status(EXIT_SUCCESS);
+}
+
+static std::vector<std::tuple<std::string, std::function<void(const std::vector<std::string>&)>>> command_handlers
+{
+	{ "run", handle_run },
+	{ "install", handle_install },
+	{ "serial-match", handle_serial_match },
+	{ "help", handle_help },
+};
+
+static void process_new_command_line(int argc, char** argv)
+{
 	if (argc == 1)
 	{
 		print_cli_help();
-		return EXIT_FAILURE;
+		exit_for_status(EXIT_FAILURE);
 	}
 
 	int deamon = 0;
 	int shell = 0;
-	int dryrun = 0;
 	std::string input_path;
 	std::string protocol_cmd;
 	std::string script_name_feedback;
@@ -471,48 +668,27 @@ int main(int argc, char **argv)
 		const std::string arg = argv[i];
 		if (!arg.empty() && arg[0] == '-')
 		{
-			const std::string opt = arg.substr(1);
-			if (opt == "b" || opt == "brun")
+			std::string opt = arg.substr(1);
+			if (arg.size() > 2)
 			{
-				if (++i >= argc)
+				if (arg[1] == '-')
 				{
-					print_syntax_error("Missing path or built-in script name");
-					return EXIT_FAILURE;
+					opt = arg.substr(2);
 				}
-
-				std::vector<std::string> args;
-				for (int j = i + 1; j < argc; j++)
+				else
 				{
-					args.push_back(argv[j]);
+					exit_for_syntax_error("Options are either single dash with single letter or multiple dashes; got: " + arg);
 				}
-
-				script_text = load_script_text(argv[i], args, script_name_feedback);
-				break;
 			}
-			else if (opt == "h")
+			if (opt == "h")
 			{
 				print_cli_help();
-				return EXIT_SUCCESS;
-			}
-			else if (opt == "h-auto-complete")
-			{
-				print_autocomplete_help();
-				return EXIT_SUCCESS;
-			}
-			else if (opt == "h-protocol-commands")
-			{
-				print_protocol_help();
-				return EXIT_SUCCESS;
-			}
-			else if (opt == "h-protocol-support")
-			{
-				print_protocol_support_info();
-				return EXIT_SUCCESS;
+				exit_for_status(EXIT_SUCCESS);
 			}
 			else if (opt == "ls-devices")
 			{
 				print_device_list();
-				return EXIT_SUCCESS;
+				exit_for_status(EXIT_SUCCESS);
 			}
 			else if (opt == "ls-builtin")
 			{
@@ -522,24 +698,24 @@ int main(int argc, char **argv)
 					script_name = argv[i];
 				}
 				print_script_catalog(script_name);
-				return EXIT_SUCCESS;
+				exit_for_status(EXIT_SUCCESS);
 			}
 			else if (opt == "cat-builtin")
 			{
 				if (2 == argc)
 				{
 					print_syntax_error("Missing built-in script name; options: " + g_ScriptCatalog.get_names());
-					return EXIT_FAILURE;
+					exit_for_status(EXIT_FAILURE);
 				}
 				std::string script_name = argv[2];
 				const Script* script = g_ScriptCatalog.find(script_name);
 				if (!script)
 				{
 					print_syntax_error("Unknown built-in script '" + script_name + "'; options: " + g_ScriptCatalog.get_names());
-					return EXIT_FAILURE;
+					exit_for_status(EXIT_FAILURE);
 				}
 				print_content(*script);
-				return EXIT_SUCCESS;
+				exit_for_status(EXIT_SUCCESS);
 			}
 			else if (opt == "d")
 			{
@@ -567,16 +743,16 @@ int main(int argc, char **argv)
 			}
 			else if (opt == "dry")
 			{
-				dryrun = 1;
+				g_dry_run = true;
 				// why is verbose set for dry-run? 
-				g_verbose = 1;
+				//g_verbose = 1;
 			}
 			else if (opt == "m")
 			{
 				if (++i >= argc)
 				{
 					print_syntax_error("Missing USB path argument");
-					return EXIT_FAILURE;
+					exit_for_status(EXIT_FAILURE);
 				}
 				uuu_add_usbpath_filter(argv[i]);
 				g_transfer_context.usb_path_filter.push_back(argv[i]);
@@ -586,7 +762,7 @@ int main(int argc, char **argv)
 				if (++i >= argc)
 				{
 					print_syntax_error("Missing serial # argument");
-					return EXIT_FAILURE;
+					exit_for_status(EXIT_FAILURE);
 				}
 				uuu_add_usbserial_no_filter(argv[i]);
 				g_transfer_context.usb_serial_no_filter.push_back(argv[i]);
@@ -596,7 +772,7 @@ int main(int argc, char **argv)
 				if (++i >= argc)
 				{
 					print_syntax_error("Missing seconds argument");
-					return EXIT_FAILURE;
+					exit_for_status(EXIT_FAILURE);
 				}
 				uuu_set_wait_timeout(atol(argv[i]));
 			}
@@ -605,7 +781,7 @@ int main(int argc, char **argv)
 				if (++i >= argc)
 				{
 					print_syntax_error("Missing seconds argument");
-					return EXIT_FAILURE;
+					exit_for_status(EXIT_FAILURE);
 				}
 				uuu_set_wait_next_timeout(atol(argv[i]));
 			}
@@ -614,7 +790,7 @@ int main(int argc, char **argv)
 				if (++i >= argc)
 				{
 					print_syntax_error("Missing milliseconds argument");
-					return EXIT_FAILURE;
+					exit_for_status(EXIT_FAILURE);
 				}
 				uuu_set_poll_period(atol(argv[i]));
 			}
@@ -631,40 +807,58 @@ int main(int argc, char **argv)
 				if (++i >= argc)
 				{
 					print_syntax_error("Missing key=value argument");
-					return EXIT_FAILURE;
+					exit_for_status(EXIT_FAILURE);
 				}
 				std::string spec = argv[i];
 				size_t equal_pos = spec.find("=");
 				if (equal_pos == std::string::npos)
 				{
 					g_logger.log_error("Invalid input '" + spec + "'; must be formatted as: key=value");
-					return EXIT_FAILURE;
+					exit_for_status(EXIT_FAILURE);
 				}
 				std::string name = spec.substr(0, equal_pos);
 				std::string value = spec.substr(equal_pos + 1);
 				if (environment::set_environment_variable(name, value))
 				{
 					g_logger.log_error("Failed to set environment variable with expression '" + spec + "'");
-					return EXIT_FAILURE;
+					exit_for_status(EXIT_FAILURE);
 				}
 				g_logger.log_verbose("Set environment variable '" + name + "' to '" + value + "'");
 			}
 #ifdef _WIN32
-			else if (opt == "IgSerNum")
+			else if (opt == "ignore-serial-number")
 			{
-				return environment::set_ignore_serial_number();
+				if (++i >= argc)
+				{
+					exit_for_syntax_error("Missing true/false");
+				}
+				const std::string to_arg = argv[i];
+				bool to_enabled;
+				if (to_arg == "true")
+				{
+					to_enabled = true;
+				}
+				else if (to_arg == "false")
+				{
+					to_enabled = false;
+				}
+				else
+				{
+					exit_for_syntax_error("Expected true/false; got '" + to_arg + "'");
+				}
+				exit_for_status(environment::set_ignore_serial_number(to_enabled));
 			}
 #else
 			else if (opt == "udev")
 			{
 				print_udev_info();
-				return EXIT_SUCCESS;
+				exit_for_status(EXIT_SUCCESS);
 			}
 #endif
 			else
 			{
 				print_syntax_error("Unknown option: " + arg);
-				return EXIT_FAILURE;
+				exit_for_status(EXIT_FAILURE);
 			}
 		}
 		else if (!arg.empty() && arg[arg.size() - 1] == ':')
@@ -680,40 +874,58 @@ int main(int argc, char **argv)
 					cmd_arg.insert(cmd_arg.end(), '"');
 				}
 				protocol_cmd.append(cmd_arg);
-				if (j != (argc -1)) // don't add space after last arg
+				if (j != (argc - 1)) // don't add space after last arg
 					protocol_cmd.append(" ");
 			}
 			break;
 		}
-		else
+		else if (false)
 		{
 			// treat as a file system path
 
 			if (argc - 1 > i)
 			{
-				print_syntax_error("Too many arguments - " + std::string(argv[i + 1]) + "; Hint: use -b to pass parameters to a script");
-				return EXIT_FAILURE;
+				exit_for_syntax_error("Too many arguments: " + std::string(argv[i + 1]));
 			}
 			input_path = arg;
+		}
+		else
+		{
+			const auto& handler = std::find_if(command_handlers.begin(), command_handlers.end(), [&](const auto& item) {
+				return std::get<0>(item) == arg;
+			});
+			if (handler == command_handlers.end())
+			{
+				exit_for_syntax_error("Unknown command '" + arg + "'; options: " + join_keys(command_handlers));
+			}
+
+			std::vector<std::string> args;
+			for (int j = i + 1; j < argc; j++)
+			{
+				args.push_back(argv[j]);
+			}
+			std::get<1>(*handler)(args);
+			g_logger.log_internal_error("Expected handler to exit");
+			exit_for_status(EXIT_FAILURE);
 		}
 	}
 
 	if (deamon && shell)
 	{
 		g_logger.log_error("Incompatible options: deamon (-d) and shell (-s)");
-		return EXIT_FAILURE;
+		exit_for_status(EXIT_FAILURE);
 	}
 
-	if (deamon && dryrun)
+	if (deamon && g_dry_run)
 	{
 		g_logger.log_error("Incompatible options: deamon (-d) and dry-run (-dry)");
-		return EXIT_FAILURE;
+		exit_for_status(EXIT_FAILURE);
 	}
 
-	if (shell && dryrun)
+	if (shell && g_dry_run)
 	{
 		g_logger.log_error("Incompatible options: shell (-s) and dry-run (-dry)");
-		return EXIT_FAILURE;
+		exit_for_status(EXIT_FAILURE);
 	}
 
 	if (g_verbose)
@@ -747,41 +959,396 @@ int main(int argc, char **argv)
 	if (shell)
 	{
 		proces_interactive_commands();
-		return EXIT_SUCCESS;
+		exit_for_status(EXIT_SUCCESS);
 	}
 	else if (!protocol_cmd.empty())
 	{
 		g_logger.log_verbose("Executing single command: " + protocol_cmd);
-		int ret = uuu_run_cmd(protocol_cmd.c_str(), dryrun);
+		int ret = uuu_run_cmd(protocol_cmd.c_str(), g_dry_run);
 
 		// what is the purpose of printing blank lines? Don't know about success, but on error, there are several blank lines on screen
-		for (size_t i = 0; i < g_transfer_context.map_path_nt.size()+3; i++)
+		for (size_t i = 0; i < g_transfer_context.map_path_nt.size() + 3; i++)
 			printf("\n");
 
 		if (ret)
 		{
 			g_logger.log_error(uuu_get_last_err_string());
-			return EXIT_FAILURE;
+			exit_for_status(EXIT_FAILURE);
 		}
 
 		g_logger.log_info("Command succeeded :)");
 
 		if (shell) proces_interactive_commands();
 
-		return EXIT_SUCCESS;
+		exit_for_status(EXIT_SUCCESS);
+	}
+	else if (!script_text.empty())
+	{
+		//if (script_name_feedback.empty())
+		//{
+		//	g_logger.log_internal_error("Expected non-empty script_spec");
+		//	exit_for_status(EXIT_FAILURE);
+		//}
+		//g_logger.log_verbose("Running script: " + script_name_feedback);
+		//if (uuu_run_cmd_script(script_text.c_str(), g_dry_run))
+		//{
+		//	g_logger.log_error(uuu_get_last_err_string());
+		//	exit_for_status(EXIT_FAILURE);
+		//}
+	}
+	else if (!input_path.empty())
+	{
+		g_logger.log_verbose("Running as auto detect file: " + input_path);
+		if (uuu_auto_detect_file(input_path.c_str()))
+		{
+			g_logger.log_error(uuu_get_last_err_string());
+			exit_for_status(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		g_logger.log_error("No operation");
+		exit_for_status(EXIT_FAILURE);
+	}
+
+	if (uuu_wait_uuu_finish(deamon, g_dry_run))
+	{
+		g_logger.log_error(uuu_get_last_err_string());
+		exit_for_status(EXIT_FAILURE);
+	}
+}
+
+static void process_old_command_line(int argc, char** argv)
+{
+	if (argc == 1)
+	{
+		print_cli_help();
+		exit_for_status(EXIT_FAILURE);
+	}
+
+	int deamon = 0;
+	int shell = 0;
+	std::string input_path;
+	std::string protocol_cmd;
+	std::string script_name_feedback;
+	std::string script_text;
+
+	for (int i = 1; i < argc; i++)
+	{
+		const std::string arg = argv[i];
+		if (!arg.empty() && arg[0] == '-')
+		{
+			const std::string opt = arg.substr(1);
+			if (opt == "b" || opt == "brun")
+			{
+				if (++i >= argc)
+				{
+					print_syntax_error("Missing path or built-in script name");
+					exit_for_status(EXIT_FAILURE);
+				}
+
+				std::vector<std::string> args;
+				for (int j = i + 1; j < argc; j++)
+				{
+					args.push_back(argv[j]);
+				}
+
+				script_text = load_script_text(argv[i], args, script_name_feedback);
+				break;
+			}
+			else if (opt == "h")
+			{
+				print_cli_help();
+				exit_for_status(EXIT_SUCCESS);
+			}
+			else if (opt == "h-auto-complete")
+			{
+				print_autocomplete_help();
+				exit_for_status(EXIT_SUCCESS);
+			}
+			else if (opt == "h-protocol-commands")
+			{
+				print_protocol_help();
+				exit_for_status(EXIT_SUCCESS);
+			}
+			else if (opt == "h-protocol-support")
+			{
+				print_protocol_support_info();
+				exit_for_status(EXIT_SUCCESS);
+			}
+			else if (opt == "ls-devices")
+			{
+				print_device_list();
+				exit_for_status(EXIT_SUCCESS);
+			}
+			else if (opt == "ls-builtin")
+			{
+				std::string script_name;
+				if (++i < argc)
+				{
+					script_name = argv[i];
+				}
+				print_script_catalog(script_name);
+				exit_for_status(EXIT_SUCCESS);
+			}
+			else if (opt == "cat-builtin")
+			{
+				if (2 == argc)
+				{
+					print_syntax_error("Missing built-in script name; options: " + g_ScriptCatalog.get_names());
+					exit_for_status(EXIT_FAILURE);
+				}
+				std::string script_name = argv[2];
+				const Script* script = g_ScriptCatalog.find(script_name);
+				if (!script)
+				{
+					print_syntax_error("Unknown built-in script '" + script_name + "'; options: " + g_ScriptCatalog.get_names());
+					exit_for_status(EXIT_FAILURE);
+				}
+				print_content(*script);
+				exit_for_status(EXIT_SUCCESS);
+			}
+			else if (opt == "d")
+			{
+				deamon = 1;
+				uuu_set_small_mem(0);
+			}
+			else if (opt == "dm")
+			{
+				uuu_set_small_mem(0);
+			}
+			else if (opt == "s")
+			{
+				shell = 1;
+				// why set verbose for shell mode?
+				g_verbose = 1;
+			}
+			else if (opt == "v")
+			{
+				g_verbose = 1;
+			}
+			else if (opt == "V")
+			{
+				g_verbose = 1;
+				uuu_set_debug_level(2);
+			}
+			else if (opt == "dry")
+			{
+				g_dry_run = true;
+				// why is verbose set for dry-run? 
+				g_verbose = 1;
+			}
+			else if (opt == "m")
+			{
+				if (++i >= argc)
+				{
+					print_syntax_error("Missing USB path argument");
+					exit_for_status(EXIT_FAILURE);
+				}
+				uuu_add_usbpath_filter(argv[i]);
+				g_transfer_context.usb_path_filter.push_back(argv[i]);
+			}
+			else if (opt == "ms")
+			{
+				if (++i >= argc)
+				{
+					print_syntax_error("Missing serial # argument");
+					exit_for_status(EXIT_FAILURE);
+				}
+				uuu_add_usbserial_no_filter(argv[i]);
+				g_transfer_context.usb_serial_no_filter.push_back(argv[i]);
+			}
+			else if (opt == "t")
+			{
+				if (++i >= argc)
+				{
+					print_syntax_error("Missing seconds argument");
+					exit_for_status(EXIT_FAILURE);
+				}
+				uuu_set_wait_timeout(atol(argv[i]));
+			}
+			else if (opt == "T")
+			{
+				if (++i >= argc)
+				{
+					print_syntax_error("Missing seconds argument");
+					exit_for_status(EXIT_FAILURE);
+				}
+				uuu_set_wait_next_timeout(atol(argv[i]));
+			}
+			else if (opt == "pp")
+			{
+				if (++i >= argc)
+				{
+					print_syntax_error("Missing milliseconds argument");
+					exit_for_status(EXIT_FAILURE);
+				}
+				uuu_set_poll_period(atol(argv[i]));
+			}
+			else if (opt == "bmap")
+			{
+				g_bmap_mode = bmap_mode::Force;
+			}
+			else if (opt == "no-bmap")
+			{
+				g_bmap_mode = bmap_mode::Ignore;
+			}
+			else if (opt == "e")
+			{
+				if (++i >= argc)
+				{
+					print_syntax_error("Missing key=value argument");
+					exit_for_status(EXIT_FAILURE);
+				}
+				std::string spec = argv[i];
+				size_t equal_pos = spec.find("=");
+				if (equal_pos == std::string::npos)
+				{
+					g_logger.log_error("Invalid input '" + spec + "'; must be formatted as: key=value");
+					exit_for_status(EXIT_FAILURE);
+				}
+				std::string name = spec.substr(0, equal_pos);
+				std::string value = spec.substr(equal_pos + 1);
+				if (environment::set_environment_variable(name, value))
+				{
+					g_logger.log_error("Failed to set environment variable with expression '" + spec + "'");
+					exit_for_status(EXIT_FAILURE);
+				}
+				g_logger.log_verbose("Set environment variable '" + name + "' to '" + value + "'");
+			}
+#ifdef _WIN32
+			else if (opt == "IgSerNum")
+			{
+				exit_for_status(environment::set_ignore_serial_number(true));
+			}
+#else
+			else if (opt == "udev")
+			{
+				print_udev_info();
+				exit_for_status(EXIT_SUCCESS);
+			}
+#endif
+			else
+			{
+				print_syntax_error("Unknown option: " + arg);
+				exit_for_status(EXIT_FAILURE);
+			}
+		}
+		else if (!arg.empty() && arg[arg.size() - 1] == ':')
+		{
+			// treat as a protocol command
+
+			for (int j = i; j < argc; j++)
+			{
+				std::string cmd_arg = argv[j];
+				if (cmd_arg.find(' ') != std::string::npos && cmd_arg[cmd_arg.size() - 1] != ':')
+				{
+					cmd_arg.insert(cmd_arg.begin(), '"');
+					cmd_arg.insert(cmd_arg.end(), '"');
+				}
+				protocol_cmd.append(cmd_arg);
+				if (j != (argc - 1)) // don't add space after last arg
+					protocol_cmd.append(" ");
+			}
+			break;
+		}
+		else
+		{
+			// treat as a file system path
+
+			if (argc - 1 > i)
+			{
+				print_syntax_error("Too many arguments: " + std::string(argv[i + 1]) + "; Hint: use -b to pass parameters to a script");
+				exit_for_status(EXIT_FAILURE);
+			}
+			input_path = arg;
+		}
+	}
+
+	if (deamon && shell)
+	{
+		g_logger.log_error("Incompatible options: deamon (-d) and shell (-s)");
+		exit_for_status(EXIT_FAILURE);
+	}
+
+	if (deamon && g_dry_run)
+	{
+		g_logger.log_error("Incompatible options: deamon (-d) and dry-run (-dry)");
+		exit_for_status(EXIT_FAILURE);
+	}
+
+	if (shell && g_dry_run)
+	{
+		g_logger.log_error("Incompatible options: shell (-s) and dry-run (-dry)");
+		exit_for_status(EXIT_FAILURE);
+	}
+
+	if (g_verbose)
+	{
+		// commented out since can print script content via -cat-builtin; print here is noise
+		//if (!cmd_script.empty())
+		//	printf("\n%sRunning built-in script:%s\n %s\n\n", g_vt->boldwhite, g_vt->default_foreground, cmd_script.c_str());
+
+		// why not log for !shell? it's logged for !g_verbose regardless
+		if (!shell) {
+			std::cout << "Waiting for device";
+			print_usb_filter();
+			std::cout << "...";
+			printf("\n");
+		}
+	}
+	else {
+		std::cout << "Waiting for device";
+		print_usb_filter();
+		std::cout << "...";
+		std::cout << "\r"; // why is this needed?
+		std::cout << "\x1b[?25l"; // what does this do?
+		std::cout.flush();
+	}
+
+	signal(SIGINT, interrupt);
+
+	uuu_set_askpasswd(environment::ask_passwd);
+	transfer_feedback.enable();
+
+	if (shell)
+	{
+		proces_interactive_commands();
+		exit_for_status(EXIT_SUCCESS);
+	}
+	else if (!protocol_cmd.empty())
+	{
+		g_logger.log_verbose("Executing single command: " + protocol_cmd);
+		int ret = uuu_run_cmd(protocol_cmd.c_str(), g_dry_run);
+
+		// what is the purpose of printing blank lines? Don't know about success, but on error, there are several blank lines on screen
+		for (size_t i = 0; i < g_transfer_context.map_path_nt.size() + 3; i++)
+			printf("\n");
+
+		if (ret)
+		{
+			g_logger.log_error(uuu_get_last_err_string());
+			exit_for_status(EXIT_FAILURE);
+		}
+
+		g_logger.log_info("Command succeeded :)");
+
+		if (shell) proces_interactive_commands();
+
+		exit_for_status(EXIT_SUCCESS);
 	}
 	else if (!script_text.empty())
 	{
 		if (script_name_feedback.empty())
 		{
 			g_logger.log_internal_error("Expected non-empty script_spec");
-			return EXIT_FAILURE;
+			exit_for_status(EXIT_FAILURE);
 		}
 		g_logger.log_verbose("Running script: " + script_name_feedback);
-		if (uuu_run_cmd_script(script_text.c_str(), dryrun))
+		if (uuu_run_cmd_script(script_text.c_str(), g_dry_run))
 		{
 			g_logger.log_error(uuu_get_last_err_string());
-			return EXIT_FAILURE;
+			exit_for_status(EXIT_FAILURE);
 		}
 	}
 	else if (!input_path.empty())
@@ -790,26 +1357,58 @@ int main(int argc, char **argv)
 		if (uuu_auto_detect_file(input_path.c_str()))
 		{
 			g_logger.log_error(uuu_get_last_err_string());
-			return EXIT_FAILURE;
+			exit_for_status(EXIT_FAILURE);
 		}
 	}
 	else
 	{
 		g_logger.log_error("No operation");
-		return EXIT_FAILURE;
+		exit_for_status(EXIT_FAILURE);
 	}
 
-	if (uuu_wait_uuu_finish(deamon, dryrun))
+	if (uuu_wait_uuu_finish(deamon, g_dry_run))
 	{
 		g_logger.log_error(uuu_get_last_err_string());
-		return EXIT_FAILURE;
+		exit_for_status(EXIT_FAILURE);
+	}
+}
+
+int main(int argc, char** argv)
+{
+	if (auto_complete(argc, argv) == 0) return EXIT_SUCCESS;
+
+	print_app_title();
+
+	std::unique_ptr<AutoCursor> auto_cursor;
+	if (g_vt->enable())
+	{
+		g_logger.is_color_output_enabled = true;
+		auto_cursor = std::make_unique<AutoCursor>();
+	}
+	else
+	{
+		// note: if output is re-directed to a file, then output does not supports color.
+		// There may be other ways color is not supported.
+		g_logger.log_warning("Color output is not supported");
+	}
+
+	bool use_new_cli = true;
+	if (use_new_cli)
+	{
+		print_cli_help = print_new_cli_help;
+		process_new_command_line(argc, argv);
+	}
+	else
+	{
+		print_cli_help = print_old_cli_help;
+		process_old_command_line(argc, argv);
 	}
 
 	// wait for the thread exit, after send out CMD_DONE
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 	// move cursor below status area; [why 3?]
-	if(!g_verbose) printf("\n\n\n");
+	if (!g_verbose) printf("\n\n\n");
 
 	g_logger.log_info(g_transfer_context.overall_status == 0 ? "Success :)" : "Failed :(");
 
