@@ -156,6 +156,11 @@ namespace environment {
 
 #else
 
+	static int set_ignore_serial_number(bool)
+	{
+		return EXIT_SUCCESS;
+	}
+
 	static int set_environment_variable(const std::string& name, const std::string& value)
 	{
 		return ::setenv(name.c_str(), value.c_str(), true);

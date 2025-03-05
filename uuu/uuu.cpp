@@ -65,7 +65,6 @@ static TransferFeedback transfer_feedback;
 static const char command_help_text[] = {
 #include "uuu.clst"
 };
-extern std::vector<std::tuple<std::string, std::function<void(const std::vector<std::string>&)>>> command_handlers;
 
 template <typename T>
 std::string join_keys(const std::vector<T> items)
@@ -148,13 +147,11 @@ static void (*print_cli_help)() = nullptr;
 static void print_new_cli_help()
 {
 	std::string text =
-		"uuu COMMAND\n"
-		"    COMMAND\t[CLI_COMMANDS]\n"
+		"uuu run:\n"
+		"uuu install:\n"
+		"uuu serial-match:\n"
+		"uuu help:\n"
 		"\n"
-		"run:\n"
-		"install:\n"
-		"serial-match:\n"
-		"help:\n"
 		"OLD INFO\n"
 		"uuu [OPTION...] SPEC|CMD|BOOTLOADER\n"
 		"    SPEC\tSpecifies a script to run without parameters; use -b for parameters;\n"
@@ -202,7 +199,6 @@ static void print_new_cli_help()
 		"    \t\tOutput auto/tab completion help info\n";
 
 	text = string_man::replace(text, "[BUILTIN_NAMES]", g_ScriptCatalog.get_names());
-	text = string_man::replace(text, "[CLI_COMMANDS]", join_keys(command_handlers));
 	std::cout << std::endl << text;
 }
 
