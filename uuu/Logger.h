@@ -4,6 +4,7 @@
 
 #include "VtEmulation.h"
 
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -27,12 +28,6 @@ class Logger final
 
 public:
 	bool is_color_output_enabled = false;
-
-	bool is_verbose_enabled()
-	{
-		extern int g_verbose;
-		return g_verbose;
-	}
 
 	void log_internal_error(const std::string& message) const
 	{
@@ -64,13 +59,15 @@ public:
 		log("Dry-run", message, g_vt->green);
 	}
 
-	void log_verbose(const std::string& message) const
+	void log_debug(std::function<std::string()> format) const
 	{
-		extern int g_verbose;
-		if (g_verbose)
+#ifdef _DEBUG
+		bool is_debug_output_enabled = true;
+		if (is_debug_output_enabled)
 		{
-			log("Verbose", message, g_vt->kcyn);
+			log("Debug", format(), g_vt->kcyn);
 		}
+#endif
 	}
 };
 

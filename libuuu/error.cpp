@@ -60,12 +60,21 @@ void uuu_set_debug_level(uint32_t mask)
 #endif
 }
 
+/**
+ * @brief Returns a pointer the cached last error message as a c-string
+ * @details
+ * Undefined behavior if the client accesses the pointer after the last error is set again.
+ * To eliminate this limitation, this should return a copy of the message; i.e. std::string.
+ */
 const char * uuu_get_last_err_string()
 {
 	lock_guard<mutex> l(g_last_error_str_mutex);
 	return g_last_error_str.c_str();
 }
 
+/**
+ * @brief Caches a string as the last error message
+ */
 int set_last_err_string(const string &str)
 {
 	lock_guard<mutex> l(g_last_error_str_mutex);
@@ -73,10 +82,10 @@ int set_last_err_string(const string &str)
 	return -1;
 }
 
-int uuu_get_last_err()
-{
-	return g_last_err_id.load();
-}
+//int uuu_get_last_err()
+//{
+//	return g_last_err_id.load();
+//}
 
 //void set_last_err_id(int id)
 //{

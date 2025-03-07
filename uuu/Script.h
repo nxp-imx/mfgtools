@@ -173,7 +173,7 @@ class Script final
 			arg_value.insert(arg_value.end(), '"');
 		}
 
-		g_logger.log_verbose("Replacing script parameter '" + arg_name + "' with value '" + arg_value + "'");
+		g_logger.log_debug([&]() { return "Replacing script parameter '" + arg_name + "' with value '" + arg_value + "'"; });
 
 		for (size_t j = 0; (j = text.find(arg_name, j)) != std::string::npos;)
 		{

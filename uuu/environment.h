@@ -18,8 +18,6 @@
 #include <iostream>
 #include <string>
 
-extern bool g_dry_run;
-
 /**
  * @brief System environment functions
  */
@@ -70,48 +68,46 @@ namespace environment {
 
 #ifdef _WIN32
 
-	static int ignore_serial_number(const char* pro, const char* chip, const char*/*comp*/, uint16_t vid, uint16_t pid, uint16_t /*bcdlow*/, uint16_t /*bcdhigh*/, void *p)
+	class SerialMatchConfig final
 	{
-		bool enable = (bool)p;
-		std::string info;
-		string_man::format(info, "chip: '%s', pro: '%s', vid:0x%04X, pid:0x%04X", chip, pro, vid, pid);
-		g_logger.log_info(info);
+		enum class Mode { ignore, match };
+		Mode mode = Mode::match;
 
-		const HKEY base_key = HKEY_LOCAL_MACHINE;
-		const char* key_path = "SYSTEM\\CurrentControlSet\\Control\\UsbFlags";
-		char value_name[128];
-		snprintf(value_name, 128, "IgnoreHWSerNum%04x%04x", vid, pid);
-		const BYTE value = 1;
-		const std::string value_desc = "HKLM\\" + std::string(key_path) + " " + value_name;
-
-		if (enable)
+		static int ignore_serial_number(
+			const char* pro,
+			const char* chip,
+			const char* /*comp*/,
+			uint16_t vid,
+			uint16_t pid,
+			uint16_t /*bcdlow*/,
+			uint16_t /*bcdhigh*/,
+			void* p)
 		{
-			std::string op_desc = "Writing registry value: " + value_desc;
-			if (g_dry_run)
+			SerialMatchConfig& context = *(SerialMatchConfig*)p;
+			std::string info;
+			string_man::format(info, "chip: '%s', pro: '%s', vid:0x%04X, pid:0x%04X", chip, pro, vid, pid);
+			g_logger.log_info(info);
+
+			const HKEY base_key = HKEY_LOCAL_MACHINE;
+			const char* key_path = "SYSTEM\\CurrentControlSet\\Control\\UsbFlags";
+			char value_name[128];
+			snprintf(value_name, 128, "IgnoreHWSerNum%04x%04x", vid, pid);
+			const BYTE value = 1;
+			const std::string value_desc = "HKLM\\" + std::string(key_path) + " " + value_name;
+
+			if (context.mode == Mode::ignore)
 			{
-				g_logger.log_dry_run(op_desc);
-			}
-			else
-			{
-				g_logger.log_verbose(op_desc);
+				g_logger.log_debug([&]() { return "Writing registry value: " + value_desc; });
 				LSTATUS status = ::RegSetKeyValueA(base_key, key_path, value_name, REG_BINARY, &value, 1);
 				if (status != ERROR_SUCCESS)
 				{
-					g_logger.log_error("Registry write failed for " + value_desc);
+					g_logger.log_error("Unable to write registry " + value_desc);
 					return EXIT_FAILURE;
 				}
 			}
-		}
-		else
-		{
-			std::string op_desc = "Deleting registry value: " + value_desc;
-			if (g_dry_run)
+			else // context.mode == Mode::match
 			{
-				g_logger.log_dry_run(op_desc);
-			}
-			else
-			{
-				g_logger.log_verbose(op_desc);
+				g_logger.log_debug([&]() { return "Deleting registry value: " + value_desc; });
 				HKEY key;
 				if (::RegOpenKeyExA(base_key, key_path, 0, KEY_ALL_ACCESS, &key) != ERROR_SUCCESS)
 				{
@@ -133,21 +129,33 @@ namespace environment {
 				}
 				::RegCloseKey(key);
 			}
+			return EXIT_SUCCESS;
 		}
-		return EXIT_SUCCESS;
-	}
 
-	static int set_ignore_serial_number(bool to_enabled)
-	{
-		const std::string op = to_enabled ? "ignore" : "match";
-		g_logger.log_info("Modifying registry to " + op + " serial number for finding devices...");
-		int status = uuu_for_each_cfg(ignore_serial_number, (void*)to_enabled);
-		if (status)
+		int apply()
 		{
-			g_logger.log_hint("Run as administrator");
+			std::string mode_desc = mode == Mode::ignore ? "ignore" : "match";
+			g_logger.log_info("Modifying registry to " + mode_desc + " serial number for device discovery...");
+			int status = uuu_for_each_cfg(ignore_serial_number, (void*)this);
+			if (status)
+			{
+				g_logger.log_hint("Run as administrator");
+			}
+			return status;
 		}
-		return status;
-	}
+
+	public:
+		int ignore()
+		{
+			mode = Mode::ignore;
+			return apply();
+		}
+		int match()
+		{
+			mode = Mode::match;
+			return apply();
+		}
+	};
 
 	static int set_environment_variable(const std::string& name, const std::string& value)
 	{

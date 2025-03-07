@@ -1,7 +1,7 @@
 uuu_version 1.4.149
 
 # @_flash.bin            | bootloader, which can extract from wic image
-# @_image   [_flash.bin] | wic image burn to emmc.
+# @_image   [_flash.bin] | wic image to burn to emmc.
 
 
 # This command will be run when i.MX6/7 i.MX8MM, i.MX8MQ

@@ -51,7 +51,7 @@ public:
 
 extern TransferContext g_transfer_context;
 
-class TransferNotifyItem
+class TransferNotifyItem final
 {
 	static constexpr const char* wait_chars = "|/-\\";
 	int wait_index;
@@ -128,7 +128,7 @@ class TransferNotifyItem
 		std::cout << s;
 	}
 
-	void render_verbose(const uuu_notify& nt)
+	void render_stream(const uuu_notify& nt)
 	{
 		if (m_dev == "Prep" && g_transfer_context.start_usb_transfer)
 			return;
@@ -179,7 +179,7 @@ class TransferNotifyItem
 
 	}
 
-	void render_simple()
+	void render_overwrite()
 	{
 		int width = g_vt->get_console_width();
 		int info, bar;
@@ -361,12 +361,12 @@ public:
 
 	void render(const uuu_notify& nt)
 	{
-		g_verbose ? render_verbose(nt) : render_simple();
+		g_verbose ? render_stream(nt) : render_overwrite();
 	}
 
 	void render()
 	{
-		render_simple();
+		render_overwrite();
 	}
 };
 
@@ -400,7 +400,6 @@ class TransferFeedback final
 		return sn;
 	}
 
-	// TODO make param const
 	void update(const uuu_notify& nt)
 	{
 		std::map<std::string, TransferNotifyItem>::iterator it;

@@ -3,18 +3,31 @@
 
 #include <stdio.h>
 
+#include <iostream>
 #include <memory>
 
 /**
- * @brief [what exactly does this do? what is it for?]
+ * @brief Hides the cursor for the lifetime of a instance
+ * @details
+ * According to https://stackoverflow.com/questions/15011478/ansi-questions-x1b25h-and-x1be,
+ * the sequence "\x1b[?25h" reads as: hey (\x1b[) show the cursor (?25h).
+ * And, for some reason this also moves the cursor to the next line (via \n).
  */
-class AutoCursor final
+class CursorHider final
 {
 public:
-	~AutoCursor()
+	CursorHider()
 	{
-		// not sure what this does, but maybe it ensures that output color is normal
-		printf("\x1b[?25h\n");
+		// hide the cursor
+		std::cout << "\x1b[?25l";
+	}
+	~CursorHider()
+	{
+		// show the cursor
+		std::cout << "\x1b[?25h";
+		
+		// [why?]
+		//std::cout << "\n";
 	}
 };
 
