@@ -205,8 +205,7 @@ static void print_new_cli_help()
 		"        List connected devices.\n"
 		"\n"
 		"    uuu install -m 1:2 -m 1:3 foo.zip\n"
-		"        Limit device discovery to USB paths 1:2 and 1:3. Use ls-devices to discover paths.\n"
-		"\n";
+		"        Limit device discovery to USB paths 1:2 and 1:3. Use ls-devices to discover paths.\n";
 	
 	std::string help_context_text;
 	{
