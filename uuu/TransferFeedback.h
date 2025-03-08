@@ -28,24 +28,59 @@ public:
 	int success_count = 0;
 	int failure_count = 0;
 
-	void print_oneline(std::string str) const
+	/**
+	 * @brief Writes to stdout to fill the current line using input text
+	 * @details
+	 * The text is truncated if it's too long for the console width.
+	 * The text is padded with spaces so that it overwrites any content on the current line
+	 * @note
+	 * Assumes the output device is a console and the cursor is at the first column on entry.
+	 */
+	void overwrite_line(std::string text) const
 	{
-		size_t w = g_vt->get_console_width();
-		if (w <= 3)
-			return;
+		const size_t console_width = g_vt->get_console_width();
+		if (console_width < 1) return;
 
-		if (str.size() >= w)
+		if (text.size() >= console_width)
 		{
-			str.resize(w - 1);
-			str[str.size() - 1] = '.';
-			str[str.size() - 2] = '.';
-			str[str.size() - 3] = '.';
+			text.resize(console_width - 1);
+			if (console_width > 3)
+			{
+				text[text.size() - 1] = '.';
+				text[text.size() - 2] = '.';
+				text[text.size() - 3] = '.';
+			}
 		}
 		else
 		{
-			str.resize(w, ' ');
+			text.resize(console_width, ' ');
 		}
-		std::cout << str << std::endl;
+		std::cout << text << std::endl;
+	}
+
+	/**
+	 * @brief Enable verbose feedback to select stream-based feedback; not overwritten
+	 */
+	void enable_stream_feedback() {
+		g_verbose = 1;
+	}
+
+	/**
+	 * @brief Moves the cursor so that it is surely below the status area
+	 * @details
+	 * Don't need for g_verbose since no status area. The cursor should already be below output.
+	 *
+	 * Even if !g_verbose, the cursor may already be below the status area since don't track its location.
+	 * This moves the cursor down by the number of lines that is the height of the status area so that
+	 * if it is in the area it this will move it after the area. If it's not at the top of the status area
+	 * then the result will be that the cursor is well below the app output.
+	 */
+	void ensure_cursor_is_below_status_area()
+	{
+		if (!g_verbose)
+		{
+			std::cout << "\n\n\n\n";
+		}
 	}
 };
 
@@ -200,7 +235,7 @@ class TransferNotifyItem final
 
 			str += wait_chars[(wait_index++) & 0x3];
 
-			g_transfer_context.print_oneline(str);
+			g_transfer_context.overwrite_line(str);
 			return;
 		}
 		else
@@ -370,6 +405,9 @@ public:
 	}
 };
 
+/**
+ * @brief Manages user feedback related to data transfer operations
+ */
 class TransferFeedback final
 {
 	std::map<uint64_t, TransferNotifyItem> nt_session;
@@ -441,14 +479,14 @@ class TransferFeedback final
 						str += it + "*";
 				}
 
-				g_transfer_context.print_oneline(str);
-				g_transfer_context.print_oneline("");
+				g_transfer_context.overwrite_line(str);
+				g_transfer_context.overwrite_line("");
 				if (nt_session[nt.id].m_dev == "Prep" && !g_transfer_context.start_usb_transfer)
 				{
 					get_summary().render();
 				}
 				else
-					g_transfer_context.print_oneline("");
+					g_transfer_context.overwrite_line("");
 
 				for (it = g_transfer_context.map_path_nt.begin(); it != g_transfer_context.map_path_nt.end(); it++)
 					it->second.render();
@@ -476,13 +514,34 @@ class TransferFeedback final
 	}
 
 public:
-	void enable() const
+	~TransferFeedback()
 	{
-		uuu_register_notify_callback(update, (void*)&nt_session);
+		disable();
 	}
 
+	/**
+	 * @brief Registers to receive notifications
+	 */
+	void enable() const
+	{
+		(void)uuu_register_notify_callback(update, (void*)&nt_session);
+
+		if (!g_verbose)
+		{
+			std::cout << g_vt->hide_cursor;
+		}
+	}
+
+	/**
+	 * @brief Unregisters to receive notifications
+	 */
 	void disable() const
 	{
-		uuu_unregister_notify_callback(update);
+		(void)uuu_unregister_notify_callback(update);
+
+		if (!g_verbose)
+		{
+			std::cout << g_vt->show_cursor;
+		}
 	}
 };

@@ -46,7 +46,6 @@
 #include <sstream>
 #include <string>
 #include <streambuf>
-#include <sstream>
 #include <thread>
 #include <tuple>
 #include <vector>
@@ -62,13 +61,6 @@ void print_autocomplete_help();
  */
 int g_verbose = 0;
 
-/**
- * @brief Enable verbose feedback to select stream-based feedback; not overwritten
- */
-static void enable_stream_feedback() {
-	g_verbose = 1;
-}
-
 Logger g_logger;
 std::shared_ptr<VtEmulation> g_vt = std::make_shared<PlatformVtEmulation>();
 TransferContext g_transfer_context;
@@ -76,7 +68,6 @@ bmap_mode g_bmap_mode = bmap_mode::Default;
 
 static bool dry_run = false;
 static bool is_continuous_mode = false;
-static TransferFeedback transfer_feedback;
 static const char command_help_text[] = {
 #include "uuu.clst"
 };
@@ -90,8 +81,10 @@ static const char command_help_text[] = {
 static void exit_for_status(int status)
 {
 	// ensure the cursor is visible before returing to the shell
+	// NOTE: the cursor might be hidden at this time since it is hidden while doing transfer operations
 	std::cout << g_vt->show_cursor;
 
+	// provide feedback on overall status
 	g_logger.log_debug([&]() { return status == EXIT_SUCCESS ? "Success :)" : "Failed :("; });
 
 	// add a blank line; to stderr so does not go to a file if stdout is redirected
@@ -99,6 +92,17 @@ static void exit_for_status(int status)
 
 	exit(status);
 }
+
+/**
+ * @brief Exits process for a runtime error
+ */
+[[noreturn]]
+static void exit_for_runtime_error(const std::string& message)
+{
+	g_logger.log_error(message);
+	exit_for_status(EXIT_FAILURE);
+}
+
 
 /**
  * @brief Exits process for a CLI syntax error
@@ -113,15 +117,17 @@ static void exit_for_syntax_error(const std::string& message)
 
 /**
  * @brief Exits after outputting feedback about interrupt
+ * @details
+ * Attach to the interrupt (ctrl-c) signal.
+ * 
+ * Without this handling for interrupt, the process would exit as desired, but the
+ * next shell cursor might be in the middle of the status area -- which looks bad.
  */
 [[noreturn]]
 static void exit_for_interrupt(int)
 {
-	// move cursor below status output area
-	printf("\n\n\n");
-
-	printf("INTERRUPTED\n");
-
+	g_transfer_context.ensure_cursor_is_below_status_area();
+	std::cout << g_vt->fg_light_red << "INTERRUPTED" << g_vt->fg_default << std::endl;
 	exit_for_status(EXIT_FAILURE);
 }
 
@@ -152,20 +158,22 @@ static void print_new_cli_help()
 		"            --dry-run\tProcess input without performing actions\n"
 		"            --continuous\n"
 		"            \t\tRepeat install action when it competes; production mode\n"
-		"            --interactive\n"
+		"            --interactive | -i\n"
 		"            \t\tEnter interactive mode after install action (if any);\n"
 		"            \t\tFYI: commands are written to uuu.inputlog for future playback\n"
 		"            -v\t\tVerbose feedback streams status instead of overwriting on a single line\n"
-		"            -V\t\tExtends verbose feedback to include USB library feedback\n"
-		"            -bmap\tUse .bmap files even if flash commands do not specify them\n"
-		"            -no-bmap\tIgnore .bmap files even if flash commands specify them\n"
-		"            -m USB_PATH\tLimits device discovery to USB port(s) specified by path\n"
-		"            -ms SN\tMonitor the serial number prefix of the device\n"
+		"            -V\t\tExtend verbose feedback to include USB library feedback\n"
+		"            --bmap\tUse .bmap files even if flash commands do not specify them\n"
+		"            --no-bmap\tIgnore .bmap files even if flash commands specify them\n"
+		"            --filter-path USB_PATH\n"
+		"            \t\tLimits device discovery to a USB port path; can include multiple\n"
+		"            --filter-serial SN\n"
+		"            \t\tLimits device discovery to a serial# prefix; can include multiple\n"
 		"            -t #\tSeconds to wait for a device to appear [what is default timeout?]\n"
-		"            -T #\tSeconds to wait for a device to appeared at stage switch [for continuous mode?]\n"
+		"            -T #\tSeconds to wait for a device to appear at stage switch [for continuous mode?]\n"
 		"            -e KEY=VAL\tSet environment variable named KEY to value VAL\n"
-		"            -pp #\tUSB polling period in milliseconds [what is default?]\n"
-		"            -dm\t\tDisable small memory [what does that mean?]\n"
+		"            --pp #\tUSB polling period in milliseconds [what is default?]\n"
+		"            --dm\tDisable small memory [what does that mean?]\n"
 		"    install [OPTION...] --script|-s BUILTIN|PATH [PARAM...]\n"
 		"        Install via built-in or custom file script and optionally passing parameters\n"
 		"        BUILTIN\t\tBuilt-in script name: $BUILTIN_NAMES\n"
@@ -317,8 +325,7 @@ static void print_script_catalog(const std::string& script_name) {
 		auto item = items.find(script_name);
 		if (item == items.end())
 		{
-			g_logger.log_error("Unknown script: " + script_name);
-			exit_for_status(EXIT_FAILURE);
+			exit_for_syntax_error("Unknown script: " + script_name);
 		}
 		print_definition(item->second);
 	}
@@ -362,14 +369,14 @@ static void print_udev_info()
 {
 	uuu_for_each_cfg(print_udev_rule, NULL);
 
-	std::cerr << std::endl <<
-		"Enable udev rules via:" << std::endl <<
-		"\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"" << std::endl <<
-		"\tsudo udevadm control --reload" << std::endl <<
-		"Note: These instructions output to standard error so are excluded from redirected standard output" << std::endl << std::endl;
+	std::cerr << std::endl
+		<< "Enable udev rules via:" << std::endl
+		<< "\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"" << std::endl
+		<< "\tsudo udevadm control --reload" << std::endl
+		<< "Note: These instructions output to standard error so are excluded from redirected standard output" << std::endl;
 }
 
-static std::string get_discovery_filter()
+static std::string get_discovery_suffix()
 {
 	std::vector<std::string> filters;
 	if (!g_transfer_context.usb_path_filter.empty())
@@ -543,31 +550,35 @@ static constexpr ScriptConfig builtin_script_configs[] =
 //! Script catalog global instance
 ScriptCatalog g_ScriptCatalog(builtin_script_configs);
 
+/**
+ * @brief Loads the content of a script
+ * @param spec Name of a built-in script or a path to a file
+ * @param args Parameter values to use with the script
+ * @param[out] source Describes the source of the script
+ */
 static std::string load_script_text(
-	const std::string& script_spec,
+	const std::string& spec,
 	const std::vector<std::string>& args,
-	std::string& script_name_feedback)
+	std::string& source)
 {
-	script_name_feedback = script_spec;
-	const Script* script = g_ScriptCatalog.find(script_spec);
+	source = spec;
+	const Script* script = g_ScriptCatalog.find(spec);
 	if (!script) {
-		script_name_feedback += " (custom)";
-		script = g_ScriptCatalog.add_from_file(script_spec);
+		source += " (custom)";
+		script = g_ScriptCatalog.add_from_file(spec);
 		if (!script)
 		{
-			g_logger.log_error("Unable to load script from file: " + script_spec);
-			exit_for_status(EXIT_FAILURE);
+			exit_for_runtime_error("Unable to load script from file: " + spec);
 		}
 	}
 	else
 	{
-		script_name_feedback += " (built-in)";
+		source += " (built-in)";
 	}
 
 	if (args.size() > script->args.size())
 	{
-		g_logger.log_error("Too many parameters for script: " + args[script->args.size()]);
-		exit_for_status(EXIT_FAILURE);
+		exit_for_runtime_error("Too many parameters for script: " + args[script->args.size()]);
 	}
 
 	const std::string text = script->replace_arguments(args);
@@ -636,7 +647,7 @@ public:
 					}
 					else
 					{
-						exit_for_syntax_error("Options are either single dash with single letter or multiple dashes; got: " + arg);
+						exit_for_syntax_error("Options are either single dash with single letter or two dashes; got: " + arg);
 					}
 				}
 				if (opt == "continuous")
@@ -653,7 +664,10 @@ public:
 				else if (opt == "i" || opt == "interactive")
 				{
 					enter_interactive_after_action = true;
-					enable_stream_feedback();
+
+					g_logger.log_info("Enabling verbose (stream-based) output since interactive UX is stream-based");
+					g_transfer_context.enable_stream_feedback();
+
 					g_logger.log_debug([&]() { return "Interactive mode enabled"; });
 				}
 				else if (opt == "v")
@@ -667,10 +681,13 @@ public:
 					uuu_set_debug_level(2);
 					g_logger.log_debug([&]() { return "Verbose+ enabled"; });
 				}
-				else if (opt == "dry")
+				else if (opt == "dry-run")
 				{
 					dry_run = true;
-					enable_stream_feedback();
+
+					g_logger.log_info("Enabling verbose (stream-based) output since dry-run UX is stream-based");
+					g_transfer_context.enable_stream_feedback();
+
 					g_logger.log_debug([&]() { return "Dry run enabled"; });
 				}
 				else if (opt == "filter-path")
@@ -754,15 +771,13 @@ public:
 					size_t equal_pos = spec.find("=");
 					if (equal_pos == std::string::npos)
 					{
-						g_logger.log_error("Invalid input '" + spec + "'; must be formatted as: key=value");
-						exit_for_status(EXIT_FAILURE);
+						exit_for_syntax_error("Invalid input '" + spec + "'; must be formatted as: key=value");
 					}
 					std::string name = spec.substr(0, equal_pos);
 					std::string value = spec.substr(equal_pos + 1);
 					if (environment::set_environment_variable(name, value))
 					{
-						g_logger.log_error("Failed to set environment variable with expression '" + spec + "'");
-						exit_for_status(EXIT_FAILURE);
+						exit_for_runtime_error("Failed to set environment variable with expression '" + spec + "'");
 					}
 					g_logger.log_debug([&]() { return "Set environment variable '" + name + "' to '" + value + "'"; });
 				}
@@ -836,36 +851,44 @@ public:
 	}
 };
 
+static void with_transfer_feedback(std::function<void()> callback)
+{
+	g_logger.log_info("Waiting for device..." + get_discovery_suffix());
+	TransferFeedback transfer_feedback;
+	transfer_feedback.enable();
+	callback();
+}
+
 static void handle_install(const std::vector<std::string>& args)
 {
 	InstallConfig config(args);
 
-	// note: probably need the cursor visible for this
+	// [what is this needed for?]
 	uuu_set_askpasswd(environment::ask_passwd);
-
-	g_logger.log_info("Waiting for device..." + get_discovery_filter());
-	std::unique_ptr<CursorHider> cursor_hider;
-	if (!g_verbose)
-	{
-		cursor_hider = std::make_unique<CursorHider>();
-	}
-
-	transfer_feedback.enable();
 
 	if (!config.protocol_cmd.empty())
 	{
-		//g_logger.log_debug([&]() { return "Executing command: " + config.protocol_cmd; });
-		int ret = uuu_run_cmd(config.protocol_cmd.c_str(), dry_run);
+		with_transfer_feedback([&]() {
+			// this can fail to parse the command or to run the command
+			int ret = uuu_run_cmd(config.protocol_cmd.c_str(), dry_run);
 
-		// what is the purpose of printing blank lines? Don't know about success, but on error, there are several blank lines on screen
-		for (size_t i = 0; i < g_transfer_context.map_path_nt.size() + 3; i++)
-			printf("\n");
+			// if status area is active, then need to move the cursor below it
+			// NOTE: the status area is not active for g_verbose or if the command failed to parse.
+			// In the latter case the cursor will be moved overly far down; not bad, but not pretty
+			if (!g_verbose)
+			{
+				// [what is the significance of g_transfer_context.map_path_nt here?]
+				for (size_t i = 0; i < g_transfer_context.map_path_nt.size() + 3; i++)
+				{
+					printf("\n");
+				}
+			}
 
-		if (ret)
-		{
-			g_logger.log_error(uuu_get_last_err_string());
-			exit_for_status(EXIT_FAILURE);
-		}
+			if (ret)
+			{
+				exit_for_runtime_error(uuu_get_last_err_string());
+			}
+		});
 
 		g_logger.log_info("Command succeeded :)");
 
@@ -878,35 +901,35 @@ static void handle_install(const std::vector<std::string>& args)
 	}
 	else if (!config.script_text.empty())
 	{
-		//g_logger.log_debug([&]() { return "Running script: " + config.script_text_source; });
+		// queue commands
 		if (uuu_run_cmd_script(config.script_text.c_str(), dry_run))
 		{
-			g_logger.log_error(uuu_get_last_err_string());
-			exit_for_status(EXIT_FAILURE);
+			exit_for_runtime_error(uuu_get_last_err_string());
 		}
 
 		// wait for queued commands to complete
-		if (uuu_wait_uuu_finish(is_continuous_mode, dry_run))
-		{
-			g_logger.log_error(uuu_get_last_err_string());
-			exit_for_status(EXIT_FAILURE);
-		}
+		with_transfer_feedback([&]() {
+			if (uuu_wait_uuu_finish(is_continuous_mode, dry_run))
+			{
+				exit_for_runtime_error(uuu_get_last_err_string());
+			}
+		});
 	}
 	else if (!config.input_path.empty())
 	{
-		//g_logger.log_debug([&]() { return "Running as auto detect file: " + config.input_path; });
+		// queue commands
 		if (uuu_auto_detect_file(config.input_path.c_str()))
 		{
-			g_logger.log_error(uuu_get_last_err_string());
-			exit_for_status(EXIT_FAILURE);
+			exit_for_runtime_error(uuu_get_last_err_string());
 		}
 
 		// wait for queued commands to complete
-		if (uuu_wait_uuu_finish(is_continuous_mode, dry_run))
-		{
-			g_logger.log_error(uuu_get_last_err_string());
-			exit_for_status(EXIT_FAILURE);
-		}
+		with_transfer_feedback([&]() {
+			if (uuu_wait_uuu_finish(is_continuous_mode, dry_run))
+			{
+				exit_for_runtime_error(uuu_get_last_err_string());
+			}
+		});
 	}
 	else if (!config.enter_interactive_after_action)
 	{
@@ -915,7 +938,6 @@ static void handle_install(const std::vector<std::string>& args)
 
 	if (config.enter_interactive_after_action)
 	{
-		cursor_hider.reset();
 		process_interactive_commands();
 	}
 
@@ -923,13 +945,7 @@ static void handle_install(const std::vector<std::string>& args)
 	// [why is wait needed?]
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-	// move cursor below status area if not in streaming status mode
-	if (!g_verbose)
-	{
-		// NOTE: the last status output seems to be to success/fail line which is 4 lines above the end of the status area
-		// NOTE: old version only output 3; not 4
-		printf("\n\n\n\n");
-	}
+	g_transfer_context.ensure_cursor_is_below_status_area();
 }
 
 static void handle_list_devices(const std::vector<std::string>& args)
@@ -1023,41 +1039,44 @@ static std::vector<command_handler_t> command_handlers
 #endif
 };
 
+[[noreturn]]
 static void process_new_command_line(int argc, char** argv)
 {
-	if (argc == 1)
+	if (argc < 2)
 	{
-		print_cli_help();
-		exit_for_status(EXIT_FAILURE);
+		exit_for_syntax_error("Missing command; options: " + string_man::join_keys(command_handlers));
 	}
-
-	const std::string arg = argv[1];
-
-	if (arg == "-h")
+	
+	const std::string command = argv[1];
+	if (command == "-h")
 	{
 		print_cli_help();
 		exit_for_status(EXIT_SUCCESS);
 	}
-	else
-	{
-		const auto& handler = std::find_if(command_handlers.begin(), command_handlers.end(), [&](const auto& item) {
-			return std::get<0>(item) == arg;
-		});
-		if (handler == command_handlers.end())
-		{
-			exit_for_syntax_error("Unknown command '" + arg + "'; options: " + string_man::join_keys(command_handlers));
-		}
 
-		std::vector<std::string> args;
-		for (int j = 2; j < argc; j++)
-		{
-			args.push_back(argv[j]);
-		}
-		auto& handle = std::get<1>(*handler);
-		handle(args);
+	const auto& handler = std::find_if(command_handlers.begin(), command_handlers.end(), [&](const auto& item) {
+		return std::get<0>(item) == command;
+	});
+	if (handler == command_handlers.end())
+	{
+		exit_for_syntax_error("Unknown command '" + command + "'; options: " + string_man::join_keys(command_handlers));
 	}
+
+	std::vector<std::string> args;
+	for (int j = 2; j < argc; j++)
+	{
+		args.push_back(argv[j]);
+	}
+	auto& handle = std::get<1>(*handler);
+	handle(args);
+
+	// exit process with feedback
+	// FYI: g_transfer_context.overall_status indicates failure if any USB command failed
+	// NOTE: should only get here if performed transfer (installed a file or ran a script)
+	exit_for_status(g_transfer_context.overall_status);
 }
 
+[[noreturn]]
 static void process_old_command_line(int argc, char** argv)
 {
 	if (argc == 1)
@@ -1156,7 +1175,9 @@ static void process_old_command_line(int argc, char** argv)
 			else if (opt == "s")
 			{
 				is_shell_mode = true;
-				enable_stream_feedback();
+
+				g_logger.log_info("Enabling verbose (stream-based) output since shell UX is stream-based");
+				g_transfer_context.enable_stream_feedback();
 			}
 			else if (opt == "v")
 			{
@@ -1170,7 +1191,9 @@ static void process_old_command_line(int argc, char** argv)
 			else if (opt == "dry")
 			{
 				dry_run = true;
-				enable_stream_feedback();
+
+				g_logger.log_info("Enabling verbose (stream-based) output since dry-run UX is stream-based");
+				g_transfer_context.enable_stream_feedback();
 			}
 			else if (opt == "m")
 			{
@@ -1232,15 +1255,13 @@ static void process_old_command_line(int argc, char** argv)
 				size_t equal_pos = spec.find("=");
 				if (equal_pos == std::string::npos)
 				{
-					g_logger.log_error("Invalid input '" + spec + "'; must be formatted as: key=value");
-					exit_for_status(EXIT_FAILURE);
+					exit_for_syntax_error("Invalid input '" + spec + "'; must be formatted as: key=value");
 				}
 				std::string name = spec.substr(0, equal_pos);
 				std::string value = spec.substr(equal_pos + 1);
 				if (environment::set_environment_variable(name, value))
 				{
-					g_logger.log_error("Failed to set environment variable with expression '" + spec + "'");
-					exit_for_status(EXIT_FAILURE);
+					exit_for_runtime_error("Failed to set environment variable with expression '" + spec + "'");
 				}
 				g_logger.log_debug([&]() { return "Set environment variable '" + name + "' to '" + value + "'"; });
 			}
@@ -1305,6 +1326,7 @@ static void process_old_command_line(int argc, char** argv)
 		exit_for_syntax_error("Incompatible options: shell (-s) and dry-run (-dry)");
 	}
 
+	// setup for transfer feedback
 	if (g_verbose)
 	{
 		// commented out since can print script content via -cat-builtin; print here is noise
@@ -1313,11 +1335,11 @@ static void process_old_command_line(int argc, char** argv)
 
 		// why not log for !shell? it's logged for !g_verbose regardless
 		if (!is_shell_mode) {
-			g_logger.log_info("Waiting for device..." + get_discovery_filter());
+			g_logger.log_info("Waiting for device..." + get_discovery_suffix());
 		}
 	}
 	else {
-		std::cout << "Waiting for device..." << get_discovery_filter();
+		std::cout << "Waiting for device..." << get_discovery_suffix();
 		
 		// move cursor to begining of line so that next output will overwrite waiting line;
 		// NOTE: This is nice when it works since it erases the transitory state of waiting, 
@@ -1334,7 +1356,9 @@ static void process_old_command_line(int argc, char** argv)
 		std::cout.flush();
 	}
 
+	CursorRestorer cursor_restorer;
 	uuu_set_askpasswd(environment::ask_passwd);
+	TransferFeedback transfer_feedback;
 	transfer_feedback.enable();
 
 	if (is_shell_mode)
@@ -1353,8 +1377,7 @@ static void process_old_command_line(int argc, char** argv)
 
 		if (ret)
 		{
-			g_logger.log_error(uuu_get_last_err_string());
-			exit_for_status(EXIT_FAILURE);
+			exit_for_runtime_error(uuu_get_last_err_string());
 		}
 
 		g_logger.log_info("Command succeeded :)");
@@ -1373,8 +1396,7 @@ static void process_old_command_line(int argc, char** argv)
 		g_logger.log_debug([&]() { return "Running script: " + script_name_feedback; });
 		if (uuu_run_cmd_script(script_text.c_str(), dry_run))
 		{
-			g_logger.log_error(uuu_get_last_err_string());
-			exit_for_status(EXIT_FAILURE);
+			exit_for_runtime_error(uuu_get_last_err_string());
 		}
 	}
 	else if (!input_path.empty())
@@ -1382,8 +1404,7 @@ static void process_old_command_line(int argc, char** argv)
 		g_logger.log_debug([&]() { return "Running as auto detect file: " + input_path; });
 		if (uuu_auto_detect_file(input_path.c_str()))
 		{
-			g_logger.log_error(uuu_get_last_err_string());
-			exit_for_status(EXIT_FAILURE);
+			exit_for_runtime_error(uuu_get_last_err_string());
 		}
 	}
 	else
@@ -1393,19 +1414,23 @@ static void process_old_command_line(int argc, char** argv)
 
 	if (uuu_wait_uuu_finish(is_continuous_mode, dry_run))
 	{
-		g_logger.log_error(uuu_get_last_err_string());
-		exit_for_status(EXIT_FAILURE);
+		exit_for_runtime_error(uuu_get_last_err_string());
 	}
 
 	// wait for the thread exit, after send out CMD_DONE
 	// [why is wait needed?]
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-	// move cursor below status area if not in streaming status mode
+	// move cursor below status area; NOTE: no status area if g_verbose
 	if (!g_verbose)
 	{
 		printf("\n\n\n");
 	}
+
+	// exit process with feedback
+	// FYI: g_transfer_context.overall_status indicates failure if any USB command failed
+	// NOTE: should only get here if performed transfer (installed a file or ran a script)
+	exit_for_status(g_transfer_context.overall_status);
 }
 
 int main(int argc, char** argv)
@@ -1417,6 +1442,7 @@ int main(int argc, char** argv)
 	signal(SIGINT, exit_for_interrupt);
 
 	print_app_title();
+
 	// enable rich output if possible
 	if (g_vt->enable())
 	{
@@ -1427,8 +1453,7 @@ int main(int argc, char** argv)
 		// note: if output is re-directed to a file, then output does not supports color.
 		// There may be other ways color is not supported.
 		g_logger.log_warning("Rich output is not supported; feedback will be monochrome and stream-based (not overwriting)");
-
-		enable_stream_feedback();
+		g_transfer_context.enable_stream_feedback();
 	}
 
 	bool use_new_cli = true;
@@ -1439,15 +1464,10 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		CursorRestorer cursor_restorer;
 		print_cli_help = print_old_cli_help;
 		process_old_command_line(argc, argv);
 	}
 
-	// NOTE: should only get here if installed a file or ran a script
-
-	// log and return install result
-	// FYI: g_transfer_context.overall_status indicate failure if any USB command failed
-	g_logger.log_info(g_transfer_context.overall_status == 0 ? "Success :)" : "Failed :(");
-	return g_transfer_context.overall_status;
+	g_logger.log_internal_error("Command line processor should not return");
+	exit_for_status(EXIT_FAILURE);
 }

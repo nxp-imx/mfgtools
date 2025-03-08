@@ -28,6 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
+//! @file
 
 #include "string_man.h"
 
@@ -70,7 +71,7 @@ string get_env_variable(string key)
 
 int clear_env()
 {
-	return g_environment.erase(std::this_thread::get_id());
+	return (int)g_environment.erase(std::this_thread::get_id());
 }
 
 bool is_env_exist(string key)
@@ -528,12 +529,18 @@ static shared_ptr<CmdBase> create_cmd_obj(string cmd)
 	return nullptr;
 }
 
+/**
+ * @brief Executes a command
+ * @param cmd Command text, c-string
+ * @param dry Whether to dry-run the operation
+ * @return 0 for success
+ */
 int uuu_run_cmd(const char * cmd, int dry)
 {
 	return run_cmd(nullptr, cmd, dry);
 }
 
-int run_cmd(CmdCtx *pCtx, const char * cmd, int dry)
+static int run_cmd(CmdCtx *pCtx, const char * cmd, int dry)
 {
 	shared_ptr<CmdBase> p;
 	p = create_cmd_obj(cmd);
@@ -695,7 +702,7 @@ int CmdShell::run(CmdCtx*pCtx)
 
 	string str;
 	str.resize(256);
-	while (fgets((char*)str.c_str(), str.size(), pipe))
+	while (fgets((char*)str.c_str(), (int)str.size(), pipe))
 	{
 		if (m_dyn)
 		{
@@ -1049,6 +1056,14 @@ static int check_version(string str)
 	return 0;
 }
 
+/**
+ * @brief Parses the text of a script and queues parsed commands for future execution
+ * @param buff Script text, c-string
+ * @param dry Not used
+ * @return 0 on success
+ * @note
+ * The name (run) implies that this blocks until the script has completed running, but it does not.
+ */
 int uuu_run_cmd_script(const char * buff, int /*dry*/)
 {
 	shared_ptr<DataBuffer> p(new DataBuffer((void*)buff, strlen(buff)));
@@ -1056,7 +1071,7 @@ int uuu_run_cmd_script(const char * buff, int /*dry*/)
 	return parser_cmd_list_file(p);
 }
 
-int parser_cmd_list_file(shared_ptr<DataBuffer> pbuff, CmdMap *pCmdMap)
+static int parser_cmd_list_file(shared_ptr<DataBuffer> pbuff, CmdMap *pCmdMap)
 {
 	char uuu_version[] = "uuu_version";
 	string str;
@@ -1095,6 +1110,11 @@ int parser_cmd_list_file(shared_ptr<DataBuffer> pbuff, CmdMap *pCmdMap)
 	return 0;
 }
 
+/**
+ * @brief Searches for a script file based on a path and queues its commands for future execution
+ * @param path File system path, c-string
+ * @return 0 on success
+ */
 int uuu_auto_detect_file(const char *path)
 {
 	string fn = strip_quotes(path);
