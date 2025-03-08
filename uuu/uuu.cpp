@@ -228,8 +228,11 @@ static void print_new_cli_help()
 		"        List connected devices.\n"
 		"\n"
 		"    uuu install -m 1:2 -m 1:3 foo.zip\n"
-		"        Limit device discovery to USB paths 1:2 and 1:3. Use ls-devices to discover paths.\n";
-	
+		"        Limit device discovery to USB paths 1:2 and 1:3. Use ls-devices to discover paths.\n"
+		"\n"
+		"    uuu install --interactive --script emmc bootloader\n"
+		"        Load a bootloader image to the device EMMC and enter interactive mode.\n";
+
 	std::string help_context_text;
 	{
 		std::ostringstream ss;
