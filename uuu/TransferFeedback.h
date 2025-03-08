@@ -29,10 +29,10 @@ public:
 	int failure_count = 0;
 
 	/**
-	 * @brief Writes to stdout to fill the current line using input text
+	 * @brief Writes to stdout to fill the current console line using input text
 	 * @details
 	 * The text is truncated if it's too long for the console width.
-	 * The text is padded with spaces so that it overwrites any content on the current line
+	 * The text is padded with spaces so that it overwrites any content on the current line.
 	 * @note
 	 * Assumes the output device is a console and the cursor is at the first column on entry.
 	 */

@@ -103,7 +103,6 @@ static void exit_for_runtime_error(const std::string& message)
 	exit_for_status(EXIT_FAILURE);
 }
 
-
 /**
  * @brief Exits process for a CLI syntax error
  */
@@ -129,6 +128,22 @@ static void exit_for_interrupt(int)
 	g_transfer_context.ensure_cursor_is_below_status_area();
 	std::cout << g_vt->fg_light_red << "INTERRUPTED" << g_vt->fg_default << std::endl;
 	exit_for_status(EXIT_FAILURE);
+}
+
+static void set_environment_variable(const std::string& spec)
+{
+	size_t equal_pos = spec.find("=");
+	if (equal_pos == std::string::npos)
+	{
+		exit_for_syntax_error("Invalid input '" + spec + "'; must be formatted as: key=value");
+	}
+	std::string name = spec.substr(0, equal_pos);
+	std::string value = spec.substr(equal_pos + 1);
+	if (environment::set_environment_variable(name, value))
+	{
+		exit_for_runtime_error("Failed to set environment variable with expression '" + spec + "'");
+	}
+	g_logger.log_debug([&]() { return "Set environment variable '" + name + "' to '" + value + "'"; });
 }
 
 /**
@@ -625,7 +640,7 @@ class InstallConfig final
 {
 public:
 	bool enter_interactive_after_action = false;
-	std::string input_path;
+	std::string file_system_path;
 	std::string protocol_cmd;
 	std::string script_text;
 	std::string script_text_source;
@@ -768,18 +783,7 @@ public:
 					}
 					std::string spec = args.front();
 					args.erase(args.begin());
-					size_t equal_pos = spec.find("=");
-					if (equal_pos == std::string::npos)
-					{
-						exit_for_syntax_error("Invalid input '" + spec + "'; must be formatted as: key=value");
-					}
-					std::string name = spec.substr(0, equal_pos);
-					std::string value = spec.substr(equal_pos + 1);
-					if (environment::set_environment_variable(name, value))
-					{
-						exit_for_runtime_error("Failed to set environment variable with expression '" + spec + "'");
-					}
-					g_logger.log_debug([&]() { return "Set environment variable '" + name + "' to '" + value + "'"; });
+					set_environment_variable(spec);
 				}
 				else if (opt == "s" || opt == "script")
 				{
@@ -802,9 +806,8 @@ public:
 			}
 			else if (!arg.empty() && arg[arg.size() - 1] == ':')
 			{
-				// treat as a protocol command
-				const std::string delim = " ";
-				protocol_cmd = arg + delim;
+				std::vector<std::string> cmd_args;
+				cmd_args.push_back(arg);
 				for (auto& cmd_arg : args)
 				{
 					if (cmd_arg.find(' ') != std::string::npos)
@@ -812,19 +815,17 @@ public:
 						cmd_arg.insert(cmd_arg.begin(), '"');
 						cmd_arg.insert(cmd_arg.end(), '"');
 					}
-					protocol_cmd.append(cmd_arg);
-					protocol_cmd.append(delim);
+					cmd_args.push_back(cmd_arg);
 				}
-				// remove last delim
-				protocol_cmd.erase(protocol_cmd.size() - delim.size());
+				protocol_cmd = string_man::join(cmd_args, " ");
 				g_logger.log_debug([&]() { return "Protocol command: '" + protocol_cmd + "'"; });
 				args.clear();
 				break;
 			}
 			else
 			{
-				input_path = arg;
-				g_logger.log_debug([&]() { return "Input path: " + input_path; });
+				file_system_path = arg;
+				g_logger.log_debug([&]() { return "Input path: " + file_system_path; });
 				break;
 			}
 		}
@@ -915,10 +916,10 @@ static void handle_install(const std::vector<std::string>& args)
 			}
 		});
 	}
-	else if (!config.input_path.empty())
+	else if (!config.file_system_path.empty())
 	{
 		// queue commands
-		if (uuu_auto_detect_file(config.input_path.c_str()))
+		if (uuu_auto_detect_file(config.file_system_path.c_str()))
 		{
 			exit_for_runtime_error(uuu_get_last_err_string());
 		}
@@ -1251,19 +1252,7 @@ static void process_old_command_line(int argc, char** argv)
 				{
 					exit_for_syntax_error("Missing key=value argument");
 				}
-				std::string spec = argv[i];
-				size_t equal_pos = spec.find("=");
-				if (equal_pos == std::string::npos)
-				{
-					exit_for_syntax_error("Invalid input '" + spec + "'; must be formatted as: key=value");
-				}
-				std::string name = spec.substr(0, equal_pos);
-				std::string value = spec.substr(equal_pos + 1);
-				if (environment::set_environment_variable(name, value))
-				{
-					exit_for_runtime_error("Failed to set environment variable with expression '" + spec + "'");
-				}
-				g_logger.log_debug([&]() { return "Set environment variable '" + name + "' to '" + value + "'"; });
+				set_environment_variable(argv[i]);
 			}
 #ifdef _WIN32
 			else if (opt == "IgSerNum")
@@ -1285,7 +1274,6 @@ static void process_old_command_line(int argc, char** argv)
 		}
 		else if (!arg.empty() && arg[arg.size() - 1] == ':')
 		{
-			g_logger.log_debug([&]() { return "Treat as a protocol command"; });
 			for (int j = i; j < argc; j++)
 			{
 				std::string cmd_arg = argv[j];
@@ -1298,16 +1286,17 @@ static void process_old_command_line(int argc, char** argv)
 				if (j != (argc - 1)) // don't add space after last arg
 					protocol_cmd.append(" ");
 			}
+			g_logger.log_debug([&]() { return "Protocol command: '" + protocol_cmd + "'"; });
 			break;
 		}
 		else
 		{
-			g_logger.log_debug([&]() { return "Treat as a file system path"; });
 			if (argc - 1 > i)
 			{
 				exit_for_syntax_error("Too many arguments: " + std::string(argv[i + 1]) + "; Hint: use -b to pass parameters to a script");
 			}
 			input_path = arg;
+			g_logger.log_debug([&]() { return "Input path: " + input_path; });
 		}
 	}
 
@@ -1368,7 +1357,6 @@ static void process_old_command_line(int argc, char** argv)
 	}
 	else if (!protocol_cmd.empty())
 	{
-		g_logger.log_debug([&]() { return "Executing command: " + protocol_cmd; });
 		int ret = uuu_run_cmd(protocol_cmd.c_str(), dry_run);
 
 		// what is the purpose of printing blank lines? Don't know about success, but on error, there are several blank lines on screen
@@ -1393,7 +1381,6 @@ static void process_old_command_line(int argc, char** argv)
 			g_logger.log_internal_error("Expected non-empty script_spec");
 			exit_for_status(EXIT_FAILURE);
 		}
-		g_logger.log_debug([&]() { return "Running script: " + script_name_feedback; });
 		if (uuu_run_cmd_script(script_text.c_str(), dry_run))
 		{
 			exit_for_runtime_error(uuu_get_last_err_string());
@@ -1401,7 +1388,6 @@ static void process_old_command_line(int argc, char** argv)
 	}
 	else if (!input_path.empty())
 	{
-		g_logger.log_debug([&]() { return "Running as auto detect file: " + input_path; });
 		if (uuu_auto_detect_file(input_path.c_str()))
 		{
 			exit_for_runtime_error(uuu_get_last_err_string());
