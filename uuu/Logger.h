@@ -18,7 +18,7 @@ class Logger final
 	{
 		if (is_color_output_enabled)
 		{
-			std::cerr << color << label << ": " << g_vt->default_fg << message << std::endl;
+			std::cerr << color << label << ": " << g_vt->fg_default << message << std::endl;
 		}
 		else
 		{
@@ -31,32 +31,32 @@ public:
 
 	void log_internal_error(const std::string& message) const
 	{
-		log("INTERNAL ERROR", message, g_vt->red);
+		log("INTERNAL ERROR", message, g_vt->fg_light_red);
 	}
 
 	void log_error(const std::string& message) const
 	{
-		log("Error", message, g_vt->red);
+		log("Error", message, g_vt->fg_light_red);
 	}
 
 	void log_warning(const std::string& message) const
 	{
-		log("Warning", message, g_vt->yellow);
+		log("Warning", message, g_vt->fg_light_yellow);
 	}
 
 	void log_info(const std::string& message) const
 	{
-		log("Info", message, g_vt->green);
+		log("Info", message, g_vt->fg_light_blue);
 	}
 
 	void log_hint(const std::string& message) const
 	{
-		log("Hint", message, g_vt->green);
+		log("Hint", message, g_vt->fg_light_green);
 	}
 
 	void log_dry_run(const std::string& message) const
 	{
-		log("Dry-run", message, g_vt->green);
+		log("Dry-run", message, g_vt->fg_light_magenta);
 	}
 
 	void log_debug(std::function<std::string()> format) const
@@ -65,7 +65,7 @@ public:
 		bool is_debug_output_enabled = true;
 		if (is_debug_output_enabled)
 		{
-			log("Debug", format(), g_vt->kcyn);
+			log("Debug", format(), g_vt->fg_light_cyan);
 		}
 #endif
 	}

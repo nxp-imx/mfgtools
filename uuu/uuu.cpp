@@ -62,8 +62,8 @@ void print_autocomplete_help();
  */
 int g_verbose = 0;
 
-/*
- * @brief Enable verbose feedback to select stream-based feedback; not overwritting
+/**
+ * @brief Enable verbose feedback to select stream-based feedback; not overwritten
  */
 static void enable_stream_feedback() {
 	g_verbose = 1;
@@ -82,31 +82,21 @@ static const char command_help_text[] = {
 };
 
 /**
- * @brief Returns a string that contains the 1st item of each vector item (a tuple) separated by pipe (|)
- */
-template <typename T>
-std::string join_keys(const std::vector<T>& items)
-{
-	const std::string& delimiter = "|";
-	std::ostringstream ss;
-	for (auto& item : items)
-	{
-		std::string s = std::get<0>(item);
-		ss << s << delimiter;
-	}
-	std::string text = ss.str();
-	text.erase(text.size() - delimiter.size());
-	return text;
-}
-
-/**
- * @brief Exits process with specified status
+ * @brief Exits process with specified status and CLI feedback/cleanup
+ * @details
+ * Use this instead of directly calling exit().
  */
 [[noreturn]]
 static void exit_for_status(int status)
 {
+	// ensure the cursor is visible before returing to the shell
+	std::cout << g_vt->show_cursor;
+
 	g_logger.log_debug([&]() { return status == EXIT_SUCCESS ? "Success :)" : "Failed :("; });
+
+	// add a blank line; to stderr so does not go to a file if stdout is redirected
 	std::cerr << std::endl;
+
 	exit(status);
 }
 
@@ -127,11 +117,6 @@ static void exit_for_syntax_error(const std::string& message)
 [[noreturn]]
 static void exit_for_interrupt(int)
 {
-	// ensure cursor is visible; this code is weird looking since just want to call the dtor
-	{
-		CursorHider o;
-	}
-
 	// move cursor below status output area
 	printf("\n\n\n");
 
@@ -299,10 +284,10 @@ static void (*print_cli_help)() = nullptr;
  */
 static void print_definition(const Script& script)
 {
-	std::string id_highlight = g_vt->green;
-	std::string key_highlight = g_vt->kcyn;
-	std::string no_highlight = g_vt->default_fg;
-	std::cout << id_highlight << script.name << g_vt->default_fg << ": " << script.desc << std::endl;
+	std::string id_highlight = g_vt->fg_light_green;
+	std::string key_highlight = g_vt->fg_cyan;
+	std::string no_highlight = g_vt->fg_default;
+	std::cout << id_highlight << script.name << g_vt->fg_default << ": " << script.desc << std::endl;
 	for (auto& arg : script.args)
 	{
 		std::string desc = id_highlight + arg.name + no_highlight;
@@ -385,21 +370,19 @@ static void print_udev_info()
 		"Note: These instructions output to standard error so are excluded from redirected standard output" << std::endl << std::endl;
 }
 
-static std::string get_usb_filter()
+static std::string get_discovery_filter()
 {
-	std::ostringstream ss;
+	std::vector<std::string> filters;
 	if (!g_transfer_context.usb_path_filter.empty())
 	{
-		ss << " at path ";
-		for (size_t i = 0; i < g_transfer_context.usb_path_filter.size(); i++)
-			ss << g_transfer_context.usb_path_filter[i] << " ";
+		filters.push_back("at path: " + string_man::join(g_transfer_context.usb_path_filter, "|"));
 	}
-	return ss.str();
-}
-
-static void print_usb_filter()
-{
-	std::cout << get_usb_filter();
+	if (!g_transfer_context.usb_serial_no_filter.empty())
+	{
+		filters.push_back("with serial#: " + string_man::join(g_transfer_context.usb_serial_no_filter, "|"));
+	}
+	if (filters.empty()) return "";
+	return " (" + string_man::join(filters, "; ") + ")";
 }
 
 static const help_handler_t get_help_handlers()
@@ -611,7 +594,7 @@ static void handle_help(const std::vector<std::string>& args)
 	const auto help_handlers = get_help_handlers();
 	if (args.size() == 0)
 	{
-		exit_for_syntax_error("Missing help context; options: " + join_keys(help_handlers));
+		exit_for_syntax_error("Missing help context; options: " + string_man::join_keys(help_handlers));
 	}
 	else
 	{
@@ -621,7 +604,7 @@ static void handle_help(const std::vector<std::string>& args)
 			});
 		if (handler == help_handlers.end())
 		{
-			exit_for_syntax_error("Unknown help context '" + context + "'; options: " + join_keys(help_handlers));
+			exit_for_syntax_error("Unknown help context '" + context + "'; options: " + string_man::join_keys(help_handlers));
 		}
 		std::get<1>(*handler)();
 	}
@@ -861,22 +844,10 @@ static void handle_install(const std::vector<std::string>& args)
 	// note: probably need the cursor visible for this
 	uuu_set_askpasswd(environment::ask_passwd);
 
+	g_logger.log_info("Waiting for device..." + get_discovery_filter());
 	std::unique_ptr<CursorHider> cursor_hider;
-	if (g_verbose)
+	if (!g_verbose)
 	{
-		std::cout << "Waiting for device" << get_usb_filter() << "..." << std::endl;
-	}
-	else
-	{
-		// prepare for feedback via status area
-		std::cout << "Waiting for device" << get_usb_filter() << "...";
-		
-		//std::cout << "\n";
-
-		// move cursor to beginning of line so that next output will overwrite it;
-		// commented out since is problematic in various situations
-		std::cout << "\r";
-
 		cursor_hider = std::make_unique<CursorHider>();
 	}
 
@@ -1075,7 +1046,7 @@ static void process_new_command_line(int argc, char** argv)
 		});
 		if (handler == command_handlers.end())
 		{
-			exit_for_syntax_error("Unknown command '" + arg + "'; options: " + join_keys(command_handlers));
+			exit_for_syntax_error("Unknown command '" + arg + "'; options: " + string_man::join_keys(command_handlers));
 		}
 
 		std::vector<std::string> args;
@@ -1343,18 +1314,24 @@ static void process_old_command_line(int argc, char** argv)
 
 		// why not log for !shell? it's logged for !g_verbose regardless
 		if (!is_shell_mode) {
-			std::cout << "Waiting for device";
-			print_usb_filter();
-			std::cout << "...";
-			printf("\n");
+			g_logger.log_info("Waiting for device..." + get_discovery_filter());
 		}
 	}
 	else {
-		std::cout << "Waiting for device";
-		print_usb_filter();
-		std::cout << "...";
-		std::cout << "\r"; // why is this needed?
-		std::cout << "\x1b[?25l"; // what does this do?
+		std::cout << "Waiting for device..." << get_discovery_filter();
+		
+		// move cursor to begining of line so that next output will overwrite waiting line;
+		// NOTE: This is nice when it works since it erases the transitory state of waiting, 
+		// but if the next line is shorter than the waiting line, then the portion of the waiting
+		// line that is longer will remain after the next line is output. 
+		// FWIW I think it's better to leave the waiting msg on screen to than allow a partial msg
+		// to show and think that \r sould be replaed with \n
+		std::cout << "\r";
+		
+		// hide the cursor
+		std::cout << g_vt->hide_cursor;
+		
+		// is this needed?
 		std::cout.flush();
 	}
 
@@ -1463,8 +1440,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		std::unique_ptr<CursorHider> cursor_hider;
-		if (!g_verbose) cursor_hider = std::make_unique<CursorHider>();
+		CursorRestorer cursor_restorer;
 		print_cli_help = print_old_cli_help;
 		process_old_command_line(argc, argv);
 	}

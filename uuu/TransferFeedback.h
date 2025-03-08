@@ -104,8 +104,8 @@ class TransferNotifyItem final
 
 		size_t start = (width - per.size()) / 2;
 		str.replace(start, per.size(), per);
-		str.insert(start, g_vt->yellow);
-		str.insert(start + per.size() + strlen(g_vt->yellow), g_vt->default_fg);
+		str.insert(start, g_vt->fg_light_yellow);
+		str.insert(start + per.size() + strlen(g_vt->fg_light_yellow), g_vt->fg_default);
 		return str;
 	}
 
@@ -147,18 +147,18 @@ class TransferNotifyItem final
 			diff /= 1000;
 			if (nt.status)
 			{
-				std::cout << m_dev << ">" << g_vt->red << "Fail " << uuu_get_last_err_string() << "(" << std::setprecision(4) << diff << "s)" << g_vt->default_fg << std::endl;
+				std::cout << m_dev << ">" << g_vt->fg_light_red << "Fail " << uuu_get_last_err_string() << "(" << std::setprecision(4) << diff << "s)" << g_vt->fg_default << std::endl;
 			}
 			else
 			{
-				std::cout << m_dev << ">" << g_vt->green << "Okay (" << std::setprecision(4) << diff << "s)" << g_vt->default_fg << std::endl;
+				std::cout << m_dev << ">" << g_vt->fg_light_green << "Okay (" << std::setprecision(4) << diff << "s)" << g_vt->fg_default << std::endl;
 			}
 		}
 
 		if (nt.type == uuu_notify::NOTIFY_TRANS_POS || nt.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
 		{
 			if (m_trans_size)
-				std::cout << g_vt->yellow << "\r" << m_trans_pos * 100 / m_trans_size << "%" << g_vt->default_fg;
+				std::cout << g_vt->fg_light_yellow << "\r" << m_trans_pos * 100 / m_trans_size << "%" << g_vt->fg_default;
 			else
 				std::cout << "\r" << m_trans_pos;
 
@@ -223,14 +223,14 @@ class TransferNotifyItem final
 					err = uuu_get_last_err_string();
 					err.resize(bar - 2, ' ');
 					str.replace(1, err.size(), err);
-					str.insert(1, g_vt->red);
-					str.insert(1 + strlen(g_vt->red) + err.size(), g_vt->default_fg);
+					str.insert(1, g_vt->fg_light_red);
+					str.insert(1 + strlen(g_vt->fg_light_red) + err.size(), g_vt->fg_default);
 				}
 				else
 				{
 					str.replace(1, 4, "Done");
-					str.insert(1, g_vt->green);
-					str.insert(1 + strlen(g_vt->green) + strlen("Done"), g_vt->default_fg);
+					str.insert(1, g_vt->fg_light_green);
+					str.insert(1 + strlen(g_vt->fg_light_green) + strlen("Done"), g_vt->fg_default);
 				}
 				std::cout << str;
 			}

@@ -5,9 +5,9 @@
 #include <stdarg.h>
 
 #include <algorithm>
-//#include <cctype>
 #include <locale>
 #include <string>
+#include <vector>
 
 /**
  * @brief String manipulation functions
@@ -121,6 +121,40 @@ namespace string_man {
 	inline std::string& trim(std::string& text) {
 		right_trim(text);
 		left_trim(text);
+		return text;
+	}
+
+	/**
+	 * @brief Returns a string that contains the 1st item of each vector item (a tuple) separated by pipe (|)
+	 */
+	template <typename T>
+	std::string join(const std::vector<T>& items, const std::string& delimiter)
+	{
+		std::ostringstream ss;
+		for (auto& item : items)
+		{
+			ss << item << delimiter;
+		}
+		std::string text = ss.str();
+		text.erase(text.size() - delimiter.size());
+		return text;
+	}
+
+	/**
+	 * @brief Returns a string that contains the 1st item of each vector item (a tuple) separated by pipe (|)
+	 */
+	template <typename T>
+	std::string join_keys(const std::vector<T>& items)
+	{
+		const std::string& delimiter = "|";
+		std::ostringstream ss;
+		for (auto& item : items)
+		{
+			std::string s = std::get<0>(item);
+			ss << s << delimiter;
+		}
+		std::string text = ss.str();
+		text.erase(text.size() - delimiter.size());
 		return text;
 	}
 }

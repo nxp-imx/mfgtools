@@ -7,32 +7,10 @@
 #include <memory>
 
 /**
- * @brief Hides the cursor for the lifetime of a instance
- * @details
- * According to https://stackoverflow.com/questions/15011478/ansi-questions-x1b25h-and-x1be,
- * the sequence "\x1b[?25h" reads as: hey (\x1b[) show the cursor (?25h).
- * And, for some reason this also moves the cursor to the next line (via \n).
- */
-class CursorHider final
-{
-public:
-	CursorHider()
-	{
-		// hide the cursor
-		std::cout << "\x1b[?25l";
-	}
-	~CursorHider()
-	{
-		// show the cursor
-		std::cout << "\x1b[?25h";
-		
-		// [why?]
-		//std::cout << "\n";
-	}
-};
-
-/**
  * @brief Base class for VT terminal emulation
+ * @details
+ * See https://gist.github.com/raghav4/48716264a0f426cf95e4342c21ada8e7
+ * See https://stackoverflow.com/questions/15011478/ansi-questions-x1b25h-and-x1be
  */
 class VtEmulation
 {
@@ -40,20 +18,30 @@ public:
 	VtEmulation() {
 		select_default_palette();
 	}
-	const char* yellow;
-	const char* default_fg;
-	const char* green;
-	const char* red;
-	const char* kcyn;
-	const char* boldwhite;
+	const char* hide_cursor;
+	const char* show_cursor;
+	const char* fg_default;
+	const char* fg_cyan;
+	const char* fg_light_red;
+	const char* fg_light_green;
+	const char* fg_light_yellow;
+	const char* fg_light_blue;
+	const char* fg_light_magenta;
+	const char* fg_light_cyan;
+	const char* fg_light_white;
 
 	void select_default_palette() {
-		yellow = "\x1B[93m";
-		default_fg = "\x1B[0m";
-		green = "\x1B[92m";
-		red = "\x1B[91m";
-		kcyn = "\x1B[36m";
-		boldwhite = "\x1B[97m";
+		hide_cursor = "\x1B[?25l";
+		show_cursor = "\x1B[?25h";
+		fg_default = "\x1B[0m";
+		fg_cyan = "\x1B[36m";
+		fg_light_red = "\x1B[91m";
+		fg_light_green = "\x1B[92m";
+		fg_light_yellow = "\x1B[93m";
+		fg_light_blue = "\x1B[94m";
+		fg_light_magenta = "\x1B[95m";
+		fg_light_cyan = "\x1B[96m";
+		fg_light_white = "\x1B[97m";
 	}
 
 	virtual bool enable() = 0;
@@ -64,6 +52,42 @@ public:
  * @brief Global singleton for VT terminal emulation
  */
 extern std::shared_ptr <VtEmulation> g_vt;
+
+/**
+ * @brief Shows (unhides) the cursor on destruction
+ * @deprecated
+ * This should be eliminated, but is maintained for the legacy CLI
+ */
+class CursorRestorer final
+{
+public:
+	~CursorRestorer()
+	{
+		// show the cursor
+		std::cout << g_vt->show_cursor; // "\x1b[?25h";
+
+		// [why?]
+		std::cout << "\n";
+	}
+};
+
+/**
+ * @brief Hides the cursor for the lifetime of a instance
+ */
+class CursorHider final
+{
+public:
+	CursorHider()
+	{
+		// hide the cursor
+		std::cout << g_vt->hide_cursor; // "\x1b[?25l";
+	}
+	~CursorHider()
+	{
+		// show the cursor
+		std::cout << g_vt->show_cursor; // "\x1b[?25h";
+	}
+};
 
 #ifdef _MSC_VER
 
@@ -77,38 +101,43 @@ extern std::shared_ptr <VtEmulation> g_vt;
  */
 class PlatformVtEmulation final : public VtEmulation
 {
-	void clear_pallet() noexcept
+	void clear_codes() noexcept
 	{
-		yellow =
-			default_fg =
-			green =
-			red =
-			kcyn =
-			boldwhite = "";
+		hide_cursor = 
+			show_cursor =
+			fg_default =
+			fg_cyan =
+			fg_light_red =
+			fg_light_green =
+			fg_light_yellow =
+			fg_light_blue =
+			fg_light_magenta =
+			fg_light_cyan =
+			fg_light_white = "";
 	}
 
 public:
 	bool enable() override
 	{
 		// Set output mode to handle virtual terminal sequences
-		HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+		HANDLE hOut = ::GetStdHandle(STD_OUTPUT_HANDLE);
 		if (hOut == INVALID_HANDLE_VALUE)
 		{
-			clear_pallet();
+			clear_codes();
 			return false;
 		}
 
 		DWORD dwMode = 0;
-		if (!GetConsoleMode(hOut, &dwMode))
+		if (!::GetConsoleMode(hOut, &dwMode))
 		{
-			clear_pallet();
+			clear_codes();
 			return false;
 		}
 
 		dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-		if (!SetConsoleMode(hOut, dwMode))
+		if (!::SetConsoleMode(hOut, dwMode))
 		{
-			clear_pallet();
+			clear_codes();
 			return false;
 		}
 		return true;
@@ -117,7 +146,7 @@ public:
 	int get_console_width() override
 	{
 		CONSOLE_SCREEN_BUFFER_INFO sbInfo;
-		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &sbInfo);
+		::GetConsoleScreenBufferInfo(::GetStdHandle(STD_OUTPUT_HANDLE), &sbInfo);
 		return sbInfo.dwSize.X;
 	}
 };
