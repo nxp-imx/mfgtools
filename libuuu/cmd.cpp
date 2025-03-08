@@ -540,7 +540,7 @@ int uuu_run_cmd(const char * cmd, int dry)
 	return run_cmd(nullptr, cmd, dry);
 }
 
-static int run_cmd(CmdCtx *pCtx, const char * cmd, int dry)
+int run_cmd(CmdCtx *pCtx, const char * cmd, int dry)
 {
 	shared_ptr<CmdBase> p;
 	p = create_cmd_obj(cmd);
@@ -1071,7 +1071,7 @@ int uuu_run_cmd_script(const char * buff, int /*dry*/)
 	return parser_cmd_list_file(p);
 }
 
-static int parser_cmd_list_file(shared_ptr<DataBuffer> pbuff, CmdMap *pCmdMap)
+int parser_cmd_list_file(shared_ptr<DataBuffer> pbuff, CmdMap *pCmdMap)
 {
 	char uuu_version[] = "uuu_version";
 	string str;
