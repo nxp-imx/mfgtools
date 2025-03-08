@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <locale>
+#include <sstream>
 #include <string>
 #include <vector>
 
