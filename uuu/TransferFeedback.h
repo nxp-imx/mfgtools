@@ -282,6 +282,17 @@ class TransferNotifyItem final
 	}
 
 	/**
+	 * @brief Formats the device context prefix
+	 * @details
+	 * Includes \r since sometimes the cursor is not at the start of the line as it was being used
+	 * repeatedly (i.e. for percent complete).
+	 */
+	std::string format_device_context() const
+	{
+		return "\r" + device_desc + "> ";
+	}
+
+	/**
 	 * @brief Reports cached status; stream-based
 	 */
 	void append_status(const uuu_notify& notify)
@@ -291,51 +302,73 @@ class TransferNotifyItem final
 
 		if (notify.type == uuu_notify::NOTIFY_DEV_ATTACH)
 		{
-			std::cout << "New USB Device Attached at " << notify.str << std::endl;
+			std::cout << format_device_context() <<
+				g_vt->fg_light_blue
+				<< "Device detected"
+				<< g_vt->fg_default
+				<< std::endl;
 		}
-		if (notify.type == uuu_notify::NOTIFY_CMD_START)
+		else if (notify.type == uuu_notify::NOTIFY_CMD_START)
 		{
-			std::cout << device_desc << ">" << "Start Cmd:" << notify.str << std::endl;
+			std::cout << format_device_context()
+				<< g_vt->fg_light_blue
+				<< "Start: " << notify.str
+				<< g_vt->fg_default
+				<< std::endl;
 		}
-		if (notify.type == uuu_notify::NOTIFY_CMD_END)
+		else if (notify.type == uuu_notify::NOTIFY_CMD_END)
 		{
-			double diff = (double)(cmd_end_timestamp - cmd_start_timestamp);
-			diff /= 1000;
+			double diff = ((double)(cmd_end_timestamp - cmd_start_timestamp)) / 1000;
+			std::cout << format_device_context();
 			if (notify.status)
 			{
-				std::cout << device_desc << ">" << g_vt->fg_light_red << "Fail " << uuu_get_last_err_string() << "(" << std::setprecision(4) << diff << "s)" << g_vt->fg_default << std::endl;
+				std::cout << g_vt->fg_light_red << "Fail " << uuu_get_last_err_string();
 			}
 			else
 			{
-				std::cout << device_desc << ">" << g_vt->fg_light_green << "Okay (" << std::setprecision(4) << diff << "s)" << g_vt->fg_default << std::endl;
+				std::cout << g_vt->fg_light_green << "Okay";
 			}
+			std::cout << " (" << std::setprecision(4) << diff << "s)"
+				<< g_vt->fg_default
+				<< std::endl;
 		}
-
-		if (notify.type == uuu_notify::NOTIFY_TRANS_POS || notify.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
+		else if (notify.type == uuu_notify::NOTIFY_TRANS_POS || notify.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
 		{
+			std::cout << "\r ";
 			if (trans_size)
 			{
-				std::cout << g_vt->fg_light_yellow << "\r" << trans_pos * 100 / trans_size << "%" << g_vt->fg_default;
+				auto percent = trans_pos * 100 / trans_size;
+				std::cout << g_vt->fg_light_yellow << percent << "% " << g_vt->fg_default;
 			}
 			else
 			{
-				std::cout << "\r" << trans_pos;
+				std::cout << trans_pos;
 			}
-
 			std::cout.flush();
 		}
-
-		if (notify.type == uuu_notify::NOTIFY_CMD_INFO)
-			std::cout << notify.str;
-
-		if (notify.type == uuu_notify::NOTIFY_WAIT_FOR)
+		else if (notify.type == uuu_notify::NOTIFY_CMD_INFO)
+		{
+			if (notify.str[0])
+			{
+				std::cout << format_device_context()
+					<< g_vt->fg_light_blue
+					<< "Info: " << notify.str
+					<< g_vt->fg_default
+					<< std::endl;
+			}
+		}
+		else if (notify.type == uuu_notify::NOTIFY_WAIT_FOR)
+		{
 			std::cout << "\r" << notify.str << " " << busy_chars[((busy_chars_index++) & 0x3)];
-
-		if (notify.type == uuu_notify::NOTIFY_DECOMPRESS_START)
+		}
+		else if (notify.type == uuu_notify::NOTIFY_DECOMPRESS_START)
+		{
 			std::cout << "Decompress file:" << notify.str << std::endl;
-
-		if (notify.type == uuu_notify::NOTIFY_DOWNLOAD_START)
+		}
+		else if (notify.type == uuu_notify::NOTIFY_DOWNLOAD_START)
+		{
 			std::cout << "Download file:" << notify.str << std::endl;
+		}
 	}
 
 	/**
@@ -570,21 +603,21 @@ class TransferFeedback final
 	std::mutex update_mutex;
 
 	/**
-	 * @brief Returns an instance used for summary report
+	 * @brief Returns an instance that summarizes trans size/pos
 	 */
 	TransferNotifyItem get_summary()
 	{
 		TransferNotifyItem item;
-		for (auto it = notify_items_by_id.begin(); it != notify_items_by_id.end(); it++)
+		for (auto& i : notify_items_by_id)
 		{
-			if (it->second.is_unknown_device())
+			if (i.second.is_unknown_device())
 			{
-				item.increment_trans_size(it->second.get_trans_size());
-				item.increment_trans_pos(it->second.get_trans_pos());
+				item.increment_trans_size(i.second.get_trans_size());
+				item.increment_trans_pos(i.second.get_trans_pos());
 			}
 			else
 			{
-				if (it->second.get_trans_pos() || it->second.get_cmd_index())
+				if (i.second.get_trans_pos() || i.second.get_cmd_index())
 				{
 					// Hidden HTTP download when USB start transfer
 					g_transfer_context.set_start_usb_transfer(true);
