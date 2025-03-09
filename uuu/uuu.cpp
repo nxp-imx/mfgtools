@@ -846,12 +846,12 @@ public:
 	}
 };
 
-static void with_transfer_feedback(std::function<void()> callback)
+static void with_transfer_feedback(std::function<void(const TransferFeedback&)> callback)
 {
 	g_logger.log_info("Waiting for device..." + get_discovery_suffix());
 	TransferFeedback transfer_feedback;
 	transfer_feedback.enable();
-	callback();
+	callback(transfer_feedback);
 }
 
 static void handle_install(const std::vector<std::string>& args)
@@ -863,7 +863,7 @@ static void handle_install(const std::vector<std::string>& args)
 
 	if (!config.protocol_cmd.empty())
 	{
-		with_transfer_feedback([&]() {
+		with_transfer_feedback([&](const TransferFeedback& feedback) {
 			// this can fail to parse the command or to run the command
 			int ret = uuu_run_cmd(config.protocol_cmd.c_str(), dry_run);
 
@@ -873,7 +873,7 @@ static void handle_install(const std::vector<std::string>& args)
 			if (!g_verbose)
 			{
 				// [what is the significance of g_transfer_context.map_path_nt here?]
-				for (size_t i = 0; i < g_transfer_context.notify_items_by_name.size() + 3; i++)
+				for (size_t i = 0; i < feedback.get_notify_item_count() + 3; i++)
 				{
 					printf("\n");
 				}
@@ -903,7 +903,7 @@ static void handle_install(const std::vector<std::string>& args)
 		}
 
 		// wait for queued commands to complete
-		with_transfer_feedback([&]() {
+		with_transfer_feedback([&](const TransferFeedback&) {
 			if (uuu_wait_uuu_finish(is_continuous_mode, dry_run))
 			{
 				exit_for_runtime_error(uuu_get_last_err_string());
@@ -919,7 +919,7 @@ static void handle_install(const std::vector<std::string>& args)
 		}
 
 		// wait for queued commands to complete
-		with_transfer_feedback([&]() {
+		with_transfer_feedback([&](const TransferFeedback&) {
 			if (uuu_wait_uuu_finish(is_continuous_mode, dry_run))
 			{
 				exit_for_runtime_error(uuu_get_last_err_string());
@@ -1356,7 +1356,7 @@ static void process_old_command_line(int argc, char** argv)
 		// move cursor below status area
 		// for g_verbose this seems wrong/sloppy
 		// even for !g_verbsose, this is wrong/sloppy if the status display was never drawn
-		for (size_t i = 0; i < g_transfer_context.notify_items_by_name.size() + 3; i++)
+		for (size_t i = 0; i < transfer_feedback.get_notify_item_count() + 3; i++)
 		{
 			printf("\n");
 		}

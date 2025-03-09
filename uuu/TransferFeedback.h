@@ -28,8 +28,6 @@ class TransferContext final
 	bool start_usb_transfer = false;
 
 public:
-	std::map<std::string, TransferNotifyItem> notify_items_by_name;
-
 	/**
 	 * @brief Enable verbose feedback to select stream-based feedback; not overwritting
 	 */
@@ -568,7 +566,8 @@ public:
 class TransferFeedback final
 {
 	std::map<uint64_t, TransferNotifyItem> notify_items_by_id;
-	std::mutex callback_mutex;
+	std::map<std::string, TransferNotifyItem> notify_items_by_name;
+	std::mutex update_mutex;
 
 	/**
 	 * @brief Returns an instance used for summary report
@@ -609,7 +608,7 @@ class TransferFeedback final
 		std::string text;
 		string_man::format(text, "\rSuccess %d    Failure %d    ", g_transfer_context.get_success_operation_count(), g_transfer_context.get_failed_operation_count());
 
-		if (g_transfer_context.notify_items_by_name.empty())
+		if (notify_items_by_name.empty())
 		{
 			// does this ever show? it doesn't for me; maybe it does for continuous mode
 			text += "Waiting for device...";
@@ -625,7 +624,7 @@ class TransferFeedback final
 	 */
 	void update(const uuu_notify& notify)
 	{
-		std::lock_guard<std::mutex> lock(callback_mutex);
+		std::lock_guard<std::mutex> lock(update_mutex);
 
 		auto& selected_item = notify_items_by_id[notify.id];
 
@@ -635,7 +634,7 @@ class TransferFeedback final
 			{
 				if (!selected_item.is_unknown_device())
 				{
-					g_transfer_context.notify_items_by_name[selected_item.get_device_desc()] = selected_item;
+					notify_items_by_name[selected_item.get_device_desc()] = selected_item;
 				}
 			}
 
@@ -664,14 +663,14 @@ class TransferFeedback final
 
 				// write line for each notify item
 				// [when are there more than one? I always see just one!]
-				for (auto i = g_transfer_context.notify_items_by_name.begin(); i != g_transfer_context.notify_items_by_name.end(); i++)
+				for (auto i = notify_items_by_name.begin(); i != notify_items_by_name.end(); i++)
 				{
 					i->second.print_to_overwrite_console_line();
 				}
 
 				// move cursor up to start of status area for next update
 				{
-					const size_t count = g_transfer_context.notify_items_by_name.size() + 3;
+					const size_t count = notify_items_by_name.size() + 3;
 					for (size_t i = 0; i < count; i++)
 					{
 						std::cout << "\x1B[1F";
@@ -729,5 +728,10 @@ public:
 		{
 			std::cout << g_vt->show_cursor;
 		}
+	}
+
+	size_t get_notify_item_count() const
+	{
+		return notify_items_by_name.size();
 	}
 };
