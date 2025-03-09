@@ -396,17 +396,8 @@ static void print_udev_info()
 
 static std::string get_discovery_suffix()
 {
-	std::vector<std::string> filters;
-	if (!g_transfer_context.usb_path_filter.empty())
-	{
-		filters.push_back("at path: " + string_man::join(g_transfer_context.usb_path_filter, "|"));
-	}
-	if (!g_transfer_context.usb_serial_no_filter.empty())
-	{
-		filters.push_back("with serial#: " + string_man::join(g_transfer_context.usb_serial_no_filter, "|"));
-	}
-	if (filters.empty()) return "";
-	return " (" + string_man::join(filters, "; ") + ")";
+	std::string text = g_transfer_context.format_discovery_filter_desc();
+	return text.empty() ? "" : " (" + text + ")";
 }
 
 static const help_handler_t get_help_handlers()
@@ -717,7 +708,7 @@ public:
 					std::string path = args.front();
 					args.erase(args.begin());
 					uuu_add_usbpath_filter(path.c_str());
-					g_transfer_context.usb_path_filter.push_back(path);
+					g_transfer_context.add_usb_path_filter(path);
 					g_logger.log_debug([&]() { return "Added device filter for USB path '" + path + "'"; });
 				}
 				else if (opt == "filter-serial")
@@ -729,7 +720,7 @@ public:
 					std::string sn = args.front();
 					args.erase(args.begin());
 					uuu_add_usbserial_no_filter(sn.c_str());
-					g_transfer_context.usb_serial_no_filter.push_back(sn);
+					g_transfer_context.add_device_serial_filter(sn);
 					g_logger.log_debug([&]() { return "Added device filter for serial# '" + sn + "'"; });
 				}
 				else if (opt == "t")
@@ -882,7 +873,7 @@ static void handle_install(const std::vector<std::string>& args)
 			if (!g_verbose)
 			{
 				// [what is the significance of g_transfer_context.map_path_nt here?]
-				for (size_t i = 0; i < g_transfer_context.map_path_nt.size() + 3; i++)
+				for (size_t i = 0; i < g_transfer_context.notify_items_by_name.size() + 3; i++)
 				{
 					printf("\n");
 				}
@@ -1077,7 +1068,7 @@ static void process_new_command_line(int argc, char** argv)
 	// exit process with feedback
 	// FYI: g_transfer_context.overall_status indicates failure if any USB command failed
 	// NOTE: should only get here if performed transfer (installed a file or ran a script)
-	exit_for_status(g_transfer_context.overall_status);
+	exit_for_status(g_transfer_context.get_overall_status_code());
 }
 
 [[noreturn]]
@@ -1206,7 +1197,7 @@ static void process_old_command_line(int argc, char** argv)
 					exit_for_syntax_error("Missing USB path argument");
 				}
 				uuu_add_usbpath_filter(argv[i]);
-				g_transfer_context.usb_path_filter.push_back(argv[i]);
+				g_transfer_context.add_usb_path_filter(argv[i]);
 			}
 			else if (opt == "ms")
 			{
@@ -1215,7 +1206,7 @@ static void process_old_command_line(int argc, char** argv)
 					exit_for_syntax_error("Missing serial # argument");
 				}
 				uuu_add_usbserial_no_filter(argv[i]);
-				g_transfer_context.usb_serial_no_filter.push_back(argv[i]);
+				g_transfer_context.add_device_serial_filter(argv[i]);
 			}
 			else if (opt == "t")
 			{
@@ -1362,9 +1353,13 @@ static void process_old_command_line(int argc, char** argv)
 	{
 		int ret = uuu_run_cmd(protocol_cmd.c_str(), dry_run);
 
-		// what is the purpose of printing blank lines? Don't know about success, but on error, there are several blank lines on screen
-		for (size_t i = 0; i < g_transfer_context.map_path_nt.size() + 3; i++)
+		// move cursor below status area
+		// for g_verbose this seems wrong/sloppy
+		// even for !g_verbsose, this is wrong/sloppy if the status display was never drawn
+		for (size_t i = 0; i < g_transfer_context.notify_items_by_name.size() + 3; i++)
+		{
 			printf("\n");
+		}
 
 		if (ret)
 		{
@@ -1419,7 +1414,7 @@ static void process_old_command_line(int argc, char** argv)
 	// exit process with feedback
 	// FYI: g_transfer_context.overall_status indicates failure if any USB command failed
 	// NOTE: should only get here if performed transfer (installed a file or ran a script)
-	exit_for_status(g_transfer_context.overall_status);
+	exit_for_status(g_transfer_context.get_overall_status_code());
 }
 
 int main(int argc, char** argv)
