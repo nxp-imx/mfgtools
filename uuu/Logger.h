@@ -31,27 +31,27 @@ public:
 
 	void log_internal_error(const std::string& message) const
 	{
-		log("INTERNAL ERROR", message, g_vt->fg_light_red);
+		log("INTERNAL ERROR", message, g_vt->fg_error());
 	}
 
 	void log_error(const std::string& message) const
 	{
-		log("Error", message, g_vt->fg_light_red);
+		log("Error", message, g_vt->fg_error());
 	}
 
 	void log_warning(const std::string& message) const
 	{
-		log("Warning", message, g_vt->fg_light_yellow);
+		log("Warning", message, g_vt->fg_warn());
 	}
 
 	void log_info(const std::string& message) const
 	{
-		log("Info", message, g_vt->fg_light_blue);
+		log("Info", message, g_vt->fg_info());
 	}
 
 	void log_hint(const std::string& message) const
 	{
-		log("Hint", message, g_vt->fg_light_green);
+		log("Hint", message, g_vt->fg_ok());
 	}
 
 	void log_dry_run(const std::string& message) const

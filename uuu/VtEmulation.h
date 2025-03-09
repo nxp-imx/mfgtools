@@ -44,6 +44,11 @@ public:
 		fg_light_white = "\x1B[97m";
 	}
 
+	const char* fg_error() const { return fg_light_red; }
+	const char* fg_warn() const { return fg_light_yellow; }
+	const char* fg_ok() const { return fg_light_green; }
+	const char* fg_info() const { return fg_light_blue; }
+
 	virtual bool enable() = 0;
 	virtual int get_console_width() = 0;
 };

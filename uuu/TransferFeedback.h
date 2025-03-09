@@ -284,8 +284,8 @@ class TransferNotifyItem final
 	/**
 	 * @brief Formats the device context prefix
 	 * @details
-	 * Includes \r since sometimes the cursor is not at the start of the line as it was being used
-	 * repeatedly (i.e. for percent complete).
+	 * Starts with '\r' to force output to start at first column since sometimes the cursor is not
+	 * at the start of the line as it was being used repeatedly (i.e. for percent complete).
 	 */
 	std::string format_device_context() const
 	{
@@ -303,7 +303,7 @@ class TransferNotifyItem final
 		if (notify.type == uuu_notify::NOTIFY_DEV_ATTACH)
 		{
 			std::cout << format_device_context() <<
-				g_vt->fg_light_blue
+				g_vt->fg_info()
 				<< "Device detected"
 				<< g_vt->fg_default
 				<< std::endl;
@@ -311,7 +311,7 @@ class TransferNotifyItem final
 		else if (notify.type == uuu_notify::NOTIFY_CMD_START)
 		{
 			std::cout << format_device_context()
-				<< g_vt->fg_light_blue
+				<< g_vt->fg_info()
 				<< "Start: " << notify.str
 				<< g_vt->fg_default
 				<< std::endl;
@@ -322,11 +322,11 @@ class TransferNotifyItem final
 			std::cout << format_device_context();
 			if (notify.status)
 			{
-				std::cout << g_vt->fg_light_red << "Fail " << uuu_get_last_err_string();
+				std::cout << g_vt->fg_error() << "Fail " << uuu_get_last_err_string();
 			}
 			else
 			{
-				std::cout << g_vt->fg_light_green << "Okay";
+				std::cout << g_vt->fg_ok() << "OK";
 			}
 			std::cout << " (" << std::setprecision(4) << diff << "s)"
 				<< g_vt->fg_default
@@ -351,7 +351,7 @@ class TransferNotifyItem final
 			if (notify.str[0])
 			{
 				std::cout << format_device_context()
-					<< g_vt->fg_light_blue
+					<< g_vt->fg_info()
 					<< "Info: " << notify.str
 					<< g_vt->fg_default
 					<< std::endl;
@@ -419,12 +419,12 @@ class TransferNotifyItem final
 						std::string message = uuu_get_last_err_string();
 						// truncate if too long; padding is not needed (since buffer already padded) but not harmful
 						message.resize(bar_width - 2, ' ');
-						text.replace(1, message.size(), g_vt->fg_light_red + message + g_vt->fg_default);
+						text.replace(1, message.size(), g_vt->fg_error() + message + g_vt->fg_default);
 					}
 					else
 					{
 						std::string message = "Done";
-						text.replace(1, message.size(), g_vt->fg_light_green + message + g_vt->fg_default);
+						text.replace(1, message.size(), g_vt->fg_ok() + message + g_vt->fg_default);
 					}
 					std::cout << text;
 				}
