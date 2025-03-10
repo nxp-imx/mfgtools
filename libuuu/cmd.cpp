@@ -1027,7 +1027,12 @@ static int added_default_boot_cmd(const char *filename)
 	return 0;
 }
 
-static int check_version(string str)
+/**
+ * @brief Validates that an application version specified in a script is supported
+ * @param str Version string
+ * @return 0 on success
+ */
+static int check_version(const string& str)
 {
 	int x = 0;
 	int ver = 0;
@@ -1051,7 +1056,7 @@ static int check_version(string str)
 
 	if (ver > cur)
 	{
-		return set_last_err_string("Script specifies higher version of application; script specifies " + std::to_string(ver) + "; application is " + std::to_string(cur));
+		return set_last_err_string("Script requires higher version of application; script specifies " + std::to_string(ver) + "; application is " + std::to_string(cur));
 	}
 	return 0;
 }
@@ -1062,7 +1067,7 @@ static int check_version(string str)
  * @param dry Not used
  * @return 0 on success
  * @note
- * The name (run) implies that this blocks until the script has completed running, but it does not.
+ * The function name (run) implies that it blocks until the script has completed running, but it does not.
  */
 int uuu_run_cmd_script(const char * buff, int /*dry*/)
 {
