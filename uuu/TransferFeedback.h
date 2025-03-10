@@ -588,7 +588,7 @@ class TransferFeedback final
 	/**
 	 * @brief Returns an instance that summarizes trans size/pos
 	 */
-	TransferNotifyItem get_summary()
+	TransferNotifyItem get_summary() const
 	{
 		TransferNotifyItem item;
 		for (auto& i : notify_items_by_id)
@@ -635,6 +635,47 @@ class TransferFeedback final
 		return text;
 	}
 
+	void print_to_append(const TransferNotifyItem& selected_item, const uuu_notify& notify) const
+	{
+		TransferNotifyItem item = selected_item.is_unknown_device() ? get_summary() : selected_item;
+		item.print_to_append(notify);
+	}
+
+	void overwrite_status_area(const TransferNotifyItem& selected_item)
+	{
+		// output overall status line
+		g_transfer_context.fill_console_line(format_overall_status_line());
+
+		// output blank line; [why?]
+		//g_transfer_context.fill_console_line("");
+
+		// write summary for unknown device or blank line
+		if (selected_item.is_unknown_device() && !g_transfer_context.get_start_usb_transfer())
+		{
+			get_summary().print_to_overwrite_console_line();
+		}
+		else
+		{
+			g_transfer_context.fill_console_line("");
+		}
+
+		// write line for each notify item
+		// [when are there more than one? I always see just one!]
+		for (auto& item : notify_items_by_name)
+		{
+			item.second.print_to_overwrite_console_line();
+		}
+
+		// move cursor up to start of status area for next update
+		{
+			const size_t count = get_status_area_height();
+			for (size_t i = 0; i < count; i++)
+			{
+				std::cout << "\x1B[1F";
+			}
+		}
+	}
+
 	/**
 	 * @brief Updates feedback for a notify event
 	 */
@@ -661,42 +702,11 @@ class TransferFeedback final
 
 			if (g_verbose)
 			{
-				TransferNotifyItem item = selected_item.is_unknown_device() ? get_summary() : selected_item;
-				item.print_to_append(notify);
+				print_to_append(selected_item, notify);
 			}
 			else
 			{
-				// output overall status line
-				g_transfer_context.fill_console_line(format_overall_status_line());
-
-				// output blank line; [why?]
-				//g_transfer_context.fill_console_line("");
-
-				// write summary for unknown device or blank line
-				if (selected_item.is_unknown_device() && !g_transfer_context.get_start_usb_transfer())
-				{
-					get_summary().print_to_overwrite_console_line();
-				}
-				else
-				{
-					g_transfer_context.fill_console_line("");
-				}
-
-				// write line for each notify item
-				// [when are there more than one? I always see just one!]
-				for (auto i = notify_items_by_name.begin(); i != notify_items_by_name.end(); i++)
-				{
-					i->second.print_to_overwrite_console_line();
-				}
-
-				// move cursor up to start of status area for next update
-				{
-					const size_t count = get_status_area_height();
-					for (size_t i = 0; i < count; i++)
-					{
-						std::cout << "\x1B[1F";
-					}
-				}
+				overwrite_status_area(selected_item);
 			}
 		}
 
