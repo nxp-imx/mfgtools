@@ -145,8 +145,8 @@ public:
 
 extern TransferContext g_transfer_context;
 
-// This should not be global lifetime or visitility
-// But due to an oddity of how items are cached, this cannot be in TransferNotifyItem
+// This should not be global lifetime or visibility, but due to an oddity of how items are cached,
+// this needs global lifetime; cannot be in TransferNotifyItem
 unsigned horizontal_scroll_index = 0;
 
 class TransferNotifyItem final
