@@ -132,7 +132,6 @@ public:
 		{
 			filters.push_back("with serial# prefix: " + string_man::join(device_serial_filters, "|"));
 		}
-		//if (filters.empty()) return "";
 		return string_man::join(filters, "; ");
 	}
 };
