@@ -126,6 +126,18 @@ namespace string_man {
 	}
 
 	/**
+	 * @brief Returns the hex representation of an integer
+	 * @param value Integer
+	 * @return Text
+	 */
+	template <typename T>
+	inline std::string to_hex(T value) {
+		std::ostringstream ss;
+		ss << std::hex << value;
+		return ss.str();
+	}
+
+	/**
 	 * @brief Returns a string that contains the 1st item of each vector item (a tuple) separated by pipe (|)
 	 */
 	template <typename T>
