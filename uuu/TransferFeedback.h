@@ -660,7 +660,7 @@ class TransferFeedback final
 		}
 
 		// write line for each notify item
-		// [when are there more than one? I always see just one!]
+		// [I think there can only be multiple in continuous mode]
 		for (auto& item : notify_items_by_name)
 		{
 			item.second.print_to_overwrite_console_line();
