@@ -9,8 +9,9 @@
 /**
  * @brief Base class for VT terminal emulation
  * @details
- * See https://gist.github.com/raghav4/48716264a0f426cf95e4342c21ada8e7
- * See https://stackoverflow.com/questions/15011478/ansi-questions-x1b25h-and-x1be
+ * For general escape code info, see https://en.wikipedia.org/wiki/ANSI_escape_code
+ * For colors, see https://gist.github.com/raghav4/48716264a0f426cf95e4342c21ada8e7
+ * For hiding cursor, see https://stackoverflow.com/questions/15011478/ansi-questions-x1b25h-and-x1be
  */
 class VtEmulation
 {
