@@ -1411,7 +1411,7 @@ int main(int argc, char** argv)
 		g_transfer_context.enable_stream_feedback();
 	}
 
-	bool use_new_cli = false;
+	bool use_new_cli = true;
 	if (use_new_cli)
 	{
 		print_cli_help = print_new_cli_help;
