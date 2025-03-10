@@ -184,33 +184,25 @@ class TransferNotifyItem final
 
 	/*
 	 * @brief Formats a representation of progress as text that renders as fixed-width
-	 * @param width Width of output in chars
+	 * @param[in,out] text Inbound as a number of spaces for the expected render width; outbound as formatted text
 	 * @param pos Number of total items completed
 	 * @param total Total number of items to complete
-	 * @return Formatted text
 	 */
-	static std::string format_percent_complete_bar(transfer_count_t width, transfer_count_t pos, transfer_count_t total)
+	static void format_percent_complete_bar(std::string& text, transfer_count_t pos, transfer_count_t total)
 	{
-		std::string text;
-
-		// load buffer with spaces and start and end char
-		{
-			text.resize(width, ' ');
-			text[0] = '[';
-			text[width - 1] = ']';
-		}
+		const transfer_count_t width = text.size();
 
 		// deal with 0 total
 		// [what causes total==0? why use 1 mibi? what is 'M'?]
 		if (total == 0)
 		{
-			if (pos == 0) return text;
+			if (pos == 0) return;
 
-			size_t s = pos / (1024 * 1024);
+			size_t size = pos / (1024 * 1024);
 			std::string loc;
-			string_man::format(loc, "%dM", s);
-			text.replace(1, loc.size(), loc);
-			return text;
+			string_man::format(loc, "%dM", size);
+			text.replace(0, loc.size(), loc);
+			return;
 		}
 
 		// conform pos to total; shouldn't happen, but just in case
@@ -218,20 +210,15 @@ class TransferNotifyItem final
 
 		// render progress as an arrow
 		{
-			size_t i;
-			for (i = 1; i < (width - 2) * pos / total; i++)
+			auto arrow_width = width * pos / total;
+			for (size_t i = 0; i < arrow_width; i++)
 			{
 				text[i] = '=';
 			}
 
-			if (i > 1)
+			if (arrow_width > 0 && pos < total)
 			{
-				text[i] = '>';
-			}
-
-			if (pos == total)
-			{
-				text[text.size() - 2] = '=';
+				text[arrow_width-1] = '>';
 			}
 		}
 
@@ -243,8 +230,6 @@ class TransferNotifyItem final
 			size_t start = (width - percent_text.size()) / 2;
 			text.replace(start, percent_text.size(), g_vt->fg_light_yellow + percent_text + g_vt->fg_default);
 		}
-
-		return text;
 	}
 	
 	/*
@@ -377,7 +362,8 @@ class TransferNotifyItem final
 	void fill_line_with_status()
 	{
 		static const unsigned prefix_width = 18;
-		static const unsigned bar_width = 40;
+		static const unsigned xbar_width = 40;
+		static const unsigned bar_content_width = xbar_width - 2;
 		const unsigned console_width = g_vt->get_console_width();
 
 		if (is_empty_line)
@@ -386,7 +372,7 @@ class TransferNotifyItem final
 			std::cout << line;
 			// why not simplify to: g_transfer_context.fill_console_line("");
 		}
-		else if (console_width <= bar_width + prefix_width + 3)
+		else if (console_width <= xbar_width + prefix_width + 3)
 		{
 			// output prefix and busy char; no room for progress bar
 			
@@ -404,40 +390,33 @@ class TransferNotifyItem final
 				std::cout << prefix;
 			}
 			
-			// output progress bar which either shows % complete or done/error status
+			// output progress bar which shows % complete, done or error
 			{
-				if (is_done || last_status_code)
+				std::string text;
+				text.resize(bar_content_width, ' ');
+				if (last_status_code)
 				{
-					// show is-done or error
-
-					std::string text;
-					text.resize(bar_width, ' ');
-					text[0] = '[';
-					text[text.size() - 1] = ']';
-					if (last_status_code)
-					{
-						std::string message = uuu_get_last_err_string();
-						// truncate if too long; padding is not needed (since buffer already padded) but not harmful
-						message.resize(bar_width - 2, ' ');
-						text.replace(1, message.size(), g_vt->fg_error() + message + g_vt->fg_default);
-					}
-					else
-					{
-						std::string message = "Done";
-						text.replace(1, message.size(), g_vt->fg_ok() + message + g_vt->fg_default);
-					}
-					std::cout << text;
+					std::string message = uuu_get_last_err_string();
+					// truncate if too long; padding is not needed (since buffer already padded) but not harmful
+					message.resize(bar_content_width, ' ');
+					text.replace(0, message.size(), g_vt->fg_error() + message + g_vt->fg_default);
+				}
+				else if (is_done)
+				{
+					std::string message = "Done";
+					text.replace(0, message.size(), g_vt->fg_ok() + message + g_vt->fg_default);
 				}
 				else
 				{
-					std::cout << format_percent_complete_bar(bar_width, trans_pos, trans_size);
+					format_percent_complete_bar(text, trans_pos, trans_size);
 				}
+				std::cout << '[' << text << ']';
 			}
 
 			// show command description with horizontal scrolling
 			{
 				std::cout << " ";
-				unsigned width = console_width - bar_width - prefix_width - 1;
+				unsigned width = console_width - xbar_width - prefix_width - 1;
 				std::cout << format_for_horizontal_scrolling(cmd_desc, width, horizontal_scroll_index);
 				if (clock() - horizontal_scroll_start > CLOCKS_PER_SEC / 4)
 				{
