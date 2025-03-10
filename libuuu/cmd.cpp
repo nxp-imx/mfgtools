@@ -1051,7 +1051,7 @@ static int check_version(string str)
 
 	if (ver > cur)
 	{
-		return set_last_err_string("Script specifies newer version of application; script specifies " + std::to_string(ver) + "; applicaiton is " + std::to_string(cur));
+		return set_last_err_string("Script specifies higher version of application; script specifies " + std::to_string(ver) + "; application is " + std::to_string(cur));
 	}
 	return 0;
 }
