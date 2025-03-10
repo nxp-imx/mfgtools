@@ -13,6 +13,75 @@
 #include <string>
 #include <vector>
 
+class HorizontalScrollingFormatter final
+{
+	static const clock_t end_delay = CLOCKS_PER_SEC * 3;
+	static const clock_t scroll_delay = CLOCKS_PER_SEC / 2;
+	unsigned scroll_pos = 0;
+	clock_t start_ticks = 0;
+	std::string last_message;
+
+public:
+	/**
+	 * @brief Clears the horizontal scroll offset
+	 * @detail
+	 * Generally, called when message changes.
+	 */
+	void restart()
+	{
+		last_message = "";
+		scroll_pos = 0;
+	}
+
+	/*
+	 * @brief Formats text that renders as fixed-width based on a message with support for horizontal scrolling
+	 * @param message Message text
+	 * @param width Length of output text
+	 * @param scroll_index Increments to support scrolling
+	 * @return Formatted text
+	 * @details
+	 * If the message is too long to fit, then the middle of the message is extracted based on
+	 * scroll_index which should start at 0 for a new message, then increment periodically while
+	 * the same message applies.
+	 */
+	std::string format(std::string message, unsigned width)
+	{
+		if (message != last_message)
+		{
+			scroll_pos = 0;
+			last_message = message;
+		}
+
+		// if message fits, return with padding to len
+		if (message.size() <= width)
+		{
+			message.resize(width, ' ');
+			return message;
+		}
+
+		// extract substring
+		std::string text = message.substr(scroll_pos, width);
+		text.resize(width, ' ');
+
+		// update scroll position
+		// long delay when showing first or last
+		{
+			const bool showing_first = scroll_pos == 0;
+			const bool showing_last = scroll_pos == message.size() - width;
+			const clock_t elapsed_ticks = clock() - start_ticks;
+			const clock_t delay_ticks = showing_first || showing_last ? end_delay: scroll_delay;
+			if (elapsed_ticks > delay_ticks)
+			{
+				scroll_pos += 1;
+				if (showing_last) scroll_pos = 0;
+				start_ticks = clock();
+			}
+		}
+
+		return text;
+	}
+};
+
 extern int g_verbose;
 
 class TransferNotifyItem;
@@ -27,11 +96,11 @@ class TransferContext final
 	std::vector<std::string> usb_path_filters;
 	bool start_usb_transfer = false;
 
-	// this should be in TransferNotifyItem, but due how items are cached, this needs global
-	// lifetime -- which this class's singleton provides
-	unsigned horizontal_scroll_index = 0;
-
 public:
+	// This should be in TransferNotifyItem, but due how items are cached, this needs global lifetime --
+	// which TransferContext's singleton provides
+	HorizontalScrollingFormatter cmd_field_formatter;
+
 	/**
 	 * @brief Enable verbose feedback to select append-based feedback; not overwritting
 	 */
@@ -56,12 +125,6 @@ public:
 	bool get_start_usb_transfer() const { return start_usb_transfer; }
 	
 	void set_start_usb_transfer(bool to) { start_usb_transfer = to; }
-
-	unsigned get_horizontal_scroll_index() const { return horizontal_scroll_index; }
-	
-	void increment_horizontal_scroll_index() { horizontal_scroll_index += 1; }
-
-	void clear_horizontal_scroll_index() { horizontal_scroll_index = 0; }
 
 	void record_operation_complete(int status_code)
 	{
@@ -151,11 +214,14 @@ class TransferNotifyItem final
 	uint64_t cmd_end_timestamp = 0;
 	transfer_count_t trans_pos = 0;
 	transfer_count_t trans_size = 0;
-	clock_t horizontal_scroll_start = 0;
 	static constexpr const char* busy_chars = "|/-\\";
 	int busy_chars_index = 0;
 
-	// NOTE: couldn't figure out how to declare this as static-ish and const-ish variable
+	/**
+	 * @brief Returns the sentinal value that indicates the device is not known
+	 * @note
+	 * Couldn't figure out how to declare this as a static-ish and const-ish variable
+	 */
 	static std::string get_unknown_device_desc() { return "Prep"; }
 
 	/*
@@ -223,40 +289,6 @@ class TransferNotifyItem final
 		}
 	}
 	
-	/*
-	 * @brief Formats text that renders as fixed-width based on a message with support for horizontal scrolling
-	 * @param message Message text
-	 * @param width Length of output text
-	 * @param scroll_index Increments to support scrolling
-	 * @return Formatted text
-	 * @details
-	 * If the message is too long to fit, then the middle of the message is extracted based on
-	 * scroll_index which should start at 0 for a new message, then increment periodically while
-	 * the same message applies.
-	 */
-	static std::string format_for_horizontal_scrolling(std::string message, unsigned width, unsigned scroll_index)
-	{
-		// if message fits, returns with padding to len
-		if (message.size() <= width)
-		{
-			message.resize(width, ' ');
-			return message;
-		}
-
-		// calculate start position of substring
-		size_t start = 0;
-		if (message.size())
-		{
-			start = scroll_index % message.size();
-		}
-
-		// extract substring
-		std::string text = message.substr(start, width);
-		text.resize(width, ' ');
-
-		return text;
-	}
-
 	/**
 	 * @brief Formats the device context prefix
 	 * @details
@@ -293,7 +325,7 @@ public:
 		if (cmd_desc != to)
 		{
 			cmd_desc = to;
-			g_transfer_context.clear_horizontal_scroll_index();
+			g_transfer_context.cmd_field_formatter.restart();
 		}
 	}
 	
@@ -529,13 +561,8 @@ public:
 			// show command description with horizontal scrolling
 			{
 				std::cout << " ";
-				unsigned width = console_width - bar_width - prefix_width - 1;
-				std::cout << format_for_horizontal_scrolling(cmd_desc, width, g_transfer_context.get_horizontal_scroll_index());
-				if (clock() - horizontal_scroll_start > CLOCKS_PER_SEC / 4)
-				{
-					g_transfer_context.increment_horizontal_scroll_index();
-					horizontal_scroll_start = clock();
-				}
+				const unsigned cmd_width = console_width - bar_width - prefix_width - 1;
+				std::cout << g_transfer_context.cmd_field_formatter.format(cmd_desc, cmd_width);
 			}
 
 			// move cursor to start of next line
