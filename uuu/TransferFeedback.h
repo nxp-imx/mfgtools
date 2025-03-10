@@ -112,18 +112,21 @@ public:
 	/**
 	 * @brief Moves the cursor so that it is surely below the status area
 	 * @details
-	 * Don't need for g_verbose since no status area. The cursor should already be below output.
+	 * Nothing to do for g_verbose since no status area. The cursor should already be below output.
 	 *
 	 * Even if !g_verbose, the cursor may already be below the status area since don't track its location.
 	 * This moves the cursor down by the number of lines that is the height of the status area so that
 	 * if it is in the area it this will move it after the area. If it's not at the top of the status area
 	 * then the result will be that the cursor is well below the app output.
+	 * 
+	 * The number of new lines varies, but the info is not available in this class.
+	 * See TransferFeedback::get_status_area_height().
 	 */
 	void ensure_cursor_is_below_status_area() const
 	{
 		if (!g_verbose)
 		{
-			std::cout << "\n\n\n\n";
+			std::cout << "\n\n\n";
 		}
 	}
 
@@ -667,7 +670,7 @@ class TransferFeedback final
 				g_transfer_context.fill_console_line(format_overall_status_line());
 
 				// output blank line; [why?]
-				g_transfer_context.fill_console_line("");
+				//g_transfer_context.fill_console_line("");
 
 				// write summary for unknown device or blank line
 				if (selected_item.is_unknown_device() && !g_transfer_context.get_start_usb_transfer())
@@ -688,7 +691,7 @@ class TransferFeedback final
 
 				// move cursor up to start of status area for next update
 				{
-					const size_t count = notify_items_by_name.size() + 3;
+					const size_t count = get_status_area_height();
 					for (size_t i = 0; i < count; i++)
 					{
 						std::cout << "\x1B[1F";
@@ -748,8 +751,14 @@ public:
 		}
 	}
 
-	size_t get_notify_item_count() const
+	/**
+	 * @brief Returns the number of lines in the status area
+	 * @detail
+	 * The area consists of a one line per notify item plus one line for
+	 * the overall status line and one for some weird other line.
+	 */
+	size_t get_status_area_height() const
 	{
-		return notify_items_by_name.size();
+		return notify_items_by_name.size() + 2;
 	}
 };

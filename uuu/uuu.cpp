@@ -872,8 +872,7 @@ static void handle_install(const std::vector<std::string>& args)
 			// In the latter case the cursor will be moved overly far down; not bad, but not pretty
 			if (!g_verbose)
 			{
-				// [what is the significance of g_transfer_context.map_path_nt here?]
-				for (size_t i = 0; i < feedback.get_notify_item_count() + 3; i++)
+				for (size_t i = 0; i < feedback.get_status_area_height(); i++)
 				{
 					printf("\n");
 				}
@@ -1356,7 +1355,7 @@ static void process_old_command_line(int argc, char** argv)
 		// move cursor below status area
 		// for g_verbose this seems wrong/sloppy
 		// even for !g_verbsose, this is wrong/sloppy if the status display was never drawn
-		for (size_t i = 0; i < transfer_feedback.get_notify_item_count() + 3; i++)
+		for (size_t i = 0; i < transfer_feedback.get_status_area_height(); i++)
 		{
 			printf("\n");
 		}
