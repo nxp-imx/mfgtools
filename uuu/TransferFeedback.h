@@ -310,7 +310,7 @@ class TransferNotifyItem final
 			std::cout << format_device_context();
 			if (notify.status)
 			{
-				std::cout << g_vt->fg_error() << "Fail " << uuu_get_last_err_string();
+				std::cout << g_vt->fg_error() << "Failed: " << uuu_get_last_err_string();
 			}
 			else
 			{
