@@ -41,5 +41,8 @@
     <ClInclude Include="..\uuu\ScriptCatalog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\uuu\HorizontalScrollingFormatter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -23,6 +23,7 @@
     <ClCompile Include="..\uuu\uuu.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\uuu\HorizontalScrollingFormatter.h" />
     <ClInclude Include="..\uuu\Script.h" />
     <ClInclude Include="..\uuu\environment.h" />
     <ClInclude Include="..\uuu\Logger.h" />
