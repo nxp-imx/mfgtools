@@ -119,14 +119,13 @@ static void exit_for_syntax_error(const std::string& message)
  * @details
  * Attach to the interrupt (ctrl-c) signal.
  * 
- * Without this handling for interrupt, the process would exit as desired, but the
- * next shell cursor might be in the middle of the status area -- which looks bad.
+ * Without this handling for interrupt, the process would exit as desired, but the cursor might
+ * not be visible and this prints a cool red message.
  */
 [[noreturn]]
 static void exit_for_interrupt(int)
 {
-	g_transfer_context.ensure_cursor_is_below_status_area();
-	std::cout << g_vt->fg_light_red << "INTERRUPTED" << g_vt->fg_default << std::endl;
+	std::cout << g_vt->fg_error() << "INTERRUPTED" << g_vt->fg_default << std::endl;
 	exit_for_status(EXIT_FAILURE);
 }
 
@@ -867,17 +866,6 @@ static void handle_install(const std::vector<std::string>& args)
 			// this can fail to parse the command or to run the command
 			int ret = uuu_run_cmd(config.protocol_cmd.c_str(), dry_run);
 
-			// if status area is active, then need to move the cursor below it
-			// NOTE: the status area is not active for g_verbose or if the command failed to parse.
-			// In the latter case the cursor will be moved overly far down; not bad, but not pretty
-			if (!g_verbose)
-			{
-				for (size_t i = 0; i < feedback.get_status_area_height(); i++)
-				{
-					printf("\n");
-				}
-			}
-
 			if (ret)
 			{
 				exit_for_runtime_error(uuu_get_last_err_string());
@@ -938,8 +926,6 @@ static void handle_install(const std::vector<std::string>& args)
 	// wait for the thread exit, after send out CMD_DONE
 	// [why is wait needed?]
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-	g_transfer_context.ensure_cursor_is_below_status_area();
 }
 
 static void handle_list_devices(const std::vector<std::string>& args)
@@ -1351,14 +1337,6 @@ static void process_old_command_line(int argc, char** argv)
 	else if (!protocol_cmd.empty())
 	{
 		int ret = uuu_run_cmd(protocol_cmd.c_str(), dry_run);
-
-		// move cursor below status area
-		// for g_verbose this seems wrong/sloppy
-		// even for !g_verbsose, this is wrong/sloppy if the status display was never drawn
-		for (size_t i = 0; i < transfer_feedback.get_status_area_height(); i++)
-		{
-			printf("\n");
-		}
 
 		if (ret)
 		{

@@ -109,27 +109,6 @@ public:
 		std::cout << text << std::endl;
 	}
 
-	/**
-	 * @brief Moves the cursor so that it is surely below the status area
-	 * @details
-	 * Nothing to do for g_verbose since no status area. The cursor should already be below output.
-	 *
-	 * Even if !g_verbose, the cursor may already be below the status area since don't track its location.
-	 * This moves the cursor down by the number of lines that is the height of the status area so that
-	 * if it is in the area it this will move it after the area. If it's not at the top of the status area
-	 * then the result will be that the cursor is well below the app output.
-	 * 
-	 * The number of new lines varies, but the info is not available in this class.
-	 * See TransferFeedback::get_status_area_height().
-	 */
-	void ensure_cursor_is_below_status_area() const
-	{
-		if (!g_verbose)
-		{
-			std::cout << "\n\n\n";
-		}
-	}
-
 	std::string format_discovery_filter_desc() const
 	{
 		std::vector<std::string> filters;
@@ -641,13 +620,33 @@ class TransferFeedback final
 		item.print_to_append(notify);
 	}
 
-	void overwrite_status_area(const TransferNotifyItem& selected_item)
+	/**
+	 * @brief Renders the status area
+	 * @details
+	 * On first call, draws the status area on new lines.
+	 * On subsequent calls, this assumes the curser is at the end of the status display,
+	 * moves the curser up a number of lines equal to the height of the last render.
+	 * Other output while using this function will probably mess up the status area.
+	 */
+	void render_status_area(const TransferNotifyItem& selected_item)
 	{
+		static unsigned lines_below_top_of_status_area = 0;
+
+		// move cursor up to first line of status area
+		for (unsigned i = 0; i < lines_below_top_of_status_area; i++)
+		{
+			std::cout << "\x1B[1F";
+		}
+
+		lines_below_top_of_status_area = 0;
+
 		// output overall status line
 		g_transfer_context.fill_console_line(format_overall_status_line());
+		lines_below_top_of_status_area += 1;
 
 		// output blank line; [why?]
 		//g_transfer_context.fill_console_line("");
+		//lines_below_top_of_status_area += 1;
 
 		// write summary for unknown device or blank line
 		if (selected_item.is_unknown_device() && !g_transfer_context.get_start_usb_transfer())
@@ -658,21 +657,14 @@ class TransferFeedback final
 		{
 			g_transfer_context.fill_console_line("");
 		}
+		lines_below_top_of_status_area += 1;
 
 		// write line for each notify item
 		// [I think there can only be multiple in continuous mode]
 		for (auto& item : notify_items_by_name)
 		{
 			item.second.print_to_overwrite_console_line();
-		}
-
-		// move cursor up to start of status area for next update
-		{
-			const size_t count = get_status_area_height();
-			for (size_t i = 0; i < count; i++)
-			{
-				std::cout << "\x1B[1F";
-			}
+			lines_below_top_of_status_area += 1;
 		}
 	}
 
@@ -706,7 +698,7 @@ class TransferFeedback final
 			}
 			else
 			{
-				overwrite_status_area(selected_item);
+				render_status_area(selected_item);
 			}
 		}
 
@@ -759,16 +751,5 @@ public:
 		{
 			std::cout << g_vt->show_cursor;
 		}
-	}
-
-	/**
-	 * @brief Returns the number of lines in the status area
-	 * @detail
-	 * The area consists of a one line per notify item plus one line for
-	 * the overall status line and one for some weird other line.
-	 */
-	size_t get_status_area_height() const
-	{
-		return notify_items_by_name.size() + 2;
 	}
 };
