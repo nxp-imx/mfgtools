@@ -118,6 +118,9 @@ public:
 		std::cout << text << std::endl;
 	}
 
+	/**
+	 * @brief Returns a description of device discovery filtering or blank if none
+	 */
 	std::string format_discovery_filter_desc() const
 	{
 		std::vector<std::string> filters;
@@ -129,7 +132,7 @@ public:
 		{
 			filters.push_back("with serial# prefix: " + string_man::join(device_serial_filters, "|"));
 		}
-		if (filters.empty()) return "";
+		//if (filters.empty()) return "";
 		return string_man::join(filters, "; ");
 	}
 };

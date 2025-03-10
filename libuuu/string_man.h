@@ -143,6 +143,7 @@ namespace string_man {
 	template <typename T>
 	std::string join(const std::vector<T>& items, const std::string& delimiter)
 	{
+		if (items.empty()) return "";
 		std::ostringstream ss;
 		for (auto& item : items)
 		{
@@ -159,6 +160,7 @@ namespace string_man {
 	template <typename T>
 	std::string join_keys(const std::vector<T>& items)
 	{
+		if (items.empty()) return "";
 		const std::string& delimiter = "|";
 		std::ostringstream ss;
 		for (auto& item : items)
