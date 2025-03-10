@@ -56,7 +56,7 @@ void print_autocomplete_help();
 /**
  * @brief Boolean indicating whether transfer feedback is verbose
  * @details
- * To support verbose status output: when truthy, statusing is stream-based; prints on subsequent lines.
+ * To support verbose status output: when truthy, statusing is append-based; prints on subsequent lines.
  * When falsy, status is written to the same line; overwriting the last status.
  */
 int g_verbose = 0;
@@ -673,8 +673,8 @@ public:
 				{
 					enter_interactive_after_action = true;
 
-					g_logger.log_info("Enabling verbose (stream-based) output since interactive UX is stream-based");
-					g_transfer_context.enable_stream_feedback();
+					g_logger.log_info("Enabling verbose (append-based) output since interactive UX is append-based");
+					g_transfer_context.enable_appending_feedback();
 
 					g_logger.log_debug([&]() { return "Interactive mode enabled"; });
 				}
@@ -693,8 +693,8 @@ public:
 				{
 					dry_run = true;
 
-					g_logger.log_info("Enabling verbose (stream-based) output since dry-run UX is stream-based");
-					g_transfer_context.enable_stream_feedback();
+					g_logger.log_info("Enabling verbose (append-based) output since dry-run UX is append-based");
+					g_transfer_context.enable_appending_feedback();
 
 					g_logger.log_debug([&]() { return "Dry run enabled"; });
 				}
@@ -1156,8 +1156,8 @@ static void process_old_command_line(int argc, char** argv)
 			{
 				is_shell_mode = true;
 
-				g_logger.log_info("Enabling verbose (stream-based) output since shell UX is stream-based");
-				g_transfer_context.enable_stream_feedback();
+				g_logger.log_info("Enabling verbose (append-based) output since shell UX is append-based");
+				g_transfer_context.enable_appending_feedback();
 			}
 			else if (opt == "v")
 			{
@@ -1172,8 +1172,8 @@ static void process_old_command_line(int argc, char** argv)
 			{
 				dry_run = true;
 
-				g_logger.log_info("Enabling verbose (stream-based) output since dry-run UX is stream-based");
-				g_transfer_context.enable_stream_feedback();
+				g_logger.log_info("Enabling verbose (append-based) output since dry-run UX is append-based");
+				g_transfer_context.enable_appending_feedback();
 			}
 			else if (opt == "m")
 			{
@@ -1407,8 +1407,8 @@ int main(int argc, char** argv)
 	{
 		// note: if output is re-directed to a file, then output does not supports color.
 		// There may be other ways color is not supported.
-		g_logger.log_warning("Rich output is not supported; feedback will be monochrome and stream-based (not overwriting)");
-		g_transfer_context.enable_stream_feedback();
+		g_logger.log_warning("Rich output is not supported; feedback will be monochrome and append-based (not overwriting)");
+		g_transfer_context.enable_appending_feedback();
 	}
 
 	bool use_new_cli = true;

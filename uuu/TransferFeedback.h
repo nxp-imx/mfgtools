@@ -33,9 +33,9 @@ class TransferContext final
 
 public:
 	/**
-	 * @brief Enable verbose feedback to select stream-based feedback; not overwritting
+	 * @brief Enable verbose feedback to select append-based feedback; not overwritting
 	 */
-	void enable_stream_feedback() {
+	void enable_appending_feedback() {
 		g_verbose = 1;
 	}
 
@@ -175,13 +175,13 @@ class TransferNotifyItem final
 
 	/*
 	 * @brief Formats a representation of progress as text that renders as fixed-width
-	 * @param[in,out] text Inbound as a number of spaces for the expected render width; outbound as formatted text
+	 * @param[in,out] text Inbound as a number of chars (background/spaces) for the expected render width; outbound as formatted text
 	 * @param pos Number of total items completed
 	 * @param total Total number of items to complete
 	 */
 	static void format_percent_complete_bar(std::string& text, transfer_count_t pos, transfer_count_t total)
 	{
-		const transfer_count_t width = text.size();
+		const size_t width = text.size();
 
 		// deal with 0 total
 		// [what causes total==0? why use 1 mibi? what is 'M'?]
@@ -199,21 +199,21 @@ class TransferNotifyItem final
 		// conform pos to total; shouldn't happen, but just in case
 		if (pos > total) pos = total;
 
-		// render progress as an arrow
+		// overwrite background with '=' to indicate percent complete
 		{
-			auto arrow_width = width * pos / total;
-			for (size_t i = 0; i < arrow_width; i++)
+			size_t progress_width = width * pos / total;
+			for (size_t i = 0; i < progress_width; i++)
 			{
 				text[i] = '=';
 			}
 
-			if (arrow_width > 0 && pos < total)
-			{
-				text[arrow_width-1] = '>';
-			}
+			//if (progress_width > 0 && pos < total)
+			//{
+			//	text[progress_width-1] = '>';
+			//}
 		}
 
-		// write percent in the middle; overwriting arrow if it reaches the middle
+		// write percent in the middle; overwriting progress chars if it reaches the middle
 		{
 			size_t percent = pos * 100 / total;
 			std::string percent_text;
@@ -266,158 +266,6 @@ class TransferNotifyItem final
 	std::string format_device_context() const
 	{
 		return "\r" + device_desc + "> ";
-	}
-
-	/**
-	 * @brief Reports cached status; stream-based
-	 */
-	void append_status(const uuu_notify& notify)
-	{
-		if (is_unknown_device() && g_transfer_context.get_start_usb_transfer())
-			return;
-
-		if (notify.type == uuu_notify::NOTIFY_DEV_ATTACH)
-		{
-			std::cout << format_device_context() <<
-				g_vt->fg_info()
-				<< "Device detected"
-				<< g_vt->fg_default
-				<< std::endl;
-		}
-		else if (notify.type == uuu_notify::NOTIFY_CMD_START)
-		{
-			std::cout << format_device_context()
-				<< g_vt->fg_info()
-				<< "Start: " << notify.str
-				<< g_vt->fg_default
-				<< std::endl;
-		}
-		else if (notify.type == uuu_notify::NOTIFY_CMD_END)
-		{
-			double diff = ((double)(cmd_end_timestamp - cmd_start_timestamp)) / 1000;
-			std::cout << format_device_context();
-			if (notify.status)
-			{
-				std::cout << g_vt->fg_error() << "Failed: " << uuu_get_last_err_string();
-			}
-			else
-			{
-				std::cout << g_vt->fg_ok() << "OK";
-			}
-			std::cout << " (" << std::setprecision(4) << diff << "s)" << g_vt->fg_default << std::endl;
-		}
-		else if (notify.type == uuu_notify::NOTIFY_TRANS_POS || notify.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
-		{
-			std::cout << "\r ";
-			if (trans_size)
-			{
-				auto percent = trans_pos * 100 / trans_size;
-				std::cout << g_vt->fg_light_yellow << percent << "% " << g_vt->fg_default;
-			}
-			else
-			{
-				std::cout << trans_pos;
-			}
-			std::cout.flush();
-		}
-		else if (notify.type == uuu_notify::NOTIFY_CMD_INFO)
-		{
-			if (notify.str[0])
-			{
-				std::cout << format_device_context()
-					<< g_vt->fg_info()
-					<< "Info: " << notify.str
-					<< g_vt->fg_default
-					<< std::endl;
-			}
-		}
-		else if (notify.type == uuu_notify::NOTIFY_WAIT_FOR)
-		{
-			std::cout << "\r" << notify.str << " " << busy_chars[((busy_chars_index++) & 0x3)];
-		}
-		else if (notify.type == uuu_notify::NOTIFY_DECOMPRESS_START)
-		{
-			std::cout << "Decompress file:" << notify.str << std::endl;
-		}
-		else if (notify.type == uuu_notify::NOTIFY_DOWNLOAD_START)
-		{
-			std::cout << "Download file:" << notify.str << std::endl;
-		}
-	}
-
-	/**
-	 * @brief Fills the current console line with a status report; overwrite-based
-	 */
-	void fill_line_with_status()
-	{
-		static const unsigned prefix_width = 18;
-		static const unsigned bar_width = 40;
-		static const unsigned bar_content_width = bar_width - 2;
-		const unsigned console_width = g_vt->get_console_width();
-
-		if (is_empty_line)
-		{
-			std::string line(console_width, ' ');
-			std::cout << line;
-			// why not simplify to: g_transfer_context.fill_console_line("");
-		}
-		else if (console_width <= bar_width + prefix_width + 3)
-		{
-			// output prefix and busy char; no room for progress bar
-			
-			std::string line = format_status_prefix() + busy_chars[(busy_chars_index++) & 0x3];
-			g_transfer_context.fill_console_line(line);
-		}
-		else
-		{
-			// output prefix, progress bar and command info
-
-			// output prefix
-			{
-				std::string prefix = format_status_prefix();
-				prefix.resize(prefix_width, ' ');
-				std::cout << prefix;
-			}
-			
-			// output progress bar which shows % complete, done or error
-			{
-				std::string text;
-				text.resize(bar_content_width, ' ');
-				if (last_status_code)
-				{
-					std::string message = uuu_get_last_err_string();
-					// truncate if too long; padding is not needed (since buffer already padded) but not harmful
-					message.resize(bar_content_width, ' ');
-					text.replace(0, message.size(), g_vt->fg_error() + message + g_vt->fg_default);
-				}
-				else if (is_done)
-				{
-					std::string message = "Done";
-					text.replace(0, message.size(), g_vt->fg_ok() + message + g_vt->fg_default);
-				}
-				else
-				{
-					format_percent_complete_bar(text, trans_pos, trans_size);
-				}
-				std::cout << '[' << text << ']';
-			}
-
-			// show command description with horizontal scrolling
-			{
-				std::cout << " ";
-				unsigned width = console_width - bar_width - prefix_width - 1;
-				std::cout << format_for_horizontal_scrolling(cmd_desc, width, g_transfer_context.get_horizontal_scroll_index());
-				if (clock() - horizontal_scroll_start > CLOCKS_PER_SEC / 4)
-				{
-					g_transfer_context.increment_horizontal_scroll_index();
-					horizontal_scroll_start = clock();
-				}
-			}
-
-			// move cursor to start of next line
-			// [not exactly sure why do this, but if don't output is messed up!]
-			std::cout << std::endl;
-		}
 	}
 
 public:
@@ -545,19 +393,155 @@ public:
 	}
 
 	/**
-	 * @brief Renders the cached state as stream-based.
+	 * @brief Appends status to stdout
 	 */
 	void print_to_append(const uuu_notify& notify)
 	{
-		append_status(notify);
+		if (is_unknown_device() && g_transfer_context.get_start_usb_transfer())
+			return;
+
+		if (notify.type == uuu_notify::NOTIFY_DEV_ATTACH)
+		{
+			std::cout << format_device_context() <<
+				g_vt->fg_info()
+				<< "Device detected"
+				<< g_vt->fg_default
+				<< std::endl;
+		}
+		else if (notify.type == uuu_notify::NOTIFY_CMD_START)
+		{
+			std::cout << format_device_context()
+				<< g_vt->fg_info()
+				<< "Start: " << notify.str
+				<< g_vt->fg_default
+				<< std::endl;
+		}
+		else if (notify.type == uuu_notify::NOTIFY_CMD_END)
+		{
+			double diff = ((double)(cmd_end_timestamp - cmd_start_timestamp)) / 1000;
+			std::cout << format_device_context();
+			if (notify.status)
+			{
+				std::cout << g_vt->fg_error() << "Failed: " << uuu_get_last_err_string();
+			}
+			else
+			{
+				std::cout << g_vt->fg_ok() << "OK";
+			}
+			std::cout << " (" << std::setprecision(4) << diff << "s)" << g_vt->fg_default << std::endl;
+		}
+		else if (notify.type == uuu_notify::NOTIFY_TRANS_POS || notify.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
+		{
+			std::cout << "\r ";
+			if (trans_size)
+			{
+				auto percent = trans_pos * 100 / trans_size;
+				std::cout << g_vt->fg_light_yellow << percent << "% " << g_vt->fg_default;
+			}
+			else
+			{
+				std::cout << trans_pos;
+			}
+			std::cout.flush();
+		}
+		else if (notify.type == uuu_notify::NOTIFY_CMD_INFO)
+		{
+			if (notify.str[0])
+			{
+				std::cout << format_device_context()
+					<< g_vt->fg_info()
+					<< "Info: " << notify.str
+					<< g_vt->fg_default
+					<< std::endl;
+			}
+		}
+		else if (notify.type == uuu_notify::NOTIFY_WAIT_FOR)
+		{
+			std::cout << "\r" << notify.str << " " << busy_chars[((busy_chars_index++) & 0x3)];
+		}
+		else if (notify.type == uuu_notify::NOTIFY_DECOMPRESS_START)
+		{
+			std::cout << "Decompress file:" << notify.str << std::endl;
+		}
+		else if (notify.type == uuu_notify::NOTIFY_DOWNLOAD_START)
+		{
+			std::cout << "Download file:" << notify.str << std::endl;
+		}
 	}
 
 	/**
-	 * @brief Renders the cached state as overwrite-based.
+	 * @brief Overwrites the current console line with status
 	 */
 	void print_to_overwrite_console_line()
 	{
-		fill_line_with_status();
+		static const unsigned prefix_width = 18;
+		static const unsigned bar_width = 40;
+		static const unsigned bar_content_width = bar_width - 2;
+		const unsigned console_width = g_vt->get_console_width();
+
+		if (is_empty_line)
+		{
+			std::string line(console_width, ' ');
+			std::cout << line;
+			// why not simplify to: g_transfer_context.fill_console_line("");
+		}
+		else if (console_width <= bar_width + prefix_width + 3)
+		{
+			// output prefix and busy char; no room for progress bar
+
+			std::string line = format_status_prefix() + busy_chars[(busy_chars_index++) & 0x3];
+			g_transfer_context.fill_console_line(line);
+		}
+		else
+		{
+			// output prefix, progress bar and command info
+
+			// output prefix
+			{
+				std::string prefix = format_status_prefix();
+				prefix.resize(prefix_width, ' ');
+				std::cout << prefix;
+			}
+
+			// output progress bar which shows % complete, done or error
+			{
+				std::string text;
+				text.resize(bar_content_width, ' ');
+				if (last_status_code)
+				{
+					std::string message = uuu_get_last_err_string();
+					// truncate if too long; padding is not needed (since buffer already padded) but not harmful
+					message.resize(bar_content_width, ' ');
+					text.replace(0, message.size(), g_vt->fg_error() + message + g_vt->fg_default);
+				}
+				else if (is_done)
+				{
+					std::string message = "Done";
+					text.replace(0, message.size(), g_vt->fg_ok() + message + g_vt->fg_default);
+				}
+				else
+				{
+					format_percent_complete_bar(text, trans_pos, trans_size);
+				}
+				std::cout << '[' << text << ']';
+			}
+
+			// show command description with horizontal scrolling
+			{
+				std::cout << " ";
+				unsigned width = console_width - bar_width - prefix_width - 1;
+				std::cout << format_for_horizontal_scrolling(cmd_desc, width, g_transfer_context.get_horizontal_scroll_index());
+				if (clock() - horizontal_scroll_start > CLOCKS_PER_SEC / 4)
+				{
+					g_transfer_context.increment_horizontal_scroll_index();
+					horizontal_scroll_start = clock();
+				}
+			}
+
+			// move cursor to start of next line
+			// [not exactly sure why do this, but if don't output is messed up!]
+			std::cout << std::endl;
+		}
 	}
 };
 
@@ -620,6 +604,11 @@ class TransferFeedback final
 		return text;
 	}
 
+	/**
+	 * @brief Prints the status of the selected item or the summary info if the selected item lacks device info
+	 * @details
+	 * [Why is the summary info used here?]
+	 */
 	void print_to_append(const TransferNotifyItem& selected_item, const uuu_notify& notify) const
 	{
 		TransferNotifyItem item = selected_item.is_unknown_device() ? get_summary() : selected_item;
@@ -638,12 +627,16 @@ class TransferFeedback final
 	{
 		static unsigned lines_below_top_of_status_area = 0;
 
-		// move cursor up to first line of status area
+		// According to https://en.wikipedia.org/wiki/ANSI_escape_code, '[#F' moves the cursor
+		// to the beginning of the line that is # lines above the current position and # can be
+		// omitted to specify one line.
+		static const char* cursor_previous_line = "\x1B[1F";
+
+		// move cursor up to first line of status area based on how many lines this function wrote last time
 		for (unsigned i = 0; i < lines_below_top_of_status_area; i++)
 		{
-			std::cout << "\x1B[1F";
+			std::cout << cursor_previous_line;
 		}
-
 		lines_below_top_of_status_area = 0;
 
 		// output overall status line
@@ -655,6 +648,7 @@ class TransferFeedback final
 		//lines_below_top_of_status_area += 1;
 
 		// write summary for unknown device or blank line
+		// [what is the deal with this line? why so special? for unknown and !start-usb-transfer?]
 		if (selected_item.is_unknown_device() && !g_transfer_context.get_start_usb_transfer())
 		{
 			get_summary().print_to_overwrite_console_line();
@@ -666,7 +660,8 @@ class TransferFeedback final
 		lines_below_top_of_status_area += 1;
 
 		// write line for each notify item
-		// [I think there can only be multiple in continuous mode]
+		// [How can there be more than one item since they are keyed by device ID?
+		// Maybe only happens in continuous mode when install to multiple devices in a single session.]
 		for (auto& item : notify_items_by_name)
 		{
 			item.second.print_to_overwrite_console_line();
