@@ -487,7 +487,7 @@ public:
 				}
 				else if (is_done)
 				{
-					std::string message = "Done";
+					std::string message = "Successful";
 					text.replace(0, message.size(), g_vt->fg_ok() + message + g_vt->fg_default);
 				}
 				else
@@ -581,6 +581,23 @@ class TransferFeedback final
 		item.print_to_append(notify);
 	}
 
+	// According to https://en.wikipedia.org/wiki/ANSI_escape_code, '[#F' moves the cursor
+	// to the beginning of the line that is # lines above the current position and # can be
+	// omitted to specify one line.
+	const char* cursor_previous_line = "\x1B[1F";
+
+	unsigned lines_below_top_of_status_area = 0;
+
+	void move_cursor_up_to_first_line_of_status_area()
+	{
+		// move cursor up to first line of status area based on how many lines this function wrote last time
+		for (unsigned i = 0; i < lines_below_top_of_status_area; i++)
+		{
+			std::cout << cursor_previous_line;
+		}
+		lines_below_top_of_status_area = 0;
+	}
+
 	/**
 	 * @brief Renders the status area
 	 * @details
@@ -591,19 +608,7 @@ class TransferFeedback final
 	 */
 	void render_status_area(const TransferNotifyItem& selected_item)
 	{
-		static unsigned lines_below_top_of_status_area = 0;
-
-		// According to https://en.wikipedia.org/wiki/ANSI_escape_code, '[#F' moves the cursor
-		// to the beginning of the line that is # lines above the current position and # can be
-		// omitted to specify one line.
-		static const char* cursor_previous_line = "\x1B[1F";
-
-		// move cursor up to first line of status area based on how many lines this function wrote last time
-		for (unsigned i = 0; i < lines_below_top_of_status_area; i++)
-		{
-			std::cout << cursor_previous_line;
-		}
-		lines_below_top_of_status_area = 0;
+		move_cursor_up_to_first_line_of_status_area();
 
 		// output overall status line
 		g_transfer_context.fill_console_line(format_overall_status_line());
@@ -695,22 +700,39 @@ public:
 	}
 
 	/**
-	 * @brief Registers to receive notifications
+	 * @brief Registers to receive notifications and prepares feedback output
+	 * @details
+	 * For append-mode, prints waiting message; no concern for filling the line or wrapping to next.
+	 * 
+	 * For overwrite mode, prints the waiting message ensuring it does not wrap. This message will
+	 * persist until USB comms are established and will be overwritten on the first USB notify.
+	 * After calling this and before calling disable, consuming code should not output to stdout as
+	 * it will probably mess up overwriting output.
 	 */
-	void enable() const
+	void enable()
 	{
 		(void)uuu_register_notify_callback(handle_notify, (void*)&notify_items_by_id);
 
+		std::string waiting_message = "Waiting for device...";
+		const std::string filter_desc = g_transfer_context.format_discovery_filter_desc();
+		if (!filter_desc.empty()) waiting_message += " (" + filter_desc + ")";
 		if (!g_verbose)
 		{
 			std::cout << g_vt->hide_cursor;
+
+			g_transfer_context.fill_console_line(waiting_message);
+			lines_below_top_of_status_area = 1;
+		}
+		else
+		{
+			g_logger.log_info(waiting_message);
 		}
 	}
 
 	/**
 	 * @brief Unregisters to receive notifications
 	 */
-	void disable() const
+	void disable()
 	{
 		(void)uuu_unregister_notify_callback(handle_notify);
 

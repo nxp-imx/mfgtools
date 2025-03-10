@@ -393,12 +393,6 @@ static void print_udev_info()
 		<< "Note: These instructions output to standard error so are excluded from redirected standard output" << std::endl;
 }
 
-static std::string get_discovery_suffix()
-{
-	std::string text = g_transfer_context.format_discovery_filter_desc();
-	return text.empty() ? "" : " (" + text + ")";
-}
-
 static const help_handler_t get_help_handlers()
 {
 	const help_handler_t help_handlers
@@ -847,7 +841,6 @@ public:
 
 static void with_transfer_feedback(std::function<void(const TransferFeedback&)> callback)
 {
-	g_logger.log_info("Waiting for device..." + get_discovery_suffix());
 	TransferFeedback transfer_feedback;
 	transfer_feedback.enable();
 	callback(transfer_feedback);
@@ -1303,11 +1296,11 @@ static void process_old_command_line(int argc, char** argv)
 
 		// why not log for !shell? it's logged for !g_verbose regardless
 		if (!is_shell_mode) {
-			g_logger.log_info("Waiting for device..." + get_discovery_suffix());
+			//g_logger.log_info("Waiting for device..." + g_transfer_context.format_discovery_suffix());
 		}
 	}
 	else {
-		std::cout << "Waiting for device..." << get_discovery_suffix();
+		//std::cout << "Waiting for device..." << g_transfer_context.format_discovery_suffix();
 		
 		// move cursor to begining of line so that next output will overwrite waiting line;
 		// NOTE: This is nice when it works since it erases the transitory state of waiting, 
@@ -1315,7 +1308,7 @@ static void process_old_command_line(int argc, char** argv)
 		// line that is longer will remain after the next line is output. 
 		// FWIW I think it's better to leave the waiting msg on screen to than allow a partial msg
 		// to show and think that \r sould be replaed with \n
-		std::cout << "\r";
+		//std::cout << "\r";
 		
 		// hide the cursor
 		std::cout << g_vt->hide_cursor;
