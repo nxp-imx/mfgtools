@@ -27,6 +27,10 @@ class TransferContext final
 	std::vector<std::string> usb_path_filters;
 	bool start_usb_transfer = false;
 
+	// this should be in TransferNotifyItem, but due how items are cached, this needs global
+	// lifetime -- which this class's singleton provides
+	unsigned horizontal_scroll_index = 0;
+
 public:
 	/**
 	 * @brief Enable verbose feedback to select stream-based feedback; not overwritting
@@ -52,6 +56,12 @@ public:
 	bool get_start_usb_transfer() const { return start_usb_transfer; }
 	
 	void set_start_usb_transfer(bool to) { start_usb_transfer = to; }
+
+	unsigned get_horizontal_scroll_index() const { return horizontal_scroll_index; }
+	
+	void increment_horizontal_scroll_index() { horizontal_scroll_index += 1; }
+
+	void clear_horizontal_scroll_index() { horizontal_scroll_index = 0; }
 
 	void record_operation_complete(int status_code)
 	{
@@ -126,10 +136,6 @@ public:
 };
 
 extern TransferContext g_transfer_context;
-
-// This should not be global lifetime or visibility, but due to an oddity of how items are cached,
-// this needs global lifetime; cannot be in TransferNotifyItem
-unsigned horizontal_scroll_index = 0;
 
 class TransferNotifyItem final
 {
@@ -400,10 +406,10 @@ class TransferNotifyItem final
 			{
 				std::cout << " ";
 				unsigned width = console_width - bar_width - prefix_width - 1;
-				std::cout << format_for_horizontal_scrolling(cmd_desc, width, horizontal_scroll_index);
+				std::cout << format_for_horizontal_scrolling(cmd_desc, width, g_transfer_context.get_horizontal_scroll_index());
 				if (clock() - horizontal_scroll_start > CLOCKS_PER_SEC / 4)
 				{
-					horizontal_scroll_index++;
+					g_transfer_context.increment_horizontal_scroll_index();
 					horizontal_scroll_start = clock();
 				}
 			}
@@ -439,7 +445,7 @@ public:
 		if (cmd_desc != to)
 		{
 			cmd_desc = to;
-			horizontal_scroll_index = 0;
+			g_transfer_context.clear_horizontal_scroll_index();
 		}
 	}
 	
