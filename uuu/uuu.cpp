@@ -1043,8 +1043,7 @@ static void process_new_command_line(int argc, char** argv)
 	auto& handle = std::get<1>(*handler);
 	handle(args);
 
-	// exit process with feedback
-	// FYI: g_transfer_context.overall_status indicates failure if any USB command failed
+	// exit process with transfer status code
 	// NOTE: should only get here if performed transfer (installed a file or ran a script)
 	exit_for_status(g_transfer_context.get_overall_status_code());
 }
@@ -1375,8 +1374,7 @@ static void process_old_command_line(int argc, char** argv)
 	// [why is wait needed?]
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-	// exit process with feedback
-	// FYI: g_transfer_context.overall_status indicates failure if any USB command failed
+	// exit process with transfer status code
 	// NOTE: should only get here if performed transfer (installed a file or ran a script)
 	exit_for_status(g_transfer_context.get_overall_status_code());
 }
