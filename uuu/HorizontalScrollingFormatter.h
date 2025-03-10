@@ -1,18 +1,11 @@
 #pragma once
 //! @file
 
-//#include "../libuuu/libuuu.h"
-//#include "../libuuu/string_man.h"
-
-//#include <stdio.h>
-//#include <string.h>
-
-//#include <iomanip>
-//#include <iostream>
-//#include <mutex>
 #include <string>
-//#include <vector>
 
+/**
+ * @brief Supports formatting text for horizontal scrolling when its too wide for a fixed width field
+ */
 class HorizontalScrollingFormatter final
 {
 	static const clock_t end_delay = CLOCKS_PER_SEC * 3;
@@ -24,7 +17,7 @@ class HorizontalScrollingFormatter final
 public:
 	/**
 	 * @brief Clears the horizontal scroll offset
-	 * @detail
+	 * @details
 	 * Generally, called when message changes.
 	 */
 	void restart()
@@ -33,11 +26,10 @@ public:
 		scroll_pos = 0;
 	}
 
-	/*
+	/**
 	 * @brief Formats text that renders as fixed-width based on a message with support for horizontal scrolling
 	 * @param message Message text
 	 * @param width Length of output text
-	 * @param scroll_index Increments to support scrolling
 	 * @return Formatted text
 	 * @details
 	 * If the message is too long to fit, then the middle of the message is extracted based on

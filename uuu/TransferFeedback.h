@@ -21,6 +21,9 @@ class TransferNotifyItem;
 
 typedef size_t transfer_count_t;
 
+/**
+ * @brief Context info related to transfer operation feedback
+ */
 class TransferContext final
 {
 	unsigned success_operation_count = 0;
@@ -133,6 +136,9 @@ public:
 
 extern TransferContext g_transfer_context;
 
+/**
+ * @brief Caches notification info and writes it to stdout
+ */
 class TransferNotifyItem final
 {
 	std::string cmd_desc;
