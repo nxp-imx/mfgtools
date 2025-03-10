@@ -316,9 +316,7 @@ class TransferNotifyItem final
 			{
 				std::cout << g_vt->fg_ok() << "OK";
 			}
-			std::cout << " (" << std::setprecision(4) << diff << "s)"
-				<< g_vt->fg_default
-				<< std::endl;
+			std::cout << " (" << std::setprecision(4) << diff << "s)" << g_vt->fg_default << std::endl;
 		}
 		else if (notify.type == uuu_notify::NOTIFY_TRANS_POS || notify.type == uuu_notify::NOTIFY_DECOMPRESS_POS)
 		{
