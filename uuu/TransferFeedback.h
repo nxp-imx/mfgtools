@@ -145,6 +145,10 @@ public:
 
 extern TransferContext g_transfer_context;
 
+// This should not be global lifetime or visitility
+// But due to an oddity of how items are cached, this cannot be in TransferNotifyItem
+unsigned horizontal_scroll_index = 0;
+
 class TransferNotifyItem final
 {
 	std::string cmd_desc;
@@ -159,7 +163,6 @@ class TransferNotifyItem final
 	uint64_t cmd_end_timestamp = 0;
 	transfer_count_t trans_pos = 0;
 	transfer_count_t trans_size = 0;
-	unsigned horizontal_scroll_index = 0;
 	clock_t horizontal_scroll_start = 0;
 	static constexpr const char* busy_chars = "|/-\\";
 	int busy_chars_index = 0;
@@ -362,8 +365,8 @@ class TransferNotifyItem final
 	void fill_line_with_status()
 	{
 		static const unsigned prefix_width = 18;
-		static const unsigned xbar_width = 40;
-		static const unsigned bar_content_width = xbar_width - 2;
+		static const unsigned bar_width = 40;
+		static const unsigned bar_content_width = bar_width - 2;
 		const unsigned console_width = g_vt->get_console_width();
 
 		if (is_empty_line)
@@ -372,7 +375,7 @@ class TransferNotifyItem final
 			std::cout << line;
 			// why not simplify to: g_transfer_context.fill_console_line("");
 		}
-		else if (console_width <= xbar_width + prefix_width + 3)
+		else if (console_width <= bar_width + prefix_width + 3)
 		{
 			// output prefix and busy char; no room for progress bar
 			
@@ -416,7 +419,7 @@ class TransferNotifyItem final
 			// show command description with horizontal scrolling
 			{
 				std::cout << " ";
-				unsigned width = console_width - xbar_width - prefix_width - 1;
+				unsigned width = console_width - bar_width - prefix_width - 1;
 				std::cout << format_for_horizontal_scrolling(cmd_desc, width, horizontal_scroll_index);
 				if (clock() - horizontal_scroll_start > CLOCKS_PER_SEC / 4)
 				{
@@ -638,6 +641,7 @@ class TransferFeedback final
 	{
 		std::lock_guard<std::mutex> lock(update_mutex);
 
+		// NOTE: creates a new instance if match not found
 		auto& selected_item = notify_items_by_id[notify.id];
 
 		if (selected_item.cache(notify))
@@ -646,7 +650,11 @@ class TransferFeedback final
 			{
 				if (!selected_item.is_unknown_device())
 				{
-					notify_items_by_name[selected_item.get_device_desc()] = selected_item;
+					const std::string name = selected_item.get_device_desc();
+
+					// this copies an item from notify_items_by_id to notify_items_by_name which is
+					// problematic since the state of the item by name gets overwritten each update
+					notify_items_by_name[name] = selected_item;
 				}
 			}
 
