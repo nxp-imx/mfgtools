@@ -1382,12 +1382,6 @@ static void process_old_command_line(int argc, char** argv)
 	// [why is wait needed?]
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-	// move cursor below status area; NOTE: no status area if g_verbose
-	if (!g_verbose)
-	{
-		printf("\n\n\n");
-	}
-
 	// exit process with feedback
 	// FYI: g_transfer_context.overall_status indicates failure if any USB command failed
 	// NOTE: should only get here if performed transfer (installed a file or ran a script)
@@ -1417,7 +1411,7 @@ int main(int argc, char** argv)
 		g_transfer_context.enable_stream_feedback();
 	}
 
-	bool use_new_cli = true;
+	bool use_new_cli = false;
 	if (use_new_cli)
 	{
 		print_cli_help = print_new_cli_help;
