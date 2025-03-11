@@ -358,7 +358,7 @@ static void print_udev_info()
 
 	std::cerr << std::endl
 		<< "Enable udev rules via:" << std::endl
-		<< "\tsudo sh -c \"uuu -udev >> /etc/udev/rules.d/70-uuu.rules\"" << std::endl
+		<< "\tsudo sh -c \"uuu -udev > /etc/udev/rules.d/70-uuu.rules\"" << std::endl
 		<< "\tsudo udevadm control --reload" << std::endl
 		<< "Note: These instructions output to standard error so are excluded from redirected standard output" << std::endl;
 }
