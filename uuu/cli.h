@@ -431,16 +431,6 @@ static void process_interactive_commands()
 	}
 }
 
-/**
- * @brief Writes the content of a script to stdout
- */
-static void print_content(const Script& script) {
-	std::string text = script.text;
-	while (text.size() > 0 && (text[0] == '\n' || text[0] == ' '))
-		text = text.erase(0, 1);
-	std::cout << text;
-}
-
 static int print_device_info(const char *path, const char *chip, const char *pro, uint16_t vid, uint16_t pid, uint16_t bcd, const char *serial_no, void * /*p*/)
 {
 	printf("%s\t%s\t%s\t0x%04X\t0x%04X\t0x%04X\t%s\n", path, chip, pro, vid, pid, bcd, serial_no);
@@ -760,11 +750,7 @@ public:
 				cmd_args.push_back(arg);
 				for (auto& cmd_arg : args)
 				{
-					if (cmd_arg.find(' ') != std::string::npos)
-					{
-						cmd_arg.insert(cmd_arg.begin(), '"');
-						cmd_arg.insert(cmd_arg.end(), '"');
-					}
+					string_man::quote_param_if_needed(cmd_arg);
 					cmd_args.push_back(cmd_arg);
 				}
 				protocol_cmd = string_man::join(cmd_args, " ");
@@ -1115,7 +1101,9 @@ static void process_option_command_line(int argc, char** argv)
 				{
 					exit_for_syntax_error("Unknown built-in script '" + script_name + "'; options: " + g_ScriptCatalog.get_names());
 				}
-				print_content(*script);
+				std::string text = script->text;
+				string_man::trim(text);
+				std::cout << text << std::endl;
 				exit_for_status(EXIT_SUCCESS);
 			}
 			else if (opt == "d")

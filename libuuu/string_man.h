@@ -126,6 +126,21 @@ namespace string_man {
 	}
 
 	/**
+	 * @brief Wraps text with double quotes if it contains a space
+	 * @param[in,out] text Input/output text
+	 * @return Reference to text
+	 */
+	inline std::string& quote_param_if_needed(std::string& text)
+	{
+		if (text.find(' ') != std::string::npos)
+		{
+			text.insert(text.begin(), '"');
+			text.insert(text.end(), '"');
+		}
+		return text;
+	}
+
+	/**
 	 * @brief Returns the hex representation of an integer
 	 * @param value Integer
 	 * @return Text

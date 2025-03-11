@@ -1057,23 +1057,16 @@ static int process_legacy_command_line(int argc, char** argv)
 					printf("error, must be have script name: %s\n", g_ScriptCatalog.get_names().c_str());
 					return -1;
 				}
+				
 				const std::string script_spec = argv[i + 1];
-
 				vector<string> args;
 				for (int j = i + 2; j < argc; j++)
 				{
-					string s = argv[j];
-					if (s.find(' ') != string::npos)
-					{
-						s.insert(s.begin(), '"');
-						s.insert(s.end(), '"');
-					}
-					args.push_back(s);
+					args.push_back(argv[j]);
 				}
 
-				std::string script_text_source;
-				cmd_script = load_script_text(script_spec, args, script_text_source);
-				g_logger.log_debug([&]() { return "Loaded script: " + script_text_source; });
+				std::string script_source;
+				cmd_script = load_script_text(script_spec, args, script_source);
 				break;
 			}
 			else
@@ -1085,14 +1078,13 @@ static int process_legacy_command_line(int argc, char** argv)
 		{
 			for (int j = i; j < argc; j++)
 			{
-				s = argv[j];
-				if (s.find(' ') != string::npos && s[s.size() - 1] != ':')
+				std::string cmd_arg = argv[j];
+				if (cmd_arg[cmd_arg.size() - 1] != ':')
 				{
-					s.insert(s.begin(), '"');
-					s.insert(s.end(), '"');
+					string_man::quote_param_if_needed(cmd_arg);
 				}
-				cmd.append(s);
-				if(j != (argc -1)) /* Don't add space at last arg */
+				cmd.append(cmd_arg);
+				if (j != (argc -1)) /* Don't add space at last arg */
 					cmd.append(" ");
 			}
 			break;
