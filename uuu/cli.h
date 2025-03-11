@@ -23,7 +23,6 @@
 
 int auto_complete(int argc, char **argv);
 void print_autocomplete_help();
-extern bmap_mode g_bmap_mode;
 
 /**
  * @brief Boolean indicating whether transfer feedback is verbose
@@ -725,12 +724,12 @@ public:
 				}
 				else if (opt == "bmap")
 				{
-					g_bmap_mode = bmap_mode::Force;
+					uuu_set_bmap_mode(bmap_mode::Force);
 					g_logger.log_debug([&]() { return "Set bmap to force"; });
 				}
 				else if (opt == "no-bmap")
 				{
-					g_bmap_mode = bmap_mode::Ignore;
+					uuu_set_bmap_mode(bmap_mode::Ignore);
 					g_logger.log_debug([&]() { return "Set bmap to ignore"; });
 				}
 				else if (opt == "e")
@@ -1182,11 +1181,11 @@ static void process_old_command_line(int argc, char** argv)
 			}
 			else if (opt == "bmap")
 			{
-				g_bmap_mode = bmap_mode::Force;
+				uuu_set_bmap_mode(bmap_mode::Force);
 			}
 			else if (opt == "no-bmap")
 			{
-				g_bmap_mode = bmap_mode::Ignore;
+				uuu_set_bmap_mode(bmap_mode::Ignore);
 			}
 			else if (opt == "e")
 			{
