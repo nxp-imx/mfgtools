@@ -645,12 +645,14 @@ public:
 				else if (opt == "v")
 				{
 					g_verbose = 1;
+					uuu_set_debug_level(LIBUUU_DETAIL);
 					g_logger.log_debug([&]() { return "Verbose enabled"; });
 				}
 				else if (opt == "V")
 				{
 					g_verbose = 1;
 					uuu_set_debug_level(2);
+					uuu_set_debug_level(LIBUUU_DETAIL | 2);
 					g_logger.log_debug([&]() { return "Verbose+ enabled"; });
 				}
 				else if (opt == "dry-run")
@@ -1124,11 +1126,13 @@ static void process_old_command_line(int argc, char** argv)
 			else if (opt == "v")
 			{
 				g_verbose = 1;
+				uuu_set_debug_level(LIBUUU_DETAIL);
 			}
 			else if (opt == "V")
 			{
 				g_verbose = 1;
 				uuu_set_debug_level(2);
+				uuu_set_debug_level(LIBUUU_DETAIL | 2);
 			}
 			else if (opt == "dry")
 			{
