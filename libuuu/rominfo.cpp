@@ -92,7 +92,9 @@ const ROM_INFO * search_rom_info(const ConfigItem *item)
 #define HASH_MAX_LEN	64
 
 #define CONTAINER_HDR_ALIGNMENT 0x400
+#define CONTAINER_HDR_ALIGNMENT_V2 0x4000
 static constexpr uint8_t CONTAINER_TAG = 0x87;
+static constexpr uint8_t V2X_TAG = 0x82; // After imx943
 
 #pragma pack (1)
 struct rom_container {
@@ -128,31 +130,47 @@ static constexpr uint32_t IMG_V2X = 0x0B;
 
 size_t GetContainerActualSize(shared_ptr<DataBuffer> p, size_t offset, bool bROMAPI, bool skipspl)
 {
+	uint32_t align = CONTAINER_HDR_ALIGNMENT;
+	unsigned int cindex = 1;
+
 	if(bROMAPI)
 		return p->size() - offset;
 
-	auto hdr = reinterpret_cast<struct rom_container *>(p->data() + offset + CONTAINER_HDR_ALIGNMENT);
+	auto hdr = reinterpret_cast<struct rom_container *>(p->data() + offset);
+	if (hdr->tag != CONTAINER_TAG)
+	{
+		return p->size() - offset;
+	}
+	else if (hdr->version >= 2)
+	{	/* after imx943 align change to 0x4000 from 0x400 */
+		align = CONTAINER_HDR_ALIGNMENT_V2;
+		hdr = reinterpret_cast<struct rom_container*>(p->data() + offset + align);
+		if (hdr->tag == V2X_TAG)
+			cindex++;
+	}
+	else
+	{
+		hdr = reinterpret_cast<struct rom_container*>(p->data() + offset + align);
+		if (hdr->tag != CONTAINER_TAG)
+		{
+			return p->size() - offset;
+		}
+
+		/* Check if include V2X container*/
+		auto image = reinterpret_cast<struct rom_bootimg*>(p->data() + offset + align
+			+ sizeof(struct rom_container));
+
+		if ((image->flags & 0xF) == IMG_V2X)
+			cindex++;
+	}
+
+	hdr = reinterpret_cast<struct rom_container*>(p->data() + offset + cindex * align);
 	if (hdr->tag != CONTAINER_TAG)
 	{
 		return p->size() - offset;
 	}
 
-	/* Check if include V2X container*/
-	auto image = reinterpret_cast<struct rom_bootimg *>(p->data() + offset + CONTAINER_HDR_ALIGNMENT
-		+ sizeof(struct rom_container));
-
-	unsigned int cindex = 1;
-	if ((image->flags & 0xF) == IMG_V2X)
-	{
-		cindex = 2;
-		hdr = reinterpret_cast<struct rom_container *>(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT);
-		if (hdr->tag != CONTAINER_TAG)
-		 {
-			return p->size() - offset;
-		}
-	}
-
-	image = reinterpret_cast<struct rom_bootimg *>(p->data() + offset + cindex * CONTAINER_HDR_ALIGNMENT
+	auto image = reinterpret_cast<struct rom_bootimg *>(p->data() + offset + cindex * align
 		+ sizeof(struct rom_container)
 		+ sizeof(struct rom_bootimg) * (hdr->num_images - 1));
 
@@ -162,8 +180,9 @@ size_t GetContainerActualSize(shared_ptr<DataBuffer> p, size_t offset, bool bROM
 		image--;
 	}
 
-	uint32_t sz = image->size + image->offset + cindex * CONTAINER_HDR_ALIGNMENT;
+	uint32_t sz = image->size + image->offset + cindex * align;
 
+	/* keep v1 align for calculate spl size */
 	sz = round_up(sz, static_cast<uint32_t>(CONTAINER_HDR_ALIGNMENT));
 
 	if (sz > (p->size() - offset))

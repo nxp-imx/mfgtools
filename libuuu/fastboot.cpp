@@ -66,6 +66,8 @@ int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input
 		memset(buff, 0, 65);
 		if (m_pTrans->read(buff, 64, &actual))
 			return -1;
+	
+		buff[actual] = '\0';
 
 		if (strncmp(buff, "DATA",4) == 0)
 		{
@@ -727,7 +729,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 			m_bmap = bmap_t{SIZE_MAX, block_size};
 		// load mappings from the file
-		} else if (!load_bmap(m_bmap_filename, m_bmap)) {
+		} else if (load_bmap(m_bmap_filename, m_bmap)) {
 			set_last_err_string("Failed to load BMAP");
 			return -1;
 		}

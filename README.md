@@ -4,7 +4,7 @@
 [![Build with VS Studio](https://github.com/nxp-imx/mfgtools/actions/workflows/win.yaml/badge.svg)](https://github.com/nxp-imx/mfgtools/actions/workflows/win.yaml)
 [![Build for x64 ubuntu-lastest](https://github.com/nxp-imx/mfgtools/actions/workflows/build.yaml/badge.svg)](https://github.com/nxp-imx/mfgtools/actions/workflows/build.yaml)
 
-![GitHub](https://img.shields.io/github/license/nxp-imx/mfgtools.svg) 
+[![GitHub](https://img.shields.io/github/license/nxp-imx/mfgtools.svg)](https://github.com/nxp-imx/mfgtools/blob/master/LICENSE)
 
 [![universal-update-utility](https://snapcraft.io/universal-update-utility/badge.svg)](https://snapcraft.io/universal-update-utility)
 
@@ -85,7 +85,7 @@ For cmake prior 3.13:
 - `brew install cmake libusb openssl pkg-config tinyxml2`
 - `cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . && make`
 
-Note that we assume [brew](https://brew.sh) is installed and can be used to resolve dependencies as shown above. The remaining dependency `libbz2` can be resolved via the XCode supplied libraries.
+Note that we assume [homebrew](https://brew.sh) is installed and can be used to resolve dependencies as shown above. The remaining dependency `libbz2` can be resolved via the XCode supplied libraries.
 
 Note if you meet "can't detach kernel driver" try to check libusb version. 
 ```
@@ -99,6 +99,9 @@ brew info libusb
  - macOS (Catalina)
  - 32 bit systems will have problems with big files.
 
+ # Python bindings
+ We also provide Python bindings for `libuuu` to enable integration of functionality from `uuu` into your code. For more information see [wrapper](./wrapper/).
+
 # License
 uuu is licensed under the BSD license. See LICENSE.
 The BSD licensed prebuilt Windows binary version of uuu is statically linked with the LGPL libusb library, which remains LGPL.
@@ -107,4 +110,4 @@ The BSD licensed prebuilt Windows binary version of uuu is statically linked wit
  - zlib  (zlib license) is from https://github.com/madler/zlib.git
  - libusb (LGPL-2.1) is from  https://github.com/libusb/libusb.git
  - zstd (Dual BSD\GPLv2 Licenses) is from https://github.com/facebook/zstd
- - tinyxml (zlib license) is from https://github.com/leethomason/tinyxml2
+ - tinyxml2 (zlib license) is from https://github.com/leethomason/tinyxml2

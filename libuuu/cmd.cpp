@@ -890,10 +890,10 @@ int CmdIf::run(CmdCtx *p)
 	build_map(p);
 
 	if (is_env_exist(l))
-		l = get_env_variable(l);
+		l = str_to_upper(get_env_variable(l));
 
 	if (is_env_exist(r))
-		r = get_env_variable(r);
+		r = str_to_upper(get_env_variable(r));
 
 	switch (i)
 	{

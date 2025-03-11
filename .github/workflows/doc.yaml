@@ -40,7 +40,7 @@ jobs:
           a2x -L -a docinfo UUU
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: UUU.pdf
           path: wiki/UUU.pdf

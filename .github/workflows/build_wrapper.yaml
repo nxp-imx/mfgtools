@@ -1,0 +1,195 @@
+name: Multiplatform build of libuuu wrapper python package
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - uuu*
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  build-dlls:
+    name: Build of dynamically linked libraries
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        arch: [x86_64, arm64]
+        exclude:
+          - os: windows-latest
+            arch: arm64
+          - os: ubuntu-latest
+            arch: arm64
+
+    steps:
+      - name: Checkout uuu repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: false
+
+      - name: Clone vcpkg repository
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+
+      - name: Set up vcpkg on Windows
+        working-directory: ./vcpkg
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo ("VCPKG_ROOT=" + $PWD.Path) >> $env:GITHUB_ENV
+          ./bootstrap-vcpkg.bat
+
+      - name: Set up vcpkg on Ubuntu and MacOS
+        working-directory: ./vcpkg
+        if: matrix.os != 'windows-latest'
+        run: |
+          echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
+          ./bootstrap-vcpkg.sh
+
+      - name: Install dependencies Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get install gcc cmake ninja-build autotools-dev automake autoconf libudev-dev
+
+      - name: Install dependencies MacOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install ninja cmake autoconf automake libtool
+
+      - name: Install dependencies Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install cmake pkgconfiglite
+
+      - name: Build on Ubuntu and MacOS
+        working-directory: ./wrapper
+        if: matrix.os != 'windows-latest'
+        run: |
+          export PATH=$VCPKG_ROOT:$PATH
+          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            cmake --preset=unix;
+          else
+            cmake --preset=unix -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }};
+          fi
+          cmake --build build
+
+      - name: Build on Windows
+        working-directory: ./wrapper
+        if: matrix.os == 'windows-latest'
+        run: |
+          $env:Path = $env:VCPKG_ROOT + ';' + $env:Path
+          cmake --preset=windows
+          cmake --build build
+
+      - name: Upload artifacts Windows
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: libuuu-windows
+          path: ./wrapper/build/Debug/*.dll
+
+      - name: Upload artifacts MacOS
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-libuuu-macos-${{ matrix.arch }}
+          path: ./wrapper/build/libuuu.dylib
+
+      - name: Upload artifacts Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: libuuu-ubuntu-${{ matrix.arch }}
+          path: ./wrapper/build/libuuu.so
+
+  create-universal-dylib:
+    runs-on: macos-latest
+    needs: build-dlls
+    steps:
+      - name: Download x86_64 artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pre-libuuu-macos-x86_64
+          path: ./x86_64
+      - name: Download arm64 artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pre-libuuu-macos-arm64
+          path: ./arm64
+
+      - name: Create build directory
+        run: mkdir -p ./wrapper/build
+
+      - name: Create universal dylib
+        run: |
+          lipo -create -output ./wrapper/build/libuuu.dylib ./x86_64/libuuu.dylib ./arm64/libuuu.dylib
+
+      - name: Upload universal dylib
+        uses: actions/upload-artifact@v4
+        with:
+          name: libuuu-macos-universal
+          path: ./wrapper/build/libuuu.dylib
+
+  build-libuuu-wrapper:
+    runs-on: ubuntu-latest
+    needs: create-universal-dylib
+    steps:
+      - name: Checkout uuu repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: false
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: libuuu-*
+          merge-multiple: true
+          path: ./wrapper/libuuu/lib/
+
+      - name: Check the path
+        run: |
+          find ./wrapper/
+
+      - name: Install python dependencies
+        working-directory: ./wrapper
+        run: |
+          pip install --upgrade pip
+          pip install --force-reinstall -U build twine nxp-codecheck colorama setuptools_scm
+
+      - name: Build the python package
+        working-directory: ./wrapper
+        run: |
+          python -m build --sdist --wheel
+
+      - name: Run codecheck
+        working-directory: ./wrapper
+        run: |
+          codecheck -s
+
+      - name: Upload reports if codecheck fails
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: ./wrapper/reports/*
+
+      - name: Release package to pypi
+        if: github.ref_type == 'tag'
+        env:
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+          #TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
+        working-directory: ./wrapper
+        run: |
+          twine --no-color check dist/*
+          twine --no-color upload --repository pypi dist/*
+
+      - name: Upload the dist folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: ./wrapper/dist

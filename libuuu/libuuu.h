@@ -34,11 +34,21 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#ifdef __cplusplus
-#define EXT extern "C"
+#ifdef DLL_EXPORT_LIBUUU
+#define DLLEXPORT __declspec(dllexport)
+#define DLLIMPORT __declspec(dllimport)
 #else
-#define EXT
+#define DLLEXPORT
+#define DLLIMPORT
 #endif
+
+
+#ifdef __cplusplus
+#define EXT extern "C" DLLEXPORT
+#else
+#define EXT DLLEXPORT
+#endif
+
 
 /**
  * Get Last error string
@@ -108,46 +118,52 @@ struct uuu_notify
 
 typedef int (*uuu_notify_fun)(struct uuu_notify, void *data);
 
-int uuu_register_notify_callback(uuu_notify_fun f, void *data);
-int uuu_unregister_notify_callback(uuu_notify_fun f);
+EXT int uuu_register_notify_callback(uuu_notify_fun f, void *data);
+EXT int uuu_unregister_notify_callback(uuu_notify_fun f);
 
 typedef int(*uuu_show_cfg)(const char *pro, const char *chip, const char *comp, uint16_t vid, uint16_t pid, uint16_t bcdlow, uint16_t bcdhigh, void *p);
-int uuu_for_each_cfg(uuu_show_cfg fn, void *p);
+EXT int uuu_for_each_cfg(uuu_show_cfg fn, void *p);
 
 typedef int(*uuu_ls_file)(const char *path, void *p);
-int uuu_for_each_ls_file(uuu_ls_file fn, const char *path, void *p);
+EXT int uuu_for_each_ls_file(uuu_ls_file fn, const char *path, void *p);
 
 typedef int(*uuu_ls_usb_devices)(const char *path, const char *chip, const char *pro,  uint16_t vid, uint16_t pid, uint16_t bcd, const char *serial_no, void *p);
-int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p);
+EXT int uuu_for_each_devices(uuu_ls_usb_devices fn, void *p);
 
-int uuu_run_cmd(const char * cmd, int dry);
-int uuu_run_cmd_script(const char *script, int dry);
+EXT int uuu_run_cmd(const char * cmd, int dry);
+EXT int uuu_run_cmd_script(const char *script, int dry);
 
-int uuu_auto_detect_file(const char * filename);
-int uuu_wait_uuu_finish(int deamon, int dry);
-int uuu_add_usbpath_filter(const char *path);
-int uuu_add_usbserial_no_filter(const char *serial_no);
+EXT int uuu_auto_detect_file(const char * filename);
+EXT int uuu_wait_uuu_finish(int deamon, int dry);
+EXT int uuu_add_usbpath_filter(const char *path);
+EXT int uuu_add_usbserial_no_filter(const char *serial_no);
 
 /*Set timeout wait for known devices appeared*/
-int uuu_set_wait_timeout(int timeout_in_seconds);
+EXT int uuu_set_wait_timeout(int timeout_in_seconds);
 /*Set timeout wait for next devices appeared, e.g. FB -> FBK*/
-int uuu_set_wait_next_timeout(int timeout_in_seconds);
+EXT int uuu_set_wait_next_timeout(int timeout_in_seconds);
 /*Set usb device polling period */
-void uuu_set_poll_period(int period_in_milliseconds);
+EXT void uuu_set_poll_period(int period_in_milliseconds);
+
+enum LIBUUU_DEBUG_LEVEL
+{
+	LIBUUU_NORMAL = 0,
+	LIBUUU_DETAIL = 0x8 << 16,
+};
 /*
  * bit 0:15 for libusb
  * bit 16:31 for uuu
  */
-void uuu_set_debug_level(uint32_t mask);
+EXT void uuu_set_debug_level(uint32_t mask);
 
 /*
  * 0 disable small memory mode, buffer all data, it is used for multi-board program.
  */
-void uuu_set_small_mem(uint32_t val);
+EXT void uuu_set_small_mem(uint32_t val);
 
 #define MAX_USER_LEN 128
 typedef int (*uuu_askpasswd)(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN]);
-int uuu_set_askpasswd(uuu_askpasswd ask);
+EXT int uuu_set_askpasswd(uuu_askpasswd ask);
 
 enum class bmap_mode {
 	Default,
@@ -156,17 +172,7 @@ enum class bmap_mode {
 };
 
 /*Get .bmap handling mode*/
-static inline bmap_mode uuu_get_bmap_mode() {
-	extern bmap_mode g_bmap_mode;
-	return g_bmap_mode;
-}
-
-static inline int uuu_force_bmap() {
-	return uuu_get_bmap_mode() == bmap_mode::Force;
-}
-
-static inline int uuu_ignore_bmap() {
-	return uuu_get_bmap_mode() == bmap_mode::Ignore;
-}
+EXT bmap_mode uuu_get_bmap_mode();
+EXT int uuu_set_bmap_mode(bmap_mode mode);
 
 #endif

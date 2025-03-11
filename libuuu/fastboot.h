@@ -288,7 +288,7 @@ public:
 private:
 	bool m_bDownload;
 	std::string m_local_file;
-	size_t m_Maxsize_pre_cmd = 0x10000;
+	size_t m_Maxsize_pre_cmd = 0x4000;
 	std::string m_target_file;
 };
 

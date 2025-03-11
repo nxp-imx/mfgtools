@@ -43,6 +43,7 @@
 #include "zstd.h"
 
 #include "libusb.h"
+#include <chrono>
 
 #include <stdio.h>
 #include <string.h>

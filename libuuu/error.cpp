@@ -49,6 +49,11 @@ int get_libusb_debug_level() noexcept
 	return g_debug_level & 0xFFFF;
 }
 
+int get_libuuu_debug_level() noexcept
+{
+	return g_debug_level & 0xFFFF0000;
+}
+
 void uuu_set_debug_level(uint32_t mask)
 {
 	g_debug_level = mask;
