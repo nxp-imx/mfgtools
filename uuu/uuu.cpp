@@ -56,8 +56,8 @@ void print_autocomplete_help();
 /**
  * @brief Boolean indicating whether transfer feedback is verbose
  * @details
- * To support verbose status output: when truthy, statusing is append-based; prints on subsequent lines.
- * When falsy, status is written to the same line; overwriting the last status.
+ * To support verbose status output: when truthy, feedback is append-based; prints on subsequent lines.
+ * When falsy, status is written to the same lines; overwriting the last output.
  */
 int g_verbose = 0;
 
