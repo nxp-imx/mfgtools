@@ -1,5 +1,5 @@
 //! @file
-//! @brief Replaces uuu.cpp while allowing for back merge from master branch
+//! @brief New command line interface (CLI)
 
 #include "environment.h"
 #include "Logger.h"
@@ -23,14 +23,6 @@
 
 int auto_complete(int argc, char **argv);
 void print_autocomplete_help();
-
-/**
- * @brief Boolean indicating whether transfer feedback is verbose
- * @details
- * To support verbose status output: when truthy, feedback is append-based; prints on subsequent lines.
- * When falsy, status is written to the same lines; overwriting the last output.
- */
-int g_verbose = 0;
 
 Logger g_logger;
 std::shared_ptr<VtEmulation> g_vt = std::make_shared<PlatformVtEmulation>();
@@ -128,7 +120,7 @@ static void print_app_title()
 typedef std::vector<std::tuple<std::string, std::function<void()>, std::string>> help_handler_t;
 static const help_handler_t get_help_handlers();
 
-static void print_new_cli_help()
+static void print_cmd_cli_help()
 {
 	std::string text =
 		"Commands:\n"
@@ -172,6 +164,8 @@ static void print_new_cli_help()
 		"    ls-builtin [BUILTIN]\n"
 		"        List built-in script; all if none specified\n"
 		"    cat-builtin BUILTIN\n"
+		"        Output built-in script content\n"
+		"    expand-script PATH|BUILTIN [ARG...]\n"
 		"        Output built-in script content\n"
 #ifdef _WIN32
 		"    device-discovery-by-serial ignore|match\n"
@@ -219,7 +213,7 @@ static void print_new_cli_help()
 	std::cout << text;
 }
 
-static void print_old_cli_help()
+static void print_option_cli_help()
 {
 	std::string text =
 		"Default mode:\n"
@@ -282,18 +276,18 @@ static void print_definition(const Script& script)
 	std::string key_highlight = g_vt->fg_cyan;
 	std::string no_highlight = g_vt->fg_default;
 	std::cout << id_highlight << script.name << g_vt->fg_default << ": " << script.desc << std::endl;
-	for (auto& arg : script.args)
+	for (auto& formal_param : script.formal_params)
 	{
-		std::string desc = id_highlight + arg.name + no_highlight;
-		if (!arg.default_value_arg_name.empty())
+		std::string desc = id_highlight + formal_param.name + no_highlight;
+		if (!formal_param.default_source_param_name.empty())
 		{
 			desc += " " +
 				key_highlight + "[default=" +
-				id_highlight + arg.default_value_arg_name +
+				id_highlight + formal_param.default_source_param_name +
 				key_highlight + "]" +
 				no_highlight;
 		}
-		std::cout << "\t" << desc << ": " << arg.desc << std::endl;
+		std::cout << "\t" << desc << ": " << formal_param.desc << std::endl;
 	}
 }
 
@@ -322,7 +316,7 @@ static void print_protocol_help() {
 	std::cout << command_help_text << std::endl;
 }
 
-static int print_cfg(const char *pro, const char * chip, const char * /*compatible*/, uint16_t vid, uint16_t pid, uint16_t bcdmin, uint16_t bcdmax, void * /*p*/)
+static int _print_cfg(const char *pro, const char * chip, const char * /*compatible*/, uint16_t vid, uint16_t pid, uint16_t bcdmin, uint16_t bcdmax, void * /*p*/)
 {
 	const char *ext;
 	if (strlen(chip) >= 7)
@@ -341,10 +335,10 @@ static void print_protocol_support_info() {
 	printf("Protocol support for devices:\n");
 	printf("\tPctl\t Chip\t\t Vid\t Pid\t BcdVersion\t Serial_No\n");
 	printf("\t==================================================\n");
-	uuu_for_each_cfg(print_cfg, NULL);
+	uuu_for_each_cfg(_print_cfg, NULL);
 }
 
-static int print_udev_rule(const char * /*pro*/, const char * /*chip*/, const char * /*compatible*/,
+static int _print_udev_rule(const char * /*pro*/, const char * /*chip*/, const char * /*compatible*/,
 	uint16_t vid, uint16_t pid, uint16_t /*bcdmin*/, uint16_t /*bcdmax*/, void * /*p*/)
 {
 	printf("SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"%04x\", ATTRS{idProduct}==\"%04x\", TAG+=\"uaccess\"\n",
@@ -354,7 +348,7 @@ static int print_udev_rule(const char * /*pro*/, const char * /*chip*/, const ch
 
 static void print_udev_info()
 {
-	uuu_for_each_cfg(print_udev_rule, NULL);
+	uuu_for_each_cfg(_print_udev_rule, NULL);
 
 	std::cerr << std::endl
 		<< "Enable udev rules via:" << std::endl
@@ -525,22 +519,22 @@ ScriptCatalog g_ScriptCatalog(builtin_script_configs);
 /**
  * @brief Loads the content of a script
  * @param spec Name of a built-in script or a path to a file
- * @param args Parameter values to use with the script
+ * @param values Parameter values to use with the script
  * @param[out] source Describes the source of the script
  */
 static std::string load_script_text(
 	const std::string& spec,
-	const std::vector<std::string>& args,
+	const std::vector<std::string>& values,
 	std::string& source)
 {
 	source = spec;
-	const Script* script = g_ScriptCatalog.find(spec);
+	const Script *script = g_ScriptCatalog.find(spec);
 	if (!script) {
 		source += " (custom)";
 		script = g_ScriptCatalog.add_from_file(spec);
 		if (!script)
 		{
-			exit_for_runtime_error("Unable to load script from file: " + spec);
+			exit_for_runtime_error("Specifies neither a built-in script nor a file: " + spec);
 		}
 	}
 	else
@@ -548,20 +542,12 @@ static std::string load_script_text(
 		source += " (built-in)";
 	}
 
-	if (args.size() > script->args.size())
+	if (values.size() > script->formal_params.size())
 	{
-		exit_for_runtime_error("Too many parameters for script: " + args[script->args.size()]);
+		exit_for_runtime_error("Too many parameters for script: " + values[script->formal_params.size()]);
 	}
 
-	const std::string text = script->replace_arguments(args);
-
-	g_logger.log_debug([&]()
-	{
-		std::string message(text);
-		string_man::trim(message);
-		string_man::replace(message, "\n", "\n\t");
-		return "Script content (with parameters replaced with values):\n\t" + message;
-	});
+	const std::string text = script->replace_parameters(values);
 
 	return text;
 }
@@ -600,7 +586,7 @@ public:
 	std::string file_system_path;
 	std::string protocol_cmd;
 	std::string script_text;
-	std::string script_text_source;
+	std::string script_source;
 
 	InstallConfig(std::vector<std::string> args)
 	{
@@ -639,7 +625,6 @@ public:
 
 					g_logger.log_info("Enabling verbose (append-based) output since interactive UX is append-based");
 					g_transfer_context.enable_appending_feedback();
-
 					g_logger.log_debug([&]() { return "Interactive mode enabled"; });
 				}
 				else if (opt == "v")
@@ -753,8 +738,14 @@ public:
 
 					std::string script_spec = args.front();
 					args.erase(args.begin());
-					script_text = load_script_text(script_spec, args, script_text_source);
-					g_logger.log_debug([&]() { return "Loaded script: " + script_text_source; });
+					script_text = load_script_text(script_spec, args, script_source);
+					g_logger.log_debug([&]()
+						{
+							std::string message(script_text);
+							string_man::trim(message);
+							string_man::replace(message, "\n", "\n\t");
+							return "Content of script " + script_source + " with parameters replaced with values:\n\t" + message;
+						});
 					args.clear();
 					break;
 				}
@@ -936,7 +927,26 @@ static void handle_print_builtin(const std::vector<std::string>& args)
 	{
 		exit_for_syntax_error("Unknown built-in script '" + script_name + "'; options: " + g_ScriptCatalog.get_names());
 	}
-	print_content(*script);
+	std::string text = script->text;
+	string_man::trim(text);
+	std::cout << text << std::endl;
+	exit_for_status(EXIT_SUCCESS);
+}
+
+static void handle_expand_script(const std::vector<std::string>& args)
+{
+	if (args.size() < 1)
+	{
+		exit_for_syntax_error("Missing script specifier");
+	}
+
+	std::string spec = args[0];
+	std::vector<std::string> params(args.begin() + 1, args.end());
+	std::string source;
+	std::string text = load_script_text(spec, params, source);
+	string_man::trim(text);
+
+	std::cout << text << std::endl;
 	exit_for_status(EXIT_SUCCESS);
 }
 
@@ -979,13 +989,14 @@ static std::vector<command_handler_t> command_handlers
 	{ "ls-devices", handle_list_devices },
 	{ "ls-builtin", handle_list_builtin },
 	{ "cat-builtin", handle_print_builtin },
+	{ "expand-script", handle_expand_script },
 #ifdef _WIN32
 	{ "device-discovery-by-serial", handle_setup_serial_matching },
 #endif
 };
 
 [[noreturn]]
-static void process_new_command_line(int argc, char** argv)
+static void process_cmd_command_line(int argc, char** argv)
 {
 	if (argc < 2)
 	{
@@ -1021,7 +1032,7 @@ static void process_new_command_line(int argc, char** argv)
 }
 
 [[noreturn]]
-static void process_old_command_line(int argc, char** argv)
+static void process_option_command_line(int argc, char** argv)
 {
 	if (argc == 1)
 	{
@@ -1099,7 +1110,7 @@ static void process_old_command_line(int argc, char** argv)
 					exit_for_syntax_error("Missing built-in script name; options: " + g_ScriptCatalog.get_names());
 				}
 				std::string script_name = argv[2];
-				const Script* script = g_ScriptCatalog.find(script_name);
+				const Script *script = g_ScriptCatalog.find(script_name);
 				if (!script)
 				{
 					exit_for_syntax_error("Unknown built-in script '" + script_name + "'; options: " + g_ScriptCatalog.get_names());
@@ -1351,43 +1362,4 @@ static void process_old_command_line(int argc, char** argv)
 	// exit process with transfer status code
 	// NOTE: should only get here if performed transfer (installed a file or ran a script)
 	exit_for_status(g_transfer_context.get_overall_status_code());
-}
-
-int main(int argc, char** argv)
-{
-	// handle auto-complete
-	if (auto_complete(argc, argv) == 0) return EXIT_SUCCESS;
-
-	// setup ctrl-c interrupt
-	signal(SIGINT, exit_for_interrupt);
-
-	print_app_title();
-
-	// enable rich output if possible
-	if (g_vt->enable())
-	{
-		g_logger.is_color_output_enabled = true;
-	}
-	else
-	{
-		// note: if output is re-directed to a file, then output does not supports color.
-		// There may be other ways color is not supported.
-		g_logger.log_warning("Rich output is not supported; feedback will be monochrome and append-based (not overwriting)");
-		g_transfer_context.enable_appending_feedback();
-	}
-
-	bool use_new_cli = true;
-	if (use_new_cli)
-	{
-		print_cli_help = print_new_cli_help;
-		process_new_command_line(argc, argv);
-	}
-	else
-	{
-		print_cli_help = print_old_cli_help;
-		process_old_command_line(argc, argv);
-	}
-
-	g_logger.log_internal_error("Command line processor should not return");
-	exit_for_status(EXIT_FAILURE);
 }
