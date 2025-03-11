@@ -29,7 +29,10 @@
 *
 */
 
+#define COMMAND_BASED_CLI
+#ifdef COMMAND_BASED_CLI
 #include "cli.h"
+#else
 #include <iostream>
 #include <stdio.h>
 #include <thread>
@@ -1225,3 +1228,4 @@ int main(int argc, char **argv)
 		printf("\n\n\n");
 	return g_overall_status;
 }
+#endif

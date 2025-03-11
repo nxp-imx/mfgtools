@@ -23,6 +23,7 @@
 
 int auto_complete(int argc, char **argv);
 void print_autocomplete_help();
+extern bmap_mode g_bmap_mode;
 
 /**
  * @brief Boolean indicating whether transfer feedback is verbose
@@ -35,7 +36,6 @@ int g_verbose = 0;
 Logger g_logger;
 std::shared_ptr<VtEmulation> g_vt = std::make_shared<PlatformVtEmulation>();
 TransferContext g_transfer_context;
-bmap_mode g_bmap_mode = bmap_mode::Default;
 
 static bool dry_run = false;
 static bool is_continuous_mode = false;
