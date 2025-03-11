@@ -1217,18 +1217,7 @@ int main(int argc, char** argv)
 	bool use_new_cli = true;
 	if (use_new_cli)
 	{
-		bool use_cmd_cli = true;
-		if (use_cmd_cli)
-		{
-			print_cli_help = print_cmd_cli_help;
-			process_cmd_command_line(argc, argv);
-		}
-		else
-		{
-			print_cli_help = print_option_cli_help;
-			process_option_command_line(argc, argv);
-		}
-
+		process_cmd_command_line(argc, argv);
 		g_logger.log_internal_error("Command line processor should not return");
 		exit_for_status(EXIT_FAILURE);
 	}
