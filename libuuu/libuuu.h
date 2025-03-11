@@ -112,7 +112,7 @@ struct uuu_notify
 		int status;
 		size_t index;
 		size_t total;
-		char *str;
+		const char *str;
 	};
 };
 

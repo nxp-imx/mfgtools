@@ -243,10 +243,7 @@ int CmdBase::dump()
 {
 	uuu_notify nt;
 	nt.type = uuu_notify::NOTIFY_CMD_INFO;
-
-	string str =  m_cmd;
-	str += "\n";
-	nt.str = (char*)str.c_str();
+	nt.str = m_cmd.c_str();
 	call_notify(nt);
 
 	return 0;
