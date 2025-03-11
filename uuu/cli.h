@@ -21,7 +21,6 @@
 #include <tuple>
 #include <vector>
 
-int auto_complete(int argc, char **argv);
 void print_autocomplete_help();
 
 Logger g_logger;
