@@ -54,11 +54,6 @@ public:
 		log("Hint", message, g_vt->fg_ok());
 	}
 
-	void log_dry_run(const std::string& message) const
-	{
-		log("Dry-run", message, g_vt->fg_light_magenta);
-	}
-
 	void log_debug(std::function<std::string()> format) const
 	{
 #ifdef _DEBUG
