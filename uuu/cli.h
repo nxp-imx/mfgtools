@@ -165,8 +165,8 @@ static void print_cli_help()
 		"        List built-in script; all if none specified\n"
 		"    cat-builtin BUILTIN\n"
 		"        Output built-in script content\n"
-		"    expand-script PATH|BUILTIN [ARG...]\n"
-		"        Output built-in script content\n"
+		"    expand-script PATH|BUILTIN [PARAM...]\n"
+		"        Expand a script with parameter values and output\n"
 #ifdef _WIN32
 		"    device-discovery-by-serial ignore|match\n"
 		"        Modify Windows registry to ignore or match (undo ignore) USB serial number when finding devices\n"
