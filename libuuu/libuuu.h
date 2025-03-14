@@ -60,7 +60,7 @@ EXT const char * uuu_get_last_err_string();
 * Get Last error code
 * @return last error code
 */
-EXT int uuu_get_last_err();
+//EXT int uuu_get_last_err();
 
 EXT const char * uuu_get_version_string();
 
@@ -112,7 +112,7 @@ struct uuu_notify
 		int status;
 		size_t index;
 		size_t total;
-		char *str;
+		const char *str;
 	};
 };
 

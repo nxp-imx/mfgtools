@@ -29,6 +29,11 @@
 *
 */
 
+//! @file
+//! @brief Legacy command line interface (CLI) code plus access to new CLI
+
+#include "cli.h"
+
 #include <iostream>
 #include <stdio.h>
 #include <thread>
@@ -43,7 +48,6 @@
 #include <time.h>
 #include <string.h>
 #include <signal.h>
-#include "buildincmd.h"
 #include <string>
 #include <streambuf>
 
@@ -82,7 +86,14 @@ char g_sample_cmd_list[] = {
 vector<string> g_usb_path_filter;
 vector<string> g_usb_serial_no_filter;
 
+/**
+ * @brief Boolean indicating whether transfer feedback is verbose
+ * @details
+ * To support verbose status output: when truthy, feedback is append-based; prints on subsequent lines.
+ * When falsy, status is written to the same lines; overwriting the last output.
+ */
 int g_verbose = 0;
+
 static bool g_start_usb_transfer;
 
 class AutoCursor
@@ -204,14 +215,10 @@ void print_help(bool detail = false)
 		"uuu -h              show general help\n"
 		"uuu -H              show general help and detailed help for commands\n\n";
 	printf("%s", help);
-	printf("uuu [-d -m -v -bmap -no-bmap] -b[run] ");
-	g_BuildScripts.ShowCmds();
-	printf(" arg...\n");
-	printf("\tRun Built-in scripts\n");
-	g_BuildScripts.ShowAll();
-	printf("\nuuu -bshow ");
-	g_BuildScripts.ShowCmds();
-	printf("\n");
+	printf("uuu [-d -m -v -bmap -no-bmap] -b[run] %s arg...\n", g_ScriptCatalog.get_names().c_str());
+	printf("\tRun Built-in scripts\n\n");
+	print_script_catalog("");
+	printf("\nuuu -bshow %s\n", g_ScriptCatalog.get_names().c_str());
 	printf("\tShow built-in script\n");
 	printf("\n");
 
@@ -493,7 +500,7 @@ public:
 		}
 
 		if (nt->type == uuu_notify::NOTIFY_CMD_INFO)
-			cout << nt->str;
+			cout << nt->str << endl;
 
 		if (nt->type == uuu_notify::NOTIFY_WAIT_FOR)
 			cout << "\r" << nt->str << " "<< g_wait[((g_wait_index++) & 0x3)];
@@ -893,7 +900,7 @@ int set_ignore_serial_number()
 #endif
 }
 
-int main(int argc, char **argv)
+static int process_legacy_command_line(int argc, char** argv)
 {
 	if (auto_complete(argc, argv) == 0)
 		return 0;
@@ -908,22 +915,13 @@ int main(int argc, char **argv)
 		}
 		if (s == "-bshow")
 		{
-			if (2 == argc || g_BuildScripts.find(argv[2]) == g_BuildScripts.end())
+			vector<string> args;
+			for (int j = 2; j < argc; j++)
 			{
-				fprintf(stderr, "Error, must be have script name: ");
-				g_BuildScripts.ShowCmds(stderr);
-				fprintf(stderr,"\n");
-				return -1;
+				string s = argv[j];
+				args.push_back(s);
 			}
-			else
-			{
-				string str = g_BuildScripts[argv[2]].m_text;
-				while (str.size() > 0 && (str[0] == '\n' || str[0] == ' '))
-					str = str.erase(0,1);
-
-				printf("%s", str.c_str());
-				return 0;
-			}
+			handle_print_builtin(args);
 		}
 	}
 
@@ -1056,50 +1054,19 @@ int main(int argc, char **argv)
 			{
 				if (i + 1 == argc)
 				{
-					printf("error, must be have script name: ");
-					g_BuildScripts.ShowCmds();
-					printf("\n");
+					printf("error, must be have script name: %s\n", g_ScriptCatalog.get_names().c_str());
 					return -1;
 				}
-
+				
+				const std::string script_spec = argv[i + 1];
 				vector<string> args;
 				for (int j = i + 2; j < argc; j++)
 				{
-					string s = argv[j];
-					if (s.find(' ') != string::npos)
-					{
-						s.insert(s.begin(), '"');
-						s.insert(s.end(), '"');
-					}
-					args.push_back(s);
+					args.push_back(argv[j]);
 				}
 
-				// if script name is not build-in, try to look for a file
-				if (g_BuildScripts.find(argv[i + 1]) == g_BuildScripts.end()) {
-					const string tmpCmdFileName{argv[i + 1]};
-
-					std::ifstream t(tmpCmdFileName);
-					std::string fileContents((std::istreambuf_iterator<char>(t)),
-						std::istreambuf_iterator<char>());
-
-					if (fileContents.empty()) {
-						printf("%s is not built-in script or fail load external script file", tmpCmdFileName.c_str());
-						return -1;
-					}
-
-					BuiltInScriptRawData tmpCmd{
-						tmpCmdFileName.c_str(),
-						fileContents.c_str(),
-						"Script loaded from file"
-					};
-
-					g_BuildScripts.emplace(tmpCmdFileName, &tmpCmd);
-
-					cmd_script = g_BuildScripts[tmpCmdFileName].replace_script_args(args);
-				}
-				else {
-					cmd_script = g_BuildScripts[argv[i + 1]].replace_script_args(args);
-				}
+				std::string script_source;
+				cmd_script = load_script_text(script_spec, args, script_source);
 				break;
 			}
 			else
@@ -1111,14 +1078,13 @@ int main(int argc, char **argv)
 		{
 			for (int j = i; j < argc; j++)
 			{
-				s = argv[j];
-				if (s.find(' ') != string::npos && s[s.size() - 1] != ':')
+				std::string cmd_arg = argv[j];
+				if (cmd_arg[cmd_arg.size() - 1] != ':')
 				{
-					s.insert(s.begin(), '"');
-					s.insert(s.end(), '"');
+					string_man::quote_param_if_needed(cmd_arg);
 				}
-				cmd.append(s);
-				if(j != (argc -1)) /* Don't add space at last arg */
+				cmd.append(cmd_arg);
+				if (j != (argc -1)) /* Don't add space at last arg */
 					cmd.append(" ");
 			}
 			break;
@@ -1223,4 +1189,40 @@ int main(int argc, char **argv)
 	if(!g_verbose)
 		printf("\n\n\n");
 	return g_overall_status;
+}
+
+int main(int argc, char** argv)
+{
+	// handle auto-complete
+	if (auto_complete(argc, argv) == 0) return EXIT_SUCCESS;
+
+	// setup ctrl-c interrupt
+	signal(SIGINT, exit_for_interrupt);
+
+	print_app_title();
+
+	// enable rich output if possible
+	if (g_vt->enable())
+	{
+		g_logger.is_color_output_enabled = true;
+	}
+	else
+	{
+		// note: if output is re-directed to a file, then output does not supports color.
+		// There may be other ways color is not supported.
+		g_logger.log_warning("Rich output is not supported; feedback will be monochrome and append-based (not overwriting)");
+		g_transfer_context.enable_appending_feedback();
+	}
+
+	bool use_new_cli = true;
+	if (use_new_cli)
+	{
+		process_cmd_command_line(argc, argv);
+		g_logger.log_internal_error("Command line processor should not return");
+		exit_for_status(EXIT_FAILURE);
+	}
+	else
+	{
+		return process_legacy_command_line(argc, argv);
+	}
 }
