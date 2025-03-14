@@ -927,7 +927,7 @@ int run_cmds(const char *protocol, CmdCtx *p)
 		if (pin == nullptr)
 			return -1;
 
-		shared_ptr<DataBuffer> pbuff = pin->request_data(0, UINT64_MAX);
+		shared_ptr<DataBuffer> pbuff = pin->request_data(0, SIZE_MAX);
 		if (!pbuff)
 			return -1;
 		if(parser_cmd_list_file(pbuff, &cmdmap))
@@ -1130,7 +1130,7 @@ int uuu_auto_detect_file(const char *filename)
 	}
 
 	string str= "uuu_version";
-	shared_ptr<DataBuffer> pData = buffer->request_data(0, UINT_MAX);
+	shared_ptr<DataBuffer> pData = buffer->request_data(0, SIZE_MAX);
 	if (!pData)
 		return -1;
 	void *p1 = pData->data();
