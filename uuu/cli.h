@@ -201,8 +201,8 @@ static void print_cli_help()
 		"    uuu install --filter-path 1:2 --filter-path 1:3 foo.zip\n"
 		"        Limit device discovery to USB paths 1:2 and 1:3. Use ls-devices to discover paths.\n"
 		"\n"
-		"    uuu install --interactive --script emmc bootloader\n"
-		"        Load a bootloader image to the device EMMC, then enter interactive mode.\n";
+		"    uuu install --interactive boot\n"
+		"        Boot the device from the bootloader image in file 'boot', then enter interactive mode.\n";
 
 	std::string help_context_text;
 	{
