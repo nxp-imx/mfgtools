@@ -5,6 +5,8 @@
 #include <stdarg.h>
 
 #include <algorithm>
+#include <iostream>
+#include <iomanip>
 #include <locale>
 #include <sstream>
 #include <string>
@@ -141,14 +143,14 @@ namespace string_man {
 	}
 
 	/**
-	 * @brief Returns the hex representation of an integer
-	 * @param value Integer
+	 * @brief Returns the uppercase hex representation of a number with minimum width; left-padded with zeros
+	 * @param value number
 	 * @return Text
 	 */
 	template <typename T>
-	inline std::string to_hex(T value) {
+	inline std::string to_hex(T value, std::streamsize width) {
 		std::ostringstream ss;
-		ss << std::hex << value;
+		ss << std::setfill('0') << std::setw(width) << std::right << std::uppercase << std::hex << value;
 		return ss.str();
 	}
 

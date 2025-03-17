@@ -385,17 +385,50 @@ static void process_interactive_commands()
 	}
 }
 
-static int print_device_info(const char *path, const char *chip, const char *pro, uint16_t vid, uint16_t pid, uint16_t bcd, const char *serial_no, void * /*p*/)
+struct DeviceInfo final
 {
-	printf("%s\t%s\t%s\t0x%04X\t0x%04X\t0x%04X\t%s\n", path, chip, pro, vid, pid, bcd, serial_no);
+	std::string usb_path;
+	std::string chip;
+	std::string protocol;
+	uint16_t usb_vid;
+	uint16_t usb_pid;
+	uint16_t version;
+	std::string serial;
+};
+
+static int append_device_info(const char *path, const char *chip, const char *pro, uint16_t vid, uint16_t pid, uint16_t bcd, const char *serial_no, void *p)
+{
+	std::vector<DeviceInfo> *device_infos = (std::vector<DeviceInfo> *)p;
+	DeviceInfo device_info{ path, chip, pro, vid, pid, bcd, serial_no };
+	device_infos->push_back(device_info);
 	return EXIT_SUCCESS;
 }
 
 static void print_device_list()
 {
-	std::cout << "Path\tChip\tPro.\tVid\tPid\tVersion\tSerial#" << std::endl;
-	std::cout << "----\t----\t----\t---\t---\t-------\t-------" << std::endl;
-	uuu_for_each_devices(print_device_info, NULL);
+	std::vector<DeviceInfo> device_infos;
+	uuu_for_each_devices(append_device_info, &device_infos);
+
+	if (device_infos.size() == 0)
+	{
+		g_logger.log_info("No devices found");
+	}
+	else
+	{
+		std::cout << "Path\tChip\tPro.\tVid\tPid\tVersion\tSerial#" << std::endl;
+		std::cout << "----\t----\t----\t---\t---\t-------\t-------" << std::endl;
+		for (auto& i : device_infos)
+		{
+			std::cout << i.usb_path;
+			std::cout << '\t' << i.chip;
+			std::cout << '\t' << i.protocol;
+			std::cout << "\t0x" << string_man::to_hex(i.usb_vid, 4);
+			std::cout << "\t0x" << string_man::to_hex(i.usb_pid, 4);
+			std::cout << "\t0x" << string_man::to_hex(i.version, 4);
+			std::cout << '\t' << i.serial;
+			std::cout << std::endl;
+		}
+	}
 }
 
 static constexpr ScriptConfig builtin_script_configs[] =
