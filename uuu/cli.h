@@ -328,41 +328,47 @@ static const help_handler_t get_help_handlers()
 
 static void process_interactive_commands()
 {
-	int uboot_cmd = 0;
-	std::string prompt = "U>";
+	const std::string root_prompt = "UUU> ";
+	std::string prompt = root_prompt;
+	bool in_uboot_mode = false;
 
-	std::cout << "Please input command: " << std::endl;
-	std::string cmd;
-	std::ofstream log("uuu.inputlog", std::ofstream::binary);
-	log << "uuu_version "
+	g_logger.log_info("Enter 'quit' to exit interactive mode");
+	std::ofstream history("uuu.inputlog", std::ofstream::binary);
+	history << "uuu_version "
 		<< ((uuu_get_version() & 0xFF000000) >> 24)
 		<< "."
 		<< ((uuu_get_version() & 0xFFF000) >> 12)
 		<< "."
 		<< ((uuu_get_version() & 0xFFF))
 		<< std::endl;
+
 	while (1)
 	{
-		std::cout << prompt;
+		std::cout << g_vt->fg_light_yellow << prompt << g_vt->fg_default;
+		std::string cmd;
 		std::getline(std::cin, cmd);
 
 		if (cmd == "uboot")
 		{
-			uboot_cmd = 1;
-			prompt = "=>";
-			std::cout << "Enter into u-boot cmd mode" << std::endl;
-			std::cout << "Okay" << std::endl;
+			in_uboot_mode = true;
+			prompt = "uboot> ";
+			g_logger.log_info("Enter 'exit' to exit uboot command mode");
 		}
-		else if (cmd == "exit" && uboot_cmd == 1)
+		else if (in_uboot_mode && cmd == "exit")
 		{
-			uboot_cmd = 0;
-			prompt = "U>";
-			std::cout << "Exit u-boot cmd mode" << std::endl;
-			std::cout << "Okay" << std::endl;
+			in_uboot_mode = false;
+			prompt = root_prompt;
 		}
 		else if (cmd == "help" || cmd == "?")
 		{
-			print_cli_help();
+			std::string text =
+				"    PROTOCOL: [ARG...]\n"
+				"        Run a protocol command\n"
+				"    uboot/exit\n"
+				"        Enter/exit u-boot command sub-mode\n"
+				"    quit | q\n"
+				"        Exit interactive mode\n";
+			std::cout << text;
 		}
 		else if (cmd == "q" || cmd == "quit")
 		{
@@ -370,17 +376,23 @@ static void process_interactive_commands()
 		}
 		else
 		{
-			log << cmd << std::endl;
-			log.flush();
-
-			if (uboot_cmd)
+			if (in_uboot_mode)
+			{
 				cmd = "fb: ucmd " + cmd;
+			}
 
 			int ret = uuu_run_cmd(cmd.c_str(), 0);
 			if (ret)
-				std::cout << uuu_get_last_err_string() << std::endl;
+			{
+				std::cout << uuu_get_last_err_string() << " (hint: enter 'quit' to exit)" << std::endl;
+			}
 			else
+			{
 				std::cout << "Okay" << std::endl;
+			}
+
+			history << cmd << std::endl;
+			history.flush();
 		}
 	}
 }
