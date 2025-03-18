@@ -332,7 +332,6 @@ static void process_interactive_commands()
 	std::string prompt = root_prompt;
 	bool in_uboot_mode = false;
 
-	g_logger.log_info("Enter 'quit' to exit interactive mode");
 	std::ofstream history("uuu.inputlog", std::ofstream::binary);
 	history << "uuu_version "
 		<< ((uuu_get_version() & 0xFF000000) >> 24)
@@ -347,12 +346,12 @@ static void process_interactive_commands()
 		std::cout << g_vt->fg_light_yellow << prompt << g_vt->fg_default;
 		std::string cmd;
 		std::getline(std::cin, cmd);
+		string_man::trim(cmd);
 
 		if (cmd == "uboot")
 		{
 			in_uboot_mode = true;
 			prompt = "uboot> ";
-			g_logger.log_info("Enter 'exit' to exit uboot command mode");
 		}
 		else if (in_uboot_mode && cmd == "exit")
 		{
@@ -367,12 +366,18 @@ static void process_interactive_commands()
 				"    uboot/exit\n"
 				"        Enter/exit u-boot command sub-mode\n"
 				"    quit | q\n"
-				"        Exit interactive mode\n";
+				"        Exit interactive mode\n"
+				"    help | ?\n"
+				"        Print this info\n";
 			std::cout << text;
 		}
 		else if (cmd == "q" || cmd == "quit")
 		{
 			return;
+		}
+		else if (cmd.size() == 0)
+		{
+			g_logger.log_hint("Enter 'help' for interactive mode commands");
 		}
 		else
 		{
@@ -384,11 +389,12 @@ static void process_interactive_commands()
 			int ret = uuu_run_cmd(cmd.c_str(), 0);
 			if (ret)
 			{
-				std::cout << uuu_get_last_err_string() << " (hint: enter 'quit' to exit)" << std::endl;
+				g_logger.log_error(uuu_get_last_err_string());
+				g_logger.log_hint("Enter 'help' for interactive mode commands");
 			}
 			else
 			{
-				std::cout << "Okay" << std::endl;
+				g_logger.log_info("OK");
 			}
 
 			history << cmd << std::endl;
