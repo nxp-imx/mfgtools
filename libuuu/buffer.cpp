@@ -1347,7 +1347,7 @@ int FileBuffer::mapfile(const string &filename, size_t sz)
 		{
 			string err;
 			err += "xx Failure open file: ";
-			err + filename;
+			err += filename;
 			set_last_err_string(err);
 			return -1;
 		}
