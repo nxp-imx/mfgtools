@@ -20,11 +20,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\uuu\autocomplete.cpp" />
-    <ClCompile Include="..\uuu\buildincmd.cpp" />
     <ClCompile Include="..\uuu\uuu.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\uuu\buildincmd.h" />
+    <ClInclude Include="..\uuu\HorizontalScrollingFormatter.h" />
+    <ClInclude Include="..\uuu\Script.h" />
+    <ClInclude Include="..\uuu\environment.h" />
+    <ClInclude Include="..\uuu\Logger.h" />
+    <ClInclude Include="..\uuu\ScriptCatalog.h" />
+    <ClInclude Include="..\uuu\TransferFeedback.h" />
+    <ClInclude Include="..\uuu\VtEmulation.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
