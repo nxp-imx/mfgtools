@@ -73,6 +73,46 @@ static bool g_small_memory = true;
 
 string g_current_dir = ">";
 
+static map<string, bool> warned_empty_files;
+
+/**
+ * @brief Logs a warning if the specified file is empty
+ * @details
+ * This situation (opening an empty file) is somewhat common on Windows since builds typically
+ * are run on Linux and such builds typically create link files which are convenient on Linux,
+ * but when transferred to Windows are useless empty files, and processing an empty file at least
+ * sometimes results in a hang at install time. This warning can be very helpful to a user 
+ * confused by the hang.
+ * 
+ * Would be nice to use the logging facility, but it's at the app level; not accessible here.
+ * Maybe should move the logging facility to the lib level.
+ */
+static void warn_if_empty_file(string filename)
+{
+	// don't know what the > prefix means, but it's problematic here; remove it
+	if (filename[0] == MAGIC_PATH)
+	{
+		filename = filename.substr(1);
+	}
+
+	// only warn once per file since annoying to warn for the same file multiple times
+	if (warned_empty_files.find(filename) != warned_empty_files.end()) return;
+	warned_empty_files[filename] = true;
+
+	// opening here shouldn't fail since should have been tested for existence already
+	ifstream file(filename);
+	if (!file.is_open()) {
+		cerr << "INTERNAL ERROR: Could not open file to validate for empty: " << filename << std::endl;
+		return;
+	}
+
+	bool is_empty = file.peek() == std::ifstream::traits_type::eof();
+	if (is_empty)
+	{
+		cerr << "Warning: Empty input file: " << filename << "; maybe it's a link file accessed in Windows" << endl;
+	}
+}
+
 void set_current_dir(const string &dir)
 {
 	g_current_dir = MAGIC_PATH;
@@ -950,7 +990,10 @@ bool FSCompressStream::exist(const string &backfile, const string &filename)
 		return false;
 
 	if (filename == "*")
+	{
+		warn_if_empty_file(backfile);
 		return true;
+	}
 
 	return false;
 }
