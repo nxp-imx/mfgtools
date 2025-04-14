@@ -132,8 +132,10 @@ int USBTrans::open(void *p)
 	m_EPs.clear();
 	for (int i = 0; i < config->interface[0].altsetting[0].bNumEndpoints; i++)
 	{
-		m_EPs.push_back(EPInfo(config->interface[0].altsetting[0].endpoint[i].bEndpointAddress,
-							   config->interface[0].altsetting[0].endpoint[i].wMaxPacketSize));
+		const struct libusb_endpoint_descriptor *ep = &config->interface[0].altsetting[0].endpoint[i];
+
+		m_EPs.push_back(EPInfo(ep->bEndpointAddress, ep->wMaxPacketSize,
+				       (enum libusb_endpoint_transfer_type)(ep->bmAttributes & 0x3)));
 	};
 
 	libusb_free_config_descriptor(config);
@@ -160,6 +162,9 @@ int HIDTrans::open(void *p)
 	{
 		if (ep.addr > 0 && ((ep.addr & 0x80) == 0))
 			m_outEP = ep.addr;
+
+		if (ep.addr & 0x80 && ep.type == LIBUSB_ENDPOINT_TRANSFER_TYPE_INTERRUPT)
+			m_inEP = ep.addr;
 	}
 
 	return 0;
@@ -213,7 +218,7 @@ int HIDTrans::read_simple(void *buff, size_t size, size_t *rsize)
 	int actual;
 	ret = libusb_interrupt_transfer(
 		(libusb_device_handle *)m_devhandle,
-		0x81,
+		m_inEP,
 		(uint8_t*)buff,
 		size,
 		&actual,

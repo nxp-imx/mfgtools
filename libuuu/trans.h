@@ -34,6 +34,8 @@
 #include <string>
 #include <vector>
 
+#include "libusb.h"
+
 class TransBase
 {
 public:
@@ -61,9 +63,11 @@ class EPInfo
 {
 public:
 	constexpr EPInfo() = default;
-	constexpr EPInfo(int a, int size) : addr{a}, package_size{size} {}
+	constexpr EPInfo(int a, int size, enum libusb_endpoint_transfer_type type) :
+		addr{a}, package_size{size}, type(type) {}
 	int addr = 0;
 	int package_size = 64;
+	enum libusb_endpoint_transfer_type type = LIBUSB_ENDPOINT_TRANSFER_TYPE_CONTROL;
 };
 
 class USBTrans : public TransBase
@@ -91,6 +95,7 @@ protected:
 
 private:
 	int m_outEP = 0;
+	int m_inEP = 0x81;
 	const int m_timeout = 1000;
 	int m_set_report = 9;
 };
