@@ -158,7 +158,7 @@ static void print_cli_help()
 		"    install [OPTION...] PROTOCOL: [ARG...]\n"
 		"        Run a protocol command; see 'help protocol-commands'\n"
 		"        OPTION\t\tSee above except for --dry-run, --continuous, --interactive\n"
-		"    ls-devices\n"
+		"    devices\n"
 		"        List connected devices\n"
 		"    ls-builtin [BUILTIN]\n"
 		"        Output use info for a built-in script; all if none specified\n"
@@ -171,10 +171,11 @@ static void print_cli_help()
 		"        Modify Windows registry to ignore or match (undo ignore) USB serial number when finding devices\n"
 #endif
 		"$HELP_COMMANDS"
-		"    -h\tOutput basic help\n"
+		"    -h|--help\n"
+		"\tOutput general help\n"
 		"\n"
 		"Examples:\n"
-		"    uuu ls-devices\n"
+		"    uuu devices\n"
 		"        List connected devices.\n"
 		"\n"
 		"    uuu install foo.zip\n"
@@ -199,7 +200,7 @@ static void print_cli_help()
 		"        Execute SDPS protocol command.\n"
 		"\n"
 		"    uuu install --filter-path 1:2 --filter-path 1:3 foo.zip\n"
-		"        Limit device discovery to USB paths 1:2 and 1:3. Use ls-devices to discover paths.\n"
+		"        Limit device discovery to USB paths 1:2 and 1:3. Use devices to discover paths.\n"
 		"\n"
 		"    uuu install --interactive boot\n"
 		"        Boot the device from the bootloader image in file 'boot', then enter interactive mode.\n";
@@ -977,7 +978,7 @@ static std::vector<command_handler_t> command_handlers
 {
 	{ "help", handle_help },
 	{ "install", handle_install },
-	{ "ls-devices", handle_list_devices },
+	{ "devices", handle_list_devices },
 	{ "ls-builtin", handle_list_builtin },
 	{ "cat-builtin", handle_print_builtin },
 	{ "expand-script", handle_expand_script },
@@ -995,7 +996,7 @@ static void process_cmd_command_line(int argc, char** argv)
 	}
 	
 	const std::string command = argv[1];
-	if (command == "-h")
+	if (command == "-h" || command == "--help")
 	{
 		print_cli_help();
 		exit_for_status(EXIT_SUCCESS);
