@@ -110,7 +110,7 @@ public:
 	{
 		va_list args;
 		va_start(args, fmt);
-		size_t len = std::vsnprintf(NULL, 0, fmt, args);
+		size_t len = std::vsnprintf(nullptr, 0, fmt, args);
 		va_end(args);
 
 		this->resize(len);
@@ -505,7 +505,7 @@ public:
 			cout << "Download file:" << nt->str << endl;
 
 	}
-	void print(int verbose = 0, uuu_notify*nt=NULL)
+	void print(int verbose = 0, uuu_notify*nt=nullptr)
 	{
 		verbose ? print_verbose(nt) : print_simple();
 	}
@@ -839,7 +839,7 @@ int runshell(int shell)
 
 void print_udev()
 {
-	uuu_for_each_cfg(print_udev_rule, NULL);
+	uuu_for_each_cfg(print_udev_rule, nullptr);
 	fprintf(stderr, "\n1: put above udev run into /etc/udev/rules.d/70-uuu.rules\n");
 	fprintf(stderr, "\tsudo sh -c \"uuu -udev > /etc/udev/rules.d/70-uuu.rules\"\n");
 	fprintf(stderr, "2: update udev rule\n");
@@ -858,7 +858,7 @@ void print_lsusb()
 	printf("\tPath\t Chip\t Pro\t Vid\t Pid\t BcdVersion\t Serial_no\n");
 	printf("\t====================================================================\n");
 
-	uuu_for_each_devices(print_usb_device, NULL);
+	uuu_for_each_devices(print_usb_device, nullptr);
 }
 
 #ifdef WIN32
@@ -889,7 +889,7 @@ int set_ignore_serial_number()
 	return -1;
 #else
 	printf("Set window registry to ignore usb hardware serial number for known uuu device:\n");
-	return uuu_for_each_cfg(ignore_serial_number, NULL);
+	return uuu_for_each_cfg(ignore_serial_number, nullptr);
 #endif
 }
 
@@ -1157,7 +1157,7 @@ int main(int argc, char **argv)
 		printf("%sBuild in config:%s\n", g_vt_boldwhite, g_vt_default);
 		printf("\tPctl\t Chip\t\t Vid\t Pid\t BcdVersion\t Serial_No\n");
 		printf("\t==================================================\n");
-		uuu_for_each_cfg(print_cfg, NULL);
+		uuu_for_each_cfg(print_cfg, nullptr);
 
 		if (!cmd_script.empty())
 			printf("\n%sRun built-in script:%s\n %s\n\n", g_vt_boldwhite, g_vt_default, cmd_script.c_str());

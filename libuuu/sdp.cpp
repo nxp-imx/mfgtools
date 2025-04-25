@@ -243,7 +243,7 @@ SDPBootCmd::SDPBootCmd(char *p) : SDPCmdBase(p)
 	insert_param_info("-barebox", &m_barebox, Param::Type::e_bool);
 }
 
-# define BAREBOX_MAGIC_OFFSET	0x20
+static constexpr size_t BAREBOX_MAGIC_OFFSET = 0x20;
 
 bool SDPBootCmd::is_barebox_img(void)
 {
