@@ -719,8 +719,15 @@ int FBFlashCmd::run(CmdCtx *ctx)
 			size_t block_size = 4096;
 			if (getvar.parser((char*)"FB: getvar logical-block-size"))
 				return -1;
-			if (!getvar.run(ctx))
-				block_size = str_to_uint32(getvar.m_val);
+
+			if (!getvar.run(ctx)) {
+				bool conversion_succeeded = false;
+				size_t tmp_block_size = str_to_uint32(getvar.m_val, &conversion_succeeded);
+
+				if (conversion_succeeded) {
+					block_size = tmp_block_size;
+				}
+			}
 
 			if (block_size == 0) {
 				set_last_err_string("Device report block_size is 0");
