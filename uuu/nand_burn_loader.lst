@@ -1,7 +1,7 @@
 uuu_version 1.2.39
 
 # @_flash.bin            | bootloader
-# @_image   [_flash.bin] | image burn to nand, default is the same as bootloader
+# @_image   [_flash.bin] | image to burn to nand, default is the same as bootloader
 
 # This command will be run when i.MX6/7 i.MX8MM, i.MX8MQ
 SDP: boot -f _flash.bin

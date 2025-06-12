@@ -1,78 +1,78 @@
-uuu_version 1.0.0
-#
-# uuu(universal update utility) command list file
-# First line must contain the minimum required uuu host version
-# ---------------------------------------------------------------------
-# Command Format PROTOCOL COMMAND ARG
-# PROTOCOL
-#          ALL protocol supported common commands
-#                      done        #last command for whole flow
-#                      delay <ms>  # delay ms
-#                      sh\shell <any shell command> #Run shell command, such as wget to file from network
-#                      <        <any shell command> #use shell command's output as uuu command
-#                               this command generally used to burn some sequence number, such as production id and mac address
-#                               for example:
-#                                      FB:< echo ucmd print
-#
-#          CFG:  Config protocol of specific usb device vid/pid
-#                SDPS|SDP|FB\Fastboot|FBK -chip <chip name> -pid <pid> -vid <vid> [-bcdversion <ver>]
-#
-#          SDPS: Stream download after MX8QXPB0
-#                      boot  -f  <filename> [-offset 0x0000]
-#
-#          SDP:  iMX6/iMX7 HID download protocol.
-#                      dcd   -f  <filename>
-#                      write -f  <filename> [-addr 0x000000] [-ivt 0]
-#                      jump  -f  <filename> [-ivt 0]
-#                      boot  -f  <filename> [-nojump]
-#                      rdmem -addr <mem_address> -format <8|16|32>
-#                      wrmem -addr <mem_address> -format <8|16|32> -value <mem_value>
-#
-#          FB[-t timeout]:\Fastboot: android fastboot protocol (timeout in ms).
-#                      getvar
-#                      ucmd <any uboot command>
-#                      acmd <any never returned uboot command, like booti, reboot>
-#                      flash [-raw2sparse [{-no-bmap|-bmap <bmap_filename}]] <partition> <filename>
-#                      download -f <filename>
-#                      crc -f <filename> [-format "mmc read $loadaddr"] [-blksz 512] [-each 0x4000000]
-#                                        [-seek 0] [-skip 0] [-nostop]
-#                                          each          CRC size each loop
-#                                          seek          skip bytes from storage
-#                                          skip          skip bytes from -f
-#                                          nostop        continue check even if found mismatch
-#                      write -f <filename> [-format "mmc write $loadaddr"] [-blksz 512] [-each 0x4000000]
-#                                        [-seek 0] [-skip 0] [-nostop]
-#                                          each          write size each loop
-#                                          seek          skip bytes from storage
-#                                          skip          skip bytes from -f
-#                                          nostop        continue write even if error occurs
-#
-#
-#          FBK: community kernel with fastboot protocol (NOT compatible with fastboot tools).
-#                      ucmd <any kernel command> and wait for command finish
-#                      acmd <any kernel command> don't wait for command finish
-#                      sync                      wait for acmd process to finish
-#                      ucp <soure> <destinate>   copy file from/to target
-#                                                T:<filename> means target board file
-#                                                T:- means copy data to target's stdio pipe
-#                                                copy image T:/root/image ;download image to path /root/image
-#                                                copy T:/root/image image ;upload /root/image to file image
-#                      Example on how to transfer big files:
-#                              acmd tar -            ; run tar background and get data from stdio
-#                              ucp rootfs.tar.gz T:- ; send to target stdio pipe
-#                              sync                  ; wait for tar process to exit
-#
-# For example:
-#          SDPS: boot -f <filename>
-#          SDP:  boot -f <filename>
-#          CFG: SDP: -chip imx6ull -pid 0x1234 -vid 0x5678
-#
-# SDP: boot -f u-boot-imx7dsabresd_sd.imx -nojump
-# SDP: write -f zImage -addr 0x80800000
-# SDP: write -f zImage-imx7d-sdb.dtb -addr 0x83000000
-# SDP: write -f fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot -addr 0x83800000
-# SDP: jump -f u-boot-dtb.imx -ivt
+General commands:
+    done                End script
+    delay #             Delay for milliseconds
+    sh|shell COMMAND    Run shell command
+    < COMMAND           Use shell command output; example: 'FB:< echo ucmd print'
 
+Protocol commands:
+    General syntax:
+        PROTOCOL: COMMAND ARG...
+
+    CFG: Config protocol of specific USB device vid/pid
+        SDPS|SDP|FB\Fastboot|FBK -chip NAME -pid PID -vid VID [-bcdversion VER]
+
+    SDPS: Stream download after MX8QXPB0
+        boot -f FILENAME [-offset 0x0000]
+
+    SDP: iMX6/iMX7 HID download protocol
+        dcd   -f FILENAME
+        write -f FILENAME [-addr 0x000000] [-ivt 0]
+        jump  -f FILENAME [-ivt 0]
+        boot  -f FILENAME [-nojump]
+        rdmem -addr ADDRESS -format 8|16|32
+        wrmem -addr ADDRESS -format 8|16|32 -value VALUE
+
+    FB[-t timeout]:\Fastboot: Android fastboot protocol (timeout in ms)
+        getvar
+        ucmd COMMAND    Execute U-Boot command that returns
+        acmd COMMAND    Execute U-Boot command that does not return, like booti and reboot
+        flash [-raw2sparse [{-no-bmap|-bmap FILENAME}]] PARTITION FILENAME
+        download -f FILENAME
+        crc -f FILENAME
+            [-format "mmc read $loadaddr"]
+            [-blksz 512]
+            [-each #]   CRC size each loop
+            [-seek #]   Skip bytes from storage
+            [-skip #]   Skip bytes from -f
+            [-nostop]   Continue check even if found mismatch
+        write -f FILENAME
+            [-format "mmc write $loadaddr"]
+            [-blksz 512]
+            [-each #]   Write size each loop
+            [-seek #]   Skip bytes from storage
+            [-skip #]   Skip bytes from -f
+            [-nostop]   Continue write even if error occurs
+
+    FBK: community kernel with fastboot protocol (NOT compatible with fastboot tools)
+        ucmd COMMAND    Execute kernel command and wait for complete
+        acmd COMMAND    Execute kernel command and don't wait for complete
+        sync            Wait for acmd process to finish
+        ucp FROM TO     Copy file from/to target
+            T:FILENAME means target board file
+            T:- means copy data to target's stdio pipe
+            copy image T:/root/image ;download image to path /root/image
+            copy T:/root/image image ;upload /root/image to file image
+        Example of transferring a big file:
+            acmd tar -            ; run tar background and get data from stdio
+            ucp rootfs.tar.gz T:- ; send to target stdio pipe
+            sync                  ; wait for tar process to exit
+
+Example 1:
+uuu_version 1.0.0
+SDPS: boot -f FILENAME
+SDP: boot -f FILENAME
+CFG: SDP: -chip imx6ull -pid 0x1234 -vid 0x5678
+
+Example 2:
+uuu_version 1.0.0
+SDP: boot -f u-boot-imx7dsabresd_sd.imx -nojump
+SDP: write -f zImage -addr 0x80800000
+SDP: write -f zImage-imx7d-sdb.dtb -addr 0x83000000
+SDP: write -f fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot -addr 0x83800000
+SDP: jump -f u-boot-dtb.imx -ivt
+
+Example 3:
+uuu_version 1.0.0
 CFG: FB:  -vid 0x18D1 -pid 0x0D02
 SDP: boot -f u-boot-dtb.imx
 FB: getvar version
