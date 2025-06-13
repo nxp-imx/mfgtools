@@ -27,7 +27,7 @@ if (WIN32)
 add_custom_command(
     OUTPUT ${gitversion_h}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${generated_files_dir}
-    COMMAND ${CMAKE_COMMAND} -E echo "#define GIT_VERSION \"${version}\"" >> ${gitversion_h};
+    COMMAND ${CMAKE_COMMAND} -E echo "inline constexpr const char * GIT_VERSION = \"${version}\";" >> ${gitversion_h};
     COMMAND ${CMAKE_COMMAND} -E echo "#define PLATFORM_WINDOWS 1" >> ${gitversion_h}
     COMMAND ${CMAKE_COMMAND} -E echo "#define ENABLE_LOGGING 1" >> ${gitversion_h}
     COMMAND ${CMAKE_COMMAND} -E echo "#define DEFAULT_VISIBILITY /**/" >> ${gitversion_h}
@@ -38,7 +38,7 @@ else ()
 add_custom_command(
     OUTPUT ${gitversion_h}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${generated_files_dir}
-    COMMAND ${CMAKE_COMMAND} -E echo "#define GIT_VERSION \"${version}\"" >> ${gitversion_h};
+    COMMAND ${CMAKE_COMMAND} -E echo "inline constexpr const char *  GIT_VERSION = \"${version}\";" >> ${gitversion_h};
     COMMENT "Generating gitversion.h"
     VERBATIM
 )

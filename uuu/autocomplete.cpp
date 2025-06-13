@@ -60,7 +60,7 @@ void linux_auto_arg(const char *space = " ", const char * filter = "")
 {
 	string str = filter;
 
-	const char *param[] = { "-b", "-d", "-v", "-V", "-s", NULL };
+	const char *param[] = { "-b", "-d", "-v", "-V", "-s", nullptr };
 	int i = 0;
 
 	for (int i = 0; param[i]; i++)
@@ -121,7 +121,7 @@ void linux_autocomplete(int argc, char **argv)
 		linux_auto_arg();
 	}
 
-	uuu_for_each_ls_file(linux_autocomplete_ls, cur.c_str(), NULL);
+	uuu_for_each_ls_file(linux_autocomplete_ls, cur.c_str(), nullptr);
 }
 
 string get_next_word(string str, size_t &pos)
@@ -172,7 +172,7 @@ void power_shell_autocomplete(const char *p)
 	if (argv.size() == 1)
 		last.clear();
 
-	uuu_for_each_ls_file(linux_autocomplete_ls, last.c_str(), NULL);
+	uuu_for_each_ls_file(linux_autocomplete_ls, last.c_str(), nullptr);
 }
 
 int auto_complete(int argc, char**argv)
@@ -218,7 +218,7 @@ void print_autocomplete_help()
 	{
 		printf("Powershell: Enjoy auto [tab] command complete by run below command or put into Documents\\WindowsPowerShell\\Microsoft.PowerShell_profile.ps1\n");
 		
-		HMODULE hModule = GetModuleHandleA(NULL);
+		HMODULE hModule = GetModuleHandleA(nullptr);
 		char path[MAX_PATH];
 		GetModuleFileNameA(hModule, path, MAX_PATH);
 
