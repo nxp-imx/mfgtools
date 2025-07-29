@@ -340,7 +340,8 @@ private:
 };
 
 std::shared_ptr<FileBuffer> get_file_buffer(std::string filename, bool async=false);
-bool check_file_exist(std::string filename, bool start_async_load=true);
+int verify_file_exist(std::string filename);
+bool path_exists(const std::string& path);
 
 void set_current_dir(const std::string &dir);
 
