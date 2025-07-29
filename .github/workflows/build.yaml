@@ -18,8 +18,8 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-20.04
           - ubuntu-22.04
+          - ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -33,19 +33,19 @@ jobs:
       - name: Build
         run: |
           git fetch --tags --force # Retrieve annotated tags. #issue 290
-          if [ "${{ matrix.os }}" == "ubuntu-20.04" ]; then git submodule update --init tinyxml2; cd tinyxml2; cmake .; make; cd ..; fi;
-          if [ "${{ matrix.os }}" == "ubuntu-20.04" ]; then cmake -D 'STATIC=1' -D 'FORCE_OLD=on' . ; else cmake .; fi;
+          if [ "${{ matrix.os }}" == "ubuntu-22.04" ]; then git submodule update --init tinyxml2; cd tinyxml2; cmake .; make; cd ..; fi;
+          if [ "${{ matrix.os }}" == "ubuntu-22.04" ]; then cmake -D 'STATIC=1' -D 'FORCE_OLD=on' . ; else cmake .; fi;
           make
 
       - name: Upload Build Artifacts
-        if: matrix.os == 'ubuntu-20.04'
+        if: matrix.os == 'ubuntu-22.04'
         uses: actions/upload-artifact@v4
         with:
           name: uuu
           path: ./uuu/uuu
 
       - name: Create or Update Release
-        if: matrix.os == 'ubuntu-20.04' && github.ref_type == 'tag'
+        if: matrix.os == 'ubuntu-22.04' && github.ref_type == 'tag'
         uses: ncipollo/release-action@v1
         with:
           name: Release ${{ github.ref_name }}
