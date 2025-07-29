@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     strategy:
       matrix:
@@ -33,7 +33,7 @@ jobs:
     - name: Build static solution
       run: |
         git fetch --tags --force # Retrieve annotated tags. #issue 290
-        msbuild /p:Configuration=${{ matrix.configuration }} /p:PlatformToolset=v143 /p:Platform=${{ matrix.platform }} msvc/uuu-static-link.sln
+        msbuild /p:Configuration=${{ matrix.configuration }} /p:PlatformToolset=v143 /p:Platform=${{ matrix.platform }} /p:ForceImportBeforeCppTargets=${{ github.workspace }}/libusb.prop msvc/uuu-static-link.sln
 
     - name: Upload Build Artifacts
       if: matrix.configuration == 'Release' && matrix.platform == 'x64'
@@ -54,4 +54,4 @@ jobs:
         artifacts: msvc/x64/Release/uuu.exe
 
     - name: Build dynamic solution
-      run: msbuild /p:Configuration=${{ matrix.configuration }} /p:PlatformToolset=v143 /p:Platform=${{ matrix.platform }} msvc/uuu.sln
+      run: msbuild /p:Configuration=${{ matrix.configuration }} /p:PlatformToolset=v143 /p:Platform=${{ matrix.platform }} /p:ForceImportBeforeCppTargets=${{ github.workspace }}/libusb.prop msvc/uuu.sln
