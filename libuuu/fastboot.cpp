@@ -819,7 +819,18 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		pb = pin->request_data(0, sizeof(sparse_header));
 		if (!pb)
 			return -1;
-		sparse_header * pfile = (sparse_header *)pb->data();
+
+		__le16 file_hdr_sz;
+		__le32 blk_sz;
+		__le32 total_blks;
+		__le32 total_chunks;
+		{
+			sparse_header * pfile = (sparse_header *)pb->data();
+			file_hdr_sz = pfile->file_hdr_sz;
+			blk_sz = pfile->blk_sz;
+			total_blks = pfile->total_blks;
+			total_chunks = pfile->total_chunks;
+		}
 
 		if (!SparseFile::is_validate_sparse_file(pb->data(), sizeof(sparse_header)))
 		{
@@ -833,14 +844,14 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 		uuu_notify nt;
 		nt.type = uuu_notify::NOTIFY_TRANS_SIZE;
-		nt.total = pfile->total_blks;
+		nt.total = total_blks;
 		call_notify(nt);
 
-		sf.init_header(pfile->blk_sz, max / pfile->blk_sz);
+		sf.init_header(blk_sz, max / blk_sz);
 		startblock = 0;
-		pos = pfile->file_hdr_sz;
+		pos = file_hdr_sz;
 
-		for(size_t nblk=0; nblk < pfile->total_chunks && pos <= pin->size(); nblk++)
+		for(size_t nblk=0; nblk < total_chunks && pos <= pin->size(); nblk++)
 		{
 			pb = pin->request_data(pos, sizeof(chunk_header_t));
 			if (!pb)
@@ -864,7 +875,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 				if (flash(&fb, sf.m_data.data(), sf.m_data.size()))
 					return -1;
 
-				sf.init_header(pfile->blk_sz, max / pfile->blk_sz);
+				sf.init_header(blk_sz, max / blk_sz);
 
 				chunk_header_t ct;
 				ct.chunk_type = CHUNK_TYPE_DONT_CARE;
@@ -889,14 +900,14 @@ int FBFlashCmd::run(CmdCtx *ctx)
 			else
 			{
 				size_t off = sz + sizeof(chunk_header_t);
-				startblock += sz / pfile->blk_sz;
+				startblock += sz / blk_sz;
 
 				do
 				{
 					if (flash(&fb, sf.m_data.data(), sf.m_data.size()))
 						return -1;
 
-					sf.init_header(pfile->blk_sz, max / pfile->blk_sz);
+					sf.init_header(blk_sz, max / blk_sz);
 
 					chunk_header_t ct;
 					ct.chunk_type = CHUNK_TYPE_DONT_CARE;
@@ -908,7 +919,7 @@ int FBFlashCmd::run(CmdCtx *ctx)
 
 					sz = sf.push_raw_data(pb->data() + off, pb->size() - off);
 					off += sz;
-					startblock += sz / pfile->blk_sz;
+					startblock += sz / blk_sz;
 
 					uuu_notify nt;
 					nt.type = uuu_notify::NOTIFY_TRANS_POS;
