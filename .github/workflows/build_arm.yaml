@@ -31,6 +31,10 @@ jobs:
           fetch-depth: 0
           submodules: true
 
+      - name: git fetch tags
+        run: |
+          git fetch --tags --force # Retrieve annotated tags. #issue 290
+
       - uses: uraimo/run-on-arch-action@v2
         name: Build artifact
         id: build

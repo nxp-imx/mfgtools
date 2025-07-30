@@ -35,6 +35,7 @@ libuuu = ["*.dll", "*.so", "*.dylib"]
 root = ".."
 version_file = "libuuu/__version__.py"
 tag_regex = "^(?P<prefix>uuu_)?(?P<version>\\d+(\\.\\d+)*)$"
+local_scheme = "no-local-version"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}

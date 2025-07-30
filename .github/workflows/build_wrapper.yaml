@@ -135,6 +135,9 @@ jobs:
 
   build-libuuu-wrapper:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for trusted publishing
+      contents: read   # Required for actions/checkout
     needs: create-universal-dylib
     steps:
       - name: Checkout uuu repository
@@ -177,16 +180,13 @@ jobs:
           name: reports
           path: ./wrapper/reports/*
 
-      - name: Release package to pypi
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
         if: github.ref_type == 'tag'
-        env:
-          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
-          #TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
-        working-directory: ./wrapper
-        run: |
-          twine --no-color check dist/*
-          twine --no-color upload --repository pypi dist/*
+        with:
+          # This tells the action to use Trusted Publishing with OIDC
+          skip-existing: true  # Optional: don’t fail if the same version is already uploaded
+          packages-dir: ./wrapper/dist
 
       - name: Upload the dist folder
         uses: actions/upload-artifact@v4
