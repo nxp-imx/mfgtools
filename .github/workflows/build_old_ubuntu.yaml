@@ -1,0 +1,55 @@
+name: Build for old ubuntu
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - uuu*
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  build:
+    name: Build with Ubuntu 20.04 Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Build
+        run: |
+          git fetch --tags --force # Retrieve annotated tags. #issue 290
+          git submodule update --init tinyxml2;
+
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace -e DEBIAN_FRONTEND=noninteractive -e TZ=UTC ubuntu:20.04 bash -c "
+            apt-get update &&
+            apt-get  --yes --force-yes install libusb-1.0-0-dev libbz2-dev libzstd-dev pkg-config cmake libssl-dev g++ zlib1g-dev git libtinyxml2-dev
+            git config --global --add safe.directory /workspace &&
+            cd tinyxml2 && cmake . && make && cd .. &&
+            cmake -D 'STATIC=1' -D 'FORCE_OLD=on' . && make"
+
+      - name: Copy
+        run: |
+          cp ./uuu/uuu ./uuu/uuu-ubuntu20.04
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: uuu-ubuntu-20.04
+          path: ./uuu/uuu-ubuntu20.04
+
+      - name: Create or Update Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Release ${{ github.ref_name }}
+          tag: ${{ github.ref_name }}
+          commit: ${{ github.sha }}
+          allowUpdates: true
+          prerelease: true
+          artifacts: "./uuu/uuu-ubuntu20.04"
