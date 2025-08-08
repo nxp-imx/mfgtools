@@ -819,7 +819,9 @@ int FBFlashCmd::run(CmdCtx *ctx)
 		pb = pin->request_data(0, sizeof(sparse_header));
 		if (!pb)
 			return -1;
-		sparse_header * pfile = (sparse_header *)pb->data();
+
+		sparse_header header = *(sparse_header *)pb->data();
+		sparse_header * pfile = &header;
 
 		if (!SparseFile::is_validate_sparse_file(pb->data(), sizeof(sparse_header)))
 		{
