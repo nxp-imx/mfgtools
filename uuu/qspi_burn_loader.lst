@@ -34,7 +34,7 @@ FB: ucmd if test ! -n "$fastboot_bytes"; then setenv fastboot_bytes $filesize; e
 # Check Image if include flexspi header
 FB: ucmd if qspihdr dump ${fastboot_buffer}; then setenv qspihdr_exist yes; else setenv qspihdr_exist no; fi;
 # Check Image size if larger than 16M, then use uboot command to write image
-FB: ucmd if itest ${fastboot_buffer} -gt 1000000; then setenv qspihdr_large yes; else setenv qspihdr_large no; fi;
+FB: ucmd if itest ${fastboot_bytes} -gt 1000000; then setenv qspihdr_large yes; else setenv qspihdr_large no; fi;
 
 FB[-t 60000]: ucmd if test ${qspihdr_exist} = yes -a ${qspihdr_large} = no; then qspihdr init ${fastboot_buffer} ${fastboot_bytes} safe; else true; fi;
 
@@ -44,5 +44,5 @@ FB[-t 40000]: ucmd if test ${qspihdr_exist} = no; then sf erase 0 +${fastboot_by
 FB[-t 20000]: ucmd if test ${qspihdr_exist} = no; then sf write ${fastboot_buffer} 0 ${fastboot_bytes}; else true; fi;
 # if Image is larger than 16M, use uboot command to write image
 FB: ucmd if test ${qspihdr_large} = yes; then sf probe; else true; fi;
-FB: write -f _image -format "sf erase @off +@size; sf write ${fastboot_buffer} @off @size" -blksz 1 -each 0x100000
+FB: write -f _image -format "if test ${qspihdr_large} = yes; then sf erase @off +@size; sf write ${fastboot_buffer} @off @size; else true; fi;" -blksz 1 -each 0x100000
 FB: done
