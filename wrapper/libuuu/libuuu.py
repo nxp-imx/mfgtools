@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2024 NXP
+# Copyright 2024-2025 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Main module for libuuu wrapper."""
 
 import logging
@@ -174,13 +175,45 @@ class UUUState:
         self.logger.debug(f"{self.cmd=},{self.dev=},{self.waiting=}")
 
 
-def get_dll() -> str:
-    """Return name of shared library based on platform."""
-    if platform.system() == "Windows":
-        return "libuuu.dll"
-    if platform.system() == "Darwin":
-        return "libuuu.dylib"
-    return "libuuu.so"
+def get_platform_info() -> tuple[str, str]:
+    """Get platform and architecture information."""
+    system = platform.system().lower()
+    machine = platform.machine().lower()
+
+    # Normalize architecture names
+    arch_mapping = {
+        "x86_64": "x86_64",
+        "amd64": "x86_64",
+        "aarch64": "aarch64",
+        "arm64": "arm64",
+    }
+
+    arch = arch_mapping.get(machine, machine)
+    if system == "linux" and arch == "arm64":
+        # For Linux on ARM64, we can use the 'aarch64' architecture name
+        arch = "aarch64"
+
+    return system, arch
+
+
+def get_dll_path() -> str:
+    """Return path to the appropriate shared library based on platform and architecture."""
+    system, arch = get_platform_info()
+
+    base_path = pathlib.Path(__file__).parent / "lib"
+
+    if system == "windows":
+        lib_name = "libuuu.dll"
+        lib_path = base_path / "windows" / arch / lib_name
+    elif system == "darwin":
+        lib_name = "libuuu.dylib"
+        # macOS uses universal binary
+        lib_path = base_path / "darwin" / arch / lib_name
+    else:  # Linux and other Unix-like systems
+        lib_name = "libuuu.so"
+        lib_path = base_path / "linux" / arch / lib_name
+
+    return str(lib_path)
 
 
 @UUUNotifyCallback
@@ -200,7 +233,7 @@ def _default_notify_callback(struct: UUUNotifyStruct, data) -> int:  # type: ign
 class LibUUU:
     """Wrapper for the libuuu library."""
 
-    DLL = str(pathlib.Path(__file__).parent / "lib" / get_dll())
+    DLL = get_dll_path()
     NULL = POINTER(c_void_p)()
 
     _response = UUUCommandResponse()

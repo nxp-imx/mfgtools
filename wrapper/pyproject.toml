@@ -1,9 +1,8 @@
 [build-system]
-requires = ["setuptools >= 61.0", "wheel", "setuptools-scm>=8"]
-build-backend = "setuptools.build_meta"
+requires = ["setuptools>=68.0", "wheel", "setuptools-scm>=8"]
+build-backend = "build_backend"
+backend-path = ["."]
 
-[tool.setuptools]
-packages = ["libuuu"]
 
 [project]
 dynamic = ["version", "dependencies"]
@@ -28,14 +27,33 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 
+[tool.setuptools]
+packages = ["libuuu"]
+
 [tool.setuptools.package-data]
-libuuu = ["*.dll", "*.so", "*.dylib"]
+"libuuu.lib.windows.x86_64" = [
+    "*.dll"
+]
+"libuuu.lib.linux.x86_64" = [
+    "*.so"
+]
+"libuuu.lib.linux.aarch64" = [
+    "*.so"
+]
+"libuuu.lib.darwin.arm64" = [
+    "*.dylib"
+]
+"libuuu.lib.darwin.x86_64" = [
+    "*.dylib"
+]
+
 
 [tool.setuptools_scm]
 root = ".."
 version_file = "libuuu/__version__.py"
 tag_regex = "^(?P<prefix>uuu_)?(?P<version>\\d+(\\.\\d+)*)$"
 local_scheme = "no-local-version"
+fallback_version = "0.0.0"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
@@ -79,7 +97,7 @@ format = { max-line-length = 120 }
 [tool.nxp_codecheck]
 git_parent_branch = "origin/master"
 output_directory = "reports"
-default_check_paths = ["libuuu"]
+default_check_paths = ["libuuu", "tests", "build_backend.py"]
 
 # *********************************** Checker list ***********************************
 [[tool.nxp_codecheck.checkers]]

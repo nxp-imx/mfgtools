@@ -1,8 +1,8 @@
 include requirements*
 
 recursive-include libuuu *
+include build_backend.py
 
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
-recursive-exclude .github*
 
