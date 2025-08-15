@@ -1,195 +1,178 @@
 name: Multiplatform build of libuuu wrapper python package
 on:
   push:
-    branches:
-      - master
-    tags:
-      - uuu*
+    branches: [master]
+    tags: [uuu*]
   pull_request:
-    types:
-      - opened
-      - synchronize
+    types: [opened, synchronize]
 
 jobs:
-  build-dlls:
-    name: Build of dynamically linked libraries
+  build-wheels:
+    name: Build libuuu for ${{ matrix.os }} on ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        arch: [x86_64, arm64]
-        exclude:
+        include:
           - os: windows-latest
+            arch: x86_64
+            cibw_archs: AMD64 x86
+            build_script: .\.github\scripts\build_windows.bat
+          - os: ubuntu-22.04
+            arch: x86_64
+            cibw_archs: x86_64
+            build_script: .github/scripts/build_linux.sh x86_64
+          - os: ubuntu-22.04-arm
+            arch: aarch64
+            cibw_archs: aarch64
+            build_script: .github/scripts/build_linux.sh aarch64
+          - os: macos-latest
+            arch: x86_64
+            cibw_archs: x86_64
+            build_script: .github/scripts/build_macos.sh x86_64
+          - os: macos-latest
             arch: arm64
-          - os: ubuntu-latest
-            arch: arm64
-
-    steps:
-      - name: Checkout uuu repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          submodules: false
-
-      - name: Clone vcpkg repository
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-
-      - name: Set up vcpkg on Windows
-        working-directory: ./vcpkg
-        if: matrix.os == 'windows-latest'
-        run: |
-          echo ("VCPKG_ROOT=" + $PWD.Path) >> $env:GITHUB_ENV
-          ./bootstrap-vcpkg.bat
-
-      - name: Set up vcpkg on Ubuntu and MacOS
-        working-directory: ./vcpkg
-        if: matrix.os != 'windows-latest'
-        run: |
-          echo "VCPKG_ROOT=$(pwd)" >> $GITHUB_ENV
-          ./bootstrap-vcpkg.sh
-
-      - name: Install dependencies Ubuntu
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get install gcc cmake ninja-build autotools-dev automake autoconf libudev-dev
-
-      - name: Install dependencies MacOS
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew install ninja cmake autoconf automake libtool
-
-      - name: Install dependencies Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          choco install cmake pkgconfiglite
-
-      - name: Build on Ubuntu and MacOS
-        working-directory: ./wrapper
-        if: matrix.os != 'windows-latest'
-        run: |
-          export PATH=$VCPKG_ROOT:$PATH
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            cmake --preset=unix;
-          else
-            cmake --preset=unix -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }};
-          fi
-          cmake --build build
-
-      - name: Build on Windows
-        working-directory: ./wrapper
-        if: matrix.os == 'windows-latest'
-        run: |
-          $env:Path = $env:VCPKG_ROOT + ';' + $env:Path
-          cmake --preset=windows
-          cmake --build build
-
-      - name: Upload artifacts Windows
-        if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: libuuu-windows
-          path: ./wrapper/build/Debug/*.dll
-
-      - name: Upload artifacts MacOS
-        if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: pre-libuuu-macos-${{ matrix.arch }}
-          path: ./wrapper/build/libuuu.dylib
-
-      - name: Upload artifacts Ubuntu
-        if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: libuuu-ubuntu-${{ matrix.arch }}
-          path: ./wrapper/build/libuuu.so
-
-  create-universal-dylib:
-    runs-on: macos-latest
-    needs: build-dlls
-    steps:
-      - name: Download x86_64 artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: pre-libuuu-macos-x86_64
-          path: ./x86_64
-      - name: Download arm64 artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: pre-libuuu-macos-arm64
-          path: ./arm64
-
-      - name: Create build directory
-        run: mkdir -p ./wrapper/build
-
-      - name: Create universal dylib
-        run: |
-          lipo -create -output ./wrapper/build/libuuu.dylib ./x86_64/libuuu.dylib ./arm64/libuuu.dylib
-
-      - name: Upload universal dylib
-        uses: actions/upload-artifact@v4
-        with:
-          name: libuuu-macos-universal
-          path: ./wrapper/build/libuuu.dylib
-
-  build-libuuu-wrapper:
-    runs-on: ubuntu-latest
+            cibw_archs: arm64
+            build_script: .github/scripts/build_macos.sh arm64
+    
     permissions:
-      id-token: write  # Required for trusted publishing
-      contents: read   # Required for actions/checkout
-    needs: create-universal-dylib
+      id-token: write
+      contents: read
+    
     steps:
-      - name: Checkout uuu repository
-        uses: actions/checkout@v3
+      - name: Set up QEMU
+        if: runner.os == 'Linux' && runner.arch == 'X64'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+      
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: false
 
-      - name: Download artifacts
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build cibuildwheel
+
+      - name: Execute permissions for build scripts
+        run: |
+          chmod +x .github/scripts/*.sh
+
+      - name: Build wheels with cibuildwheel
+        run: python -m cibuildwheel ./wrapper --output-dir outputs
+        env:
+          CIBW_BUILD: cp39-*
+          CIBW_ARCHS_LINUX: ${{ matrix.cibw_archs }}
+          CIBW_ARCHS_WINDOWS: ${{ matrix.cibw_archs }}
+          CIBW_ARCHS_MACOS: ${{ matrix.cibw_archs }}
+          CIBW_SKIP: "*-musllinux*"
+          CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux_2_28_x86_64
+          CIBW_MANYLINUX_AARCH64_IMAGE: quay.io/pypa/manylinux_2_28_aarch64
+          CIBW_BEFORE_ALL: ${{ matrix.build_script }}
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel repair -w {dest_dir} {wheel}"
+          CIBW_TEST_COMMAND: "pytest {project}/wrapper/tests"
+          MACOSX_DEPLOYMENT_TARGET: 11.0
+          CIBW_BUILD_VERBOSITY: 1
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}-${{ matrix.arch }}
+          path: ./outputs/*.whl
+
+      - name: Upload shared libraries
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-${{ matrix.os }}-${{ matrix.arch }}
+          path: ${{ contains(matrix.os, 'ubuntu') && './outputs/libuuu/lib' || './wrapper/libuuu/lib' }}
+
+  build-sdist:
+    name: Build source distribution of libuuu wrapper
+    runs-on: ubuntu-latest
+    needs: build-wheels
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: false
+
+      - name: Download shared libraries
         uses: actions/download-artifact@v4
         with:
-          pattern: libuuu-*
+          pattern: libs-*
+          path: ./wrapper/libuuu/lib
           merge-multiple: true
-          path: ./wrapper/libuuu/lib/
 
-      - name: Check the path
+      - name: Print shared libraries
+        run: find ./wrapper/libuuu/lib
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install build dependencies
         run: |
-          find ./wrapper/
+          python -m pip install --upgrade pip
+          python -m pip install build nxp-codecheck colorama setuptools_scm
+      
 
-      - name: Install python dependencies
+      - name: Build source distribution
         working-directory: ./wrapper
-        run: |
-          pip install --upgrade pip
-          pip install --force-reinstall -U build twine nxp-codecheck colorama setuptools_scm
+        run: python -m build --sdist 
 
-      - name: Build the python package
-        working-directory: ./wrapper
-        run: |
-          python -m build --sdist --wheel
-
+      - name: Upload source distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist-libuuu
+          path: ./wrapper/dist/*.tar.gz
+      
       - name: Run codecheck
         working-directory: ./wrapper
-        run: |
-          codecheck -s
-
+        run: codecheck -s
+      
       - name: Upload reports if codecheck fails
-        if: ${{ failure() }}
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: reports
+          name: reports-codecheck
           path: ./wrapper/reports/*
 
+  publish-pypi:
+    name: Publish to PyPI
+    needs: build-sdist
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    environment:
+      name: pypi
+      url: https://pypi.org/project/libuuu/
+    if: github.ref_type == 'tag'
+    steps:
+      - name: Download all wheels
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
+      - name: Download source distribution
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist-libuuu
+          path: dist
+          merge-multiple: true
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        if: github.ref_type == 'tag'
         with:
-          # This tells the action to use Trusted Publishing with OIDC
-          skip-existing: true  # Optional: don’t fail if the same version is already uploaded
-          packages-dir: ./wrapper/dist
-
-      - name: Upload the dist folder
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: ./wrapper/dist
+          packages-dir: dist
+          skip-existing: true
