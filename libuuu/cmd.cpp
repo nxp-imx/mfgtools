@@ -28,6 +28,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 */
+//! @file
+
+#include "string_man.h"
 
 #include <regex>
 #include <iterator>
@@ -47,13 +50,12 @@
 #include <sys/stat.h>
 #include <thread>
 
-#include <stdio.h>  
-#include <stdlib.h>  
+#include <stdio.h>
+#include <stdlib.h>
 
 static CmdMap g_cmd_map;
 static CmdObjCreateMap g_cmd_create_map;
 static string g_cmd_list_file;
-
 static map<thread::id, map<string, string>> g_environment;
 
 int insert_env_variable(string key, string value)
@@ -69,7 +71,7 @@ string get_env_variable(string key)
 
 int clear_env()
 {
-	return g_environment.erase(std::this_thread::get_id());
+	return (int)g_environment.erase(std::this_thread::get_id());
 }
 
 bool is_env_exist(string key)
@@ -167,7 +169,7 @@ int CmdBase::parser(char *p)
 				param = get_next_param(m_cmd, pos);
 			*(string*)pp->pData = param;
 
-			if (!check_file_exist(param))
+			if (verify_file_exist(param))
 				return -1;
 		}
 
@@ -175,7 +177,7 @@ int CmdBase::parser(char *p)
 		{
 			if (!m_NoKeyParam)
 				param = get_next_param(m_cmd, pos);
-			*(string*)pp->pData = remove_quota(param);
+			*(string*)pp->pData = strip_quotes(param);
 		}
 
 		if (pp->type == Param::Type::e_bool)
@@ -241,10 +243,7 @@ int CmdBase::dump()
 {
 	uuu_notify nt;
 	nt.type = uuu_notify::NOTIFY_CMD_INFO;
-
-	string str =  m_cmd;
-	str += "\n";
-	nt.str = (char*)str.c_str();
+	nt.str = m_cmd.c_str();
 	call_notify(nt);
 
 	return 0;
@@ -295,7 +294,7 @@ int CmdMap::run_all(const std::string &protocol, CmdCtx *p, bool dry_run)
 {
 	if (find(protocol) == end())
 	{
-		set_last_err_id(-1);
+		//set_last_err_id(-1);
 		std::string err;
 		err.append("Unknown Protocol:");
 		err.append(protocol);
@@ -496,7 +495,7 @@ CmdObjCreateMap::CmdObjCreateMap()
 
 }
 
-shared_ptr<CmdBase> create_cmd_obj(string cmd)
+static shared_ptr<CmdBase> create_cmd_obj(string cmd)
 {
 	string param;
 	size_t pos = 0;
@@ -523,13 +522,16 @@ shared_ptr<CmdBase> create_cmd_obj(string cmd)
 		return g_cmd_create_map[param]((char*)cmd.c_str());
 	}
 
-	string err;
-	err = "Unknown Command:";
-	err += cmd;
-	set_last_err_string(err);
+	set_last_err_string("Unknown command: " + cmd);
 	return nullptr;
 }
 
+/**
+ * @brief Executes a command
+ * @param cmd Command text, c-string
+ * @param dry Whether to dry-run the operation
+ * @return 0 for success
+ */
 int uuu_run_cmd(const char * cmd, int dry)
 {
 	return run_cmd(nullptr, cmd, dry);
@@ -697,7 +699,7 @@ int CmdShell::run(CmdCtx*pCtx)
 
 	string str;
 	str.resize(256);
-	while (fgets((char*)str.c_str(), str.size(), pipe))
+	while (fgets((char*)str.c_str(), (int)str.size(), pipe))
 	{
 		if (m_dyn)
 		{
@@ -964,7 +966,7 @@ static int insert_one_cmd(const char * cmd, CmdMap *pCmdMap)
 
 	if (p->parser())
 		return -1;
-
+	
 	if (pCmdMap->find(pro) == pCmdMap->end())
 	{
 		shared_ptr<CmdList> list(new CmdList);
@@ -1022,7 +1024,12 @@ static int added_default_boot_cmd(const char *filename)
 	return 0;
 }
 
-int check_version(string str)
+/**
+ * @brief Validates that an application version specified in a script is supported
+ * @param str Version string
+ * @return 0 on success
+ */
+static int check_version(const string& str)
 {
 	int x = 0;
 	int ver = 0;
@@ -1046,14 +1053,21 @@ int check_version(string str)
 
 	if (ver > cur)
 	{
-		string str;
-		str = "This version of uuu is too old, please download the latest one";
-		set_last_err_string(str);
-		return -1;
+		return set_last_err_string(
+			"Script requires higher version of application; script specifies '" + str +
+			"'; application is '" + uuu_get_version_string() + "'");
 	}
 	return 0;
 }
 
+/**
+ * @brief Parses the text of a script and queues parsed commands for future execution
+ * @param buff Script text, c-string
+ * @param dry Not used
+ * @return 0 on success
+ * @note
+ * The function name (run) implies that it blocks until the script has completed running, but it does not.
+ */
 int uuu_run_cmd_script(const char * buff, int /*dry*/)
 {
 	shared_ptr<DataBuffer> p(new DataBuffer((void*)buff, strlen(buff)));
@@ -1100,23 +1114,35 @@ int parser_cmd_list_file(shared_ptr<DataBuffer> pbuff, CmdMap *pCmdMap)
 	return 0;
 }
 
-int uuu_auto_detect_file(const char *filename)
+/**
+ * @brief Searches for a script file based on a path and queues its commands for future execution
+ * @param path File system path, c-string
+ * @return 0 on success
+ */
+int uuu_auto_detect_file(const char *path)
 {
-	string_ex fn;
-	fn += remove_quota(filename);
-	fn.replace('\\', '/');
-
+	string fn = strip_quotes(path);
+	string_man::replace(fn, "\\", "/");
 	if (fn.empty())
 		fn += "./";
+	const string clean_input_path = fn;
 
-	string oldfn =fn;
+	string ss = path;
+	if (!path_exists(ss))
+	{
+		return set_last_err_string("Path not found: " + ss);
+	}
 
-	fn += "/uuu.auto";
+	// look for default file name as if path is a directory
+	// TODO seems that uuu is the file type so a better name is 'auto.uuu'
+	static const string default_script_name = "uuu.auto";
+	fn += "/" + default_script_name;
 	shared_ptr<FileBuffer> buffer = get_file_buffer(fn);
+
 	if (buffer == nullptr)
 	{
-		fn.clear();
-		fn += oldfn;
+		// default file not found; look for ??
+		fn = clean_input_path;
 		size_t pos = str_to_upper(fn).find("ZIP");
 		if(pos == string::npos || pos != fn.size() - 3)
 		{
@@ -1125,14 +1151,19 @@ int uuu_auto_detect_file(const char *filename)
 				buffer = get_file_buffer(fn); //we don't try open a zip file here
 		}
 
-		if(buffer == nullptr)
-			return -1;
+		if (buffer == nullptr)
+		{
+			return set_last_err_string("Unsure what to do with path: " + string(path));
+		}
 	}
 
 	string str= "uuu_version";
 	shared_ptr<DataBuffer> pData = buffer->request_data(0, SIZE_MAX);
 	if (!pData)
-		return -1;
+	{
+		return set_last_err_string("Unable read data from path: " + string(path));
+	}
+
 	void *p1 = pData->data();
 	void *p2 = (void*)str.data();
 	if (memcmp(p1, p2, str.size()) == 0)
