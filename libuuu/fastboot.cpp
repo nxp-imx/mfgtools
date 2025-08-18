@@ -1069,7 +1069,7 @@ int FBFlashCmd::flash_ffu(FastBoot *fb, shared_ptr<FileBuffer> pin)
 	return 0;
 }
 
-FBLoop::FBLoop(char* p): CmdBase(p)
+FBLoop::FBLoop(const char* p): CmdBase(p)
 {
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
 	insert_param_info("-format", &m_uboot_cmd, Param::Type::e_string);

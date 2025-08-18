@@ -87,7 +87,7 @@ class CmdBase
 {
 public:
 	CmdBase() = default;
-	CmdBase(char *p) { if (p) m_cmd = p; }
+	CmdBase(const char *p) { if (p) m_cmd = p; }
 	virtual ~CmdBase();
 
 	virtual int dump();
@@ -123,7 +123,7 @@ public:
 class CmdDone :public CmdBase
 {
 public:
-	CmdDone(char *p) :CmdBase(p) { m_lastcmd = true; }
+	CmdDone(const char *p) :CmdBase(p) { m_lastcmd = true; }
 
 	int run(CmdCtx *p) override;
 };
@@ -131,7 +131,7 @@ public:
 class CmdDelay :public CmdBase
 {
 public:
-	CmdDelay(char *p) :CmdBase(p) {}
+	CmdDelay(const char *p) :CmdBase(p) {}
 
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *p) override;
@@ -143,7 +143,7 @@ private:
 class CmdError : public CmdBase
 {
 public:
-	CmdError(char *p) :CmdBase(p) {}
+	CmdError(const char *p) :CmdBase(p) {}
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *p) override;
 
@@ -154,7 +154,7 @@ private:
 class CmdShell : public CmdBase
 {
 public:
-	CmdShell(char *p) : CmdBase(p) {}
+	CmdShell(const char *p) : CmdBase(p) {}
 
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *p) override;
@@ -168,7 +168,7 @@ private:
 class CmdIf : public CmdBase
 {
 public:
-	CmdIf(char *p) : CmdBase(p) {}
+	CmdIf(const char *p) : CmdBase(p) {}
 
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *p) override;
@@ -207,7 +207,7 @@ public:
 class CfgCmd :public CmdBase
 {
 public:
-	CfgCmd(char *cmd) :CmdBase(cmd) {}
+	CfgCmd(const char *cmd) :CmdBase(cmd) {}
 
 	int parser(char * /*p*/) override { return 0; }
 	int run(CmdCtx *p) override;
