@@ -314,7 +314,7 @@ string get_next_param(const string &cmd, size_t &pos, char separate)
 		return str;
 
 	//trim left space
-	while (cmd[pos] == separate && pos < cmd.size())
+	while (pos < cmd.size() && cmd[pos] == separate)
 		pos++;
 
 	bool quote = false;
