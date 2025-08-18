@@ -570,7 +570,7 @@ static class FSGz : public FSCompressStream
 {
 public:
 	FSGz() { m_ext = ".GZ"; };
-	virtual std::shared_ptr<CommonStream> create_stream() { return std::make_shared<Gzstream>(); }
+	virtual std::shared_ptr<CommonStream> create_stream() override { return std::make_shared<Gzstream>(); }
 }g_fsgz;
 
 class ZstdStream:public CommonStream
@@ -642,7 +642,7 @@ static class FSzstd : public FSCompressStream
 {
 public:
 	FSzstd() { m_ext = ".ZST"; };
-	virtual std::shared_ptr<CommonStream> create_stream() { return make_shared<ZstdStream>(); };
+	virtual std::shared_ptr<CommonStream> create_stream() override { return make_shared<ZstdStream>(); };
 }g_FSzstd;
 
 static class FS_DATA
