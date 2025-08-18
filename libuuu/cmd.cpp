@@ -828,7 +828,7 @@ int CmdIf::parser(char *p)
 	{
 		string err = "Unknown command: ";
 		err += s;
-		set_last_err_string(s);
+		set_last_err_string(err);
 		return -1;
 	}
 	size_t lc = pos;
