@@ -38,7 +38,7 @@
 
 #include "fat.h"
 
-int Fat::Open(string filename)
+int Fat::Open(const string &filename)
 {
 	m_filename = filename;
 

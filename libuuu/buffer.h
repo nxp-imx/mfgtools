@@ -56,7 +56,7 @@
 
 #ifdef WIN32
 class FileBuffer;
-int file_overwrite_monitor(std::string filename, FileBuffer *p);
+int file_overwrite_monitor(const std::string &filename, FileBuffer *p);
 #endif 
 
 //bit 0, data loaded
@@ -340,7 +340,7 @@ private:
 };
 
 std::shared_ptr<FileBuffer> get_file_buffer(std::string filename, bool async=false);
-bool check_file_exist(std::string filename, bool start_async_load=true);
+bool check_file_exist(const std::string &filename, bool start_async_load=true);
 
 void set_current_dir(const std::string &dir);
 

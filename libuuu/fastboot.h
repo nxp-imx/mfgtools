@@ -51,8 +51,8 @@ class FastBoot
 public:
 	FastBoot(TransBase *p) : m_pTrans{p} {}
 
-	int Transport(std::string cmd, void *p = nullptr, size_t size = 0, std::vector<uint8_t> *input = nullptr);
-	int Transport(std::string cmd, std::vector<uint8_t> data, std::vector<uint8_t> *input = nullptr) { return Transport(cmd, data.data(), data.size(), input); }
+	int Transport(const std::string &cmd, void *p = nullptr, size_t size = 0, std::vector<uint8_t> *input = nullptr);
+	int Transport(const std::string &cmd, std::vector<uint8_t> data, std::vector<uint8_t> *input = nullptr) { return Transport(cmd, data.data(), data.size(), input); }
 
 	std::string m_info;
 
@@ -108,7 +108,7 @@ public:
 
 	virtual int each(FastBoot& fb, std::shared_ptr<DataBuffer> fbuff, size_t off) = 0;
 	int run(CmdCtx* ctx) override;
-	std::string build_cmd(std::string& cmd, size_t off, size_t sz);
+	std::string build_cmd(const std::string& cmd, size_t off, size_t sz);
 };
 
 class FBCRC : public FBLoop

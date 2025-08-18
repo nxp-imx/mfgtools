@@ -173,7 +173,7 @@ int Zip::BuildDirInfo()
 	return 0;
 }
 
-bool Zip::check_file_exist(string filename)
+bool Zip::check_file_exist(const string &filename)
 {
 	if (m_filemap.find(filename) == m_filemap.end())
 	{
@@ -206,7 +206,7 @@ int Zip::get_file_buff(string filename, shared_ptr<FileBuffer> p)
 	return m_filemap[filename].decompress(this, p);
 }
 
-int Zip::Open(string filename)
+int Zip::Open(const string &filename)
 {
 	m_filename = filename;
 	return BuildDirInfo();

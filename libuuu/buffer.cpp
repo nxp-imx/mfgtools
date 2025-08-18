@@ -361,7 +361,7 @@ public:
 	};
 	int for_each_ls(uuu_ls_file /*fn*/, const string &/*backfile*/, const string &/*filename*/, void * /*p*/) override { return 0; };
 	int get_file_timesample(const string &/*filename*/, uint64_t * /*ptime*/) override { return 0; };
-	int http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string filename);
+	int http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, const string &filename);
 }g_fshttp;
 
 static class FSHttps : public FSHttp
@@ -370,7 +370,7 @@ public:
 	FSHttps() { m_Prefix = "HTTPS://"; m_Port = 443; }
 }g_fshttps;
 
-int FSHttp::http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, string filename)
+int FSHttp::http_load(shared_ptr<HttpStream> http, shared_ptr<FileBuffer> p, const string &filename)
 {
 	size_t max = 0x10000;
 
@@ -679,7 +679,7 @@ public:
 		return -1;
 	}
 
-	int for_each_ls(uuu_ls_file fn, string path, void *p)
+	int for_each_ls(uuu_ls_file fn, const string &path, void *p)
 	{
 		for (int i = m_pFs.size() -1; i >= 0; i--)
                 {
@@ -774,7 +774,7 @@ int FSZip::for_each_ls(uuu_ls_file fn, const string &backfile, const string &fil
 	return 0;
 }
 
-int zip_async_load(string zipfile, string fn, shared_ptr<FileBuffer> buff)
+int zip_async_load(const string &zipfile, const string &fn, shared_ptr<FileBuffer> buff)
 {
 	std::lock_guard<mutex> lock(buff->m_async_mutex);
 
@@ -1168,7 +1168,7 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 	return 0;
 }
 
-uint64_t get_file_timesample(string filename)
+uint64_t get_file_timesample(const string &filename)
 {
 	uint64_t time=0;
 	g_fs_data.get_file_timesample(filename, &time);
@@ -1803,7 +1803,7 @@ int FileBuffer::unmapfile()
 	return 0;
 }
 
-bool check_file_exist(string filename, bool /*start_async_load*/)
+bool check_file_exist(const string &filename, bool /*start_async_load*/)
 {
 	string_ex fn;
 	fn += remove_quota(filename);
@@ -1828,7 +1828,7 @@ bool check_file_exist(string filename, bool /*start_async_load*/)
 
 #ifdef WIN32
 
-int file_overwrite_monitor(string filename, FileBuffer *p)
+int file_overwrite_monitor(const string &filename, FileBuffer *p)
 {
 	WaitForSingleObject(p->m_OverLapped.hEvent, INFINITE);
 

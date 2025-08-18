@@ -193,7 +193,7 @@ size_t GetContainerActualSize(shared_ptr<DataBuffer> p, size_t offset, bool bROM
 	return sz;
 }
 
-bool CheckHeader(uint32_t *p)
+bool CheckHeader(const uint32_t *p)
 {
 	static constexpr std::array <uint32_t, 2> FlashHeaderMagic
 	{

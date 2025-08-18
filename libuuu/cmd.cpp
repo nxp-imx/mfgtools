@@ -56,7 +56,7 @@ static string g_cmd_list_file;
 
 static map<thread::id, map<string, string>> g_environment;
 
-int insert_env_variable(string key, string value)
+int insert_env_variable(const string &key, const string &value)
 {
 	g_environment[std::this_thread::get_id()][key] = value;
 	return 0;
@@ -496,7 +496,7 @@ CmdObjCreateMap::CmdObjCreateMap()
 
 }
 
-shared_ptr<CmdBase> create_cmd_obj(string cmd)
+shared_ptr<CmdBase> create_cmd_obj(const string &cmd)
 {
 	string param;
 	size_t pos = 0;
