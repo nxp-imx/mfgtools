@@ -99,7 +99,7 @@ public:
 		HabDisabled = 0x56787856
 	};
 
-	SDPCmdBase(char *p) :CmdBase(p) { init_cmd(); }
+	SDPCmdBase(const char *p) :CmdBase(p) { init_cmd(); }
 
 protected:
 	int check_ack(HIDReport *report, uint32_t ack);
@@ -121,14 +121,14 @@ private:
 class SDPBootlogCmd : public SDPCmdBase
 {
 public:
-	SDPBootlogCmd(char *p);
+	SDPBootlogCmd(const char *p);
 	int run(CmdCtx *) override;
 };
 
 class SDPDcdCmd : public SDPCmdBase
 {
 public:
-	SDPDcdCmd(char *p);
+	SDPDcdCmd(const char *p);
 	int run(CmdCtx *) override;
 
 private:
@@ -138,7 +138,7 @@ private:
 class SDPReadMemCmd : public SDPCmdBase
 {
 public:
-	SDPReadMemCmd(char*p);
+	SDPReadMemCmd(const char*p);
 	int run(CmdCtx *) override;
 
 private:
@@ -149,7 +149,7 @@ private:
 class SDPWriteMemCmd : public SDPCmdBase
 {
 public:
-	SDPWriteMemCmd(char*p);
+	SDPWriteMemCmd(const char*p);
 	int run(CmdCtx *p) override;
 
 private:
@@ -161,7 +161,7 @@ private:
 class SDPWriteCmd : public SDPCmdBase
 {
 public:
-	SDPWriteCmd(char*p);
+	SDPWriteCmd(const char*p);
 
 	int run(CmdCtx *p) override;
 	int run(CmdCtx *p, void *buff, size_t size, uint32_t addr, bool validate = true);
@@ -182,7 +182,7 @@ private:
 class SDPJumpCmd : public SDPCmdBase
 {
 public:
-	SDPJumpCmd(char*p);
+	SDPJumpCmd(const char*p);
 	int run(CmdCtx *p) override;
 
 private:
@@ -195,21 +195,21 @@ private:
 class SDPSkipDCDCmd :public SDPCmdBase
 {
 public:
-	SDPSkipDCDCmd(char *p);
+	SDPSkipDCDCmd(const char *p);
 	int run(CmdCtx *p) override;
 };
 
 class SDPStatusCmd :public SDPCmdBase
 {
 public:
-	SDPStatusCmd(char *p);
+	SDPStatusCmd(const char *p);
 	int run(CmdCtx *p) override;
 };
 
 class SDPBootCmd : public SDPCmdBase
 {
 public:
-	SDPBootCmd(char *p);
+	SDPBootCmd(const char *p);
 	int run(CmdCtx *p) override;
 
 private:

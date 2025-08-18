@@ -63,7 +63,7 @@ private:
 class FBGetVar : public CmdBase
 {
 public:
-	FBGetVar(char *p) :CmdBase(p) {}
+	FBGetVar(const char *p) :CmdBase(p) {}
 
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
@@ -78,7 +78,7 @@ private:
 class FBCmd: public CmdBase
 {
 public:
-	FBCmd(char *p, std::string &&fb_cmd, char separator =':') :
+	FBCmd(const char *p, std::string &&fb_cmd, char separator =':') :
 		CmdBase(p), m_fb_cmd{std::move(fb_cmd)}, m_separator(separator) {}
 
 	int parser(char *p = nullptr) override;
@@ -104,7 +104,7 @@ public:
 
 	std::string m_filename;
 
-	FBLoop(char* p);
+	FBLoop(const char* p);
 
 	virtual int each(FastBoot& fb, std::shared_ptr<DataBuffer> fbuff, size_t off) = 0;
 	int run(CmdCtx* ctx) override;
@@ -134,37 +134,37 @@ public:
 class FBUCmd : public FBCmd
 {
 public:
-	FBUCmd(char *p) :FBCmd(p, "UCmd") {}
+	FBUCmd(const char *p) :FBCmd(p, "UCmd") {}
 };
 
 class FBACmd : public FBCmd
 {
 public:
-	FBACmd(char *p) :FBCmd(p, "ACmd") {}
+	FBACmd(const char *p) :FBCmd(p, "ACmd") {}
 };
 
 class FBSyncCmd: public FBCmd
 {
 public:
-	FBSyncCmd(char *p) : FBCmd(p, "Sync") {}
+	FBSyncCmd(const char *p) : FBCmd(p, "Sync") {}
 };
 
 class FBFlashingCmd : public FBCmd
 {
 public:
-	FBFlashingCmd(char *p) : FBCmd(p, "flashing") {}
+	FBFlashingCmd(const char *p) : FBCmd(p, "flashing") {}
 };
 
 class FBOemCmd : public FBCmd
 {
 public:
-	FBOemCmd(char *p) : FBCmd(p, "oem", ' ') {}
+	FBOemCmd(const char *p) : FBCmd(p, "oem", ' ') {}
 };
 
 class FBFlashCmd : public FBCmd
 {
 public:
-	FBFlashCmd(char *p) : FBCmd(p, "flash") { m_timeout = 10000; }
+	FBFlashCmd(const char *p) : FBCmd(p, "flash") { m_timeout = 10000; }
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
 	int flash(FastBoot *fb, void *p, size_t sz);
@@ -189,13 +189,13 @@ private:
 class FBDelPartition : public FBCmd
 {
 public:
-	FBDelPartition(char*p) : FBCmd(p, "delete-logical-partition") {}
+	FBDelPartition(const char*p) : FBCmd(p, "delete-logical-partition") {}
 };
 
 class FBPartNumber : public CmdBase
 {
 public:
-	FBPartNumber(char *p, std::string &&fb_cmd) :CmdBase(p), m_fb_cmd{std::move(fb_cmd)}
+	FBPartNumber(const char *p, std::string &&fb_cmd) :CmdBase(p), m_fb_cmd{std::move(fb_cmd)}
 	{
 		m_Size = 0;
 		m_bCheckTotalParam = true;
@@ -227,7 +227,7 @@ public:
 class FBUpdateSuper : public CmdBase
 {
 public:
-	FBUpdateSuper(char *p) :CmdBase(p)
+	FBUpdateSuper(const char *p) :CmdBase(p)
 	{
 		m_bCheckTotalParam = true;
 		m_NoKeyParam = true;
@@ -246,27 +246,27 @@ private:
 class FBEraseCmd : public FBCmd
 {
 public:
-	FBEraseCmd(char *p) : FBCmd(p, "erase") {}
+	FBEraseCmd(const char *p) : FBCmd(p, "erase") {}
 };
 
 
 class FBRebootCmd : public FBCmd
 {
 public:
-	FBRebootCmd(char *p) : FBCmd(p, "reboot") {}
+	FBRebootCmd(const char *p) : FBCmd(p, "reboot") {}
 };
 
 
 class FBSetActiveCmd : public FBCmd
 {
 public:
-	FBSetActiveCmd(char *p) : FBCmd(p, "set_active") {}
+	FBSetActiveCmd(const char *p) : FBCmd(p, "set_active") {}
 };
 
 class FBDownload : public CmdBase
 {
 public:
-	FBDownload(char *p) :CmdBase(p)
+	FBDownload(const char *p) :CmdBase(p)
 	{
 		insert_param_info("download", nullptr, Param::Type::e_null);
 		insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
@@ -281,7 +281,7 @@ private:
 class FBCopy : public CmdBase
 {
 public:
-	FBCopy(char *p) :CmdBase(p) {}
+	FBCopy(const char *p) :CmdBase(p) {}
 	int parser(char *p = nullptr) override;
 	int run(CmdCtx *ctx) override;
 
@@ -295,19 +295,19 @@ private:
 class FBBootCmd : public FBCmd
 {
 public:
-	FBBootCmd(char *p) : FBCmd(p, "boot") {}
+	FBBootCmd(const char *p) : FBCmd(p, "boot") {}
 };
 
 class FBContinueCmd : public FBCmd
 {
 public:
-	FBContinueCmd(char *p) : FBCmd(p, "continue") {}
+	FBContinueCmd(const char *p) : FBCmd(p, "continue") {}
 };
 
 class FBUpload : public CmdBase
 {
 public:
-	FBUpload(char* p) : CmdBase(p)
+	FBUpload(const char* p) : CmdBase(p)
 	{
 		insert_param_info("upload", nullptr, Param::Type::e_null);
 		insert_param_info("-v", &m_var, Param::Type::e_string);

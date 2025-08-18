@@ -130,7 +130,7 @@ int SDPCmdBase::send_cmd(HIDReport *p)
 	return p->write(&m_spdcmd, sizeof(m_spdcmd), 1);
 }
 
-SDPDcdCmd::SDPDcdCmd(char *p) : SDPCmdBase(p)
+SDPDcdCmd::SDPDcdCmd(const char *p) : SDPCmdBase(p)
 {
 	insert_param_info("dcd", nullptr, Param::Type::e_null);
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
@@ -211,7 +211,7 @@ int SDPDcdCmd::run(CmdCtx*ctx)
 	return 0;
 }
 
-SDPSkipDCDCmd::SDPSkipDCDCmd(char *p) : SDPCmdBase(p)
+SDPSkipDCDCmd::SDPSkipDCDCmd(const char *p) : SDPCmdBase(p)
 {
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_SKIP_DCD_HEADER;
 }
@@ -232,7 +232,7 @@ int SDPSkipDCDCmd::run(CmdCtx*ctx)
 	return 0;
 }
 
-SDPBootCmd::SDPBootCmd(char *p) : SDPCmdBase(p)
+SDPBootCmd::SDPBootCmd(const char *p) : SDPCmdBase(p)
 {
 	insert_param_info("boot", nullptr, Param::Type::e_null);
 	insert_param_info("-f", &m_filename, Param::Type::e_string_filename);
@@ -371,7 +371,7 @@ int SDPBootCmd::run(CmdCtx *ctx)
 	return 0;
 }
 
-SDPStatusCmd::SDPStatusCmd(char *p) : SDPCmdBase(p)
+SDPStatusCmd::SDPStatusCmd(const char *p) : SDPCmdBase(p)
 {
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_ERROR_STATUS;
 	insert_param_info("status", nullptr, Param::Type::e_null);
@@ -397,7 +397,7 @@ int SDPStatusCmd::run(CmdCtx *ctx)
 	return 0;
 }
 
-SDPWriteCmd::SDPWriteCmd(char *p) : SDPCmdBase(p)
+SDPWriteCmd::SDPWriteCmd(const char *p) : SDPCmdBase(p)
 {
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_FILE;
 	m_PlugIn = -1;
@@ -599,7 +599,7 @@ int SDPWriteCmd::run(CmdCtx *ctx, void *pbuff, size_t size, uint32_t addr, bool 
 	return 0;
 }
 
-SDPReadMemCmd::SDPReadMemCmd(char *p) : SDPCmdBase(p)
+SDPReadMemCmd::SDPReadMemCmd(const char *p) : SDPCmdBase(p)
 {
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_RD_MEM;
 
@@ -664,7 +664,7 @@ int SDPReadMemCmd::run(CmdCtx *ctx)
 	return 0;
 }
 
-SDPWriteMemCmd::SDPWriteMemCmd(char *p) : SDPCmdBase(p)
+SDPWriteMemCmd::SDPWriteMemCmd(const char *p) : SDPCmdBase(p)
 {
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_WR_MEM;
 
@@ -721,7 +721,7 @@ int SDPWriteMemCmd::run(CmdCtx *ctx)
 	return 0;
 }
 
-SDPJumpCmd::SDPJumpCmd(char *p) : SDPCmdBase(p)
+SDPJumpCmd::SDPJumpCmd(const char *p) : SDPCmdBase(p)
 {
 	m_spdcmd.m_cmd = ROM_KERNEL_CMD_JUMP_ADDR;
 	insert_param_info("jump", nullptr, Param::Type::e_null);
@@ -826,7 +826,7 @@ int SDPJumpCmd::run(CmdCtx *ctx)
 	return 0;
 }
 
-SDPBootlogCmd::SDPBootlogCmd(char *p) : SDPCmdBase(p)
+SDPBootlogCmd::SDPBootlogCmd(const char *p) : SDPCmdBase(p)
 {
 	insert_param_info("blog", nullptr, Param::Type::e_null);
 }
