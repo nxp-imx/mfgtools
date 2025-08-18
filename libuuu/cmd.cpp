@@ -253,7 +253,6 @@ int CmdBase::dump()
 int CmdList::run_all(CmdCtx *p, bool dry)
 {
 	CmdList::iterator it;
-	int ret;
 
 	uuu_notify nt;
 	nt.type = uuu_notify::NOTIFY_CMD_TOTAL;
@@ -262,6 +261,7 @@ int CmdList::run_all(CmdCtx *p, bool dry)
 
 	int i = 0;
 
+	int ret = -1;
 	for (it = begin(); it != end(); it++, i++)
 	{
 		uuu_notify nt;
