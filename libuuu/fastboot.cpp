@@ -178,7 +178,7 @@ int FBCmd::parser(char *p)
 	{
 		string err = "Unknown command: ";
 		err += s;
-		set_last_err_string(s);
+		set_last_err_string(err);
 		return -1;
 	}
 
@@ -304,7 +304,7 @@ int FBCopy::parser(char *p)
 	{
 		string err = "Unknown command: ";
 		err += s;
-		set_last_err_string(s);
+		set_last_err_string(err);
 		return -1;
 	}
 
