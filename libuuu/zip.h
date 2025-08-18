@@ -187,9 +187,9 @@ class Zip : public Backfile
 {
 public:
 	int BuildDirInfo();
-	bool check_file_exist(std::string filename);
+	bool check_file_exist(const std::string &filename);
 	int get_file_buff(std::string filename, std::shared_ptr<FileBuffer>p);
-	int Open(std::string filename);
+	int Open(const std::string &filename);
 
 	std::map<std::string, Zip_file_Info> m_filemap;
 };

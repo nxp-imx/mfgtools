@@ -89,7 +89,7 @@ public:
 	int get_file_buff(string filename, shared_ptr<FileBuffer>p);
 	int get_next_cluster(shared_ptr<FileBuffer> p, int cluster);
 	string lfn2string(FatLFN *p);
-	int Open(string filename);
+	int Open(const string &filename);
 
 	map<string, FatDirEntry> m_filemap;
 

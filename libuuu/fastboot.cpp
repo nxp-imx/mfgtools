@@ -52,7 +52,7 @@
 #include "zlib.h"
 #include "libusb.h"
 
-int FastBoot::Transport(string cmd, void *p, size_t size, vector<uint8_t> *input)
+int FastBoot::Transport(const string &cmd, void *p, size_t size, vector<uint8_t> *input)
 {
 	if (m_pTrans->write((void*)cmd.data(), cmd.size()))
 		return -1;
@@ -1080,7 +1080,7 @@ FBLoop::FBLoop(const char* p): CmdBase(p)
 	insert_param_info("-nostop", &m_nostop, Param::Type::e_bool);
 }
 
-string FBLoop::build_cmd(string& cmd, size_t off, size_t sz)
+string FBLoop::build_cmd(const string& cmd, size_t off, size_t sz)
 {
 	string ucmd="UCmd: ";
 	ucmd += cmd;

@@ -110,7 +110,7 @@ static const std::map<std::string, bool (*)(bmap_t &, const tinyxml2::XMLElement
 	{ "BlockMap", parse_block_map },
 };
 
-void send_info(std::string msg)
+void send_info(const std::string &msg)
 {
 	uuu_notify nt;
 	nt.type = uuu_notify::NOTIFY_CMD_INFO;
