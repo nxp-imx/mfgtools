@@ -1,0 +1,82 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "created": "2025-08-24T08:15:58Z",
+    "creators": [
+      "Organization: NXP"
+    ],
+    "licenseListVersion": "3.20"
+  },
+  "name": "mfgtools-1.5.222",
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://nxp.com/spdx/5db452dd-a4ca-4c0d-91de-a85ed94fa7e1",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-package-5db452dd-a4ca-4c0d-91de-a85ed94fa7e1",
+      "name": "mfgtools",
+      "versionInfo": "1.5.222",
+      "licenseConcluded": "(BSD-3-Clause)",
+      "licenseDeclared": "(BSD-3-Clause)",
+      "downloadLocation": "https://github.com/nxp-imx/mfgtools -b master",
+      "originator": "Organization: NXP",
+      "supplier": "NOASSERTION",
+      "externalRefs": [],
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-package-4823f66e-28e1-4c3d-a580-b5d87c083ca6",
+      "name": "create-react-app",
+      "versionInfo": "5.27.2",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "homepage": "https://github.com/facebook/create-react-app",
+      "downloadLocation": "NOASSERTION",
+      "originator": "Organization: create-react-app",
+      "supplier": "NOASSERTION",
+      "externalRefs": [],
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-package-6009a07b-b1a5-4a14-b3eb-47715883fa40",
+      "name": "mfgtools",
+      "versionInfo": "uuu_1.5.219",
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "homepage": "https://github.com/nxp-imx/mfgtools",
+      "downloadLocation": "NOASSERTION",
+      "originator": "Organization: nxp-imx",
+      "supplier": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:github/nxp-imx/mfgtools@uuu_1.5.219",
+          "referenceType": "purl"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceLocator": "575bed60-fad1-49b2-b7e1-188bbd9dedfc",
+          "referenceType": "BlackDuck-ComponentOrigin"
+        }
+      ],
+      "filesAnalyzed": false
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-package-5db452dd-a4ca-4c0d-91de-a85ed94fa7e1"
+    },
+    {
+      "spdxElementId": "SPDXRef-package-5db452dd-a4ca-4c0d-91de-a85ed94fa7e1",
+      "relationshipType": "DYNAMIC_LINK",
+      "relatedSpdxElement": "SPDXRef-package-6009a07b-b1a5-4a14-b3eb-47715883fa40"
+    },
+    {
+      "spdxElementId": "SPDXRef-package-5db452dd-a4ca-4c0d-91de-a85ed94fa7e1",
+      "relationshipType": "DYNAMIC_LINK",
+      "relatedSpdxElement": "SPDXRef-package-4823f66e-28e1-4c3d-a580-b5d87c083ca6"
+    }
+  ]
+}
