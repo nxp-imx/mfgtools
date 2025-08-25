@@ -61,15 +61,15 @@ int file_overwrite_monitor(const std::string &filename, FileBuffer *p);
 
 //bit 0, data loaded
 //bit 1, data total size known
-#define FILEBUFFER_FLAG_LOADED_BIT		0x1
-#define FILEBUFFER_FLAG_KNOWN_SIZE_BIT  0x2
-#define FILEBUFFER_FLAG_ERROR_BIT		0x4
-#define FILEBUFFER_FLAG_NEVER_FREE		0x8
-#define FILEBUFFER_FLAG_PARTIAL_RELOADABLE 0x10
-#define FILEBUFFER_FLAG_SEG_DONE		0x20
+inline constexpr int FILEBUFFER_FLAG_LOADED_BIT = 0x1;
+inline constexpr int FILEBUFFER_FLAG_KNOWN_SIZE_BIT = 0x2;
+inline constexpr int FILEBUFFER_FLAG_ERROR_BIT = 0x4;
+inline constexpr int FILEBUFFER_FLAG_NEVER_FREE = 0x8;
+inline constexpr int FILEBUFFER_FLAG_PARTIAL_RELOADABLE = 0x10;
+inline constexpr int FILEBUFFER_FLAG_SEG_DONE = 0x20;
 
-#define FILEBUFFER_FLAG_LOADED		(FILEBUFFER_FLAG_LOADED_BIT|FILEBUFFER_FLAG_KNOWN_SIZE_BIT) // LOADED must be known size
-#define FILEBUFFER_FLAG_KNOWN_SIZE	FILEBUFFER_FLAG_KNOWN_SIZE_BIT
+inline constexpr int FILEBUFFER_FLAG_LOADED = (FILEBUFFER_FLAG_LOADED_BIT|FILEBUFFER_FLAG_KNOWN_SIZE_BIT); // LOADED must be known size
+inline constexpr int FILEBUFFER_FLAG_KNOWN_SIZE = FILEBUFFER_FLAG_KNOWN_SIZE_BIT;
 
 class FileBuffer;
 class FSBasic;
@@ -95,7 +95,7 @@ public:
 	std::vector<uint8_t> m_data;
 	std::mutex m_mutex;
 	std::atomic_int m_dataflags{0};
-	uint8_t* m_pData = NULL;
+	uint8_t* m_pData = nullptr;
 	uint8_t* data()
 	{
 		if (m_pData)
@@ -118,7 +118,7 @@ class DataBuffer : public std::enable_shared_from_this<DataBuffer>
 protected:
 
 	ALLOCATION_WAYS get_m_allocate_way() const noexcept { return m_allocate_way; }
-	uint8_t* m_pDatabuffer = NULL;
+	uint8_t* m_pDatabuffer = nullptr;
 	size_t m_DataSize = 0;
 	size_t m_MemSize = 0;
 	std::shared_ptr<FileBuffer> m_ref;
@@ -223,7 +223,7 @@ public:
 			std::lock_guard<std::mutex> lock(m_seg_map_mutex);
 			auto it = m_seg_map.lower_bound(offset);
 			if ( it == m_seg_map.end())
-				return NULL;
+				return nullptr;
 
 			auto blk = it->second;
 			if (check_offset_in_seg(offset, blk))
@@ -235,7 +235,7 @@ public:
 				}
 				return blk;
 			}
-			return NULL;
+			return nullptr;
 		}
 	}
 	void truncate_old_data_in_pool();
