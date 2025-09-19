@@ -1178,9 +1178,12 @@ int uuu_wait_uuu_finish(int deamon, int dry)
 	if (!deamon)
 		uuu_register_notify_callback(notify_done, &exit);
 
-	if(polling_usb(exit))
+	if (polling_usb(exit)) {
+		uuu_unregister_notify_callback(notify_done);
 		return -1;
+	}
 
+	uuu_unregister_notify_callback(notify_done);
 	clean_up_filemap();
 	return 0;
 }
