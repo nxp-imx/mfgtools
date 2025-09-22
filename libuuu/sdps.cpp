@@ -67,15 +67,15 @@ struct _ST_HID_CBW
 	CDBHIDDOWNLOAD Cdb;        // cdb: the command descriptor block
 };
 
-#define BLTC_DOWNLOAD_FW					2
-#define HID_BLTC_REPORT_TYPE_DATA_OUT		2
-#define HID_BLTC_REPORT_TYPE_COMMAND_OUT	1
+static constexpr uint8_t BLTC_DOWNLOAD_FW = 2;
+[[maybe_unused]] static constexpr uint8_t HID_BLTC_REPORT_TYPE_DATA_OUT = 2;
+static constexpr uint8_t HID_BLTC_REPORT_TYPE_COMMAND_OUT = 1;
 
-#define CBW_BLTC_SIGNATURE  0x43544C42; // "BLTC" (little endian)
-#define CBW_PITC_SIGNATURE  0x43544950; // "PITC" (little endian)
+static constexpr uint32_t CBW_BLTC_SIGNATURE = 0x43544C42; // "BLTC" (little endian)
+[[maybe_unused]] static constexpr uint32_t CBW_PITC_SIGNATURE = 0x43544950; // "PITC" (little endian)
 // Flags values for _ST_HID_CBW
-#define CBW_DEVICE_TO_HOST_DIR 0x80; // "Data Out"
-#define CBW_HOST_TO_DEVICE_DIR 0x00; // "Data In"
+[[maybe_unused]] static constexpr uint8_t CBW_DEVICE_TO_HOST_DIR = 0x80; // "Data Out"
+static constexpr uint8_t CBW_HOST_TO_DEVICE_DIR = 0x00; // "Data In"
 
 #pragma pack ()
 
