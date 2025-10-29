@@ -18,10 +18,26 @@ include_directories(${generated_files_dir})
 
 # Set the path for gitversion.h in the generated files directory
 set(gitversion_h "${generated_files_dir}/gitversion.h")
+# Run git describe without --always flag
+execute_process(
+    COMMAND git describe --tags --long 
+    OUTPUT_VARIABLE version 
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE git_result
+    ERROR_VARIABLE git_error
+)
 
-# Run git describe
-execute_process(COMMAND git describe --long --always OUTPUT_VARIABLE version OUTPUT_STRIP_TRAILING_WHITESPACE)
+# Check if git describe failed
+if(NOT git_result EQUAL 0)
+    message(FATAL_ERROR "Failed to get version from git: ${git_error}\n"
+                       "Make sure you have tags in your repository.\n"
+                       "Create a tag with: git tag uuu_1.0.0")
+endif()
 
+# Validate version format
+if(NOT version MATCHES "^uuu_[0-9]+\\.[0-9]+\\.[0-9]+(\\-[0-9]+\\-g[0-9a-f]+)?$")
+    message(FATAL_ERROR "Git version '${version}' doesn't match expected format 'uuu_X.Y.Z' or 'uuu_X.Y.Z-N-gHASH'")
+endif()
 # Add a custom command to generate definitions.h
 if (WIN32)
 add_custom_command(
