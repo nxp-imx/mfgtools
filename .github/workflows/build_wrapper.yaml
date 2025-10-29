@@ -56,15 +56,34 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
+
+      - name: Validate git versioning (Windows)
+        if: runner.os == 'Windows'
+        run: |
+            $version = git describe --tags --long 2>$null
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "Error: No git tags found. Cannot determine version."
+              Write-Host "Available tags:"
+              git tag -l
+              exit 1
+            }
+            Write-Host "Found version: $version"
+
+      - name: Validate git versioning (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          if ! version=$(git describe --tags --long 2>/dev/null); then
+            echo "Error: No git tags found. Cannot determine version."
+            echo "Available tags:"
+            git tag -l
+            exit 1
+          fi
+          echo "Found version: $version"
       
       - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install build cibuildwheel
-
-      - name: Execute permissions for build scripts
-        run: |
-          chmod +x .github/scripts/*.sh
 
       - name: Build wheels with cibuildwheel
         run: python -m cibuildwheel ./wrapper --output-dir outputs
@@ -81,7 +100,7 @@ jobs:
           CIBW_TEST_COMMAND: "pytest {project}/wrapper/tests"
           MACOSX_DEPLOYMENT_TARGET: 11.0
           CIBW_BUILD_VERBOSITY: 1
-
+      
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -123,8 +142,7 @@ jobs:
       - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install build nxp-codecheck colorama setuptools_scm
-      
+          python -m pip install -U build nxp-codecheck colorama setuptools_scm
 
       - name: Build source distribution
         working-directory: ./wrapper
@@ -138,7 +156,9 @@ jobs:
       
       - name: Run codecheck
         working-directory: ./wrapper
-        run: codecheck -s
+        run: |
+          codecheck --version
+          codecheck -s
       
       - name: Upload reports if codecheck fails
         if: failure()
@@ -175,4 +195,4 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
-          skip-existing: true
+          skip-existing: false
