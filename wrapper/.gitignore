@@ -11,6 +11,7 @@ __pycache__/
 libuuu/__version__.py
 
 # Distribution / packaging
+outputs/
 .Python
 env/
 build/
