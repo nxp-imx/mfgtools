@@ -159,3 +159,17 @@ def test_error_handling_invalid_command() -> None:
     result = lib.run_cmd("invalid_command_xyz", dry=True)
     # Should return an error code (non-zero) but not crash
     assert isinstance(result, int)
+
+
+def test_get_version() -> None:
+    """Test getting library version as an integer."""
+    lib = LibUUU()
+    ver = lib.get_version()
+    assert isinstance(ver, int)
+
+
+def test_get_version_string() -> None:
+    """Test getting library version as a string."""
+    lib = LibUUU()
+    ver = lib.get_version_string()
+    assert isinstance(ver, str)
