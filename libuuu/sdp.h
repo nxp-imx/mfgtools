@@ -68,25 +68,25 @@ struct BootData
 
 #pragma pack ()
 
-#define ROM_KERNEL_CMD_RD_MEM							0x0101
-#define ROM_KERNEL_CMD_WR_MEM							0x0202
-#define ROM_KERNEL_CMD_WR_FILE							0x0404
-#define ROM_KERNEL_CMD_ERROR_STATUS				0x0505
-#define RAM_KERNEL_CMD_HEADER							0x0606
-//#define ROM_KERNEL_CMD_RE_ENUM 0x0909
-#define ROM_KERNEL_CMD_DCD_WRITE					0x0A0A
-#define ROM_KERNEL_CMD_JUMP_ADDR					0x0B0B
-#define ROM_KERNEL_CMD_SKIP_DCD_HEADER				0x0C0C
+inline constexpr uint16_t ROM_KERNEL_CMD_RD_MEM = 0x0101;
+inline constexpr uint16_t ROM_KERNEL_CMD_WR_MEM = 0x0202;
+inline constexpr uint16_t ROM_KERNEL_CMD_WR_FILE = 0x0404;
+inline constexpr uint16_t ROM_KERNEL_CMD_ERROR_STATUS = 0x0505;
+inline constexpr uint16_t RAM_KERNEL_CMD_HEADER = 0x0606;
+// inline constexpr uint16_t ROM_KERNEL_CMD_RE_ENUM = 0x0909;
+inline constexpr uint16_t ROM_KERNEL_CMD_DCD_WRITE = 0x0A0A;
+inline constexpr uint16_t ROM_KERNEL_CMD_JUMP_ADDR = 0x0B0B;
+inline constexpr uint16_t ROM_KERNEL_CMD_SKIP_DCD_HEADER = 0x0C0C;
 
-#define MAX_DCD_WRITE_REG_CNT		85
-#define ROM_WRITE_ACK						0x128A8A12
-#define ROM_STATUS_ACK					0x88888888
-#define ROM_OK_ACK						0x900DD009
+inline constexpr unsigned int MAX_DCD_WRITE_REG_CNT = 85;
+inline constexpr uint32_t ROM_WRITE_ACK = 0x128A8A12;
+inline constexpr uint32_t ROM_STATUS_ACK = 0x88888888;
+inline constexpr uint32_t ROM_OK_ACK = 0x900DD009;
 
-#define IVT_BARKER_HEADER				0x402000D1
-#define IVT_BARKER2_HEADER				0x412000D1
+inline constexpr uint32_t IVT_BARKER_HEADER = 0x402000D1;
+inline constexpr uint32_t IVT_BARKER2_HEADER = 0x412000D1;
 
-#define HAB_TAG_DCD							0xd2       /**< Device Configuration Data */
+inline constexpr uint8_t HAB_TAG_DCD = 0xd2;       /**< Device Configuration Data */
 
 class SDPCmdBase:public CmdBase
 {
