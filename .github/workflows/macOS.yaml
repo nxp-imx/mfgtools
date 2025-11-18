@@ -18,8 +18,8 @@ jobs:
     strategy:
       matrix:
         os:
-          - macos-14
-          - macos-13
+          - macos-15
+          - macos-14-intel
 
     steps:
       - name: Checkout repository
@@ -36,22 +36,22 @@ jobs:
           export PATH="/usr/local/Cellar/pkg-config/0.29.2_3/bin:${PATH}"; pkg-config --list-all; cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . ; make
 
       - name: Rename_x86
-        if: matrix.os == 'macos-13'
+        if: matrix.os == 'macos-14-intel'
         run: cp uuu/uuu uuu_mac_x86
 
       - name: Rename_arm
-        if: matrix.os == 'macos-14'
+        if: matrix.os == 'macos-15'
         run: cp uuu/uuu uuu_mac_arm
 
       - name: Upload Build Artifacts
-        if: matrix.os == 'macos-13'
+        if: matrix.os == 'macos-14-intel'
         uses: actions/upload-artifact@v4
         with:
           name: uuu_mac_x86
           path: uuu_mac_x86
 
       - name: Upload Build Artifacts
-        if: matrix.os == 'macos-14'
+        if: matrix.os == 'macos-15'
         uses: actions/upload-artifact@v4
         with:
           name: uuu_mac_arm
