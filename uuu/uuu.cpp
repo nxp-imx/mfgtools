@@ -344,6 +344,7 @@ void print_auto_scroll(string str, size_t len, size_t start)
 		str[str.size() - 1] = '.';
 		str[str.size() - 2] = '.';
 		str[str.size() - 3] = '.';
+		start = start % str.size();
 	}
 
 	string s = str.substr(start, len);
