@@ -174,5 +174,6 @@ enum class bmap_mode {
 /*Get .bmap handling mode*/
 EXT bmap_mode uuu_get_bmap_mode();
 EXT int uuu_set_bmap_mode(bmap_mode mode);
+EXT void uuu_set_force_hid_use_ctrl_ep(bool force);
 
 #endif

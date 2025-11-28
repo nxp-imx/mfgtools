@@ -43,6 +43,13 @@ extern "C"
 
 using namespace std;
 
+static bool g_force_hid_use_ctrl_ep = false;
+
+void uuu_set_force_hid_use_ctrl_ep(bool force)
+{
+	g_force_hid_use_ctrl_ep = force;
+}
+
 TransBase::~TransBase()
 {
 }
@@ -171,7 +178,7 @@ int HIDTrans::write_simple(void *buff, size_t size)
 	uint8_t *p = (uint8_t *)buff;
 	int actual_size;
 
-	if (m_outEP)
+	if (m_outEP && !g_force_hid_use_ctrl_ep)
 	{
 		ret = libusb_interrupt_transfer(
 			(libusb_device_handle *)m_devhandle,
