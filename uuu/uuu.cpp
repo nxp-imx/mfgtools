@@ -188,6 +188,7 @@ void print_help(bool detail = false)
 		"    -dry            Dry run mode, check if script or cmd correct \n"
 		"    -bmap           Try using .bmap files even if flash commands do not specify them\n"
 		"    -no-bmap        Ignore .bmap files even if flash commands specify them\n"
+		"    -force-ctrl     Force HID transfer use control endpoint\n"
 		"    -m <usbpath>    Only monitor these paths.\n"
 		"                      -m 1:2 -m 1:3\n\n"
 		"    -ms <serial_no> Monitor the serial number prefix of the device using 'serial_no'.\n"
@@ -1040,6 +1041,10 @@ int main(int argc, char **argv)
 			else if (s == "-no-bmap")
 			{
 				uuu_set_bmap_mode(bmap_mode::Ignore);
+			}
+			else if (s == "-force-ctrl")
+			{
+				uuu_set_force_hid_use_ctrl_ep(true);
 			}
 			else if (s == "-e")
 			{
