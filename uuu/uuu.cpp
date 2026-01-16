@@ -56,6 +56,8 @@ const char * g_vt_red = "\x1B[91m";
 const char * g_vt_kcyn = "\x1B[36m";
 const char * g_vt_boldwhite = "\x1B[97m";
 
+int g_failback_console_width = 300;
+
 size_t g_max_process_width = 0;
 
 void clean_vt_color() noexcept
@@ -761,7 +763,10 @@ bool enable_vt_mode() { return true; }
 int get_console_width()
 {
 	struct winsize w;
-	ioctl(0, TIOCGWINSZ, &w);
+	if (ioctl(0, TIOCGWINSZ, &w) == -1)
+	{
+		return g_failback_console_width;
+	}
 	return w.ws_col;
 }
 #endif
