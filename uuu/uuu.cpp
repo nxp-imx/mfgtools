@@ -692,18 +692,22 @@ int progress(uuu_notify nt, void *p)
 					str += it + "*";
 			}
 
-			print_oneline(str);
-			print_oneline("");
-			if ((*np)[nt.id].m_dev == "Prep" && !g_start_usb_transfer)
+			bool disable_summary = getenv("DISABLE_SUMMARY") != NULL;
+			if (!disable_summary)
 			{
-				Summary(np).print();
-			}else
+				print_oneline(str);
 				print_oneline("");
+				if ((*np)[nt.id].m_dev == "Prep" && !g_start_usb_transfer)
+				{
+					Summary(np).print();
+				}else
+					print_oneline("");
+			}
 
 			for (it = g_map_path_nt.begin(); it != g_map_path_nt.end(); it++)
 				it->second.print();
 
-			for (size_t i = 0; i < g_map_path_nt.size() + 3; i++)
+			for (size_t i = 0; i < g_map_path_nt.size() + (disable_summary ? 0 : 3); i++)
 				cout << "\x1B[1F";
 
 		}
