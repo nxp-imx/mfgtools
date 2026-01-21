@@ -161,7 +161,7 @@ EXT void uuu_set_debug_level(uint32_t mask);
  */
 EXT void uuu_set_small_mem(uint32_t val);
 
-#define MAX_USER_LEN 128
+inline constexpr size_t MAX_USER_LEN = 128;
 typedef int (*uuu_askpasswd)(char* prompt, char user[MAX_USER_LEN], char passwd[MAX_USER_LEN]);
 EXT int uuu_set_askpasswd(uuu_askpasswd ask);
 
