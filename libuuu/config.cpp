@@ -85,6 +85,7 @@ Config::Config()
 	emplace_back(ConfigItem{"FB:", nullptr, nullptr,  BD_VID, 0x0001});
 	emplace_back(ConfigItem{"FB:", nullptr, nullptr,  NXP_VID, 0x0152});
 	emplace_back(ConfigItem{"FB:", nullptr, nullptr,  0x0483, 0x0afb});
+	emplace_back(ConfigItem{"FB:", nullptr, nullptr,  0x1d6b, 0x0104});
 }
 
 int uuu_for_each_cfg(uuu_show_cfg fn, void *p)
