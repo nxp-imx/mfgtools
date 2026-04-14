@@ -102,31 +102,20 @@ int TransBase::read(vector<uint8_t> &buff)
 	return ret;
 }
 
-int USBTrans::open(void *p)
+int USBTrans::open(TransHandle &usb)
 {
-	m_devhandle = p;
+	if (usb.handle == nullptr) {
+		set_last_err_string("Invalid USB device handle");
+		return -1;
+	}
+
+	m_devhandle = usb.handle;
 	string_ex err;
-	int libusb_ret = 0;
 	libusb_device_handle * handle = (libusb_device_handle *)m_devhandle;
 
-	if (libusb_kernel_driver_active(handle, 0))
-	{
-		libusb_ret = libusb_detach_kernel_driver((libusb_device_handle *)m_devhandle, 0);
-
-		if(libusb_ret < 0 && libusb_ret != LIBUSB_ERROR_NOT_SUPPORTED)
-		{
-			err.format("detach kernel driver failure (%d)", libusb_ret);
-			set_last_err_string(err);
-			return libusb_ret;
-		}
-	}
-
-	if ((libusb_ret = libusb_claim_interface(handle, 0)))
-	{
-		err.format("Failure claim interface (%d)", libusb_ret);
-		set_last_err_string(err);
+	int libusb_ret = ensure_interface_claimed(usb);
+	if (libusb_ret)
 		return libusb_ret;
-	}
 
 	libusb_config_descriptor *config;
 	if ((libusb_ret = libusb_get_active_config_descriptor(libusb_get_device(handle), &config)))
@@ -148,6 +137,47 @@ int USBTrans::open(void *p)
 	return 0;
 }
 
+int USBTrans::ensure_interface_claimed(TransHandle &usb)
+{
+	/*
+	 * A fastboot session keeps one libusb handle open and reuses it across
+	 * multiple commands, even though each command creates a fresh transport.
+	 *
+	 * Record the claimed state in the session handle so detach/claim only
+	 * happens once per session. Repeating that path on the same handle is
+	 * unnecessary and triggers a problem on macOS where the second capture
+	 * of the same interface will fail when not running as root.
+	 */
+	if (usb.interface_claimed)
+		return 0;
+
+	string_ex err;
+	libusb_device_handle *handle = (libusb_device_handle *)usb.handle;
+	int libusb_ret = 0;
+
+	if (libusb_kernel_driver_active(handle, 0))
+	{
+		libusb_ret = libusb_detach_kernel_driver(handle, 0);
+
+		if (libusb_ret < 0 && libusb_ret != LIBUSB_ERROR_NOT_SUPPORTED)
+		{
+			err.format("detach kernel driver failure (%d)", libusb_ret);
+			set_last_err_string(err);
+			return libusb_ret;
+		}
+	}
+
+	if ((libusb_ret = libusb_claim_interface(handle, 0)))
+	{
+		err.format("Failure claim interface (%d)", libusb_ret);
+		set_last_err_string(err);
+		return libusb_ret;
+	}
+
+	usb.interface_claimed = true;
+	return 0;
+}
+
 int USBTrans::close()
 {
 	/* needn't clean resource here
@@ -156,7 +186,7 @@ int USBTrans::close()
 	return 0;
 }
 
-int HIDTrans::open(void *p)
+int HIDTrans::open(TransHandle &p)
 {
 	int ret;
 
@@ -295,7 +325,7 @@ int BulkTrans::write_simple(void *buff, size_t size)
 	return ret;
 }
 
-int BulkTrans::open(void *p)
+int BulkTrans::open(TransHandle &p)
 {
 	int ret;
 
