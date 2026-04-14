@@ -46,6 +46,7 @@
 #include "cmd.h"
 #include "libcomm.h"
 #include "libuuu.h"
+#include "trans.h"
 #include "rominfo.h"
 #include "vector"
 #include <time.h>
@@ -279,7 +280,7 @@ static string get_device_serial_no(libusb_device *dev)
 	return get_device_serial_no(dev, &desc, item);
 }
 
-static int open_libusb(libusb_device *dev, void **usb_device_handle)
+static int open_libusb(libusb_device *dev, TransHandle *usb_device_handle)
 {
 	int retry = 10;
 
@@ -297,7 +298,8 @@ static int open_libusb(libusb_device *dev, void **usb_device_handle)
 		CAutoList l;
 
 		int ret;
-		if ((ret = libusb_open(dev, (libusb_device_handle **)(usb_device_handle))) < 0)
+		libusb_device_handle *handle = nullptr;
+		if ((ret = libusb_open(dev, &handle)) < 0)
 		{
 			if ((ret != LIBUSB_ERROR_NOT_SUPPORTED && ret != LIBUSB_ERROR_ACCESS)
 			    || (retry == 0))
@@ -309,6 +311,8 @@ static int open_libusb(libusb_device *dev, void **usb_device_handle)
 		}
 		else
 		{
+			usb_device_handle->handle = handle;
+			usb_device_handle->interface_claimed = false;
 			return 0;
 		}
 	}
@@ -343,7 +347,7 @@ static int run_usb_cmds(ConfigItem *item, libusb_device *dev, short bcddevice)
 	ctx.m_config_item = item;
 	ctx.m_current_bcd = bcddevice;
 
-	if ((ret = open_libusb(dev, &(ctx.m_dev))))
+	if ((ret = open_libusb(dev, &ctx.m_dev)))
 	{
 		nt.type = uuu_notify::NOTIFY_CMD_END;
 		nt.status = -1;
@@ -509,10 +513,11 @@ int polling_usb(std::atomic<int>& bexit)
 
 CmdUsbCtx::~CmdUsbCtx()
 {
-	if (m_dev)
+	if (m_dev.handle)
 	{
-		libusb_close((libusb_device_handle*)m_dev);
-		m_dev = 0;
+		libusb_close((libusb_device_handle*)m_dev.handle);
+		m_dev.handle = nullptr;
+		m_dev.interface_claimed = false;
 	}
 }
 
@@ -561,7 +566,7 @@ int CmdUsbCtx::look_for_match_device(const char *pro)
 					m_current_bcd = desc.bcdDevice;
 
 					int ret;
-					if ((ret = open_libusb(dev, &(m_dev))))
+					if ((ret = open_libusb(dev, &m_dev)))
 						return ret;
 
 					nt.str = (char*)str.c_str();

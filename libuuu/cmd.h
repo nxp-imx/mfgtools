@@ -35,6 +35,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "trans.h"
 
 class ConfigItem;
 
@@ -49,7 +50,7 @@ public:
 	virtual ~CmdCtx();
 
 	ConfigItem *m_config_item = nullptr;
-	void *m_dev = nullptr;
+	TransHandle m_dev;
 	short m_current_bcd;
 };
 

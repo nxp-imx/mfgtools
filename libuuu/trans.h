@@ -34,6 +34,12 @@
 #include <string>
 #include <vector>
 
+struct TransHandle
+{
+	void *handle = nullptr;
+	bool interface_claimed = false;
+};
+
 class TransBase
 {
 public:
@@ -42,7 +48,7 @@ public:
 	TransBase& operator=(const TransBase&) = delete;
 	virtual ~TransBase();
 
-	virtual int open(void *) { return 0; }
+	virtual int open(TransHandle &) { return 0; }
 	virtual int close() { return 0; }
 	int write(void *buff, size_t size);
 	int read(void *buff, size_t size, size_t *return_size);
@@ -70,11 +76,14 @@ class USBTrans : public TransBase
 {
 public:
 	USBTrans(int retry = 1) : TransBase(retry) {}
-	int open(void *p) override;
+	int open(TransHandle &p) override;
 	int close() override;
 
 protected:
 	std::vector<EPInfo> m_EPs;
+
+private:
+	int ensure_interface_claimed(TransHandle &usb);
 };
 class HIDTrans : public USBTrans
 {
@@ -82,7 +91,7 @@ public:
 	HIDTrans(int timeout = 1000) : USBTrans(2), m_timeout{timeout} {}
 	~HIDTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
 
-	int open(void *p) override;
+	int open(TransHandle &p) override;
 	void set_hid_out_ep(int ep) noexcept { m_outEP = ep; }
 
 protected:
@@ -101,7 +110,7 @@ public:
 	BulkTrans(int timeout = 2000) : USBTrans(2), m_timeout{timeout} {}
 	~BulkTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
 
-	int open(void *p) override;
+	int open(TransHandle &p) override;
 
 protected:
 	int write_simple(void *buff, size_t size) override;
