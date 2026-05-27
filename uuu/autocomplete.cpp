@@ -61,7 +61,6 @@ void linux_auto_arg(const char *space = " ", const char * filter = "")
 	string str = filter;
 
 	const char *param[] = { "-b", "-d", "-v", "-V", "-s", NULL };
-	int i = 0;
 
 	for (int i = 0; param[i]; i++)
 	{
