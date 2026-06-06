@@ -377,10 +377,7 @@ HttpStream::~HttpStream()
 
 #else
 
-HttpStream::HttpStream()
-{
-	m_buff.empty();
-}
+HttpStream::HttpStream() = default;
 
 int HttpStream::SendPacket(char *buff, size_t sz)
 {
