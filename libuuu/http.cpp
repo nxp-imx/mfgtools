@@ -377,11 +377,6 @@ HttpStream::~HttpStream()
 
 #else
 
-HttpStream::HttpStream()
-{
-	m_buff.empty();
-}
-
 int HttpStream::SendPacket(char *buff, size_t sz)
 {
 #ifdef UUUSSL

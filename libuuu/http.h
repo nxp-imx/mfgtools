@@ -51,7 +51,7 @@ class HttpStream
 	void * m_ssl = nullptr;
 	int parser_response(std::string rep);
 public:
-	HttpStream();
+	HttpStream() = default;
 	int HttpGetHeader(std::string host, std::string path, int port = 80, bool ishttps=false);
 	size_t HttpGetFileSize();
 	int HttpDownload(char *buff, size_t sz);
