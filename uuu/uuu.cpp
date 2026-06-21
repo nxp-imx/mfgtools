@@ -37,7 +37,6 @@
 #include <map>
 #include <mutex>
 #include <vector>
-#include <sstream>
 #include <fstream>
 #include <stdarg.h>
 #include <time.h>
@@ -45,7 +44,6 @@
 #include <signal.h>
 #include "buildincmd.h"
 #include <string>
-#include <streambuf>
 
 #include "../libuuu/libuuu.h"
 
