@@ -69,7 +69,7 @@ void linux_auto_arg(const char *space = " ", const char * filter = "")
 	}
 }
 
-int linux_autocomplete_ls(const char *path, void *p)
+int linux_autocomplete_ls(const char *path, void * /*p*/)
 {
 	cout << path + 2 << endl;
 	return 0;
