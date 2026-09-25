@@ -54,8 +54,6 @@ const char * g_vt_red = "\x1B[91m";
 const char * g_vt_kcyn = "\x1B[36m";
 const char * g_vt_boldwhite = "\x1B[97m";
 
-int g_failback_console_width = 300;
-
 size_t g_max_process_width = 0;
 
 void clean_vt_color() noexcept
@@ -778,8 +776,9 @@ int get_console_width()
 	struct winsize w;
 	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == -1)
 	{
-		return g_failback_console_width;
+		return -1;
 	}
+
 	return w.ws_col;
 }
 #endif
@@ -1160,6 +1159,12 @@ int main(int argc, char **argv)
 		g_verbose = 1;
 	}
 #endif
+
+	if (!g_verbose && get_console_width() <= 3)
+	{
+	    cout << "Failed to get terminal width, or terminal width too small. Using verbose mode" << endl;
+		g_verbose = 1;
+	}
 
 	signal(SIGINT, ctrl_c_handle);
 
