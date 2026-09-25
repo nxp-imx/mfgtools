@@ -765,7 +765,8 @@ bool enable_vt_mode()
 int get_console_width()
 {
 	CONSOLE_SCREEN_BUFFER_INFO sbInfo;
-	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &sbInfo);
+	if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &sbInfo))
+		return -1;
 	return sbInfo.dwSize.X;
 }
 #else
