@@ -1154,6 +1154,13 @@ int main(int argc, char **argv)
 		}
 	}
 
+#ifndef _WIN32
+	if (!g_verbose && !isatty(STDOUT_FILENO)) {
+	    cout << "stdout is not a TTY. Using verbose mode" << endl;
+		g_verbose = 1;
+	}
+#endif
+
 	signal(SIGINT, ctrl_c_handle);
 
 	uuu_set_askpasswd(ask_passwd);
