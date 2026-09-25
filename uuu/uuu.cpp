@@ -600,12 +600,12 @@ mutex g_callback_mutex;
 
 void print_oneline(string str)
 {
-	size_t w = get_console_width();
+	int w = get_console_width();
 	if (w <= 3)
 		return;
 
 	if (g_max_process_width == 0){
-		g_max_process_width = min(str.size(), w);
+		g_max_process_width = min<int>(str.size(), w);
 	}
 
 	if (str.size() >= w)
