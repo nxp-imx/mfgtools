@@ -44,6 +44,7 @@ extern "C"
 #ifdef __APPLE__
 #include <hidapi.h>
 #include <hidapi_darwin.h>
+#include <mutex>
 #endif
 
 using namespace std;
@@ -217,6 +218,13 @@ int HIDTrans::open_hidapi(TransHandle &usb)
 		set_last_err_string("Invalid USB device handle");
 		return -1;
 	}
+
+	/*
+	 * Each device runs in its own thread, but hidapi's init, enumerate and
+	 * open are not thread safe, so serialize them.
+	 */
+	static std::mutex hid_open_mutex;
+	std::lock_guard<std::mutex> lock(hid_open_mutex);
 
 	if (hid_init()) {
 		set_last_err_string("Call hid_init failure");
