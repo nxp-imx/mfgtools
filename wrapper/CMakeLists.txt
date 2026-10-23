@@ -85,6 +85,12 @@ add_library(
     ${gitversion_h}
 )
 
+if (APPLE)
+    target_sources(libuuu PRIVATE ../libuuu/hid-apple.cpp)
+else()
+    target_sources(libuuu PRIVATE ../libuuu/hid-libusb.cpp)
+endif()
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(libusb REQUIRED IMPORTED_TARGET libusb-1.0)
 pkg_check_modules(tinyxml2 REQUIRED IMPORTED_TARGET tinyxml2)

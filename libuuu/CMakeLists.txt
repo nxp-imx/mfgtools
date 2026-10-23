@@ -58,6 +58,12 @@ set(SOURCES
 	bmap.cpp
 )
 
+if (APPLE)
+	list(APPEND SOURCES hid-apple.cpp)
+else()
+	list(APPEND SOURCES hid-libusb.cpp)
+endif()
+
 set(generated_files_dir "${CMAKE_BINARY_DIR}/libuuu/gen")
 set(gitversion_h "${generated_files_dir}/gitversion.h")
 
