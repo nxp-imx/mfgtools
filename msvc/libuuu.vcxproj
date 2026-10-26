@@ -34,6 +34,7 @@
     <ClCompile Include="..\libuuu\sdps.cpp" />
     <ClCompile Include="..\libuuu\sparse.cpp" />
     <ClCompile Include="..\libuuu\tar.cpp" />
+    <ClCompile Include="..\libuuu\hid-libusb.cpp" />
     <ClCompile Include="..\libuuu\trans.cpp" />
     <ClCompile Include="..\libuuu\usbhotplug.cpp" />
     <ClCompile Include="..\libuuu\version.cpp" />

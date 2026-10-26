@@ -70,6 +70,7 @@ add_library(
     ../libuuu/notify.cpp
     ../libuuu/sdps.cpp
     ../libuuu/trans.cpp
+    ../libuuu/hid-libusb.cpp
     ../libuuu/usbhotplug.cpp
     ../libuuu/version.cpp
     ../libuuu/sdp.cpp

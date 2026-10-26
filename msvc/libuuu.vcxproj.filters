@@ -92,6 +92,9 @@
     <ClCompile Include="..\libuuu\sparse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\libuuu\hid-libusb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\libuuu\trans.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
