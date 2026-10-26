@@ -10,6 +10,9 @@ pkg_check_modules(LIBUSB REQUIRED libusb-1.0>=1.0.16)
 pkg_check_modules(LIBZSTD REQUIRED libzstd)
 find_package(Threads)
 pkg_check_modules(TINYXML2 REQUIRED tinyxml2)
+if (APPLE)
+pkg_check_modules(HIDAPI REQUIRED hidapi)
+endif()
 
 if (STATIC)
 set(OPENSSL_USE_STATIC_LIBS TRUE)
@@ -22,7 +25,7 @@ set(UUUSSL "-DUUUSSL")
 set(UUUOPENSLL_INCLUDE_DIR ${OPENSSL_INCLUDE_DIR})
 endif()
 
-include_directories(${LIBUSB_INCLUDE_DIRS} ${LIBZSTD_INCLUDE_DIRS} ${UUUOPENSLL_INCLUDE_DIR} ${TINYXML2_INCLUDE_DIRS} include)
+include_directories(${LIBUSB_INCLUDE_DIRS} ${LIBZSTD_INCLUDE_DIRS} ${UUUOPENSLL_INCLUDE_DIR} ${TINYXML2_INCLUDE_DIRS} ${HIDAPI_INCLUDE_DIRS} include)
 
 
 if (FORCE_OLD)
@@ -40,7 +43,6 @@ set(SOURCES
 	notify.cpp
 	sdps.cpp
 	trans.cpp
-	hid-libusb.cpp
 	usbhotplug.cpp
 	version.cpp
 	sdp.cpp
@@ -55,6 +57,12 @@ set(SOURCES
 	sparse.cpp
 	bmap.cpp
 )
+
+if (APPLE)
+	list(APPEND SOURCES hid-apple.cpp)
+else()
+	list(APPEND SOURCES hid-libusb.cpp)
+endif()
 
 set(generated_files_dir "${CMAKE_BINARY_DIR}/libuuu/gen")
 set(gitversion_h "${generated_files_dir}/gitversion.h")

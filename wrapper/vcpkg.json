@@ -5,6 +5,10 @@
         "bzip2",
         "zstd",
         "zlib",
-        "openssl"
+        "openssl",
+        {
+            "name": "hidapi",
+            "platform": "osx"
+        }
     ]
 }
