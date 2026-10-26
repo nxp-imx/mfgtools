@@ -43,7 +43,7 @@ extern "C"
 
 using namespace std;
 
-static bool g_force_hid_use_ctrl_ep = false;
+bool g_force_hid_use_ctrl_ep = false;
 
 void uuu_set_force_hid_use_ctrl_ep(bool force)
 {
@@ -183,90 +183,6 @@ int USBTrans::close()
 	/* needn't clean resource here
 	   libusb_close will release all resource when finish running cmd
 	*/
-	return 0;
-}
-
-int HIDTrans::open(TransHandle &p)
-{
-	int ret;
-
-	if ((ret = USBTrans::open(p)))
-		return ret;
-
-	for (const auto &ep : m_EPs)
-	{
-		if (ep.addr > 0 && ((ep.addr & 0x80) == 0))
-			m_outEP = ep.addr;
-	}
-
-	return 0;
-}
-
-int HIDTrans::write_simple(void *buff, size_t size)
-{
-	int ret;
-	uint8_t *p = (uint8_t *)buff;
-	int actual_size;
-
-	if (m_outEP && !g_force_hid_use_ctrl_ep)
-	{
-		ret = libusb_interrupt_transfer(
-			(libusb_device_handle *)m_devhandle,
-			m_outEP,
-			p,
-			size,
-			&actual_size,
-			m_timeout
-		);
-	}
-	else
-	{
-		ret = libusb_control_transfer(
-			(libusb_device_handle *)m_devhandle,
-			LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE,
-			m_set_report,
-			(2 << 8) | p[0],
-			0,
-			p,
-			size,
-			m_timeout
-		);
-	}
-
-	if (ret < 0)
-	{
-		string_ex err;
-		err.format("HID(W): %s (%d)", libusb_error_name(ret), ret);
-		set_last_err_string(err);
-		return ret;
-	}
-
-	return ret;
-}
-
-int HIDTrans::read_simple(void *buff, size_t size, size_t *rsize)
-{
-	int ret;
-	int actual;
-	ret = libusb_interrupt_transfer(
-		(libusb_device_handle *)m_devhandle,
-		0x81,
-		(uint8_t*)buff,
-		size,
-		&actual,
-		m_timeout
-	);
-
-	*rsize = actual;
-
-	if (ret < 0)
-	{
-		string_ex err;
-		err.format("HID(R): %s (%d)", libusb_error_name(ret), ret);
-		set_last_err_string(err);
-		return ret;
-	}
-
 	return 0;
 }
 

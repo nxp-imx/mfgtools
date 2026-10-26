@@ -40,6 +40,7 @@ set(SOURCES
 	notify.cpp
 	sdps.cpp
 	trans.cpp
+	hid-libusb.cpp
 	usbhotplug.cpp
 	version.cpp
 	sdp.cpp
