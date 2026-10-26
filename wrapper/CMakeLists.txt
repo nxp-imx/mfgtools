@@ -70,7 +70,6 @@ add_library(
     ../libuuu/notify.cpp
     ../libuuu/sdps.cpp
     ../libuuu/trans.cpp
-    ../libuuu/hid-libusb.cpp
     ../libuuu/usbhotplug.cpp
     ../libuuu/version.cpp
     ../libuuu/sdp.cpp
@@ -86,6 +85,12 @@ add_library(
     ${gitversion_h}
 )
 
+if (APPLE)
+    target_sources(libuuu PRIVATE ../libuuu/hid-apple.cpp)
+else()
+    target_sources(libuuu PRIVATE ../libuuu/hid-libusb.cpp)
+endif()
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(libusb REQUIRED IMPORTED_TARGET libusb-1.0)
 pkg_check_modules(tinyxml2 REQUIRED IMPORTED_TARGET tinyxml2)
@@ -93,6 +98,9 @@ pkg_check_modules(bzip2 REQUIRED IMPORTED_TARGET bzip2)
 pkg_check_modules(zstd REQUIRED IMPORTED_TARGET libzstd)
 pkg_check_modules(openssl REQUIRED IMPORTED_TARGET openssl)
 pkg_check_modules(zlib REQUIRED IMPORTED_TARGET zlib)
+if (APPLE)
+pkg_check_modules(hidapi REQUIRED IMPORTED_TARGET hidapi)
+endif()
 
 
 if (DARWIN)
@@ -115,3 +123,6 @@ endif(UNIX)
 
 
 target_link_libraries(libuuu PkgConfig::libusb PkgConfig::tinyxml2 PkgConfig::bzip2 PkgConfig::zstd PkgConfig::zlib PkgConfig::openssl)
+if (APPLE)
+target_link_libraries(libuuu PkgConfig::hidapi)
+endif()

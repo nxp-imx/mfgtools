@@ -92,6 +92,9 @@ public:
 	~HIDTrans() override { if (m_devhandle) close();  m_devhandle = nullptr; }
 
 	int open(TransHandle &p) override;
+#ifdef __APPLE__
+	int close() override;
+#endif
 	void set_hid_out_ep(int ep) noexcept { m_outEP = ep; }
 
 protected:
@@ -99,6 +102,10 @@ protected:
 	int read_simple(void *buff, size_t size, size_t *return_size) override;
 
 private:
+#ifdef __APPLE__
+	int open_hidapi(TransHandle &usb);
+	void *m_hid = nullptr;
+#endif
 	int m_outEP = 0;
 	const int m_timeout = 1000;
 	int m_set_report = 9;

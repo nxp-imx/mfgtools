@@ -82,16 +82,12 @@ For cmake prior 3.13:
 ## macOS
 - `git clone https://github.com/nxp-imx/mfgtools.git`
 - `cd mfgtools`
-- `brew install cmake libusb openssl pkg-config tinyxml2`
+- `brew install cmake libusb hidapi openssl pkg-config tinyxml2`
 - `cmake -DOPENSSL_ROOT_DIR=$(brew --prefix)/opt/openssl . && make`
 
 Note that we assume [homebrew](https://brew.sh) is installed and can be used to resolve dependencies as shown above. The remaining dependency `libbz2` can be resolved via the XCode supplied libraries.
 
-Note if you meet "can't detach kernel driver" try to check libusb version. 
-```
-brew info libusb
-==> libusb: stable 1.0.26 (bottled), HEAD
-```
+On macOS, HID devices (SDP/SDPS boot ROM) are accessed through hidapi, so `sudo` is not needed to download images.
 
 # Run environment
  - Windows 10 64 bit

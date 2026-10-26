@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up environment
-        run: brew install libusb pkg-config zstd tinyxml2
+        run: brew install libusb hidapi pkg-config zstd tinyxml2
 
       - name: Build
         run: |
