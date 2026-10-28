@@ -1194,32 +1194,32 @@ shared_ptr<FileBuffer> get_file_buffer(string filename, bool async)
 
 	filename = path;
 
-	bool find;
+	shared_ptr<FileBuffer> p;
 	{
 		std::lock_guard<mutex> lock(g_mutex_map);
-		find = (g_filebuffer_map.find(filename) == g_filebuffer_map.end());
+		auto it = g_filebuffer_map.find(filename);
+		if (it != g_filebuffer_map.end())
+		{
+			p = it->second;
+		}
 	}
 
-	if (find)
+	if (!p)
 	{
-		shared_ptr<FileBuffer> p(new FileBuffer);
+		p.reset(new FileBuffer);
 
 		if (p->reload(filename, async))
 			return nullptr;
 
 		{
 			std::lock_guard<mutex> lock(g_mutex_map);
-			g_filebuffer_map[filename] = p;
+			/* Keep an entry another thread added: releasing it here could run ~FileBuffer under the lock */
+			g_filebuffer_map.emplace(filename, p);
 		}
 		return p;
 	}
 	else
 	{
-		shared_ptr<FileBuffer> p;
-		{
-			std::lock_guard<mutex> lock(g_mutex_map);
-			p= g_filebuffer_map[filename];
-		}
 		if (p->m_timesample != get_file_timesample(filename))
 			if (p->reload(filename, async))
 			{
@@ -1836,12 +1836,19 @@ int file_overwrite_monitor(const string &filename, FileBuffer *p)
 	str = ">";
 	str += filename;
 
-	if(p->m_pDatabuffer && p->get_m_allocate_way() == FileBuffer::ALLOCATION_WAYS::MMAP)
+	/* Destroyed after the lock is released: ~FileBuffer may join threads that take g_mutex_map */
+	shared_ptr<FileBuffer> erased;
 	{
 		std::lock_guard<mutex> lock(g_mutex_map);
-		p->m_file_monitor.detach(); /*Detach itself, erase will delete p*/
-		if(g_filebuffer_map.find(str) != g_filebuffer_map.end())
-			g_filebuffer_map.erase(str);
+		auto it = g_filebuffer_map.find(str);
+		/* Not in the map: the owner is destroying p and will join this thread */
+		if (it != g_filebuffer_map.end() && it->second.get() == p &&
+			p->m_pDatabuffer && p->get_m_allocate_way() == FileBuffer::ALLOCATION_WAYS::MMAP)
+		{
+			p->m_file_monitor.detach(); /*Detach itself, releasing erased may delete p*/
+			erased = std::move(it->second);
+			g_filebuffer_map.erase(it);
+		}
 	}
 
 	return 0;
@@ -2038,12 +2045,22 @@ void uuu_set_small_mem(uint32_t val)
 
 void clean_up_filemap()
 {
-	for (auto it : g_filebuffer_map)
+	/*
+	 * Detach the map under the lock, but join and destroy outside it: ~FileBuffer
+	 * joins file_overwrite_monitor and the async loader, and both take g_mutex_map.
+	 */
+	map<string, shared_ptr<FileBuffer>> filemap;
+	{
+		std::lock_guard<mutex> lock(g_mutex_map);
+		filemap.swap(g_filebuffer_map);
+	}
+
+	for (auto &it : filemap)
 	{
 		it.second->m_reset_stream = true;
 		it.second->m_pool_load_cv.notify_all();
 		if (it.second->m_async_thread.joinable())
 			it.second->m_async_thread.join();
 	}
-	g_filebuffer_map.clear();
+	filemap.clear();
 }
