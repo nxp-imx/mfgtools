@@ -1077,6 +1077,10 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 	blk = outp->get_map_it(0, true);
 	if (!blk)
 		blk = outp->request_new_blk();
+	if (!blk)
+	{
+		return -1;
+	}
 
 	{
 		lock_guard<mutex> l(outp->m_seg_map_mutex);
@@ -1139,6 +1143,10 @@ int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>o
 					blk = outp->get_map_it(outOffset, true);
 					if(!blk)
 						blk = outp->request_new_blk();
+					if (!blk)
+					{
+						return -1;
+					}
 					cs->set_output_buff(blk->data(), blk->m_output_size);
 
 					{
@@ -1459,7 +1467,10 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 
 	do
 	{
-		m_last_request_offset = offset;
+		{
+			std::lock_guard<std::mutex> lock(m_pool_load_cv_mutex);
+			m_last_request_offset = offset;
+		}
 		std::unique_lock<std::mutex> lck(m_request_cv_mutex);
 
 		shared_ptr<FragmentBlock> blk;
@@ -1519,6 +1530,11 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 		{
 			m_dataflags = 0;
 			m_available_size = 0;
+			{
+				std::lock_guard<std::mutex> lock(m_pool_load_cv_mutex);
+				m_reset_stream = true;
+			}
+			m_pool_load_cv.notify_all();
 			this->m_async_thread.join();
 			m_reset_stream = false;
 
@@ -1656,12 +1672,15 @@ std::shared_ptr<FragmentBlock> FileBuffer::request_new_blk()
 				offset = p->m_output_offset;
 			}
 
-			while (offset > m_last_request_offset + m_total_buffer_size)
 			{
-				if (m_reset_stream)
-					return NULL;
 				std::unique_lock<std::mutex> lck(m_pool_load_cv_mutex);
-				m_pool_load_cv.wait(lck);
+				m_pool_load_cv.wait(lck, [&] {
+					return m_reset_stream || offset <= m_last_request_offset + m_total_buffer_size;
+				});
+				if (offset > m_last_request_offset + m_total_buffer_size)
+				{
+					return NULL;
+				}
 			}
 		}
 
@@ -2003,7 +2022,10 @@ int FSBasic::PreloadWorkThread(shared_ptr<FileBuffer>outp)
 			)
 		{
 			std::unique_lock<std::mutex> lck(outp->m_pool_load_cv_mutex);
-			outp->m_pool_load_cv.wait(lck);
+			if (!outp->m_reset_stream)
+			{
+				outp->m_pool_load_cv.wait(lck);
+			}
 			continue;
 		}
 
@@ -2057,7 +2079,10 @@ void clean_up_filemap()
 
 	for (auto &it : filemap)
 	{
-		it.second->m_reset_stream = true;
+		{
+			std::lock_guard<mutex> lock(it.second->m_pool_load_cv_mutex);
+			it.second->m_reset_stream = true;
+		}
 		it.second->m_pool_load_cv.notify_all();
 		if (it.second->m_async_thread.joinable())
 			it.second->m_async_thread.join();
