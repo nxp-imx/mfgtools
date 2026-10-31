@@ -1538,6 +1538,17 @@ int64_t FileBuffer::request_data_from_segment(void *data, size_t offset, size_t 
 			this->m_async_thread.join();
 			m_reset_stream = false;
 
+			/* The stream restarts from the beginning (a second pass over the same file, such as two partitions
+			   flashed from one image). The blocks of the previous pass stay in the map with their data released,
+			   and the decompressor would refill them through get_map_it(offset, true) without going through
+			   request_new_blk(), which is where small-memory mode waits for the reader and releases old blocks:
+			   the whole decompressed file would end up in memory. Start the new pass from an empty map. */
+			{
+				std::lock_guard<std::mutex> lock(m_seg_map_mutex);
+				m_seg_map.clear();
+				m_last_db.reset();
+			}
+
 			this->reload(m_filename, true);
 			continue;
 		}
