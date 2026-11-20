@@ -122,6 +122,7 @@ struct rom_bootimg {
 };
 
 
+static constexpr uint32_t IMG_ELE = 0x06;
 static constexpr uint32_t IMG_FCB_COPY = 0x08;
 static constexpr uint32_t IMG_V2X = 0x0B;
 
@@ -144,9 +145,27 @@ size_t GetContainerActualSize(shared_ptr<DataBuffer> p, size_t offset, bool bROM
 	else if (hdr->version >= 2)
 	{	/* after imx943 align change to 0x4000 from 0x400 */
 		align = CONTAINER_HDR_ALIGNMENT_V2;
-		hdr = reinterpret_cast<struct rom_container*>(p->data() + offset + align);
-		if (hdr->tag == V2X_TAG)
-			cindex++;
+		if (p->size() - offset < sizeof(struct rom_container) + sizeof(struct rom_bootimg))
+		{
+			return p->size() - offset;
+		}
+
+		auto image = reinterpret_cast<struct rom_bootimg*>(p->data() + offset
+			+ sizeof(struct rom_container));
+
+		/* Double-authentication images can start directly with the OEM container. */
+		if ((image->flags & 0xF) != IMG_ELE)
+		{
+			cindex = 0;
+		}
+		else
+		{
+			hdr = reinterpret_cast<struct rom_container*>(p->data() + offset + align);
+			if (hdr->tag == V2X_TAG)
+			{
+				cindex++;
+			}
+		}
 	}
 	else
 	{
