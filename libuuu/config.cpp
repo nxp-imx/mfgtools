@@ -58,6 +58,7 @@ Config::Config()
 	emplace_back(ConfigItem{"SDPS:", "MX95", nullptr, NXP_VID, 0x015D});
 	emplace_back(ConfigItem{"SDPS:", "MX95", nullptr, NXP_VID, 0x015C});
 	emplace_back(ConfigItem{"SDPS:", "MX943", "MX95", NXP_VID, 0x0027});
+	emplace_back(ConfigItem{"OCP:",  "MX943", "MX95", NXP_VID, 0x002d});
 	emplace_back(ConfigItem{"SDPS:", "MX952/IMX937", "MX95", NXP_VID, 0x0028});
 	emplace_back(ConfigItem{"SDP:", "MX7D",    nullptr,   FSL_VID, 0x0076});
 	emplace_back(ConfigItem{"SDP:", "MX6Q",    nullptr,   FSL_VID, 0x0054});

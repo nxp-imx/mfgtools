@@ -66,6 +66,7 @@
     <ClInclude Include="..\libuuu\bmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\libuuu\ocp.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\libuuu\error.cpp">
@@ -123,6 +124,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\libuuu\bmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuuu\ocp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

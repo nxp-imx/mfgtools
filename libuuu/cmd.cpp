@@ -44,6 +44,7 @@
 #include "buffer.h"
 #include "sdp.h"
 #include "fastboot.h"
+#include "ocp.h"
 #include <sys/stat.h>
 #include <thread>
 
@@ -484,6 +485,14 @@ CmdObjCreateMap::CmdObjCreateMap()
 	(*this)["FBK:ACMD"] = new_cmd_obj<FBACmd>;
 	(*this)["FBK:SYNC"] = new_cmd_obj<FBSyncCmd>;
 	(*this)["FBK:UCP"] = new_cmd_obj<FBCopy>;
+
+	(*this)["OCP:QUERY"]    = new_cmd_obj<OCPQueryCmd>;
+	(*this)["OCP:STATUS"]   = new_cmd_obj<OCPStatusCmd>;
+	(*this)["OCP:BOOT"]    = new_cmd_obj<OCPBootCmd>;
+	(*this)["OCP:RECOVERY"] = new_cmd_obj<OCPRecoveryCmd>;
+	(*this)["OCP:RESET"]    = new_cmd_obj<OCPResetCmd>;
+	(*this)["OCP:LOG"]      = new_cmd_obj<OCPLogCmd>;
+	(*this)["OCP:FIFO"]     = new_cmd_obj<OCPFifoStatusCmd>;
 
 	(*this)["_ALL:DONE"] = new_cmd_obj<CmdDone>;
 	(*this)["_ALL:DELAY"] = new_cmd_obj<CmdDelay>;
@@ -1018,6 +1027,17 @@ static int added_default_boot_cmd(const char *filename)
 	insert_one_cmd(str.c_str(), &g_cmd_map);
 	insert_one_cmd("SDPV: jump", &g_cmd_map);
 	insert_one_cmd("SDPV: done", &g_cmd_map);
+
+
+	str = "OCP: boot -f ";
+	str += "\"";
+	str += filename;
+	str += "\"";
+
+	ret = insert_one_cmd(str.c_str(), &g_cmd_map);
+	if (ret) return ret;
+
+	insert_one_cmd("OCP: done", &g_cmd_map);
 
 	return 0;
 }

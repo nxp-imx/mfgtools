@@ -53,6 +53,7 @@ set(SOURCES
 	hidreport.cpp
 	sparse.cpp
 	bmap.cpp
+	ocp.cpp
 )
 
 set(generated_files_dir "${CMAKE_BINARY_DIR}/libuuu/gen")
