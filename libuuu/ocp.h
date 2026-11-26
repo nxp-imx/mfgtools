@@ -119,9 +119,11 @@
 #define OCP_RESET_BOOT  0x0002  /* Reset and boot to recovery image */
 
 /*
- * RECOVERY_CTRL image type codes (section 5.7).
+ * RECOVERY_CTRL image selection and activation codes.
  */
-#define OCP_RECOVERY_IMAGE_UPDATE   0x0001  /* Push a new firmware image */
+#define OCP_RECOVERY_IMAGE_FROM_CMS 0x01
+#define OCP_RECOVERY_ACTIVATE_NONE  0x00
+#define OCP_RECOVERY_ACTIVATE_IMAGE 0x0F
 
 /*
  * RECOVERY_STATUS status codes (section 5.8).
@@ -222,13 +224,16 @@ struct OCPDeviceReset {
 };
 
 /*
- * OCP_CMD_RECOVERY_CTRL register layout (4 bytes, WO).
- * Section 5.7.  Written to initiate recovery.
+ * OCP_CMD_RECOVERY_CTRL register layout (3 bytes).
+ * Select a CMS image and optionally request activation.
  */
 struct OCPRecoveryCtrl {
-	uint16_t image_type;        /* OCP_RECOVERY_IMAGE_UPDATE */
-	uint16_t reserved;
+	uint8_t cms;
+	uint8_t recovery_image;
+	uint8_t activate;
 };
+
+static_assert(sizeof(OCPRecoveryCtrl) == 3, "RECOVERY_CTRL must be 3 bytes");
 
 /*
  * OCP_CMD_RECOVERY_STATUS register layout (4 bytes, RO).

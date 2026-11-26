@@ -262,8 +262,9 @@ int OCPBase::DeviceReset(uint16_t reset_type)
 int OCPBase::StartRecovery(uint32_t image_size)
 {
 	OCPRecoveryCtrl rc;
-	rc.image_type = OCP_RECOVERY_IMAGE_UPDATE;
-	rc.reserved   = 0;
+	rc.cms = 0;
+	rc.recovery_image = OCP_RECOVERY_IMAGE_FROM_CMS;
+	rc.activate = OCP_RECOVERY_ACTIVATE_NONE;
 	if (WriteCmd(OCP_CMD_RECOVERY_CTRL, &rc, sizeof(rc)))
 		return -1;
 
@@ -536,8 +537,9 @@ int OCPRecoveryCmd::run(CmdCtx *ctx)
 
 	OCPBase ocp(h);
 	OCPRecoveryCtrl rc;
-	rc.image_type = OCP_RECOVERY_IMAGE_UPDATE;
-	rc.reserved   = 0;
+	rc.cms = 0;
+	rc.recovery_image = OCP_RECOVERY_IMAGE_FROM_CMS;
+	rc.activate = OCP_RECOVERY_ACTIVATE_IMAGE;
 	return ocp.WriteCmd(OCP_CMD_RECOVERY_CTRL, &rc, sizeof(rc));
 }
 
