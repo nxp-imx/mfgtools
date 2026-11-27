@@ -29,7 +29,7 @@
 *
 */
 
-#include "compress_streams/compress_stream.h"
+#include "compress_streams/bz2_stream.h"
 #include <map>
 #include "buffer.h"
 #include <sys/stat.h>
@@ -42,7 +42,6 @@
 #include "fat.h"
 #include "tar.h"
 #include <string.h>
-#include "bzlib.h"
 #include "stdio.h"
 #include <limits>
 #include "http.h"
@@ -459,46 +458,6 @@ public:
 	virtual std::shared_ptr<CommonStream> create_stream() { return nullptr; };
 };
 
-
-class Bz2stream : public CommonStream
-{
-	bz_stream m_strm;
-	size_t m_in_size = 0;
-	size_t m_out_size = 0;
-
-public:
-	Bz2stream() { memset(&m_strm, 0, sizeof(m_strm));  BZ2_bzDecompressInit(&m_strm, 0, 0); }
-	virtual ~Bz2stream()
-	{
-		BZ2_bzDecompressEnd(&m_strm);
-	}
-	virtual int set_input_buff(void* p, size_t sz) override
-	{
-		m_strm.next_in = (char*)p;
-		m_strm.avail_in = m_in_size = sz;
-		return 0;
-	};
-	virtual int set_output_buff(void* p, size_t sz) override
-	{
-		m_strm.next_out = (char*)p;
-		m_strm.avail_out = m_out_size = sz;
-		return 0;
-	};
-	virtual size_t get_input_pos() override
-	{
-		return m_in_size - m_strm.avail_in;
-	};
-	virtual size_t get_output_pos() override
-	{
-		return m_out_size - m_strm.avail_out;
-	};
-	virtual int decompress() override
-	{
-		return BZ2_bzDecompress(&m_strm);
-	};
-
-	virtual size_t get_default_input_size() override { return 0x10000; }
-};
 
 static class FSBz2 : public FSCompressStream
 {

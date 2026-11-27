@@ -27,6 +27,14 @@
  *
  */
 
+#pragma once
+
+#include "compress_stream.h"
+
+#include <bzlib.h>
+
+#include <cstring>
+
 class Bz2stream : public CommonStream
 {
 	bz_stream m_strm;
@@ -34,7 +42,7 @@ class Bz2stream : public CommonStream
 	size_t m_out_size = 0;
 
 public:
-	Bz2stream() { memset(&m_strm, 0, sizeof(m_strm));  BZ2_bzDecompressInit(&m_strm, 0, 0); }
+	Bz2stream() { std::memset(&m_strm, 0, sizeof(m_strm));  BZ2_bzDecompressInit(&m_strm, 0, 0); }
 	virtual ~Bz2stream()
 	{
 		BZ2_bzDecompressEnd(&m_strm);
