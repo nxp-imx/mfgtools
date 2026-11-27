@@ -27,6 +27,12 @@
  *
  */
 
+#pragma once
+
+#include "compress_stream.h"
+
+#include <zstd.h>
+
 class ZstdStream:public CommonStream
 {
 	ZSTD_DCtx* m_dctx;
@@ -67,21 +73,8 @@ public:
 		return ZSTD_DStreamInSize();
 	}
 
-	size_t decompress_size(const string& backfile) override
-	{
-		shared_ptr<FileBuffer> inp = get_file_buffer(backfile, true);
-		if (inp == nullptr)
-		{
-			return 0;
-		}
-		size_t sz = ZSTD_DStreamInSize();
-		shared_ptr<DataBuffer> pb = inp->request_data(0, sz);
-		if (!pb)
-			return 0;
-		size_t decompressed_sz = ZSTD_getFrameContentSize(pb->data(), sz);
+	size_t decompress_size(const std::string& backfile) override;
 
-		return decompressed_sz;
-	}
 	ZstdStream()
 	{
 		m_dctx = ZSTD_createDCtx();

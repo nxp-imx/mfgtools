@@ -31,6 +31,7 @@
 
 #include "compress_streams/bz2_stream.h"
 #include "compress_streams/gz_stream.h"
+#include "compress_streams/zstd_stream.h"
 #include <map>
 #include "buffer.h"
 #include <sys/stat.h>
@@ -46,7 +47,6 @@
 #include "stdio.h"
 #include <limits>
 #include "http.h"
-#include "zstd.h"
 #include "libusb.h"
 #include <chrono>
 
@@ -476,71 +476,6 @@ public:
 	FSGz() { m_ext = ".GZ"; };
 	virtual std::shared_ptr<CommonStream> create_stream() override { return std::make_shared<Gzstream>(); }
 }g_fsgz;
-
-class ZstdStream:public CommonStream
-{
-	ZSTD_DCtx* m_dctx;
-	ZSTD_outBuffer m_output = { 0, 0, 0 };
-	ZSTD_inBuffer m_input = { 0, 0, 0 };
-
-public:
-	virtual int set_input_buff(void* p, size_t sz) override
-	{
-		m_input.src = p;
-		m_input.pos = 0;
-		m_input.size = sz;
-		return 0;
-	};
-	virtual int set_output_buff(void* p, size_t sz) override
-	{
-		m_output.dst = p;
-		m_output.pos = 0;
-		m_output.size = sz;
-		return 0;
-	};
-	virtual size_t get_input_pos() override
-	{
-		return m_input.pos;
-	};
-	virtual size_t get_output_pos() override
-	{
-		return m_output.pos;
-	};
-
-	virtual int decompress() override
-	{
-		return ZSTD_decompressStream(m_dctx, &m_output, &m_input);
-	};
-
-	virtual size_t get_default_input_size() override
-	{
-		return ZSTD_DStreamInSize();
-	}
-
-	size_t decompress_size(const string& backfile) override
-	{
-		shared_ptr<FileBuffer> inp = get_file_buffer(backfile, true);
-		if (inp == nullptr)
-		{
-			return 0;
-		}
-		size_t sz = ZSTD_DStreamInSize();
-		shared_ptr<DataBuffer> pb = inp->request_data(0, sz);
-		if (!pb)
-			return 0;
-		size_t decompressed_sz = ZSTD_getFrameContentSize(pb->data(), sz);
-
-		return decompressed_sz;
-	}
-	ZstdStream()
-	{
-		m_dctx = ZSTD_createDCtx();
-	};
-	virtual ~ZstdStream()
-	{
-		ZSTD_freeDCtx(m_dctx);
-	}
-};
 
 static class FSzstd : public FSCompressStream
 {
