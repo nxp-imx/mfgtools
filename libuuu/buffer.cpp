@@ -30,6 +30,7 @@
 */
 
 #include "compress_streams/bz2_stream.h"
+#include "compress_streams/gz_stream.h"
 #include <map>
 #include "buffer.h"
 #include <sys/stat.h>
@@ -468,50 +469,6 @@ public:
 	virtual std::shared_ptr<FragmentBlock> ScanCompressblock(const string& backfile, size_t& input_offset, size_t& output_offset) override;
 
 }g_fsbz2;
-
-class Gzstream : public CommonStream
-{
-	z_stream m_strm;
-	size_t m_in_size = 0;
-	size_t m_out_size = 0;
-
-public:
-	Gzstream()
-	{
-		memset(&m_strm, 0, sizeof(m_strm));
-		inflateInit2(&m_strm, 15 + 16);
-	}
-	virtual ~Gzstream()
-	{
-		deflateEnd(&m_strm);
-	}
-	virtual int set_input_buff(void* p, size_t sz) override
-	{
-		m_strm.next_in = (Bytef*)p;
-		m_strm.avail_in = m_in_size = sz;
-		return 0;
-	};
-	virtual int set_output_buff(void* p, size_t sz) override
-	{
-		m_strm.next_out = (Bytef*)p;
-		m_strm.avail_out = m_out_size = sz;
-		return 0;
-	};
-	virtual size_t get_input_pos() override
-	{
-		return m_in_size - m_strm.avail_in;
-	};
-	virtual size_t get_output_pos() override
-	{
-		return m_out_size - m_strm.avail_out;
-	};
-	virtual int decompress() override
-	{
-		return inflate(&m_strm, Z_SYNC_FLUSH);
-	};
-
-	virtual size_t get_default_input_size() override { return 0x10000; }
-};
 
 static class FSGz : public FSCompressStream
 {

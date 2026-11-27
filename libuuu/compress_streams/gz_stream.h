@@ -27,6 +27,14 @@
  *
  */
 
+#pragma once
+
+#include "compress_stream.h"
+
+#include <zlib.h>
+
+#include <cstring>
+
 class Gzstream : public CommonStream
 {
 	z_stream m_strm;
@@ -36,7 +44,7 @@ class Gzstream : public CommonStream
 public:
 	Gzstream()
 	{
-		memset(&m_strm, 0, sizeof(m_strm));
+		std::memset(&m_strm, 0, sizeof(m_strm));
 		inflateInit2(&m_strm, 15 + 16);
 	}
 	virtual ~Gzstream()
