@@ -33,7 +33,7 @@
 
 #include <zstd.h>
 
-class ZstdStream:public CommonStream
+class ZstdStream:public CompressStream
 {
 	ZSTD_DCtx*const m_dctx{nullptr};
 	ZSTD_outBuffer m_output = { 0, 0, 0 };

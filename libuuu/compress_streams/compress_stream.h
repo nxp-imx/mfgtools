@@ -31,10 +31,10 @@
 
 #include <string>
 
-class CommonStream
+class CompressStream
 {
 public:
-	virtual ~CommonStream() = default;
+	virtual ~CompressStream() = default;
 
 	virtual int set_input_buff(void* p, size_t sz) = 0;
 	virtual int set_output_buff(void* p, size_t sz) = 0;

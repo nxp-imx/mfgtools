@@ -35,7 +35,7 @@
 
 #include <cstring>
 
-class Gzstream : public CommonStream
+class Gzstream : public CompressStream
 {
 	z_stream m_strm;
 	size_t m_in_size = 0;

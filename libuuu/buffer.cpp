@@ -456,7 +456,7 @@ public:
 	bool exist(const string& backfile, const string& filename) override;
 	int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) override;
 	int Decompress(const string& backfile, shared_ptr<FileBuffer>outp) override;
-	virtual std::shared_ptr<CommonStream> create_stream() { return nullptr; };
+	virtual std::shared_ptr<CompressStream> create_stream() { return nullptr; };
 };
 
 
@@ -465,7 +465,7 @@ static class FSBz2 : public FSCompressStream
 public:
 	FSBz2() { m_ext = ".BZ2"; };
 	virtual bool seekable(const string& backfile) override;
-	virtual std::shared_ptr<CommonStream> create_stream() override { return std::make_shared<Bz2stream>(); }
+	virtual std::shared_ptr<CompressStream> create_stream() override { return std::make_shared<Bz2stream>(); }
 	virtual std::shared_ptr<FragmentBlock> ScanCompressblock(const string& backfile, size_t& input_offset, size_t& output_offset) override;
 
 }g_fsbz2;
@@ -474,14 +474,14 @@ static class FSGz : public FSCompressStream
 {
 public:
 	FSGz() { m_ext = ".GZ"; };
-	virtual std::shared_ptr<CommonStream> create_stream() override { return std::make_shared<Gzstream>(); }
+	virtual std::shared_ptr<CompressStream> create_stream() override { return std::make_shared<Gzstream>(); }
 }g_fsgz;
 
 static class FSzstd : public FSCompressStream
 {
 public:
 	FSzstd() { m_ext = ".ZST"; };
-	virtual std::shared_ptr<CommonStream> create_stream() override { return make_shared<ZstdStream>(); };
+	virtual std::shared_ptr<CompressStream> create_stream() override { return make_shared<ZstdStream>(); };
 }g_FSzstd;
 
 static class FS_DATA
@@ -882,7 +882,7 @@ bool FSBz2::seekable(const string& backfile)
 
 int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>outp)
 {
-	shared_ptr<CommonStream> cs = create_stream();
+	shared_ptr<CompressStream> cs = create_stream();
 	if (!cs)
 		return -1;
 
