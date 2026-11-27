@@ -56,6 +56,7 @@ set(SOURCES
 	hidreport.cpp
 	sparse.cpp
 	bmap.cpp
+	compress_streams/zstd_stream.cpp
 )
 
 if (APPLE)

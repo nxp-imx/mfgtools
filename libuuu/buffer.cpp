@@ -29,6 +29,9 @@
 *
 */
 
+#include "compress_streams/bz2_stream.h"
+#include "compress_streams/gz_stream.h"
+#include "compress_streams/zstd_stream.h"
 #include <map>
 #include "buffer.h"
 #include <sys/stat.h>
@@ -41,11 +44,9 @@
 #include "fat.h"
 #include "tar.h"
 #include <string.h>
-#include "bzlib.h"
 #include "stdio.h"
 #include <limits>
 #include "http.h"
-#include "zstd.h"
 #include "libusb.h"
 #include <chrono>
 
@@ -447,19 +448,6 @@ public:
 }g_fsfat;
 
 
-class CommonStream
-{
-public:
-	virtual int set_input_buff(void* p, size_t sz) = 0;
-	virtual int set_output_buff(void* p, size_t sz) = 0;
-	virtual size_t get_input_pos() = 0;
-	virtual size_t get_output_pos() = 0;
-	virtual int decompress() = 0;
-
-	virtual size_t get_default_input_size() { return 0x1000; }
-	virtual size_t decompress_size(const string& /*backfile*/) { return 0; }
-};
-
 class FSCompressStream : public FSBackFile
 {
 public:
@@ -468,181 +456,32 @@ public:
 	bool exist(const string& backfile, const string& filename) override;
 	int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) override;
 	int Decompress(const string& backfile, shared_ptr<FileBuffer>outp) override;
-	virtual std::shared_ptr<CommonStream> create_stream() { return nullptr; };
+	virtual std::shared_ptr<CompressStream> create_stream() { return nullptr; };
 };
 
-
-class Bz2stream : public CommonStream
-{
-	bz_stream m_strm;
-	size_t m_in_size = 0;
-	size_t m_out_size = 0;
-
-public:
-	Bz2stream() { memset(&m_strm, 0, sizeof(m_strm));  BZ2_bzDecompressInit(&m_strm, 0, 0); }
-	virtual ~Bz2stream()
-	{
-		BZ2_bzDecompressEnd(&m_strm);
-	}
-	virtual int set_input_buff(void* p, size_t sz) override
-	{
-		m_strm.next_in = (char*)p;
-		m_strm.avail_in = m_in_size = sz;
-		return 0;
-	};
-	virtual int set_output_buff(void* p, size_t sz) override
-	{
-		m_strm.next_out = (char*)p;
-		m_strm.avail_out = m_out_size = sz;
-		return 0;
-	};
-	virtual size_t get_input_pos() override
-	{
-		return m_in_size - m_strm.avail_in;
-	};
-	virtual size_t get_output_pos() override
-	{
-		return m_out_size - m_strm.avail_out;
-	};
-	virtual int decompress() override
-	{
-		return BZ2_bzDecompress(&m_strm);
-	};
-
-	virtual size_t get_default_input_size() override { return 0x10000; }
-};
 
 static class FSBz2 : public FSCompressStream
 {
 public:
 	FSBz2() { m_ext = ".BZ2"; };
 	virtual bool seekable(const string& backfile) override;
-	virtual std::shared_ptr<CommonStream> create_stream() override { return std::make_shared<Bz2stream>(); }
+	virtual std::shared_ptr<CompressStream> create_stream() override { return std::make_shared<Bz2stream>(); }
 	virtual std::shared_ptr<FragmentBlock> ScanCompressblock(const string& backfile, size_t& input_offset, size_t& output_offset) override;
 
 }g_fsbz2;
-
-class Gzstream : public CommonStream
-{
-	z_stream m_strm;
-	size_t m_in_size = 0;
-	size_t m_out_size = 0;
-
-public:
-	Gzstream()
-	{
-		memset(&m_strm, 0, sizeof(m_strm));
-		inflateInit2(&m_strm, 15 + 16);
-	}
-	virtual ~Gzstream()
-	{
-		deflateEnd(&m_strm);
-	}
-	virtual int set_input_buff(void* p, size_t sz) override
-	{
-		m_strm.next_in = (Bytef*)p;
-		m_strm.avail_in = m_in_size = sz;
-		return 0;
-	};
-	virtual int set_output_buff(void* p, size_t sz) override
-	{
-		m_strm.next_out = (Bytef*)p;
-		m_strm.avail_out = m_out_size = sz;
-		return 0;
-	};
-	virtual size_t get_input_pos() override
-	{
-		return m_in_size - m_strm.avail_in;
-	};
-	virtual size_t get_output_pos() override
-	{
-		return m_out_size - m_strm.avail_out;
-	};
-	virtual int decompress() override
-	{
-		return inflate(&m_strm, Z_SYNC_FLUSH);
-	};
-
-	virtual size_t get_default_input_size() override { return 0x10000; }
-};
 
 static class FSGz : public FSCompressStream
 {
 public:
 	FSGz() { m_ext = ".GZ"; };
-	virtual std::shared_ptr<CommonStream> create_stream() override { return std::make_shared<Gzstream>(); }
+	virtual std::shared_ptr<CompressStream> create_stream() override { return std::make_shared<Gzstream>(); }
 }g_fsgz;
-
-class ZstdStream:public CommonStream
-{
-	ZSTD_DCtx* m_dctx;
-	ZSTD_outBuffer m_output = { 0, 0, 0 };
-	ZSTD_inBuffer m_input = { 0, 0, 0 };
-
-public:
-	virtual int set_input_buff(void* p, size_t sz) override
-	{
-		m_input.src = p;
-		m_input.pos = 0;
-		m_input.size = sz;
-		return 0;
-	};
-	virtual int set_output_buff(void* p, size_t sz) override
-	{
-		m_output.dst = p;
-		m_output.pos = 0;
-		m_output.size = sz;
-		return 0;
-	};
-	virtual size_t get_input_pos() override
-	{
-		return m_input.pos;
-	};
-	virtual size_t get_output_pos() override
-	{
-		return m_output.pos;
-	};
-
-	virtual int decompress() override
-	{
-		return ZSTD_decompressStream(m_dctx, &m_output, &m_input);
-	};
-
-	virtual size_t get_default_input_size() override
-	{
-		return ZSTD_DStreamInSize();
-	}
-
-	size_t decompress_size(const string& backfile) override
-	{
-		shared_ptr<FileBuffer> inp = get_file_buffer(backfile, true);
-		if (inp == nullptr)
-		{
-			return 0;
-		}
-		size_t sz = ZSTD_DStreamInSize();
-		shared_ptr<DataBuffer> pb = inp->request_data(0, sz);
-		if (!pb)
-			return 0;
-		size_t decompressed_sz = ZSTD_getFrameContentSize(pb->data(), sz);
-
-		return decompressed_sz;
-	}
-	ZstdStream()
-	{
-		m_dctx = ZSTD_createDCtx();
-	};
-	virtual ~ZstdStream()
-	{
-		ZSTD_freeDCtx(m_dctx);
-	}
-};
 
 static class FSzstd : public FSCompressStream
 {
 public:
 	FSzstd() { m_ext = ".ZST"; };
-	virtual std::shared_ptr<CommonStream> create_stream() override { return make_shared<ZstdStream>(); };
+	virtual std::shared_ptr<CompressStream> create_stream() override { return make_shared<ZstdStream>(); };
 }g_FSzstd;
 
 static class FS_DATA
@@ -1043,7 +882,7 @@ bool FSBz2::seekable(const string& backfile)
 
 int FSCompressStream::Decompress(const string& backfile, shared_ptr<FileBuffer>outp)
 {
-	shared_ptr<CommonStream> cs = create_stream();
+	shared_ptr<CompressStream> cs = create_stream();
 	if (!cs)
 		return -1;
 
