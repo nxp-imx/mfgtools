@@ -34,6 +34,8 @@
 class CommonStream
 {
 public:
+	virtual ~CommonStream() = default;
+
 	virtual int set_input_buff(void* p, size_t sz) = 0;
 	virtual int set_output_buff(void* p, size_t sz) = 0;
 	virtual size_t get_input_pos() = 0;

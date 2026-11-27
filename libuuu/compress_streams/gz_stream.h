@@ -47,7 +47,7 @@ public:
 		std::memset(&m_strm, 0, sizeof(m_strm));
 		inflateInit2(&m_strm, 15 + 16);
 	}
-	virtual ~Gzstream()
+	~Gzstream() override
 	{
 		deflateEnd(&m_strm);
 	}

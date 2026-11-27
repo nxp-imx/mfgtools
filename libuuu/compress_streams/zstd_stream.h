@@ -79,7 +79,7 @@ public:
 	{
 		m_dctx = ZSTD_createDCtx();
 	};
-	virtual ~ZstdStream()
+	~ZstdStream() override
 	{
 		ZSTD_freeDCtx(m_dctx);
 	}

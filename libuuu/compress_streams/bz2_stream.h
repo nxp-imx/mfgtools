@@ -43,7 +43,7 @@ class Bz2stream : public CommonStream
 
 public:
 	Bz2stream() { std::memset(&m_strm, 0, sizeof(m_strm));  BZ2_bzDecompressInit(&m_strm, 0, 0); }
-	virtual ~Bz2stream()
+	~Bz2stream() override
 	{
 		BZ2_bzDecompressEnd(&m_strm);
 	}
