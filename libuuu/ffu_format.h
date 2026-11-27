@@ -36,7 +36,7 @@
 
 #include <cstdint>
 
-#define FFU_SECURITY_SIGNATURE "SignedImage "
+inline constexpr const char * FFU_SECURITY_SIGNATURE = "SignedImage ";
 
 #pragma pack(1)
 
@@ -50,7 +50,7 @@ typedef struct _FFU_SECURITY_HEADER
 	uint32_t dwHashTableSize;   // size of hash table
 } FFU_SECURITY_HEADER;
 
-#define FFU_SIGNATURE "ImageFlash  "
+inline constexpr const char * FFU_SIGNATURE = "ImageFlash  ";
 
 typedef struct _IMAGE_HEADER
 {

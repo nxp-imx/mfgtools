@@ -38,12 +38,12 @@ typedef struct sparse_header {
     /* table implementation */
 } sparse_header_t;
 
-#define SPARSE_HEADER_MAGIC	0xed26ff3a
+inline constexpr uint32_t SPARSE_HEADER_MAGIC = 0xed26ff3a;
 
-#define CHUNK_TYPE_RAW		0xCAC1
-#define CHUNK_TYPE_FILL		0xCAC2
-#define CHUNK_TYPE_DONT_CARE	0xCAC3
-#define CHUNK_TYPE_CRC32    0xCAC4
+inline constexpr uint16_t CHUNK_TYPE_RAW = 0xCAC1;
+inline constexpr uint16_t CHUNK_TYPE_FILL = 0xCAC2;
+inline constexpr uint16_t CHUNK_TYPE_DONT_CARE = 0xCAC3;
+inline constexpr uint16_t CHUNK_TYPE_CRC32 = 0xCAC4;
 
 typedef struct chunk_header {
     __le16 chunk_type;          /* 0xCAC1 -> raw; 0xCAC2 -> fill; 0xCAC3 -> don't care */

@@ -36,16 +36,14 @@
 
 using namespace std;
 
-static constexpr auto g_version = GIT_VERSION;
-
 const char *uuu_get_version_string()
 {
-	return g_version;
+	return GIT_VERSION;
 }
 
 int uuu_get_version()
 {
-	string version_str{g_version};
+	string version_str{GIT_VERSION};
 
 	// Find first dot because major version number must be before it
 	auto pos = version_str.find(".");
