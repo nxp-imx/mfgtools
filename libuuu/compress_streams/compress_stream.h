@@ -27,6 +27,10 @@
  *
  */
 
+#pragma once
+
+#include <string>
+
 class CommonStream
 {
 public:
@@ -37,5 +41,5 @@ public:
 	virtual int decompress() = 0;
 
 	virtual size_t get_default_input_size() { return 0x1000; }
-	virtual size_t decompress_size(const string& /*backfile*/) { return 0; }
+	virtual size_t decompress_size(const std::string& /*backfile*/) { return 0; }
 };

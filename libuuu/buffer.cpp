@@ -29,6 +29,7 @@
 *
 */
 
+#include "compress_streams/compress_stream.h"
 #include <map>
 #include "buffer.h"
 #include <sys/stat.h>
@@ -446,19 +447,6 @@ public:
 	int for_each_ls(uuu_ls_file fn, const string &backfile, const string &filename, void *p) override;
 }g_fsfat;
 
-
-class CommonStream
-{
-public:
-	virtual int set_input_buff(void* p, size_t sz) = 0;
-	virtual int set_output_buff(void* p, size_t sz) = 0;
-	virtual size_t get_input_pos() = 0;
-	virtual size_t get_output_pos() = 0;
-	virtual int decompress() = 0;
-
-	virtual size_t get_default_input_size() { return 0x1000; }
-	virtual size_t decompress_size(const string& /*backfile*/) { return 0; }
-};
 
 class FSCompressStream : public FSBackFile
 {
