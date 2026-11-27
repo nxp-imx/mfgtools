@@ -35,7 +35,7 @@
 
 class ZstdStream:public CommonStream
 {
-	ZSTD_DCtx* m_dctx;
+	ZSTD_DCtx*const m_dctx{nullptr};
 	ZSTD_outBuffer m_output = { 0, 0, 0 };
 	ZSTD_inBuffer m_input = { 0, 0, 0 };
 
@@ -75,10 +75,7 @@ public:
 
 	size_t decompress_size(const std::string& backfile) override;
 
-	ZstdStream()
-	{
-		m_dctx = ZSTD_createDCtx();
-	};
+	ZstdStream() : m_dctx{ZSTD_createDCtx()} {};
 	~ZstdStream() override
 	{
 		ZSTD_freeDCtx(m_dctx);
